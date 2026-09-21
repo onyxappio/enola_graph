@@ -1,0 +1,12 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/enola-labs/enola/internal/graphsession
+cpu: Apple M1 Pro
+BenchmarkCheckpointEndProof/payload_copy_decode-10         	      49	  24264017 ns/op	 8662594 B/op	     265 allocs/op
+BenchmarkCheckpointEndProof/payload_copy_decode-10         	      49	  24477511 ns/op	 8662592 B/op	     265 allocs/op
+BenchmarkCheckpointEndProof/payload_copy_decode-10         	      48	  24625966 ns/op	 8662592 B/op	     265 allocs/op
+BenchmarkCheckpointEndProof/retained_metadata-10           	 4355954	       276.7 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCheckpointEndProof/retained_metadata-10           	 4351815	       276.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkCheckpointEndProof/retained_metadata-10           	 4355788	       277.3 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	10.468s

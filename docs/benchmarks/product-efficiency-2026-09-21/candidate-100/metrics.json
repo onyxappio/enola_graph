@@ -1,0 +1,2143 @@
+[
+  {
+    "label": "r1-resident-initial",
+    "start_ns": 1789993620092766000,
+    "seconds": 10.881437875,
+    "driver": {
+      "coverage_catchup": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 1,
+          "TargetGeneration": 1,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4228,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null,
+          "Work": {
+            "PolicyBuilds": 1,
+            "BoundedContextChecks": 0,
+            "FactAssemblies": 1,
+            "CapturedReads": 0,
+            "PublishedEvents": 0,
+            "CheckpointBytes": 0,
+            "InventoryScans": 1,
+            "DetectionScans": 1,
+            "ContextScans": 1,
+            "ConfigScans": 1,
+            "HashedFiles": 5191,
+            "DirtyHashBytes": 0,
+            "VerifiedFiles": 0,
+            "Checkpoints": 0
+          },
+          "Epoch": "fs-1789993620577273000",
+          "Watermark": 10,
+          "Reconciled": true,
+          "FallbackReason": "external config watch registered; reconcile registration gap"
+        }
+      ],
+      "done_ns": 1789993630973892000,
+      "label": "initial",
+      "native_events": 3,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789993620577273000",
+        "From": 0,
+        "Through": 0,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": "benchmark bootstrap"
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "initial": 4128
+          }
+        },
+        "RunID": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main1-1-1789993622462076000",
+        "BaseGeneration": 0,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 4228,
+          "files_parsed": 4128,
+          "cached_files": 0,
+          "graphql_parsed": 2,
+          "sfc_parsed": 17,
+          "summary_scans": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "manifests",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "hcl",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "python",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "swift",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 5491,
+        "ParsedFiles": 4128,
+        "EarlyLocal": 4128,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 1,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 1,
+          "CapturedReads": 59,
+          "PublishedEvents": 5198,
+          "CheckpointBytes": 51198070,
+          "InventoryScans": 1,
+          "DetectionScans": 1,
+          "ContextScans": 1,
+          "ConfigScans": 1,
+          "HashedFiles": 5191,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 4228,
+          "Checkpoints": 1
+        },
+        "Epoch": "fs-1789993620577273000",
+        "Watermark": 0,
+        "Reconciled": true,
+        "FallbackReason": "benchmark bootstrap"
+      },
+      "seconds": 10.869832625,
+      "source": "watch",
+      "started_ns": 1789993620104051000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4128
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main1-1-1789993622462076000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4228,
+        "files_parsed": 4128,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 5491,
+      "ParsedFiles": 4128,
+      "EarlyLocal": 4128,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 1,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 1,
+        "CapturedReads": 59,
+        "PublishedEvents": 5198,
+        "CheckpointBytes": 51198070,
+        "InventoryScans": 1,
+        "DetectionScans": 1,
+        "ContextScans": 1,
+        "ConfigScans": 1,
+        "HashedFiles": 5191,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 4228,
+        "Checkpoints": 1
+      },
+      "Epoch": "fs-1789993620577273000",
+      "Watermark": 0,
+      "Reconciled": true,
+      "FallbackReason": "benchmark bootstrap"
+    },
+    "aggregate_parsed": 4128,
+    "aggregate_work": {
+      "PolicyBuilds": 2,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 2,
+      "CapturedReads": 59,
+      "PublishedEvents": 5198,
+      "CheckpointBytes": 51198070,
+      "InventoryScans": 2,
+      "DetectionScans": 2,
+      "ContextScans": 2,
+      "ConfigScans": 2,
+      "HashedFiles": 10382,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 4228,
+      "Checkpoints": 1
+    },
+    "aggregate_stats": {
+      "files_read": 4228,
+      "files_parsed": 4128,
+      "cached_files": 4228,
+      "graphql_parsed": 2,
+      "sfc_parsed": 17,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [
+      "benchmark bootstrap",
+      "external config watch registered; reconcile registration gap"
+    ],
+    "reconciliation_count": 2,
+    "wire": {
+      "broker_end_ns": 1789993629664765000,
+      "bytes": 148106752,
+      "canonical_sha256": "4ddb820e6ad926db03f9d46c60d863ee7ef6f42ec77b42934ee50176d0bde04c",
+      "consumer_end_ns": 1789993629776765000,
+      "context": "enola-efficiency-v2-measured-resident100-main1",
+      "edges": 171533,
+      "empty_batches": 0,
+      "first_batch_ns": 1789993622736101000,
+      "first_ns": 1789993622722226000,
+      "messages": 5198,
+      "nodes": 69595,
+      "normalized_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+      "owners": 5619,
+      "run_id": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main1-1-1789993622462076000",
+      "total_edges": 171533,
+      "total_nodes": 69595
+    },
+    "first_s": 2.62946,
+    "first_batch_s": 2.643335,
+    "broker_end_s": 9.571999,
+    "consumer_end_s": 9.683999,
+    "graph_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+    "wire_messages": 5198,
+    "lifetime_rss_bytes": 1129578496
+  },
+  {
+    "label": "r1-resident-noop",
+    "start_ns": 1789993630990755000,
+    "seconds": 0.00014604099999893094,
+    "driver": {
+      "coverage_catchup": null,
+      "done_ns": 1789993630990842000,
+      "label": "noop",
+      "native_events": 6,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789993620577273000",
+        "From": 10,
+        "Through": 10,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": ""
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": null
+        },
+        "RunID": "",
+        "BaseGeneration": 1,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 0,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0
+        },
+        "Fallbacks": null,
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 0,
+        "EarlyLocal": 0,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 0,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 0,
+          "CapturedReads": 0,
+          "PublishedEvents": 0,
+          "CheckpointBytes": 0,
+          "InventoryScans": 0,
+          "DetectionScans": 0,
+          "ContextScans": 0,
+          "ConfigScans": 0,
+          "HashedFiles": 0,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 0,
+          "Checkpoints": 0
+        },
+        "Epoch": "fs-1789993620577273000",
+        "Watermark": 10,
+        "Reconciled": false,
+        "FallbackReason": ""
+      },
+      "seconds": 6.792e-06,
+      "source": "watch",
+      "started_ns": 1789993630990835000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": null
+      },
+      "RunID": "",
+      "BaseGeneration": 1,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 0,
+        "files_parsed": 0,
+        "cached_files": 0,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": null,
+      "Unreadable": null,
+      "OwnersPublished": 0,
+      "ParsedFiles": 0,
+      "EarlyLocal": 0,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 0,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 0,
+        "CapturedReads": 0,
+        "PublishedEvents": 0,
+        "CheckpointBytes": 0,
+        "InventoryScans": 0,
+        "DetectionScans": 0,
+        "ContextScans": 0,
+        "ConfigScans": 0,
+        "HashedFiles": 0,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 0,
+        "Checkpoints": 0
+      },
+      "Epoch": "fs-1789993620577273000",
+      "Watermark": 10,
+      "Reconciled": false,
+      "FallbackReason": ""
+    },
+    "aggregate_parsed": 0,
+    "aggregate_work": {
+      "PolicyBuilds": 0,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 0,
+      "CapturedReads": 0,
+      "PublishedEvents": 0,
+      "CheckpointBytes": 0,
+      "InventoryScans": 0,
+      "DetectionScans": 0,
+      "ContextScans": 0,
+      "ConfigScans": 0,
+      "HashedFiles": 0,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 0,
+      "Checkpoints": 0
+    },
+    "aggregate_stats": {
+      "files_read": 0,
+      "files_parsed": 0,
+      "cached_files": 0,
+      "graphql_parsed": 0,
+      "sfc_parsed": 0,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [],
+    "reconciliation_count": 0,
+    "graph_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+    "wire_messages": 0
+  },
+  {
+    "label": "r1-resident-multifile",
+    "start_ns": 1789993631142213000,
+    "seconds": 5.002255041999998,
+    "driver": {
+      "coverage_catchup": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4244,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null,
+          "Work": {
+            "PolicyBuilds": 1,
+            "BoundedContextChecks": 0,
+            "FactAssemblies": 1,
+            "CapturedReads": 0,
+            "PublishedEvents": 0,
+            "CheckpointBytes": 0,
+            "InventoryScans": 1,
+            "DetectionScans": 1,
+            "ContextScans": 1,
+            "ConfigScans": 1,
+            "HashedFiles": 5209,
+            "DirtyHashBytes": 0,
+            "VerifiedFiles": 0,
+            "Checkpoints": 0
+          },
+          "Epoch": "fs-1789993620577273000",
+          "Watermark": 207,
+          "Reconciled": true,
+          "FallbackReason": "graph policy watch coverage refreshed"
+        }
+      ],
+      "done_ns": 1789993636144000000,
+      "label": "history",
+      "native_events": 413,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789993620577273000",
+        "From": 10,
+        "Through": 202,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": "filesystem name change requires reconciliation"
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": true,
+          "PolicyReconciled": true,
+          "AddedSources": 16,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "added source": 16,
+            "resolution": 364,
+            "source content": 34
+          }
+        },
+        "RunID": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main1-2-1789993632184472000",
+        "BaseGeneration": 1,
+        "TargetGeneration": 2,
+        "Stats": {
+          "files_read": 414,
+          "files_parsed": 414,
+          "cached_files": 4146,
+          "graphql_parsed": 1,
+          "sfc_parsed": 0,
+          "summary_scans": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "manifests",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 1474,
+        "ParsedFiles": 414,
+        "EarlyLocal": 414,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 1,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 1,
+          "CapturedReads": 473,
+          "PublishedEvents": 1170,
+          "CheckpointBytes": 51317045,
+          "InventoryScans": 1,
+          "DetectionScans": 1,
+          "ContextScans": 1,
+          "ConfigScans": 1,
+          "HashedFiles": 5210,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 4244,
+          "Checkpoints": 1
+        },
+        "Epoch": "fs-1789993620577273000",
+        "Watermark": 202,
+        "Reconciled": true,
+        "FallbackReason": "filesystem name change requires reconciliation"
+      },
+      "seconds": 5.0016355,
+      "source": "watch",
+      "started_ns": 1789993631142361000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": true,
+        "PolicyReconciled": true,
+        "AddedSources": 16,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "added source": 16,
+          "resolution": 364,
+          "source content": 34
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main1-2-1789993632184472000",
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "Stats": {
+        "files_read": 414,
+        "files_parsed": 414,
+        "cached_files": 4146,
+        "graphql_parsed": 1,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 1474,
+      "ParsedFiles": 414,
+      "EarlyLocal": 414,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 1,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 1,
+        "CapturedReads": 473,
+        "PublishedEvents": 1170,
+        "CheckpointBytes": 51317045,
+        "InventoryScans": 1,
+        "DetectionScans": 1,
+        "ContextScans": 1,
+        "ConfigScans": 1,
+        "HashedFiles": 5210,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 4244,
+        "Checkpoints": 1
+      },
+      "Epoch": "fs-1789993620577273000",
+      "Watermark": 202,
+      "Reconciled": true,
+      "FallbackReason": "filesystem name change requires reconciliation"
+    },
+    "aggregate_parsed": 414,
+    "aggregate_work": {
+      "PolicyBuilds": 2,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 2,
+      "CapturedReads": 473,
+      "PublishedEvents": 1170,
+      "CheckpointBytes": 51317045,
+      "InventoryScans": 2,
+      "DetectionScans": 2,
+      "ContextScans": 2,
+      "ConfigScans": 2,
+      "HashedFiles": 10419,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 4244,
+      "Checkpoints": 1
+    },
+    "aggregate_stats": {
+      "files_read": 414,
+      "files_parsed": 414,
+      "cached_files": 8390,
+      "graphql_parsed": 1,
+      "sfc_parsed": 0,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [
+      "filesystem name change requires reconciliation",
+      "graph policy watch coverage refreshed"
+    ],
+    "reconciliation_count": 2,
+    "wire": {
+      "broker_end_ns": 1789993634799046000,
+      "bytes": 32263026,
+      "canonical_sha256": "1cea5c69843724f6361358f8b70ecee9be6afa0d9fef79a98f71a45858621dce",
+      "consumer_end_ns": 1789993634823629000,
+      "context": "enola-efficiency-v2-measured-resident100-main1",
+      "edges": 45301,
+      "empty_batches": 0,
+      "first_batch_ns": 1789993632640713000,
+      "first_ns": 1789993632535119000,
+      "messages": 1170,
+      "nodes": 19756,
+      "normalized_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+      "owners": 1486,
+      "run_id": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main1-2-1789993632184472000",
+      "total_edges": 171954,
+      "total_nodes": 69754
+    },
+    "first_s": 1.392906,
+    "first_batch_s": 1.4985,
+    "broker_end_s": 3.656833,
+    "consumer_end_s": 3.681416,
+    "graph_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+    "wire_messages": 1170,
+    "checkout_seconds": 0.13620095899999995,
+    "checkout_through_apply_seconds": 5.1632603339999985
+  },
+  {
+    "label": "r2-resident-initial",
+    "start_ns": 1789993636340429000,
+    "seconds": 10.408499708,
+    "driver": {
+      "coverage_catchup": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 1,
+          "TargetGeneration": 1,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4228,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null,
+          "Work": {
+            "PolicyBuilds": 1,
+            "BoundedContextChecks": 0,
+            "FactAssemblies": 1,
+            "CapturedReads": 0,
+            "PublishedEvents": 0,
+            "CheckpointBytes": 0,
+            "InventoryScans": 1,
+            "DetectionScans": 1,
+            "ContextScans": 1,
+            "ConfigScans": 1,
+            "HashedFiles": 5191,
+            "DirtyHashBytes": 0,
+            "VerifiedFiles": 0,
+            "Checkpoints": 0
+          },
+          "Epoch": "fs-1789993636757204000",
+          "Watermark": 10,
+          "Reconciled": true,
+          "FallbackReason": "external config watch registered; reconcile registration gap"
+        }
+      ],
+      "done_ns": 1789993646746180000,
+      "label": "initial",
+      "native_events": 3,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789993636757204000",
+        "From": 0,
+        "Through": 0,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": "benchmark bootstrap"
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "initial": 4128
+          }
+        },
+        "RunID": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main2-1-1789993638233286000",
+        "BaseGeneration": 0,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 4228,
+          "files_parsed": 4128,
+          "cached_files": 0,
+          "graphql_parsed": 2,
+          "sfc_parsed": 17,
+          "summary_scans": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "manifests",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "hcl",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "python",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "swift",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 5491,
+        "ParsedFiles": 4128,
+        "EarlyLocal": 4128,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 1,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 1,
+          "CapturedReads": 59,
+          "PublishedEvents": 5198,
+          "CheckpointBytes": 51198070,
+          "InventoryScans": 1,
+          "DetectionScans": 1,
+          "ContextScans": 1,
+          "ConfigScans": 1,
+          "HashedFiles": 5191,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 4228,
+          "Checkpoints": 1
+        },
+        "Epoch": "fs-1789993636757204000",
+        "Watermark": 0,
+        "Reconciled": true,
+        "FallbackReason": "benchmark bootstrap"
+      },
+      "seconds": 10.39236925,
+      "source": "watch",
+      "started_ns": 1789993636353802000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4128
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main2-1-1789993638233286000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4228,
+        "files_parsed": 4128,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 5491,
+      "ParsedFiles": 4128,
+      "EarlyLocal": 4128,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 1,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 1,
+        "CapturedReads": 59,
+        "PublishedEvents": 5198,
+        "CheckpointBytes": 51198070,
+        "InventoryScans": 1,
+        "DetectionScans": 1,
+        "ContextScans": 1,
+        "ConfigScans": 1,
+        "HashedFiles": 5191,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 4228,
+        "Checkpoints": 1
+      },
+      "Epoch": "fs-1789993636757204000",
+      "Watermark": 0,
+      "Reconciled": true,
+      "FallbackReason": "benchmark bootstrap"
+    },
+    "aggregate_parsed": 4128,
+    "aggregate_work": {
+      "PolicyBuilds": 2,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 2,
+      "CapturedReads": 59,
+      "PublishedEvents": 5198,
+      "CheckpointBytes": 51198070,
+      "InventoryScans": 2,
+      "DetectionScans": 2,
+      "ContextScans": 2,
+      "ConfigScans": 2,
+      "HashedFiles": 10382,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 4228,
+      "Checkpoints": 1
+    },
+    "aggregate_stats": {
+      "files_read": 4228,
+      "files_parsed": 4128,
+      "cached_files": 4228,
+      "graphql_parsed": 2,
+      "sfc_parsed": 17,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [
+      "benchmark bootstrap",
+      "external config watch registered; reconcile registration gap"
+    ],
+    "reconciliation_count": 2,
+    "wire": {
+      "broker_end_ns": 1789993645397279000,
+      "bytes": 148106672,
+      "canonical_sha256": "4ddb820e6ad926db03f9d46c60d863ee7ef6f42ec77b42934ee50176d0bde04c",
+      "consumer_end_ns": 1789993645512721000,
+      "context": "enola-efficiency-v2-measured-resident100-main2",
+      "edges": 171533,
+      "empty_batches": 0,
+      "first_batch_ns": 1789993638506991000,
+      "first_ns": 1789993638491824000,
+      "messages": 5198,
+      "nodes": 69595,
+      "normalized_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+      "owners": 5619,
+      "run_id": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main2-1-1789993638233286000",
+      "total_edges": 171533,
+      "total_nodes": 69595
+    },
+    "first_s": 2.151395,
+    "first_batch_s": 2.166562,
+    "broker_end_s": 9.05685,
+    "consumer_end_s": 9.172292,
+    "graph_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+    "wire_messages": 5198,
+    "lifetime_rss_bytes": 998195200
+  },
+  {
+    "label": "r2-resident-noop",
+    "start_ns": 1789993646766637000,
+    "seconds": 0.00016470799999979135,
+    "driver": {
+      "coverage_catchup": null,
+      "done_ns": 1789993646766731000,
+      "label": "noop",
+      "native_events": 8,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789993636757204000",
+        "From": 10,
+        "Through": 10,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": ""
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": null
+        },
+        "RunID": "",
+        "BaseGeneration": 1,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 0,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0
+        },
+        "Fallbacks": null,
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 0,
+        "EarlyLocal": 0,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 0,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 0,
+          "CapturedReads": 0,
+          "PublishedEvents": 0,
+          "CheckpointBytes": 0,
+          "InventoryScans": 0,
+          "DetectionScans": 0,
+          "ContextScans": 0,
+          "ConfigScans": 0,
+          "HashedFiles": 0,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 0,
+          "Checkpoints": 0
+        },
+        "Epoch": "fs-1789993636757204000",
+        "Watermark": 10,
+        "Reconciled": false,
+        "FallbackReason": ""
+      },
+      "seconds": 5.208e-06,
+      "source": "watch",
+      "started_ns": 1789993646766726000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": null
+      },
+      "RunID": "",
+      "BaseGeneration": 1,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 0,
+        "files_parsed": 0,
+        "cached_files": 0,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": null,
+      "Unreadable": null,
+      "OwnersPublished": 0,
+      "ParsedFiles": 0,
+      "EarlyLocal": 0,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 0,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 0,
+        "CapturedReads": 0,
+        "PublishedEvents": 0,
+        "CheckpointBytes": 0,
+        "InventoryScans": 0,
+        "DetectionScans": 0,
+        "ContextScans": 0,
+        "ConfigScans": 0,
+        "HashedFiles": 0,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 0,
+        "Checkpoints": 0
+      },
+      "Epoch": "fs-1789993636757204000",
+      "Watermark": 10,
+      "Reconciled": false,
+      "FallbackReason": ""
+    },
+    "aggregate_parsed": 0,
+    "aggregate_work": {
+      "PolicyBuilds": 0,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 0,
+      "CapturedReads": 0,
+      "PublishedEvents": 0,
+      "CheckpointBytes": 0,
+      "InventoryScans": 0,
+      "DetectionScans": 0,
+      "ContextScans": 0,
+      "ConfigScans": 0,
+      "HashedFiles": 0,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 0,
+      "Checkpoints": 0
+    },
+    "aggregate_stats": {
+      "files_read": 0,
+      "files_parsed": 0,
+      "cached_files": 0,
+      "graphql_parsed": 0,
+      "sfc_parsed": 0,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [],
+    "reconciliation_count": 0,
+    "graph_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+    "wire_messages": 0
+  },
+  {
+    "label": "r2-resident-multifile",
+    "start_ns": 1789993646916138000,
+    "seconds": 5.010492457999998,
+    "driver": {
+      "coverage_catchup": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4244,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null,
+          "Work": {
+            "PolicyBuilds": 1,
+            "BoundedContextChecks": 0,
+            "FactAssemblies": 1,
+            "CapturedReads": 0,
+            "PublishedEvents": 0,
+            "CheckpointBytes": 0,
+            "InventoryScans": 1,
+            "DetectionScans": 1,
+            "ContextScans": 1,
+            "ConfigScans": 1,
+            "HashedFiles": 5209,
+            "DirtyHashBytes": 0,
+            "VerifiedFiles": 0,
+            "Checkpoints": 0
+          },
+          "Epoch": "fs-1789993636757204000",
+          "Watermark": 214,
+          "Reconciled": true,
+          "FallbackReason": "graph policy watch coverage refreshed"
+        }
+      ],
+      "done_ns": 1789993651926440000,
+      "label": "history",
+      "native_events": 414,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789993636757204000",
+        "From": 10,
+        "Through": 209,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": "filesystem name change requires reconciliation"
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": true,
+          "PolicyReconciled": true,
+          "AddedSources": 16,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "added source": 16,
+            "resolution": 364,
+            "source content": 34
+          }
+        },
+        "RunID": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main2-2-1789993647966274000",
+        "BaseGeneration": 1,
+        "TargetGeneration": 2,
+        "Stats": {
+          "files_read": 414,
+          "files_parsed": 414,
+          "cached_files": 4146,
+          "graphql_parsed": 1,
+          "sfc_parsed": 0,
+          "summary_scans": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "manifests",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 1474,
+        "ParsedFiles": 414,
+        "EarlyLocal": 414,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 1,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 1,
+          "CapturedReads": 473,
+          "PublishedEvents": 1170,
+          "CheckpointBytes": 51317045,
+          "InventoryScans": 1,
+          "DetectionScans": 1,
+          "ContextScans": 1,
+          "ConfigScans": 1,
+          "HashedFiles": 5210,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 4244,
+          "Checkpoints": 1
+        },
+        "Epoch": "fs-1789993636757204000",
+        "Watermark": 209,
+        "Reconciled": true,
+        "FallbackReason": "filesystem name change requires reconciliation"
+      },
+      "seconds": 5.010134583,
+      "source": "watch",
+      "started_ns": 1789993646916302000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": true,
+        "PolicyReconciled": true,
+        "AddedSources": 16,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "added source": 16,
+          "resolution": 364,
+          "source content": 34
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main2-2-1789993647966274000",
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "Stats": {
+        "files_read": 414,
+        "files_parsed": 414,
+        "cached_files": 4146,
+        "graphql_parsed": 1,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 1474,
+      "ParsedFiles": 414,
+      "EarlyLocal": 414,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 1,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 1,
+        "CapturedReads": 473,
+        "PublishedEvents": 1170,
+        "CheckpointBytes": 51317045,
+        "InventoryScans": 1,
+        "DetectionScans": 1,
+        "ContextScans": 1,
+        "ConfigScans": 1,
+        "HashedFiles": 5210,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 4244,
+        "Checkpoints": 1
+      },
+      "Epoch": "fs-1789993636757204000",
+      "Watermark": 209,
+      "Reconciled": true,
+      "FallbackReason": "filesystem name change requires reconciliation"
+    },
+    "aggregate_parsed": 414,
+    "aggregate_work": {
+      "PolicyBuilds": 2,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 2,
+      "CapturedReads": 473,
+      "PublishedEvents": 1170,
+      "CheckpointBytes": 51317045,
+      "InventoryScans": 2,
+      "DetectionScans": 2,
+      "ContextScans": 2,
+      "ConfigScans": 2,
+      "HashedFiles": 10419,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 4244,
+      "Checkpoints": 1
+    },
+    "aggregate_stats": {
+      "files_read": 414,
+      "files_parsed": 414,
+      "cached_files": 8390,
+      "graphql_parsed": 1,
+      "sfc_parsed": 0,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [
+      "filesystem name change requires reconciliation",
+      "graph policy watch coverage refreshed"
+    ],
+    "reconciliation_count": 2,
+    "wire": {
+      "broker_end_ns": 1789993650559016000,
+      "bytes": 32263096,
+      "canonical_sha256": "1cea5c69843724f6361358f8b70ecee9be6afa0d9fef79a98f71a45858621dce",
+      "consumer_end_ns": 1789993650584331000,
+      "context": "enola-efficiency-v2-measured-resident100-main2",
+      "edges": 45301,
+      "empty_batches": 0,
+      "first_batch_ns": 1789993648422750000,
+      "first_ns": 1789993648305688000,
+      "messages": 1170,
+      "nodes": 19756,
+      "normalized_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+      "owners": 1486,
+      "run_id": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main2-2-1789993647966274000",
+      "total_edges": 171954,
+      "total_nodes": 69754
+    },
+    "first_s": 1.38955,
+    "first_batch_s": 1.506612,
+    "broker_end_s": 3.642878,
+    "consumer_end_s": 3.668193,
+    "graph_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+    "wire_messages": 1170,
+    "checkout_seconds": 0.13326966700000042,
+    "checkout_through_apply_seconds": 5.162607625000003
+  },
+  {
+    "label": "r3-resident-initial",
+    "start_ns": 1789993652117123000,
+    "seconds": 10.467971708,
+    "driver": {
+      "coverage_catchup": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 1,
+          "TargetGeneration": 1,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4228,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null,
+          "Work": {
+            "PolicyBuilds": 1,
+            "BoundedContextChecks": 0,
+            "FactAssemblies": 1,
+            "CapturedReads": 0,
+            "PublishedEvents": 0,
+            "CheckpointBytes": 0,
+            "InventoryScans": 1,
+            "DetectionScans": 1,
+            "ContextScans": 1,
+            "ConfigScans": 1,
+            "HashedFiles": 5191,
+            "DirtyHashBytes": 0,
+            "VerifiedFiles": 0,
+            "Checkpoints": 0
+          },
+          "Epoch": "fs-1789993652529244000",
+          "Watermark": 10,
+          "Reconciled": true,
+          "FallbackReason": "external config watch registered; reconcile registration gap"
+        }
+      ],
+      "done_ns": 1789993662583830000,
+      "label": "initial",
+      "native_events": 4,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789993652529244000",
+        "From": 0,
+        "Through": 0,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": "benchmark bootstrap"
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "initial": 4128
+          }
+        },
+        "RunID": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main3-1-1789993653992324000",
+        "BaseGeneration": 0,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 4228,
+          "files_parsed": 4128,
+          "cached_files": 0,
+          "graphql_parsed": 2,
+          "sfc_parsed": 17,
+          "summary_scans": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "manifests",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "hcl",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "python",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "swift",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 5491,
+        "ParsedFiles": 4128,
+        "EarlyLocal": 4128,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 1,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 1,
+          "CapturedReads": 59,
+          "PublishedEvents": 5198,
+          "CheckpointBytes": 51198070,
+          "InventoryScans": 1,
+          "DetectionScans": 1,
+          "ContextScans": 1,
+          "ConfigScans": 1,
+          "HashedFiles": 5191,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 4228,
+          "Checkpoints": 1
+        },
+        "Epoch": "fs-1789993652529244000",
+        "Watermark": 0,
+        "Reconciled": true,
+        "FallbackReason": "benchmark bootstrap"
+      },
+      "seconds": 10.452475166,
+      "source": "watch",
+      "started_ns": 1789993652131347000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4128
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main3-1-1789993653992324000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4228,
+        "files_parsed": 4128,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 5491,
+      "ParsedFiles": 4128,
+      "EarlyLocal": 4128,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 1,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 1,
+        "CapturedReads": 59,
+        "PublishedEvents": 5198,
+        "CheckpointBytes": 51198070,
+        "InventoryScans": 1,
+        "DetectionScans": 1,
+        "ContextScans": 1,
+        "ConfigScans": 1,
+        "HashedFiles": 5191,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 4228,
+        "Checkpoints": 1
+      },
+      "Epoch": "fs-1789993652529244000",
+      "Watermark": 0,
+      "Reconciled": true,
+      "FallbackReason": "benchmark bootstrap"
+    },
+    "aggregate_parsed": 4128,
+    "aggregate_work": {
+      "PolicyBuilds": 2,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 2,
+      "CapturedReads": 59,
+      "PublishedEvents": 5198,
+      "CheckpointBytes": 51198070,
+      "InventoryScans": 2,
+      "DetectionScans": 2,
+      "ContextScans": 2,
+      "ConfigScans": 2,
+      "HashedFiles": 10382,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 4228,
+      "Checkpoints": 1
+    },
+    "aggregate_stats": {
+      "files_read": 4228,
+      "files_parsed": 4128,
+      "cached_files": 4228,
+      "graphql_parsed": 2,
+      "sfc_parsed": 17,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [
+      "benchmark bootstrap",
+      "external config watch registered; reconcile registration gap"
+    ],
+    "reconciliation_count": 2,
+    "wire": {
+      "broker_end_ns": 1789993661266276000,
+      "bytes": 148106842,
+      "canonical_sha256": "4ddb820e6ad926db03f9d46c60d863ee7ef6f42ec77b42934ee50176d0bde04c",
+      "consumer_end_ns": 1789993661370880000,
+      "context": "enola-efficiency-v2-measured-resident100-main3",
+      "edges": 171533,
+      "empty_batches": 0,
+      "first_batch_ns": 1789993654272760000,
+      "first_ns": 1789993654252368000,
+      "messages": 5198,
+      "nodes": 69595,
+      "normalized_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+      "owners": 5619,
+      "run_id": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main3-1-1789993653992324000",
+      "total_edges": 171533,
+      "total_nodes": 69595
+    },
+    "first_s": 2.135245,
+    "first_batch_s": 2.155637,
+    "broker_end_s": 9.149153,
+    "consumer_end_s": 9.253757,
+    "graph_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+    "wire_messages": 5198,
+    "lifetime_rss_bytes": 1078263808
+  },
+  {
+    "label": "r3-resident-noop",
+    "start_ns": 1789993662604851000,
+    "seconds": 0.00014079099999975142,
+    "driver": {
+      "coverage_catchup": null,
+      "done_ns": 1789993662604930000,
+      "label": "noop",
+      "native_events": 9,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789993652529244000",
+        "From": 10,
+        "Through": 10,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": ""
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": null
+        },
+        "RunID": "",
+        "BaseGeneration": 1,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 0,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0
+        },
+        "Fallbacks": null,
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 0,
+        "EarlyLocal": 0,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 0,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 0,
+          "CapturedReads": 0,
+          "PublishedEvents": 0,
+          "CheckpointBytes": 0,
+          "InventoryScans": 0,
+          "DetectionScans": 0,
+          "ContextScans": 0,
+          "ConfigScans": 0,
+          "HashedFiles": 0,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 0,
+          "Checkpoints": 0
+        },
+        "Epoch": "fs-1789993652529244000",
+        "Watermark": 10,
+        "Reconciled": false,
+        "FallbackReason": ""
+      },
+      "seconds": 3.375e-06,
+      "source": "watch",
+      "started_ns": 1789993662604927000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": null
+      },
+      "RunID": "",
+      "BaseGeneration": 1,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 0,
+        "files_parsed": 0,
+        "cached_files": 0,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": null,
+      "Unreadable": null,
+      "OwnersPublished": 0,
+      "ParsedFiles": 0,
+      "EarlyLocal": 0,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 0,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 0,
+        "CapturedReads": 0,
+        "PublishedEvents": 0,
+        "CheckpointBytes": 0,
+        "InventoryScans": 0,
+        "DetectionScans": 0,
+        "ContextScans": 0,
+        "ConfigScans": 0,
+        "HashedFiles": 0,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 0,
+        "Checkpoints": 0
+      },
+      "Epoch": "fs-1789993652529244000",
+      "Watermark": 10,
+      "Reconciled": false,
+      "FallbackReason": ""
+    },
+    "aggregate_parsed": 0,
+    "aggregate_work": {
+      "PolicyBuilds": 0,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 0,
+      "CapturedReads": 0,
+      "PublishedEvents": 0,
+      "CheckpointBytes": 0,
+      "InventoryScans": 0,
+      "DetectionScans": 0,
+      "ContextScans": 0,
+      "ConfigScans": 0,
+      "HashedFiles": 0,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 0,
+      "Checkpoints": 0
+    },
+    "aggregate_stats": {
+      "files_read": 0,
+      "files_parsed": 0,
+      "cached_files": 0,
+      "graphql_parsed": 0,
+      "sfc_parsed": 0,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [],
+    "reconciliation_count": 0,
+    "graph_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+    "wire_messages": 0
+  },
+  {
+    "label": "r3-resident-multifile",
+    "start_ns": 1789993662761870000,
+    "seconds": 4.861570709000006,
+    "driver": {
+      "coverage_catchup": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4244,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null,
+          "Work": {
+            "PolicyBuilds": 1,
+            "BoundedContextChecks": 0,
+            "FactAssemblies": 1,
+            "CapturedReads": 0,
+            "PublishedEvents": 0,
+            "CheckpointBytes": 0,
+            "InventoryScans": 1,
+            "DetectionScans": 1,
+            "ContextScans": 1,
+            "ConfigScans": 1,
+            "HashedFiles": 5209,
+            "DirtyHashBytes": 0,
+            "VerifiedFiles": 0,
+            "Checkpoints": 0
+          },
+          "Epoch": "fs-1789993652529244000",
+          "Watermark": 214,
+          "Reconciled": true,
+          "FallbackReason": "graph policy watch coverage refreshed"
+        }
+      ],
+      "done_ns": 1789993667623285000,
+      "label": "history",
+      "native_events": 419,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789993652529244000",
+        "From": 10,
+        "Through": 209,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": "filesystem name change requires reconciliation"
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": true,
+          "PolicyReconciled": true,
+          "AddedSources": 16,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "added source": 16,
+            "resolution": 364,
+            "source content": 34
+          }
+        },
+        "RunID": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main3-2-1789993663787831000",
+        "BaseGeneration": 1,
+        "TargetGeneration": 2,
+        "Stats": {
+          "files_read": 414,
+          "files_parsed": 414,
+          "cached_files": 4146,
+          "graphql_parsed": 1,
+          "sfc_parsed": 0,
+          "summary_scans": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "manifests",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 1474,
+        "ParsedFiles": 414,
+        "EarlyLocal": 414,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 1,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 1,
+          "CapturedReads": 473,
+          "PublishedEvents": 1170,
+          "CheckpointBytes": 51317045,
+          "InventoryScans": 1,
+          "DetectionScans": 1,
+          "ContextScans": 1,
+          "ConfigScans": 1,
+          "HashedFiles": 5210,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 4244,
+          "Checkpoints": 1
+        },
+        "Epoch": "fs-1789993652529244000",
+        "Watermark": 209,
+        "Reconciled": true,
+        "FallbackReason": "filesystem name change requires reconciliation"
+      },
+      "seconds": 4.861237833,
+      "source": "watch",
+      "started_ns": 1789993662762043000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": true,
+        "PolicyReconciled": true,
+        "AddedSources": 16,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "added source": 16,
+          "resolution": 364,
+          "source content": 34
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main3-2-1789993663787831000",
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "Stats": {
+        "files_read": 414,
+        "files_parsed": 414,
+        "cached_files": 4146,
+        "graphql_parsed": 1,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 1474,
+      "ParsedFiles": 414,
+      "EarlyLocal": 414,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 1,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 1,
+        "CapturedReads": 473,
+        "PublishedEvents": 1170,
+        "CheckpointBytes": 51317045,
+        "InventoryScans": 1,
+        "DetectionScans": 1,
+        "ContextScans": 1,
+        "ConfigScans": 1,
+        "HashedFiles": 5210,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 4244,
+        "Checkpoints": 1
+      },
+      "Epoch": "fs-1789993652529244000",
+      "Watermark": 209,
+      "Reconciled": true,
+      "FallbackReason": "filesystem name change requires reconciliation"
+    },
+    "aggregate_parsed": 414,
+    "aggregate_work": {
+      "PolicyBuilds": 2,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 2,
+      "CapturedReads": 473,
+      "PublishedEvents": 1170,
+      "CheckpointBytes": 51317045,
+      "InventoryScans": 2,
+      "DetectionScans": 2,
+      "ContextScans": 2,
+      "ConfigScans": 2,
+      "HashedFiles": 10419,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 4244,
+      "Checkpoints": 1
+    },
+    "aggregate_stats": {
+      "files_read": 414,
+      "files_parsed": 414,
+      "cached_files": 8390,
+      "graphql_parsed": 1,
+      "sfc_parsed": 0,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [
+      "filesystem name change requires reconciliation",
+      "graph policy watch coverage refreshed"
+    ],
+    "reconciliation_count": 2,
+    "wire": {
+      "broker_end_ns": 1789993666278966000,
+      "bytes": 32263026,
+      "canonical_sha256": "1cea5c69843724f6361358f8b70ecee9be6afa0d9fef79a98f71a45858621dce",
+      "consumer_end_ns": 1789993666304158000,
+      "context": "enola-efficiency-v2-measured-resident100-main3",
+      "edges": 45301,
+      "empty_batches": 0,
+      "first_batch_ns": 1789993664235912000,
+      "first_ns": 1789993664130932000,
+      "messages": 1170,
+      "nodes": 19756,
+      "normalized_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+      "owners": 1486,
+      "run_id": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-main3-2-1789993663787831000",
+      "total_edges": 171954,
+      "total_nodes": 69754
+    },
+    "first_s": 1.369062,
+    "first_batch_s": 1.474042,
+    "broker_end_s": 3.517096,
+    "consumer_end_s": 3.542288,
+    "graph_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+    "wire_messages": 1170,
+    "checkout_seconds": 0.1409700419999993,
+    "checkout_through_apply_seconds": 5.020297833000001
+  },
+  {
+    "state_peak_sampled_bytes": 85050680,
+    "spool_peak_sampled_bytes": 38379531,
+    "state_final_bytes": 51317649,
+    "label": "cold-target",
+    "start_ns": 1789993667681198000,
+    "seconds": 8.825635208999998,
+    "exit": 0,
+    "process_real_s": 8.82,
+    "rss_bytes": 1004355584.0,
+    "user_s": 21.28,
+    "sys_s": 2.11,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4144
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-cold-target-1-1789993669135935000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4244,
+        "files_parsed": 4144,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 5510,
+      "ParsedFiles": 4144,
+      "EarlyLocal": 4144
+    },
+    "fallbacks": [
+      "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "broker_end_ns": 1789993676384865000,
+      "bytes": 148482010,
+      "canonical_sha256": "1cea5c69843724f6361358f8b70ecee9be6afa0d9fef79a98f71a45858621dce",
+      "consumer_end_ns": 1789993676503202000,
+      "context": "enola-efficiency-v2-measured-resident100-cold-target",
+      "edges": 171954,
+      "empty_batches": 0,
+      "first_batch_ns": 1789993669396649000,
+      "first_ns": 1789993669384363000,
+      "messages": 5211,
+      "nodes": 69754,
+      "normalized_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+      "owners": 5638,
+      "run_id": "/tmp/enola-product-history-source-enola-efficiency-v2-measured-resident100-cold-target-1-1789993669135935000",
+      "total_edges": 171954,
+      "total_nodes": 69754
+    },
+    "first_s": 1.703165,
+    "first_batch_s": 1.715451,
+    "broker_end_s": 8.703667,
+    "consumer_end_s": 8.822004,
+    "graph_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835"
+  }
+]

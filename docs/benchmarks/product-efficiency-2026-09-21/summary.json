@@ -1,0 +1,308 @@
+{
+  "before": {
+    "groups": {
+      "resident-initial": {
+        "seconds": {
+          "median": 10.698722709000002,
+          "min": 10.545317082999997,
+          "max": 10.784661625,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 2.20855,
+          "min": 2.194856,
+          "max": 2.220915,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 9.236066,
+          "min": 9.0973,
+          "max": 9.311004,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 9.349524,
+          "min": 9.211079,
+          "max": 9.429858,
+          "n": 3
+        }
+      },
+      "resident-body": {
+        "seconds": {
+          "median": 0.7383767500000005,
+          "min": 0.7300547919999971,
+          "max": 0.7384873750000001,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 0.160687,
+          "min": 0.158176,
+          "max": 0.162623,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 0.645307,
+          "min": 0.639989,
+          "max": 0.645448,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 0.647234,
+          "min": 0.641924,
+          "max": 0.647477,
+          "n": 3
+        }
+      },
+      "resident-structural": {
+        "seconds": {
+          "median": 0.8099757910000012,
+          "min": 0.7828286250000005,
+          "max": 0.8146916250000018,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 0.158085,
+          "min": 0.151268,
+          "max": 0.165912,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 0.723903,
+          "min": 0.698857,
+          "max": 0.728614,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 0.72582,
+          "min": 0.70079,
+          "max": 0.730494,
+          "n": 3
+        }
+      }
+    },
+    "checks_passed": 66
+  },
+  "end-proof-only": {
+    "groups": {
+      "resident-initial": {
+        "seconds": {
+          "median": 10.510827041000002,
+          "min": 10.462274208000004,
+          "max": 11.280046416000001,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 2.183638,
+          "min": 2.179804,
+          "max": 2.9642,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 9.18541,
+          "min": 9.129111,
+          "max": 9.949995,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 9.293768,
+          "min": 9.243158,
+          "max": 10.062214,
+          "n": 3
+        }
+      },
+      "resident-body": {
+        "seconds": {
+          "median": 0.7379840839999972,
+          "min": 0.7329059579999999,
+          "max": 0.7484135409999979,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 0.165201,
+          "min": 0.164858,
+          "max": 0.16569,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 0.665341,
+          "min": 0.65173,
+          "max": 0.666695,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 0.667215,
+          "min": 0.653684,
+          "max": 0.668607,
+          "n": 3
+        }
+      },
+      "resident-structural": {
+        "seconds": {
+          "median": 0.7723837500000013,
+          "min": 0.7666831250000001,
+          "max": 0.7790273749999983,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 0.150149,
+          "min": 0.146194,
+          "max": 0.152689,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 0.694327,
+          "min": 0.68551,
+          "max": 0.700046,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 0.696289,
+          "min": 0.687525,
+          "max": 0.701936,
+          "n": 3
+        }
+      }
+    },
+    "checks_passed": 66
+  },
+  "candidate": {
+    "groups": {
+      "resident-initial": {
+        "seconds": {
+          "median": 10.523005209,
+          "min": 10.428736291999996,
+          "max": 11.462793374999999,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 2.195068,
+          "min": 2.19007,
+          "max": 2.976904,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 9.165626,
+          "min": 9.104243,
+          "max": 10.132965,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 9.274756,
+          "min": 9.212778,
+          "max": 10.261781,
+          "n": 3
+        }
+      },
+      "resident-body": {
+        "seconds": {
+          "median": 0.7107658749999999,
+          "min": 0.7024974579999963,
+          "max": 0.7187307920000006,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 0.149912,
+          "min": 0.146022,
+          "max": 0.15264,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 0.635667,
+          "min": 0.623568,
+          "max": 0.642483,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 0.637655,
+          "min": 0.625541,
+          "max": 0.644487,
+          "n": 3
+        }
+      },
+      "resident-structural": {
+        "seconds": {
+          "median": 0.7605189590000005,
+          "min": 0.7466003749999999,
+          "max": 0.7671930839999987,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 0.142215,
+          "min": 0.138468,
+          "max": 0.143136,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 0.682487,
+          "min": 0.667637,
+          "max": 0.689111,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 0.684395,
+          "min": 0.669616,
+          "max": 0.691053,
+          "n": 3
+        }
+      }
+    },
+    "checks_passed": 66
+  },
+  "candidate-100": {
+    "groups": {
+      "resident-initial": {
+        "seconds": {
+          "median": 10.467971708,
+          "min": 10.408499708,
+          "max": 10.881437875,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 2.166562,
+          "min": 2.155637,
+          "max": 2.643335,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 9.149153,
+          "min": 9.05685,
+          "max": 9.571999,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 9.253757,
+          "min": 9.172292,
+          "max": 9.683999,
+          "n": 3
+        }
+      },
+      "resident-multifile": {
+        "seconds": {
+          "median": 5.002255041999998,
+          "min": 4.861570709000006,
+          "max": 5.010492457999998,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 1.4985,
+          "min": 1.474042,
+          "max": 1.506612,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 3.642878,
+          "min": 3.517096,
+          "max": 3.656833,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 3.668193,
+          "min": 3.542288,
+          "max": 3.681416,
+          "n": 3
+        }
+      }
+    },
+    "checks_passed": 9
+  }
+}

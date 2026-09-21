@@ -1,0 +1,22 @@
+[
+  "python3",
+  "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/resident_history.py",
+  "--binary",
+  "/tmp/enola-efficiency-v2",
+  "--root",
+  "/tmp/enola-efficiency-v2-measured-resident100",
+  "--source",
+  "/tmp/enola-product-history-source",
+  "--nats",
+  "nats://127.0.0.1:14351",
+  "--repeat",
+  "3",
+  "--scope-config",
+  "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/product-graph-scope.yaml",
+  "--resident",
+  "/tmp/enola-efficiency-v2-resident",
+  "--base",
+  "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+  "--target",
+  "a609c19f3861971930fae7b33dcb2950598953c5"
+]

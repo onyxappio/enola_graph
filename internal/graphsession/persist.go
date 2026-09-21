@@ -132,26 +132,10 @@ func recoverAcknowledgedPending(dir string, journal *graphstream.Journal, opts O
 	return pending, nil
 }
 
+// journalHasAckedEnd uses metadata decoded when the journal was appended or opened.
+// Avoid copying and decoding every retained payload at the checkpoint barrier.
 func journalHasAckedEnd(j *graphstream.Journal, runID string) bool {
-	if j == nil || runID == "" {
-		return false
-	}
-	for _, e := range j.Entries() {
-		if !e.Acked {
-			continue
-		}
-		var probe struct {
-			Type  string `json:"type"`
-			RunID string `json:"run_id"`
-		}
-		if err := json.Unmarshal(e.Payload, &probe); err != nil {
-			continue
-		}
-		if probe.Type == graphstream.TypeEndReplace && probe.RunID == runID {
-			return true
-		}
-	}
-	return false
+	return j.HasAckedEnd(runID)
 }
 
 func writePendingState(dir string, st *State) error {

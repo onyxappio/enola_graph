@@ -483,7 +483,10 @@ func resultFromRecord(rec *FileRecord) tsFileResult {
 	if rec == nil {
 		return res
 	}
-	res.facts = cloneFactSlice(rec.Facts)
+	// Borrow immutable cached facts here. The aggregation loop clones them once
+	// before composition can mutate properties/relations; cloning at both points
+	// needlessly duplicates every unchanged file's facts on a small delta.
+	res.facts = rec.Facts
 	res.routers = routerFromDTO(rec.Router)
 	return res
 }

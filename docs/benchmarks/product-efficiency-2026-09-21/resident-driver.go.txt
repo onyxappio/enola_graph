@@ -1,0 +1,213 @@
+// Copy into cmd/benchresident/main.go in a private source snapshot before building.
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"flag"
+	"fmt"
+	"os"
+	"path/filepath"
+	"time"
+
+	"github.com/enola-labs/enola/internal/graphsession"
+	"github.com/enola-labs/enola/internal/graphstream"
+	"github.com/enola-labs/enola/pkg/bootstrap"
+)
+
+type request struct {
+	Label          string            `json:"label"`
+	Paths          []string          `json:"paths"`
+	Reconcile      string            `json:"reconcile"`
+	AllowReconcile bool              `json:"allow_reconcile"`
+	ArmPaths       []string          `json:"arm_paths"`
+	ObserveAfter   map[string]uint64 `json:"observe_after"`
+}
+
+func must(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
+func main() {
+	config := flag.String("config", "", "config YAML")
+	repo := flag.String("repo", "", "checkout")
+	state := flag.String("state", "", "state directory outside checkout")
+	contextID := flag.String("context", "", "consumer context")
+	natsURL := flag.String("nats", "", "broker URL")
+	sourceMode := flag.String("source", "watch", "watch or cooperating-writer queue")
+	flag.Parse()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	started := time.Now()
+	eng, err := bootstrap.NewGraphEngine(bootstrap.GraphOptions{Repo: *repo, ConfigPath: *config, StateDirs: []string{*state}})
+	must(err)
+	sink, err := graphstream.ConnectNATS(ctx, graphstream.NATSOptions{URL: *natsURL})
+	must(err)
+	defer sink.Close()
+	var source graphsession.ChangeSource
+	var queue *graphsession.ChangeQueue
+	var fileSource *graphsession.FileChangeSource
+	if *sourceMode == "queue" {
+		queue = graphsession.NewChangeQueue("cooperating-writer", 8192)
+		source = queue
+	} else if *sourceMode == "watch" {
+		fileSource = graphsession.NewGraphFileChangeSource(eng.Analysis(), *repo, []string{*state, filepath.Join(*repo, ".enola")}, 8192)
+		source = fileSource
+	} else {
+		panic("unknown source")
+	}
+	must(source.Start(ctx))
+	defer source.Close()
+	session, err := graphsession.OpenSession(ctx, eng.Analysis(), *repo, sink, graphsession.Options{
+		ConfigPaths: []string{*config}, StateDir: *state, ContextID: *contextID, SinkID: "nats|" + *natsURL + "|ENOLA_GRAPH|enola.graph.>", Subject: "enola.graph.>",
+	})
+	must(err)
+	defer session.Close()
+	enc := json.NewEncoder(os.Stdout)
+	var observedProof map[string]uint64
+	apply := func(label string, start time.Time, batch graphsession.ChangeBatch) {
+		res, err := session.ApplyChanges(ctx, batch)
+		must(err)
+		var catchup []*graphsession.OnlineResult
+		if fileSource != nil {
+			must(fileSource.CoverSessionInputs(session))
+			settled := false
+			for n := 0; n < 16; n++ {
+				next := source.Drain()
+				if next.Covered && next.Reconcile == "" && len(next.Paths) == 0 && next.From == next.Through {
+					settled = true
+					break
+				}
+				more, e := session.ApplyChanges(ctx, next)
+				must(e)
+				catchup = append(catchup, more)
+				if more.TargetGeneration != res.TargetGeneration {
+					panic("input changed while settling benchmark operation")
+				}
+				must(fileSource.CoverSessionInputs(session))
+			}
+			if !settled {
+				panic("watcher coverage did not settle")
+			}
+		}
+		done := time.Now()
+		var nativeEvents uint64
+		if fileSource != nil {
+			nativeEvents = fileSource.ObservedEvents()
+		}
+		must(enc.Encode(map[string]any{"label": label, "source": *sourceMode, "started_ns": start.UnixNano(), "done_ns": done.UnixNano(), "seconds": done.Sub(start).Seconds(), "observed_batch": batch, "native_observed": observedProof, "native_events": nativeEvents, "result": res, "coverage_catchup": catchup}))
+	}
+	batch := source.Drain()
+	batch.Reconcile = "benchmark bootstrap"
+	apply("initial", started, batch)
+	dec := json.NewDecoder(os.Stdin)
+	for {
+		var req request
+		if err := dec.Decode(&req); err != nil {
+			return
+		}
+		start := time.Now()
+		observedProof = nil
+		if len(req.ArmPaths) > 0 {
+			if fileSource == nil {
+				panic("native observation requires watch source")
+			}
+			baseline := map[string]uint64{}
+			for _, path := range req.ArmPaths {
+				baseline[path] = fileSource.ObservedPath(filepath.Join(*repo, path))
+			}
+			must(enc.Encode(map[string]any{"label": req.Label, "observed": baseline}))
+			continue
+		}
+		if len(req.ObserveAfter) > 0 {
+			if fileSource == nil {
+				panic("native observation requires watch source")
+			}
+			observedProof = map[string]uint64{}
+			deadline := time.NewTimer(15 * time.Second)
+			tick := time.NewTicker(time.Millisecond)
+			for len(observedProof) != len(req.ObserveAfter) {
+				for path, before := range req.ObserveAfter {
+					if current := fileSource.ObservedPath(filepath.Join(*repo, path)); current > before {
+						observedProof[path] = current
+					}
+				}
+				if len(observedProof) == len(req.ObserveAfter) {
+					break
+				}
+				select {
+				case <-tick.C:
+				case <-deadline.C:
+					panic("native ignored-input event was not observed")
+				case <-ctx.Done():
+					panic(ctx.Err())
+				}
+			}
+			deadline.Stop()
+			tick.Stop()
+		}
+		if queue != nil {
+			for _, p := range req.Paths {
+				queue.Add(p)
+			}
+			if req.Reconcile != "" {
+				queue.Lost(req.Reconcile)
+			}
+		}
+		batch = source.Drain()
+		if queue == nil && len(req.Paths) > 0 {
+			seen := map[string]bool{}
+			add := func(paths []string) {
+				for _, p := range paths {
+					if filepath.IsAbs(p) {
+						rel, e := filepath.Rel(*repo, p)
+						if e == nil {
+							p = rel
+						}
+					}
+					seen[filepath.ToSlash(p)] = true
+				}
+			}
+			complete := func() bool {
+				for _, p := range req.Paths {
+					if !seen[filepath.ToSlash(p)] {
+						return false
+					}
+				}
+				return true
+			}
+			add(batch.Paths)
+			deadline := time.NewTimer(15 * time.Second)
+			for !complete() && batch.Reconcile == "" {
+				select {
+				case <-source.Ready():
+				case <-deadline.C:
+					panic(fmt.Sprintf("watch missed paths %v; observed %v", req.Paths, seen))
+				case <-ctx.Done():
+					panic(ctx.Err())
+				}
+				next := source.Drain()
+				if next.Epoch != batch.Epoch || next.From != batch.Through {
+					batch.Reconcile = "benchmark observed continuity gap"
+				}
+				batch.Through = next.Through
+				batch.Covered = batch.Covered && next.Covered
+				batch.Paths = append(batch.Paths, next.Paths...)
+				add(next.Paths)
+				if next.Reconcile != "" {
+					batch.Reconcile = next.Reconcile
+				}
+			}
+			deadline.Stop()
+			if !req.AllowReconcile && (!complete() || !batch.Covered || batch.Reconcile != "") {
+				panic(fmt.Sprintf("local-edit benchmark requires observed paths without coverage loss: expected=%v batch=%+v", req.Paths, batch))
+			}
+		}
+		if req.Reconcile != "" {
+			batch.Reconcile = req.Reconcile
+		}
+		apply(req.Label, start, batch)
+	}
+}

@@ -1,3 +1,8 @@
+> Follow-up: [redundant journal decoding and cached-fact copying](product-efficiency-2026-09-21/README.md)
+> reduced measured resident body/structural medians by 3.7%/6.1%. Initial and
+> 100-path history improvements are not established. This is a focused follow-up,
+> not a replacement for the full accepted old/new CLI comparison below.
+
 # Product performance investigation
 
 Status: **the latest repeated Product validation passes initial throughput and

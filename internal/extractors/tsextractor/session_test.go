@@ -2,10 +2,61 @@ package tsextractor
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
 )
+
+func TestExtractSession_ResultDoesNotMutateCachedRecords(t *testing.T) {
+	dir := t.TempDir()
+	for name, body := range map[string]string{
+		"a.ts": "export function a() { return 1; }",
+		"b.ts": "import { a } from './a'; export function b() { return a(); }",
+	} {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte(body), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	ext := New()
+	files := []string{"a.ts", "b.ts"}
+	first, err := ext.ExtractSession(context.Background(), dir, files, nil, nil, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	before, err := json.Marshal(first.Records)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, dirty := range []map[string]bool{{}, {"b.ts": true}} {
+		next, err := ext.ExtractSession(context.Background(), dir, files, first.Records, dirty, SessionHooks{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		props, relations := 0, 0
+		for i := range next.Facts {
+			f := &next.Facts[i]
+			if f.Props != nil {
+				f.Props["mutation_probe"] = true
+				props++
+			}
+			for j := range f.Relations {
+				f.Relations[j].Target = "mutation_probe"
+				relations++
+			}
+		}
+		if props == 0 || relations == 0 {
+			t.Fatal("fixture must exercise both properties and relations")
+		}
+		after, err := json.Marshal(first.Records)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(before) != string(after) {
+			t.Fatal("composition/output mutations escaped into cached records")
+		}
+	}
+}
 
 func TestExtractSession_ReusesUnchangedFiles(t *testing.T) {
 	dir := t.TempDir()
