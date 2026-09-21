@@ -115,6 +115,36 @@ coverage. Validate delta results against a full analysis under this same contrac
 These rules govern new graph extraction and incremental maintenance. Audit retained
 extractors against them when expanding the supported incremental profile.
 
+## Authoritative invalidation planning: simplicity first
+
+For the upcoming Codata replacement contract, the user prioritizes a simple,
+maintainable file-dependency planner over a minimal replacement scope. Compute
+a conservative, complete owner scope before BeginReplace and freeze it for that
+run. Prefer file-level dependencies and conservative fallback rules; do not add
+fine-grained symbol/reference indexes merely to reduce the number of invalidated
+files at this stage. Broader scopes are acceptable. This updates earlier scope
+narrowing priorities; it does not permit missed invalidations or weaker delivery
+and recovery guarantees.
+
+The prior file graph alone cannot represent dependencies that did not previously
+exist. Additions, deletions, renames, configuration changes and resolver behavior
+that can affect references without an old file edge require conservative fallback.
+Use a wider proven analysis domain, including the whole repository when no smaller
+safe boundary is established. Do not assume every ordinary source edit is local
+if the active resolver can introduce nonlocal name-resolution changes.
+
+Every owner included in the replacement scope must receive its complete current
+contribution, possibly reused from valid caches, or an empty replacement when it
+no longer contributes facts. Scope size and reparsed-file count are distinct.
+Do not silently grow the scope after Begin; an out-of-scope contribution must
+fail the run without a successful End or completed-generation advancement.
+Dependency traversal for invalidation must not introduce transitive attribute
+propagation. Measure scope size, actual parses and latency before considering
+further narrowing complexity.
+
+This section records the agreed target; it does not assert that the current
+streaming protocol already implements a frozen full scope on Begin.
+
 ## Upstream update procedure
 
 Use upstream tests and implementation changes to maintain compatibility with
