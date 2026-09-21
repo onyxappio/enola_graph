@@ -14,6 +14,7 @@ const stateSchema = "enola.graphstate.v1"
 
 // State is durable analysis state for one (repo, context) pair.
 type State struct {
+	Protocol          string            `json:"protocol,omitempty"`
 	Schema            string            `json:"schema"`
 	ExtractorVersion  string            `json:"extractor_version"`
 	RepoID            string            `json:"repo_id"`

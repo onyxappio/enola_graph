@@ -6,13 +6,13 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
-	"github.com/enola-labs/enola/internal/graphinput"
 	"path/filepath"
 	"sort"
 	"strings"
 
 	"github.com/enola-labs/enola/internal/engine"
 	"github.com/enola-labs/enola/internal/facts"
+	"github.com/enola-labs/enola/internal/graphinput"
 	"github.com/enola-labs/enola/internal/graphstream"
 	"github.com/enola-labs/enola/pkg/plugin"
 )
@@ -265,6 +265,39 @@ func filesToHash(eng *engine.Engine, inv engine.RepoInventory, prev map[string]*
 				}
 			}
 		}
+	}
+	return out
+}
+
+// graphSemanticNames keeps graph-profile analysis names: lockfiles and other
+// non-semantic inventory entries are omitted even when they remain in AllNames
+// for extractor detection.
+func graphSemanticNames(eng *engine.Engine, names []string) []string {
+	return filterGraphNames(eng, names, true)
+}
+
+// graphPublishedOwners keeps previously published file owners for a replacement
+// manifest. Current policy must not drop them: exclusion is expressed as an
+// empty replacement of the old identity.
+func graphPublishedOwners(names []string) []string {
+	return filterGraphNames(nil, names, false)
+}
+
+func filterGraphNames(eng *engine.Engine, names []string, applyPolicy bool) []string {
+	out := make([]string, 0, len(names))
+	seen := map[string]bool{}
+	for _, f := range names {
+		f = filepath.ToSlash(f)
+		if f == "" || seen[f] || graphinput.IsLockfile(f) {
+			continue
+		}
+		if applyPolicy && eng != nil {
+			if scope := eng.GraphScope(); scope != nil && scope.Policy != nil && scope.Policy.Classify(f, false).Kind != graphinput.Semantic {
+				continue
+			}
+		}
+		seen[f] = true
+		out = append(out, f)
 	}
 	return out
 }

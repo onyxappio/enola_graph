@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/enola-labs/enola/internal/engine"
 	"github.com/enola-labs/enola/internal/facts"
@@ -86,9 +87,13 @@ func Fork(opts ForkOptions) (*State, error) {
 		return nil, fmt.Errorf("graphsession fork: source schema %q is not %s", src.Schema, stateSchema)
 	}
 
-	if existing, err := inspectForkTarget(dstDir, src, opts, checkout); err != nil {
+	protocol := forkProtocol(srcDir, src)
+	if existing, err := inspectForkTarget(dstDir, src, opts, checkout, protocol); err != nil {
 		return nil, err
 	} else if existing != nil {
+		if err := writeProtocolFile(dstDir, protocol); err != nil {
+			return nil, err
+		}
 		return existing, nil
 	}
 
@@ -109,15 +114,65 @@ func Fork(opts ForkOptions) (*State, error) {
 	dst.ForkBaseGeneration = src.Generation
 	dst.ForkBaseRunID = src.LastRunID
 	dst.LastComplete = true
+	if protocol != "" {
+		dst.Protocol = protocol
+	}
 
 	id := boundIdentity{RepoID: dst.RepoID, ContextID: dst.ContextID, SinkID: dst.SinkID, Checkout: dst.Checkout}
 	if err := writeIdentityFile(dstDir, id); err != nil {
+		return nil, err
+	}
+	// Preserve the source protocol binding. OpenSession must not interpret a
+	// frozen checkpoint as legacy (or vice versa) after a fork.
+	if err := writeProtocolFile(dstDir, protocol); err != nil {
 		return nil, err
 	}
 	if err := saveState(dstDir, dst); err != nil {
 		return nil, err
 	}
 	return dst, nil
+}
+
+func forkProtocol(srcDir string, src *State) string {
+	if src != nil && src.Protocol != "" {
+		return src.Protocol
+	}
+	b, err := os.ReadFile(filepath.Join(srcDir, "protocol"))
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(b))
+}
+
+func writeProtocolFile(dir, protocol string) error {
+	if protocol == "" {
+		return nil
+	}
+	p := filepath.Join(dir, "protocol")
+	if b, err := os.ReadFile(p); err == nil {
+		if string(b) == protocol {
+			return nil
+		}
+		return fmt.Errorf("graphsession fork: protocol file is %s, source is %s", b, protocol)
+	} else if !os.IsNotExist(err) {
+		return err
+	}
+	f, err := os.OpenFile(p, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o644)
+	if err != nil {
+		return err
+	}
+	if _, err := f.WriteString(protocol); err != nil {
+		_ = f.Close()
+		return err
+	}
+	if err := f.Sync(); err != nil {
+		_ = f.Close()
+		return err
+	}
+	if err := f.Close(); err != nil {
+		return err
+	}
+	return fsyncDir(dir)
 }
 
 func absClean(p string) (string, error) {
@@ -177,7 +232,7 @@ func loadForkSource(dir string) (*State, error) {
 	return st, nil
 }
 
-func inspectForkTarget(dstDir string, src *State, opts ForkOptions, checkout string) (*State, error) {
+func inspectForkTarget(dstDir string, src *State, opts ForkOptions, checkout, protocol string) (*State, error) {
 	entries, err := os.ReadDir(dstDir)
 	if err != nil {
 		return nil, err
@@ -185,6 +240,7 @@ func inspectForkTarget(dstDir string, src *State, opts ForkOptions, checkout str
 	hasIdentity := false
 	hasState := false
 	hasPending := false
+	hasProtocol := false
 	for _, e := range entries {
 		if e.IsDir() {
 			return nil, fmt.Errorf("graphsession fork: target state-dir is not empty")
@@ -197,7 +253,21 @@ func inspectForkTarget(dstDir string, src *State, opts ForkOptions, checkout str
 			hasState = true
 		case "pending-state.json":
 			hasPending = true
+		case "protocol":
+			hasProtocol = true
 		default:
+			return nil, fmt.Errorf("graphsession fork: target state-dir is not empty")
+		}
+	}
+	if hasProtocol {
+		b, err := os.ReadFile(filepath.Join(dstDir, "protocol"))
+		if err != nil {
+			return nil, err
+		}
+		if protocol != "" && string(b) != protocol {
+			return nil, fmt.Errorf("graphsession fork: target state-dir is not empty")
+		}
+		if protocol == "" && !hasState && !hasPending {
 			return nil, fmt.Errorf("graphsession fork: target state-dir is not empty")
 		}
 	}

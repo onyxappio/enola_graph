@@ -40,19 +40,21 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 	fs := flag.NewFlagSet("graph "+mode, flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
 	var (
-		watchEvery   = fs.Duration("watch-every", graphsession.DefaultWatchEvery, "with watch: fixed change-collection window after the first event (positive duration, e.g. 5s or 10s)")
-		natsURL      = fs.String("nats", "", "NATS URL (JetStream)")
-		stream       = fs.String("stream", "ENOLA_GRAPH", "JetStream stream name")
-		subject      = fs.String("subject", "enola.graph.>", "JetStream subject filter for the stream")
-		events       = fs.String("events", "", "write protocol JSONL to this file (debug sink)")
-		contextID    = fs.String("context", "default", "analysis context id (branch/workspace label, not a generation)")
-		stateDir     = fs.String("state-dir", "", "durable graph state directory (default: <repo>/.enola/graphstate)")
-		summaryJSON  = fs.Bool("summary-json", false, "print result summaries without Facts as a JSON array")
-		configPath   = fs.String("config", "", "explicit graph configuration path")
-		asJSON       = fs.Bool("json", false, "print the run result as JSON")
-		force        = fs.Bool("force-initial", false, "with analyze: ignore existing state and run a full initial replacement")
-		baseStateDir = fs.String("base-state-dir", "", "completed source graphstate to seed a new --state-dir/--context (fork, or delta)")
-		repoID       = fs.String("repo-id", "", "stable repository identity (default: absolute checkout path)")
+		watchEvery    = fs.Duration("watch-every", graphsession.DefaultWatchEvery, "with watch: fixed change-collection window after the first event (positive duration, e.g. 5s or 10s)")
+		authoritative = fs.Bool("authoritative-scope", false, "use frozen file-owner BeginReplace manifest (v2 protocol)")
+		maxBeginBytes = fs.Int("max-begin-bytes", 0, "maximum BeginReplace payload bytes (0 = 256KiB, or 512KiB with --authoritative-scope). Frozen v2 refuses oversized manifests; it does not chunk owner scope. Must fit the broker max_payload.")
+		natsURL       = fs.String("nats", "", "NATS URL (JetStream)")
+		stream        = fs.String("stream", "ENOLA_GRAPH", "JetStream stream name")
+		subject       = fs.String("subject", "enola.graph.>", "JetStream subject filter for the stream")
+		events        = fs.String("events", "", "write protocol JSONL to this file (debug sink)")
+		contextID     = fs.String("context", "default", "analysis context id (branch/workspace label, not a generation)")
+		stateDir      = fs.String("state-dir", "", "durable graph state directory (default: <repo>/.enola/graphstate)")
+		summaryJSON   = fs.Bool("summary-json", false, "print result summaries without Facts as a JSON array")
+		configPath    = fs.String("config", "", "explicit graph configuration path")
+		asJSON        = fs.Bool("json", false, "print the run result as JSON")
+		force         = fs.Bool("force-initial", false, "with analyze: ignore existing state and run a full initial replacement")
+		baseStateDir  = fs.String("base-state-dir", "", "completed source graphstate to seed a new --state-dir/--context (fork, or delta)")
+		repoID        = fs.String("repo-id", "", "stable repository identity (default: absolute checkout path)")
 	)
 	fs.Usage = func() {
 		fmt.Fprint(os.Stderr,
@@ -71,6 +73,9 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 	}
 	if *watchEvery <= 0 {
 		r.cmdFatal("graph", "--watch-every must be a positive duration")
+	}
+	if *maxBeginBytes < 0 {
+		r.cmdFatal("graph", "--max-begin-bytes must be >= 0")
 	}
 	arg := ""
 	if rest := fs.Args(); len(rest) > 0 {
@@ -125,11 +130,15 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 
 	var sink graphstream.Sink
 	if *natsURL != "" {
-		js, err := graphstream.ConnectNATS(ctx, graphstream.NATSOptions{
+		natsOpts := graphstream.NATSOptions{
 			URL:     *natsURL,
 			Stream:  *stream,
 			Subject: *subject,
-		})
+		}
+		if *maxBeginBytes > 512*1024 {
+			natsOpts.MaxPayload = *maxBeginBytes
+		}
+		js, err := graphstream.ConnectNATS(ctx, natsOpts)
 		if err != nil {
 			r.cmdFatal("graph", "%v", err)
 		}
@@ -146,12 +155,14 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 
 	optsFor := func(repo string) graphsession.Options {
 		opts := graphsession.Options{
-			WatchEvery:   *watchEvery,
-			ContextID:    *contextID,
-			StateDir:     *stateDir,
-			RepoID:       *repoID,
-			ForceInitial: mode == "analyze" && *force,
-			Subject:      *subject,
+			AuthoritativeFiles: *authoritative,
+			MaxBeginBytes:      *maxBeginBytes,
+			WatchEvery:         *watchEvery,
+			ContextID:          *contextID,
+			StateDir:           *stateDir,
+			RepoID:             *repoID,
+			ForceInitial:       mode == "analyze" && *force,
+			Subject:            *subject,
 		}
 		if opts.StateDir == "" {
 			opts.StateDir = filepath.Join(repo, tgt.engine.Config().Output.Dir, "graphstate")

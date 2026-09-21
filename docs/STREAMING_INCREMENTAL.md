@@ -91,6 +91,34 @@ PhaseScope) before resolved writes. Do not silently write resolved facts outside
 the announced-or-collected scope. Large scopes must respect broker payload limits.
 Initial analysis must overlap extraction with bounded async broker delivery.
 
+### Frozen file-owner protocol (v2)
+
+`enola graph analyze|delta|watch --authoritative-scope` selects envelope
+`schema_version` `enola.graph.v2`. Default graph runs stay on `enola.graph.v1`.
+The flag is opt-in and binds the state directory; a forked checkpoint keeps the
+source protocol and must be reopened with the same flag.
+
+BeginReplace publishes the complete file-owner manifest (`scope_mode=complete`)
+before any file parse. That owner set is frozen for the run. Batches are
+`resolved` file-owned replacements only. EndReplace repeats the same owner-scope
+count and digest. Empty initial analysis still publishes an epoch. Deleting the
+last contributing file publishes an empty replacement of that file owner.
+
+An oversized Begin fails closed with zero published events: v2 never splits the
+file-owner manifest into `PhaseScope` chunks. `--max-begin-bytes` sets that cap
+(default 512KiB with `--authoritative-scope`) and must fit the broker
+`max_payload` (NATS default 1MiB). Raise both together; a larger Begin limit
+does not change the frozen contract.
+
+A lockfile-only add, edit, rename, or removal publishes no events and does not
+advance generation. Frozen scan hashing uses semantic inventory names and omits
+lockfiles.
+
+A change in stored `PolicyIdentity`, including repository `.gitignore` that
+alters graph admission, starts a frozen replacement. Previously published file
+owners remain in the Begin manifest so exclusion can clear obsolete
+contributions.
+
 Each result carries explicit ownership. A call from B into C is owned by B; replacing
 C must not erase an unchanged incoming call owned by B. If C disappears or resolution
 changes, affected owners must be refreshed. Shared identities require contributions

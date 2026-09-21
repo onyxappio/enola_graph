@@ -120,6 +120,24 @@ func (c *Consumer) Apply(r graphstream.Recorded) error {
 }
 
 func (c *Consumer) applyBegin(b graphstream.BeginReplace) error {
+	if b.SchemaVersion == graphstream.FrozenSchemaVersion {
+		if b.ScopeMode != graphstream.ScopeModeComplete || b.OwnerScopeCount != len(b.OwnerScope) || b.OwnerScopeDigest != graphstream.DigestOwners(b.OwnerScope) || b.TargetGeneration != b.BaseGeneration+1 {
+			return fmt.Errorf("consumer: invalid frozen Begin manifest")
+		}
+		seen := map[string]bool{}
+		for _, o := range b.OwnerScope {
+			if o.Kind != graphstream.OwnerFile || seen[o.ID] {
+				return fmt.Errorf("consumer: frozen manifest requires unique file owners")
+			}
+			if _, err := planFileInvalidation([]string{o.ID}, nil, nil, nil, false, nil); err != nil {
+				return err
+			}
+			seen[o.ID] = true
+		}
+	} else if b.SchemaVersion != "" && b.SchemaVersion != graphstream.SchemaVersion {
+		return fmt.Errorf("consumer: unsupported schema %q", b.SchemaVersion)
+	}
+
 	if b.RunID == "" {
 		return fmt.Errorf("consumer: begin missing run_id")
 	}
@@ -291,6 +309,9 @@ func (c *Consumer) applyBatch(b graphstream.Batch, raw []byte) error {
 		}
 		return fmt.Errorf("batch seq %d for unknown run %s", b.Seq, b.RunID)
 	}
+	if st.begin.SchemaVersion == graphstream.FrozenSchemaVersion && (b.Phase != graphstream.PhaseResolved || len(b.Owners) != 0 || b.Seq <= 0) {
+		return fmt.Errorf("consumer: frozen contract requires resolved batches without scope additions")
+	}
 	if _, dup := st.seq[b.Seq]; dup {
 		return fmt.Errorf("duplicate batch seq %d in %s", b.Seq, b.RunID)
 	}
@@ -354,6 +375,14 @@ func (c *Consumer) applyEnd(e graphstream.EndReplace, raw []byte) error {
 	st := c.open[e.RunID]
 	if st == nil {
 		return fmt.Errorf("end for unknown run %s", e.RunID)
+	}
+	if st.begin.SchemaVersion == graphstream.FrozenSchemaVersion {
+		if e.OwnerScopeLen != st.begin.OwnerScopeCount || e.OwnerScopeDigest != st.begin.OwnerScopeDigest || e.BatchDigest == "" || len(e.Completeness.FilesUnreadable) > 0 {
+			return fmt.Errorf("consumer: frozen End manifest/completeness mismatch")
+		}
+		if st.begin.BaseGeneration != c.LastGeneration {
+			return fmt.Errorf("consumer: stale frozen generation")
+		}
 	}
 	if e.Completeness.Status != "success" {
 		delete(c.open, e.RunID)

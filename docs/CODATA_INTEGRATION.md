@@ -19,6 +19,13 @@ go build -o enola ./cmd/enola
 ./enola graph delta --nats nats://127.0.0.1:4222 \
   --repo-id product --context main --state-dir /tmp/product-enola-state \
   --summary-json /path/to/product/mcp-arch.yaml
+# Opt-in frozen file-owner protocol (schema_version enola.graph.v2).
+# Product-scale manifests (~832KiB) need --max-begin-bytes 1048576 and a
+# broker max_payload of at least that size; v2 never chunks Begin.
+./enola graph analyze --authoritative-scope --max-begin-bytes 1048576 \
+  --nats nats://127.0.0.1:4222 \
+  --repo-id product --context main --state-dir /tmp/product-enola-v2-state \
+  --summary-json /path/to/product/mcp-arch.yaml
 ```
 
 The default stream is `ENOLA_GRAPH`, subject filter `enola.graph.>`. Use a separate
@@ -29,21 +36,33 @@ analysis pipeline.
 
 ## Consumer contract
 
-The envelope schema is `enola.graph.v1`. Exact JSON fields and digest algorithms
-are defined in [protocol.go](../internal/graphstream/protocol.go), with the
-replacement semantics in [Streaming and incremental analysis](STREAMING_INCREMENTAL.md).
-The [reference consumer](../internal/graphsession/consumer.go) demonstrates
-validation and owned replacement; it is not a production database adapter or a
-complete production validator. For example, it does not enforce `schema_version`;
-Codata must implement the full stated contract rather than copy it unchanged.
+The default envelope schema is `enola.graph.v1`. `--authoritative-scope` selects
+`enola.graph.v2`: a frozen file-owner Begin/End. Exact JSON fields and digest
+algorithms are defined in [protocol.go](../internal/graphstream/protocol.go),
+with the replacement semantics in
+[Streaming and incremental analysis](STREAMING_INCREMENTAL.md). The
+[reference consumer](../internal/graphsession/consumer.go) demonstrates
+validation and owned replacement; it is not a production database adapter.
+When `schema_version` is `enola.graph.v2` it checks the frozen Begin/End
+manifest. Codata must implement the full stated contract rather than copy it
+unchanged.
 
 | Event | Consumer action |
 | --- | --- |
-| `begin_replace` | Validate schema, repository/context and exact base generation; open staging and seed the scope from `owner_scope`. |
-| `batch`, phase `scope` | Collect the replacement owner manifest. |
-| `batch`, phase `local` | Treat as provisional declarations; retain its original bytes for completeness checks. |
-| `batch`, phase `resolved` | Stage authoritative owned nodes and edges. |
-| `end_replace` | Verify every sequence, batch count/digest, final owner manifest and successful completeness; atomically commit the replacement. |
+| `begin_replace` | Validate schema, repository/context and exact base generation; open staging and seed the scope from `owner_scope`. For v2, require `scope_mode=complete`, unique file owners, and a digest that matches the inline manifest; that set is immutable for the run. |
+| `batch`, phase `scope` | Collect the replacement owner manifest. Under v2 the Begin file-owner set is already complete. |
+| `batch`, phase `local` | Treat as provisional declarations; retain its original bytes for completeness checks. Under v2 every batch is `resolved`. |
+| `batch`, phase `resolved` | Stage authoritative owned nodes and edges. Under v2 these writes use only file owners named on Begin. |
+| `end_replace` | Verify every sequence, batch count/digest, final owner manifest and successful completeness; atomically commit the replacement. For v2, `owner_scope_len`/`owner_scope_digest` must match Begin. |
+
+A lockfile-only add, edit, rename, or removal under v2 publishes no events and
+does not advance generation. A `PolicyIdentity` change, including repository
+`.gitignore` that alters graph admission, starts a frozen replacement; previously
+published file owners stay in the Begin manifest so exclusion can clear obsolete
+contributions. Empty initial analysis still publishes an epoch. Last-file
+deletion publishes an empty replacement of that file owner. Fork copies the
+protocol binding; reopen the new state directory with the same
+`--authoritative-scope` setting as the source.
 
 Hash the original batch bytes in sequence order, not JSON reserialized by Node.
 Delivery may repeat or arrive out of sequence. Deduplicate envelopes by run and

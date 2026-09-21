@@ -20,6 +20,7 @@ import (
 	"github.com/enola-labs/enola/internal/extractors/tsextractor"
 	"github.com/enola-labs/enola/internal/facts"
 	"github.com/enola-labs/enola/internal/filelock"
+	"github.com/enola-labs/enola/internal/graphinput"
 	"github.com/enola-labs/enola/internal/graphprofile"
 	"github.com/enola-labs/enola/internal/graphstream"
 	"github.com/enola-labs/enola/pkg/plugin"
@@ -29,6 +30,8 @@ var ErrInputsChanged = errors.New("inputs changed during transaction")
 
 // Options configure a graph session and its generation transactions.
 type Options struct {
+	// AuthoritativeFiles selects the v2 frozen file-owner contract.
+	AuthoritativeFiles bool
 	// ReloadEngine reconstructs registrations and effective config after a config edit.
 	ReloadEngine func(context.Context) (*engine.Engine, error)
 	// ConfigPaths includes external and missing configuration-selection candidates.
@@ -43,10 +46,13 @@ type Options struct {
 	// Non-positive values use DefaultWatchEvery. Baseline analysis starts immediately.
 	WatchEvery time.Duration
 	// WatchIgnore must contain only non-input output artifacts (for example the event sink).
-	WatchIgnore   []string
-	ForceInitial  bool
-	AllowMemory   bool
-	SinkID        string
+	WatchIgnore  []string
+	ForceInitial bool
+	AllowMemory  bool
+	SinkID       string
+	// MaxBeginBytes is the BeginReplace payload cap. Zero uses 256KiB, or 512KiB
+	// with AuthoritativeFiles. Frozen v2 refuses a larger inline manifest; it
+	// never splits owner scope into PhaseScope chunks.
 	MaxBeginBytes int
 	// OnBeforeParse is a test hook invoked before each dirty TypeScript file is parsed.
 	OnBeforeParse func(rel string)
@@ -142,6 +148,9 @@ func OpenSession(ctx context.Context, eng *engine.Engine, repoPath string, sink 
 		}
 	}()
 	tr.Mark("open_journal", "")
+	if err := bindProtocol(opts.StateDir, opts.AuthoritativeFiles); err != nil {
+		return nil, err
+	}
 	replay := &graphstream.Publisher{Sink: sink, Journal: journal}
 	if err := replay.ReplayUnacked(ctx); err != nil {
 		return nil, fmt.Errorf("replay journal: %w", err)
@@ -183,6 +192,7 @@ func identityOK(st *State, opts Options, abs string) error {
 }
 
 type session struct {
+	plan              *fileInvalidationPlan
 	extraFallbacks    []graphstream.Fallback
 	priorResolution   *idIndex
 	validateEffective func() error
@@ -240,6 +250,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	inv, detectedExt, hashes := input.inventory, input.detected, input.hashes
 	contextInputs, cfgHash, capturedCfg := input.contexts, input.configHash, input.config
 	scanHash := inventoryDigest(inv.AllNames, hashes)
+	if s.opts.AuthoritativeFiles {
+		scanHash = inventoryDigest(graphSemanticNames(s.eng, inv.AllNames), hashes)
+	}
 	prevScan := ""
 	if s.state != nil {
 		prevScan = s.state.ScanHash
@@ -408,6 +421,47 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		delete(extractorInput, name)
 	}
 	tr.Mark("extractor_need", fmt.Sprintf("non_ts_need=%v detected=%d", nonTSNeed, len(detectedExt)))
+	if s.opts.AuthoritativeFiles {
+		// The name-based graph resolver has no proven isolated domain. Announce
+		// the full prior/current file union, while retaining incremental parsing.
+		// Empty initial and last-file deletion still Begin before extraction so
+		// the frozen manifest is immutable for the run.
+		changed := initial || forceAll || nonTSNeed || s.state == nil || s.state.ScanHash != scanHash || s.state.ConfigHash != cfgHash || s.state.PolicyIdentity != input.policyIdentity
+		if changed {
+			previous := []string{}
+			if s.state != nil {
+				for f := range s.state.Files {
+					previous = append(previous, f)
+				}
+			}
+			// Keep previously published owners even when the current policy
+			// excludes them, so the frozen replacement can clear obsolete facts.
+			previous = graphPublishedOwners(previous)
+			// Only files that can contribute authoritative graph facts belong in
+			// the replacement manifest. AllNames also contains ignored marker and
+			// lock files used only for extractor detection; including them would
+			// inflate Begin without creating deletable graph owners.
+			current := graphSemanticNames(s.eng, inv.Files)
+			seeds := append(append([]string{}, previous...), current...)
+			s.plan, err = planFileInvalidation(seeds, previous, current, nil, true, nil)
+			if err != nil {
+				return nil, err
+			}
+			s.replaceScope = s.plan.manifest()
+			s.scopeLimited = true
+			fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "frozen scope: global name-resolution domain"})
+			phase := graphstream.PhaseResolved
+			if initial || forceAll {
+				phase = graphstream.PhaseEpoch
+			}
+			if err := s.begin(ctx, runID, repoID, base, target, phase, graphstream.ScopeModeComplete, s.replaceScope); err != nil {
+				return nil, err
+			}
+			if err := s.pub.Flush(ctx); err != nil {
+				return nil, err
+			}
+		}
+	}
 
 	for _, ext := range s.eng.Extractors() {
 		if !s.eng.Config().IsExtractorEnabled(ext.Name()) {
@@ -559,20 +613,29 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			graphstream.SortOwners(fileOwners)
 			fileOwners = dedupeOwners(fileOwners)
 			s.growScope(fileOwners)
-			phase := graphstream.PhaseResolved
-			if forceAll || initial {
-				phase = graphstream.PhaseEpoch
-			}
-			scopeMode := graphstream.ScopeModeComplete
-			if forceAll || initial {
-				scopeMode = graphstream.ScopeModeIncremental
-			}
-			s.scopeMode = scopeMode
-			if err := s.begin(ctx, runID, repoID, base, target, phase, scopeMode, s.replaceScope); err != nil {
-				return nil, err
-			}
-			if err := s.pub.Flush(ctx); err != nil {
-				return nil, err
+			if s.opts.AuthoritativeFiles {
+				if err := s.fileLocalErr(); err != nil {
+					return nil, err
+				}
+				if !s.began {
+					return nil, fmt.Errorf("frozen Begin was not published before analysis")
+				}
+			} else {
+				phase := graphstream.PhaseResolved
+				if forceAll || initial {
+					phase = graphstream.PhaseEpoch
+				}
+				scopeMode := graphstream.ScopeModeComplete
+				if forceAll || initial {
+					scopeMode = graphstream.ScopeModeIncremental
+				}
+				s.scopeMode = scopeMode
+				if err := s.begin(ctx, runID, repoID, base, target, phase, scopeMode, s.replaceScope); err != nil {
+					return nil, err
+				}
+				if err := s.pub.Flush(ctx); err != nil {
+					return nil, err
+				}
 			}
 			hooks := tsextractor.SessionHooks{
 				SkipConfigPaths: true,
@@ -956,6 +1019,23 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		}, nil
 	}
 
+	if s.opts.AuthoritativeFiles {
+		kept := make([]facts.Fact, 0, len(allFacts))
+		for _, f := range allFacts {
+			o := ownerOf(f)
+			if o.Kind == graphstream.OwnerSynthetic {
+				continue
+			}
+			if s.plan == nil {
+				return nil, fmt.Errorf("missing frozen invalidation plan")
+			}
+			if err := s.plan.check(o); err != nil {
+				return nil, err
+			}
+			kept = append(kept, f)
+		}
+		allFacts = kept
+	}
 	idx := buildIndex(allFacts)
 	s.inputs.resolution = idx
 	grouped := groupOwners(allFacts)
@@ -987,6 +1067,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		inScope[o.String()] = true
 	}
 	if !s.began {
+		if s.opts.AuthoritativeFiles {
+			return nil, fmt.Errorf("frozen Begin was not published before analysis")
+		}
 		phase := graphstream.PhaseResolved
 		if forceAll || initial {
 			phase = graphstream.PhaseEpoch
@@ -1037,6 +1120,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		}
 	}
 	next := newState(repoID, s.opts.ContextID, s.abs, engine.ExtractorVersion())
+	if s.opts.AuthoritativeFiles {
+		next.Protocol = graphstream.FrozenSchemaVersion
+	}
 	next.Generation = target
 	next.ConfigHash = cfgHash
 	next.TSContext = input.tsContext
@@ -1193,9 +1279,15 @@ func chunkOwner(nodes []graphstream.Node, edges []graphstream.Edge, limit int) [
 }
 
 func (s *session) begin(ctx context.Context, runID, repoID string, base, target int64, phase, scopeMode string, owners []graphstream.OwnerRef) error {
+	if s.opts.AuthoritativeFiles && s.began {
+		return s.fileLocalErr()
+	}
 	limit := s.opts.MaxBeginBytes
 	if limit <= 0 {
 		limit = 256 * 1024
+		if s.opts.AuthoritativeFiles {
+			limit = 512 * 1024
+		}
 	}
 	if scopeMode == "" {
 		scopeMode = graphstream.ScopeModeComplete
@@ -1214,6 +1306,11 @@ func (s *session) begin(ctx context.Context, runID, repoID string, base, target 
 		OwnerScope:       owners,
 		OwnerScopeCount:  len(owners),
 	}
+	if s.opts.AuthoritativeFiles {
+		msg.SchemaVersion = graphstream.FrozenSchemaVersion
+		msg.ScopeMode = graphstream.ScopeModeComplete
+		msg.OwnerScopeDigest = graphstream.DigestOwners(owners)
+	}
 	if s.state != nil && s.state.ForkBaseRunID != "" && s.state.LastRunID == s.state.ForkBaseRunID {
 		msg.ForkBaseRepoID = s.state.ForkBaseRepoID
 		msg.ForkBaseContextID = s.state.ForkBaseContextID
@@ -1223,6 +1320,9 @@ func (s *session) begin(ctx context.Context, runID, repoID string, base, target 
 	payload, err := graphstream.Marshal(msg)
 	if err != nil {
 		return err
+	}
+	if s.opts.AuthoritativeFiles && len(payload) > limit {
+		return fmt.Errorf("frozen Begin manifest is %d bytes, exceeds limit %d; no scope chunks allowed", len(payload), limit)
 	}
 	if len(payload) > limit && len(owners) > 0 {
 		msg.OwnerScope = nil
@@ -1322,6 +1422,28 @@ func (s *session) fileLocalErr() error {
 }
 
 func (s *session) growScope(owners []graphstream.OwnerRef) {
+	if s.opts.AuthoritativeFiles {
+		if s.plan == nil {
+			for _, o := range owners {
+				if o.Kind == graphstream.OwnerSynthetic || o.Kind == "" {
+					continue
+				}
+				s.localErr = fmt.Errorf("missing frozen invalidation plan")
+				return
+			}
+			return
+		}
+		for _, o := range owners {
+			if o.Kind == graphstream.OwnerSynthetic {
+				continue
+			}
+			if err := s.plan.check(o); err != nil {
+				s.localErr = err
+				return
+			}
+		}
+		return
+	}
 	if len(owners) == 0 {
 		return
 	}
@@ -1385,6 +1507,9 @@ func scopeOwnerRefs(scopeFiles map[string]bool, owned []string, st *State, force
 }
 
 func (s *session) publishLocal(ctx context.Context, runID, repoID string, rec *tsextractor.FileRecord, earlyLocal *int) {
+	if s.opts.AuthoritativeFiles {
+		return
+	}
 	if rec == nil || rec.Unreadable || rec.Minified {
 		return
 	}
@@ -1545,6 +1670,9 @@ func (s *session) emitBatch(ctx context.Context, runID, phase string, nodes []gr
 }
 
 func (s *session) publishScope(ctx context.Context, runID string, owners []graphstream.OwnerRef) error {
+	if s.opts.AuthoritativeFiles {
+		return s.fileLocalErr()
+	}
 	var extra []graphstream.OwnerRef
 	s.mu.Lock()
 	if s.announced == nil {
@@ -1597,6 +1725,21 @@ func dedupeOwners(owners []graphstream.OwnerRef) []graphstream.OwnerRef {
 }
 
 func (s *session) batch(ctx context.Context, runID string, seq int, phase string, nodes []graphstream.Node, edges []graphstream.Edge) error {
+	if s.opts.AuthoritativeFiles {
+		if !s.began || s.plan == nil || phase != graphstream.PhaseResolved {
+			return fmt.Errorf("invalid frozen batch phase or missing Begin")
+		}
+		for _, n := range nodes {
+			if err := s.plan.check(n.Owner); err != nil {
+				return err
+			}
+		}
+		for _, e := range edges {
+			if err := s.plan.check(e.Owner); err != nil {
+				return err
+			}
+		}
+	}
 	msg := graphstream.Batch{Type: graphstream.TypeBatch, RunID: runID, Seq: seq, Phase: phase, Nodes: nodes, Edges: edges}
 	payload, err := graphstream.Marshal(msg)
 	if err != nil {
@@ -1607,6 +1750,14 @@ func (s *session) batch(ctx context.Context, runID string, seq int, phase string
 }
 
 func (s *session) end(ctx context.Context, runID string, batchCount int, owners []graphstream.OwnerRef, c graphstream.Completeness) error {
+	if s.opts.AuthoritativeFiles {
+		if err := s.fileLocalErr(); err != nil {
+			return err
+		}
+		if s.plan == nil || graphstream.DigestOwners(owners) != s.plan.digest {
+			return fmt.Errorf("frozen manifest changed before End")
+		}
+	}
 	msg := graphstream.EndReplace{
 		Type:             graphstream.TypeEndReplace,
 		RunID:            runID,
@@ -1662,6 +1813,9 @@ func analysisFingerprintInputs(abs string, eng *engine.Engine) (string, map[stri
 	}
 	sort.Strings(paths)
 	for _, p := range paths {
+		if graphinput.IsLockfile(p) {
+			continue
+		}
 		rel := filepath.ToSlash(p)
 		h.Write([]byte(rel))
 		h.Write([]byte{0})

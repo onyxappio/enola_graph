@@ -14,6 +14,9 @@ import (
 // SchemaVersion identifies the envelope contract.
 const SchemaVersion = "enola.graph.v1"
 
+// FrozenSchemaVersion requires the complete immutable file manifest in Begin.
+const FrozenSchemaVersion = "enola.graph.v2"
+
 // Envelope types.
 const (
 	TypeBeginReplace = "begin_replace"
@@ -78,6 +81,7 @@ type BeginReplace struct {
 	ScopeMode        string     `json:"scope_mode,omitempty"`
 	OwnerScope       []OwnerRef `json:"owner_scope,omitempty"`
 	OwnerScopeCount  int        `json:"owner_scope_count"`
+	OwnerScopeDigest string     `json:"owner_scope_digest,omitempty"`
 	// ForkBase* identify the completed source checkpoint the consumer must
 	// already hold before applying this context's first replacement. Empty on
 	// ordinary (non-fork) runs.
