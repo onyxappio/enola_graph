@@ -1,0 +1,59 @@
+package graphsession
+
+import (
+ "context"
+ "encoding/json"
+ "strings"
+ "github.com/enola-labs/enola/internal/facts"
+ "github.com/enola-labs/enola/internal/graphstream"
+ "os"
+ "path/filepath"
+ "testing"
+ "github.com/enola-labs/enola/internal/extractors/manifestextractor"
+ "github.com/enola-labs/enola/internal/extractors/swiftextractor"
+ "github.com/enola-labs/enola/pkg/plugin"
+)
+
+func TestFinalContextRemoval(t *testing.T) {
+ for _, tc := range []struct{name string; ext plugin.Extractor; files map[string]string; remove string}{
+ {"hidden-manifest",manifestextractor.New(),map[string]string{"package.json":"{}", "private/package.json":`{"dependencies":{"a":"1.0.0"}}`},"private/package.json"},
+ {"swift-include",swiftextractor.New(),map[string]string{"Sources/Core/A.swift":"public struct A {}", "project.yml":"include:\n  - private/targets.data\n", "private/targets.data":"targets:\n  Core:\n    type: framework\n    sources: [Sources]\n"},"private/targets.data"},
+ {"swift-root",swiftextractor.New(),map[string]string{"Sources/Core/A.swift":"public struct A {}", "project.yml":"targets:\n  Core:\n    type: framework\n    sources: [Sources]\n"},"project.yml"},
+ } {t.Run(tc.name,func(t *testing.T){
+ root:=setupTSRepo(t,tc.files); eng:=independentEngine(t,root,[]string{"private/**"},tc.ext); applied:=NewConsumer()
+ independentRun(t,eng,root,"state",applied)
+ if err:=os.Remove(filepath.Join(root,tc.remove));err!=nil{t.Fatal(err)}
+ independentRun(t,eng,root,"state",applied)
+ cold:=NewConsumer(); independentRun(t,eng,root,"cold",cold); assertAppliedEqualsCold(t,applied,cold)
+ independentRun(t,eng,root,"state",applied); assertAppliedEqualsCold(t,applied,cold)
+ })}
+}
+
+func TestFinalLegacyVersionMigration(t *testing.T) {
+ root:=setupTSRepo(t,map[string]string{"Sources/A.swift":"public struct A {}", "project.yml":"targets:\n  Core:\n    type: framework\n    sources: [Sources]\n"})
+ eng:=independentEngine(t,root,nil,swiftextractor.New()); applied:=NewConsumer()
+ first,_:=independentRun(t,eng,root,"state",applied)
+ p:=filepath.Join(root,".enola","state","state.json"); b,err:=os.ReadFile(p);if err!=nil{t.Fatal(err)}
+ var st State;if err=json.Unmarshal(b,&st);err!=nil{t.Fatal(err)}
+ st.ExtractorVersion="v272";st.ExtractorInputHash=nil;st.ExtractorSynthetic=nil
+ b,err=json.Marshal(st);if err!=nil{t.Fatal(err)};if err=os.WriteFile(p,b,0644);err!=nil{t.Fatal(err)}
+ independentWrite(t,root,"project.yml","targets:\n  Renamed:\n    type: framework\n    sources: [Sources]\n")
+ delta,n:=independentRun(t,eng,root,"state",applied)
+ if n==0||delta.TargetGeneration==first.TargetGeneration{t.Fatal("old version reused")}
+ cold:=NewConsumer();independentRun(t,eng,root,"cold",cold);assertAppliedEqualsCold(t,applied,cold)
+ noop,n:=independentRun(t,eng,root,"state",applied);if n!=0||noop.ParsedFiles!=0||noop.TargetGeneration!=delta.TargetGeneration{t.Fatal("postmigration noop failed")}
+}
+
+type finalMutatingSwift struct {*swiftextractor.SwiftExtractor}
+func (e *finalMutatingSwift) Extract(ctx context.Context,root string,files []string)([]facts.Fact,error){
+ ff,err:=e.SwiftExtractor.Extract(ctx,root,files)
+ if err==nil {err=os.WriteFile(filepath.Join(root,"private/targets.data"),[]byte("targets: {}\n"),0644)}
+ return ff,err
+}
+func TestFinalContextRevalidation(t *testing.T){
+ root:=setupTSRepo(t,map[string]string{"Sources/A.swift":"public struct A {}", "project.yml":"include: [private/targets.data]\n", "private/targets.data":"targets:\n  Core:\n    type: framework\n    sources: [Sources]\n"})
+ eng:=independentEngine(t,root,[]string{"private/**"},&finalMutatingSwift{swiftextractor.New()})
+ _,err:=Run(context.Background(),eng,root,&graphstream.MemorySink{},Options{StateDir:filepath.Join(root,".enola","state")})
+ if err==nil||!strings.Contains(err.Error(),"extractor context changed"){t.Fatalf("wanted context rejection, got %v",err)}
+ if _,err=os.Stat(filepath.Join(root,".enola","state","state.json"));!os.IsNotExist(err){t.Fatalf("state advanced: %v",err)}
+}

@@ -30,6 +30,7 @@ import (
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/extractors/tsutil"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
@@ -63,13 +64,14 @@ const angularSearchDepth = 2
 // and an Nx workspace's `apps/<app>/`). Checking only the root would leave the flag
 // false and every gate below silently producing nothing — the failure detectEmber
 // records having made once already.
-func detectAngular(repoPath string) bool {
-	tsRoot, _ := findTSRoot(repoPath)
-	if hasPkgDependency(tsRoot, "@angular/core") ||
-		(tsRoot != repoPath && hasPkgDependency(repoPath, "@angular/core")) {
+func detectAngular(repoPath string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	tsRoot, _ := findTSRoot(repoPath, inputScope)
+	if hasPkgDependency(tsRoot, "@angular/core", inputScope) ||
+		(tsRoot != repoPath && hasPkgDependency(repoPath, "@angular/core", inputScope)) {
 		return true
 	}
-	return nestedPkgDeclares(repoPath, "@angular/core", angularSearchDepth)
+	return nestedPkgDeclares(repoPath, "@angular/core", angularSearchDepth, inputScope)
 }
 
 // angularCounts accounts for the injection sites one file declared: those whose

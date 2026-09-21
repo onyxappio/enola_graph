@@ -1,0 +1,42 @@
+enola: using config /tmp/enola-product-fastdelta-results/config.yaml
+enola graph: config /tmp/enola-product-fastdelta-results/config.yaml
+[graph-profile] lock                               0.000s  total= 0.000s
+[graph-profile] bind_identity                      0.000s  total= 0.000s
+[graph-profile] open_journal                       0.000s  total= 0.001s
+[graph-profile] replay_unacked                     0.000s  total= 0.001s
+[graph-profile] state_read_bytes                   0.011s  state.json bytes=58202526
+[graph-profile] state_json_unmarshal               0.469s  files=6479
+[graph-profile] load_state                         0.480s  total= 0.481s  files=6479
+[graph-profile] engine_walk_repo                   0.429s  files=42583 tests=2522 all_names=45105
+[graph-profile] inventory                          0.429s  total= 0.910s  files=42583 tests=2522 all_names=45105
+[graph-profile] detect_extractors                  1.081s  total= 1.991s  detected=6
+[graph-profile] engine_hash_files                  0.286s  n=9030 hashed=9030 bytes=90567325
+[graph-profile] hash_content_inputs                0.518s  total= 2.509s  n=9030 hashed=9032 of_files=42583
+[graph-profile] scan_digest                        0.011s  total= 2.520s
+[graph-profile] ts_config_inputs                   0.163s  n=77
+[graph-profile] analysis_fingerprint               0.165s  total= 2.685s  cfg_files=60
+[graph-profile] clone_file_state                   0.002s  total= 2.687s  n=6479
+[graph-profile] extractor_need                     0.071s  total= 2.758s  non_ts_need=false detected=6
+[graph-profile] ts_dirty_scope                     0.082s  total= 2.840s  dirty=1 scope=1 force=false
+[graph-profile] ts_detect_frameworks               0.014s  total= 0.014s  files=4281
+[graph-profile] ts_read_dirty                      0.001s  total= 0.015s  to_read=1 cached=4280
+[graph-profile] ts_graphql_grpc_index              0.000s  total= 0.015s  ts_files=4281
+[graph-profile] ts_mapfiles_aggregate              0.038s  total= 0.053s  parsed=1 facts=60174 routers=0
+[graph-profile] ts_compose_modules                 0.165s  total= 0.218s  facts=60626 records=4281 unread=0
+[graph-profile] ts_config_inputs                   0.161s  n=77
+[graph-profile] ts_extract_session                 0.470s  total= 3.310s  parsed=1 cached=4280 facts=60626 records=4281
+[graph-profile] ts_detect_frameworks               0.012s  total= 0.012s  files=4281
+[graph-profile] ts_read_dirty                      0.000s  total= 0.012s  to_read=1 cached=4280
+[graph-profile] ts_graphql_grpc_index              0.000s  total= 0.013s  ts_files=4281
+[graph-profile] ts_mapfiles_aggregate              0.031s  total= 0.044s  parsed=1 facts=60174 routers=0
+[graph-profile] ts_compose_modules                 0.168s  total= 0.212s  facts=60626 records=4281 unread=0
+[graph-profile] ts_config_inputs                   0.162s  n=77
+[graph-profile] assemble_new_files                 0.484s  total= 3.794s  new=6479 ts_noop=false non_ts_need=false skip=false facts=82493
+[graph-profile] index_group_owners                 0.023s  total= 3.817s  facts=82493 owners=6812
+[graph-profile] publish_resolved                   0.113s  total= 3.930s  owners=89
+[graph-profile] revalidate_ts_records              0.116s  total= 4.046s  n=4281
+[graph-profile] ts_config_inputs                   0.161s  n=77
+[graph-profile] state_json_marshal                 0.133s  bytes=58201824 files=6479
+[graph-profile] write_pending_state                0.526s  total= 4.572s
+[graph-profile] end_flush_promote                  0.103s  total= 4.675s  parsed=2 published=89
+[graph] /tmp/enola-product-benchmark-source: generation 3→4 parsed=2 cached=4280 early_local=2 fallbacks=0

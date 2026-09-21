@@ -13,8 +13,9 @@ package scalaextractor
 
 import (
 	"context"
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"log"
-	"os"
+
 	"path/filepath"
 	"strings"
 
@@ -26,7 +27,7 @@ import (
 )
 
 // ScalaExtractor extracts architectural facts from Scala source code.
-type ScalaExtractor struct{}
+type ScalaExtractor struct{ inputScope *inputscope.Scope }
 
 // New creates a new ScalaExtractor.
 func New() *ScalaExtractor {
@@ -68,14 +69,15 @@ func (e *ScalaExtractor) Detect(repoPath string) (bool, error) {
 // names the language. Kept separate from the source fallback because it is the
 // half that must stay conservative.
 func (e *ScalaExtractor) detectByBuild(repoPath string) (bool, error) {
+	inputScope := e.inputScope
 
 	for _, m := range buildMarkers {
-		if _, err := os.Stat(filepath.Join(repoPath, filepath.FromSlash(m))); err == nil {
+		if _, err := inputScope.Stat(filepath.Join(repoPath, filepath.FromSlash(m))); err == nil {
 			return true, nil
 		}
 	}
 	// A root *.sbt under any name (build.sbt is conventional, not required).
-	if entries, err := os.ReadDir(repoPath); err == nil {
+	if entries, err := inputScope.ReadDir(repoPath); err == nil {
 		for _, entry := range entries {
 			if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".sbt") {
 				return true, nil
@@ -86,7 +88,7 @@ func (e *ScalaExtractor) detectByBuild(repoPath string) (bool, error) {
 	// Java and Kotlin projects, so the file alone proves nothing — the plugin or
 	// library coordinate is what names the language.
 	for _, name := range []string{"pom.xml", "build.gradle", "build.gradle.kts"} {
-		data, err := os.ReadFile(filepath.Join(repoPath, name))
+		data, err := inputScope.ReadFile(filepath.Join(repoPath, name))
 		if err != nil {
 			continue
 		}
@@ -150,6 +152,7 @@ func (e *ScalaExtractor) AffectsKey(relFile string) bool {
 // from pass 1. Without it, `extends Base` in one file and the declaration of Base
 // in another are two unrelated strings and the graph has no edge between them.
 func (e *ScalaExtractor) Extract(ctx context.Context, repoPath string, files []string) ([]facts.Fact, error) {
+	inputScope := e.inputScope
 	var scalaFiles []string
 	for _, relFile := range files {
 		if isScalaFile(relFile) {
@@ -165,7 +168,7 @@ func (e *ScalaExtractor) Extract(ctx context.Context, repoPath string, files []s
 	// extractFileAST is a pure function of (src, relFile); parse in parallel and
 	// merge in file order so the output is deterministic regardless of scheduling.
 	perFileFacts := parallel.MapFiles(ctx, scalaFiles, func(relFile string) fileResult {
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			log.Printf("[scala-extractor] error reading %s: %v", relFile, err)
 			return fileResult{}
@@ -189,7 +192,7 @@ func (e *ScalaExtractor) Extract(ctx context.Context, repoPath string, files []s
 	// Play declares its whole HTTP surface in conf/routes, a DSL of its own that no
 	// glob admits and the walker cannot reach — read from disk like the OpenAPI and
 	// Symfony route configs.
-	allFacts = append(allFacts, extractPlayRoutes(repoPath)...)
+	allFacts = append(allFacts, extractPlayRoutes(repoPath, inputScope)...)
 
 	canonicalizeTargets(allFacts, packageIndex, filePkg)
 	// After canonicalization, so the closure walks edges that point at real facts:
@@ -230,3 +233,5 @@ type fileResult struct {
 	facts []facts.Fact
 	pkg   string
 }
+
+func NewGraph(scope *inputscope.Scope) *ScalaExtractor { return &ScalaExtractor{inputScope: scope} }

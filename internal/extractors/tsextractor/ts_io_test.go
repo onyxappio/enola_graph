@@ -106,9 +106,12 @@ function getFetchAllUpdate(a, b) { return { ...a, ...b }; }
 }
 
 func TestTsIO_PerformsIOPropagatesToCaller(t *testing.T) {
-	// A wrapper that calls the network binding is io_direct; a same-module caller that
-	// only calls the wrapper picks up performs_io transitively (bare same-module call
-	// resolves to "<dir>.wrapper", so the edge connects).
+	// Historical name (cache v66). Local-fact contract: the wrapper is direct I/O;
+	// its caller is not tagged performs_io.
+	TestTsIO_CallerDoesNotInheritPerformsIO(t)
+}
+
+func TestTsIO_CallerDoesNotInheritPerformsIO(t *testing.T) {
 	files := map[string]string{
 		"src/svc.ts": `
 import request from 'cross-fetch';
@@ -121,46 +124,17 @@ export function unrelated() { return 1 + 1; }
 
 	wrapper, _ := findFact(got, "src.wrapper")
 	if !tsBoolProp(wrapper, "io_direct") || !tsBoolProp(wrapper, "performs_io") {
-		t.Errorf("wrapper: io_direct=%v performs_io=%v, want both true", tsBoolProp(wrapper, "io_direct"), tsBoolProp(wrapper, "performs_io"))
+		t.Errorf("wrapper: io_direct=%v performs_io=%v, want both true (direct I/O)", tsBoolProp(wrapper, "io_direct"), tsBoolProp(wrapper, "performs_io"))
 	}
 	caller, _ := findFact(got, "src.caller")
 	if tsBoolProp(caller, "io_direct") {
 		t.Errorf("caller: io_direct = true, want false (only calls wrapper)")
 	}
-	if !tsBoolProp(caller, "performs_io") {
-		t.Errorf("caller: performs_io = false, want true (transitive through wrapper)")
+	if tsBoolProp(caller, "performs_io") {
+		t.Errorf("caller: performs_io = true, want false (no transitive IO in this profile)")
 	}
 	unrelated, _ := findFact(got, "src.unrelated")
 	if tsBoolProp(unrelated, "performs_io") {
 		t.Errorf("unrelated: performs_io = true, want false")
-	}
-}
-
-func TestComputeTSPerformsIO_MultiHopAndCycleSafe(t *testing.T) {
-	sym := func(name string, ioDirect bool, calls ...string) facts.Fact {
-		props := map[string]any{"symbol_kind": facts.SymbolFunc}
-		if ioDirect {
-			props["io_direct"] = true
-		}
-		f := facts.Fact{Kind: facts.KindSymbol, Name: name, Props: props}
-		for _, c := range calls {
-			f.Relations = append(f.Relations, facts.Relation{Kind: facts.RelCalls, Target: c})
-		}
-		return f
-	}
-	// A→B→C(io); and a no-I/O cycle X↔Y that must terminate and stay false.
-	all := []facts.Fact{
-		sym("d.A", false, "d.B"),
-		sym("d.B", false, "d.C"),
-		sym("d.C", true),
-		sym("d.X", false, "d.Y"),
-		sym("d.Y", false, "d.X"),
-	}
-	computeTSPerformsIO(all)
-	want := map[string]bool{"d.A": true, "d.B": true, "d.C": true, "d.X": false, "d.Y": false}
-	for _, f := range all {
-		if got := tsBoolProp(f, "performs_io"); got != want[f.Name] {
-			t.Errorf("%s: performs_io = %v, want %v", f.Name, got, want[f.Name])
-		}
 	}
 }

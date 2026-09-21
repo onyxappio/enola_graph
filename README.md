@@ -1,5 +1,12 @@
 # enola — architecture context and regression testing across repositories
 
+This fork adds graph streaming through NATS JetStream, file-level delta analysis
+and resident watch sessions. For this implementation, build from this repository
+and follow the [Codata integration guide](docs/CODATA_INTEGRATION.md),
+[protocol contract](docs/STREAMING_INCREMENTAL.md) and
+[current validation status](docs/GRAPH_VALIDATION.md). Performance optimization is
+ongoing. The upstream installation links below install upstream Enola, not this fork.
+
 [![MCP Toplist](https://mcptoplist.com/badge/glama%2Fenola-labs%2Fenola.svg)](https://mcptoplist.com/server/glama%2Fenola-labs%2Fenola)
 [![CI](https://github.com/enola-labs/enola/actions/workflows/ci.yml/badge.svg)](https://github.com/enola-labs/enola/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/enola-labs/enola)](https://github.com/enola-labs/enola/releases)

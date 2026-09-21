@@ -7,7 +7,7 @@ import (
 	"github.com/enola-labs/enola/internal/extractors/tsutil"
 	"io/fs"
 	"log"
-	"os"
+
 	"path/filepath"
 	"sort"
 	"strings"
@@ -17,6 +17,7 @@ import (
 	"github.com/enola-labs/enola/internal/facts"
 	"github.com/enola-labs/enola/internal/parallel"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	typescript "github.com/tree-sitter/tree-sitter-typescript/bindings/go"
@@ -24,6 +25,7 @@ import (
 
 // TSExtractor extracts architectural facts from TypeScript/TSX source code using tree-sitter.
 type TSExtractor struct {
+	inputScope *inputscope.Scope
 	// clients are the in-house HTTP clients the config declares for TypeScript, handed
 	// over by the engine at registration and read-only afterwards.
 	clients []clientspec.Spec
@@ -48,7 +50,7 @@ func (e *TSExtractor) ConfigKey() string { return clientspec.Fingerprint(e.clien
 // Detect returns true if the repository (or one of its immediate subdirectories
 // in the case of a monorepo) contains TypeScript markers.
 func (e *TSExtractor) Detect(repoPath string) (bool, error) {
-	return e.DetectFiles(repoPath, detectnames.Walk(repoPath))
+	return e.DetectFiles(repoPath, detectnames.Walk(repoPath, e.inputScope))
 }
 
 // unambiguousTSExts are the extensions that name this extractor's languages and
@@ -74,7 +76,8 @@ var unambiguousTSExts = map[string]bool{
 // repository has reached Extract with findTSRoot returning no root since that arm was
 // added, and every consumer of it pairs tsRoot with a repoPath fallback.
 func (e *TSExtractor) DetectFiles(repoPath string, files []string) (bool, error) {
-	if _, found := findTSRoot(repoPath); found {
+	inputScope := e.inputScope
+	if _, found := findTSRoot(repoPath, inputScope); found {
 		return true, nil
 	}
 	if hasGraphQLDocs(files) {
@@ -95,24 +98,26 @@ func (e *TSExtractor) DetectFiles(repoPath string, files []string) (bool, error)
 // with a boolean indicating whether one was found. Search depth adapts to
 // repo structure: Java/Gradle projects nest UI code deep (src/main/resources/ui)
 // so we search up to 8 levels; plain repos need at most 2.
-func findTSRoot(repoPath string) (string, bool) {
-	if hasTSMarkers(repoPath) {
+func findTSRoot(repoPath string, inputScopes ...*inputscope.Scope) (string, bool) {
+	inputScope := inputscope.First(inputScopes)
+	if hasTSMarkers(repoPath, inputScope) {
 		return repoPath, true
 	}
 	maxDepth := 2
-	if isDeepNestedProject(repoPath) {
+	if isDeepNestedProject(repoPath, inputScope) {
 		maxDepth = 8
 	}
-	return searchTSRoot(repoPath, 0, maxDepth)
+	return searchTSRoot(repoPath, 0, maxDepth, inputScope)
 }
 
-func isDeepNestedProject(repoPath string) bool {
+func isDeepNestedProject(repoPath string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
 	markers := []string{
 		"pom.xml", "build.gradle", "build.gradle.kts",
 		"pyproject.toml", "setup.py", "setup.cfg", "requirements.txt",
 	}
 	for _, marker := range markers {
-		if _, err := os.Stat(filepath.Join(repoPath, marker)); err == nil {
+		if _, err := inputScope.Stat(filepath.Join(repoPath, marker)); err == nil {
 			return true
 		}
 	}
@@ -124,11 +129,12 @@ var tsSkipDirs = map[string]bool{
 	"build": true, "out": true, "target": true, "vendor": true,
 }
 
-func searchTSRoot(dir string, depth, maxDepth int) (string, bool) {
+func searchTSRoot(dir string, depth, maxDepth int, inputScopes ...*inputscope.Scope) (string, bool) {
+	inputScope := inputscope.First(inputScopes)
 	if depth >= maxDepth {
 		return "", false
 	}
-	entries, err := os.ReadDir(dir)
+	entries, err := inputScope.ReadDir(dir)
 	if err != nil {
 		return "", false
 	}
@@ -137,10 +143,10 @@ func searchTSRoot(dir string, depth, maxDepth int) (string, bool) {
 			continue
 		}
 		sub := filepath.Join(dir, entry.Name())
-		if hasTSMarkers(sub) {
+		if hasTSMarkers(sub, inputScope) {
 			return sub, true
 		}
-		if found, ok := searchTSRoot(sub, depth+1, maxDepth); ok {
+		if found, ok := searchTSRoot(sub, depth+1, maxDepth, inputScope); ok {
 			return found, true
 		}
 	}
@@ -149,14 +155,17 @@ func searchTSRoot(dir string, depth, maxDepth int) (string, bool) {
 
 // hasTSMarkers returns true if the directory looks like a project root this
 // extractor should handle (TypeScript, or a JS framework it also parses).
-func hasTSMarkers(dir string) bool {
-	// tsconfig.json (standard), tsconfig.base.json (Nx monorepo), or a Deno
-	// project's config — Deno ships TypeScript with no package.json at all
-	// (deno.json/deno.jsonc, import_map.json), so a Deno Slack app or service
-	// was undetectable by every package.json rule below.
+func hasTSMarkers(dir string, inputScopes ...
+// tsconfig.json (standard), tsconfig.base.json (Nx monorepo), or a Deno
+// project's config — Deno ships TypeScript with no package.json at all
+// (deno.json/deno.jsonc, import_map.json), so a Deno Slack app or service
+// was undetectable by every package.json rule below.
+*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+
 	for _, name := range []string{"tsconfig.json", "tsconfig.base.json",
 		"deno.json", "deno.jsonc", "import_map.json"} {
-		if _, err := os.Stat(filepath.Join(dir, name)); err == nil {
+		if _, err := inputScope.Stat(filepath.Join(dir, name)); err == nil {
 			return true
 		}
 	}
@@ -167,7 +176,7 @@ func hasTSMarkers(dir string) bool {
 	// Rails 8 app, 350+ files were invisible until this marker.
 	for _, pkg := range []string{"typescript", "vue", "react", "svelte", "next", "nuxt", "ember-source",
 		"@hotwired/stimulus", "@hotwired/turbo-rails"} {
-		if hasPkgDependency(dir, pkg) {
+		if hasPkgDependency(dir, pkg, inputScope) {
 			return true
 		}
 	}
@@ -177,18 +186,19 @@ func hasTSMarkers(dir string) bool {
 	// every package.json rule above is blind to it — an importmap app's whole
 	// app/javascript tree (Stimulus controllers included) was claimed by this
 	// extractor and never parsed.
-	if _, err := os.Stat(filepath.Join(dir, "config", "importmap.rb")); err == nil {
+	if _, err := inputScope.Stat(filepath.Join(dir, "config", "importmap.rb")); err == nil {
 		return true
 	}
 	// A dependency-free plain-JavaScript package is still a JavaScript project:
 	// a Node CLI with zero deps declares itself structurally (bin, main,
 	// exports, type, workspaces, or any dependency map). Only a bare
 	// name-holding stub — a marker file, not a package — stays undetected.
-	return packageJSONDeclaresPackage(dir)
+	return packageJSONDeclaresPackage(dir, inputScope)
 }
 
-func packageJSONDeclaresPackage(dir string) bool {
-	data, err := os.ReadFile(filepath.Join(dir, "package.json"))
+func packageJSONDeclaresPackage(dir string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	data, err := overlayReadFile(context.Background(), filepath.Join(dir, "package.json"), inputScope)
 	if err != nil {
 		return false
 	}
@@ -211,28 +221,29 @@ func packageJSONDeclaresPackage(dir string) bool {
 
 // Extract parses TypeScript/TSX files and emits architectural facts.
 func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []string) ([]facts.Fact, error) {
+	inputScope := e.inputScope
 	var allFacts []facts.Fact
 
 	// Detect frameworks
-	isNextJS := detectNextJS(repoPath)
-	isVue := detectVue(repoPath)
-	isNuxt := detectNuxt(repoPath)
-	isSvelteKit := detectSvelteKit(repoPath)
-	isEmber := detectEmber(repoPath)
-	isReactNav := detectReactNavigation(repoPath)
-	isAngular := detectAngular(repoPath)
+	isNextJS := detectNextJS(repoPath, inputScope)
+	isVue := detectVue(repoPath, inputScope)
+	isNuxt := detectNuxt(repoPath, inputScope)
+	isSvelteKit := detectSvelteKit(repoPath, inputScope)
+	isEmber := detectEmber(repoPath, inputScope)
+	isReactNav := detectReactNavigation(repoPath, inputScope)
+	isAngular := detectAngular(repoPath, inputScope)
 	// ORM detection is gated on the package.json dependency, exactly as Vue/Nuxt are, so
 	// a class coincidentally decorated @Entity models nothing in a repo without TypeORM.
-	isTypeORM, isDrizzle, isPrisma := detectORMs(repoPath)
+	isTypeORM, isDrizzle, isPrisma := detectORMs(repoPath, inputScope)
 	orms := ormFlags{typeORM: isTypeORM, drizzle: isDrizzle}
 
 	// Parse tsconfig.json path aliases, one root per package for monorepos.
-	aliasRoots := collectTSAliasRoots(repoPath)
+	aliasRoots := collectTSAliasRoots(ctx, repoPath, inputScope)
 
 	// SvelteKit maps $lib by convention and may declare literal aliases in its
 	// config even before `svelte-kit sync` has generated a tsconfig.
 	if isSvelteKit {
-		aliasRoots = withSvelteKitAliasFallbacks(repoPath, aliasRoots)
+		aliasRoots = withSvelteKitAliasFallbacks(repoPath, aliasRoots, inputScope)
 	}
 
 	// Restrict to TypeScript files once, then parse them in parallel. The
@@ -273,7 +284,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 		err error
 	}
 	readSources := parallel.MapFiles(ctx, tsFiles, func(relFile string) sourceResult {
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		return sourceResult{src: src, err: err}
 	})
 	sources := make(map[string][]byte, len(tsFiles))
@@ -320,7 +331,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	templates := make(map[string]*angularTemplate, len(htmlFiles))
 	if len(htmlFiles) > 0 {
 		scans := parallel.MapFiles(ctx, htmlFiles, func(relFile string) *angularTemplate {
-			src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+			src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 			if err != nil {
 				log.Printf("[ts-extractor] error reading %s: %v", relFile, err)
 				return nil
@@ -378,13 +389,13 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 		}
 	}
 
-	// Serial post-pass: propagate the per-body io_direct flag transitively across the
-	// call graph into performs_io, so wrapper-hidden network/file I/O is visible to the
-	// performance analyzer. Mirrors the Swift extractor's computePerformsIO.
+	// Local-fact contract: keep io_direct, and set performs_io only on the same
+	// symbol. Transitive caller tagging is intentionally not applied; reachability
+	// belongs in graph queries. See applyDirectIOContract.
 	if isNuxt {
 		resolveNuxtAutoComposableCalls(allFacts)
 	}
-	computeTSPerformsIO(allFacts)
+	applyDirectIOContract(allFacts)
 
 	// Engine-relative routes compose onto their mount point here, where every
 	// mount in the repo is visible; a per-file pass cannot see both sides.
@@ -463,17 +474,18 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	// Prisma models live in schema.prisma — a separate DSL, so tree-sitter never sees it.
 	// Read it off-glob, the same way package.json and tsconfig.json already are.
 	if isPrisma {
-		allFacts = append(allFacts, extractPrismaStorage(repoPath)...)
+		ff, _ := extractPrismaStorage(ctx, repoPath, inputScope)
+		allFacts = append(allFacts, ff...)
 	}
 
 	// Emit module facts for each directory
-	pkgNames := collectPackageNames(repoPath)
+	pkgNames := collectPackageNames(repoPath, inputScope)
 	// The workspace project each directory belongs to, where the repository states
 	// one. A monorepo's unit of ownership is its project, not its directory, and
 	// every reading that groups by unit was inferring the boundary from the path.
 	var projects map[string]string
 	if isAngular {
-		projects = angularProjectNames(repoPath)
+		projects = angularProjectNames(repoPath, inputScope)
 	}
 	for dir := range modules {
 		props := map[string]any{
@@ -1393,9 +1405,10 @@ func detectRoute(relFile string) *facts.Fact {
 // detectNextJS checks if the repository is a Next.js project.
 // It searches the TypeScript root directory (which may be a subdirectory in a
 // monorepo) for next.config.* files or a package.json with a "next" dependency.
-func detectNextJS(repoPath string) bool {
-	tsRoot, _ := findTSRoot(repoPath)
-	return detectNextJSAt(tsRoot) || (tsRoot != repoPath && detectNextJSAt(repoPath))
+func detectNextJS(repoPath string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	tsRoot, _ := findTSRoot(repoPath, inputScope)
+	return detectNextJSAt(tsRoot, inputScope) || (tsRoot != repoPath && detectNextJSAt(repoPath, inputScope))
 }
 
 // collectPackageNames maps each directory holding a package.json to the package
@@ -1423,9 +1436,10 @@ func detectNextJS(repoPath string) bool {
 // named here instead — tsSkipDirs (shared with the alias-root walk) plus dot-directories
 // and testdata. node_modules is the critical one: a dependency's package.json would
 // otherwise be read as if the repo published it.
-func collectPackageNames(repoPath string) map[string]string {
+func collectPackageNames(repoPath string, inputScopes ...*inputscope.Scope) map[string]string {
+	inputScope := inputscope.First(inputScopes)
 	out := map[string]string{}
-	_ = filepath.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+	_ = inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return nil // unreadable subtree: skip it rather than fail extraction
 		}
@@ -1439,7 +1453,7 @@ func collectPackageNames(repoPath string) map[string]string {
 		if d.Name() != "package.json" {
 			return nil
 		}
-		data, err := os.ReadFile(path)
+		data, err := overlayReadFile(context.Background(), path, inputScope)
 		if err != nil {
 			return nil
 		}
@@ -1479,16 +1493,19 @@ func nearestPackageName(pkgNames map[string]string, dir string) string {
 	}
 }
 
-func detectNextJSAt(dir string) bool {
-	// Check next.config.* at this directory level
+func detectNextJSAt(dir string, inputScopes ...
+// Check next.config.* at this directory level
+*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+
 	for _, name := range []string{"next.config.js", "next.config.mjs", "next.config.ts"} {
-		if _, err := os.Stat(filepath.Join(dir, name)); err == nil {
+		if _, err := inputScope.Stat(filepath.Join(dir, name)); err == nil {
 			return true
 		}
 	}
 
 	// Check package.json for next dependency
-	data, err := os.ReadFile(filepath.Join(dir, "package.json"))
+	data, err := overlayReadFile(context.Background(), filepath.Join(dir, "package.json"), inputScope)
 	if err != nil {
 		return false
 	}
@@ -1549,6 +1566,13 @@ func isMinifiedSource(content []byte) bool {
 func (e *TSExtractor) OwnsFile(relFile string) bool {
 	return isTypeScriptFile(relFile) || isAngularTemplateFile(relFile)
 }
+
+// ContentInput implements plugin.DeltaInputs. Nested tsconfig/package inputs are
+// hashed separately by ConfigInputPaths' own traversal.
+func (e *TSExtractor) ContentInput(rel string) bool { return e.OwnsFile(rel) }
+
+// NameSetInput implements plugin.DeltaInputs.
+func (e *TSExtractor) NameSetInput() bool { return false }
 
 // isAngularTemplateFile reports whether a path is a candidate component template.
 func isAngularTemplateFile(path string) bool {
@@ -1863,18 +1887,20 @@ type tsAliasRoot struct {
 // collectTSAliasRoots finds every directory whose tsconfig.json (or
 // tsconfig.base.json) declares path aliases — unlike findTSRoot, which stops
 // at the first match, this covers monorepos with one tsconfig per package.
-func collectTSAliasRoots(repoPath string) []tsAliasRoot {
+func collectTSAliasRoots(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) []tsAliasRoot {
+	inputScope := inputscope.First(inputScopes)
 	maxDepth := 2
-	if isDeepNestedProject(repoPath) {
+	if isDeepNestedProject(repoPath, inputScope) {
 		maxDepth = 8
 	}
 	var roots []tsAliasRoot
-	walkTSAliasRoots(repoPath, repoPath, 0, maxDepth, &roots)
+	walkTSAliasRoots(ctx, repoPath, repoPath, 0, maxDepth, &roots, inputScope)
 	return roots
 }
 
-func walkTSAliasRoots(repoPath, dir string, depth, maxDepth int, out *[]tsAliasRoot) {
-	if aliases, ok := aliasesAtDir(dir); ok {
+func walkTSAliasRoots(ctx context.Context, repoPath, dir string, depth, maxDepth int, out *[]tsAliasRoot, inputScopes ...*inputscope.Scope) {
+	inputScope := inputscope.First(inputScopes)
+	if aliases, ok := aliasesAtDir(ctx, dir, inputScope); ok {
 		rel, err := filepath.Rel(repoPath, dir)
 		if err != nil || rel == "." {
 			rel = ""
@@ -1899,7 +1925,7 @@ func walkTSAliasRoots(repoPath, dir string, depth, maxDepth int, out *[]tsAliasR
 	if depth >= maxDepth {
 		return
 	}
-	entries, err := os.ReadDir(dir)
+	entries, err := inputScope.ReadDir(dir)
 	if err != nil {
 		return
 	}
@@ -1907,15 +1933,16 @@ func walkTSAliasRoots(repoPath, dir string, depth, maxDepth int, out *[]tsAliasR
 		if !entry.IsDir() || strings.HasPrefix(entry.Name(), ".") || tsSkipDirs[entry.Name()] {
 			continue
 		}
-		walkTSAliasRoots(repoPath, filepath.Join(dir, entry.Name()), depth+1, maxDepth, out)
+		walkTSAliasRoots(ctx, repoPath, filepath.Join(dir, entry.Name()), depth+1, maxDepth, out, inputScope)
 	}
 }
 
 // aliasesAtDir tries tsconfig.json then tsconfig.base.json at dir, returning
 // the first one that declares a non-empty paths map.
-func aliasesAtDir(dir string) (map[string]tsAlias, bool) {
+func aliasesAtDir(ctx context.Context, dir string, inputScopes ...*inputscope.Scope) (map[string]tsAlias, bool) {
+	inputScope := inputscope.First(inputScopes)
 	for _, name := range []string{"tsconfig.json", "tsconfig.base.json"} {
-		if aliases, ok := tryParseTSConfigAliases(filepath.Join(dir, name)); ok {
+		if aliases, ok := tryParseTSConfigAliases(ctx, filepath.Join(dir, name), inputScope); ok {
 			return aliases, true
 		}
 	}
@@ -2020,8 +2047,9 @@ func stripJSONC(data []byte) []byte {
 	return out
 }
 
-func readTSConfig(path string) (tsConfigAliasFile, error) {
-	data, err := os.ReadFile(path)
+func readTSConfig(ctx context.Context, path string, inputScopes ...*inputscope.Scope) (tsConfigAliasFile, error) {
+	inputScope := inputscope.First(inputScopes)
+	data, err := overlayReadFile(ctx, path, inputScope)
 	if err != nil {
 		return tsConfigAliasFile{}, err
 	}
@@ -2046,7 +2074,8 @@ func resolveTSConfigExtends(from, spec string) string {
 	return filepath.Clean(p) //factpath:host
 }
 
-func tryParseTSConfigAliases(tsconfigPath string) (map[string]tsAlias, bool) {
+func tryParseTSConfigAliases(ctx context.Context, tsconfigPath string, inputScopes ...*inputscope.Scope) (map[string]tsAlias, bool) {
+	inputScope := inputscope.First(inputScopes)
 	originDir := filepath.Dir(tsconfigPath) //factpath:host
 	path := filepath.Clean(tsconfigPath)    //factpath:host
 	seen := map[string]bool{}
@@ -2055,7 +2084,7 @@ func tryParseTSConfigAliases(tsconfigPath string) (map[string]tsAlias, bool) {
 			return nil, false
 		}
 		seen[path] = true
-		config, err := readTSConfig(path)
+		config, err := readTSConfig(ctx, path, inputScope)
 		if err != nil {
 			return nil, false
 		}
@@ -2583,6 +2612,7 @@ func isTSTestFile(relFile string) bool {
 // prodFiles is unused: knownFiles is deliberately left nil (see above), so this
 // pass has nothing to check a production file set against.
 func (e *TSExtractor) ExtractTestRefs(ctx context.Context, repoPath string, files, _ []string) ([]facts.Fact, error) {
+	inputScope := e.inputScope
 	var testFiles []string
 	for _, relFile := range files {
 		if isTSTestFile(relFile) {
@@ -2593,10 +2623,10 @@ func (e *TSExtractor) ExtractTestRefs(ctx context.Context, repoPath string, file
 		return nil, nil
 	}
 
-	aliasRoots := collectTSAliasRoots(repoPath)
+	aliasRoots := collectTSAliasRoots(ctx, repoPath, inputScope)
 
 	perFile := parallel.MapFiles(ctx, testFiles, func(relFile string) []facts.Fact {
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			log.Printf("[ts-extractor] error reading test file %s: %v", relFile, err)
 			return nil
@@ -3445,67 +3475,27 @@ func tsIsTrueCondition(kinds *tsutil.KindTable, c *sitter.Node, src []byte) bool
 	return false
 }
 
-// computeTSPerformsIO propagates the walk-time io_direct flag transitively across the
-// call graph into a performs_io prop, so a function that reaches network/file I/O only
-// through helpers is still flagged — the signal the performance analyzer reads to catch a
-// per-iteration network call behind a wrapper. Mirrors the Swift computePerformsIO, but
-// simpler: TS call targets are already canonical fact names, so no bare-name fan-out is
-// needed. A monotone fixpoint (only ever flips false→true) makes it cycle-safe.
-func computeTSPerformsIO(allFacts []facts.Fact) {
-	// Index symbol facts by name (a name may map to >1 fact) and record which names exist.
-	exists := make(map[string]bool)
-	for i := range allFacts {
-		if allFacts[i].Kind == facts.KindSymbol {
-			exists[allFacts[i].Name] = true
-		}
-	}
-
-	io := make(map[string]bool)      // name → performs I/O (directly or transitively)
-	adj := make(map[string][]string) // name → called names that are known symbols
+// applyDirectIOContract is the streaming/local-fact IO rule: a symbol performs I/O
+// only when this file's body (or annotation) established io_direct. Callers are
+// not tagged. performs_io is retained as a synonym of io_direct so existing
+// readers of the property still see direct I/O, without transitive materialization.
+func applyDirectIOContract(allFacts []facts.Fact) {
 	for i := range allFacts {
 		f := &allFacts[i]
 		if f.Kind != facts.KindSymbol {
 			continue
 		}
-		if b, _ := f.Props["io_direct"].(bool); b {
-			io[f.Name] = true
-		}
-		seen := make(map[string]bool)
-		for _, r := range f.Relations {
-			if r.Kind != facts.RelCalls || r.Target == f.Name || seen[r.Target] || !exists[r.Target] {
-				continue
+		direct, _ := f.Props["io_direct"].(bool)
+		if !direct {
+			if f.Props != nil {
+				delete(f.Props, "performs_io")
 			}
-			seen[r.Target] = true
-			adj[f.Name] = append(adj[f.Name], r.Target)
+			continue
 		}
-	}
-
-	// Fixpoint: a name performs I/O if any callee does. Monotone, so it terminates
-	// even with call cycles (a no-I/O cycle simply stays false).
-	for changed := true; changed; {
-		changed = false
-		for name, callees := range adj {
-			if io[name] {
-				continue
-			}
-			for _, c := range callees {
-				if io[c] {
-					io[name] = true
-					changed = true
-					break
-				}
-			}
+		if f.Props == nil {
+			f.Props = map[string]any{}
 		}
-	}
-
-	for i := range allFacts {
-		f := &allFacts[i]
-		if f.Kind == facts.KindSymbol && io[f.Name] {
-			if f.Props == nil {
-				f.Props = map[string]any{}
-			}
-			f.Props["performs_io"] = true
-		}
+		f.Props["performs_io"] = true
 	}
 }
 
@@ -3558,3 +3548,6 @@ func tsGrammarLanguage(isTSX bool) *sitter.Language {
 	}
 	return sitter.NewLanguage(typescript.LanguageTypescript())
 }
+
+// NewGraph binds an immutable graph input snapshot; New retains legacy behavior.
+func NewGraph(scope *inputscope.Scope) *TSExtractor { return &TSExtractor{inputScope: scope} }

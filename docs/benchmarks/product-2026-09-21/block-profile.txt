@@ -1,0 +1,46 @@
+File: enola-product-block-profile
+Type: delay
+Time: 2026-09-21 07:50:56 EEST
+Showing nodes accounting for 701.58s, 100% of 701.61s total
+Dropped 86 nodes (cum <= 3.51s)
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%    402.30s 57.34%  github.com/enola-labs/enola/internal/graphstream.(*Publisher).EnableAsync.func2
+         0     0%     0%    402.30s 57.34%  github.com/enola-labs/enola/internal/graphstream.(*Publisher).deliverPump
+   372.22s 53.05% 53.05%    372.22s 53.05%  runtime.selectgo
+   115.51s 16.46% 69.52%    115.51s 16.46%  sync.(*Cond).Wait
+    98.20s 14.00% 83.51%     98.20s 14.00%  sync.(*Mutex).Lock (inline)
+    58.62s  8.36% 91.87%     58.62s  8.36%  runtime.chanrecv2
+         0     0% 91.87%     57.79s  8.24%  github.com/nats-io/nats%2ego.(*asyncCallbacksHandler).asyncCBDispatcher
+         0     0% 91.87%     57.79s  8.24%  github.com/nats-io/nats%2ego.Options.Connect.gowrap1
+         0     0% 91.87%     57.73s  8.23%  github.com/nats-io/nats%2ego.(*Conn).subscribeLocked.gowrap1
+         0     0% 91.87%     57.73s  8.23%  github.com/nats-io/nats%2ego.(*Conn).waitForMsgs
+         0     0% 91.87%     57.62s  8.21%  github.com/nats-io/nats%2ego.(*Conn).flusher
+         0     0% 91.87%     57.62s  8.21%  github.com/nats-io/nats%2ego.(*Conn).processConnectInit.gowrap3
+         0     0% 91.87%     57.09s  8.14%  github.com/enola-labs/enola/internal/graphstream.(*Publisher).Publish
+         0     0% 91.87%     56.81s  8.10%  github.com/enola-labs/enola/internal/graphsession.(*session).batch
+         0     0% 91.87%     56.81s  8.10%  github.com/enola-labs/enola/internal/graphsession.(*session).emitBatch
+         0     0% 91.87%     56.80s  8.10%  github.com/enola-labs/enola/internal/graphsession.(*session).appendPhase
+         0     0% 91.87%     53.45s  7.62%  github.com/enola-labs/enola/internal/graphstream.(*Journal).appendUnsynced
+    51.45s  7.33% 99.20%     51.45s  7.33%  sync.(*WaitGroup).Wait
+         0     0% 99.20%     51.18s  7.30%  github.com/enola-labs/enola/internal/graphstream.(*Publisher).EnableAsync.func3
+         0     0% 99.20%     42.02s  5.99%  github.com/enola-labs/enola/pkg/command.(*Runner).Dispatch
+         0     0% 99.20%     42.02s  5.99%  github.com/enola-labs/enola/pkg/command.(*Runner).Graph
+         0     0% 99.20%     42.02s  5.99%  main.main
+         0     0% 99.20%     42.02s  5.99%  runtime.main
+         0     0% 99.20%     42.02s  5.99%  github.com/enola-labs/enola/internal/graphsession.(*session).analyze (inline)
+         0     0% 99.20%     42.02s  5.99%  github.com/enola-labs/enola/internal/graphsession.(*session).run
+         0     0% 99.20%     42.02s  5.99%  github.com/enola-labs/enola/internal/graphsession.Run
+         0     0% 99.20%     37.74s  5.38%  github.com/enola-labs/enola/internal/graphstream.(*Journal).ackUnsynced
+         0     0% 99.20%     21.91s  3.12%  github.com/enola-labs/enola/internal/parallel.MapFiles[go.shape.struct { github.com/enola-labs/enola/internal/extractors/tsextractor.res github.com/enola-labs/enola/internal/extractors/tsextractor.tsFileResult; github.com/enola-labs/enola/internal/extractors/tsextractor.rec *github.com/enola-labs/enola/internal/extractors/tsextractor.FileRecord }].func1
+         0     0% 99.20%     20.97s  2.99%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).ExtractSession.func3
+         0     0% 99.20%     20.94s  2.98%  github.com/enola-labs/enola/internal/graphsession.(*session).publishLocal
+         0     0% 99.20%     20.94s  2.98%  github.com/enola-labs/enola/internal/graphsession.(*session).run.func2
+         0     0% 99.20%     10.99s  1.57%  github.com/enola-labs/enola/internal/graphstream.(*Publisher).EnableAsync.func1
+         0     0% 99.20%     10.99s  1.57%  github.com/enola-labs/enola/internal/graphstream.(*Publisher).commitPump
+         0     0% 99.20%      7.07s  1.01%  github.com/nats-io/nats%2ego.(*Conn).requestWithContext
+         0     0% 99.20%      7.07s  1.01%  github.com/enola-labs/enola/internal/graphstream.(*NATSSink).Publish
+         0     0% 99.20%      7.07s  1.01%  github.com/nats-io/nats%2ego.(*Conn).RequestMsgWithContext
+         0     0% 99.20%      7.07s  1.01%  github.com/nats-io/nats.go/jetstream.(*jetStream).PublishMsg
+         0     0% 99.20%      5.82s  0.83%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).ExtractSession
+         0     0% 99.20%      5.74s  0.82%  github.com/enola-labs/enola/internal/parallel.MapFiles[go.shape.struct { github.com/enola-labs/enola/internal/extractors/tsextractor.res github.com/enola-labs/enola/internal/extractors/tsextractor.tsFileResult; github.com/enola-labs/enola/internal/extractors/tsextractor.rec *github.com/enola-labs/enola/internal/extractors/tsextractor.FileRecord }]
+     5.58s   0.8%   100%      5.58s   0.8%  runtime.chansend1

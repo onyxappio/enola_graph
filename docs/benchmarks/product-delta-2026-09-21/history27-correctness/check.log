@@ -1,0 +1,9 @@
+START r1-new-initial
+DONE r1-new-initial 11.886 {'BaseGeneration': 0, 'TargetGeneration': 1, 'ParsedFiles': 4173, 'CachedFiles': 0, 'EarlyLocal': 4173, 'FallbackCount': 5}
+START r1-new-noop
+DONE r1-new-noop 2.691 {'BaseGeneration': 1, 'TargetGeneration': 1, 'ParsedFiles': 0, 'CachedFiles': 4273, 'EarlyLocal': 0, 'FallbackCount': 0}
+START r1-new-multifile
+DONE r1-new-multifile 5.794 {'BaseGeneration': 1, 'TargetGeneration': 2, 'ParsedFiles': 348, 'CachedFiles': 4224, 'EarlyLocal': 348, 'FallbackCount': 1}
+START cold-target
+DONE cold-target 10.695 {'BaseGeneration': 0, 'TargetGeneration': 1, 'ParsedFiles': 4181, 'CachedFiles': 0, 'EarlyLocal': 4181, 'FallbackCount': 5}
+CHECKS [{'check': 'r1 baseline repeat equality', 'pass': True}, {'check': 'r1-new-noop no-op', 'pass': True}, {'check': 'r1-new-multifile equals target cold', 'pass': True, 'actual': '50615fbe8f578c49a2f43b647ccf7d158e9c8865e93787f5680287cdb2d7528c', 'expected': '50615fbe8f578c49a2f43b647ccf7d158e9c8865e93787f5680287cdb2d7528c'}]

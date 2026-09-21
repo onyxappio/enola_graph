@@ -1395,7 +1395,7 @@ func TestParseTSConfigAliases_ExactPatternIsRecorded(t *testing.T) {
 	}}}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	aliases, ok := tryParseTSConfigAliases(path)
+	aliases, ok := tryParseTSConfigAliases(context.Background(), path)
 	if !ok {
 		t.Fatal("no aliases parsed")
 	}
@@ -1431,7 +1431,7 @@ func TestParseTSConfigAliases_FollowsExtendsAndRebasesDeclaringFile(t *testing.T
 		t.Fatal(err)
 	}
 
-	aliases, ok := tryParseTSConfigAliases(child)
+	aliases, ok := tryParseTSConfigAliases(context.Background(), child)
 	if !ok {
 		t.Fatal("no inherited aliases parsed")
 	}
@@ -1451,7 +1451,7 @@ func TestParseTSConfigAliases_ChildPathsReplaceParent(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	aliases, ok := tryParseTSConfigAliases(child)
+	aliases, ok := tryParseTSConfigAliases(context.Background(), child)
 	if !ok {
 		t.Fatal("no child aliases parsed")
 	}
@@ -1472,7 +1472,7 @@ func TestParseTSConfigAliases_ExtendsCycleFailsClosed(t *testing.T) {
 	if err := os.WriteFile(b, []byte(`{"extends":"./a.json"}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if aliases, ok := tryParseTSConfigAliases(a); ok || aliases != nil {
+	if aliases, ok := tryParseTSConfigAliases(context.Background(), a); ok || aliases != nil {
 		t.Fatalf("cycle parsed: %v", aliases)
 	}
 }

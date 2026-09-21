@@ -2,9 +2,10 @@ package tsextractor
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"github.com/enola-labs/enola/internal/extractors/tsutil"
-	"os"
+
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/enola-labs/enola/internal/facts"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	typescript "github.com/tree-sitter/tree-sitter-typescript/bindings/go"
@@ -90,31 +92,36 @@ func indexCaseInsensitive(src, needle []byte) int {
 	return bytes.Index(bytes.ToLower(src), bytes.ToLower(needle))
 }
 
-func detectVue(repoPath string) bool {
-	tsRoot, _ := findTSRoot(repoPath)
-	return detectVueAt(tsRoot) || (tsRoot != repoPath && detectVueAt(repoPath))
+func detectVue(repoPath string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	tsRoot, _ := findTSRoot(repoPath, inputScope)
+	return detectVueAt(tsRoot, inputScope) || (tsRoot != repoPath && detectVueAt(repoPath, inputScope))
 }
 
-func detectVueAt(dir string) bool {
-	return hasPkgDependency(dir, "vue")
+func detectVueAt(dir string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	return hasPkgDependency(dir, "vue", inputScope)
 }
 
-func detectNuxt(repoPath string) bool {
-	tsRoot, _ := findTSRoot(repoPath)
-	return detectNuxtAt(tsRoot) || (tsRoot != repoPath && detectNuxtAt(repoPath))
+func detectNuxt(repoPath string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	tsRoot, _ := findTSRoot(repoPath, inputScope)
+	return detectNuxtAt(tsRoot, inputScope) || (tsRoot != repoPath && detectNuxtAt(repoPath, inputScope))
 }
 
-func detectNuxtAt(dir string) bool {
+func detectNuxtAt(dir string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
 	for _, name := range []string{"nuxt.config.js", "nuxt.config.ts", "nuxt.config.mjs"} {
-		if _, err := os.Stat(filepath.Join(dir, name)); err == nil {
+		if _, err := inputScope.Stat(filepath.Join(dir, name)); err == nil {
 			return true
 		}
 	}
-	return hasPkgDependency(dir, "nuxt")
+	return hasPkgDependency(dir, "nuxt", inputScope)
 }
 
-func hasPkgDependency(dir, pkg string) bool {
-	data, err := os.ReadFile(filepath.Join(dir, "package.json"))
+func hasPkgDependency(dir, pkg string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	data, err := overlayReadFile(context.Background(), filepath.Join(dir, "package.json"), inputScope)
 	if err != nil {
 		return false
 	}

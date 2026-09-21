@@ -61,43 +61,81 @@ type serverBinding struct {
 	mounted   bool   // whether a mount point is known at all
 }
 
+// Distinctive literals each factory regex requires. A file without them cannot
+// produce a binding, so the NFA never runs. Tokens are case-sensitive and match
+// the factory patterns exactly; extra hits only mean the regex still runs.
+var (
+	tokExpress    = []byte("express")
+	tokFastify    = []byte("fastify")
+	tokFastifyCap = []byte("Fastify")
+	tokHono       = []byte("Hono")
+	tokHonoLow    = []byte("hono")
+	tokKoa        = []byte("Koa")
+	tokKoaLow     = []byte("koa")
+	tokRouter     = []byte("Router")
+)
+
+func possibleAppFactory(src []byte) bool {
+	return containsAny(src, tokExpress, tokFastify, tokFastifyCap, tokHono, tokHonoLow, tokKoa, tokKoaLow)
+}
+
+func possibleRouterFactory(src []byte) bool {
+	return bytes.Contains(src, tokRouter)
+}
+
+func possibleServerBinding(src []byte) bool {
+	return possibleAppFactory(src) || possibleRouterFactory(src)
+}
+
 // serverBindings maps identifier -> binding for every app/router constructed in this
 // file, with same-file mounts already resolved.
 func serverBindings(src []byte) map[string]serverBinding {
+	if !possibleServerBinding(src) {
+		return nil
+	}
 	out := map[string]serverBinding{}
-	for _, re := range []*regexp.Regexp{appFactory, appFactoryRequire} {
-		for _, m := range re.FindAllSubmatch(src, -1) {
-			out[string(m[1])] = serverBinding{framework: frameworkOf[string(m[2])], mounted: true}
+	if possibleAppFactory(src) {
+		for _, re := range []*regexp.Regexp{appFactory, appFactoryRequire} {
+			for _, m := range re.FindAllSubmatch(src, -1) {
+				out[string(m[1])] = serverBinding{framework: frameworkOf[string(m[2])], mounted: true}
+			}
 		}
 	}
-	for _, re := range []*regexp.Regexp{routerFactory, routerFactoryRequire} {
-		for _, m := range re.FindAllSubmatch(src, -1) {
-			name := string(m[1])
-			if _, taken := out[name]; taken {
-				continue // an app binding of the same name wins; do not downgrade it
+	if possibleRouterFactory(src) {
+		for _, re := range []*regexp.Regexp{routerFactory, routerFactoryRequire} {
+			for _, m := range re.FindAllSubmatch(src, -1) {
+				name := string(m[1])
+				if _, taken := out[name]; taken {
+					continue // an app binding of the same name wins; do not downgrade it
+				}
+				out[name] = serverBinding{framework: "express", isRouter: true}
 			}
-			out[name] = serverBinding{framework: "express", isRouter: true}
 		}
+	}
+	if len(out) == 0 {
+		return nil
 	}
 	// Resolve mounts declared in this file: app.use('/webhooks', router).
-	for _, m := range mountCall.FindAllSubmatch(src, -1) {
-		prefix := firstNonEmpty(m[2], m[3], m[4])
-		child := string(m[5])
-		b, ok := out[child]
-		if !ok || !b.isRouter || b.mounted {
-			continue
-		}
-		// Only a parent whose OWN mount point is known can give one to a child.
-		// Mounting onto an unmounted sub-router — `apiRouter.use('/orders', orders)`
-		// in a file that does not itself mount apiRouter — yields the fragment
-		// "/orders", which is exactly the wrong fact this pass exists to avoid: the
-		// route really serves "/api/orders". The child stays unmounted here and
-		// routermount.go composes it once both mounts are visible.
-		if parent, ok := out[string(m[1])]; ok && parent.mounted {
-			b.prefix = facts.JoinRoutePath(parent.prefix, prefix)
-			b.mounted = true
-			b.framework = parent.framework
-			out[child] = b
+	if hasDotKeyword(src, []byte("use")) {
+		for _, m := range mountCall.FindAllSubmatch(src, -1) {
+			prefix := firstNonEmpty(m[2], m[3], m[4])
+			child := string(m[5])
+			b, ok := out[child]
+			if !ok || !b.isRouter || b.mounted {
+				continue
+			}
+			// Only a parent whose OWN mount point is known can give one to a child.
+			// Mounting onto an unmounted sub-router — `apiRouter.use('/orders', orders)`
+			// in a file that does not itself mount apiRouter — yields the fragment
+			// "/orders", which is exactly the wrong fact this pass exists to avoid: the
+			// route really serves "/api/orders". The child stays unmounted here and
+			// routermount.go composes it once both mounts are visible.
+			if parent, ok := out[string(m[1])]; ok && parent.mounted {
+				b.prefix = facts.JoinRoutePath(parent.prefix, prefix)
+				b.mounted = true
+				b.framework = parent.framework
+				out[child] = b
+			}
 		}
 	}
 	return out
@@ -195,6 +233,42 @@ func identifierEndingAt(src []byte, pos int) string {
 
 func isIdentByte(c byte) bool {
 	return c == '_' || c == '$' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
+}
+
+func isASCIISpace(c byte) bool {
+	return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v'
+}
+
+func containsAny(src []byte, tokens ...[]byte) bool {
+	for _, tok := range tokens {
+		if bytes.Contains(src, tok) {
+			return true
+		}
+	}
+	return false
+}
+
+// hasDotKeyword reports whether src contains `.` + optional whitespace + kw, the
+// necessary shape of `<recv>.<kw>(...)` with the whitespace the mount/verb
+// regexes allow between the dot and the name.
+func hasDotKeyword(src, kw []byte) bool {
+	if len(kw) == 0 {
+		return false
+	}
+	for i := 0; i < len(src); {
+		j := bytes.IndexByte(src[i:], '.')
+		if j < 0 {
+			return false
+		}
+		i += j + 1
+		for i < len(src) && isASCIISpace(src[i]) {
+			i++
+		}
+		if bytes.HasPrefix(src[i:], kw) {
+			return true
+		}
+	}
+	return false
 }
 
 func firstNonEmpty(vals ...[]byte) string {

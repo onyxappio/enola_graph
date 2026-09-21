@@ -58,6 +58,8 @@ type Config struct {
 	// a disabled extractor would have detected the repository.
 	ExtractorsExplicit bool `yaml:"-"`
 
+	GraphInputs GraphInputsConfig `yaml:"graph_inputs"`
+
 	Ignore     []string     `yaml:"ignore"`
 	TestGlobs  []string     `yaml:"test_globs"`
 	Extractors []string     `yaml:"extractors"`

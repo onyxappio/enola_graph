@@ -1,6 +1,13 @@
 package engine
 
 import (
+	"github.com/enola-labs/enola/internal/extractors/hclextractor"
+	"github.com/enola-labs/enola/internal/extractors/manifestextractor"
+	"github.com/enola-labs/enola/internal/extractors/mdintent"
+	"github.com/enola-labs/enola/internal/extractors/pythonextractor"
+	"github.com/enola-labs/enola/internal/extractors/swiftextractor"
+	"github.com/enola-labs/enola/internal/extractors/tsextractor"
+
 	"bufio"
 	"bytes"
 	"context"
@@ -9,11 +16,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"io"
 	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"runtime/debug"
 	"sort"
@@ -27,6 +36,7 @@ import (
 	"github.com/enola-labs/enola/internal/explainers"
 	"github.com/enola-labs/enola/internal/extractors"
 	"github.com/enola-labs/enola/internal/facts"
+	"github.com/enola-labs/enola/internal/graphprofile"
 	"github.com/enola-labs/enola/internal/intent"
 	"github.com/enola-labs/enola/internal/linkers/binders"
 	"github.com/enola-labs/enola/internal/linkers/crossrepo"
@@ -62,13 +72,17 @@ type snapshotBundle struct {
 
 // Engine orchestrates the snapshot generation pipeline.
 type Engine struct {
-	mu         sync.Mutex // serializes GenerateSnapshot calls and guards the build-scratch store
-	cfg        *config.Config
-	extractors *extractors.Registry
-	explainers *explainers.Registry
-	renderers  *renderers.Registry
-	binders    *binders.Registry
-	signals    *signals.Registry
+	graphScope            *inputscope.Scope
+	graphRebuild          func() (*Engine, error)
+	mu                    sync.Mutex // serializes GenerateSnapshot calls and guards the build-scratch store
+	cfg                   *config.Config
+	extractors            *extractors.Registry
+	concurrentDetection   map[int]bool
+	observedTSIndependent []observedTSRegistration
+	explainers            *explainers.Registry
+	renderers             *renderers.Registry
+	binders               *binders.Registry
+	signals               *signals.Registry
 
 	// store is BUILD SCRATCH: it is reassigned to a fresh store at the top of each
 	// GenerateSnapshot and read only by the pipeline helpers, all under mu. It is
@@ -150,8 +164,135 @@ func (e *Engine) RegisterExtractor(ext extractors.Extractor) {
 	e.extractors.Register(ext)
 }
 
+// observedTSRegistration is an explicit caller audit: changing bytes of an
+// existing TS source cannot affect this detector, nor (when active) extraction.
+// It does not cover path changes, configuration, or arbitrary custom extractors.
+type observedTSRegistration struct {
+	ext                          plugin.Extractor
+	active                       bool
+	detectorTree, extractionTree bool
+}
+
+func (e *Engine) RegisterObservedTSIndependentExtractor(ext plugin.Extractor, active bool) {
+	e.RegisterIndependentExtractor(ext)
+	e.observedTSIndependent = append(e.observedTSIndependent, observedTSRegistration{ext: ext, active: active})
+}
+
+// RegisterObservedRepositoryExtractor additionally audits detector discovery as
+// repository-tree bounded. extractionTree is a separate complete-read boundary,
+// not inferred from independence of existing TS source contents.
+func (e *Engine) RegisterObservedRepositoryExtractor(ext plugin.Extractor, tsIndependent, extractionTree bool) {
+	e.RegisterObservedTSIndependentExtractor(ext, tsIndependent)
+	i := len(e.observedTSIndependent) - 1
+	e.observedTSIndependent[i].detectorTree = true
+	e.observedTSIndependent[i].extractionTree = extractionTree
+}
+
+func (e *Engine) ObservedRepositoryCoverage(ext plugin.Extractor, detected bool) bool {
+	if ext == nil || !reflect.TypeOf(ext).Comparable() {
+		return false
+	}
+	for _, a := range e.observedTSIndependent {
+		if a.ext == ext {
+			return a.detectorTree && (!detected || a.extractionTree)
+		}
+	}
+	return false
+}
+
+func (e *Engine) ObservedTSContentIndependent(ext plugin.Extractor, detected bool) bool {
+	if ext == nil || !reflect.TypeOf(ext).Comparable() {
+		return false
+	}
+	for _, a := range e.observedTSIndependent {
+		if a.ext == ext {
+			return !detected || a.active
+		}
+	}
+	return false
+}
+
+// RegisterIndependentExtractor registers an extractor whose detection only reads
+// repository inputs and may overlap detection by other independent extractors.
+// Registration and configuration must finish before analysis starts. Custom
+// extractors registered through RegisterExtractor remain serial barriers.
+func (e *Engine) RegisterIndependentExtractor(ext extractors.Extractor) {
+	index := len(e.extractors.All())
+	e.RegisterExtractor(ext)
+	if e.concurrentDetection == nil {
+		e.concurrentDetection = make(map[int]bool)
+	}
+	e.concurrentDetection[index] = true
+}
+
+// DetectExtractors retains each detector's own discovery scope. Independent
+// registrations run in bounded groups; opaque registrations keep their original
+// ordering and never overlap any other detector. Errors retain the session's
+// existing behavior of treating an unsuccessful detector as inactive.
+func (e *Engine) DetectExtractors(repoPath string, allNames []string) map[string]bool {
+	exts := e.extractors.All()
+	active := make([]bool, len(exts))
+	var pending sync.WaitGroup
+	slots := make(chan struct{}, 4)
+	run := func(i int) {
+		ok, err := e.DetectExtractor(exts[i], repoPath, allNames)
+		active[i] = err == nil && ok
+	}
+	for i, ext := range exts {
+		if e.cfg != nil && !e.cfg.IsExtractorEnabled(ext.Name()) {
+			continue
+		}
+		if !e.concurrentDetection[i] {
+			pending.Wait()
+			run(i)
+			continue
+		}
+		slots <- struct{}{}
+		pending.Add(1)
+		go func(i int) {
+			defer pending.Done()
+			defer func() { <-slots }()
+			run(i)
+		}(i)
+	}
+	pending.Wait()
+	detected := make(map[string]bool)
+	for i, ext := range exts {
+		if active[i] {
+			detected[ext.Name()] = true
+		}
+	}
+	return detected
+}
+
 func (e *Engine) Extractors() []extractors.Extractor {
 	return e.extractors.All()
+}
+
+// RepoInventory is the walked file set a graph session uses. A filesystem scan
+// is not parsing; callers should report its cost separately.
+type RepoInventory struct {
+	Files     []string
+	TestFiles []string
+	AllNames  []string
+}
+
+// Inventory walks repoPath with the engine's ignore and test globs.
+func (e *Engine) Inventory(repoPath string) (RepoInventory, error) {
+	files, testFiles, allNames, _, err := e.walkRepo(repoPath)
+	return RepoInventory{Files: files, TestFiles: testFiles, AllNames: allNames}, err
+}
+
+// FileHashes returns hex SHA-256 of each relative file. Unreadable files are omitted.
+func (e *Engine) FileHashes(repoPath string, files []string) map[string]string {
+	return e.computeFileHashes(repoPath, files)
+}
+
+// DetectExtractor reports whether ext applies to the repository.
+func (e *Engine) DetectExtractor(ext extractors.Extractor, repoPath string, allNames []string) (bool, error) {
+	start := time.Now()
+	defer func() { graphprofile.Since("detect_"+ext.Name(), start, "") }()
+	return e.detect(ext, repoPath, allNames)
 }
 
 // RegisterExplainer adds an explainer to the engine.
@@ -975,12 +1116,18 @@ const skippedSampleCap = 20
 // the only marker a language has, and the bundled config ignores **/*.yaml, which
 // is how a Dart repository is spelled.
 func (e *Engine) walkRepo(repoPath string) (files, testFiles, allNames []string, skips walkSkips, err error) {
+	ignoreSet := facts.CompileGlobs(e.cfg.Ignore)
+	testSet := facts.CompileGlobs(e.cfg.TestGlobs)
+	tWalk := time.Now()
+	defer func() {
+		graphprofile.Since("engine_walk_repo", tWalk, fmt.Sprintf("files=%d tests=%d all_names=%d", len(files), len(testFiles), len(allNames)))
+	}()
 	// A symlinked repo root walks as a single non-directory entry (WalkDir
 	// Lstats the root), silently yielding zero files. Resolve the ROOT only —
 	// symlinks inside the tree keep their non-followed semantics — so a config
 	// may alias a checkout (a stable clone under the repo's own label) and
 	// still extract. The label was already derived from the unresolved path.
-	if resolved, rerr := filepath.EvalSymlinks(repoPath); rerr == nil && resolved != repoPath {
+	if resolved, rerr := filepath.EvalSymlinks(repoPath); rerr == nil && resolved != repoPath && e.graphScope == nil {
 		repoPath = resolved
 	}
 	err = filepath.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
@@ -988,6 +1135,12 @@ func (e *Engine) walkRepo(repoPath string) (files, testFiles, allNames []string,
 			return err
 		}
 
+		if !e.graphScope.Allowed(path, d.IsDir()) {
+			if d.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
 		rawRel, err := filepath.Rel(repoPath, path)
 		if err != nil {
 			return err
@@ -1010,7 +1163,7 @@ func (e *Engine) walkRepo(repoPath string) (files, testFiles, allNames []string,
 		}
 
 		// Skip ignored paths
-		if pattern, ok := e.ignoreMatch(relPath); ok {
+		if pattern, ok := ignoreSet.Match(relPath); ok {
 			if d.IsDir() {
 				// enola's own output directory is not part of the source tree.
 				// Counting it would make dirs_skipped differ between a repo's
@@ -1024,7 +1177,7 @@ func (e *Engine) walkRepo(repoPath string) (files, testFiles, allNames []string,
 			// An ignored FILE that is a test/spec is not indexed as production
 			// source, but is collected for reference-only extraction so a
 			// production symbol exercised only by a test does not look dead.
-			if e.matchesTestGlob(relPath) {
+			if testSet.MatchAny(relPath) {
 				testFiles = append(testFiles, relPath)
 			}
 			skips.count++
@@ -1059,7 +1212,8 @@ func (e *Engine) detect(ext extractors.Extractor, repoPath string, allNames []st
 
 // matchesTestGlob reports whether a repo-relative path matches any TestGlob.
 func (e *Engine) matchesTestGlob(relPath string) bool {
-	return matchAnyGlob(filepath.ToSlash(relPath), e.cfg.TestGlobs)
+	relPath = filepath.ToSlash(relPath)
+	return matchAnyGlob(relPath, e.cfg.TestGlobs)
 }
 
 // matchAnyGlob and matchGlob are thin aliases onto the shared matcher, which lives
@@ -1084,7 +1238,8 @@ func (e *Engine) isIgnored(relPath string, isDir bool) bool {
 // ignoreMatch reports whether a path is ignored, and by which pattern. The walker
 // needs the pattern to record it in the receipt's skipped sample.
 func (e *Engine) ignoreMatch(relPath string) (string, bool) {
-	return matchGlob(filepath.ToSlash(relPath), e.cfg.Ignore)
+	relPath = filepath.ToSlash(relPath)
+	return matchGlob(relPath, e.cfg.Ignore)
 }
 
 // runExtractors detects applicable extractors and runs them. When cache is
@@ -1578,6 +1733,8 @@ func (e *Engine) GetArtifact(name string) ([]byte, error) {
 // prefetches. The extraction parsing, not hashing, is the bottleneck worth
 // parallelizing.
 func (e *Engine) computeFileHashes(repoPath string, files []string) map[string]string {
+	tHash := time.Now()
+	var nbytes int64
 	hashes := make(map[string]string, len(files))
 	for _, relFile := range files {
 		absFile := filepath.Join(repoPath, relFile)
@@ -1585,9 +1742,11 @@ func (e *Engine) computeFileHashes(repoPath string, files []string) map[string]s
 		if err != nil {
 			continue
 		}
+		nbytes += int64(len(data))
 		h := sha256.Sum256(data)
 		hashes[relFile] = hex.EncodeToString(h[:])
 	}
+	graphprofile.Since("engine_hash_files", tHash, fmt.Sprintf("n=%d hashed=%d bytes=%d", len(files), len(hashes), nbytes))
 	return hashes
 }
 
@@ -1610,4 +1769,33 @@ func fileHashesOf(absRepo string, hashes map[string]string) []facts.FileHash {
 		})
 	}
 	return out
+}
+
+// ConfigureGraphInputs is construction-only; published engines are immutable.
+func (e *Engine) ConfigureGraphInputs(scope *inputscope.Scope, rebuild func() (*Engine, error)) {
+	e.graphScope = scope
+	e.graphRebuild = rebuild
+}
+func (e *Engine) GraphScope() *inputscope.Scope { return e.graphScope }
+func (e *Engine) RebuildGraphInputs() (*Engine, error) {
+	if e.graphRebuild != nil {
+		return e.graphRebuild()
+	}
+	return e, nil
+}
+func (e *Engine) ValidateGraphConsumers(detected map[string]bool) error {
+	if e.graphScope == nil {
+		return nil
+	}
+	for _, ext := range e.Extractors() {
+		if !detected[ext.Name()] {
+			continue
+		}
+		switch ext.(type) {
+		case *tsextractor.TSExtractor, *manifestextractor.Extractor, *mdintent.Extractor, *hclextractor.Extractor, *pythonextractor.PythonExtractor, *swiftextractor.SwiftExtractor:
+			continue
+		}
+		return fmt.Errorf("graph input policy: active extractor %s has unaudited side inputs; use the legacy profile or disable it explicitly", ext.Name())
+	}
+	return nil
 }

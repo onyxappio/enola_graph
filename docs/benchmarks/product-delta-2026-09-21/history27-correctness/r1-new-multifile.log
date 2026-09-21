@@ -1,0 +1,23 @@
+enola: using config /private/tmp/enola-product-history27-check/config.yaml
+enola graph: config /private/tmp/enola-product-history27-check/config.yaml
+2026/09/21 10:33:55 [mdintent] 2133 document(s), 19363 section(s), 6620 link(s) resolved on disk, 12132 not
+[graph] /tmp/enola-product-history-source: generation 1→2 parsed=348 cached=4224 early_local=348 fallbacks=1
+[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)
+        5.76 real         7.53 user         3.07 sys
+           936083456  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               57434  page reclaims
+                 176  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                1224  messages sent
+                 467  messages received
+                 658  signals received
+                1182  voluntary context switches
+               38590  involuntary context switches
+        114821447078  instructions retired
+         32382006310  cycles elapsed
+           916623040  peak memory footprint

@@ -1,0 +1,24 @@
+=== RUN   TestFinalContextRemoval
+=== RUN   TestFinalContextRemoval/hidden-manifest
+=== RUN   TestFinalContextRemoval/swift-include
+=== RUN   TestFinalContextRemoval/swift-root
+--- PASS: TestFinalContextRemoval (3.46s)
+    --- PASS: TestFinalContextRemoval/hidden-manifest (1.05s)
+    --- PASS: TestFinalContextRemoval/swift-include (1.22s)
+    --- PASS: TestFinalContextRemoval/swift-root (1.20s)
+=== RUN   TestFinalLegacyVersionMigration
+--- PASS: TestFinalLegacyVersionMigration (1.17s)
+=== RUN   TestFinalContextRevalidation
+--- PASS: TestFinalContextRevalidation (0.18s)
+=== RUN   TestConfigChangeRestoreUsesCapturedBytes
+--- PASS: TestConfigChangeRestoreUsesCapturedBytes (0.94s)
+=== RUN   TestSourceHashUsesConsumedBytes
+--- PASS: TestSourceHashUsesConsumedBytes (0.58s)
+=== RUN   TestConsumedHashMatchesBytes
+--- PASS: TestConsumedHashMatchesBytes (0.00s)
+=== RUN   TestDeepReexportClosureParsesChainAndPreservesIndependents
+--- PASS: TestDeepReexportClosureParsesChainAndPreservesIndependents (1.27s)
+=== RUN   TestDeleteAndRenameAppliedEqualsCold
+--- PASS: TestDeleteAndRenameAppliedEqualsCold (1.62s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	9.779s

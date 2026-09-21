@@ -1,0 +1,121 @@
+ok  	github.com/enola-labs/enola/cmd/enola	(cached)	coverage: 18.7% of statements
+ok  	github.com/enola-labs/enola/internal/cachecov	1.843s	coverage: [no statements]
+ok  	github.com/enola-labs/enola/internal/clientspec	(cached)	coverage: 97.1% of statements
+ok  	github.com/enola-labs/enola/internal/config	(cached)	coverage: 79.8% of statements
+ok  	github.com/enola-labs/enola/internal/conformance	(cached)	coverage: 69.7% of statements
+ok  	github.com/enola-labs/enola/internal/diff	(cached)	coverage: 78.6% of statements
+ok  	github.com/enola-labs/enola/internal/docslint	5.111s	coverage: 72.3% of statements
+	github.com/enola-labs/enola/internal/drift		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/internal/engine	35.200s	coverage: produced 0 insights
+ok  	github.com/enola-labs/enola/internal/eslintscaffold	(cached)	coverage: 72.7% of statements
+ok  	github.com/enola-labs/enola/internal/estateref	(cached)	coverage: 78.0% of statements
+ok  	github.com/enola-labs/enola/internal/explainers	(cached)	coverage: 100.0% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/common	(cached)	coverage: 88.3% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/complexity	(cached)	coverage: 85.4% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/constraints	(cached)	coverage: 87.3% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/coverage	(cached)	coverage: 68.8% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/crossrepo	(cached)	coverage: 95.5% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/cycles	(cached)	coverage: 95.5% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/deadmethods	(cached)	coverage: 84.3% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/depth	(cached)	coverage: 96.0% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/domain	(cached)	coverage: 29.7% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/entrypoints	(cached)	coverage: 87.5% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/godclass	(cached)	coverage: 96.9% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/hotspots	(cached)	coverage: 95.3% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/importclosure	(cached)	coverage: 90.3% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/intentcheck	(cached)	coverage: 85.2% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/layers	(cached)	coverage: 93.2% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/messagingcoverage	(cached)	coverage: produced 0 insights
+ok  	github.com/enola-labs/enola/internal/explainers/queryloops	(cached)	coverage: 89.9% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/surface	(cached)	coverage: 90.6% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/unusedroutes	(cached)	coverage: 93.0% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/vendoredcandidates	(cached)	coverage: 84.1% of statements
+ok  	github.com/enola-labs/enola/internal/extractors	(cached)	coverage: 100.0% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/ansibleextractor	(cached)	coverage: 90.8% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/asyncapiextractor	(cached)	coverage: 91.5% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/cppextractor	(cached)	coverage: 86.5% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/dartextractor	(cached)	coverage: 73.6% of statements
+	github.com/enola-labs/enola/internal/extractors/dartextractor/grammar		coverage: 0.0% of statements
+	github.com/enola-labs/enola/internal/extractors/detectnames		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/dotnetextractor	(cached)	coverage: 86.5% of statements
+	github.com/enola-labs/enola/internal/extractors/extcoverage		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/goextractor	(cached)	coverage: 88.5% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/grpcextractor	(cached)	coverage: 90.5% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/hclextractor	(cached)	coverage: 88.5% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/javaextractor	(cached)	coverage: 84.6% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/jvmsrc	(cached)	coverage: 91.4% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/kotlinextractor	(cached)	coverage: 75.9% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/manifestextractor	(cached)	coverage: 88.4% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/mdintent	(cached)	coverage: 90.8% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/openapiextractor	(cached)	coverage: 83.5% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/phpextractor	(cached)	coverage: 85.7% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/pythonextractor	(cached)	coverage: 89.1% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/rubyextractor	(cached)	coverage: 87.5% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/rustextractor	(cached)	coverage: 88.9% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/scalaextractor	(cached)	coverage: 84.3% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/swiftextractor	(cached)	coverage: 86.6% of statements
+	github.com/enola-labs/enola/internal/extractors/swiftextractor/grammar		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/tsextractor	(cached)	coverage: 86.0% of statements
+	github.com/enola-labs/enola/internal/extractors/tsutil		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/internal/factpath	(cached)	coverage: 91.7% of statements
+ok  	github.com/enola-labs/enola/internal/facts	32.741s	coverage: 86.8% of statements
+ok  	github.com/enola-labs/enola/internal/filelock	(cached)	coverage: 61.9% of statements
+ok  	github.com/enola-labs/enola/internal/gqlscan	(cached)	coverage: 79.6% of statements
+	github.com/enola-labs/enola/internal/graphprofile		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/internal/graphsession	(cached)	coverage: 81.4% of statements
+ok  	github.com/enola-labs/enola/internal/graphstream	(cached)	coverage: 75.3% of statements
+ok  	github.com/enola-labs/enola/internal/history	(cached)	coverage: 74.1% of statements
+ok  	github.com/enola-labs/enola/internal/hookstate	(cached)	coverage: 85.5% of statements
+ok  	github.com/enola-labs/enola/internal/intent	2.878s	coverage: 84.3% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders	(cached)	coverage: 66.7% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/clientseam	(cached)	coverage: 80.9% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/emberresolver	(cached)	coverage: 90.4% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/frameworkroots	(cached)	coverage: 90.4% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/grpcclientfqn	(cached)	coverage: 87.5% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/grpcimpl	(cached)	coverage: 91.1% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/httphandler	(cached)	coverage: 90.0% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/messagingcontract	(cached)	coverage: 96.6% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/mixinowner	(cached)	coverage: 86.0% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/moduleedges	(cached)	coverage: 89.7% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/stimulusresolver	(cached)	coverage: 91.5% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/unmatchedroutes	(cached)	coverage: 91.5% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/vendoredspecs	(cached)	coverage: 90.7% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo	(cached)	coverage: 94.5% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/routeindex	(cached)	coverage: 74.4% of statements
+	github.com/enola-labs/enola/internal/linkers/crossrepo/signals		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/graphqlsig	(cached)	coverage: 37.9% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/http	(cached)	coverage: 86.4% of statements
+	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/imports		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/kafka	(cached)	coverage: 72.0% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/sharedcode	(cached)	coverage: 36.9% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/vocab	(cached)	coverage: 97.4% of statements
+ok  	github.com/enola-labs/enola/internal/litfold	(cached)	coverage: 95.5% of statements
+ok  	github.com/enola-labs/enola/internal/metrics	(cached)	coverage: 69.5% of statements
+ok  	github.com/enola-labs/enola/internal/mining	(cached)	coverage: 92.5% of statements
+ok  	github.com/enola-labs/enola/internal/orphans	(cached)	coverage: 79.3% of statements
+ok  	github.com/enola-labs/enola/internal/parallel	(cached)	coverage: 100.0% of statements
+ok  	github.com/enola-labs/enola/internal/perf	(cached)	coverage: 77.6% of statements
+ok  	github.com/enola-labs/enola/internal/providers	(cached)	coverage: 84.6% of statements
+ok  	github.com/enola-labs/enola/internal/providers/rubydex	(cached)	coverage: 10.5% of statements
+ok  	github.com/enola-labs/enola/internal/renderers	(cached)	coverage: 100.0% of statements
+ok  	github.com/enola-labs/enola/internal/renderers/llmcontext	(cached)	coverage: 62.8% of statements
+ok  	github.com/enola-labs/enola/internal/server	(cached)	coverage: produced 0 insights
+ok  	github.com/enola-labs/enola/internal/updatecheck	(cached)	coverage: 85.9% of statements
+ok  	github.com/enola-labs/enola/internal/upgrade	(cached)	coverage: 44.1% of statements
+?   	github.com/enola-labs/enola/internal/version	[no test files]
+ok  	github.com/enola-labs/enola/internal/workspace	(cached)	coverage: 87.5% of statements
+ok  	github.com/enola-labs/enola/pkg/bootstrap	2.844s	coverage: produced 0 insights
+ok  	github.com/enola-labs/enola/pkg/check	(cached)	coverage: 87.0% of statements
+ok  	github.com/enola-labs/enola/pkg/cli	(cached)	coverage: 88.1% of statements
+ok  	github.com/enola-labs/enola/pkg/command	(cached)	coverage: produced 0 insights
+ok  	github.com/enola-labs/enola/pkg/coverage	(cached)	coverage: 97.3% of statements
+ok  	github.com/enola-labs/enola/pkg/dashboard	(cached)	coverage: 87.6% of statements
+?   	github.com/enola-labs/enola/pkg/diff	[no test files]
+ok  	github.com/enola-labs/enola/pkg/explain	(cached)	coverage: 90.3% of statements
+	github.com/enola-labs/enola/pkg/facts		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/pkg/history	(cached)	coverage: 48.0% of statements
+ok  	github.com/enola-labs/enola/pkg/install	(cached)	coverage: 87.7% of statements
+ok  	github.com/enola-labs/enola/pkg/mcputil	(cached)	coverage: 30.6% of statements
+ok  	github.com/enola-labs/enola/pkg/plan	(cached)	coverage: 88.3% of statements
+	github.com/enola-labs/enola/pkg/plugin		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/pkg/status	(cached)	coverage: 69.6% of statements

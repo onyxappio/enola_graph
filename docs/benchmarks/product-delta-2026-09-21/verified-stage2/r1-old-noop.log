@@ -1,0 +1,118 @@
+enola: using config /private/tmp/enola-product-fastdelta-results/config.yaml
+2026/09/21 10:07:07 [engine] found 42583 files (2522 test files, 2522 skipped) in /tmp/enola-product-benchmark-source
+2026/09/21 10:07:09 [engine] extractor cpp: not detected
+2026/09/21 10:07:10 [engine] extractor asyncapi: not detected
+2026/09/21 10:07:10 [engine] extractor dotnet: not detected
+2026/09/21 10:07:10 [engine] extractor go: not detected
+2026/09/21 10:07:10 [engine] extractor manifests: reused 131 cached facts
+2026/09/21 10:07:10 [engine] running extractor: mdintent
+2026/09/21 10:07:10 [mdintent] 2133 document(s), 19363 section(s), 6620 link(s) resolved on disk, 12132 not
+2026/09/21 10:07:10 [engine] extractor mdintent: emitted 21497 facts in 256ms
+2026/09/21 10:07:10 [engine] extractor grpc: not detected
+2026/09/21 10:07:10 [engine] extractor hcl: reused 10 cached facts
+2026/09/21 10:07:10 [engine] extractor ansible: not detected
+2026/09/21 10:07:10 [engine] extractor java: not detected
+2026/09/21 10:07:10 [engine] extractor kotlin: not detected
+2026/09/21 10:07:10 [engine] extractor openapi: not detected
+2026/09/21 10:07:10 [engine] extractor php: not detected
+2026/09/21 10:07:10 [engine] extractor python: reused 202 cached facts
+2026/09/21 10:07:11 [engine] extractor typescript: reused 60626 cached facts
+2026/09/21 10:07:11 [engine] extractor swift: reused 27 cached facts
+2026/09/21 10:07:11 [engine] extractor ruby: not detected
+2026/09/21 10:07:11 [engine] extractor rust: not detected
+2026/09/21 10:07:11 [engine] extractor scala: not detected
+2026/09/21 10:07:11 [engine] extractor dart: not detected
+2026/09/21 10:07:11 [engine] extractor typescript: emitted 2522 test-ref facts from 2522 files
+2026/09/21 10:07:12 [engine] extractor cache: 5 reused
+2026/09/21 10:07:12 [engine] extracted 85015 facts using 6 extractors
+2026/09/21 10:07:12 [engine] flagged 122 facts from 11 generated file(s)
+2026/09/21 10:07:12 [module-edges] derived 501 module edge(s) from resolved symbol edges; 16 pair(s) an extractor already connected, 10773 symbol edge(s) not resolving to a production symbol, 0 landing in another repository
+2026/09/21 10:07:12 [module-edges] unresolved symbol edge breakdown: typescript/calls/no_symbol_match=8388, typescript/calls/unique_short_name_match=1632, typescript/calls/ambiguous_short_name_match=507, typescript/calls/known_symbol_outside_production_module=201, python/instantiates/no_symbol_match=24, python/instantiates/unique_short_name_match=11, swift/instantiates/no_symbol_match=7, swift/calls/ambiguous_short_name_match=2, swift/calls/no_symbol_match=1
+2026/09/21 10:07:12 [engine] built graph index (71093 nodes, 235819 edges)
+2026/09/21 10:07:12 [engine] running annotator: package-metrics
+2026/09/21 10:07:12 [engine] running annotator: dead-code
+2026/09/21 10:07:12 [engine] running annotator: performance
+2026/09/21 10:07:12 [engine] running explainer: cycles
+2026/09/21 10:07:12 [engine] explainer cycles: produced 13 insights
+2026/09/21 10:07:12 [engine] running explainer: layers
+2026/09/21 10:07:12 [engine] explainer layers: produced 0 insights
+2026/09/21 10:07:12 [engine] running explainer: crossrepo
+2026/09/21 10:07:12 [engine] explainer crossrepo: produced 0 insights
+2026/09/21 10:07:12 [engine] running explainer: coverage
+2026/09/21 10:07:12 [engine] explainer coverage: produced 0 insights
+2026/09/21 10:07:12 [engine] running explainer: unused-routes
+2026/09/21 10:07:12 [engine] explainer unused-routes: produced 0 insights
+2026/09/21 10:07:12 [engine] running explainer: domain
+2026/09/21 10:07:12 [engine] explainer domain: produced 11 insights
+2026/09/21 10:07:12 [engine] running explainer: query-loops
+2026/09/21 10:07:12 [engine] explainer query-loops: produced 0 insights
+2026/09/21 10:07:12 [engine] running explainer: dead-methods
+2026/09/21 10:07:12 [engine] explainer dead-methods: produced 0 insights
+2026/09/21 10:07:12 [engine] running explainer: entry-points
+2026/09/21 10:07:12 [engine] explainer entry-points: produced 0 insights
+2026/09/21 10:07:12 [engine] running explainer: messaging-coverage
+2026/09/21 10:07:12 [engine] explainer messaging-coverage: produced 0 insights
+2026/09/21 10:07:12 [engine] running explainer: god-class
+2026/09/21 10:07:12 [engine] explainer god-class: produced 25 insights
+2026/09/21 10:07:12 [engine] running explainer: hotspots
+2026/09/21 10:07:12 [engine] explainer hotspots: produced 20 insights
+2026/09/21 10:07:12 [engine] running explainer: dependency-depth
+2026/09/21 10:07:12 [engine] explainer dependency-depth: produced 10 insights
+2026/09/21 10:07:12 [engine] running explainer: exported-surface
+2026/09/21 10:07:12 [engine] explainer exported-surface: produced 20 insights
+2026/09/21 10:07:12 [engine] running explainer: complexity-outliers
+2026/09/21 10:07:12 [engine] explainer complexity-outliers: produced 15 insights
+2026/09/21 10:07:12 [engine] running explainer: intent
+2026/09/21 10:07:12 [engine] explainer intent: produced 0 insights
+2026/09/21 10:07:12 [engine] running explainer: constraints
+2026/09/21 10:07:12 [engine] explainer constraints: produced 0 insights
+2026/09/21 10:07:12 [engine] running explainer: vendored-candidates
+2026/09/21 10:07:12 [engine] explainer vendored-candidates: produced 0 insights
+2026/09/21 10:07:12 [engine] running explainer: import-closure
+2026/09/21 10:07:12 [engine] explainer import-closure: produced 0 insights
+2026/09/21 10:07:12 [engine] running explainer: package-metrics
+2026/09/21 10:07:12 [engine] explainer package-metrics: produced 4 insights
+2026/09/21 10:07:12 [engine] running explainer: dead-code
+2026/09/21 10:07:13 [engine] explainer dead-code: produced 51 insights
+2026/09/21 10:07:13 [engine] running explainer: performance
+2026/09/21 10:07:13 [engine] explainer performance: produced 51 insights
+2026/09/21 10:07:13 [engine] produced 220 insights using 22 explainers
+2026/09/21 10:07:13 [engine] running renderer: llm_context
+2026/09/21 10:07:13 [engine] produced 1 artifacts using 1 renderers
+2026/09/21 10:07:13 [engine] froze fact store in 37ms
+2026/09/21 10:07:13 [engine] snapshot generated in 9.567477625s
+2026/09/21 10:07:13 [engine] timings: walk=3.238s hash=1.95s extract=2.847s link=142ms graph=45ms explain=675ms render=27ms
+2026/09/21 10:07:13 [engine] memory after snapshot: heap=95 MiB sys=436 MiB (85516 facts)
+2026/09/21 10:07:13 [engine] wrote /tmp/enola-product-benchmark-source/.enola/llm_context.md (30969 bytes)
+2026/09/21 10:07:14 [engine] wrote /tmp/enola-product-benchmark-source/.enola/facts.jsonl
+2026/09/21 10:07:14 [engine] wrote /tmp/enola-product-benchmark-source/.enola/insights.json (354953 bytes)
+2026/09/21 10:07:14 [engine] wrote /tmp/enola-product-benchmark-source/.enola/snapshot.meta.json (10821204 bytes)
+2026/09/21 10:07:14 [engine] wrote /tmp/enola-product-benchmark-source/.enola/receipt.json (4982 bytes)
+2026/09/21 10:07:15 [engine] wrote /Users/oleksandr.mykulych/.enola/receipt.json (1 repos)
+2026/09/21 10:07:15 [engine] wrote /Users/oleksandr.mykulych/.enola/graphs/enola-product-benchmark-source-c833d05d.json
+
+Snapshot complete:
+  Repository:  /tmp/enola-product-benchmark-source
+  Facts:       85516
+  Insights:    220
+  Artifacts:   1
+  Duration:    9.567477625s
+  Output:      /tmp/enola-product-benchmark-source/.enola
+       12.10 real        17.26 user         4.18 sys
+           497025024  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               59456  page reclaims
+                 245  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                3129  signals received
+                 980  voluntary context switches
+               36433  involuntary context switches
+        203829452686  instructions retired
+         61409928040  cycles elapsed
+           439421888  peak memory footprint

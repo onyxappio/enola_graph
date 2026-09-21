@@ -2,12 +2,13 @@ package rubyextractor
 
 import (
 	"fmt"
-	"os"
+
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/facts"
 )
 
@@ -88,7 +89,8 @@ func newStimulusControllerIndex(files []string) *stimulusControllerIndex {
 // bindings and emits one fact per declared controller identifier, sorted by
 // identifier so the file's facts are a function of what it declares, not of
 // attribute order.
-func extractStimulusBindings(repoPath, relFile string, src []byte, controllers *stimulusControllerIndex) []facts.Fact {
+func extractStimulusBindings(repoPath, relFile string, src []byte, controllers *stimulusControllerIndex, inputScopes ...*inputscope.Scope) []facts.Fact {
+	inputScope := inputscope.First(inputScopes)
 	if !strings.HasSuffix(strings.ToLower(relFile), ".html.erb") {
 		return nil
 	}
@@ -155,7 +157,7 @@ func extractStimulusBindings(repoPath, relFile string, src []byte, controllers *
 		if handlers := sortedKeys(handlersOf[identifier]); len(handlers) > 0 {
 			fact.Props[stimulusHandlersProp] = strings.Join(handlers, " ")
 		}
-		if target := stimulusControllerFile(repoPath, identifier, controllers); target != "" {
+		if target := stimulusControllerFile(repoPath, identifier, controllers, inputScope); target != "" {
 			fact.Relations = []facts.Relation{{Kind: facts.RelDependsOn, Target: target}}
 		}
 		out = append(out, fact)
@@ -195,11 +197,12 @@ func stimulusAction(descriptor string) (identifier, method string) {
 // tree whose path ends with that relative path; two candidates are a genuine
 // ambiguity and yield no target, which is what `dropdown` naming both a root
 // controller and a nested one has to mean.
-func stimulusControllerFile(repoPath, identifier string, controllers *stimulusControllerIndex) string {
+func stimulusControllerFile(repoPath, identifier string, controllers *stimulusControllerIndex, inputScopes ...*inputscope.Scope) string {
+	inputScope := inputscope.First(inputScopes)
 	base := stimulusControllerPath(identifier)
 	for _, ext := range []string{".js", ".ts"} {
 		rel := filepath.ToSlash(filepath.Join(stimulusControllersDir, base+ext))
-		if _, err := os.Stat(filepath.Join(repoPath, filepath.FromSlash(rel))); err == nil {
+		if _, err := inputScope.Stat(filepath.Join(repoPath, filepath.FromSlash(rel))); err == nil {
 			return rel
 		}
 	}

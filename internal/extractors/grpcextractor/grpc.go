@@ -11,9 +11,10 @@ package grpcextractor
 
 import (
 	"context"
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"io/fs"
 	"log"
-	"os"
+
 	"path/filepath"
 	"strings"
 
@@ -22,7 +23,7 @@ import (
 )
 
 // GRPCExtractor parses .proto files and emits gRPC route/symbol facts.
-type GRPCExtractor struct{}
+type GRPCExtractor struct{ inputScope *inputscope.Scope }
 
 // New creates a new GRPCExtractor.
 func New() *GRPCExtractor {
@@ -42,8 +43,9 @@ func (e *GRPCExtractor) OwnsFile(relFile string) bool {
 // tree (bounded by the same directory skips other extractors use) because Detect
 // runs before the engine hands over the file list.
 func (e *GRPCExtractor) Detect(repoPath string) (bool, error) {
+	inputScope := e.inputScope
 	found := false
-	err := filepath.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+	err := inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil || found {
 			return err //nolint:wrapcheck // propagate walk error verbatim
 		}
@@ -65,6 +67,7 @@ func (e *GRPCExtractor) Detect(repoPath string) (bool, error) {
 // facts. .proto files are not excluded by the default ignore globs, so the
 // engine passes them in `files` and no independent walk is needed here.
 func (e *GRPCExtractor) Extract(ctx context.Context, repoPath string, files []string) ([]facts.Fact, error) {
+	inputScope := e.inputScope
 	var out []facts.Fact
 	seenModule := map[string]bool{}
 
@@ -77,7 +80,7 @@ func (e *GRPCExtractor) Extract(ctx context.Context, repoPath string, files []st
 		if !strings.HasSuffix(rel, ".proto") {
 			continue
 		}
-		src, err := os.ReadFile(filepath.Join(repoPath, rel))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, rel))
 		if err != nil {
 			log.Printf("[grpc-extractor] error reading %s: %v", rel, err)
 			continue
@@ -255,3 +258,5 @@ func skipDir(name string) bool {
 	}
 	return false
 }
+
+func NewGraph(scope *inputscope.Scope) *GRPCExtractor { return &GRPCExtractor{inputScope: scope} }

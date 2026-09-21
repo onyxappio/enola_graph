@@ -1,0 +1,9 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/enola-labs/enola/internal/graphinput
+cpu: Apple M1 Pro
+BenchmarkPolicyAdmission-10    	   64813	      9223 ns/op	     432 B/op	       7 allocs/op
+BenchmarkPolicyAdmission-10    	   64520	      9240 ns/op	     432 B/op	       7 allocs/op
+BenchmarkPolicyAdmission-10    	   64920	      9242 ns/op	     432 B/op	       7 allocs/op
+PASS
+ok  	github.com/enola-labs/enola/internal/graphinput	3.943s

@@ -1,12 +1,12 @@
 package rubyextractor
 
 import (
-	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/facts"
 	sitter "github.com/tree-sitter/go-tree-sitter"
 )
@@ -44,7 +44,8 @@ type modelIndex struct {
 	parents map[string]string
 }
 
-func buildModelIndex(repoPath string, files []string) *modelIndex {
+func buildModelIndex(repoPath string, files []string, inputScopes ...*inputscope.Scope) *modelIndex {
+	inputScope := inputscope.First(inputScopes)
 	index := &modelIndex{byName: map[string]string{}, parents: map[string]string{}}
 	superclasses := map[string]string{}
 	for _, relFile := range files {
@@ -55,7 +56,7 @@ func buildModelIndex(repoPath string, files []string) *modelIndex {
 		if name == "" {
 			continue
 		}
-		superclass, declared := declaredSuperclass(filepath.Join(repoPath, relFile), name)
+		superclass, declared := declaredSuperclass(filepath.Join(repoPath, relFile), name, inputScope)
 		if !declared {
 			continue
 		}
@@ -117,8 +118,9 @@ func enclosingScope(name string) string {
 // A concern is a module rather than a class: it may declare associations, but
 // they belong to whatever includes it, and emitting them against the concern's
 // own name produces edges the runtime has no counterpart for.
-func declaredSuperclass(path, name string) (string, bool) {
-	src, err := os.ReadFile(path)
+func declaredSuperclass(path, name string, inputScopes ...*inputscope.Scope) (string, bool) {
+	inputScope := inputscope.First(inputScopes)
+	src, err := inputScope.ReadFile(path)
 	if err != nil {
 		return "", false
 	}
@@ -139,7 +141,8 @@ var classDeclaration = regexp.MustCompile(`(?m)^\s*class\s+([A-Za-z0-9_:]+)\s*<\
 // parseModelFile reads every association a model file declares. It is the
 // promoted form of the reader the route resolver has been using: same macros,
 // same class_name:/source: handling, now returning enough for both callers.
-func parseModelFile(path string) []modelAssociation {
+func parseModelFile(path string, inputScopes ...*inputscope.Scope) []modelAssociation {
+	inputScope := inputscope.First(inputScopes)
 	var out []modelAssociation
 	eachCall(path, func(method string, args *sitter.Node, src []byte) {
 		if !associationMacros[method] {
@@ -184,7 +187,7 @@ func parseModelFile(path string) []modelAssociation {
 			}
 			out = append(out, assoc)
 		}
-	})
+	}, inputScope)
 	return out
 }
 
@@ -221,10 +224,11 @@ func modelClassName(relFile string) string {
 // extractAssociations emits one fact per association whose target can be named,
 // and reports the rest as unresolved. The split is the decision: an edge names
 // its target or it is not an edge.
-func extractAssociations(repoPath string, files []string) ([]facts.Fact, map[string]int) {
+func extractAssociations(repoPath string, files []string, inputScopes ...*inputscope.Scope) ([]facts.Fact, map[string]int) {
+	inputScope := inputscope.First(inputScopes)
 	var out []facts.Fact
 	unresolved := map[string]int{}
-	index := buildModelIndex(repoPath, files)
+	index := buildModelIndex(repoPath, files, inputScope)
 	declared := map[string][]modelAssociation{}
 	for _, relFile := range files {
 		if !isModelFile(relFile) {
@@ -234,7 +238,7 @@ func extractAssociations(repoPath string, files []string) ([]facts.Fact, map[str
 		if model == "" || index.byName[strings.ToLower(model)] == "" {
 			continue
 		}
-		declared[model] = parseModelFile(filepath.Join(repoPath, relFile))
+		declared[model] = parseModelFile(filepath.Join(repoPath, relFile), inputScope)
 	}
 
 	// A concern's associations belong to every class that includes it. The
@@ -250,12 +254,12 @@ func extractAssociations(repoPath string, files []string) ([]facts.Fact, map[str
 	// to includers and to nobody else, which is the correction the association
 	// ADR's build notes recorded when reading a concern against its own name
 	// scored as wrong.
-	for model, includes := range includedModules(repoPath, files) {
+	for model, includes := range includedModules(repoPath, files, inputScope) {
 		if index.byName[strings.ToLower(model)] == "" {
 			continue
 		}
 		for _, module := range includes {
-			for _, assoc := range concernAssociations(repoPath, files, module) {
+			for _, assoc := range concernAssociations(repoPath, files, module, inputScope) {
 				if findAssociation(declared[model], assoc.name) != nil {
 					// The class declares it itself; its own declaration wins.
 					continue
@@ -424,7 +428,8 @@ func modelFileOf(model string) string {
 
 // includedModules maps each class to the modules it includes, read from the
 // same `include` statements the extractor already emits as relations.
-func includedModules(repoPath string, files []string) map[string][]string {
+func includedModules(repoPath string, files []string, inputScopes ...*inputscope.Scope) map[string][]string {
+	inputScope := inputscope.First(inputScopes)
 	out := map[string][]string{}
 	for _, relFile := range files {
 		if !isModelFile(relFile) {
@@ -434,7 +439,7 @@ func includedModules(repoPath string, files []string) map[string][]string {
 		if model == "" {
 			continue
 		}
-		raw, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		raw, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			continue
 		}
@@ -452,12 +457,13 @@ var includeStatement = regexp.MustCompile(`(?m)^\s*include\s+([A-Z][\w:]*)\s*$`)
 // concernAssociations reads the associations a module declares, including
 // inside an `included do` block, which is where ActiveSupport::Concern puts
 // them and therefore where most of them are.
-func concernAssociations(repoPath string, files []string, module string) []modelAssociation {
+func concernAssociations(repoPath string, files []string, module string, inputScopes ...*inputscope.Scope) []modelAssociation {
+	inputScope := inputscope.First(inputScopes)
 	for _, relFile := range files {
 		if !strings.HasSuffix(relFile, "/"+underscoreClass(module)+".rb") {
 			continue
 		}
-		return parseModelFile(filepath.Join(repoPath, relFile))
+		return parseModelFile(filepath.Join(repoPath, relFile), inputScope)
 	}
 	return nil
 }

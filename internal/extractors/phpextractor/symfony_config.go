@@ -3,11 +3,12 @@ package phpextractor
 import (
 	"encoding/xml"
 	"io/fs"
-	"os"
+
 	"path/filepath"
 	"sort"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 	"gopkg.in/yaml.v3"
@@ -24,10 +25,11 @@ import (
 // specs the same way. The global `**/*.yaml`/`**/*.json` ignore that the bundled
 // configs apply (to suppress config/data noise) would otherwise hide them. Only
 // Symfony's dedicated route-config locations are read, so this stays cheap and targeted.
-func extractSymfonyConfigRoutes(repoPath string) []facts.Fact {
+func extractSymfonyConfigRoutes(repoPath string, inputScopes ...*inputscope.Scope) []facts.Fact {
+	inputScope := inputscope.First(inputScopes)
 	var out []facts.Fact
-	for _, rel := range discoverSymfonyRouteConfigs(repoPath) {
-		data, err := os.ReadFile(filepath.Join(repoPath, rel))
+	for _, rel := range discoverSymfonyRouteConfigs(repoPath, inputScope) {
+		data, err := inputScope.ReadFile(filepath.Join(repoPath, rel))
 		if err != nil {
 			continue
 		}
@@ -44,10 +46,11 @@ func extractSymfonyConfigRoutes(repoPath string) []facts.Fact {
 // discoverSymfonyRouteConfigs returns the relative paths of Symfony route-config
 // files present on disk: config/routes.{yaml,yml,xml} and every .yaml/.yml/.xml file
 // under config/routes/ (recursively). Results are sorted for deterministic output.
-func discoverSymfonyRouteConfigs(repoPath string) []string {
+func discoverSymfonyRouteConfigs(repoPath string, inputScopes ...*inputscope.Scope) []string {
+	inputScope := inputscope.First(inputScopes)
 	seen := map[string]bool{}
 	add := func(rel string) {
-		if _, err := os.Stat(filepath.Join(repoPath, rel)); err == nil {
+		if _, err := inputScope.Stat(filepath.Join(repoPath, rel)); err == nil {
 			seen[rel] = true
 		}
 	}
@@ -55,7 +58,7 @@ func discoverSymfonyRouteConfigs(repoPath string) []string {
 		add(filepath.ToSlash(filepath.Join("config", name)))
 	}
 	routesDir := filepath.Join(repoPath, "config", "routes")
-	_ = filepath.WalkDir(routesDir, func(path string, d fs.DirEntry, err error) error {
+	_ = inputScope.WalkDir(routesDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
 			return nil
 		}

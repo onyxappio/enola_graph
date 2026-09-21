@@ -1,0 +1,22 @@
+[
+  "python3",
+  "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/resident_history.py",
+  "--binary",
+  "/tmp/enola-scoped-stage",
+  "--root",
+  "/tmp/enola-scoped-smoke-resident100",
+  "--source",
+  "/tmp/enola-product-history-source",
+  "--nats",
+  "nats://127.0.0.1:14350",
+  "--repeat",
+  "1",
+  "--scope-config",
+  "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/product-graph-scope.yaml",
+  "--resident",
+  "/tmp/enola-scoped-stage-driver",
+  "--base",
+  "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+  "--target",
+  "a609c19f3861971930fae7b33dcb2950598953c5"
+]

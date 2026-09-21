@@ -1,0 +1,43 @@
+File: enola-product-profile
+Type: cpu
+Time: 2026-09-21 07:41:07 EEST
+Duration: 44.96s, Total samples = 63.13s (140.42%)
+Showing nodes accounting for 58.25s, 92.27% of 63.13s total
+Dropped 495 nodes (cum <= 0.32s)
+Showing top 35 nodes out of 263
+      flat  flat%   sum%        cum   cum%
+    10.41s 16.49% 16.49%     10.41s 16.49%  syscall.rawsyscalln
+     9.95s 15.76% 32.25%     10.99s 17.41%  runtime.cgocall
+     8.16s 12.93% 45.18%     10.80s 17.11%  regexp.(*machine).add
+     4.62s  7.32% 52.49%      9.27s 14.68%  regexp.(*machine).step
+     4.51s  7.14% 59.64%      4.51s  7.14%  runtime.pthread_cond_signal
+     3.66s  5.80% 65.44%      3.66s  5.80%  runtime.madvise
+     1.76s  2.79% 68.22%     19.67s 31.16%  regexp.(*machine).match
+     1.75s  2.77% 71.00%      1.75s  2.77%  regexp/syntax.(*Inst).MatchRunePos
+     1.72s  2.72% 73.72%      1.72s  2.72%  runtime.pthread_cond_wait
+     1.66s  2.63% 76.35%      1.66s  2.63%  runtime.memmove
+     1.09s  1.73% 78.08%      1.09s  1.73%  runtime.kevent
+     1.03s  1.63% 79.71%      1.03s  1.63%  runtime.usleep
+     0.82s  1.30% 81.01%      0.83s  1.31%  encoding/json.stateInString
+     0.78s  1.24% 82.24%      1.47s  2.33%  regexp.(*Regexp).tryBacktrack
+     0.77s  1.22% 83.46%      0.81s  1.28%  regexp.(*inputBytes).step
+     0.75s  1.19% 84.65%      0.75s  1.19%  path.matchChunk
+     0.72s  1.14% 85.79%      0.88s  1.39%  regexp.(*machine).alloc (inline)
+     0.63s     1% 86.79%      1.18s  1.87%  encoding/json.checkValid
+     0.55s  0.87% 87.66%      0.55s  0.87%  runtime.memclrNoHeapPointers
+     0.41s  0.65% 88.31%      0.52s  0.82%  runtime.tryDeferToSpanScan
+     0.34s  0.54% 88.85%      0.34s  0.54%  regexp.(*bitState).shouldVisit (inline)
+     0.34s  0.54% 89.39%      0.34s  0.54%  runtime.fcntl
+     0.32s  0.51% 89.89%      0.62s  0.98%  runtime.cgoCheckArg
+     0.31s  0.49% 90.38%      0.98s  1.55%  encoding/json.(*decodeState).skip
+     0.28s  0.44% 90.83%      0.41s  0.65%  runtime.reentersyscall
+     0.15s  0.24% 91.07%      0.33s  0.52%  runtime.scanObjectsSmall
+     0.14s  0.22% 91.29%      0.92s  1.46%  path.Match
+     0.14s  0.22% 91.51%      0.45s  0.71%  runtime.wbBufFlush1
+     0.09s  0.14% 91.65%      1.84s  2.91%  regexp/syntax.(*Inst).MatchRune (inline)
+     0.09s  0.14% 91.79%      0.74s  1.17%  runtime.mallocgcSmallScanNoHeader
+     0.08s  0.13% 91.92%      0.34s  0.54%  runtime.scanObject
+     0.07s  0.11% 92.03%      1.19s  1.88%  runtime.mallocgc
+     0.06s 0.095% 92.13%      0.52s  0.82%  runtime.entersyscall
+     0.05s 0.079% 92.21%      0.71s  1.12%  github.com/tree-sitter/go-tree-sitter.(*Node).KindId.func1
+     0.04s 0.063% 92.27%      0.48s  0.76%  gcWriteBarrier

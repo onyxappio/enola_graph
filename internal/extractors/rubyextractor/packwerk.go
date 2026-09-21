@@ -2,10 +2,11 @@ package rubyextractor
 
 import (
 	"log"
-	"os"
+
 	"path/filepath"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 	"gopkg.in/yaml.v3"
@@ -75,14 +76,15 @@ func (p *packwerkInfo) isPackage(dir string) bool {
 
 // parsePackwerk detects packwerk.yml and parses all package.yml files.
 // Returns a packwerkInfo with module facts and the privacy boundary map.
-func parsePackwerk(repoPath string) *packwerkInfo {
+func parsePackwerk(repoPath string, inputScopes ...*inputscope.Scope) *packwerkInfo {
+	inputScope := inputscope.First(inputScopes)
 	info := &packwerkInfo{
 		packages: make(map[string]*packwerkPackage),
 	}
 
 	// Check for packwerk.yml.
 	packwerkPath := filepath.Join(repoPath, "packwerk.yml")
-	data, err := os.ReadFile(packwerkPath)
+	data, err := inputScope.ReadFile(packwerkPath)
 	if err != nil {
 		return info
 	}
@@ -107,21 +109,21 @@ func parsePackwerk(repoPath string) *packwerkInfo {
 	for _, pattern := range packagePaths {
 		if pattern == "." {
 			// Root package.
-			if _, err := os.Stat(filepath.Join(repoPath, "package.yml")); err == nil {
+			if _, err := inputScope.Stat(filepath.Join(repoPath, "package.yml")); err == nil {
 				packageDirs = append(packageDirs, ".")
 			}
 			continue
 		}
 
 		// Expand glob patterns (e.g. "packages/*").
-		matches, err := filepath.Glob(filepath.Join(repoPath, pattern))
+		matches, err := inputScope.Glob(filepath.Join(repoPath, pattern))
 		if err != nil {
 			log.Printf("[ruby-extractor] error globbing %s: %v", pattern, err)
 			continue
 		}
 		for _, match := range matches {
 			pkgYml := filepath.Join(match, "package.yml")
-			if _, err := os.Stat(pkgYml); err == nil {
+			if _, err := inputScope.Stat(pkgYml); err == nil {
 				rel, err := filepath.Rel(repoPath, match)
 				if err != nil {
 					continue
@@ -136,7 +138,7 @@ func parsePackwerk(repoPath string) *packwerkInfo {
 	// Parse each package.yml and emit module facts.
 	for _, pkgDir := range packageDirs {
 		pkgYmlPath := filepath.Join(repoPath, pkgDir, "package.yml")
-		pkgData, err := os.ReadFile(pkgYmlPath)
+		pkgData, err := inputScope.ReadFile(pkgYmlPath)
 		if err != nil {
 			log.Printf("[ruby-extractor] error reading %s: %v", pkgYmlPath, err)
 			continue

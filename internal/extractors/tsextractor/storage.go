@@ -1,14 +1,17 @@
 package tsextractor
 
 import (
-	"github.com/enola-labs/enola/internal/extractors/tsutil"
-	"os"
+	"context"
+
 	"path/filepath"
 	"regexp"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/tsutil"
+
 	sitter "github.com/tree-sitter/go-tree-sitter"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 )
@@ -41,10 +44,11 @@ var drizzleTableFns = map[string]bool{
 
 // detectORMs reports which ORMs the repo declares, reusing the same package.json
 // primitive (and the same tsRoot + repo-root fallback) that Vue/Nuxt detection uses.
-func detectORMs(repoPath string) (typeorm, drizzle, prisma bool) {
-	tsRoot, _ := findTSRoot(repoPath)
+func detectORMs(repoPath string, inputScopes ...*inputscope.Scope) (typeorm, drizzle, prisma bool) {
+	inputScope := inputscope.First(inputScopes)
+	tsRoot, _ := findTSRoot(repoPath, inputScope)
 	has := func(pkg string) bool {
-		return hasPkgDependency(tsRoot, pkg) || (tsRoot != repoPath && hasPkgDependency(repoPath, pkg))
+		return hasPkgDependency(tsRoot, pkg, inputScope) || (tsRoot != repoPath && hasPkgDependency(repoPath, pkg, inputScope))
 	}
 	return has(depTypeORM), has(depDrizzle), has(depPrisma)
 }
@@ -204,8 +208,9 @@ var prismaSchemaFiles = []string{
 // package.json for framework detection and tsconfig.json for path aliases. This is the
 // same mechanism, plus a block-header match. (`datasource`/`generator` blocks are not
 // models and are ignored by construction.)
-func extractPrismaStorage(repoPath string) []facts.Fact {
-	tsRoot, _ := findTSRoot(repoPath)
+func extractPrismaStorage(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) (factsOut []facts.Fact, unread []string) {
+	inputScope := inputscope.First(inputScopes)
+	tsRoot, _ := findTSRoot(repoPath, inputScope)
 	roots := []string{tsRoot}
 	if tsRoot != repoPath {
 		roots = append(roots, repoPath)
@@ -216,8 +221,16 @@ func extractPrismaStorage(repoPath string) []facts.Fact {
 	for _, root := range roots {
 		for _, rel := range prismaSchemaFiles {
 			abs := filepath.Join(root, rel)
-			data, err := os.ReadFile(abs)
+			st, err := inputScope.Stat(abs)
 			if err != nil {
+				continue
+			}
+			if st.IsDir() {
+				continue
+			}
+			data, err := overlayReadFile(ctx, abs, inputScope)
+			if err != nil {
+				unread = append(unread, rel)
 				continue
 			}
 			rawRel, err := filepath.Rel(repoPath, abs)
@@ -250,7 +263,7 @@ func extractPrismaStorage(repoPath string) []facts.Fact {
 			}
 		}
 	}
-	return out
+	return out, unread
 }
 
 // ormFlags carries the per-repo ORM detection results into per-file extraction. The

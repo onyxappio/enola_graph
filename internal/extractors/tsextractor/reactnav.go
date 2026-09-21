@@ -2,7 +2,7 @@ package tsextractor
 
 import (
 	"github.com/enola-labs/enola/internal/extractors/tsutil"
-	"os"
+
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -10,6 +10,7 @@ import (
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/facts"
 )
 
@@ -31,22 +32,23 @@ const (
 	NavRouteLinksProp = "nav_route_links"
 )
 
-func detectReactNavigation(repoPath string) bool {
-	tsRoot, _ := findTSRoot(repoPath)
-	if hasPkgDependency(tsRoot, "@react-navigation/native") ||
-		(tsRoot != repoPath && hasPkgDependency(repoPath, "@react-navigation/native")) {
+func detectReactNavigation(repoPath string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	tsRoot, _ := findTSRoot(repoPath, inputScope)
+	if hasPkgDependency(tsRoot, "@react-navigation/native", inputScope) ||
+		(tsRoot != repoPath && hasPkgDependency(repoPath, "@react-navigation/native", inputScope)) {
 		return true
 	}
 	// A monorepo's example/demo app declares the dependency in its own
 	// package.json one level down (the framework's own repository is the
 	// extreme case: the root IS the dependency and depends on nothing).
-	entries, err := os.ReadDir(repoPath)
+	entries, err := inputScope.ReadDir(repoPath)
 	if err != nil {
 		return false
 	}
 	for _, ent := range entries {
 		if ent.IsDir() && !strings.HasPrefix(ent.Name(), ".") && !tsSkipDirs[ent.Name()] &&
-			hasPkgDependency(filepath.Join(repoPath, ent.Name()), "@react-navigation/native") {
+			hasPkgDependency(filepath.Join(repoPath, ent.Name()), "@react-navigation/native", inputScope) {
 			return true
 		}
 	}

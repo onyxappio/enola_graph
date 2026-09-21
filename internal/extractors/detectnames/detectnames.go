@@ -14,6 +14,7 @@
 package detectnames
 
 import (
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"io/fs"
 	"path/filepath"
 	"strings"
@@ -36,12 +37,14 @@ var pruned = map[string]bool{
 }
 
 // Walk returns every file under repoPath as a repo-relative, forward-slash path,
-// pruning `pruned` and every dot-directory. It is best-effort: an unreadable
+// applying graph policy when present, otherwise pruning `pruned` and every
+// dot-directory. It is best-effort: an unreadable
 // subtree contributes nothing rather than failing the walk, because detection
 // answering "no" is always better than a snapshot failing to start.
-func Walk(repoPath string) []string {
+func Walk(repoPath string, scopes ...*inputscope.Scope) []string {
+	scope := inputscope.First(scopes)
 	var names []string
-	_ = filepath.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+	_ = scope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			// A directory that cannot be read is skipped whole; a file that cannot be
 			// stat'd is simply not a name.
@@ -59,7 +62,7 @@ func Walk(repoPath string) []string {
 			return nil
 		}
 		if d.IsDir() {
-			if pruned[d.Name()] || strings.HasPrefix(d.Name(), ".") {
+			if (scope == nil || scope.Policy == nil) && (pruned[d.Name()] || strings.HasPrefix(d.Name(), ".")) {
 				return filepath.SkipDir
 			}
 			return nil

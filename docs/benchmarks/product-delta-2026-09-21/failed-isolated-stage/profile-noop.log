@@ -1,0 +1,60 @@
+enola graph: config /tmp/enola-final-isolated-cli/config.yaml
+[graph-profile] lock                               0.000s  total= 0.000s
+[graph-profile] bind_identity                      0.000s  total= 0.000s
+[graph-profile] open_journal                       0.000s  total= 0.000s
+[graph-profile] replay_unacked                     0.000s  total= 0.000s
+[graph-profile] state_read_bytes                   0.012s  state.json bytes=51338747
+[graph-profile] state_json_unmarshal               0.416s  files=5190
+[graph-profile] load_state                         0.428s  total= 0.428s  files=5190
+[graph-profile] engine_walk_repo                   0.468s  files=11127 tests=0 all_names=11127
+[graph-profile] inventory                          0.468s  total= 0.468s  files=11127 all_names=11127
+[graph-profile] detect_go                          0.000s
+[graph-profile] detect_manifests                   0.000s
+[graph-profile] detect_mdintent                    0.000s
+[graph-profile] detect_dotnet                      0.005s
+[graph-profile] detect_cpp                         0.006s
+[graph-profile] detect_hcl                         0.001s
+[graph-profile] detect_ansible                     0.001s
+[graph-profile] detect_java                        0.003s
+[graph-profile] detect_kotlin                      0.004s
+[graph-profile] detect_php                         0.000s
+[graph-profile] detect_python                      0.000s
+[graph-profile] detect_typescript                  0.001s
+[graph-profile] detect_swift                       0.001s
+[graph-profile] detect_ruby                        0.002s
+[graph-profile] detect_rust                        0.001s
+[graph-profile] detect_scala                       0.006s
+[graph-profile] detect_dart                        0.001s
+[graph-profile] detect_grpc                        0.430s
+[graph-profile] detect_openapi                     0.427s
+[graph-profile] detect_asyncapi                    0.446s
+[graph-profile] detect_extractors                  0.446s  total= 0.914s  detected=6
+[graph-profile] engine_hash_files                  0.178s  n=5209 hashed=5209 bytes=58935712
+[graph-profile] hash_content_inputs                1.117s  total= 2.032s  targets=5209
+[graph-profile] ts_config_inputs                   0.409s  n=83
+[graph-profile] analysis_fingerprint               0.439s  total= 2.470s  cfg_files=59
+[graph-profile] clone_file_state                   2.929s  total= 2.929s  n=5190
+[graph-profile] extractor_need                     0.016s  total= 2.946s  non_ts_need=false detected=6
+[graph-profile] ts_reuse_cache                     0.053s  total= 2.998s  owned=4244 facts=69735
+[graph-profile] assemble_new_files                 0.009s  total= 3.007s  new=5190 ts_noop=true non_ts_need=false skip=true facts=69754
+[graph-profile] ts_config_inputs                   0.410s  n=83
+[graph-profile] skip_publish_return                0.413s  total= 3.420s
+[graph] /tmp/enola-product-benchmark-source: generation 1→1 parsed=0 cached=4244 early_local=0 fallbacks=0
+        6.00 real         6.60 user         0.77 sys
+           339689472  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               61133  page reclaims
+                 263  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   5  messages sent
+                   4  messages received
+                 516  signals received
+                 139  voluntary context switches
+               13887  involuntary context switches
+         84397610438  instructions retired
+         22539397852  cycles elapsed
+           323275136  peak memory footprint

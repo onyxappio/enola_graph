@@ -3,7 +3,7 @@ package scalaextractor
 import (
 	"context"
 	"log"
-	"os"
+
 	"path/filepath"
 	"sort"
 	"strings"
@@ -35,6 +35,7 @@ import (
 //
 // prodFiles is unused: nothing here decides whether a referenced module exists.
 func (e *ScalaExtractor) ExtractTestRefs(ctx context.Context, repoPath string, testFiles, _ []string) ([]facts.Fact, error) {
+	inputScope := e.inputScope
 	var scalaFiles []string
 	for _, relFile := range testFiles {
 		if isScalaFile(relFile) {
@@ -46,7 +47,7 @@ func (e *ScalaExtractor) ExtractTestRefs(ctx context.Context, repoPath string, t
 	}
 
 	perFile := parallel.MapFiles(ctx, scalaFiles, func(relFile string) []facts.Fact {
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			log.Printf("[scala-extractor] error reading test file %s: %v", relFile, err)
 			return nil

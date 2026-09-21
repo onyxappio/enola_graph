@@ -1,0 +1,42 @@
+File: enola-product-profile
+Type: alloc_space
+Time: 2026-09-21 07:41:52 EEST
+Showing nodes accounting for 5719.51MB, 93.35% of 6127.18MB total
+Dropped 329 nodes (cum <= 30.64MB)
+Showing top 35 nodes out of 128
+      flat  flat%   sum%        cum   cum%
+    1457MB 23.78% 23.78%     1457MB 23.78%  os.readFileContents
+ 1040.53MB 16.98% 40.76%  1040.53MB 16.98%  github.com/tree-sitter/go-tree-sitter.newNode (inline)
+  616.64MB 10.06% 50.83%   616.64MB 10.06%  strings.genSplit
+  560.78MB  9.15% 59.98%   606.31MB  9.90%  encoding/json.Marshal
+  283.33MB  4.62% 64.60%   283.33MB  4.62%  bytes.Clone (inline)
+  275.22MB  4.49% 69.09%   275.22MB  4.49%  github.com/enola-labs/enola/internal/graphsession.(*session).storePayload
+  170.97MB  2.79% 71.88%   172.97MB  2.82%  github.com/enola-labs/enola/internal/graphstream.(*Publisher).enqueue
+  166.14MB  2.71% 74.60%   260.15MB  4.25%  github.com/enola-labs/enola/internal/graphsession.encodeOwner
+  139.83MB  2.28% 76.88%   139.83MB  2.28%  github.com/enola-labs/enola/internal/extractors/tsextractor.possibleGraphQLServerSignal
+  107.69MB  1.76% 78.64%   145.69MB  2.38%  os.(*File).readdir
+   95.55MB  1.56% 80.19%  1269.20MB 20.71%  github.com/enola-labs/enola/internal/graphsession.(*session).appendPhase
+   88.32MB  1.44% 81.64%    94.82MB  1.55%  github.com/enola-labs/enola/internal/extractors/asyncapiextractor.hasAsyncAPIContent
+   88.01MB  1.44% 83.07%    88.01MB  1.44%  internal/bytealg.MakeNoZero
+   86.02MB  1.40% 84.48%    94.02MB  1.53%  github.com/enola-labs/enola/internal/facts.factIDInto
+   56.52MB  0.92% 85.40%    56.52MB  0.92%  github.com/enola-labs/enola/internal/extractors/tsextractor.cloneFact (inline)
+   56.42MB  0.92% 86.32%    56.42MB  0.92%  github.com/enola-labs/enola/internal/graphsession.takePacked (inline)
+   43.69MB  0.71% 87.03%   221.03MB  3.61%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).ExtractSession
+   43.09MB   0.7% 87.74%    71.18MB  1.16%  github.com/enola-labs/enola/internal/extractors/mdintent.documentFacts
+   39.89MB  0.65% 88.39%    39.89MB  0.65%  github.com/tree-sitter/go-tree-sitter.readUTF8
+   39.47MB  0.64% 89.03%  1319.47MB 21.53%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).extractFile
+      38MB  0.62% 89.65%       38MB  0.62%  os.newUnixDirent
+   34.39MB  0.56% 90.21%   119.84MB  1.96%  github.com/enola-labs/enola/internal/extractors/tsextractor.extractGraphQLServerSDL
+   29.79MB  0.49% 90.70%    36.79MB   0.6%  github.com/enola-labs/enola/internal/graphsession.groupOwners
+   27.06MB  0.44% 91.14%  3739.66MB 61.03%  github.com/enola-labs/enola/internal/graphsession.(*session).run
+   24.14MB  0.39% 91.53%    50.20MB  0.82%  github.com/enola-labs/enola/internal/extractors/manifestextractor.(*readCtx).read
+   18.11MB   0.3% 91.83%   244.12MB  3.98%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).extractDeclarations
+      17MB  0.28% 92.11%       34MB  0.55%  encoding/json.mapEncoder.encode
+   14.19MB  0.23% 92.34%   126.12MB  2.06%  github.com/enola-labs/enola/internal/extractors/mdintent.(*Extractor).Extract
+   13.07MB  0.21% 92.55%    69.60MB  1.14%  github.com/enola-labs/enola/internal/extractors/tsextractor.cloneFactSlice
+   11.50MB  0.19% 92.74%   223.01MB  3.64%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).extractNode
+    9.51MB  0.16% 92.90%   271.52MB  4.43%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).extractImports
+       9MB  0.15% 93.04%   192.51MB  3.14%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).funcSymbol
+       7MB  0.11% 93.16%    84.95MB  1.39%  github.com/enola-labs/enola/internal/extractors/tsextractor.blankTSComments
+    6.11MB   0.1% 93.26%   392.16MB  6.40%  github.com/enola-labs/enola/internal/engine.(*Engine).walkRepo.func1
+    5.50MB  0.09% 93.35%   304.03MB  4.96%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).collectTSFileRefs

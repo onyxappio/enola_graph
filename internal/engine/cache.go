@@ -20,6 +20,10 @@ import (
 	"github.com/enola-labs/enola/pkg/plugin"
 )
 
+// v272: TypeScript streaming/local-fact profile: performs_io is no longer propagated
+// transitively through the call graph. io_direct remains the local I/O fact; performs_io
+// is set only on the same symbol. Cached TS facts that stored wrapper-caller performs_io
+// must re-extract.
 // v271: Go records a function used as a VALUE. analyzeBody walked bodies for CallExpr
 // only, so `"go.mod": readGoMod` in a dispatch table and `rc.lock(f, "yarn.lock",
 // yarnLock)` as an argument left the callee with no incoming edge; package-level var
@@ -2434,7 +2438,11 @@ import (
 // v270: SvelteKit reads literal kit.alias fallbacks before generated config exists,
 // keeps tsconfig paths authoritative, and classifies $app/$env/$service-worker imports
 // as framework-provided rather than unresolved third-party dependencies.
-const cacheVersion = "v271"
+// v273: Delta input contexts include manifest ancestor locks and Swift XcodeGen
+// includes/iOS markers; detectors retain their independent discovery scopes.
+// v274: Graph policy controls manifest/Markdown discovery, no-lock graph inputs,
+// and versioned effective TS contexts separate raw validity from scoped reparsing.
+const cacheVersion = "v274"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

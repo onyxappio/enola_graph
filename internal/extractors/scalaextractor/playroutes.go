@@ -2,11 +2,12 @@ package scalaextractor
 
 import (
 	"bufio"
-	"os"
+
 	"path/filepath"
 	"regexp"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/facts"
 )
 
@@ -62,9 +63,10 @@ type playInclude struct {
 // the walker has already filtered that list and `conf/routes` — extensionless — is
 // not something any glob admits. Only the `conf/` directory is read, so the cost is
 // a single directory listing on a repository that has no Play app at all.
-func extractPlayRoutes(repoPath string) []facts.Fact {
+func extractPlayRoutes(repoPath string, inputScopes ...*inputscope.Scope) []facts.Fact {
+	inputScope := inputscope.First(inputScopes)
 	confDir := filepath.Join(repoPath, "conf")
-	entries, err := os.ReadDir(confDir)
+	entries, err := inputScope.ReadDir(confDir)
 	if err != nil {
 		return nil // no conf/ directory: not a Play application
 	}
@@ -81,7 +83,7 @@ func extractPlayRoutes(repoPath string) []facts.Fact {
 			continue
 		}
 		rel := filepath.ToSlash(filepath.Join("conf", name))
-		parsed := parsePlayRoutesFile(filepath.Join(confDir, name), rel)
+		parsed := parsePlayRoutesFile(filepath.Join(confDir, name), rel, inputScope)
 		if parsed == nil {
 			continue
 		}
@@ -162,8 +164,9 @@ func playRouteFact(relFile, prefix string, r playRoute) facts.Fact {
 
 // parsePlayRoutesFile reads one routes file. Comments and blank lines are skipped;
 // a continuation of the modifier syntax (`+ nocsrf`) is a directive, not a route.
-func parsePlayRoutesFile(absPath, rel string) *playRoutesFile {
-	f, err := os.Open(absPath)
+func parsePlayRoutesFile(absPath, rel string, inputScopes ...*inputscope.Scope) *playRoutesFile {
+	inputScope := inputscope.First(inputScopes)
+	f, err := inputScope.Open(absPath)
 	if err != nil {
 		return nil
 	}

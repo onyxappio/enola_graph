@@ -1,0 +1,21 @@
+enola: using config /private/tmp/enola-product-fastdelta-results/config.yaml
+enola graph: config /private/tmp/enola-product-fastdelta-results/config.yaml
+[graph] /tmp/enola-product-benchmark-source: generation 1→1 parsed=0 cached=4281 early_local=0 fallbacks=0
+        2.95 real         1.70 user         1.50 sys
+           405012480  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               24620  page reclaims
+                 348  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   5  messages sent
+                   4  messages received
+                 214  signals received
+                  44  voluntary context switches
+                5336  involuntary context switches
+         37923526375  instructions retired
+         10059996322  cycles elapsed
+           388729280  peak memory footprint

@@ -8,19 +8,21 @@ package mdintent
 
 import (
 	"context"
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/enola-labs/enola/internal/extractors/extcoverage"
+	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 	"github.com/enola-labs/enola/internal/intent"
 	"github.com/enola-labs/enola/pkg/plugin"
 )
 
 // Extractor extracts enola_intent frontmatter from markdown pages.
-type Extractor struct{}
+type Extractor struct{ inputScope *inputscope.Scope }
 
 // New creates the extractor.
 func New() *Extractor { return &Extractor{} }
@@ -32,18 +34,35 @@ func (e *Extractor) OwnsFactFile(relFile string) bool {
 	return strings.HasSuffix(relFile, ".md")
 }
 
+// ContentInput implements plugin.DeltaInputs: markdown bytes, excluding archive/view trees.
+func (e *Extractor) ContentInput(rel string) bool {
+	slashed := filepath.ToSlash(rel)
+	if !strings.HasSuffix(slashed, ".md") {
+		return false
+	}
+	return !strings.Contains(slashed, "_archive/") && !strings.Contains(slashed, "_views/")
+}
+
+// NameSetInput implements plugin.DeltaInputs: document links resolve against inventory names.
+func (e *Extractor) NameSetInput() bool { return true }
+
 // Detect probes for any markdown file up to five directory levels (wiki trees
 // nest: wiki/<scope>/permanent/<area>/page.md). A page carrying the
 // enola_intent key compiles as intent; every other markdown file is a
-// document, so a repository with a README is in scope.
+// document, so a repository with a README is in scope. Graph mode instead
+// follows input policy at any depth and uses the extraction content predicate.
 func (e *Extractor) Detect(repoPath string) (bool, error) {
+	inputScope := e.inputScope
 	found := false
 	root := filepath.Clean(repoPath) //factpath:host
-	_ = filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+	_ = inputScope.WalkDir(root, func(path string, d os.DirEntry, err error) error {
 		if err != nil || found {
 			return filepath.SkipAll
 		}
 		if d.IsDir() {
+			if inputScope != nil && inputScope.Policy != nil {
+				return nil
+			}
 			name := d.Name()
 			if path != root && (strings.HasPrefix(name, ".") || mdSkipDirs[name]) {
 				return filepath.SkipDir
@@ -54,7 +73,13 @@ func (e *Extractor) Detect(repoPath string) (bool, error) {
 			}
 			return nil
 		}
-		if strings.HasSuffix(path, ".md") {
+		rel, _ := filepath.Rel(root, path)
+		rel = factpath.Slash(rel)
+		supported := strings.HasSuffix(path, ".md")
+		if inputScope != nil && inputScope.Policy != nil {
+			supported = e.ContentInput(rel)
+		}
+		if supported {
 			found = true
 			return filepath.SkipAll
 		}
@@ -75,6 +100,7 @@ var mdSkipDirs = map[string]bool{
 // relation per link that resolves against the walked file set, with the links
 // that do not counted on the extraction fact.
 func (e *Extractor) Extract(ctx context.Context, repoPath string, files []string) ([]facts.Fact, error) {
+	inputScope := e.inputScope
 	var out []facts.Fact
 	var links linkCount
 	documents, sections := 0, 0
@@ -84,11 +110,10 @@ func (e *Extractor) Extract(ctx context.Context, repoPath string, files []string
 	scope := newInScope(files)
 	for _, relFile := range files {
 		slashed := filepath.ToSlash(relFile)
-		if !strings.HasSuffix(slashed, ".md") ||
-			strings.Contains(slashed, "_archive/") || strings.Contains(slashed, "_views/") {
+		if !e.ContentInput(relFile) {
 			continue
 		}
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			continue
 		}
@@ -128,3 +153,5 @@ func (e *Extractor) Extract(ctx context.Context, repoPath string, files []string
 	}
 	return out, nil
 }
+
+func NewGraph(scope *inputscope.Scope) *Extractor { return &Extractor{inputScope: scope} }

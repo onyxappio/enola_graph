@@ -1,0 +1,70 @@
+# Delta input contract: bounded independent audit
+
+2026-09-21. Read-only comparison of `/tmp/enola-product-candidate2-source` against the actively edited checkout `/Users/oleksandr.mykulych/orca/enola_graph`. No build, test, timing, Product mutation, or main-checkout edit. Findings describe inspected code, not an atomic final revision or implementation approval. The new `plugin.DeltaInputs` and extractor predicates appeared during inspection; graphsession wiring was still changing. Critical findings were sent to root and Grok `ctx_b58d6a132740`.
+
+## Immediate actions
+
+1. **Do not equate an input predicate over engine AllNames with complete read discovery.** AllNames excludes directory-pruned descendants and all directory entries. Independent extractor walks, explicit side reads, missing paths, and empty marker directories need their own discovery/state contract.
+2. **Manifests' newly added `ContentInput = OwnsFile` is incomplete.** `manifestextractor/parsers.go:npmResolution/pythonResolution` reads `pnpm-lock.yaml`, `bun.lockb`, `uv.lock`, `poetry.lock`, and `Pipfile.lock`, but `lockNames` contains only package-lock.json, yarn.lock, Gemfile.lock, Cargo.lock, and pubspec.lock. Shared hashing of a file is also insufficient unless the manifests digest consumes its hash.
+3. **Swift's newly added predicate misses includes and marker state.** It covers Swift files and root project.yml, but project.yml's enabled include files influence module identities; shallow disk directory discovery influences iOS extraction. An AllNames filename boolean cannot capture those reads in general.
+4. **New FileListDetector methods do not preserve old walk scope.** Restore the old Detect path until a shared inventory can prove equivalent discovery, or enumerate the missing scope and apply each detector's original skip/depth rules. Filtering an incomplete AllNames list cannot recover paths already pruned.
+5. **Retain the original TS config traversal; extend it deliberately for actual side reads.** The changed `SessionResult.ConfigPaths = tsConfigInputs(repoPath, files)` is narrower even than AllNames: `files` is extraction inventory. It can lose file-ignored nested configs as well as directory-pruned configs. Fix both initial fingerprint discovery and extraction/revalidation discovery, not just one call site.
+
+## Per-extractor required dependencies
+
+| Extractor | Content inputs | Membership/context inputs and recommendation |
+|---|---|---|
+| TypeScript | Every consumed session/test source; package/config bytes listed below; declared client spec/config fingerprint. | Preserve exact source membership for resolution/GraphQL/gRPC/composition. Off-inventory framework/config/root selection needs separate context enumeration. Treat context changes as invalidating the affected resolution scope; merely hashing their bytes does not refresh cached records. |
+| manifests | All seven `manifestReaders` names found by its own detectnames walk; all actual ancestor lock candidates, including the five missing names above. | Extract ignores engine Files and independently calls detectnames.Walk. A user-pruned private/package.json still contributes when extraction is enabled elsewhere. Capture discovery and missing/empty/unreadable-to-readable transitions; ancestor precedence changes matter. Keep aggregate merging across manifests. |
+| mdintent | `.md` bytes from extraction Files, using the same `_archive/` and `_views/` exclusions as Extract. | All extraction Files names, including non-markdown paths, determine link/file/directory existence via newInScope. Bytes of a non-markdown link target are unnecessary. Keep extractor identity/capability explicit; a custom extractor named mdintent gets no implicit privilege. Detection has a different scope, described below. |
+| hcl | `.tf`/`.hcl` files actually passed to Extract, with case-insensitive extension predicate. | Their paths/directories determine module identity and same-directory declaration resolution. No extra disk reads found in hcl.go. A set digest over content paths+hashes covers membership; unrelated filenames need not invalidate it. Preserve broader re-resolution within a module on declaration changes. |
+| python | `.py` extraction/test inputs; root requirements.txt, pyproject.toml, setup.cfg, setup.py framework-gating bytes; every pyproject.toml in Files for entry points. | Root manage.py existence independently enables Django, even if file-ignored. Python source membership controls packageDirs, module resolution and router composition. New predicate covers these manifest basenames conservatively, but direct root probes and missing/existence state must remain observable under ignores and zero-byte files. Detector markers are separate from extraction inputs. |
+| swift | Swift files including Package.swift; root project.yml and each enabled root include path actually read, including its case-insensitive fallback. | `detectiOSProject` enumerates root entries, their children and grandchildren without engine ignore filtering: root Info.plist, plus Info.plist/Assets.xcassets below root. Empty Assets.xcassets directories affect it but never enter AllNames. Preserve case-sensitive precedence over case-insensitive fallback, missing paths, and directory membership. NameSetInput over production FILE names alone cannot represent this. |
+
+Relevant source anchors: `manifestextractor/manifest.go:Extract/readCtx.lock/readCtx.exists`, `parsers.go:npmResolution/pythonResolution`; `mdintent/mdintent.go:Extract` and its `newInScope` caller; `hclextractor/hcl.go:Extract`; `pythonextractor/python.go:Extract/extractEntryPoints/detectDjango/detectDependencyToken`; `swiftextractor/swift.go:Extract/detectiOSProject`, `swift_xcodegen.go:parseXcodeGenProject/readXcodeFileCaseInsensitive/resolveCaseInsensitive`.
+
+Swift clarification: current code follows **only the root project.yml include list**, not nested includes recursively. My first quick message said recursive; a correction was sent immediately after reading the implementation. Match implemented semantics, rather than inventing broader traversal.
+
+## TS side-read details
+
+`ExtractSession` invokes framework detection, alias-root collection, Svelte alias fallback, and composition. These involve independent filesystem access:
+
+- `ts.go:findTSRoot/searchTSRoot/hasTSMarkers/isDeepNestedProject`: root-selection directory names, package.json contents, tsconfig/deno/import_map.json and config/importmap.rb existence; pom.xml/build.gradle/build.gradle.kts and Python marker existence changes the search depth from 2 to 8. Context must capture selection changes, not just the selected root's current files.
+- `collectTSAliasRoots`: own bounded walk, ignoring dot-directories and tsSkipDirs, reading tsconfig.json/tsconfig.base.json and supported relative extends chains. Preserve external relative extends paths and missing endpoints as already supported; do not silently restrict them to engine AllNames.
+- `collectPackageNames`: separate walk, ignoring dot-directories, tsSkipDirs and testdata; reads nested package.json even when engine globs exclude it. ConfigInputPaths' historical walk is a conservative superset in some cases and must not be narrowed accidentally.
+- `svelte.go:withSvelteKitAliasFallbacks` reads svelte.config.js/ts/mjs in **each alias root**, not only repository root. These bytes affect import resolution. Hashing a JS config as a normal TS source is not enough if cached users still retain old alias resolution.
+- `storage.go:extractPrismaStorage` reads schema.prisma and prisma/schema.prisma at **findTSRoot and repository root**, including ignored paths. Fixed repo-root slots alone omit nested TS-root schemas.
+- Framework marker variants include next.config.ts, nuxt.config.mjs, svelte.config.mjs; the historical fixed config list is not a complete inventory of those variants. `angularProjectNames` independently reads nested project.json and angular.json; current Angular full-extraction fallback must remain until context caching is proven.
+- Ember and React Navigation search nested package.json with their own bounds/skips. Root/package/config discovery must use their effective scope, not assume every nested read shares one walk's pruning policy.
+- Several helpers call os.ReadFile or `overlayReadFile(context.Background(), ...)`, outside the session overlay supplied through ctx. An input digest is not proof of bytes consumed during a concurrent edit. Preserve revalidation or bind actual reads to captured content; final race/consistency testing is separate.
+
+These TS read sites largely already exist in candidate2. The new config-list reuse introduces an additional narrowing; historical incompleteness is not evidence that an audited closure is now complete.
+
+## Detector scope differences versus candidate2
+
+Candidate2 already had FileListDetector for TS/manifests/hcl/python/swift; the new additions are mdintent/grpc/openapi/asyncapi. Unchanged implementations of the first group still need their side reads covered by the newly claimed input capability.
+
+| Newly migrated detector | Original Detect behavior | Observed new DetectFiles issue |
+|---|---|---|
+| mdintent | Independent walk skips dot-directories and mdSkipDirs (including _archive/_views/tmp/testdata), and prunes directories with 5 or more slashes below root. | Any `.md` in supplied names enables it, without those restrictions. A markdown file only in `_archive`, dot trees, or beyond the old depth can flip enabled state. Conversely custom engine `private/**` pruning hides markdown original Detect sees. |
+| grpc | Independent .proto discovery with its own skipDir list. | Any `.proto` in names; old skipDir filtering absent. Relaxed engine ignores can detect testdata/vendor/etc that original Detect excludes. Engine custom pruning can remove old positive detection. Extract itself consumes Files, so compare detection contracts separately from whether this fixture emits facts. |
+| openapi | Independent own-skip walk; name/path candidate and first-512-byte root marker test. Extract uses another independent walk. | Engine-pruned directory specs disappear from detection even though original Extract would include them. Old skipDir filtering absent. Also original candidate receives an **absolute path** while DetectFiles passes a relative path: if repo itself or an ancestor is named `openapi`, ordinary `api.yaml` can be a candidate originally and rejected by the new relative-path predicate. |
+| asyncapi | Own-skip walk over all YAML/YML/JSON candidates, root-content detection. Extract independently walks and resolves local references. | Same scope mismatch; filename-restricted JSON predicate was an explicit regression (already demonstrated in earlier probes). Preserve arbitrary api.json. `$ref` can read arbitrary repository-contained relative filenames, including files in extractor-pruned or engine-pruned directories and without JSON/YAML extension. Content closure must follow actual reference reads and missing paths, or remain conservative. |
+
+For OpenAPI/AsyncAPI, false-positive detection can also matter: a marker in a directory original Detect skips may enable extraction of a different valid spec outside that directory. Detection and extraction scope are separately observable, not interchangeable.
+
+Minimal follow-up checks: only `private/spec.openapi.yaml` with engine ignore private/**; only `_archive/page.md`; only deep markdown beyond old depth; relaxed-ignore testdata/service.proto; repository root named openapi containing api.yaml; AsyncAPI spec referencing `private/schema.data`; manifest pyproject.toml with changing uv.lock; Swift project.yml including ignored arbitrary-name config; empty Assets.xcassets addition. Compare original Detect and new detection first, then initial+delta original Consumer against full cold extraction. Those tests were not run in this bounded audit.
+
+## Contract shape and rollout
+
+The current two-method capability (`ContentInput(rel) bool`, `NameSetInput() bool`) is suitable for purely inventory-driven extraction such as HCL and mdintent. For the others it needs a separate enumerated context component: extra content paths, missing/readability states, directory/existence observations, detector input scope, and a capability/digest version. This can be collected with targeted probes or an extraction read manifest; it need not hash arbitrary PNG/JSON artifacts. Retain conservative behavior for unproven profiles, and do not grant audited behavior by extractor Name or FileOwner alone. Conservative AllNames hashing preserves the old scanned universe, but cannot by itself fix pre-existing side reads outside that universe.
+
+Persist per-extractor consumed input digests independent of output ownership; include capability version or force migration/reanalysis when dependency semantics change. Discovery must observe additions/deletions and disabled-to-enabled transitions; digesting only previously read files misses newly eligible candidates. Preserve content checks for same-size/restored-mtime edits and missing/empty/unreadable distinctions where the reader treats them differently. Input tracking must not introduce transitive attribute propagation.
+
+The FileListDetector interface comment currently promises a pure name function (apart from stat fast paths), but OpenAPI/AsyncAPI implementations read content. Update the capability contract or retain Detect; do not build no-op planning on the inaccurate pure-name assumption.
+
+## Shared glob state note
+
+At the final read checkpoint, `engine.go:walkRepo` still assigns compiled sets into shared `e.ignoreSet/e.testSet`, used by helper methods. Concurrent Inventory/Drift/CurrentMeta on one Engine can race despite identical config. Root already raised this with Grok. Prefer immutable local compiled sets captured by a per-walk closure and preserve non-walk helper behavior; final race testing remains separate.
+
+Audit complete. Main code, final corrected-snapshot verification, and performance acceptance remain coordinator-owned.

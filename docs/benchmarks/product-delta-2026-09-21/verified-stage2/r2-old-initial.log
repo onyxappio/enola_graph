@@ -1,0 +1,224 @@
+enola: using config /private/tmp/enola-product-fastdelta-results/config.yaml
+2026/09/21 10:08:37 [engine] found 42583 files (2522 test files, 2522 skipped) in /tmp/enola-product-benchmark-source
+2026/09/21 10:08:39 [engine] extractor cpp: not detected
+2026/09/21 10:08:40 [engine] extractor asyncapi: not detected
+2026/09/21 10:08:40 [engine] extractor dotnet: not detected
+2026/09/21 10:08:40 [engine] extractor go: not detected
+2026/09/21 10:08:40 [engine] running extractor: manifests
+2026/09/21 10:08:40 [engine] extractor manifests: emitted 131 facts in 212ms
+2026/09/21 10:08:40 [engine] running extractor: mdintent
+2026/09/21 10:08:40 [mdintent] 2133 document(s), 19363 section(s), 6620 link(s) resolved on disk, 12132 not
+2026/09/21 10:08:40 [engine] extractor mdintent: emitted 21497 facts in 264ms
+2026/09/21 10:08:40 [engine] extractor grpc: not detected
+2026/09/21 10:08:40 [engine] running extractor: hcl
+2026/09/21 10:08:40 [engine] extractor hcl: emitted 10 facts in 1ms
+2026/09/21 10:08:40 [engine] extractor ansible: not detected
+2026/09/21 10:08:40 [engine] extractor java: not detected
+2026/09/21 10:08:40 [engine] extractor kotlin: not detected
+2026/09/21 10:08:41 [engine] extractor openapi: not detected
+2026/09/21 10:08:41 [engine] extractor php: not detected
+2026/09/21 10:08:41 [engine] running extractor: python
+2026/09/21 10:08:41 [engine] extractor python: emitted 202 facts in 36ms
+2026/09/21 10:08:41 [engine] running extractor: typescript
+2026/09/21 10:08:41 [ts-extractor] skipping minified/bundled file apps/architect-console/src/data/mobileAppMachineGraph.generated.ts
+2026/09/21 10:08:41 [ts-extractor] skipping minified/bundled file apps/architect-console/src/data/onboardingProtectBehaviorGraphs.generated.ts
+2026/09/21 10:08:41 [ts-extractor] skipping minified/bundled file apps/mobile/scripts/benchmark-affected-scenario-journeys-phase7.ts
+2026/09/21 10:08:41 [ts-extractor] skipping minified/bundled file apps/mobile/scripts/generate-projected-screen-structures.mjs
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/FigmaIcon.tsx
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/cards/CourseCardCertificatePreview.tsx
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/cards/assets/browserProtectionGlobe.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/cards/assets/browserProtectionIllustrationGeometry.generated.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/cards/assets/stampFakeSealPaths.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/cards/certificateBadgeSealPaint.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/cards/certificateWatermarkGeometry.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/cards/planDiscountTagExactSvg.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/generated/promotedFigmaComponentData.generated.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/icons/glass/glassIconGeometry.generated.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/icons/glass/glassIconSourceAuthority.generated.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/icons/glassIconLiveGeometry.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/exactSvg/badge-banner-3699-24547.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/exactSvg/certificate-badge-3699-10124.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/exactSvg/certificate-badge-symbol-3699-10128.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/exactSvg/certificate-badge-symbol-3699-10136.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/exactSvg/glass-icon-check-circle.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/exactSvg/glass-icon-lock.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/exactSvg/glass-icon-pointer.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/exactSvg/glass-icon-check-circle-success-3482-28947.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/exactSvg/glass-icon-warning.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/exactSvg/proof-stat-leaves-left-2467-13111.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/exactSvg/proof-stat-leaves-right-2467-13112.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/exactSvg/glass-icon-shield-check.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/pinnedDirectVectorGeometry.generated.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/pinnedDirectVectorLeaves/proof-stat-leaves-left-2467-13111.generated.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/pinnedDirectVectorLeaves/proof-stat-leaves-right-2467-13112.generated.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/pinnedDomainVectorGeometry.generated.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/pinnedExactFigmaSvgs.generated.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/pinnedGenericIconGeometry.generated.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/pinnedInlineExactFigmaSvgs.ts
+2026/09/21 10:08:42 [ts-extractor] skipping minified/bundled file apps/mobile/src/components/figma/vectorGeometry/pinnedVectorPathConstants.ts
+2026/09/21 10:08:44 [ts-extractor] skipping minified/bundled file apps/mobile/src/visual-diff/affectedGateBenchmarkStatusContract.ts
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/Color-23OOGO2C-CFyZFonx.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/DeepScan-DHvM5dCJ.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/DocsRenderer-LL677BLK-BuIR6bZY.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ForgotPasswordReviewScreen-DrvQnIcW.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/GetStartedFreeScreen-BnD4gdvs.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/GetStartedScreen-DiHBSXQR.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/LeakedLogo-DG0KS9dA.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/MainAppShell-DykjRsCQ.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/OnboardingFirstSessionScreen-Ccla2iGl.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/PointsCard-UPQ-OhXY.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/PricingContentContext-ENjeFjYN.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProfileScreen-aoCBlYSa.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProjectedFigmaScreen-B-0ULYBe.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProtectFreeScreen-4DLtefNg.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProtectSurface-CtgJS1RL.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/RiskIndicatorDropMessage-f1IgdUCx.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenBackgroundBlur-DBMfPfhN.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenCompositionHost-WK6OxeVJ.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenContentTransition-Bs4S8klL.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenFigmaComparisonPanel-CvcgEIaM.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/StatusBadge-DGggXXdu.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/SubscriptionInfoCard-CX9utM5L.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/TabBar-vMBrgBKe.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/Toast-DoOWktSp.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/WithTooltip-65CFNBJE-B3RsNAAg.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/chunk-3LY4VQVK-DCoUZ6n4.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/chunk-LITCR56V-JVUNf0OC.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/components-BtTjbzAC.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/deepscan-components.stories-DuUlNjuO.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/figma-components.stories-LvwegD9L.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/figmaScreenStructures.generated-JjgbhcQt.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/forgot-password.stories-BIhZW3ml.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/generatedFigmaComponents-DmjMpYnh.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/get-started-free.stories-BDbRpoO2.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/get-started.stories-CvUR968C.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/getStartedDataSlotSource-Rr5d3rz_.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/iframe-D-RxKruK.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/legalLinks-CB7C40_C.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/onboardingBackgroundMorph-CeKD0Tk0.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/onboardingDataSlotSource-qPx6fUNU.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/onyxStoryMetadata-Bq_5Th--.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/pricingFixtures.generated-CEiD1ca2.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/profile.stories-DlPoX8YC.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/protect-task.stories-dOTaLEMy.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/protectSteadyStateStoryKit-BPtgP0dI.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/quiz-flow.stories-NeKa839I.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/quiz-flow.stories-NppO7NZx.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/react-18-BfUV1oqG.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/screen-structure-components.stories-BrmjAFna.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/screenBackgroundMorph-RdKWbQdJ.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/screenReviewStoryKit-Dt_Rkzsv.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/screenStructureStoryKit-ComKfaDB.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/syntaxhighlighter-W7WJGI2T-BKWqXrBS.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/theming-BRkukHDK.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/train.stories-Dz3ntN8J.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-addons/docs-1/manager-bundle.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-addons/storybook-core-server-presets-0/common-manager-bundle.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-manager/globals-runtime.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-manager/runtime.js
+2026/09/21 10:08:45 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/vite-inject-mocker-entry.js
+2026/09/21 10:08:46 [ts-extractor] skipping minified/bundled file scripts/deploy/t013-build-service-release.mjs
+2026/09/21 10:08:46 [ts-extractor] skipping minified/bundled file scripts/deploy/t013-pulumi-role-handoff.mjs
+2026/09/21 10:08:46 [ts-extractor] skipping minified/bundled file scripts/deploy/t013-q006-transaction-core.test.mjs
+2026/09/21 10:08:47 [engine] extractor typescript: emitted 60626 facts in 6.58s
+2026/09/21 10:08:47 [engine] running extractor: swift
+2026/09/21 10:08:47 [engine] extractor swift: emitted 27 facts in 11ms
+2026/09/21 10:08:47 [engine] extractor ruby: not detected
+2026/09/21 10:08:47 [engine] extractor rust: not detected
+2026/09/21 10:08:47 [engine] extractor scala: not detected
+2026/09/21 10:08:47 [engine] extractor dart: not detected
+2026/09/21 10:08:48 [engine] extractor typescript: emitted 2522 test-ref facts from 2522 files
+2026/09/21 10:08:48 [engine] extractor cache: 0 reused
+2026/09/21 10:08:48 [engine] extracted 85015 facts using 6 extractors
+2026/09/21 10:08:48 [engine] flagged 122 facts from 11 generated file(s)
+2026/09/21 10:08:48 [module-edges] derived 501 module edge(s) from resolved symbol edges; 16 pair(s) an extractor already connected, 10773 symbol edge(s) not resolving to a production symbol, 0 landing in another repository
+2026/09/21 10:08:48 [module-edges] unresolved symbol edge breakdown: typescript/calls/no_symbol_match=8388, typescript/calls/unique_short_name_match=1632, typescript/calls/ambiguous_short_name_match=507, typescript/calls/known_symbol_outside_production_module=201, python/instantiates/no_symbol_match=24, python/instantiates/unique_short_name_match=11, swift/instantiates/no_symbol_match=7, swift/calls/ambiguous_short_name_match=2, swift/calls/no_symbol_match=1
+2026/09/21 10:08:49 [engine] built graph index (71093 nodes, 235819 edges)
+2026/09/21 10:08:49 [engine] running annotator: package-metrics
+2026/09/21 10:08:49 [engine] running annotator: dead-code
+2026/09/21 10:08:49 [engine] running annotator: performance
+2026/09/21 10:08:49 [engine] running explainer: cycles
+2026/09/21 10:08:49 [engine] explainer cycles: produced 13 insights
+2026/09/21 10:08:49 [engine] running explainer: layers
+2026/09/21 10:08:49 [engine] explainer layers: produced 0 insights
+2026/09/21 10:08:49 [engine] running explainer: crossrepo
+2026/09/21 10:08:49 [engine] explainer crossrepo: produced 0 insights
+2026/09/21 10:08:49 [engine] running explainer: coverage
+2026/09/21 10:08:49 [engine] explainer coverage: produced 0 insights
+2026/09/21 10:08:49 [engine] running explainer: unused-routes
+2026/09/21 10:08:49 [engine] explainer unused-routes: produced 0 insights
+2026/09/21 10:08:49 [engine] running explainer: domain
+2026/09/21 10:08:49 [engine] explainer domain: produced 11 insights
+2026/09/21 10:08:49 [engine] running explainer: query-loops
+2026/09/21 10:08:49 [engine] explainer query-loops: produced 0 insights
+2026/09/21 10:08:49 [engine] running explainer: dead-methods
+2026/09/21 10:08:49 [engine] explainer dead-methods: produced 0 insights
+2026/09/21 10:08:49 [engine] running explainer: entry-points
+2026/09/21 10:08:49 [engine] explainer entry-points: produced 0 insights
+2026/09/21 10:08:49 [engine] running explainer: messaging-coverage
+2026/09/21 10:08:49 [engine] explainer messaging-coverage: produced 0 insights
+2026/09/21 10:08:49 [engine] running explainer: god-class
+2026/09/21 10:08:49 [engine] explainer god-class: produced 25 insights
+2026/09/21 10:08:49 [engine] running explainer: hotspots
+2026/09/21 10:08:49 [engine] explainer hotspots: produced 20 insights
+2026/09/21 10:08:49 [engine] running explainer: dependency-depth
+2026/09/21 10:08:49 [engine] explainer dependency-depth: produced 10 insights
+2026/09/21 10:08:49 [engine] running explainer: exported-surface
+2026/09/21 10:08:49 [engine] explainer exported-surface: produced 20 insights
+2026/09/21 10:08:49 [engine] running explainer: complexity-outliers
+2026/09/21 10:08:49 [engine] explainer complexity-outliers: produced 15 insights
+2026/09/21 10:08:49 [engine] running explainer: intent
+2026/09/21 10:08:49 [engine] explainer intent: produced 0 insights
+2026/09/21 10:08:49 [engine] running explainer: constraints
+2026/09/21 10:08:49 [engine] explainer constraints: produced 0 insights
+2026/09/21 10:08:49 [engine] running explainer: vendored-candidates
+2026/09/21 10:08:49 [engine] explainer vendored-candidates: produced 0 insights
+2026/09/21 10:08:49 [engine] running explainer: import-closure
+2026/09/21 10:08:49 [engine] explainer import-closure: produced 0 insights
+2026/09/21 10:08:49 [engine] running explainer: package-metrics
+2026/09/21 10:08:49 [engine] explainer package-metrics: produced 4 insights
+2026/09/21 10:08:49 [engine] running explainer: dead-code
+2026/09/21 10:08:49 [engine] explainer dead-code: produced 51 insights
+2026/09/21 10:08:49 [engine] running explainer: performance
+2026/09/21 10:08:49 [engine] explainer performance: produced 51 insights
+2026/09/21 10:08:49 [engine] produced 220 insights using 22 explainers
+2026/09/21 10:08:50 [engine] running renderer: llm_context
+2026/09/21 10:08:50 [engine] produced 1 artifacts using 1 renderers
+2026/09/21 10:08:50 [engine] froze fact store in 51ms
+2026/09/21 10:08:50 [engine] snapshot generated in 16.472264167s
+2026/09/21 10:08:50 [engine] timings: walk=3.234s hash=2.492s extract=9.061s link=160ms graph=43ms explain=723ms render=28ms
+2026/09/21 10:08:50 [engine] memory after snapshot: heap=90 MiB sys=517 MiB (85516 facts)
+2026/09/21 10:08:50 [engine] wrote /tmp/enola-product-benchmark-source/.enola/llm_context.md (30970 bytes)
+2026/09/21 10:08:50 [engine] wrote /tmp/enola-product-benchmark-source/.enola/facts.jsonl
+2026/09/21 10:08:50 [engine] wrote /tmp/enola-product-benchmark-source/.enola/insights.json (354953 bytes)
+2026/09/21 10:08:50 [engine] wrote /tmp/enola-product-benchmark-source/.enola/snapshot.meta.json (10821205 bytes)
+2026/09/21 10:08:50 [engine] wrote /tmp/enola-product-benchmark-source/.enola/receipt.json (4983 bytes)
+2026/09/21 10:08:52 [engine] recorded history revision 907392c (initial: 85516 facts, 220 findings)
+2026/09/21 10:08:52 [engine] wrote /Users/oleksandr.mykulych/.enola/receipt.json (1 repos)
+2026/09/21 10:08:52 [engine] wrote /Users/oleksandr.mykulych/.enola/graphs/enola-product-benchmark-source-c833d05d.json
+
+Snapshot complete:
+  Repository:  /tmp/enola-product-benchmark-source
+  Facts:       85516
+  Insights:    220
+  Artifacts:   1
+  Duration:    16.472264167s
+  Output:      /tmp/enola-product-benchmark-source/.enola
+       18.92 real        70.41 user         6.03 sys
+           592068608  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               78928  page reclaims
+                 927  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                6247  signals received
+               21902  voluntary context switches
+               84801  involuntary context switches
+       1000344657877  instructions retired
+        218770977946  cycles elapsed
+           551799936  peak memory footprint

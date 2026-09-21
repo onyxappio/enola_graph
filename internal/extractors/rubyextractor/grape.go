@@ -3,11 +3,12 @@ package rubyextractor
 import (
 	"context"
 	"log"
-	"os"
+
 	"path/filepath"
 	"sort"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 	"github.com/enola-labs/enola/internal/parallel"
@@ -71,7 +72,8 @@ type grapeRoute struct {
 // classFacts is the class symbols from the main AST pass; it is read for the
 // name/superclass/file triples only. The returned facts are appended to the snapshot
 // like any other route.
-func extractGrapeRoutes(ctx context.Context, repoPath string, classFacts []facts.Fact) []facts.Fact {
+func extractGrapeRoutes(ctx context.Context, repoPath string, classFacts []facts.Fact, inputScopes ...*inputscope.Scope) []facts.Fact {
+	inputScope := inputscope.First(inputScopes)
 	grapeFiles := grapeAPIFiles(classFacts)
 	if len(grapeFiles) == 0 {
 		return nil
@@ -79,7 +81,7 @@ func extractGrapeRoutes(ctx context.Context, repoPath string, classFacts []facts
 
 	// Parse only the confirmed Grape files, in parallel, in file order.
 	perFile := parallel.MapFiles(ctx, grapeFiles, func(relFile string) []grapeClass {
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			log.Printf("[ruby-extractor] error reading grape file %s: %v", relFile, err)
 			return nil

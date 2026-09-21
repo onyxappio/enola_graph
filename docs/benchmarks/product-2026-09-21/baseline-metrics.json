@@ -1,0 +1,584 @@
+[
+  {
+    "label": "r1-old-initial",
+    "seconds": 17.7570345,
+    "start_ns": 1789961619391592000,
+    "exit": 0,
+    "rss_bytes": 570163200.0,
+    "user_s": 70.4,
+    "sys_s": 5.83,
+    "facts": 85516,
+    "extractors": [
+      [
+        "manifests",
+        "131",
+        "210ms"
+      ],
+      [
+        "mdintent",
+        "21497",
+        "261ms"
+      ],
+      [
+        "hcl",
+        "10",
+        "1ms"
+      ],
+      [
+        "python",
+        "202",
+        "38ms"
+      ],
+      [
+        "typescript",
+        "60626",
+        "6.626s"
+      ],
+      [
+        "swift",
+        "27",
+        "18ms"
+      ]
+    ],
+    "cache_hits": [
+      "2026/09/21 06:33:54 [engine] extractor cache: 0 reused"
+    ]
+  },
+  {
+    "label": "r1-old-noop",
+    "seconds": 12.469199750000001,
+    "start_ns": 1789961637153976000,
+    "exit": 0,
+    "rss_bytes": 490684416.0,
+    "user_s": 15.85,
+    "sys_s": 4.15,
+    "facts": 85516,
+    "extractors": [
+      [
+        "mdintent",
+        "21497",
+        "265ms"
+      ]
+    ],
+    "cache_hits": [
+      "2026/09/21 06:34:04 [engine] extractor manifests: reused 131 cached facts",
+      "2026/09/21 06:34:04 [engine] extractor hcl: reused 10 cached facts",
+      "2026/09/21 06:34:04 [engine] extractor python: reused 202 cached facts",
+      "2026/09/21 06:34:04 [engine] extractor typescript: reused 60626 cached facts",
+      "2026/09/21 06:34:05 [engine] extractor swift: reused 27 cached facts",
+      "2026/09/21 06:34:05 [engine] extractor cache: 5 reused"
+    ]
+  },
+  {
+    "label": "r1-new-initial",
+    "seconds": 469.03027433399996,
+    "start_ns": 1789961649624874000,
+    "exit": 0,
+    "rss_bytes": 1830158336.0,
+    "user_s": 81.97,
+    "sys_s": 46.07,
+    "result": {
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "ParsedFiles": 4181,
+      "CachedFiles": 0,
+      "EarlyLocal": 4181,
+      "FallbackCount": 5
+    },
+    "fallbacks": [
+      "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "broker_end_ns": 1789962117608126000,
+      "bytes": 172928163,
+      "canonical_sha256": "782dc7036a113310238252338b3f27447eaf3c4cd20e2f921bbc02056115c28b",
+      "consumer_end_ns": 1789962117789523000,
+      "context": "measured-main1",
+      "edges": 188879,
+      "first_batch_ns": 1789961658239502000,
+      "first_ns": 1789961658231287000,
+      "messages": 48663,
+      "nodes": 82493,
+      "run_id": "/tmp/enola-product-benchmark-source-measured-main1-1-1789961655663975000"
+    },
+    "first_s": 8.606413,
+    "first_batch_s": 8.614628,
+    "broker_end_s": 467.983252,
+    "consumer_end_s": 468.164649
+  },
+  {
+    "label": "r2-old-initial",
+    "seconds": 18.089095417,
+    "start_ns": 1789962150117314000,
+    "exit": 0,
+    "rss_bytes": 566525952.0,
+    "user_s": 69.4,
+    "sys_s": 5.99,
+    "facts": 85516,
+    "extractors": [
+      [
+        "manifests",
+        "131",
+        "211ms"
+      ],
+      [
+        "mdintent",
+        "21497",
+        "265ms"
+      ],
+      [
+        "hcl",
+        "10",
+        "1ms"
+      ],
+      [
+        "python",
+        "202",
+        "40ms"
+      ],
+      [
+        "typescript",
+        "60626",
+        "6.598s"
+      ],
+      [
+        "swift",
+        "27",
+        "18ms"
+      ]
+    ],
+    "cache_hits": [
+      "2026/09/21 06:42:45 [engine] extractor cache: 0 reused"
+    ]
+  },
+  {
+    "label": "r2-old-noop",
+    "seconds": 12.867111874999999,
+    "start_ns": 1789962168211038000,
+    "exit": 0,
+    "rss_bytes": 474071040.0,
+    "user_s": 16.36,
+    "sys_s": 4.39,
+    "facts": 85516,
+    "extractors": [
+      [
+        "mdintent",
+        "21497",
+        "267ms"
+      ]
+    ],
+    "cache_hits": [
+      "2026/09/21 06:42:55 [engine] extractor manifests: reused 131 cached facts",
+      "2026/09/21 06:42:55 [engine] extractor hcl: reused 10 cached facts",
+      "2026/09/21 06:42:56 [engine] extractor python: reused 202 cached facts",
+      "2026/09/21 06:42:56 [engine] extractor typescript: reused 60626 cached facts",
+      "2026/09/21 06:42:56 [engine] extractor swift: reused 27 cached facts",
+      "2026/09/21 06:42:57 [engine] extractor cache: 5 reused"
+    ]
+  },
+  {
+    "label": "r3-old-initial",
+    "seconds": 17.590425999999997,
+    "start_ns": 1789962181084138000,
+    "exit": 0,
+    "rss_bytes": 553943040.0,
+    "user_s": 70.09,
+    "sys_s": 5.81,
+    "facts": 85516,
+    "extractors": [
+      [
+        "manifests",
+        "131",
+        "206ms"
+      ],
+      [
+        "mdintent",
+        "21497",
+        "262ms"
+      ],
+      [
+        "hcl",
+        "10",
+        "1ms"
+      ],
+      [
+        "python",
+        "202",
+        "39ms"
+      ],
+      [
+        "typescript",
+        "60626",
+        "6.626s"
+      ],
+      [
+        "swift",
+        "27",
+        "11ms"
+      ]
+    ],
+    "cache_hits": [
+      "2026/09/21 06:43:16 [engine] extractor cache: 0 reused"
+    ]
+  },
+  {
+    "label": "r3-old-noop",
+    "seconds": 12.341410624999995,
+    "start_ns": 1789962198679898000,
+    "exit": 0,
+    "rss_bytes": 488783872.0,
+    "user_s": 17.21,
+    "sys_s": 4.01,
+    "facts": 85516,
+    "extractors": [
+      [
+        "mdintent",
+        "21497",
+        "256ms"
+      ]
+    ],
+    "cache_hits": [
+      "2026/09/21 06:43:25 [engine] extractor manifests: reused 131 cached facts",
+      "2026/09/21 06:43:25 [engine] extractor hcl: reused 10 cached facts",
+      "2026/09/21 06:43:25 [engine] extractor python: reused 202 cached facts",
+      "2026/09/21 06:43:26 [engine] extractor typescript: reused 60626 cached facts",
+      "2026/09/21 06:43:26 [engine] extractor swift: reused 27 cached facts",
+      "2026/09/21 06:43:27 [engine] extractor cache: 5 reused"
+    ]
+  },
+  {
+    "label": "r1-new-noop",
+    "seconds": 21.930061207999998,
+    "start_ns": 1789962211023551000,
+    "exit": 0,
+    "rss_bytes": 1270939648.0,
+    "user_s": 16.12,
+    "sys_s": 4.82,
+    "result": {
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "ParsedFiles": 280,
+      "CachedFiles": 4001,
+      "EarlyLocal": 280,
+      "FallbackCount": 0
+    },
+    "fallbacks": [],
+    "wire": {
+      "broker_end_ns": 1789962232770372000,
+      "bytes": 21349068,
+      "canonical_sha256": "7658674e2764dca8ff25ec5bca13b20fb124cf04181e82acbfa6867ea668edac",
+      "consumer_end_ns": 1789962232811140000,
+      "context": "measured-main1",
+      "edges": 39764,
+      "first_batch_ns": 1789962221334725000,
+      "first_ns": 1789962221333876000,
+      "messages": 1207,
+      "nodes": 12934,
+      "run_id": "/tmp/enola-product-benchmark-source-measured-main1-2-1789962219023172000"
+    },
+    "first_s": 10.310325,
+    "first_batch_s": 10.311174,
+    "broker_end_s": 21.746821,
+    "consumer_end_s": 21.787589
+  },
+  {
+    "label": "r2-new-noop",
+    "seconds": 21.535612083999993,
+    "start_ns": 1789962233167647000,
+    "exit": 0,
+    "rss_bytes": 1291321344.0,
+    "user_s": 16.04,
+    "sys_s": 4.68,
+    "result": {
+      "BaseGeneration": 2,
+      "TargetGeneration": 3,
+      "ParsedFiles": 280,
+      "CachedFiles": 4001,
+      "EarlyLocal": 280,
+      "FallbackCount": 0
+    },
+    "fallbacks": [],
+    "wire": {
+      "broker_end_ns": 1789962254543913000,
+      "bytes": 21347825,
+      "canonical_sha256": "7658674e2764dca8ff25ec5bca13b20fb124cf04181e82acbfa6867ea668edac",
+      "consumer_end_ns": 1789962254628084000,
+      "context": "measured-main1",
+      "edges": 39764,
+      "first_batch_ns": 1789962243202118000,
+      "first_ns": 1789962243140084000,
+      "messages": 1201,
+      "nodes": 12934,
+      "run_id": "/tmp/enola-product-benchmark-source-measured-main1-3-1789962240937452000"
+    },
+    "first_s": 9.972437,
+    "first_batch_s": 10.034471,
+    "broker_end_s": 21.376266,
+    "consumer_end_s": 21.460437
+  },
+  {
+    "label": "r3-new-noop",
+    "seconds": 21.587698250000003,
+    "start_ns": 1789962254918916000,
+    "exit": 0,
+    "rss_bytes": 1292828672.0,
+    "user_s": 15.92,
+    "sys_s": 4.68,
+    "result": {
+      "BaseGeneration": 3,
+      "TargetGeneration": 4,
+      "ParsedFiles": 280,
+      "CachedFiles": 4001,
+      "EarlyLocal": 280,
+      "FallbackCount": 0
+    },
+    "fallbacks": [],
+    "wire": {
+      "broker_end_ns": 1789962276306924000,
+      "bytes": 21347825,
+      "canonical_sha256": "7658674e2764dca8ff25ec5bca13b20fb124cf04181e82acbfa6867ea668edac",
+      "consumer_end_ns": 1789962276404018000,
+      "context": "measured-main1",
+      "edges": 39764,
+      "first_batch_ns": 1789962264818753000,
+      "first_ns": 1789962264757659000,
+      "messages": 1201,
+      "nodes": 12934,
+      "run_id": "/tmp/enola-product-benchmark-source-measured-main1-4-1789962262552488000"
+    },
+    "first_s": 9.838743,
+    "first_batch_s": 9.899837,
+    "broker_end_s": 21.388008,
+    "consumer_end_s": 21.485102
+  },
+  {
+    "label": "r1-old-body",
+    "seconds": 19.90693300000001,
+    "start_ns": 1789962276721766000,
+    "exit": 0,
+    "rss_bytes": 618070016.0,
+    "user_s": 72.34,
+    "sys_s": 5.84,
+    "facts": 85516,
+    "extractors": [
+      [
+        "mdintent",
+        "21497",
+        "255ms"
+      ],
+      [
+        "typescript",
+        "60626",
+        "6.706s"
+      ]
+    ],
+    "cache_hits": [
+      "2026/09/21 06:44:43 [engine] extractor manifests: reused 131 cached facts",
+      "2026/09/21 06:44:44 [engine] extractor hcl: reused 10 cached facts",
+      "2026/09/21 06:44:44 [engine] extractor python: reused 202 cached facts",
+      "2026/09/21 06:44:51 [engine] extractor swift: reused 27 cached facts",
+      "2026/09/21 06:44:52 [engine] extractor cache: 4 reused"
+    ]
+  },
+  {
+    "label": "r1-new-body",
+    "seconds": 454.07204220899996,
+    "start_ns": 1789962296633708000,
+    "exit": 0,
+    "rss_bytes": 1654620160.0,
+    "user_s": 41.51,
+    "sys_s": 42.47,
+    "result": {
+      "BaseGeneration": 4,
+      "TargetGeneration": 5,
+      "ParsedFiles": 281,
+      "CachedFiles": 4000,
+      "EarlyLocal": 281,
+      "FallbackCount": 1
+    },
+    "fallbacks": [
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "broker_end_ns": 1789962750011600000,
+      "bytes": 110302913,
+      "canonical_sha256": "bbc234408371e98bb7b6c24d169b40f9a53806d96041e60f808ab7b789ecce4a",
+      "consumer_end_ns": 1789962750160737000,
+      "context": "measured-main1",
+      "edges": 188462,
+      "first_batch_ns": 1789962306549535000,
+      "first_ns": 1789962306539829000,
+      "messages": 44389,
+      "nodes": 81763,
+      "run_id": "/tmp/enola-product-benchmark-source-measured-main1-5-1789962304038623000"
+    },
+    "first_s": 9.906121,
+    "first_batch_s": 9.915827,
+    "broker_end_s": 453.377892,
+    "consumer_end_s": 453.527029
+  },
+  {
+    "label": "ts-old-initial",
+    "seconds": 17.797784541,
+    "start_ns": 1789962825819848000,
+    "exit": 0,
+    "rss_bytes": 649969664.0,
+    "user_s": 67.92,
+    "sys_s": 5.73,
+    "facts": 63649,
+    "extractors": [
+      [
+        "typescript",
+        "60626",
+        "6.592s"
+      ]
+    ],
+    "cache_hits": [
+      "2026/09/21 06:54:01 [engine] extractor cache: 0 reused"
+    ]
+  },
+  {
+    "label": "ts-new-initial",
+    "seconds": 95.27964324999999,
+    "start_ns": 1789962843621876000,
+    "exit": 0,
+    "rss_bytes": 1453424640.0,
+    "user_s": 59.7,
+    "sys_s": 9.27,
+    "result": {
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "ParsedFiles": 4181,
+      "CachedFiles": 0,
+      "EarlyLocal": 4181,
+      "FallbackCount": 0
+    },
+    "fallbacks": [],
+    "wire": {
+      "broker_end_ns": 1789962938059122000,
+      "bytes": 141809097,
+      "canonical_sha256": "e80cbe507f853fea18efcbbc5072d59b031cbebc910e768c4dee0bd4ee93fbd4",
+      "consumer_end_ns": 1789962938167331000,
+      "context": "ts-context",
+      "edges": 160675,
+      "first_batch_ns": 1789962850276884000,
+      "first_ns": 1789962850267973000,
+      "messages": 10162,
+      "nodes": 60626,
+      "run_id": "/tmp/enola-product-benchmark-source-ts-context-1-1789962850251015000"
+    },
+    "first_s": 6.646097,
+    "first_batch_s": 6.655008,
+    "broker_end_s": 94.437246,
+    "consumer_end_s": 94.545455
+  },
+  {
+    "label": "ts-old-noop",
+    "seconds": 12.698656749999998,
+    "start_ns": 1789962938903906000,
+    "exit": 0,
+    "rss_bytes": 339427328.0,
+    "user_s": 14.95,
+    "sys_s": 4.45,
+    "facts": 63649,
+    "extractors": [],
+    "cache_hits": [
+      "2026/09/21 06:55:48 [engine] extractor typescript: reused 60626 cached facts",
+      "2026/09/21 06:55:49 [engine] extractor cache: 1 reused"
+    ]
+  },
+  {
+    "label": "ts-new-noop",
+    "seconds": 17.237530375000006,
+    "start_ns": 1789962951604192000,
+    "exit": 0,
+    "rss_bytes": 1067728896.0,
+    "user_s": 14.42,
+    "sys_s": 3.08,
+    "result": {
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "ParsedFiles": 280,
+      "CachedFiles": 4001,
+      "EarlyLocal": 280,
+      "FallbackCount": 0
+    },
+    "fallbacks": [],
+    "wire": {
+      "broker_end_ns": 1789962968730533000,
+      "bytes": 14006650,
+      "canonical_sha256": "e80cbe507f853fea18efcbbc5072d59b031cbebc910e768c4dee0bd4ee93fbd4",
+      "consumer_end_ns": 1789962968742099000,
+      "context": "ts-context",
+      "edges": 19882,
+      "first_batch_ns": 1789962960094015000,
+      "first_ns": 1789962960023839000,
+      "messages": 913,
+      "nodes": 6513,
+      "run_id": "/tmp/enola-product-benchmark-source-ts-context-2-1789962959850355000"
+    },
+    "first_s": 8.419647,
+    "first_batch_s": 8.489823,
+    "broker_end_s": 17.126341,
+    "consumer_end_s": 17.137907
+  },
+  {
+    "label": "ts-old-body",
+    "seconds": 18.45444437499998,
+    "start_ns": 1789962968953936000,
+    "exit": 0,
+    "rss_bytes": 498221056.0,
+    "user_s": 68.48,
+    "sys_s": 5.88,
+    "facts": 63649,
+    "extractors": [
+      [
+        "typescript",
+        "60626",
+        "6.587s"
+      ]
+    ],
+    "cache_hits": [
+      "2026/09/21 06:56:24 [engine] extractor cache: 0 reused"
+    ]
+  },
+  {
+    "label": "ts-new-body",
+    "seconds": 17.192217916999994,
+    "start_ns": 1789962987412195000,
+    "exit": 0,
+    "rss_bytes": 1023426560.0,
+    "user_s": 14.59,
+    "sys_s": 3.15,
+    "result": {
+      "BaseGeneration": 2,
+      "TargetGeneration": 3,
+      "ParsedFiles": 281,
+      "CachedFiles": 4000,
+      "EarlyLocal": 281,
+      "FallbackCount": 0
+    },
+    "fallbacks": [],
+    "wire": {
+      "broker_end_ns": 1789963004470938000,
+      "bytes": 14055375,
+      "canonical_sha256": "e80cbe507f853fea18efcbbc5072d59b031cbebc910e768c4dee0bd4ee93fbd4",
+      "consumer_end_ns": 1789963004482050000,
+      "context": "ts-context",
+      "edges": 19948,
+      "first_batch_ns": 1789962995844879000,
+      "first_ns": 1789962995780102000,
+      "messages": 917,
+      "nodes": 6538,
+      "run_id": "/tmp/enola-product-benchmark-source-ts-context-3-1789962995614619000"
+    },
+    "first_s": 8.367907,
+    "first_batch_s": 8.432684,
+    "broker_end_s": 17.058743,
+    "consumer_end_s": 17.069855
+  }
+]

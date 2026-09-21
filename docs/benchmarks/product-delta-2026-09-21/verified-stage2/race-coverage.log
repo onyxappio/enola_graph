@@ -1,0 +1,126 @@
+ok  	github.com/enola-labs/enola/cmd/enola	11.536s	coverage: 18.7% of statements
+ok  	github.com/enola-labs/enola/internal/cachecov	3.474s	coverage: [no statements]
+ok  	github.com/enola-labs/enola/internal/clientspec	2.937s	coverage: 97.1% of statements
+ok  	github.com/enola-labs/enola/internal/config	3.498s	coverage: 79.8% of statements
+ok  	github.com/enola-labs/enola/internal/conformance	3.573s	coverage: 69.7% of statements
+ok  	github.com/enola-labs/enola/internal/diff	4.657s	coverage: 78.6% of statements
+ok  	github.com/enola-labs/enola/internal/docslint	7.623s	coverage: 72.3% of statements
+	github.com/enola-labs/enola/internal/drift		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/internal/engine	84.469s	coverage: produced 0 insights
+ok  	github.com/enola-labs/enola/internal/eslintscaffold	4.528s	coverage: 72.7% of statements
+ok  	github.com/enola-labs/enola/internal/estateref	4.895s	coverage: 78.0% of statements
+ok  	github.com/enola-labs/enola/internal/explainers	4.438s	coverage: 100.0% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/common	4.253s	coverage: 88.3% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/complexity	4.928s	coverage: 85.4% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/constraints	6.102s	coverage: 87.2% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/coverage	4.290s	coverage: 68.8% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/crossrepo	4.986s	coverage: 95.5% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/cycles	5.508s	coverage: 95.5% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/deadmethods	5.130s	coverage: 84.3% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/depth	5.125s	coverage: 96.0% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/domain	4.634s	coverage: 29.7% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/entrypoints	4.773s	coverage: 87.5% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/godclass	4.185s	coverage: 96.9% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/hotspots	4.043s	coverage: 95.3% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/importclosure	3.769s	coverage: 90.3% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/intentcheck	3.122s	coverage: 85.2% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/layers	3.407s	coverage: 93.2% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/messagingcoverage	3.217s	coverage: produced 0 insights
+ok  	github.com/enola-labs/enola/internal/explainers/queryloops	3.133s	coverage: 89.9% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/surface	3.194s	coverage: 90.6% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/unusedroutes	3.214s	coverage: 93.0% of statements
+ok  	github.com/enola-labs/enola/internal/explainers/vendoredcandidates	3.134s	coverage: 84.1% of statements
+ok  	github.com/enola-labs/enola/internal/extractors	3.186s	coverage: 100.0% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/ansibleextractor	3.471s	coverage: 90.8% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/asyncapiextractor	3.512s	coverage: 91.2% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/cppextractor	3.997s	coverage: 86.5% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/dartextractor	2.863s	coverage: 73.6% of statements
+	github.com/enola-labs/enola/internal/extractors/dartextractor/grammar		coverage: 0.0% of statements
+	github.com/enola-labs/enola/internal/extractors/detectnames		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/dotnetextractor	2.916s	coverage: 86.5% of statements
+	github.com/enola-labs/enola/internal/extractors/extcoverage		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/goextractor	3.689s	coverage: 88.5% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/grpcextractor	2.964s	coverage: 90.5% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/hclextractor	3.198s	coverage: 88.5% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/javaextractor	3.523s	coverage: 84.6% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/jvmsrc	2.989s	coverage: 91.4% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/kotlinextractor	3.227s	coverage: 75.9% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/manifestextractor	2.892s	coverage: 88.4% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/mdintent	3.068s	coverage: 90.8% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/openapiextractor	2.514s	coverage: 83.5% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/phpextractor	2.070s	coverage: 85.7% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/pythonextractor	3.529s	coverage: 89.1% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/rubyextractor	3.184s	coverage: 87.5% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/rustextractor	2.227s	coverage: 88.9% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/scalaextractor	2.383s	coverage: 84.3% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/swiftextractor	4.474s	coverage: 86.6% of statements
+	github.com/enola-labs/enola/internal/extractors/swiftextractor/grammar		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/internal/extractors/tsextractor	63.735s	coverage: 86.0% of statements
+	github.com/enola-labs/enola/internal/extractors/tsutil		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/internal/factpath	1.682s	coverage: 91.7% of statements
+ok  	github.com/enola-labs/enola/internal/facts	34.375s	coverage: 86.8% of statements
+ok  	github.com/enola-labs/enola/internal/filelock	2.238s	coverage: 61.9% of statements
+ok  	github.com/enola-labs/enola/internal/gqlscan	2.467s	coverage: 79.6% of statements
+	github.com/enola-labs/enola/internal/graphprofile		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/internal/graphsession	88.121s	coverage: 81.4% of statements
+ok  	github.com/enola-labs/enola/internal/graphstream	40.837s	coverage: 75.3% of statements
+ok  	github.com/enola-labs/enola/internal/history	11.925s	coverage: 74.1% of statements
+ok  	github.com/enola-labs/enola/internal/hookstate	3.968s	coverage: 85.5% of statements
+--- FAIL: TestOwnDeclaration_GovernsEveryPackage (0.03s)
+    selfdeclaration_test.go:42: package "internal/graphprofile" is in no declared layer — nothing governs it, and no finding would say so
+FAIL
+coverage: 84.3% of statements
+FAIL	github.com/enola-labs/enola/internal/intent	5.047s
+ok  	github.com/enola-labs/enola/internal/linkers/binders	2.105s	coverage: 66.7% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/clientseam	2.194s	coverage: 80.9% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/emberresolver	1.382s	coverage: 90.4% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/frameworkroots	1.541s	coverage: 90.4% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/grpcclientfqn	1.503s	coverage: 87.5% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/grpcimpl	1.396s	coverage: 91.1% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/httphandler	1.362s	coverage: 90.0% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/messagingcontract	1.398s	coverage: 96.6% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/mixinowner	1.461s	coverage: 86.0% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/moduleedges	1.418s	coverage: 89.7% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/stimulusresolver	1.421s	coverage: 91.5% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/unmatchedroutes	1.424s	coverage: 91.5% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/binders/vendoredspecs	1.407s	coverage: 90.7% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo	1.417s	coverage: 94.5% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/routeindex	1.651s	coverage: 74.4% of statements
+	github.com/enola-labs/enola/internal/linkers/crossrepo/signals		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/graphqlsig	1.649s	coverage: 37.9% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/http	1.882s	coverage: 86.4% of statements
+	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/imports		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/kafka	1.384s	coverage: 72.0% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/sharedcode	1.458s	coverage: 36.9% of statements
+ok  	github.com/enola-labs/enola/internal/linkers/vocab	1.439s	coverage: 97.4% of statements
+ok  	github.com/enola-labs/enola/internal/litfold	1.395s	coverage: 95.5% of statements
+ok  	github.com/enola-labs/enola/internal/metrics	1.416s	coverage: 69.5% of statements
+ok  	github.com/enola-labs/enola/internal/mining	1.536s	coverage: 92.5% of statements
+ok  	github.com/enola-labs/enola/internal/orphans	1.493s	coverage: 79.3% of statements
+ok  	github.com/enola-labs/enola/internal/parallel	1.365s	coverage: 100.0% of statements
+ok  	github.com/enola-labs/enola/internal/perf	1.460s	coverage: 77.6% of statements
+ok  	github.com/enola-labs/enola/internal/providers	15.059s	coverage: 84.6% of statements
+ok  	github.com/enola-labs/enola/internal/providers/rubydex	1.375s	coverage: 10.5% of statements
+ok  	github.com/enola-labs/enola/internal/renderers	1.711s	coverage: 100.0% of statements
+ok  	github.com/enola-labs/enola/internal/renderers/llmcontext	2.109s	coverage: 62.8% of statements
+ok  	github.com/enola-labs/enola/internal/server	20.302s	coverage: produced 0 insights
+ok  	github.com/enola-labs/enola/internal/updatecheck	2.611s	coverage: 85.9% of statements
+ok  	github.com/enola-labs/enola/internal/upgrade	2.457s	coverage: 44.1% of statements
+?   	github.com/enola-labs/enola/internal/version	[no test files]
+ok  	github.com/enola-labs/enola/internal/workspace	2.365s	coverage: 87.5% of statements
+ok  	github.com/enola-labs/enola/pkg/bootstrap	5.118s	coverage: produced 0 insights
+ok  	github.com/enola-labs/enola/pkg/check	11.181s	coverage: 87.0% of statements
+ok  	github.com/enola-labs/enola/pkg/cli	2.358s	coverage: 88.1% of statements
+ok  	github.com/enola-labs/enola/pkg/command	10.443s	coverage: produced 0 insights
+ok  	github.com/enola-labs/enola/pkg/coverage	1.974s	coverage: 97.3% of statements
+ok  	github.com/enola-labs/enola/pkg/dashboard	2.282s	coverage: 87.6% of statements
+?   	github.com/enola-labs/enola/pkg/diff	[no test files]
+ok  	github.com/enola-labs/enola/pkg/explain	2.105s	coverage: 90.3% of statements
+	github.com/enola-labs/enola/pkg/facts		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/pkg/history	2.065s	coverage: 48.0% of statements
+ok  	github.com/enola-labs/enola/pkg/install	5.038s	coverage: 87.7% of statements
+ok  	github.com/enola-labs/enola/pkg/mcputil	1.427s	coverage: 30.6% of statements
+ok  	github.com/enola-labs/enola/pkg/plan	3.027s	coverage: 88.3% of statements
+	github.com/enola-labs/enola/pkg/plugin		coverage: 0.0% of statements
+ok  	github.com/enola-labs/enola/pkg/status	3.185s	coverage: 69.6% of statements
+FAIL

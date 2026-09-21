@@ -1,0 +1,40 @@
+| Scenario | Old process s: median (range) | New process s: median (range) | Broker End s | Consumer applied s | Speedup |
+|---|---:|---:|---:|---:|---:|
+| initial | 19.243 (18.951–20.794) | 11.526 (11.424–12.377) | 11.335 (11.225–12.161) | 11.454 (11.345–12.286) | 1.67× |
+| noop | 12.309 (12.158–12.324) | 2.881 (2.828–2.978) | — | — | 4.27× |
+| body | 20.220 (19.480–20.560) | 4.395 (4.379–4.408) | 4.277 (4.257–4.285) | 4.279 (4.259–4.287) | 4.60× |
+| structural | 21.100 (19.974–21.244) | 4.841 (4.814–4.903) | 4.711 (4.697–4.778) | 4.713 (4.699–4.780) | 4.36× |
+
+Validation:
+PASS r1 initial equals independent repaired baseline
+PASS r1-new-noop no-op
+PASS r2 initial equals independent repaired baseline
+PASS r2-new-noop no-op
+PASS r3 initial equals independent repaired baseline
+PASS r3-new-noop no-op
+PASS r1-new-structural equals cold
+PASS r2-new-structural equals cold
+PASS r3-new-structural equals cold
+PASS r1-new-body equals cold
+PASS r2-new-body equals cold
+PASS r3-new-body equals cold
+DIRECT_IO_CONTRACT_MATCH r1-new-initial True
+PREOPT_COLD_MATCH r1-new-initial False d727bfe7f954069a6b16c636c8ad6bd87b288bf11a5e214c71b88b3b75eae2d2
+DIRECT_IO_CONTRACT_MATCH r2-new-initial True
+PREOPT_COLD_MATCH r2-new-initial False d727bfe7f954069a6b16c636c8ad6bd87b288bf11a5e214c71b88b3b75eae2d2
+DIRECT_IO_CONTRACT_MATCH r3-new-initial True
+PREOPT_COLD_MATCH r3-new-initial False d727bfe7f954069a6b16c636c8ad6bd87b288bf11a5e214c71b88b3b75eae2d2
+
+Resource and output:
+r1-new-initial {"rss_bytes": 988561408.0, "state_peak_sampled_bytes": 77209709, "spool_peak_sampled_bytes": 37811153, "state_final_bytes": 58202391, "result": {"BaseGeneration": 0, "TargetGeneration": 1, "ParsedFiles": 4181, "CachedFiles": 0, "EarlyLocal": 4181, "FallbackCount": 5}} {"messages": 5510, "bytes": 162593632, "nodes": 82493, "edges": 188879, "total_nodes": 82493, "total_edges": 188879, "empty_batches": 0}
+r1-new-noop {"rss_bytes": 375095296.0, "state_peak_sampled_bytes": 58202391, "spool_peak_sampled_bytes": 328, "state_final_bytes": 58202391, "result": {"BaseGeneration": 1, "TargetGeneration": 1, "ParsedFiles": 0, "CachedFiles": 4281, "EarlyLocal": 0, "FallbackCount": 0}} {"messages": null, "bytes": null, "nodes": null, "edges": null, "total_nodes": null, "total_edges": null, "empty_batches": null}
+r1-new-body {"rss_bytes": 618446848.0, "state_peak_sampled_bytes": 118799235, "spool_peak_sampled_bytes": 2395348, "state_final_bytes": 58202499, "result": {"BaseGeneration": 1, "TargetGeneration": 2, "ParsedFiles": 1, "CachedFiles": 4280, "EarlyLocal": 1, "FallbackCount": 0}} {"messages": 73, "bytes": 1772830, "nodes": 1432, "edges": 4330, "total_nodes": 82493, "total_edges": 188879, "empty_batches": 0}
+r1-new-structural {"rss_bytes": 648101888.0, "state_peak_sampled_bytes": 118835725, "spool_peak_sampled_bytes": 2431136, "state_final_bytes": 58203312, "result": {"BaseGeneration": 2, "TargetGeneration": 3, "ParsedFiles": 2, "CachedFiles": 4280, "EarlyLocal": 2, "FallbackCount": 0}} {"messages": 75, "bytes": 1798955, "nodes": 1441, "edges": 4371, "total_nodes": 82494, "total_edges": 188883, "empty_batches": 0}
+r2-new-initial {"rss_bytes": 983941120.0, "state_peak_sampled_bytes": 77208543, "spool_peak_sampled_bytes": 36286323, "state_final_bytes": 58202391, "result": {"BaseGeneration": 0, "TargetGeneration": 1, "ParsedFiles": 4181, "CachedFiles": 0, "EarlyLocal": 4181, "FallbackCount": 5}} {"messages": 5510, "bytes": 162593822, "nodes": 82493, "edges": 188879, "total_nodes": 82493, "total_edges": 188879, "empty_batches": 0}
+r2-new-noop {"rss_bytes": 372473856.0, "state_peak_sampled_bytes": 58202391, "spool_peak_sampled_bytes": 328, "state_final_bytes": 58202391, "result": {"BaseGeneration": 1, "TargetGeneration": 1, "ParsedFiles": 0, "CachedFiles": 4281, "EarlyLocal": 0, "FallbackCount": 0}} {"messages": null, "bytes": null, "nodes": null, "edges": null, "total_nodes": null, "total_edges": null, "empty_batches": null}
+r2-new-body {"rss_bytes": 592674816.0, "state_peak_sampled_bytes": 118799111, "spool_peak_sampled_bytes": 2395224, "state_final_bytes": 58202500, "result": {"BaseGeneration": 1, "TargetGeneration": 2, "ParsedFiles": 1, "CachedFiles": 4280, "EarlyLocal": 1, "FallbackCount": 0}} {"messages": 73, "bytes": 1772830, "nodes": 1432, "edges": 4330, "total_nodes": 82493, "total_edges": 188879, "empty_batches": 0}
+r2-new-structural {"rss_bytes": 720437248.0, "state_peak_sampled_bytes": 60632133, "spool_peak_sampled_bytes": 2430070, "state_final_bytes": 58203312, "result": {"BaseGeneration": 2, "TargetGeneration": 3, "ParsedFiles": 2, "CachedFiles": 4280, "EarlyLocal": 2, "FallbackCount": 0}} {"messages": 75, "bytes": 1798955, "nodes": 1441, "edges": 4371, "total_nodes": 82494, "total_edges": 188883, "empty_batches": 0}
+r3-new-initial {"rss_bytes": 992231424.0, "state_peak_sampled_bytes": 77209829, "spool_peak_sampled_bytes": 35484342, "state_final_bytes": 58202391, "result": {"BaseGeneration": 0, "TargetGeneration": 1, "ParsedFiles": 4181, "CachedFiles": 0, "EarlyLocal": 4181, "FallbackCount": 5}} {"messages": 5510, "bytes": 162593692, "nodes": 82493, "edges": 188879, "total_nodes": 82493, "total_edges": 188879, "empty_batches": 0}
+r3-new-noop {"rss_bytes": 405012480.0, "state_peak_sampled_bytes": 58202391, "spool_peak_sampled_bytes": 328, "state_final_bytes": 58202391, "result": {"BaseGeneration": 1, "TargetGeneration": 1, "ParsedFiles": 0, "CachedFiles": 4281, "EarlyLocal": 0, "FallbackCount": 0}} {"messages": null, "bytes": null, "nodes": null, "edges": null, "total_nodes": null, "total_edges": null, "empty_batches": null}
+r3-new-body {"rss_bytes": 597671936.0, "state_peak_sampled_bytes": 118799233, "spool_peak_sampled_bytes": 2395346, "state_final_bytes": 58202501, "result": {"BaseGeneration": 1, "TargetGeneration": 2, "ParsedFiles": 1, "CachedFiles": 4280, "EarlyLocal": 1, "FallbackCount": 0}} {"messages": 73, "bytes": 1772830, "nodes": 1432, "edges": 4330, "total_nodes": 82493, "total_edges": 188879, "empty_batches": 0}
+r3-new-structural {"rss_bytes": 634372096.0, "state_peak_sampled_bytes": 60633904, "spool_peak_sampled_bytes": 2431139, "state_final_bytes": 58203311, "result": {"BaseGeneration": 2, "TargetGeneration": 3, "ParsedFiles": 2, "CachedFiles": 4280, "EarlyLocal": 2, "FallbackCount": 0}} {"messages": 75, "bytes": 1798955, "nodes": 1441, "edges": 4371, "total_nodes": 82494, "total_edges": 188883, "empty_batches": 0}

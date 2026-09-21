@@ -3,7 +3,7 @@ package pythonextractor
 import (
 	"context"
 	"log"
-	"os"
+
 	"path/filepath"
 	"strings"
 
@@ -29,6 +29,7 @@ import (
 // so without it resolveCallTargets would drop every production target as external
 // and the emitted facts would carry no usable edges.
 func (e *PythonExtractor) ExtractTestRefs(ctx context.Context, repoPath string, testFiles, prodFiles []string) ([]facts.Fact, error) {
+	inputScope := e.inputScope
 	var pyTests []string
 	for _, relFile := range testFiles {
 		if isPythonFile(relFile) {
@@ -40,7 +41,7 @@ func (e *PythonExtractor) ExtractTestRefs(ctx context.Context, repoPath string, 
 	}
 
 	perFile := parallel.MapFiles(ctx, pyTests, func(relFile string) []facts.Fact {
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			log.Printf("[python-extractor] error reading test file %s: %v", relFile, err)
 			return nil

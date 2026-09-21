@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	ruby "github.com/tree-sitter/tree-sitter-ruby/bindings/go"
 )
@@ -25,7 +26,8 @@ import (
 // and loses only its handler. The value sits at hop 2 and the risk sits below it,
 // which is what makes a chain this long affordable.
 type jsonapiResolver struct {
-	repoPath string
+	inputScope *inputscope.Scope
+	repoPath   string
 	// resourceFiles maps "<module path>/<singular name>" to a resource class file.
 	// The module path is part of the key because seven of the monolith's resource
 	// classes share a basename across api/v1, api/partner/v1 and api/channel/v1.
@@ -109,6 +111,7 @@ func joinModule(modulePath, name string) string {
 // resourceClass returns what the resource class a declaration names says, or nil
 // when the name does not locate exactly one file.
 func (r *jsonapiResolver) resourceClass(modulePath, declared string) *jsonapiResourceClass {
+	inputScope := r.inputScope
 	key := joinModule(modulePath, singularize(declared))
 	relFile, ok := r.resourceFiles[key]
 	if !ok {
@@ -117,7 +120,7 @@ func (r *jsonapiResolver) resourceClass(modulePath, declared string) *jsonapiRes
 	if cached, seen := r.relCache[relFile]; seen {
 		return cached
 	}
-	parsed := parseResourceClass(filepath.Join(r.repoPath, relFile))
+	parsed := parseResourceClass(filepath.Join(r.repoPath, relFile), inputScope)
 	r.relCache[relFile] = parsed
 	return parsed
 }
@@ -175,6 +178,7 @@ func (r *jsonapiResolver) handlerFor(modulePath string, rel jsonapiRelationship,
 // first is authoritative even when it is empty, the second means the caller
 // should use the name ActiveRecord would derive.
 func (r *jsonapiResolver) associationClassName(owner *jsonapiResourceClass, ownerName, relName string) (string, bool) {
+	inputScope := r.inputScope
 	model := ownerName
 	if owner != nil && owner.modelName != "" {
 		model = underscoreClass(owner.modelName)
@@ -185,7 +189,7 @@ func (r *jsonapiResolver) associationClassName(owner *jsonapiResourceClass, owne
 	}
 	associations, cached := r.modelCache[relFile]
 	if !cached {
-		associations = parseModelAssociations(filepath.Join(r.repoPath, relFile))
+		associations = parseModelAssociations(filepath.Join(r.repoPath, relFile), inputScope)
 		r.modelCache[relFile] = associations
 	}
 	className, stated := associations[relName]
@@ -195,7 +199,8 @@ func (r *jsonapiResolver) associationClassName(owner *jsonapiResourceClass, owne
 // writeActions are the actions an immutable resource class does not serve.
 var writeActions = map[string]bool{"create": true, "update": true, "destroy": true}
 
-func parseResourceClass(path string) *jsonapiResourceClass {
+func parseResourceClass(path string, inputScopes ...*inputscope.Scope) *jsonapiResourceClass {
+	inputScope := inputscope.First(inputScopes)
 	out := &jsonapiResourceClass{}
 	eachCall(path, func(method string, args *sitter.Node, src []byte) {
 		switch {
@@ -217,7 +222,7 @@ func parseResourceClass(path string) *jsonapiResourceClass {
 				})
 			}
 		}
-	})
+	}, inputScope)
 	return out
 }
 
@@ -226,7 +231,8 @@ func parseResourceClass(path string) *jsonapiResourceClass {
 // `through:` ones, which are entered with an empty value meaning "stated, and
 // not derivable here". An ordinary association is deliberately absent, so the
 // caller falls back to the class ActiveRecord derives from its name.
-func parseModelAssociations(path string) map[string]string {
+func parseModelAssociations(path string, inputScopes ...*inputscope.Scope) map[string]string {
+	inputScope := inputscope.First(inputScopes)
 	out := map[string]string{}
 	eachCall(path, func(method string, args *sitter.Node, src []byte) {
 		if !associationMacros[method] {
@@ -252,7 +258,7 @@ func parseModelAssociations(path string) map[string]string {
 		for _, name := range positionalSymbols(args, src) {
 			out[name] = className
 		}
-	})
+	}, inputScope)
 	return out
 }
 

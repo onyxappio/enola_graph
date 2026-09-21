@@ -1,6 +1,7 @@
 package tsextractor
 
 import (
+	"bytes"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -49,9 +50,14 @@ func hasGraphQLDocs(files []string) bool {
 }
 
 func hasGraphQLBuildSegment(path string) bool {
-	for _, segment := range strings.Split(filepath.ToSlash(path), "/") {
-		if tsSkipDirs[segment] {
-			return true
+	p := filepath.ToSlash(path)
+	start := 0
+	for i := 0; i <= len(p); i++ {
+		if i == len(p) || p[i] == '/' {
+			if tsSkipDirs[p[start:i]] {
+				return true
+			}
+			start = i + 1
 		}
 	}
 	return false
@@ -300,43 +306,58 @@ type graphqlServerContext struct {
 func detectGraphQLServerUsage(files []string, sources map[string][]byte) graphqlServerContext {
 	ctx := graphqlServerContext{sdlDocuments: map[string]bool{}}
 	for _, relFile := range files {
-		if facts.IsTestPath(relFile) {
-			continue
-		}
-		if isGraphQLDocFile(relFile) {
-			if isHasuraSDLPath(relFile) {
-				ctx.enabled = true
-				ctx.sdlDocuments[filepath.ToSlash(relFile)] = true
-			}
-			continue
-		}
 		src := sources[relFile]
-		if src == nil {
-			continue
-		}
-		if !possibleGraphQLServerSignal(src) {
-			continue
-		}
-		server, imports := graphQLServerASTSignals(src, relFile)
-		if server {
+		contrib := collectGraphQLContribution(relFile, src)
+		if contrib.Server {
 			ctx.enabled = true
-			for _, imported := range imports {
-				ctx.sdlDocuments[imported] = true
-			}
+		}
+		for _, imported := range contrib.SDL {
+			ctx.sdlDocuments[imported] = true
 		}
 	}
 	return ctx
 }
 
+// graphqlFileContribution is one file's GraphQL-server context summary. Cached
+// unchanged files reuse this instead of re-running graphQLServerASTSignals.
+type graphqlFileContribution struct {
+	Server bool
+	SDL    []string
+}
+
+func collectGraphQLContribution(relFile string, src []byte) graphqlFileContribution {
+	var out graphqlFileContribution
+	if facts.IsTestPath(relFile) {
+		return out
+	}
+	if isGraphQLDocFile(relFile) {
+		if isHasuraSDLPath(relFile) {
+			out.Server = true
+			out.SDL = []string{filepath.ToSlash(relFile)}
+		}
+		return out
+	}
+	if len(src) == 0 || !possibleGraphQLServerSignal(src) {
+		return out
+	}
+	server, imports := graphQLServerASTSignals(src, relFile)
+	if server {
+		out.Server = true
+		out.SDL = imports
+	}
+	return out
+}
+
+var graphqlServerSignalTokens = [][]byte{
+	[]byte("ApolloServer"), []byte("GraphQLServer"), []byte("buildSchema"), []byte("makeExecutableSchema"), []byte("graphqlHTTP"),
+	[]byte("@apollo/server"), []byte("apollo-server"), []byte("graphql-yoga"), []byte("mercurius"), []byte("express-graphql"),
+	[]byte("graphql-http"), []byte("@graphql-tools/schema"),
+	[]byte("@nestjs/graphql"), []byte("type-graphql"), []byte("nexus"), []byte("@pothos/core"),
+}
+
 func possibleGraphQLServerSignal(src []byte) bool {
-	text := string(src)
-	for _, token := range []string{
-		"ApolloServer", "GraphQLServer", "buildSchema", "makeExecutableSchema", "graphqlHTTP",
-		"@apollo/server", "apollo-server", "graphql-yoga", "mercurius", "express-graphql",
-		"graphql-http", "@graphql-tools/schema",
-		"@nestjs/graphql", "type-graphql", "nexus", "@pothos/core",
-	} {
-		if strings.Contains(text, token) {
+	for _, token := range graphqlServerSignalTokens {
+		if bytes.Contains(src, token) {
 			return true
 		}
 	}
@@ -727,15 +748,83 @@ var serverSDLOpen = regexp.MustCompile("(?:(?:\\b(?:typeDefs|typeDefinitions|sch
 // through its opening brace.
 var sdlTypeBlock = regexp.MustCompile(`(?m)^\s*(?:extend\s+)?type\s+(Query|Mutation|Subscription)\b[^{]*\{`)
 
+var (
+	tokBacktick           = []byte("`")
+	tokSchemaLow          = []byte("schema")
+	tokSchemaCap          = []byte("Schema")
+	tokTypeDefs           = []byte("typeDefs")
+	tokTypeDefsCap        = []byte("TypeDefs")
+	tokTypeDefinitions    = []byte("typeDefinitions")
+	tokTypeDefinitionsCap = []byte("TypeDefinitions")
+	tokBuildSchema        = []byte("buildSchema")
+	tokGQLTag             = []byte("gql`")
+	tokGraphQLTag         = []byte("graphql`")
+	tokGraphQLRequest     = []byte("graphql-request")
+	tokFetchParen         = []byte("fetch(")
+	tokQueryColon         = []byte("query:")
+	tokType               = []byte("type")
+	tokQueryRoot          = []byte("Query")
+	tokMutationRoot       = []byte("Mutation")
+	tokSubscriptionRoot   = []byte("Subscription")
+)
+
+func possibleGraphQLServerSDL(src []byte) bool {
+	if !bytes.Contains(src, tokBacktick) {
+		return false
+	}
+	if !containsAny(src, tokSchemaLow, tokSchemaCap, tokTypeDefs, tokTypeDefsCap, tokTypeDefinitions, tokTypeDefinitionsCap, tokBuildSchema) {
+		return false
+	}
+	return hasGraphQLSDLRootType(src)
+}
+
+// hasGraphQLSDLRootType is a necessary condition for sdlTypeBlock: `type` +
+// whitespace + Query|Mutation|Subscription. `extend type Query` contains that
+// sequence after `extend`.
+func hasGraphQLSDLRootType(src []byte) bool {
+	for i := 0; i < len(src); {
+		j := bytes.Index(src[i:], tokType)
+		if j < 0 {
+			return false
+		}
+		at := i + j
+		if at > 0 && isIdentByte(src[at-1]) {
+			i = at + 4
+			continue
+		}
+		end := at + 4
+		if end < len(src) && isIdentByte(src[end]) {
+			i = at + 1
+			continue
+		}
+		k := end
+		for k < len(src) && isASCIISpace(src[k]) {
+			k++
+		}
+		if hasGraphQLRootNameAt(src, k) {
+			return true
+		}
+		i = at + 4
+	}
+	return false
+}
+
+func hasGraphQLRootNameAt(src []byte, k int) bool {
+	for _, name := range [][]byte{tokQueryRoot, tokMutationRoot, tokSubscriptionRoot} {
+		if bytes.HasPrefix(src[k:], name) {
+			end := k + len(name)
+			if end == len(src) || !isIdentByte(src[end]) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // extractGraphQLServerSDL returns one server route per root field in candidate
 // SDL templates. The caller owns the repository-level server gate.
 func extractGraphQLServerSDL(src []byte, relFile string) []facts.Fact {
-	raw := string(src)
-	if !strings.Contains(raw, "`") ||
-		(!strings.Contains(raw, "schema") && !strings.Contains(raw, "Schema") &&
-			!strings.Contains(raw, "typeDefs") && !strings.Contains(raw, "TypeDefs") &&
-			!strings.Contains(raw, "typeDefinitions") && !strings.Contains(raw, "TypeDefinitions") &&
-			!strings.Contains(raw, "buildSchema")) {
+	if !possibleGraphQLServerSDL(src) {
 		return nil
 	}
 	text := string(blankTSComments(src, relFile))
@@ -1063,10 +1152,10 @@ func skipInterpolation(text string, i int) int {
 // extractGraphQLTagFacts pulls client operations out of a source file's tagged
 // templates.
 func extractGraphQLTagFacts(src []byte, relFile string) []facts.Fact {
-	text := string(src)
-	if !strings.Contains(text, "gql`") && !strings.Contains(text, "graphql`") {
+	if !bytes.Contains(src, tokGQLTag) && !bytes.Contains(src, tokGraphQLTag) {
 		return nil
 	}
+	text := string(src)
 	var out []facts.Fact
 	for at := 0; at < len(text); {
 		m := gqlTagOpen.FindStringIndex(text[at:])
@@ -1122,9 +1211,8 @@ func extractGraphQLTagFactsAST(src []byte, relFile string, kinds *tsutil.KindTab
 // operation are read. The package or fetch-body evidence is mandatory, keeping
 // GraphQL examples in arbitrary strings inert.
 func extractGraphQLClientCallFacts(src []byte, relFile string) []facts.Fact {
-	text := string(src)
-	possibleGraphQLRequest := strings.Contains(text, "graphql-request")
-	fetchBody := hasGraphQLFetchBodyCandidate(text)
+	possibleGraphQLRequest := bytes.Contains(src, tokGraphQLRequest)
+	fetchBody := hasGraphQLFetchBodyCandidateBytes(src)
 	if !possibleGraphQLRequest && !fetchBody {
 		return nil
 	}
@@ -1147,6 +1235,10 @@ func extractGraphQLClientCallFacts(src []byte, relFile string) []facts.Fact {
 
 func hasGraphQLFetchBodyCandidate(text string) bool {
 	return strings.Contains(text, "fetch(") && strings.Contains(text, "query:")
+}
+
+func hasGraphQLFetchBodyCandidateBytes(src []byte) bool {
+	return bytes.Contains(src, tokFetchParen) && bytes.Contains(src, tokQueryColon)
 }
 
 func extractGraphQLClientCallFactsAST(src []byte, relFile string, kinds *tsutil.KindTable, rootNode *sitter.Node, fetchBody bool, bindings graphqlImportBindings) []facts.Fact {

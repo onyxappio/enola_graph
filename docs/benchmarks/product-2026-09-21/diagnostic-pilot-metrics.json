@@ -1,0 +1,52 @@
+[
+  {
+    "state_peak_sampled_bytes": 81356178,
+    "spool_peak_sampled_bytes": 34069859,
+    "state_final_bytes": 62923436,
+    "label": "r1-new-initial",
+    "start_ns": 1789965503180011000,
+    "seconds": 46.275017834,
+    "exit": 0,
+    "rss_bytes": 1141211136.0,
+    "user_s": 68.02,
+    "sys_s": 7.35,
+    "result": {
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "ParsedFiles": 4181,
+      "CachedFiles": 0,
+      "EarlyLocal": 4181,
+      "FallbackCount": 5
+    },
+    "fallbacks": [
+      "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "broker_end_ns": 1789965549272993000,
+      "bytes": 163752093,
+      "canonical_sha256": "c1a98b9bfe114c4824ee2a05fc937155dfd5f59e4b80a10c02e8d208c803d086",
+      "consumer_end_ns": 1789965549410407000,
+      "context": "enola-product-pilot-results-main1",
+      "edges": 188879,
+      "empty_batches": 0,
+      "first_batch_ns": 1789965514857105000,
+      "first_ns": 1789965514845289000,
+      "messages": 5510,
+      "nodes": 82493,
+      "normalized_hash": "73bd9ecb01201b5946393424b6101daa04d212674566d184b058aee0be1ebaf3",
+      "owners": 6941,
+      "run_id": "/private/tmp/enola-product-benchmark-source-enola-product-pilot-results-main1-1-1789965512335307000",
+      "total_edges": 188879,
+      "total_nodes": 82493
+    },
+    "first_s": 11.665278,
+    "first_batch_s": 11.677094,
+    "broker_end_s": 46.092982,
+    "consumer_end_s": 46.230396,
+    "graph_hash": "73bd9ecb01201b5946393424b6101daa04d212674566d184b058aee0be1ebaf3"
+  }
+]

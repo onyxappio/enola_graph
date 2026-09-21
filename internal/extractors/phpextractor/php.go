@@ -13,18 +13,19 @@ package phpextractor
 import (
 	"context"
 	"log"
-	"os"
+
 	"path/filepath"
 	"strings"
 
 	"github.com/enola-labs/enola/internal/extractors/detectnames"
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 	"github.com/enola-labs/enola/internal/parallel"
 )
 
 // PHPExtractor extracts architectural facts from PHP source code.
-type PHPExtractor struct{}
+type PHPExtractor struct{ inputScope *inputscope.Scope }
 
 // New creates a new PHPExtractor.
 func New() *PHPExtractor {
@@ -43,11 +44,12 @@ var wordpressMarkers = []string{"wp-load.php", "wp-settings.php", "wp-config.php
 // composer.json, a WordPress bootstrap file, or any .php file within a few
 // directory levels (generic PHP projects often ship neither manifest).
 func (e *PHPExtractor) Detect(repoPath string) (bool, error) {
-	if _, err := os.Stat(filepath.Join(repoPath, "composer.json")); err == nil {
+	inputScope := e.inputScope
+	if _, err := inputScope.Stat(filepath.Join(repoPath, "composer.json")); err == nil {
 		return true, nil
 	}
 	for _, m := range wordpressMarkers {
-		if _, err := os.Stat(filepath.Join(repoPath, m)); err == nil {
+		if _, err := inputScope.Stat(filepath.Join(repoPath, m)); err == nil {
 			return true, nil
 		}
 	}
@@ -59,11 +61,12 @@ func (e *PHPExtractor) Detect(repoPath string) (bool, error) {
 // fallback, which was a three-level scan and is now membership over every walked
 // name — so a Gemfile-less, composer-less PHP tree is found wherever it lives.
 func (e *PHPExtractor) DetectFiles(repoPath string, files []string) (bool, error) {
-	if _, err := os.Stat(filepath.Join(repoPath, "composer.json")); err == nil {
+	inputScope := e.inputScope
+	if _, err := inputScope.Stat(filepath.Join(repoPath, "composer.json")); err == nil {
 		return true, nil
 	}
 	for _, m := range wordpressMarkers {
-		if _, err := os.Stat(filepath.Join(repoPath, m)); err == nil {
+		if _, err := inputScope.Stat(filepath.Join(repoPath, m)); err == nil {
 			return true, nil
 		}
 	}
@@ -77,15 +80,16 @@ func (e *PHPExtractor) DetectFiles(repoPath string, files []string) (bool, error
 
 // detectWordPress reports whether the repository is a WordPress codebase, which
 // turns on hook (add_action / add_filter / …) route extraction.
-func detectWordPress(repoPath string) bool {
+func detectWordPress(repoPath string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
 	for _, m := range wordpressMarkers {
-		if _, err := os.Stat(filepath.Join(repoPath, m)); err == nil {
+		if _, err := inputScope.Stat(filepath.Join(repoPath, m)); err == nil {
 			return true
 		}
 	}
 	// WordPress core keeps its bootstrap files under src/ in the develop checkout.
 	for _, m := range wordpressMarkers {
-		if _, err := os.Stat(filepath.Join(repoPath, "src", m)); err == nil {
+		if _, err := inputScope.Stat(filepath.Join(repoPath, "src", m)); err == nil {
 			return true
 		}
 	}
@@ -94,7 +98,8 @@ func detectWordPress(repoPath string) bool {
 
 // Extract parses PHP files and emits architectural facts.
 func (e *PHPExtractor) Extract(ctx context.Context, repoPath string, files []string) ([]facts.Fact, error) {
-	fw := detectPHPFramework(repoPath)
+	inputScope := e.inputScope
+	fw := detectPHPFramework(repoPath, inputScope)
 	isWordPress := fw == frameworkWordPress
 
 	var phpFiles []string
@@ -107,7 +112,7 @@ func (e *PHPExtractor) Extract(ctx context.Context, repoPath string, files []str
 	// Per-file parsing is independent. Parse in parallel and merge in file order
 	// for deterministic output.
 	perFileFacts := parallel.MapFiles(ctx, phpFiles, func(relFile string) []facts.Fact {
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			log.Printf("[php-extractor] error reading %s: %v", relFile, err)
 			return nil
@@ -141,7 +146,7 @@ func (e *PHPExtractor) Extract(ctx context.Context, repoPath string, files []str
 	// discovered directly on disk (it is commonly hidden by a **/*.yaml ignore),
 	// so it is parsed once per repo rather than per PHP file.
 	if fw == frameworkSymfony {
-		allFacts = append(allFacts, extractSymfonyConfigRoutes(repoPath)...)
+		allFacts = append(allFacts, extractSymfonyConfigRoutes(repoPath, inputScope)...)
 	}
 
 	// Emit one module fact per directory containing PHP files.
@@ -242,3 +247,5 @@ func isPHPFile(path string) bool {
 	}
 	return false
 }
+
+func NewGraph(scope *inputscope.Scope) *PHPExtractor { return &PHPExtractor{inputScope: scope} }

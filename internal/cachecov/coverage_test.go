@@ -33,6 +33,9 @@ import (
 // test functions that assert the behavior that version introduced. v1 is the
 // implicit baseline (no changelog line), so coverage starts at v2.
 var versionCoverage = map[int][]string{
+	274: {"TestPolicyDiscoveryAllowedFacts", "TestScopedPackageReadersStableContext", "TestScopedDiscoveryCacheMigration"},
+	273: {"TestBuiltinHiddenInputDelta", "TestDetectorOriginalScope"},
+	272: {"TestTsIO_CallerDoesNotInheritPerformsIO"},                                                                                                                                                                             // TypeScript: local-fact IO — performs_io is not transitive
 	271: {"TestPackageLevelDispatchTableReferencesItsFuncs", "TestPackageLevelInitializerCallIsAReference", "TestFuncValueInBodyIsReferenced", "TestStructLiteralKeyIsNotAReference", "TestShadowedNameDoesNotBecomeAReference"}, // Go: a function used as a value, and package-level initializers, are references
 	270: {"TestStaticSvelteKitAliases_LiteralsOnly", "TestSvelteKitAliasFallbacks_TsconfigWins", "TestExtract_SvelteKitVirtualDependencyIsFrameworkProvided"},
 	269: {"TestParseTSConfigAliases_FollowsExtendsAndRebasesDeclaringFile", "TestParseTSConfigAliases_ChildPathsReplaceParent", "TestParseTSConfigAliases_ExtendsCycleFailsClosed"},

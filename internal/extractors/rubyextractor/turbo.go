@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/facts"
 	sitter "github.com/tree-sitter/go-tree-sitter"
 )
@@ -103,7 +104,8 @@ func extractTurboFrames(relFile string, src []byte) []facts.Fact {
 // per record, so it emits NOTHING: a stream identity this pass cannot read is
 // a counted absence, never a guess. Facts are sorted by name then file, so
 // the output is a function of what the models declare.
-func extractBroadcasts(repoPath string, files []string) []facts.Fact {
+func extractBroadcasts(repoPath string, files []string, inputScopes ...*inputscope.Scope) []facts.Fact {
+	inputScope := inputscope.First(inputScopes)
 	var out []facts.Fact
 	for _, relFile := range files {
 		if !isModelFile(relFile) {
@@ -134,7 +136,7 @@ func extractBroadcasts(repoPath string, files []string) []facts.Fact {
 					"resolution_level": "literal-declared",
 				},
 			})
-		})
+		}, inputScope)
 	}
 	sort.Slice(out, func(i, j int) bool {
 		if out[i].Name != out[j].Name {

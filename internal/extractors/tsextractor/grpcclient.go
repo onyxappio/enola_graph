@@ -146,58 +146,75 @@ func looksLikeGRPCStub(src []byte) bool {
 // shared with the repository-context and extraction passes so indexing does not
 // reread every TypeScript file from disk.
 func buildGRPCStubIndex(tsFiles []string, sources map[string][]byte) *grpcStubIndex {
-	idx := &grpcStubIndex{
+	idx := newGRPCStubIndex()
+	for _, rel := range tsFiles {
+		idx.mergeFile(grpcFileContribution(sources[rel]))
+	}
+	if idx.empty() {
+		return nil
+	}
+	return idx
+}
+
+func newGRPCStubIndex() *grpcStubIndex {
+	return &grpcStubIndex{
 		byClass:          map[string]*grpcService{},
 		byService:        map[string]*grpcService{},
 		ambiguousClass:   map[string]bool{},
 		ambiguousService: map[string]bool{},
 	}
+}
 
-	for _, rel := range tsFiles {
-		src := sources[rel]
-		if src == nil {
-			continue
-		}
-		if !looksLikeGRPCStub(src) {
-			continue
-		}
-		text := string(src)
+// GRPCRecord is the persistable stub contribution of one file.
+type GRPCRecord struct {
+	FQ             string   `json:"fq,omitempty"`
+	Methods        []string `json:"methods,omitempty"`
+	Classes        []string `json:"classes,omitempty"`
+	ServiceConsts  []string `json:"service_consts,omitempty"`
+	AmbiguousClass bool     `json:"ambiguous_class,omitempty"`
+}
 
-		fq := serviceFQN(text)
-		if fq == "" {
-			continue
-		}
-		methods := protoMethods(text)
-		if len(methods) == 0 {
-			continue
-		}
-		svc := &grpcService{fq: fq, methods: map[string]string{}}
-		for _, m := range methods {
-			svc.methods[lowerFirst(m)] = m
-		}
-
-		// Associate every client class declared in this stub file, plus the
-		// conventional "<ServiceName>Client" name derived from the FQN.
-		for _, m := range reClientClass.FindAllStringSubmatch(text, -1) {
-			if cls := m[1]; strings.HasSuffix(cls, "Client") {
-				idx.bindClass(cls, svc)
-			}
-		}
-		idx.bindClass(lastSegment(fq)+"Client", svc)
-
-		// connect-es: a consumer passes the exported service-definition const to
-		// createClient(...), so associate each `export const X` in this stub file
-		// with its service. Also register the conventional "<ServiceName>" name.
-		for _, m := range reServiceConst.FindAllStringSubmatch(text, -1) {
-			idx.bindService(m[1], svc)
-		}
-		idx.bindService(lastSegment(fq), svc)
-	}
-
-	if idx.empty() {
+func grpcFileContribution(src []byte) *GRPCRecord {
+	if src == nil || !looksLikeGRPCStub(src) {
 		return nil
 	}
-	return idx
+	text := string(src)
+	fq := serviceFQN(text)
+	if fq == "" {
+		return nil
+	}
+	methods := protoMethods(text)
+	if len(methods) == 0 {
+		return nil
+	}
+	rec := &GRPCRecord{FQ: fq, Methods: methods}
+	for _, m := range reClientClass.FindAllStringSubmatch(text, -1) {
+		if cls := m[1]; strings.HasSuffix(cls, "Client") {
+			rec.Classes = append(rec.Classes, cls)
+		}
+	}
+	rec.Classes = append(rec.Classes, lastSegment(fq)+"Client")
+	for _, m := range reServiceConst.FindAllStringSubmatch(text, -1) {
+		rec.ServiceConsts = append(rec.ServiceConsts, m[1])
+	}
+	rec.ServiceConsts = append(rec.ServiceConsts, lastSegment(fq))
+	return rec
+}
+
+func (idx *grpcStubIndex) mergeFile(rec *GRPCRecord) {
+	if idx == nil || rec == nil || rec.FQ == "" {
+		return
+	}
+	svc := &grpcService{fq: rec.FQ, methods: map[string]string{}}
+	for _, m := range rec.Methods {
+		svc.methods[lowerFirst(m)] = m
+	}
+	for _, cls := range rec.Classes {
+		idx.bindClass(cls, svc)
+	}
+	for _, name := range rec.ServiceConsts {
+		idx.bindService(name, svc)
+	}
 }
 
 // serviceFQN pulls the fully-qualified service name from a stub file, trying the

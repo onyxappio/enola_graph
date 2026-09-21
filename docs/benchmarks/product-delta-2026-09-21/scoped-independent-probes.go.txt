@@ -1,0 +1,36 @@
+package bootstrap
+
+import (
+ "testing"
+)
+
+func TestIndependentSvelteMJSContext(t *testing.T) {
+ root, _, sink, apply := scopedFixture(t)
+ graphWrite(t, root, "svelte.config.mjs", "export default {kit:{alias:{'@chosen':'./a.ts'}}}")
+ graphWrite(t, root, "consumer.ts", "import {a} from '@chosen';export function consumer(){return a()}")
+ apply("svelte.config.mjs", "consumer.ts")
+ graphColdEqual(t, root, sink)
+ graphWrite(t, root, "svelte.config.mjs", "export default {kit:{alias:{'@chosen':'./unrelated.ts'}}}")
+ res := apply("svelte.config.mjs")
+ t.Logf("alias config result: parsed=%d reconciled=%v invalidation=%+v",res.ParsedFiles,res.Reconciled,res.Invalidation)
+ graphColdEqual(t, root, sink)
+}
+
+func TestIndependentNestedSvelteContext(t *testing.T) {
+ for _, ext := range []string{"js", "ts", "mjs"} {
+ t.Run(ext,func(t *testing.T){
+ root, _, sink, apply := scopedFixture(t)
+ graphWrite(t, root, "package.json", `{"name":"app","dependencies":{"@sveltejs/kit":"2"}}`)
+ graphWrite(t, root, "packages/database/tsconfig.json", `{"compilerOptions":{"paths":{"@stable":["../../a.ts"]}}}`)
+ config := "packages/database/svelte.config."+ext
+ graphWrite(t, root, config, "export default {kit:{alias:{'@chosen':'../../a.ts'}}}")
+ graphWrite(t, root, "packages/database/consumer.ts", "import {a} from '@chosen';export function consumer(){return a()}")
+ apply("package.json", "packages/database/tsconfig.json", config, "packages/database/consumer.ts")
+ graphColdEqual(t, root, sink)
+ graphWrite(t, root, config, "export default {kit:{alias:{'@chosen':'../../unrelated.ts'}}}")
+ res := apply(config)
+ t.Logf("alias config result: parsed=%d reconciled=%v invalidation=%+v",res.ParsedFiles,res.Reconciled,res.Invalidation)
+ graphColdEqual(t, root, sink)
+ })
+ }
+}

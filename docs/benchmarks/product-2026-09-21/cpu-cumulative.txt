@@ -1,0 +1,68 @@
+File: enola-product-profile
+Type: cpu
+Time: 2026-09-21 07:41:07 EEST
+Duration: 44.96s, Total samples = 63.13s (140.42%)
+Showing nodes accounting for 43.15s, 68.35% of 63.13s total
+Dropped 495 nodes (cum <= 0.32s)
+Showing top 60 nodes out of 263
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%     34.91s 55.30%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).ExtractSession.func3
+         0     0%     0%     34.91s 55.30%  github.com/enola-labs/enola/internal/parallel.MapFiles[go.shape.struct { github.com/enola-labs/enola/internal/extractors/tsextractor.res github.com/enola-labs/enola/internal/extractors/tsextractor.tsFileResult; github.com/enola-labs/enola/internal/extractors/tsextractor.rec *github.com/enola-labs/enola/internal/extractors/tsextractor.FileRecord }].func1
+         0     0%     0%     25.62s 40.58%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).extractFile
+         0     0%     0%     21.29s 33.72%  regexp.(*Regexp).allMatches
+         0     0%     0%     21.29s 33.72%  regexp.(*Regexp).doExecute
+     1.76s  2.79%  2.79%     19.67s 31.16%  regexp.(*machine).match
+         0     0%  2.79%     16.09s 25.49%  regexp.(*Regexp).FindAllSubmatch
+         0     0%  2.79%     11.95s 18.93%  github.com/enola-labs/enola/internal/extractors/tsextractor.serverBindings
+     9.95s 15.76% 18.55%     10.99s 17.41%  runtime.cgocall
+     8.16s 12.93% 31.47%     10.80s 17.11%  regexp.(*machine).add
+    10.41s 16.49% 47.96%     10.41s 16.49%  syscall.rawsyscalln
+         0     0% 47.96%     10.41s 16.49%  syscall.syscalln
+         0     0% 47.96%     10.33s 16.36%  github.com/enola-labs/enola/internal/graphsession.(*session).analyze (inline)
+         0     0% 47.96%     10.33s 16.36%  github.com/enola-labs/enola/internal/graphsession.(*session).run
+         0     0% 47.96%     10.33s 16.36%  github.com/enola-labs/enola/internal/graphsession.Run
+         0     0% 47.96%     10.33s 16.36%  github.com/enola-labs/enola/pkg/command.(*Runner).Dispatch
+         0     0% 47.96%     10.33s 16.36%  github.com/enola-labs/enola/pkg/command.(*Runner).Graph
+         0     0% 47.96%     10.33s 16.36%  main.main
+         0     0% 47.96%     10.33s 16.36%  runtime.main
+         0     0% 47.96%     10.06s 15.94%  syscall.syscall
+     4.62s  7.32% 55.28%      9.27s 14.68%  regexp.(*machine).step
+         0     0% 55.28%      9.10s 14.41%  runtime.systemstack
+         0     0% 55.28%      8.40s 13.31%  github.com/enola-labs/enola/internal/extractors/tsextractor.collectRouterFile
+         0     0% 55.28%      8.14s 12.89%  github.com/enola-labs/enola/internal/extractors/tsextractor.extractHTTPClientFacts
+         0     0% 55.28%      8.07s 12.78%  runtime.cgocallback
+     0.01s 0.016% 55.30%      8.07s 12.78%  runtime.cgocallbackg
+         0     0% 55.30%      8.07s 12.78%  runtime.systemstack_switch
+     0.04s 0.063% 55.36%      8.06s 12.77%  runtime.cgocallbackg1
+         0     0% 55.36%      7.73s 12.24%  os.ignoringEINTR (inline)
+         0     0% 55.36%      6.50s 10.30%  os.open (inline)
+         0     0% 55.36%      6.50s 10.30%  syscall.Open
+         0     0% 55.36%         6s  9.50%  github.com/tree-sitter/go-tree-sitter._cgo_cmalloc
+         0     0% 55.36%      5.69s  9.01%  _cgoexp_80dba3ccedfc_go_malloc
+     0.02s 0.032% 55.39%      5.69s  9.01%  github.com/tree-sitter/go-tree-sitter.go_malloc
+         0     0% 55.39%      5.67s  8.98%  github.com/tree-sitter/go-tree-sitter.SetAllocator.func2
+         0     0% 55.39%      5.67s  8.98%  github.com/tree-sitter/go-tree-sitter._Cfunc__CMalloc (inline)
+         0     0% 55.39%      5.55s  8.79%  path/filepath.WalkDir
+         0     0% 55.39%      5.55s  8.79%  path/filepath.walkDir
+         0     0% 55.39%      5.42s  8.59%  github.com/tree-sitter/go-tree-sitter.(*Parser).Parse
+         0     0% 55.39%      5.42s  8.59%  github.com/tree-sitter/go-tree-sitter.(*Parser).ParseWith
+         0     0% 55.39%      5.35s  8.47%  github.com/tree-sitter/go-tree-sitter.(*Parser).ParseWith.func2 (inline)
+         0     0% 55.39%      5.35s  8.47%  github.com/tree-sitter/go-tree-sitter._Cfunc_ts_parser_parse
+         0     0% 55.39%      4.91s  7.78%  regexp.(*Regexp).FindAllSubmatchIndex
+     4.51s  7.14% 62.54%      4.51s  7.14%  runtime.pthread_cond_signal
+         0     0% 62.54%      4.51s  7.14%  runtime.semawakeup
+         0     0% 62.54%      4.49s  7.11%  runtime.notewakeup
+         0     0% 62.54%      4.46s  7.06%  github.com/enola-labs/enola/internal/extractors/tsextractor.extractServerRouteFacts
+         0     0% 62.54%      4.40s  6.97%  runtime.startm
+     0.01s 0.016% 62.55%      4.38s  6.94%  runtime.wakep
+         0     0% 62.55%      3.93s  6.23%  runtime.(*mheap).allocSpan
+         0     0% 62.55%      3.92s  6.21%  runtime.(*mheap).alloc.func1
+         0     0% 62.55%      3.76s  5.96%  os.ReadFile
+         0     0% 62.55%      3.67s  5.81%  os.Open (inline)
+         0     0% 62.55%      3.67s  5.81%  os.OpenFile
+         0     0% 62.55%      3.67s  5.81%  os.openFileNolog
+     3.66s  5.80% 68.35%      3.66s  5.80%  runtime.madvise
+         0     0% 68.35%      3.65s  5.78%  runtime.sysUsed (inline)
+         0     0% 68.35%      3.65s  5.78%  runtime.sysUsedOS (inline)
+         0     0% 68.35%      3.62s  5.73%  runtime.schedule
+         0     0% 68.35%      3.61s  5.72%  runtime.ready

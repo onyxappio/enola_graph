@@ -1,0 +1,41 @@
+START r1-old-initial
+DONE r1-old-initial 9.906 None
+START r1-old-noop
+DONE r1-old-noop 4.612 None
+START r1-new-initial
+DONE r1-new-initial 15.27 {'Invalidation': {'RawConfigChanged': False, 'PolicyReconciled': False, 'AddedSources': 0, 'RemovedSources': 0, 'ContextAffectedSources': 0, 'ContextReasons': None, 'ParsedByReason': {'initial': 4144}}, 'RunID': '/tmp/enola-product-benchmark-source-enola-final-isolated-cli-main1-1-1789982942187366000', 'BaseGeneration': 0, 'TargetGeneration': 1, 'Stats': {'files_read': 4244, 'files_parsed': 4144, 'cached_files': 0, 'graphql_parsed': 2, 'sfc_parsed': 17, 'summary_scans': 0}, 'Fallbacks': [{'extractor': 'manifests', 'scope': 'all files owned by extractor', 'reason': 'no per-file incremental session; whole-extractor re-run'}, {'extractor': 'mdintent', 'scope': 'all files owned by extractor', 'reason': 'no per-file incremental session; whole-extractor re-run'}, {'extractor': 'hcl', 'scope': 'all files owned by extractor', 'reason': 'no per-file incremental session; whole-extractor re-run'}, {'extractor': 'python', 'scope': 'all files owned by extractor', 'reason': 'no per-file incremental session; whole-extractor re-run'}, {'extractor': 'swift', 'scope': 'all files owned by extractor', 'reason': 'no per-file incremental session; whole-extractor re-run'}], 'Unreadable': None, 'OwnersPublished': 5510, 'ParsedFiles': 4144, 'EarlyLocal': 4144}
+START r1-new-noop
+DONE r1-new-noop 5.982 {'Invalidation': {'RawConfigChanged': False, 'PolicyReconciled': False, 'AddedSources': 0, 'RemovedSources': 0, 'ContextAffectedSources': 0, 'ContextReasons': None, 'ParsedByReason': {}}, 'RunID': '', 'BaseGeneration': 1, 'TargetGeneration': 1, 'Stats': {'files_read': 0, 'files_parsed': 0, 'cached_files': 4244, 'graphql_parsed': 0, 'sfc_parsed': 0, 'summary_scans': 0}, 'Fallbacks': None, 'Unreadable': None, 'OwnersPublished': 0, 'ParsedFiles': 0, 'EarlyLocal': 0}
+START r1-old-body
+DONE r1-old-body 10.65 None
+START r1-new-body
+DONE r1-new-body 7.634 {'Invalidation': {'RawConfigChanged': False, 'PolicyReconciled': False, 'AddedSources': 0, 'RemovedSources': 0, 'ContextAffectedSources': 0, 'ContextReasons': None, 'ParsedByReason': {'source content': 1}}, 'RunID': '/tmp/enola-product-benchmark-source-enola-final-isolated-cli-main1-2-1789982981479963000', 'BaseGeneration': 1, 'TargetGeneration': 2, 'Stats': {'files_read': 1, 'files_parsed': 1, 'cached_files': 4243, 'graphql_parsed': 0, 'sfc_parsed': 0, 'summary_scans': 0}, 'Fallbacks': None, 'Unreadable': None, 'OwnersPublished': 86, 'ParsedFiles': 1, 'EarlyLocal': 1}
+START r1-old-structural
+DONE r1-old-structural 11.692 None
+START r1-new-structural
+DONE r1-new-structural 8.067 {'Invalidation': {'RawConfigChanged': False, 'PolicyReconciled': False, 'AddedSources': 0, 'RemovedSources': 0, 'ContextAffectedSources': 0, 'ContextReasons': None, 'ParsedByReason': {'resolution': 1, 'source content': 1}}, 'RunID': '/tmp/enola-product-benchmark-source-enola-final-isolated-cli-main1-3-1789983008181945000', 'BaseGeneration': 2, 'TargetGeneration': 3, 'Stats': {'files_read': 2, 'files_parsed': 2, 'cached_files': 4243, 'graphql_parsed': 0, 'sfc_parsed': 0, 'summary_scans': 0}, 'Fallbacks': None, 'Unreadable': None, 'OwnersPublished': 87, 'ParsedFiles': 2, 'EarlyLocal': 2}
+START r2-old-initial
+DONE r2-old-initial 10.132 None
+START r2-old-noop
+DONE r2-old-noop 4.551 None
+START r2-new-initial
+DONE r2-new-initial 14.43 {'Invalidation': {'RawConfigChanged': False, 'PolicyReconciled': False, 'AddedSources': 0, 'RemovedSources': 0, 'ContextAffectedSources': 0, 'ContextReasons': None, 'ParsedByReason': {'initial': 4144}}, 'RunID': '/tmp/enola-product-benchmark-source-enola-final-isolated-cli-main2-1-1789983038477500000', 'BaseGeneration': 0, 'TargetGeneration': 1, 'Stats': {'files_read': 4244, 'files_parsed': 4144, 'cached_files': 0, 'graphql_parsed': 2, 'sfc_parsed': 17, 'summary_scans': 0}, 'Fallbacks': [{'extractor': 'manifests', 'scope': 'all files owned by extractor', 'reason': 'no per-file incremental session; whole-extractor re-run'}, {'extractor': 'mdintent', 'scope': 'all files owned by extractor', 'reason': 'no per-file incremental session; whole-extractor re-run'}, {'extractor': 'hcl', 'scope': 'all files owned by extractor', 'reason': 'no per-file incremental session; whole-extractor re-run'}, {'extractor': 'python', 'scope': 'all files owned by extractor', 'reason': 'no per-file incremental session; whole-extractor re-run'}, {'extractor': 'swift', 'scope': 'all files owned by extractor', 'reason': 'no per-file incremental session; whole-extractor re-run'}], 'Unreadable': None, 'OwnersPublished': 5510, 'ParsedFiles': 4144, 'EarlyLocal': 4144}
+START r2-new-noop
+Traceback (most recent call last):
+  File "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/cli.py", line 130, in <module>
+    ng(f'r{i}-new-noop','delta',state,ctx,True)
+  File "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/cli.py", line 105, in ng
+    def ng(label,mode,state,ctx,noop=False):return run(label,[a.binary,'graph',mode,'--summary-json','--nats',a.nats,'--state-dir',str(root/state),'--context',ctx,str(cfg)],ctx,noop)
+  File "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/cli.py", line 78, in run
+    wait_process(child,600)
+  File "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/harness_support.py", line 29, in wait_process
+    child.wait()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 1189, in wait
+    return self._wait(timeout=timeout)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 1917, in _wait
+    (pid, sts) = self._try_wait(0)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 1875, in _try_wait
+    (pid, sts) = os.waitpid(self.pid, wait_flags)
+  File "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/cli.py", line 11, in interrupted
+    def interrupted(signum,frame):raise KeyboardInterrupt('Signal '+str(signum))
+KeyboardInterrupt: Signal 15

@@ -1,0 +1,47 @@
+ok  	github.com/enola-labs/enola/internal/extractors/asyncapiextractor	0.388s
+ok  	github.com/enola-labs/enola/internal/graphsession	41.875s
+ok  	github.com/enola-labs/enola/internal/facts	2.987s
+=== NOOP2 Mon Sep 21 09:34:10 EEST 2026 ===
+enola: using config /tmp/enola-delta-profile/config.yaml
+enola graph: config /tmp/enola-delta-profile/config.yaml
+[graph-profile] lock                               0.000s  total= 0.000s
+[graph-profile] bind_identity                      0.000s  total= 0.000s
+[graph-profile] open_journal                       0.001s  total= 0.001s
+[graph-profile] replay_unacked                     0.000s  total= 0.001s
+[graph-profile] state_read_bytes                   0.009s  state.json bytes=58200919
+[graph-profile] state_json_unmarshal               0.470s  files=6476
+[graph-profile] load_state                         0.479s  total= 0.480s  files=6476
+[graph-profile] engine_walk_repo                   0.430s  files=42583 tests=2522 all_names=45105
+[graph-profile] inventory                          0.430s  total= 0.910s  files=42583 tests=2522 all_names=45105
+[graph-profile] detect_extractors                  0.153s  total= 1.063s  detected=6
+[graph-profile] engine_hash_files                  0.301s  n=9058 hashed=9058 bytes=90350234
+[graph-profile] hash_content_inputs                0.332s  total= 1.395s  n=9058 hashed=9058 of_files=42583
+[graph-profile] scan_digest                        0.012s  total= 1.406s
+[graph-profile] ts_config_inputs                   0.002s  n=78
+[graph-profile] analysis_fingerprint               0.004s  total= 1.410s  cfg_files=61
+[graph-profile] clone_file_state                   0.002s  total= 1.412s  n=6476
+[graph-profile] extractor_need                     0.046s  total= 1.458s  non_ts_need=false detected=6
+[graph-profile] ts_reuse_cache                     0.047s  total= 1.505s  owned=4281 facts=82466
+[graph-profile] assemble_new_files                 0.008s  total= 1.513s  new=6476 ts_noop=true non_ts_need=false skip=true facts=82493
+[graph-profile] skip_publish_return                0.000s  total= 1.513s
+[graph] /tmp/enola-delta-profile/source: generation 2→2 parsed=0 cached=4281 early_local=0 fallbacks=0
+        2.19 real         1.22 user         0.47 sys
+           397492224  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               24335  page reclaims
+                 172  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                 143  signals received
+                  25  voluntary context switches
+                1846  involuntary context switches
+         20598272251  instructions retired
+          5314500801  cycles elapsed
+           382208576  peak memory footprint
+=== events delta=0 ===
+product fixture NFKC False

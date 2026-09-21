@@ -4,12 +4,13 @@ import (
 	"bufio"
 	"context"
 	"log"
-	"os"
+
 	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/enola-labs/enola/internal/extractors/detectnames"
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/extractors/jvmsrc"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
@@ -18,7 +19,7 @@ import (
 
 // KotlinExtractor extracts architectural facts from Kotlin source code using
 // tree-sitter AST parsing (see kotlin_ast.go for the walker implementation).
-type KotlinExtractor struct{}
+type KotlinExtractor struct{ inputScope *inputscope.Scope }
 
 // New creates a new KotlinExtractor.
 func New() *KotlinExtractor {
@@ -43,9 +44,10 @@ func (e *KotlinExtractor) Detect(repoPath string) (bool, error) {
 // Gradle or Maven file is shared with Java and Scala, so the plugin or coordinate
 // is what names the language; this half stays exactly as conservative as it was.
 func (e *KotlinExtractor) detectByBuild(repoPath string) (bool, error) {
+	inputScope := e.inputScope
 
 	for _, name := range []string{"build.gradle.kts", "build.gradle"} {
-		data, err := os.ReadFile(filepath.Join(repoPath, name))
+		data, err := inputScope.ReadFile(filepath.Join(repoPath, name))
 		if err != nil {
 			continue
 		}
@@ -56,7 +58,7 @@ func (e *KotlinExtractor) detectByBuild(repoPath string) (bool, error) {
 	}
 	// Maven: a Kotlin project declares the kotlin-maven-plugin / org.jetbrains.kotlin
 	// dependency and typically a src/main/kotlin sourceDirectory in its pom.xml.
-	if data, err := os.ReadFile(filepath.Join(repoPath, "pom.xml")); err == nil {
+	if data, err := inputScope.ReadFile(filepath.Join(repoPath, "pom.xml")); err == nil {
 		content := string(data)
 		if strings.Contains(content, "org.jetbrains.kotlin") ||
 			strings.Contains(content, "kotlin-maven-plugin") ||
@@ -66,7 +68,7 @@ func (e *KotlinExtractor) detectByBuild(repoPath string) (bool, error) {
 	}
 	// Fallback: a conventional Kotlin source root exists even without a recognized
 	// build file. Cheap stat, no directory walk.
-	if fi, err := os.Stat(filepath.Join(repoPath, "src", "main", "kotlin")); err == nil && fi.IsDir() {
+	if fi, err := inputScope.Stat(filepath.Join(repoPath, "src", "main", "kotlin")); err == nil && fi.IsDir() {
 		return true, nil
 	}
 	return false, nil
@@ -102,11 +104,12 @@ func (e *KotlinExtractor) DetectFiles(repoPath string, files []string) (bool, er
 // facts, Room storage facts, and call-graph relations (RelInstantiates,
 // RelInjects) suitable for reverse-dependency queries.
 func (e *KotlinExtractor) Extract(ctx context.Context, repoPath string, files []string) ([]facts.Fact, error) {
+	inputScope := e.inputScope
 	var allFacts []facts.Fact
 
-	isAndroid := detectAndroidProject(repoPath)
-	sourceRoot := detectKotlinSourceRoot(repoPath, files)
-	basePackage := detectKotlinBasePackage(repoPath)
+	isAndroid := detectAndroidProject(repoPath, inputScope)
+	sourceRoot := detectKotlinSourceRoot(repoPath, files, inputScope)
+	basePackage := detectKotlinBasePackage(repoPath, inputScope)
 	// Multi-module resolution: map every declared package (across .kt AND .java
 	// files) to its real directory so cross-module imports resolve to the module
 	// that actually holds the package, instead of collapsing onto the single most
@@ -124,7 +127,7 @@ func (e *KotlinExtractor) Extract(ctx context.Context, repoPath string, files []
 	// The detected flags above are read-only, and the per-file extractors are
 	// pure, so parse in parallel and merge in file order for deterministic output.
 	perFileFacts := parallel.MapFiles(ctx, kotlinFiles, func(relFile string) []facts.Fact {
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			log.Printf("[kotlin-extractor] error reading %s: %v", relFile, err)
 			return nil
@@ -186,13 +189,14 @@ func (e *KotlinExtractor) AffectsKey(relFile string) bool {
 // --- Android & framework detection helpers (called by the AST walker) ---
 
 // detectAndroidProject checks for AndroidManifest.xml.
-func detectAndroidProject(repoPath string) bool {
+func detectAndroidProject(repoPath string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
 	candidates := []string{
 		filepath.Join(repoPath, "app", "src", "main", "AndroidManifest.xml"),
 		filepath.Join(repoPath, "src", "main", "AndroidManifest.xml"),
 	}
 	for _, p := range candidates {
-		if _, err := os.Stat(p); err == nil {
+		if _, err := inputScope.Stat(p); err == nil {
 			return true
 		}
 	}
@@ -402,7 +406,8 @@ func extractTypeName(s string) string {
 // walked file was a test ("app/src/androidTest/java/…") resolved every internal
 // import under that test root, so the targets never matched the real (main)
 // module dirs and coupling collapsed to zero.
-func detectKotlinSourceRoot(repoPath string, files []string) string {
+func detectKotlinSourceRoot(repoPath string, files []string, inputScopes ...*inputscope.Scope) string {
+	inputScope := inputscope.First(inputScopes)
 	counts := make(map[string]int) // production source root -> file count
 	fallback := ""                 // any root seen, used only if all files are tests
 	haveFallback := false
@@ -411,7 +416,7 @@ func detectKotlinSourceRoot(repoPath string, files []string) string {
 		if !isKotlinFile(relFile) {
 			continue
 		}
-		root, ok := kotlinFileSourceRoot(repoPath, relFile)
+		root, ok := kotlinFileSourceRoot(repoPath, relFile, inputScope)
 		if !ok {
 			continue
 		}
@@ -438,9 +443,10 @@ func detectKotlinSourceRoot(repoPath string, files []string) string {
 
 // kotlinFileSourceRoot returns a single file's source root: its directory with
 // its package path stripped. ok is false when the file has no package decl.
-func kotlinFileSourceRoot(repoPath, relFile string) (string, bool) {
+func kotlinFileSourceRoot(repoPath, relFile string, inputScopes ...*inputscope.Scope) (string, bool) {
+	inputScope := inputscope.First(inputScopes)
 	absFile := filepath.Join(repoPath, relFile)
-	f, err := os.Open(absFile)
+	f, err := inputScope.Open(absFile)
 	if err != nil {
 		return "", false
 	}
@@ -472,7 +478,8 @@ func isKotlinTestSource(relFile string) bool {
 // detectKotlinBasePackage reads the Android namespace from build.gradle.kts so
 // that internal imports (matching the project's package) can be resolved to
 // filesystem paths rather than being treated as external library imports.
-func detectKotlinBasePackage(repoPath string) string {
+func detectKotlinBasePackage(repoPath string, inputScopes ...*inputscope.Scope) string {
+	inputScope := inputscope.First(inputScopes)
 	candidates := []string{
 		filepath.Join(repoPath, "app", "build.gradle.kts"),
 		filepath.Join(repoPath, "app", "build.gradle"),
@@ -485,7 +492,7 @@ func detectKotlinBasePackage(repoPath string) string {
 	// package empty and making every in-repo import resolve as external.
 	nsRe := regexp.MustCompile(`namespace\s*=?\s*['"]([^'"]+)['"]`)
 	for _, path := range candidates {
-		data, err := os.ReadFile(path)
+		data, err := inputScope.ReadFile(path)
 		if err != nil {
 			continue
 		}
@@ -518,3 +525,5 @@ func resolveKotlinImport(importPath string, packageIndex map[string]string, sour
 	}
 	return importPath, true
 }
+
+func NewGraph(scope *inputscope.Scope) *KotlinExtractor { return &KotlinExtractor{inputScope: scope} }

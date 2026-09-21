@@ -1,0 +1,56 @@
+[
+  {
+    "check": "r1 initial equals independent repaired baseline",
+    "pass": true,
+    "expected": "d727bfe7f954069a6b16c636c8ad6bd87b288bf11a5e214c71b88b3b75eae2d2",
+    "actual": "d727bfe7f954069a6b16c636c8ad6bd87b288bf11a5e214c71b88b3b75eae2d2"
+  },
+  {
+    "check": "r1-new-noop no-op",
+    "pass": true
+  },
+  {
+    "check": "r2 initial equals independent repaired baseline",
+    "pass": true,
+    "expected": "d727bfe7f954069a6b16c636c8ad6bd87b288bf11a5e214c71b88b3b75eae2d2",
+    "actual": "d727bfe7f954069a6b16c636c8ad6bd87b288bf11a5e214c71b88b3b75eae2d2"
+  },
+  {
+    "check": "r2-new-noop no-op",
+    "pass": true
+  },
+  {
+    "check": "r3 initial equals independent repaired baseline",
+    "pass": true,
+    "expected": "d727bfe7f954069a6b16c636c8ad6bd87b288bf11a5e214c71b88b3b75eae2d2",
+    "actual": "d727bfe7f954069a6b16c636c8ad6bd87b288bf11a5e214c71b88b3b75eae2d2"
+  },
+  {
+    "check": "r3-new-noop no-op",
+    "pass": true
+  },
+  {
+    "check": "r1-new-structural equals cold",
+    "pass": true
+  },
+  {
+    "check": "r2-new-structural equals cold",
+    "pass": true
+  },
+  {
+    "check": "r3-new-structural equals cold",
+    "pass": true
+  },
+  {
+    "check": "r1-new-body equals cold",
+    "pass": true
+  },
+  {
+    "check": "r2-new-body equals cold",
+    "pass": true
+  },
+  {
+    "check": "r3-new-body equals cold",
+    "pass": true
+  }
+]

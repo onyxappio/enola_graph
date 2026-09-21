@@ -1,11 +1,11 @@
 package rubyextractor
 
 import (
-	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/facts"
 )
 
@@ -79,8 +79,9 @@ type rbReference struct {
 // the tables it declares, in the same shape the structure.sql reader produces
 // for the same database — the two dumps describe one thing, so a rule written
 // against the census must not be able to tell which format declared it.
-func applySchemaRB(repoPath string, allFacts []facts.Fact) []facts.Fact {
-	data, err := os.ReadFile(filepath.Join(repoPath, filepath.FromSlash(schemaRBPath)))
+func applySchemaRB(repoPath string, allFacts []facts.Fact, inputScopes ...*inputscope.Scope) []facts.Fact {
+	inputScope := inputscope.First(inputScopes)
+	data, err := inputScope.ReadFile(filepath.Join(repoPath, filepath.FromSlash(schemaRBPath)))
 	if err != nil {
 		return nil
 	}
@@ -92,11 +93,12 @@ func applySchemaRB(repoPath string, allFacts []facts.Fact) []facts.Fact {
 // both files exist: opting into the SQL format is what makes it the
 // authoritative dump, and one database read twice would fold two censuses onto
 // one storage identity.
-func applySchemaDump(repoPath string, allFacts []facts.Fact) []facts.Fact {
-	if _, err := os.Stat(filepath.Join(repoPath, filepath.FromSlash(structureSQLPath))); err == nil {
-		return applyStructureSQL(repoPath, allFacts)
+func applySchemaDump(repoPath string, allFacts []facts.Fact, inputScopes ...*inputscope.Scope) []facts.Fact {
+	inputScope := inputscope.First(inputScopes)
+	if _, err := inputScope.Stat(filepath.Join(repoPath, filepath.FromSlash(structureSQLPath))); err == nil {
+		return applyStructureSQL(repoPath, allFacts, inputScope)
 	}
-	return applySchemaRB(repoPath, allFacts)
+	return applySchemaRB(repoPath, allFacts, inputScope)
 }
 
 // parseSchemaRB walks the dump line by line: a create_table opens a member scan

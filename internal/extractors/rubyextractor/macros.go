@@ -1,9 +1,9 @@
 package rubyextractor
 
 import (
-	"os"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	ruby "github.com/tree-sitter/tree-sitter-ruby/bindings/go"
 )
@@ -69,8 +69,9 @@ var associationMacros = map[string]bool{
 
 // eachCall visits every call in a Ruby file, at any nesting depth, so a macro
 // inside `module X; class Y` is seen without tracking the enclosing scopes.
-func eachCall(path string, visit func(method string, args *sitter.Node, src []byte)) {
-	src, err := os.ReadFile(path)
+func eachCall(path string, visit func(method string, args *sitter.Node, src []byte), inputScopes ...*inputscope.Scope) {
+	inputScope := inputscope.First(inputScopes)
+	src, err := inputScope.ReadFile(path)
 	if err != nil {
 		return
 	}

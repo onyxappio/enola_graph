@@ -1,0 +1,21 @@
+enola: using config /private/tmp/enola-product-history100-check/config.yaml
+enola graph: config /private/tmp/enola-product-history100-check/config.yaml
+[graph] /tmp/enola-product-history-source: generation 1→1 parsed=0 cached=4265 early_local=0 fallbacks=0
+        2.34 real         1.79 user         2.34 sys
+           406650880  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               24895  page reclaims
+                 174  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   5  messages sent
+                   4  messages received
+                 218  signals received
+                  31  voluntary context switches
+               19695  involuntary context switches
+         37352364357  instructions retired
+         12842550580  cycles elapsed
+           390072832  peak memory footprint

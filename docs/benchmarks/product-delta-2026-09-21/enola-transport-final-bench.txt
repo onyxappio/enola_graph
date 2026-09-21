@@ -1,0 +1,15 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/enola-labs/enola/internal/graphstream
+cpu: Apple M1 Pro
+BenchmarkAsyncTransport/1000-10  	      80	   2834839 ns/op	 1234818 B/op	   16890 allocs/op
+BenchmarkAsyncTransport/1000-10  	      82	   2820391 ns/op	 1231268 B/op	   16894 allocs/op
+BenchmarkAsyncTransport/1000-10  	     100	   2632690 ns/op	 1224326 B/op	   16930 allocs/op
+BenchmarkAsyncTransport/4000-10  	      21	  10917409 ns/op	 4879963 B/op	   67585 allocs/op
+BenchmarkAsyncTransport/4000-10  	      21	  10847935 ns/op	 4879009 B/op	   67623 allocs/op
+BenchmarkAsyncTransport/4000-10  	      21	  10847841 ns/op	 4884356 B/op	   67616 allocs/op
+BenchmarkTransportMetadata-10    	    1729	    139923 ns/op	 178.36 MB/s	     336 B/op	      10 allocs/op
+BenchmarkTransportMetadata-10    	    1723	    134763 ns/op	 185.18 MB/s	     336 B/op	      10 allocs/op
+BenchmarkTransportMetadata-10    	    1783	    134077 ns/op	 186.13 MB/s	     336 B/op	      10 allocs/op
+PASS
+ok  	github.com/enola-labs/enola/internal/graphstream	2.663s

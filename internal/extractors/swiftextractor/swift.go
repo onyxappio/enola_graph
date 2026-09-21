@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/enola-labs/enola/internal/extractors/detectnames"
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 	"github.com/enola-labs/enola/internal/parallel"
@@ -18,7 +19,7 @@ import (
 
 // SwiftExtractor extracts architectural facts from Swift source code using
 // tree-sitter AST parsing (see swift_ast.go for the walker implementation).
-type SwiftExtractor struct{}
+type SwiftExtractor struct{ inputScope *inputscope.Scope }
 
 // New creates a new SwiftExtractor.
 func New() *SwiftExtractor {
@@ -31,7 +32,7 @@ func (e *SwiftExtractor) Name() string {
 
 // Detect returns true if the repository looks like a Swift or iOS project.
 func (e *SwiftExtractor) Detect(repoPath string) (bool, error) {
-	return e.DetectFiles(repoPath, detectnames.Walk(repoPath))
+	return e.DetectFiles(repoPath, detectnames.Walk(repoPath, e.inputScope))
 }
 
 // DetectFiles implements plugin.FileListDetector.
@@ -73,9 +74,10 @@ func (e *SwiftExtractor) DetectFiles(_ string, files []string) (bool, error) {
 //     the graph's reverse traversal (impact_analysis) finds Swift dependents.
 //   - Pass 2: scan type references to discover cross-module import dependencies.
 func (e *SwiftExtractor) Extract(ctx context.Context, repoPath string, files []string) ([]facts.Fact, error) {
+	inputScope := e.inputScope
 	var allFacts []facts.Fact
 
-	isiOS := detectiOSProject(repoPath)
+	isiOS := detectiOSProject(repoPath, inputScope)
 
 	modules := make(map[string]bool)
 	typeIndex := make(map[string]string)     // simple type name -> module identity
@@ -105,13 +107,13 @@ func (e *SwiftExtractor) Extract(ctx context.Context, repoPath string, files []s
 	// to its owning target module. Both signals are additive: when neither covers
 	// a file, moduleForFile falls back to the file's leaf directory, preserving
 	// behaviour for loose Swift projects.
-	xp, xerr := parseXcodeGenProject(repoPath, projectManifestName)
+	xp, xerr := parseXcodeGenProject(repoPath, projectManifestName, inputScope)
 	if xerr != nil {
 		log.Printf("[swift-extractor] project.yml parse error: %v", xerr)
 	}
 	spmRoots := map[string]string{}
 	for _, relFile := range manifestFiles {
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			continue
 		}
@@ -132,7 +134,7 @@ func (e *SwiftExtractor) Extract(ctx context.Context, repoPath string, files []s
 	// idiom, so the scan is gated on isiOS to avoid a wasted read pass elsewhere.
 	var defaultURLPrefix string
 	if isiOS {
-		defaultURLPrefix = detectDefaultURLPrefix(repoPath, files)
+		defaultURLPrefix = detectDefaultURLPrefix(repoPath, files, inputScope)
 	}
 
 	// extractFileAST/extractURLSessionFacts are pure; parse the source files in
@@ -141,7 +143,7 @@ func (e *SwiftExtractor) Extract(ctx context.Context, repoPath string, files []s
 	// moduleForFile is pure and order-independent, so the identity a file resolves
 	// to is the same in the parallel walk and the serial fold below.
 	perFileFacts := parallel.MapFiles(ctx, swiftFiles, func(relFile string) []facts.Fact {
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			log.Printf("[swift-extractor] error reading %s: %v", relFile, err)
 			return nil
@@ -216,7 +218,7 @@ func (e *SwiftExtractor) Extract(ctx context.Context, repoPath string, files []s
 	// matching the endpoint idiom (and the defaultURLPrefix gate above).
 	if isiOS {
 		allFacts = append(allFacts,
-			extractCallSiteEndpointFacts(repoPath, files, defaultURLPrefix, moduleForFile)...)
+			extractCallSiteEndpointFacts(repoPath, files, defaultURLPrefix, moduleForFile, inputScope)...)
 	}
 
 	// Parse Package.swift manifests: emit SPM target module facts + the inter-target
@@ -225,7 +227,7 @@ func (e *SwiftExtractor) Extract(ctx context.Context, repoPath string, files []s
 	manifestModules := make(map[string]bool)
 	for _, relFile := range manifestFiles {
 		absFile := filepath.Join(repoPath, relFile)
-		src, err := os.ReadFile(absFile)
+		src, err := inputScope.ReadFile(absFile)
 		if err != nil {
 			log.Printf("[swift-extractor] error reading %s: %v", relFile, err)
 			continue
@@ -329,7 +331,7 @@ func (e *SwiftExtractor) Extract(ctx context.Context, repoPath string, files []s
 
 		sourceModule := moduleForFile(relFile)
 		absFile := filepath.Join(repoPath, relFile)
-		refs := extractTypeReferences(absFile)
+		refs := extractTypeReferences(absFile, inputScope)
 
 		for _, typeName := range refs {
 			// An ambiguous short name (defined in >1 module) cannot be resolved to a
@@ -655,8 +657,9 @@ var importRe = regexp.MustCompile(`^\s*import\s+(\w+)`)
 var typeRefRe = regexp.MustCompile(`:\s*([A-Z][A-Za-z0-9_]+)`)
 
 // extractTypeReferences scans a Swift file for type references (property types, parameter types).
-func extractTypeReferences(absFile string) []string {
-	f, err := os.Open(absFile)
+func extractTypeReferences(absFile string, inputScopes ...*inputscope.Scope) []string {
+	inputScope := inputscope.First(inputScopes)
+	f, err := inputScope.Open(absFile)
 	if err != nil {
 		return nil
 	}
@@ -762,9 +765,12 @@ func extractSupertypesFromText(text string) string {
 // --- iOS detection helpers ---
 
 // detectiOSProject checks for Info.plist or other iOS markers.
-func detectiOSProject(repoPath string) bool {
-	// Walk up to two levels looking for Info.plist or Assets.xcassets
-	entries, err := os.ReadDir(repoPath)
+func detectiOSProject(repoPath string, inputScopes ...
+// Walk up to two levels looking for Info.plist or Assets.xcassets
+*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+
+	entries, err := inputScope.ReadDir(repoPath)
 	if err != nil {
 		return false
 	}
@@ -773,13 +779,13 @@ func detectiOSProject(repoPath string) bool {
 			return true
 		}
 		if entry.IsDir() {
-			subEntries, _ := os.ReadDir(filepath.Join(repoPath, entry.Name()))
+			subEntries, _ := inputScope.ReadDir(filepath.Join(repoPath, entry.Name()))
 			for _, sub := range subEntries {
 				if sub.Name() == "Info.plist" || sub.Name() == "Assets.xcassets" {
 					return true
 				}
 				if sub.IsDir() {
-					deepEntries, _ := os.ReadDir(filepath.Join(repoPath, entry.Name(), sub.Name()))
+					deepEntries, _ := inputScope.ReadDir(filepath.Join(repoPath, entry.Name(), sub.Name()))
 					for _, deep := range deepEntries {
 						if deep.Name() == "Info.plist" || deep.Name() == "Assets.xcassets" {
 							return true
@@ -973,6 +979,21 @@ func isSwiftFile(path string) bool {
 // OwnsFile implements plugin.FileOwner for incremental caching.
 func (e *SwiftExtractor) OwnsFile(relFile string) bool { return isSwiftFile(relFile) }
 
+// ContentInput implements plugin.DeltaInputs: Swift sources plus the XcodeGen
+// manifest parseXcodeGenProject reads at the repo root.
+func (e *SwiftExtractor) ContentInput(rel string) bool {
+	if isSwiftFile(rel) {
+		return true
+	}
+	return filepath.ToSlash(rel) == projectManifestName
+}
+
+// NameSetInput implements plugin.DeltaInputs.
+func (e *SwiftExtractor) NameSetInput() bool { return false }
+
 func matchesXcodeProject(name string) bool {
 	return strings.HasSuffix(name, ".xcodeproj") || strings.HasSuffix(name, ".xcworkspace")
 }
+
+// NewGraph binds an immutable graph input snapshot; New retains legacy behavior.
+func NewGraph(scope *inputscope.Scope) *SwiftExtractor { return &SwiftExtractor{inputScope: scope} }

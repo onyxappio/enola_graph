@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
-	"os"
+
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 	"gopkg.in/yaml.v3"
@@ -19,14 +21,55 @@ import (
 // Extractor extracts channels and operations from AsyncAPI 2.x and 3.x specs.
 // It walks the repository itself because YAML and JSON are excluded from the
 // engine's normal source-file walk.
-type Extractor struct{}
+type Extractor struct{ inputScope *inputscope.Scope }
 
 func New() *Extractor             { return &Extractor{} }
 func (e *Extractor) Name() string { return "asyncapi" }
 
 func (e *Extractor) Detect(repoPath string) (bool, error) {
-	found := false
-	err := filepath.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+	inputScope := e.inputScope
+	return detect(repoPath, func(path string) bool { return hasAsyncAPIRootScoped(path, inputScope) }, inputScope)
+}
+
+// Probe file candidates in bounded batches, flushing before every directory or
+// walk error. This preserves the original walk's pruning decisions (including
+// its behavior after a match), absolute paths, and error ordering. Only reads of
+// candidates in the current uninterrupted file sequence may be speculative.
+func detect(repoPath string, probe func(string) bool, inputScopes ...*inputscope.Scope) (bool, error) {
+	inputScope := inputscope.First(inputScopes)
+	const workers, window = 4, 32
+	jobs := make(chan string, window)
+	results := make(chan bool, window)
+	var wg sync.WaitGroup
+	started := false
+	start := func() {
+		if started {
+			return
+		}
+		started = true
+		for i := 0; i < workers; i++ {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				for path := range jobs {
+					results <- probe(path)
+				}
+			}()
+		}
+	}
+	found, pending := false, 0
+	flush := func() {
+		for pending > 0 {
+			if <-results {
+				found = true
+			}
+			pending--
+		}
+	}
+	err := inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+		if err != nil || !d.Type().IsRegular() {
+			flush()
+		}
 		if err != nil || found {
 			return err
 		}
@@ -36,17 +79,32 @@ func (e *Extractor) Detect(repoPath string) (bool, error) {
 			}
 			return nil
 		}
-		if isCandidate(path) && hasAsyncAPIRoot(path) {
-			found = true
+		if isCandidate(path) {
+			// Never speculatively open symlinks or special files: a positive
+			// preceding file historically prevents even attempting those reads.
+			if !d.Type().IsRegular() {
+				found = probe(path)
+				return nil
+			}
+			start()
+			jobs <- path
+			pending++
+			if pending == window {
+				flush()
+			}
 		}
 		return nil
 	})
+	flush()
+	close(jobs)
+	wg.Wait()
 	return found, err
 }
 
 func (e *Extractor) Extract(ctx context.Context, repoPath string, _ []string) ([]facts.Fact, error) {
+	inputScope := e.inputScope
 	var result []facts.Fact
-	err := filepath.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+	err := inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -61,7 +119,7 @@ func (e *Extractor) Extract(ctx context.Context, repoPath string, _ []string) ([
 			}
 			return nil
 		}
-		if !isCandidate(path) || !hasAsyncAPIContent(path) {
+		if !isCandidate(path) || !hasAsyncAPIContent(path, inputScope) {
 			return nil
 		}
 		rawRel, relErr := filepath.Rel(repoPath, path)
@@ -69,7 +127,7 @@ func (e *Extractor) Extract(ctx context.Context, repoPath string, _ []string) ([
 			return nil
 		}
 		rel := factpath.Slash(rawRel)
-		ff, parseErr := parseFile(path, rel, repoPath)
+		ff, parseErr := parseFile(path, rel, repoPath, inputScope)
 		if parseErr != nil {
 			log.Printf("[asyncapi-extractor] skipping %s: %v", rel, parseErr)
 			return nil
@@ -80,8 +138,9 @@ func (e *Extractor) Extract(ctx context.Context, repoPath string, _ []string) ([
 	return result, err
 }
 
-func parseFile(absPath, relFile, repoPath string) ([]facts.Fact, error) {
-	data, err := os.ReadFile(absPath)
+func parseFile(absPath, relFile, repoPath string, inputScopes ...*inputscope.Scope) ([]facts.Fact, error) {
+	inputScope := inputscope.First(inputScopes)
+	data, err := inputScope.ReadFile(absPath)
 	if err != nil {
 		return nil, err
 	}
@@ -367,8 +426,9 @@ func isCandidate(path string) bool {
 	}
 }
 
-func hasAsyncAPIContent(path string) bool {
-	f, err := os.Open(path)
+func hasAsyncAPIContent(path string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	f, err := inputScope.Open(path)
 	if err != nil {
 		return false
 	}
@@ -379,11 +439,12 @@ func hasAsyncAPIContent(path string) bool {
 	return strings.Contains(content, "asyncapi:") || strings.Contains(content, `"asyncapi"`)
 }
 
-func hasAsyncAPIRoot(path string) bool {
-	if !hasAsyncAPIContent(path) {
+func hasAsyncAPIRootScoped(path string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	if !hasAsyncAPIContent(path, inputScope) {
 		return false
 	}
-	data, err := os.ReadFile(path)
+	data, err := inputScope.ReadFile(path)
 	if err != nil {
 		return false
 	}
@@ -401,3 +462,7 @@ func skipDir(name string) bool {
 		return false
 	}
 }
+
+func NewGraph(scope *inputscope.Scope) *Extractor { return &Extractor{inputScope: scope} }
+
+func hasAsyncAPIRoot(path string) bool { return hasAsyncAPIRootScoped(path) }

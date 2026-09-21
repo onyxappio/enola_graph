@@ -1,0 +1,43 @@
+package bootstrap
+
+import (
+ "context"
+ "testing"
+ "github.com/enola-labs/enola/internal/graphinput"
+ "github.com/enola-labs/enola/internal/graphsession"
+ "github.com/enola-labs/enola/internal/graphstream"
+)
+
+func TestIndependentPolicyAllowedFacts(t *testing.T) {
+ for _, tc := range []struct{name, ext, path, body string}{
+  {"dot_manifest", "manifests", ".app/package.json", `{"dependencies":{"independent-probe":"^1.0.0"}}`},
+  {"override_cache_manifest", "manifests", "node_modules/local/package.json", `{"dependencies":{"independent-probe":"^1.0.0"}}`},
+  {"build_markdown", "mdintent", "build/README.md", "# Independent document\n"},
+ } { t.Run(tc.name,func(t *testing.T){
+  root:=t.TempDir()
+  graphWrite(t,root,"mcp-arch.yaml","extractors: ["+tc.ext+"]\nignore: []\ngraph_inputs:\n  cache_exclusions: []\n")
+  graphWrite(t,root,tc.path,tc.body)
+  eng,err:=NewGraphEngine(GraphOptions{Repo:root}); if err!=nil {t.Fatal(err)}
+  d:=eng.Analysis().GraphScope().Policy.Classify(tc.path,false)
+  if d.Kind!=graphinput.Semantic {t.Fatalf("not allowed: %+v",d)}
+  inv,err:=eng.Analysis().Inventory(root); if err!=nil {t.Fatal(err)}
+  found:=false; for _,p:=range inv.Files {if p==tc.path {found=true}}; if !found {t.Fatal("missing inventory")}
+  res,err:=graphsession.Run(context.Background(),eng.Analysis(),root,&graphstream.MemorySink{},graphsession.Options{StateDir:t.TempDir()}); if err!=nil {t.Fatal(err)}
+  for _,f:=range res.Facts {if f.File==tc.path {return}}
+  t.Fatalf("policy-allowed %s has no facts; detected=%v facts=%v",tc.path,eng.Analysis().DetectExtractors(root,inv.AllNames),res.Facts)
+ }) }
+}
+
+func TestIndependentPolicyLocalIO(t *testing.T) {
+ root:=t.TempDir()
+ graphWrite(t,root,"mcp-arch.yaml","extractors: [python]\nignore: []\n")
+ graphWrite(t,root,"a.py","import requests\ndef leaf():\n    return requests.get('https://example.test')\ndef middle():\n    return leaf()\ndef outer():\n    return middle()\n")
+ eng,err:=NewGraphEngine(GraphOptions{Repo:root}); if err!=nil {t.Fatal(err)}
+ res,err:=graphsession.Run(context.Background(),eng.Analysis(),root,&graphstream.MemorySink{},graphsession.Options{StateDir:t.TempDir()}); if err!=nil {t.Fatal(err)}
+ direct, indirect := 0,0
+ for _, f:=range res.Facts {
+  io,_:=f.Props["io_direct"].(bool); performs,_:=f.Props["performs_io"].(bool)
+  if io {direct++}; if performs && !io {indirect++; t.Errorf("transitive IO materialized: name=%s file=%s props=%v",f.Name,f.File,f.Props)}
+ }
+ if direct==0 {t.Fatal("fixture did not detect direct IO")}; t.Logf("direct=%d indirect=%d",direct,indirect)
+}

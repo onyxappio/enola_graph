@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 	"gopkg.in/yaml.v3"
@@ -129,10 +130,11 @@ type xcodeFile struct {
 // resolved relative to the project root; a missing include is skipped. Returns
 // nil (no error) when the manifest is absent so callers can treat XcodeGen as an
 // optional, additive signal.
-func parseXcodeGenProject(repoPath, projectRel string) (*xcodeProject, error) {
+func parseXcodeGenProject(repoPath, projectRel string, inputScopes ...*inputscope.Scope) (*xcodeProject, error) {
+	inputScope := inputscope.First(inputScopes)
 	projectDir := factpath.Dir(projectRel)
 
-	root, err := readXcodeFile(filepath.Join(repoPath, projectRel))
+	root, err := readXcodeFile(filepath.Join(repoPath, projectRel), inputScope)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil, nil
@@ -153,7 +155,7 @@ func parseXcodeGenProject(repoPath, projectRel string) (*xcodeProject, error) {
 			continue
 		}
 		incRel := path.Join(projectDir, filepath.ToSlash(inc.Path))
-		incFile, err := readXcodeFileCaseInsensitive(repoPath, incRel)
+		incFile, err := readXcodeFileCaseInsensitive(repoPath, incRel, inputScope)
 		if err != nil {
 			continue // a missing/unreadable include must not fail the whole parse
 		}
@@ -178,8 +180,9 @@ func mergeXcodeFile(xp *xcodeProject, f *xcodeFile) {
 	}
 }
 
-func readXcodeFile(absPath string) (*xcodeFile, error) {
-	data, err := os.ReadFile(absPath)
+func readXcodeFile(absPath string, inputScopes ...*inputscope.Scope) (*xcodeFile, error) {
+	inputScope := inputscope.First(inputScopes)
+	data, err := inputScope.ReadFile(absPath)
 	if err != nil {
 		return nil, err
 	}
@@ -193,12 +196,13 @@ func readXcodeFile(absPath string) (*xcodeFile, error) {
 // readXcodeFileCaseInsensitive reads a repo-relative yaml path, retrying with a
 // case-insensitive directory lookup so specs that reference `XCodegen/…` still
 // resolve on case-sensitive filesystems where the directory is `XCodegen`.
-func readXcodeFileCaseInsensitive(repoPath, rel string) (*xcodeFile, error) {
-	if f, err := readXcodeFile(filepath.Join(repoPath, rel)); err == nil {
+func readXcodeFileCaseInsensitive(repoPath, rel string, inputScopes ...*inputscope.Scope) (*xcodeFile, error) {
+	inputScope := inputscope.First(inputScopes)
+	if f, err := readXcodeFile(filepath.Join(repoPath, rel), inputScope); err == nil {
 		return f, nil
 	}
-	if resolved, ok := resolveCaseInsensitive(repoPath, rel); ok {
-		return readXcodeFile(filepath.Join(repoPath, resolved))
+	if resolved, ok := resolveCaseInsensitive(repoPath, rel, inputScope); ok {
+		return readXcodeFile(filepath.Join(repoPath, resolved), inputScope)
 	}
 	return nil, os.ErrNotExist
 }
@@ -206,11 +210,12 @@ func readXcodeFileCaseInsensitive(repoPath, rel string) (*xcodeFile, error) {
 // resolveCaseInsensitive walks rel one segment at a time, matching each segment
 // against directory entries case-insensitively. Returns the actual-cased
 // repo-relative path when every segment resolves.
-func resolveCaseInsensitive(repoPath, rel string) (string, bool) {
+func resolveCaseInsensitive(repoPath, rel string, inputScopes ...*inputscope.Scope) (string, bool) {
+	inputScope := inputscope.First(inputScopes)
 	parts := strings.Split(filepath.ToSlash(rel), "/")
 	cur := ""
 	for _, part := range parts {
-		entries, err := os.ReadDir(filepath.Join(repoPath, cur))
+		entries, err := inputScope.ReadDir(filepath.Join(repoPath, cur))
 		if err != nil {
 			return "", false
 		}

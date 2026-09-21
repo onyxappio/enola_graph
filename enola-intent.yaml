@@ -57,6 +57,7 @@ layers:
     paths:
       - "internal/engine/**"
       - "internal/config/**"
+      - "internal/graphsession/**"
   - name: analysis
     paths:
       - "internal/extractors/**"
@@ -79,6 +80,9 @@ layers:
   - name: core
     paths:
       - "internal/facts/**"
+      - "internal/graphstream/**"
+      - "internal/graphprofile/**"
+      - "internal/graphinput/**"
       # internal/factpath is core, and depends on nothing: it is the fact-path
       # dialect (forward slashes on every host) that internal/facts, every
       # extractor and every explainer build their paths with.

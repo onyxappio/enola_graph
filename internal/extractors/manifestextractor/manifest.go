@@ -25,7 +25,7 @@ package manifestextractor
 
 import (
 	"context"
-	"os"
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -90,16 +90,31 @@ type pkgDep struct {
 }
 
 // Extractor emits one fact per declared direct dependency.
-type Extractor struct{}
+type Extractor struct {
+	inputScope       *inputscope.Scope
+	withoutLockfiles bool
+}
 
-func New() *Extractor             { return &Extractor{} }
+func New() *Extractor { return &Extractor{} }
+
+// NewWithoutLockfiles reads only manifest declarations, without resolving or
+// reporting dependency lockfiles. The option is immutable after construction.
+func NewWithoutLockfiles() *Extractor { return &Extractor{withoutLockfiles: true} }
+
+// ConfigKey prevents reuse of lock-aware contributions in a manifest-only profile.
+func (e *Extractor) ConfigKey() string {
+	if e.withoutLockfiles {
+		return "manifests-without-lockfiles-v1"
+	}
+	return ""
+}
 func (e *Extractor) Name() string { return "manifests" }
 
 // Detect walks for itself, for the one caller with no engine walk to borrow.
 // DetectFiles below is the answer the engine uses; both read the same predicate,
 // so they cannot drift.
 func (e *Extractor) Detect(repoPath string) (bool, error) {
-	return e.DetectFiles(repoPath, detectnames.Walk(repoPath))
+	return e.DetectFiles(repoPath, detectnames.Walk(repoPath, e.inputScope))
 }
 
 // DetectFiles reports whether any walked name is a manifest this extractor
@@ -123,8 +138,15 @@ func (e *Extractor) OwnsFile(relFile string) bool {
 	if manifestReaders[base] != nil {
 		return true
 	}
-	return lockNames[base]
+	return !e.withoutLockfiles && lockNames[base]
 }
+
+// ContentInput implements plugin.DeltaInputs; Extract reads the same manifest
+// and lockfile basenames, including ignored AllNames entries.
+func (e *Extractor) ContentInput(rel string) bool { return e.OwnsFile(rel) }
+
+// NameSetInput implements plugin.DeltaInputs.
+func (e *Extractor) NameSetInput() bool { return false }
 
 // Extract reads every manifest in the repository. It walks rather than taking
 // the engine's file list for the reason DetectFiles states — the ignore globs
@@ -132,8 +154,8 @@ func (e *Extractor) OwnsFile(relFile string) bool {
 // and AsyncAPI extractors already make, for the same reason.
 func (e *Extractor) Extract(ctx context.Context, repoPath string, _ []string) ([]facts.Fact, error) {
 	var deps []pkgDep
-	rc := &readCtx{repoPath: repoPath, locks: map[string]map[string]string{}}
-	names := detectnames.Walk(repoPath)
+	rc := &readCtx{repoPath: repoPath, inputScope: e.inputScope, withoutLockfiles: e.withoutLockfiles, locks: map[string]map[string]string{}}
+	names := detectnames.Walk(repoPath, e.inputScope)
 	sort.Strings(names)
 	for _, rel := range names {
 		select {
@@ -292,7 +314,9 @@ func isExactConstraint(c string) bool {
 // without it a repository with fourteen package.json files would parse the same
 // multi-megabyte yarn.lock fourteen times.
 type readCtx struct {
-	repoPath string
+	inputScope       *inputscope.Scope
+	withoutLockfiles bool
+	repoPath         string
 	// locks is keyed by the lockfile's repo-relative path. A nil value is a
 	// cached miss, which matters as much as a hit: it is what stops an absent
 	// lockfile from being stat'd once per manifest.
@@ -303,7 +327,10 @@ type readCtx struct {
 // read contributes no dependencies, which is the same answer as a repository
 // that does not have one, and neither should fail a snapshot.
 func (rc *readCtx) read(relFile string) string {
-	data, err := os.ReadFile(filepath.Join(rc.repoPath, filepath.FromSlash(relFile)))
+	if rc.withoutLockfiles && lockNames[detectnames.Base(relFile)] {
+		return ""
+	}
+	data, err := rc.inputScope.ReadFile(filepath.Join(rc.repoPath, filepath.FromSlash(relFile)))
 	if err != nil {
 		return ""
 	}
@@ -320,6 +347,9 @@ func (rc *readCtx) read(relFile string) string {
 // of excalidraw's dependencies as unpinned when its root yarn.lock pins all of
 // them — a false answer, not a missing one.
 func (rc *readCtx) lock(relFile, name string, parse func(text string) map[string]string) (map[string]string, string) {
+	if rc.withoutLockfiles {
+		return nil, ""
+	}
 	for dir := factpath.Dir(relFile); ; dir = factpath.Dir(dir) {
 		path := name
 		if dir != "." && dir != "" && dir != "/" {
@@ -348,6 +378,9 @@ func (rc *readCtx) lock(relFile, name string, parse func(text string) map[string
 // exists reports whether a file sits at or above a manifest, without parsing
 // it — the question asked of a lockfile this extractor cannot read.
 func (rc *readCtx) exists(relFile, name string) string {
+	if rc.withoutLockfiles {
+		return ""
+	}
 	for dir := factpath.Dir(relFile); ; dir = factpath.Dir(dir) {
 		path := name
 		if dir != "." && dir != "" && dir != "/" {
@@ -370,4 +403,8 @@ func lines(text string) []string {
 		out = append(out, strings.TrimRight(ln, "\r"))
 	}
 	return out
+}
+
+func NewGraph(scope *inputscope.Scope) *Extractor {
+	return &Extractor{withoutLockfiles: true, inputScope: scope}
 }

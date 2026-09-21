@@ -3,7 +3,8 @@ package phpextractor
 import (
 	"encoding/json"
 	"github.com/enola-labs/enola/internal/factpath"
-	"os"
+
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"path/filepath"
 	"strings"
 )
@@ -23,18 +24,19 @@ const (
 // WordPress is checked first (it has the most specific markers), then Laravel and
 // Symfony via composer dependencies and characteristic files. A repo with no
 // recognized framework is frameworkPlain (symbols/calls/clients only, no routes).
-func detectPHPFramework(repoPath string) phpFramework {
-	if detectWordPress(repoPath) {
+func detectPHPFramework(repoPath string, inputScopes ...*inputscope.Scope) phpFramework {
+	inputScope := inputscope.First(inputScopes)
+	if detectWordPress(repoPath, inputScope) {
 		return frameworkWordPress
 	}
-	req := composerRequires(repoPath)
+	req := composerRequires(repoPath, inputScope)
 	switch {
 	case hasComposerDep(req, "laravel/framework") || hasComposerDep(req, "laravel/lumen-framework") ||
-		fileExists(repoPath, "artisan") ||
-		fileExists(repoPath, "routes/web.php") || fileExists(repoPath, "routes/api.php"):
+		fileExists(repoPath, "artisan", inputScope) ||
+		fileExists(repoPath, "routes/web.php", inputScope) || fileExists(repoPath, "routes/api.php", inputScope):
 		return frameworkLaravel
 	case hasComposerDep(req, "symfony/framework-bundle") || hasComposerDep(req, "symfony/symfony") ||
-		(fileExists(repoPath, "bin/console") && fileExists(repoPath, "config")):
+		(fileExists(repoPath, "bin/console", inputScope) && fileExists(repoPath, "config", inputScope)):
 		return frameworkSymfony
 	}
 	return frameworkPlain
@@ -42,8 +44,9 @@ func detectPHPFramework(repoPath string) phpFramework {
 
 // composerRequires returns the merged require + require-dev map (package -> version
 // constraint) from a repo's composer.json, or an empty map when absent/unparseable.
-func composerRequires(repoPath string) map[string]string {
-	data, err := os.ReadFile(filepath.Join(repoPath, "composer.json"))
+func composerRequires(repoPath string, inputScopes ...*inputscope.Scope) map[string]string {
+	inputScope := inputscope.First(inputScopes)
+	data, err := inputScope.ReadFile(filepath.Join(repoPath, "composer.json"))
 	if err != nil {
 		return nil
 	}
@@ -72,8 +75,9 @@ func hasComposerDep(req map[string]string, pkg string) bool {
 }
 
 // fileExists reports whether rel exists (file or dir) under repoPath.
-func fileExists(repoPath, rel string) bool {
-	_, err := os.Stat(filepath.Join(repoPath, rel))
+func fileExists(repoPath, rel string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	_, err := inputScope.Stat(filepath.Join(repoPath, rel))
 	return err == nil
 }
 

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"io/fs"
 	"log"
 	"os"
@@ -229,6 +230,9 @@ func (e *Engine) Extractors() []plugin.Extractor {
 	return e.eng.Extractors()
 }
 
+// Analysis returns the internal engine for graph-only streaming analysis.
+func (e *Engine) Analysis() *engine.Engine { return e.eng }
+
 // RegisterExplainer adds an explainer to the engine.
 func (e *Engine) RegisterExplainer(exp plugin.Explainer) {
 	e.eng.RegisterExplainer(exp)
@@ -420,28 +424,99 @@ func NewEngineFromConfig(cfg *config.Config) (*Engine, error) {
 	return &Engine{eng: eng}, nil
 }
 
-func registerOSSPlugins(eng *engine.Engine, cfg *config.Config) {
-	// Register all OSS extractors
-	eng.RegisterExtractor(cppextractor.New())
-	eng.RegisterExtractor(asyncapiextractor.New())
-	eng.RegisterExtractor(dotnetextractor.New())
-	eng.RegisterExtractor(goextractor.New())
-	eng.RegisterExtractor(manifestextractor.New())
-	eng.RegisterExtractor(mdintent.New())
-	eng.RegisterExtractor(grpcextractor.New())
-	eng.RegisterExtractor(hclextractor.New())
-	eng.RegisterExtractor(ansibleextractor.New())
-	eng.RegisterExtractor(javaextractor.New())
-	eng.RegisterExtractor(kotlinextractor.New())
-	eng.RegisterExtractor(openapiextractor.New())
-	eng.RegisterExtractor(phpextractor.New())
-	eng.RegisterExtractor(pythonextractor.New())
-	eng.RegisterExtractor(tsextractor.New())
-	eng.RegisterExtractor(swiftextractor.New())
-	eng.RegisterExtractor(rubyextractor.New())
-	eng.RegisterExtractor(rustextractor.New())
-	eng.RegisterExtractor(scalaextractor.New())
-	eng.RegisterExtractor(dartextractor.New())
+func registerOSSPlugins(eng *engine.Engine, cfg *config.Config, scopes ...*inputscope.Scope) {
+	scope := inputscope.First(scopes)
+	// Register all OSS extractors. Detector discovery below is repository bounded.
+	// Complete extraction coverage is separately audited for manifests (including
+	// hidden manifests/ancestor locks inside the root), markdown (inventory-based
+	// links), HCL (owned files), and Python (owned sources/root manifests). TS and
+	// Swift require graphsession's explicit external config/include path coverage.
+	// Other active profiles conservatively require a supplied coverage source.
+	eng.RegisterObservedRepositoryExtractor(cppextractor.New(), true, false)
+	eng.RegisterObservedRepositoryExtractor((func() plugin.Extractor {
+		if scope != nil {
+			return asyncapiextractor.NewGraph(scope)
+		}
+		return asyncapiextractor.New()
+	})(), false, false)
+	eng.RegisterObservedRepositoryExtractor(dotnetextractor.New(), true, false)
+	eng.RegisterObservedRepositoryExtractor(goextractor.New(), true, false)
+	eng.RegisterObservedRepositoryExtractor((func() plugin.Extractor {
+		if scope != nil {
+			return manifestextractor.NewGraph(scope)
+		}
+		return manifestextractor.New()
+	})(), true, true)
+	eng.RegisterObservedRepositoryExtractor((func() plugin.Extractor {
+		if scope != nil {
+			return mdintent.NewGraph(scope)
+		}
+		return mdintent.New()
+	})(), true, true)
+	eng.RegisterObservedRepositoryExtractor((func() plugin.Extractor {
+		if scope != nil {
+			return grpcextractor.NewGraph(scope)
+		}
+		return grpcextractor.New()
+	})(), true, false)
+	eng.RegisterObservedRepositoryExtractor((func() plugin.Extractor {
+		if scope != nil {
+			return hclextractor.NewGraph(scope)
+		}
+		return hclextractor.New()
+	})(), true, true)
+	eng.RegisterObservedRepositoryExtractor(ansibleextractor.New(), true, false)
+	eng.RegisterObservedRepositoryExtractor(javaextractor.New(), true, false)
+	eng.RegisterObservedRepositoryExtractor((func() plugin.Extractor {
+		if scope != nil {
+			return kotlinextractor.NewGraph(scope)
+		}
+		return kotlinextractor.New()
+	})(), true, false)
+	eng.RegisterObservedRepositoryExtractor((func() plugin.Extractor {
+		if scope != nil {
+			return openapiextractor.NewGraph(scope)
+		}
+		return openapiextractor.New()
+	})(), false, false)
+	eng.RegisterObservedRepositoryExtractor((func() plugin.Extractor {
+		if scope != nil {
+			return phpextractor.NewGraph(scope)
+		}
+		return phpextractor.New()
+	})(), true, false)
+	eng.RegisterObservedRepositoryExtractor((func() plugin.Extractor {
+		if scope != nil {
+			return pythonextractor.NewGraph(scope)
+		}
+		return pythonextractor.New()
+	})(), true, true)
+	eng.RegisterIndependentExtractor((func() plugin.Extractor {
+		if scope != nil {
+			return tsextractor.NewGraph(scope)
+		}
+		return tsextractor.New()
+	})())
+	eng.RegisterObservedRepositoryExtractor((func() plugin.Extractor {
+		if scope != nil {
+			return swiftextractor.NewGraph(scope)
+		}
+		return swiftextractor.New()
+	})(), false, false)
+	eng.RegisterObservedRepositoryExtractor((func() plugin.Extractor {
+		if scope != nil {
+			return rubyextractor.NewGraph(scope)
+		}
+		return rubyextractor.New()
+	})(), true, false)
+	eng.RegisterObservedRepositoryExtractor(rustextractor.New(), true, false)
+	eng.RegisterObservedRepositoryExtractor((func() plugin.Extractor {
+		if scope != nil {
+			return scalaextractor.NewGraph(scope)
+		}
+		return scalaextractor.New()
+	})(), true, false)
+	eng.RegisterObservedRepositoryExtractor(dartextractor.New(), true, false)
 
 	// Resolve the linking vocabulary once and hand it to everything that matches under
 	// it, so the signals and the unmatched-route binder cannot disagree about what

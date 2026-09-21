@@ -3,12 +3,13 @@ package pythonextractor
 import (
 	"context"
 	"log"
-	"os"
+
 	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/enola-labs/enola/internal/extractors/detectnames"
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 	"github.com/enola-labs/enola/internal/parallel"
@@ -16,7 +17,7 @@ import (
 
 // PythonExtractor extracts architectural facts from Python source code using
 // line-based regex parsing with indentation-based scope tracking.
-type PythonExtractor struct{}
+type PythonExtractor struct{ inputScope *inputscope.Scope }
 
 // New creates a new PythonExtractor.
 func New() *PythonExtractor {
@@ -31,7 +32,7 @@ func (e *PythonExtractor) Name() string {
 // It checks root-level markers first, then walks up to 3 subdirectory levels
 // to support monorepos where Python code lives in a subdirectory (e.g. python/).
 func (e *PythonExtractor) Detect(repoPath string) (bool, error) {
-	return e.DetectFiles(repoPath, detectnames.Walk(repoPath))
+	return e.DetectFiles(repoPath, detectnames.Walk(repoPath, e.inputScope))
 }
 
 // pyMarkers are the manifests that name a Python project wherever they appear.
@@ -71,9 +72,10 @@ func (e *PythonExtractor) DetectFiles(_ string, files []string) (bool, error) {
 // regardless of how the work was scheduled. Python parsing dominates snapshot
 // time on large polyglot repos, so this is the main throughput lever.
 func (e *PythonExtractor) Extract(ctx context.Context, repoPath string, files []string) ([]facts.Fact, error) {
-	isDjango := detectDjango(repoPath)
-	isFlask := detectFlask(repoPath)
-	isFastAPI := detectFastAPI(repoPath)
+	inputScope := e.inputScope
+	isDjango := detectDjango(repoPath, inputScope)
+	isFlask := detectFlask(repoPath, inputScope)
+	isFastAPI := detectFastAPI(repoPath, inputScope)
 
 	// Restrict to Python files once; both passes iterate the same ordered set.
 	var pyFiles []string
@@ -88,7 +90,7 @@ func (e *PythonExtractor) Extract(ctx context.Context, repoPath string, files []
 	// order so duplicate-module last-write-wins stays deterministic.
 	idx := &pySymbolIndex{classes: make(map[string]*pyClassInfo), moduleDefs: make(map[string]map[string]bool)}
 	localIdxs := parallel.MapFiles(ctx, pyFiles, func(relFile string) *pySymbolIndex {
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			return nil
 		}
@@ -116,7 +118,7 @@ func (e *PythonExtractor) Extract(ctx context.Context, repoPath string, files []
 		topo pyRouterTopology
 	}
 	perFileFacts := parallel.MapFiles(ctx, pyFiles, func(relFile string) pyFileResult {
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			log.Printf("[python-extractor] error reading %s: %v", relFile, err)
 			return pyFileResult{}
@@ -168,7 +170,7 @@ func (e *PythonExtractor) Extract(ctx context.Context, repoPath string, files []
 	// reference edges, so functions registered as entry points — loaded by name by
 	// the framework, never called in-code — are not mis-reported as dead. Emitted
 	// before resolveCallTargets so their dotted targets resolve to slash symbols.
-	allFacts = append(allFacts, extractEntryPoints(repoPath, files)...)
+	allFacts = append(allFacts, extractEntryPoints(repoPath, files, inputScope)...)
 
 	// Resolve the dotted call/instantiate targets emitted for absolute imports into
 	// canonical slash symbol names (dropping stdlib/third-party edges) now that the
@@ -353,13 +355,14 @@ var (
 // referenced module.attr targets (colon rewritten to dot). Entry-point functions are
 // loaded by name by the framework, so without these edges they read as dead code.
 // The dotted targets are resolved to slash symbols by resolveCallTargets.
-func extractEntryPoints(repoPath string, files []string) []facts.Fact {
+func extractEntryPoints(repoPath string, files []string, inputScopes ...*inputscope.Scope) []facts.Fact {
+	inputScope := inputscope.First(inputScopes)
 	var out []facts.Fact
 	for _, rel := range files {
 		if filepath.Base(rel) != "pyproject.toml" {
 			continue
 		}
-		data, err := os.ReadFile(filepath.Join(repoPath, rel))
+		data, err := inputScope.ReadFile(filepath.Join(repoPath, rel))
 		if err != nil {
 			continue
 		}
@@ -513,9 +516,10 @@ func applyDecoratorProps(props map[string]any, decoratorName string, importsModa
 
 // detectDjango returns true if the project at repoPath uses Django, by scanning
 // common dependency files and checking for manage.py.
-func detectDjango(repoPath string) bool {
+func detectDjango(repoPath string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
 	for _, name := range []string{"requirements.txt", "pyproject.toml", "setup.cfg", "setup.py"} {
-		data, err := os.ReadFile(filepath.Join(repoPath, name))
+		data, err := inputScope.ReadFile(filepath.Join(repoPath, name))
 		if err != nil {
 			continue
 		}
@@ -523,16 +527,17 @@ func detectDjango(repoPath string) bool {
 			return true
 		}
 	}
-	_, err := os.Stat(filepath.Join(repoPath, "manage.py"))
+	_, err := inputScope.Stat(filepath.Join(repoPath, "manage.py"))
 	return err == nil
 }
 
 // detectDependencyToken reports whether any of the project's dependency manifests
 // mentions token (case-insensitive). Shared by the Flask/FastAPI detectors, which
 // disambiguate the framework prop of verb-shorthand routes (@app.get).
-func detectDependencyToken(repoPath, token string) bool {
+func detectDependencyToken(repoPath, token string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
 	for _, name := range []string{"requirements.txt", "pyproject.toml", "setup.cfg", "setup.py"} {
-		data, err := os.ReadFile(filepath.Join(repoPath, name))
+		data, err := inputScope.ReadFile(filepath.Join(repoPath, name))
 		if err != nil {
 			continue
 		}
@@ -544,10 +549,16 @@ func detectDependencyToken(repoPath, token string) bool {
 }
 
 // detectFlask returns true if the project at repoPath depends on Flask.
-func detectFlask(repoPath string) bool { return detectDependencyToken(repoPath, "flask") }
+func detectFlask(repoPath string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	return detectDependencyToken(repoPath, "flask", inputScope)
+}
 
 // detectFastAPI returns true if the project at repoPath depends on FastAPI.
-func detectFastAPI(repoPath string) bool { return detectDependencyToken(repoPath, "fastapi") }
+func detectFastAPI(repoPath string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	return detectDependencyToken(repoPath, "fastapi", inputScope)
+}
 
 // camelToSnake converts a PascalCase class name to the snake_case table name
 // Django would auto-generate. e.g. "UserProfile" → "user_profile".
@@ -583,3 +594,23 @@ func isPythonFile(path string) bool {
 
 // OwnsFile implements plugin.FileOwner for incremental caching.
 func (e *PythonExtractor) OwnsFile(relFile string) bool { return isPythonFile(relFile) }
+
+// ContentInput implements plugin.DeltaInputs: Python sources plus the manifests
+// detectDjango/detectFlask/detectFastAPI read at extract time.
+func (e *PythonExtractor) ContentInput(rel string) bool {
+	if isPythonFile(rel) {
+		return true
+	}
+	switch filepath.Base(rel) {
+	case "requirements.txt", "pyproject.toml", "setup.cfg", "setup.py", "Pipfile", "pytest.ini", "mypy.ini", "tox.ini":
+		return true
+	default:
+		return false
+	}
+}
+
+// NameSetInput implements plugin.DeltaInputs.
+func (e *PythonExtractor) NameSetInput() bool { return false }
+
+// NewGraph binds an immutable graph input snapshot; New retains legacy behavior.
+func NewGraph(scope *inputscope.Scope) *PythonExtractor { return &PythonExtractor{inputScope: scope} }

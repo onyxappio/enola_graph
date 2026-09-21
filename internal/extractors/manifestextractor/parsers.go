@@ -10,6 +10,11 @@ import (
 // describes a transitive closure this extractor has already decided not to
 // carry.
 var lockNames = map[string]bool{
+	"uv.lock":           true,
+	"poetry.lock":       true,
+	"Pipfile.lock":      true,
+	"bun.lockb":         true,
+	"pnpm-lock.yaml":    true,
 	"package-lock.json": true,
 	"yarn.lock":         true,
 	"Gemfile.lock":      true,

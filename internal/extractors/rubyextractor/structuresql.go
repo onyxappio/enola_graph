@@ -1,12 +1,12 @@
 package rubyextractor
 
 import (
-	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/facts"
 )
 
@@ -41,8 +41,9 @@ type parsedTable struct {
 
 // applyStructureSQL parses db/structure.sql when present and returns storage
 // facts for the tables it declares.
-func applyStructureSQL(repoPath string, allFacts []facts.Fact) []facts.Fact {
-	data, err := os.ReadFile(filepath.Join(repoPath, filepath.FromSlash(structureSQLPath)))
+func applyStructureSQL(repoPath string, allFacts []facts.Fact, inputScopes ...*inputscope.Scope) []facts.Fact {
+	inputScope := inputscope.First(inputScopes)
+	data, err := inputScope.ReadFile(filepath.Join(repoPath, filepath.FromSlash(structureSQLPath)))
 	if err != nil {
 		return nil
 	}

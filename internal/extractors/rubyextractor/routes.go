@@ -2,13 +2,14 @@ package rubyextractor
 
 import (
 	"log"
-	"os"
+
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
 
 	"github.com/enola-labs/enola/internal/extractors/extcoverage"
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 	sitter "github.com/tree-sitter/go-tree-sitter"
@@ -32,14 +33,15 @@ import (
 // and mounts; then the files those name, seeded with the prefix they were named under;
 // then anything left over at the root prefix, so a route file that is genuinely loaded
 // by a mechanism not modelled here still contributes its routes rather than vanishing.
-func extractAllRoutes(repoPath string, files []string) []facts.Fact {
+func extractAllRoutes(repoPath string, files []string, inputScopes ...*inputscope.Scope) []facts.Fact {
+	inputScope := inputscope.First(inputScopes)
 	idx := indexRouteFiles(files)
 	if len(idx.all) == 0 {
 		return nil
 	}
 
 	readSrc := func(relFile string) ([]byte, bool) {
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			log.Printf("[ruby-extractor] error reading route file %s: %v", relFile, err)
 			return nil, false
@@ -52,7 +54,7 @@ func extractAllRoutes(repoPath string, files []string) []facts.Fact {
 	// before any handler is emitted. That is the only reason this walk reads the
 	// route files twice.
 	jsonapi := jsonapiContext{}
-	jsonapi.format, jsonapi.refusalCause = jsonapiRouteFormat(repoPath, files)
+	jsonapi.format, jsonapi.refusalCause = jsonapiRouteFormat(repoPath, files, inputScope)
 	jsonapi.resolver = newJsonapiResolver(repoPath, files)
 	for _, relFile := range idx.all {
 		if src, ok := readSrc(relFile); ok {
@@ -111,7 +113,7 @@ func extractAllRoutes(repoPath string, files []string) []facts.Fact {
 
 	// Pass 3: mounted engines. Resolve each mount's constant to the directory whose
 	// config/routes.rb it owns, and parse that file under the mount path.
-	constants := engineConstants(repoPath, idx, files)
+	constants := engineConstants(repoPath, idx, files, inputScope)
 	for _, m := range pendingMounts {
 		dir, ok := constants[normalizeConstant(m.constant)]
 		if !ok {
@@ -512,12 +514,13 @@ type jsonapiContext struct {
 // gets jsonapiRouteUnknown, on which the declarations are counted rather than
 // expanded — the segment is unknowable without running the formatter, and a
 // plausible-looking wrong path is worse than a counted miss.
-func jsonapiRouteFormat(repoPath string, files []string) (string, string) {
+func jsonapiRouteFormat(repoPath string, files []string, inputScopes ...*inputscope.Scope) (string, string) {
+	inputScope := inputscope.First(inputScopes)
 	for _, relFile := range files {
 		if factpath.Dir(relFile) != "config/initializers" || !isRubyFile(relFile) {
 			continue
 		}
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			continue
 		}

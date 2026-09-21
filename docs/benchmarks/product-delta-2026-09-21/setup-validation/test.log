@@ -1,0 +1,135 @@
+# github.com/enola-labs/enola/docs/benchmarks/product-delta-2026-09-21 [github.com/enola-labs/enola/docs/benchmarks/product-delta-2026-09-21.test]
+docs/benchmarks/product-delta-2026-09-21/final_removal_probe_test.go:23:8: undefined: setupTSRepo
+docs/benchmarks/product-delta-2026-09-21/final_removal_probe_test.go:23:38: undefined: independentEngine
+docs/benchmarks/product-delta-2026-09-21/final_removal_probe_test.go:23:104: undefined: NewConsumer
+docs/benchmarks/product-delta-2026-09-21/final_removal_probe_test.go:24:2: undefined: independentRun
+docs/benchmarks/product-delta-2026-09-21/final_removal_probe_test.go:26:2: undefined: independentRun
+docs/benchmarks/product-delta-2026-09-21/final_removal_probe_test.go:27:8: undefined: NewConsumer
+docs/benchmarks/product-delta-2026-09-21/final_removal_probe_test.go:27:23: undefined: independentRun
+docs/benchmarks/product-delta-2026-09-21/final_removal_probe_test.go:27:63: undefined: assertAppliedEqualsCold
+docs/benchmarks/product-delta-2026-09-21/final_removal_probe_test.go:28:2: undefined: independentRun
+docs/benchmarks/product-delta-2026-09-21/final_removal_probe_test.go:28:46: undefined: assertAppliedEqualsCold
+docs/benchmarks/product-delta-2026-09-21/final_removal_probe_test.go:28:46: too many errors
+ok  	github.com/enola-labs/enola/cmd/enola	7.123s
+FAIL	github.com/enola-labs/enola/docs/benchmarks/product-delta-2026-09-21 [build failed]
+ok  	github.com/enola-labs/enola/internal/cachecov	0.972s
+ok  	github.com/enola-labs/enola/internal/clientspec	1.152s
+ok  	github.com/enola-labs/enola/internal/config	1.473s
+ok  	github.com/enola-labs/enola/internal/conformance	1.733s
+ok  	github.com/enola-labs/enola/internal/diff	2.082s
+ok  	github.com/enola-labs/enola/internal/docslint	2.550s
+?   	github.com/enola-labs/enola/internal/drift	[no test files]
+ok  	github.com/enola-labs/enola/internal/engine	47.035s
+ok  	github.com/enola-labs/enola/internal/eslintscaffold	3.137s
+ok  	github.com/enola-labs/enola/internal/estateref	3.278s
+ok  	github.com/enola-labs/enola/internal/explainers	2.850s
+ok  	github.com/enola-labs/enola/internal/explainers/common	2.911s
+ok  	github.com/enola-labs/enola/internal/explainers/complexity	2.851s
+ok  	github.com/enola-labs/enola/internal/explainers/constraints	2.993s
+ok  	github.com/enola-labs/enola/internal/explainers/coverage	2.798s
+ok  	github.com/enola-labs/enola/internal/explainers/crossrepo	2.498s
+ok  	github.com/enola-labs/enola/internal/explainers/cycles	2.221s
+ok  	github.com/enola-labs/enola/internal/explainers/deadmethods	2.959s
+ok  	github.com/enola-labs/enola/internal/explainers/depth	2.985s
+ok  	github.com/enola-labs/enola/internal/explainers/domain	2.985s
+ok  	github.com/enola-labs/enola/internal/explainers/entrypoints	2.985s
+ok  	github.com/enola-labs/enola/internal/explainers/godclass	2.863s
+ok  	github.com/enola-labs/enola/internal/explainers/hotspots	2.947s
+ok  	github.com/enola-labs/enola/internal/explainers/importclosure	2.957s
+ok  	github.com/enola-labs/enola/internal/explainers/intentcheck	2.963s
+ok  	github.com/enola-labs/enola/internal/explainers/layers	2.210s
+ok  	github.com/enola-labs/enola/internal/explainers/messagingcoverage	2.571s
+ok  	github.com/enola-labs/enola/internal/explainers/queryloops	2.539s
+ok  	github.com/enola-labs/enola/internal/explainers/surface	2.855s
+ok  	github.com/enola-labs/enola/internal/explainers/unusedroutes	2.881s
+ok  	github.com/enola-labs/enola/internal/explainers/vendoredcandidates	2.861s
+ok  	github.com/enola-labs/enola/internal/extractors	2.862s
+ok  	github.com/enola-labs/enola/internal/extractors/ansibleextractor	2.865s
+ok  	github.com/enola-labs/enola/internal/extractors/asyncapiextractor	2.901s
+ok  	github.com/enola-labs/enola/internal/extractors/cppextractor	2.991s
+ok  	github.com/enola-labs/enola/internal/extractors/dartextractor	2.546s
+?   	github.com/enola-labs/enola/internal/extractors/dartextractor/grammar	[no test files]
+?   	github.com/enola-labs/enola/internal/extractors/detectnames	[no test files]
+ok  	github.com/enola-labs/enola/internal/extractors/dotnetextractor	2.665s
+?   	github.com/enola-labs/enola/internal/extractors/extcoverage	[no test files]
+ok  	github.com/enola-labs/enola/internal/extractors/goextractor	2.686s
+ok  	github.com/enola-labs/enola/internal/extractors/grpcextractor	2.568s
+ok  	github.com/enola-labs/enola/internal/extractors/hclextractor	2.564s
+ok  	github.com/enola-labs/enola/internal/extractors/javaextractor	2.625s
+ok  	github.com/enola-labs/enola/internal/extractors/jvmsrc	2.568s
+ok  	github.com/enola-labs/enola/internal/extractors/kotlinextractor	2.558s
+ok  	github.com/enola-labs/enola/internal/extractors/manifestextractor	2.457s
+ok  	github.com/enola-labs/enola/internal/extractors/mdintent	2.551s
+ok  	github.com/enola-labs/enola/internal/extractors/openapiextractor	2.460s
+ok  	github.com/enola-labs/enola/internal/extractors/phpextractor	2.397s
+ok  	github.com/enola-labs/enola/internal/extractors/pythonextractor	2.614s
+ok  	github.com/enola-labs/enola/internal/extractors/rubyextractor	2.625s
+ok  	github.com/enola-labs/enola/internal/extractors/rustextractor	2.511s
+ok  	github.com/enola-labs/enola/internal/extractors/scalaextractor	2.604s
+ok  	github.com/enola-labs/enola/internal/extractors/swiftextractor	2.654s
+?   	github.com/enola-labs/enola/internal/extractors/swiftextractor/grammar	[no test files]
+ok  	github.com/enola-labs/enola/internal/extractors/tsextractor	8.897s
+?   	github.com/enola-labs/enola/internal/extractors/tsutil	[no test files]
+ok  	github.com/enola-labs/enola/internal/factpath	2.844s
+ok  	github.com/enola-labs/enola/internal/facts	5.229s
+ok  	github.com/enola-labs/enola/internal/filelock	2.828s
+ok  	github.com/enola-labs/enola/internal/gqlscan	2.709s
+?   	github.com/enola-labs/enola/internal/graphprofile	[no test files]
+ok  	github.com/enola-labs/enola/internal/graphsession	70.543s
+ok  	github.com/enola-labs/enola/internal/graphstream	28.129s
+ok  	github.com/enola-labs/enola/internal/history	6.995s
+ok  	github.com/enola-labs/enola/internal/hookstate	3.046s
+ok  	github.com/enola-labs/enola/internal/intent	3.697s
+ok  	github.com/enola-labs/enola/internal/linkers/binders	2.375s
+ok  	github.com/enola-labs/enola/internal/linkers/binders/clientseam	2.376s
+ok  	github.com/enola-labs/enola/internal/linkers/binders/emberresolver	1.099s
+ok  	github.com/enola-labs/enola/internal/linkers/binders/frameworkroots	1.266s
+ok  	github.com/enola-labs/enola/internal/linkers/binders/grpcclientfqn	1.308s
+ok  	github.com/enola-labs/enola/internal/linkers/binders/grpcimpl	1.306s
+ok  	github.com/enola-labs/enola/internal/linkers/binders/httphandler	1.335s
+ok  	github.com/enola-labs/enola/internal/linkers/binders/messagingcontract	1.395s
+ok  	github.com/enola-labs/enola/internal/linkers/binders/mixinowner	1.621s
+ok  	github.com/enola-labs/enola/internal/linkers/binders/moduleedges	1.627s
+ok  	github.com/enola-labs/enola/internal/linkers/binders/stimulusresolver	1.646s
+ok  	github.com/enola-labs/enola/internal/linkers/binders/unmatchedroutes	1.605s
+ok  	github.com/enola-labs/enola/internal/linkers/binders/vendoredspecs	1.600s
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo	1.610s
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/routeindex	1.618s
+?   	github.com/enola-labs/enola/internal/linkers/crossrepo/signals	[no test files]
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/graphqlsig	1.824s
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/http	1.954s
+?   	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/imports	[no test files]
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/kafka	2.143s
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/sharedcode	2.112s
+ok  	github.com/enola-labs/enola/internal/linkers/vocab	2.095s
+ok  	github.com/enola-labs/enola/internal/litfold	2.107s
+ok  	github.com/enola-labs/enola/internal/metrics	1.902s
+ok  	github.com/enola-labs/enola/internal/mining	2.200s
+ok  	github.com/enola-labs/enola/internal/orphans	2.030s
+ok  	github.com/enola-labs/enola/internal/parallel	2.251s
+ok  	github.com/enola-labs/enola/internal/perf	2.011s
+ok  	github.com/enola-labs/enola/internal/providers	22.468s
+ok  	github.com/enola-labs/enola/internal/providers/rubydex	1.834s
+ok  	github.com/enola-labs/enola/internal/renderers	1.811s
+ok  	github.com/enola-labs/enola/internal/renderers/llmcontext	1.830s
+ok  	github.com/enola-labs/enola/internal/server	9.450s
+ok  	github.com/enola-labs/enola/internal/updatecheck	1.489s
+ok  	github.com/enola-labs/enola/internal/upgrade	1.279s
+?   	github.com/enola-labs/enola/internal/version	[no test files]
+ok  	github.com/enola-labs/enola/internal/workspace	1.695s
+ok  	github.com/enola-labs/enola/pkg/bootstrap	3.447s
+ok  	github.com/enola-labs/enola/pkg/check	5.643s
+ok  	github.com/enola-labs/enola/pkg/cli	1.599s
+ok  	github.com/enola-labs/enola/pkg/command	9.115s
+ok  	github.com/enola-labs/enola/pkg/coverage	2.329s
+ok  	github.com/enola-labs/enola/pkg/dashboard	1.971s
+?   	github.com/enola-labs/enola/pkg/diff	[no test files]
+ok  	github.com/enola-labs/enola/pkg/explain	1.838s
+?   	github.com/enola-labs/enola/pkg/facts	[no test files]
+ok  	github.com/enola-labs/enola/pkg/history	1.708s
+ok  	github.com/enola-labs/enola/pkg/install	3.428s
+ok  	github.com/enola-labs/enola/pkg/mcputil	1.767s
+ok  	github.com/enola-labs/enola/pkg/plan	2.039s
+?   	github.com/enola-labs/enola/pkg/plugin	[no test files]
+ok  	github.com/enola-labs/enola/pkg/status	3.233s
+FAIL

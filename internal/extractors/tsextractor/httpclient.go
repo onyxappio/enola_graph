@@ -207,6 +207,94 @@ func optionsObjectAfter(src []byte, pos int) []byte {
 // scan run over a whole file.
 const objectScanCap = 4096
 
+var (
+	tokFetch        = []byte("fetch")
+	tokMakeRequest  = []byte("makeRequest")
+	tokDotGET       = []byte(".GET")
+	tokDotPOST      = []byte(".POST")
+	tokDotPUT       = []byte(".PUT")
+	tokDotDELETE    = []byte(".DELETE")
+	tokDotPATCH     = []byte(".PATCH")
+	tokDotGet       = []byte(".get")
+	tokDotPost      = []byte(".post")
+	tokDotPut       = []byte(".put")
+	tokDotDelete    = []byte(".delete")
+	tokDotPatch     = []byte(".patch")
+	tokInterp       = []byte("${")
+	tokURL          = []byte("url")
+	tokDoubleSlashQ = []byte(`"/`)
+	tokSingleSlashQ = []byte(`'/`)
+	tokTickSlashQ   = []byte("`/")
+)
+
+func possibleHTTPClientSignal(src []byte) (hasFetch, hasUpper, hasLower, hasURL bool) {
+	hasFetch = hasRegexpWordToken(src, tokFetch) || hasRegexpWordToken(src, tokMakeRequest)
+	hasUpper = containsAny(src, tokDotGET, tokDotPOST, tokDotPUT, tokDotDELETE, tokDotPATCH)
+	if containsAny(src, tokDotGet, tokDotPost, tokDotPut, tokDotDelete, tokDotPatch) &&
+		(containsAny(src, tokDoubleSlashQ, tokSingleSlashQ, tokTickSlashQ) || bytes.Contains(src, tokInterp)) {
+		hasLower = true
+	}
+	hasURL = hasURLPropertySignal(src)
+	return
+}
+
+// hasRegexpWordToken is the necessary condition for `(?:^|[^\w])ident` — `$fetch`
+// matches (Go `\w` does not include `$`) while `prefetch`/`refetch` do not.
+func hasRegexpWordToken(src, ident []byte) bool {
+	for i := 0; i < len(src); {
+		j := bytes.Index(src[i:], ident)
+		if j < 0 {
+			return false
+		}
+		at := i + j
+		if at > 0 && isRegexpWordByte(src[at-1]) {
+			i = at + len(ident)
+			continue
+		}
+		end := at + len(ident)
+		if end < len(src) && isRegexpWordByte(src[end]) {
+			i = at + len(ident)
+			continue
+		}
+		return true
+	}
+	return false
+}
+
+func isRegexpWordByte(c byte) bool {
+	return c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
+}
+
+// hasURLPropertySignal is the necessary condition for `\burl\s*:`. Go `\b`
+// uses ASCII `\w` (`[A-Za-z0-9_]`), so `$url:` matches (`$` is not `\w`) while
+// `_url:` / `myurl:` do not.
+func hasURLPropertySignal(src []byte) bool {
+	for i := 0; i < len(src); {
+		j := bytes.Index(src[i:], tokURL)
+		if j < 0 {
+			return false
+		}
+		at := i + j
+		if at > 0 && isRegexpWordByte(src[at-1]) {
+			i = at + 3
+			continue
+		}
+		k := at + 3
+		if k < len(src) && isRegexpWordByte(src[k]) {
+			i = at + 3
+			continue
+		}
+		for k < len(src) && isASCIISpace(src[k]) {
+			k++
+		}
+		if k < len(src) && src[k] == ':' {
+			return true
+		}
+		i = at + 3
+	}
+	return false
+}
+
 // extractHTTPClientFacts emits a client-route fact for every hand-written HTTP
 // call to the backend, recognizing three shapes: (1) positional fetch()/
 // makeRequest() calls, (2) verb-named generated-client calls (.GET(/.POST(/…), and
@@ -215,23 +303,33 @@ const objectScanCap = 4096
 // suffix); the cross-repo linker's normalization reconciles prefixes and format
 // suffixes.
 func extractHTTPClientFacts(src []byte, relFile string) []facts.Fact {
+	hasFetch, hasUpper, hasLower, hasURL := possibleHTTPClientSignal(src)
+	if !hasFetch && !hasUpper && !hasLower && !hasURL {
+		return nil
+	}
+
 	dir := factpath.Dir(relFile)
 	api := tsAPIHint(relFile)
-	bases := fileBaseLiterals(src)
+	var bases map[string]string
+	if bytes.Contains(src, tokInterp) {
+		bases = fileBaseLiterals(src)
+	}
 
 	folds := litfold.NewAssignments()
-	declared := map[int]bool{}
-	for _, m := range urlAssignDecl.FindAllSubmatchIndex(src, -1) {
-		folds.Add(string(src[m[2]:m[3]]), firstNonEmptyGroup(src, m, 2, 3, 4))
-		declared[m[2]] = true
-	}
-	for _, m := range bareAssign.FindAllSubmatchIndex(src, -1) {
-		name := string(src[m[2]:m[3]])
-		if declared[m[2]] || name == "const" || name == "let" || name == "var" ||
-			name == "return" || name == "typeof" || name == "await" {
-			continue
+	if hasFetch || hasURL {
+		declared := map[int]bool{}
+		for _, m := range urlAssignDecl.FindAllSubmatchIndex(src, -1) {
+			folds.Add(string(src[m[2]:m[3]]), firstNonEmptyGroup(src, m, 2, 3, 4))
+			declared[m[2]] = true
 		}
-		folds.Add(name, "")
+		for _, m := range bareAssign.FindAllSubmatchIndex(src, -1) {
+			name := string(src[m[2]:m[3]])
+			if declared[m[2]] || name == "const" || name == "let" || name == "var" ||
+				name == "return" || name == "typeof" || name == "await" {
+				continue
+			}
+			folds.Add(name, "")
+		}
 	}
 
 	var out []facts.Fact
@@ -290,41 +388,45 @@ func extractHTTPClientFacts(src []byte, relFile string) []facts.Fact {
 	// Group 1 is the verb, so the URL literal is in groups 2-4 and the reported
 	// offset is the verb start (m[2]) — not m[0], which now includes the leading
 	// word-boundary char and would mis-count the line when that char is a newline.
-	for _, m := range httpClientCall.FindAllSubmatchIndex(src, -1) {
-		raw := firstNonEmptyGroup(src, m, 2, 3, 4)
-		method := "GET"
-		if opts := optionsObjectAfter(src, m[1]); opts != nil {
-			if mm := httpClientMethod.FindSubmatch(opts); mm != nil {
-				method = strings.ToUpper(string(mm[1]))
+	if hasFetch {
+		for _, m := range httpClientCall.FindAllSubmatchIndex(src, -1) {
+			raw := firstNonEmptyGroup(src, m, 2, 3, 4)
+			method := "GET"
+			if opts := optionsObjectAfter(src, m[1]); opts != nil {
+				if mm := httpClientMethod.FindSubmatch(opts); mm != nil {
+					method = strings.ToUpper(string(mm[1]))
+				}
 			}
+			add(raw, method, "fetch", m[2], "")
 		}
-		add(raw, method, "fetch", m[2], "")
-	}
 
-	// Pass 1b — positional fetch()/makeRequest() whose argument is a bare
-	// identifier assigned a literal exactly once in this file (litfold's
-	// single-assignment rule). The resolved literal flows through cleanTSPath
-	// exactly as an inline argument would, so `const url = ` + "`${config.HOST}/mcp`" + `;
-	// fetch(url)` models identically to the inline form.
-	for _, m := range identArgCall.FindAllSubmatchIndex(src, -1) {
-		raw, ok := folds.Resolve(string(src[m[4]:m[5]]))
-		if !ok {
-			continue
-		}
-		method := "GET"
-		if opts := optionsObjectAfter(src, m[5]); opts != nil {
-			if mm := httpClientMethod.FindSubmatch(opts); mm != nil {
-				method = strings.ToUpper(string(mm[1]))
+		// Pass 1b — positional fetch()/makeRequest() whose argument is a bare
+		// identifier assigned a literal exactly once in this file (litfold's
+		// single-assignment rule). The resolved literal flows through cleanTSPath
+		// exactly as an inline argument would, so `const url = ` + "`${config.HOST}/mcp`" + `;
+		// fetch(url)` models identically to the inline form.
+		for _, m := range identArgCall.FindAllSubmatchIndex(src, -1) {
+			raw, ok := folds.Resolve(string(src[m[4]:m[5]]))
+			if !ok {
+				continue
 			}
+			method := "GET"
+			if opts := optionsObjectAfter(src, m[5]); opts != nil {
+				if mm := httpClientMethod.FindSubmatch(opts); mm != nil {
+					method = strings.ToUpper(string(mm[1]))
+				}
+			}
+			add(raw, method, "fetch", m[2], "single-assignment")
 		}
-		add(raw, method, "fetch", m[2], "single-assignment")
 	}
 
 	// Pass 2 — verb-named generated-client calls; the method is the call name.
-	for _, m := range verbNamedCall.FindAllSubmatchIndex(src, -1) {
-		method := strings.ToUpper(string(src[m[2]:m[3]]))
-		raw := firstNonEmptyGroup(src, m, 2, 3, 4)
-		add(raw, method, "openapi-fetch", m[0], "")
+	if hasUpper {
+		for _, m := range verbNamedCall.FindAllSubmatchIndex(src, -1) {
+			method := strings.ToUpper(string(src[m[2]:m[3]]))
+			raw := firstNonEmptyGroup(src, m, 2, 3, 4)
+			add(raw, method, "openapi-fetch", m[0], "")
+		}
 	}
 
 	// Pass 2b — lowercase verb-named calls (axios.get('/x'), http.post('/x')). The
@@ -337,88 +439,96 @@ func extractHTTPClientFacts(src []byte, relFile string) []facts.Fact {
 	// extractServerRouteFacts owns those, so skip them here or the call site would be
 	// emitted twice, once in each direction. Only known server receivers are skipped:
 	// an unknown one stays a client call, exactly as before this pass existed.
-	serverRecv := serverBindings(src)
-	for _, m := range lowerVerbCall.FindAllSubmatchIndex(src, -1) {
-		if isServerReceiver(serverRecv, identifierEndingAt(src, m[0])) {
-			continue
-		}
-		method := strings.ToUpper(string(src[m[2]:m[3]]))
-		raw := firstNonEmptyGroup(src, m, 2, 3, 4)
-		add(raw, method, "axios", m[0], "")
-	}
+	if hasLower {
+		lower := lowerVerbCall.FindAllSubmatchIndex(src, -1)
+		tmpl := lowerVerbTemplateCall.FindAllSubmatchIndex(src, -1)
+		if len(lower) > 0 || len(tmpl) > 0 {
+			serverRecv := serverBindings(src)
+			for _, m := range lower {
+				if isServerReceiver(serverRecv, identifierEndingAt(src, m[0])) {
+					continue
+				}
+				method := strings.ToUpper(string(src[m[2]:m[3]]))
+				raw := firstNonEmptyGroup(src, m, 2, 3, 4)
+				add(raw, method, "axios", m[0], "")
+			}
 
-	// Pass 2c — lowercase verb calls whose argument is an interpolation-headed
-	// template with a "/"-rooted literal tail (litfold's template-tail rule).
-	// cleanTSPath resolves or strips the base; the tail is the path.
-	for _, m := range lowerVerbTemplateCall.FindAllSubmatchIndex(src, -1) {
-		if isServerReceiver(serverRecv, identifierEndingAt(src, m[0])) {
-			continue
+			// Pass 2c — lowercase verb calls whose argument is an interpolation-headed
+			// template with a "/"-rooted literal tail (litfold's template-tail rule).
+			// cleanTSPath resolves or strips the base; the tail is the path.
+			for _, m := range tmpl {
+				if isServerReceiver(serverRecv, identifierEndingAt(src, m[0])) {
+					continue
+				}
+				raw := string(src[m[4]:m[5]])
+				if !litfold.TemplateTailPath(raw) {
+					continue
+				}
+				method := strings.ToUpper(string(src[m[2]:m[3]]))
+				add(raw, method, "axios", m[0], "template-tail")
+			}
 		}
-		raw := string(src[m[4]:m[5]])
-		if !litfold.TemplateTailPath(raw) {
-			continue
-		}
-		method := strings.ToUpper(string(src[m[2]:m[3]]))
-		add(raw, method, "axios", m[0], "template-tail")
 	}
 
 	// Pass 3 — options-object clients: a `url:` property inside an object literal
 	// that also carries a request-descriptor key, with the verb from a sibling
 	// `type:`/`method:` (default GET). The scan is scoped to the enclosing object so
 	// a neighbouring object's verb cannot bleed in.
-	for _, m := range urlProperty.FindAllSubmatchIndex(src, -1) {
-		window := enclosingObject(src, m[0], m[1])
-		if window == nil {
-			continue // no enclosing object literal
-		}
-		// The object is an outbound request only if it carries a real HTTP verb
-		// (type:/method: whose value maps to a verb) or a request-payload key. An
-		// object whose only descriptor signal is a non-verb type: — SEO openGraph
-		// { url, type: 'website' }, JSON-LD — is metadata, not a call.
-		method := "GET"
-		haveVerb := false
-		if vm := requestVerbProperty.FindSubmatch(window); vm != nil {
-			if v := mapClientVerb(string(vm[1])); v != "" {
-				method = v
-				haveVerb = true
+	if hasURL {
+		for _, m := range urlProperty.FindAllSubmatchIndex(src, -1) {
+			window := enclosingObject(src, m[0], m[1])
+			if window == nil {
+				continue // no enclosing object literal
 			}
+			// The object is an outbound request only if it carries a real HTTP verb
+			// (type:/method: whose value maps to a verb) or a request-payload key. An
+			// object whose only descriptor signal is a non-verb type: — SEO openGraph
+			// { url, type: 'website' }, JSON-LD — is metadata, not a call.
+			method := "GET"
+			haveVerb := false
+			if vm := requestVerbProperty.FindSubmatch(window); vm != nil {
+				if v := mapClientVerb(string(vm[1])); v != "" {
+					method = v
+					haveVerb = true
+				}
+			}
+			if !haveVerb && !requestPayloadKey.Match(window) {
+				continue // a plain link / config / SEO-metadata object
+			}
+			raw := firstNonEmptyGroup(src, m, 1, 2, 3)
+			add(raw, method, "request-options", m[0], "")
 		}
-		if !haveVerb && !requestPayloadKey.Match(window) {
-			continue // a plain link / config / SEO-metadata object
-		}
-		raw := firstNonEmptyGroup(src, m, 1, 2, 3)
-		add(raw, method, "request-options", m[0], "")
-	}
 
-	// Pass 3b — a `url:` property whose value is a bare identifier, resolved
-	// through the single-assignment store; the enclosing-object discipline is
-	// pass 3's, unchanged.
-	for _, m := range urlPropertyIdent.FindAllSubmatchIndex(src, -1) {
-		raw, ok := folds.Resolve(string(src[m[2]:m[3]]))
-		if !ok {
-			continue
-		}
-		window := enclosingObject(src, m[0], m[1])
-		if window == nil {
-			continue
-		}
-		// A verb-less options object states no method: the protocol library
-		// picks one at runtime, so the client route carries facts.MethodAny and
-		// the matcher pairs it with whichever verb serves the path (fetch's
-		// GET default does NOT apply — that default is fetch's spec, not this
-		// library's).
-		method := facts.MethodAny
-		haveVerb := false
-		if vm := requestVerbProperty.FindSubmatch(window); vm != nil {
-			if v := mapClientVerb(string(vm[1])); v != "" {
-				method = v
-				haveVerb = true
+		// Pass 3b — a `url:` property whose value is a bare identifier, resolved
+		// through the single-assignment store; the enclosing-object discipline is
+		// pass 3's, unchanged.
+		for _, m := range urlPropertyIdent.FindAllSubmatchIndex(src, -1) {
+			raw, ok := folds.Resolve(string(src[m[2]:m[3]]))
+			if !ok {
+				continue
 			}
+			window := enclosingObject(src, m[0], m[1])
+			if window == nil {
+				continue
+			}
+			// A verb-less options object states no method: the protocol library
+			// picks one at runtime, so the client route carries facts.MethodAny and
+			// the matcher pairs it with whichever verb serves the path (fetch's
+			// GET default does NOT apply — that default is fetch's spec, not this
+			// library's).
+			method := facts.MethodAny
+			haveVerb := false
+			if vm := requestVerbProperty.FindSubmatch(window); vm != nil {
+				if v := mapClientVerb(string(vm[1])); v != "" {
+					method = v
+					haveVerb = true
+				}
+			}
+			if !haveVerb && !requestPayloadKey.Match(window) {
+				continue
+			}
+			add(raw, method, "request-options", m[0], "single-assignment")
 		}
-		if !haveVerb && !requestPayloadKey.Match(window) {
-			continue
-		}
-		add(raw, method, "request-options", m[0], "single-assignment")
 	}
 
 	return out

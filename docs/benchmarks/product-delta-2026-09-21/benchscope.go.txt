@@ -1,0 +1,116 @@
+package main
+
+import (
+	"crypto/sha256"
+	"encoding/json"
+	"flag"
+	"fmt"
+	"github.com/enola-labs/enola/internal/graphinput"
+	"github.com/enola-labs/enola/pkg/bootstrap"
+	"gopkg.in/yaml.v3"
+	"io/fs"
+	"os"
+	"path/filepath"
+)
+
+func main() {
+	repo := flag.String("repo", "", "Product checkout")
+	cfgPath := flag.String("config", "", "input config")
+	export := flag.Bool("export-selected", false, "export selected repository inputs and digests for a private legacy mirror")
+	flag.Parse()
+	eng, err := bootstrap.NewGraphEngine(bootstrap.GraphOptions{Repo: *repo, ConfigPath: *cfgPath})
+	if err != nil {
+		panic(err)
+	}
+	cfg := eng.Analysis().Config()
+	policy := eng.Analysis().GraphScope().Policy
+	type selectedInput struct {
+		Path   string `json:"path"`
+		Kind   string `json:"kind"`
+		SHA256 string `json:"sha256,omitempty"`
+		Mode   uint32 `json:"mode"`
+	}
+	selected := []selectedInput{}
+	// Only config-only mode needs approximate exclusions translated to legacy
+	// ignores. Export physically filters the mirror; redundant generated ignores
+	// would burden the legacy matcher with patterns for absent paths.
+	err = filepath.WalkDir(*repo, func(path string, d fs.DirEntry, e error) error {
+		if e != nil {
+			return e
+		}
+		rel, e := filepath.Rel(*repo, path)
+		if e != nil {
+			return e
+		}
+		if rel == "." {
+			return nil
+		}
+		decision := policy.Classify(path, d.IsDir())
+		if decision.Kind == graphinput.Excluded {
+			if !*export {
+				escaped := ""
+				for _, r := range filepath.ToSlash(rel) {
+					switch r {
+					case '*', '?', '[':
+						escaped += "\\"
+					}
+					escaped += string(r)
+				}
+				if d.IsDir() {
+					escaped += "/**"
+				}
+				cfg.Ignore = append(cfg.Ignore, escaped)
+			}
+			if d.IsDir() {
+				return filepath.SkipDir
+			}
+		}
+		if *export && decision.Kind != graphinput.Excluded {
+			info, e := d.Info()
+			if e != nil {
+				return e
+			}
+			item := selectedInput{Path: filepath.ToSlash(rel), Kind: "directory", Mode: uint32(info.Mode().Perm())}
+			if !d.IsDir() {
+				if !info.Mode().IsRegular() {
+					return fmt.Errorf("selected mirror requires regular files, got %s", path)
+				}
+				data, e := os.ReadFile(path)
+				if e != nil {
+					return e
+				}
+				item.Kind = "semantic"
+				if decision.Kind == graphinput.NameOnly {
+					item.Kind = "name_only"
+				}
+				item.SHA256 = fmt.Sprintf("%x", sha256.Sum256(data))
+			}
+			selected = append(selected, item)
+		}
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+	b, err := yaml.Marshal(cfg)
+	if err != nil {
+		panic(err)
+	}
+	var plain map[string]any
+	if err = yaml.Unmarshal(b, &plain); err != nil {
+		panic(err)
+	}
+	delete(plain, "graph_inputs")
+	plain["repo"] = *repo
+	var output any = plain
+	if *export {
+		inventory, e := eng.Analysis().Inventory(*repo)
+		if e != nil {
+			panic(e)
+		}
+		output = map[string]any{"version": 1, "repo": *repo, "config": plain, "selected": selected, "candidate_inventory": inventory, "policy_identity": policy.Identity(), "policy_dependencies": policy.Dependencies()}
+	}
+	if err = json.NewEncoder(os.Stdout).Encode(output); err != nil {
+		panic(err)
+	}
+}

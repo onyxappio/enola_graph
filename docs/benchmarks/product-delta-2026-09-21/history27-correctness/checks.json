@@ -1,0 +1,16 @@
+[
+  {
+    "check": "r1 baseline repeat equality",
+    "pass": true
+  },
+  {
+    "check": "r1-new-noop no-op",
+    "pass": true
+  },
+  {
+    "check": "r1-new-multifile equals target cold",
+    "pass": true,
+    "actual": "50615fbe8f578c49a2f43b647ccf7d158e9c8865e93787f5680287cdb2d7528c",
+    "expected": "50615fbe8f578c49a2f43b647ccf7d158e9c8865e93787f5680287cdb2d7528c"
+  }
+]

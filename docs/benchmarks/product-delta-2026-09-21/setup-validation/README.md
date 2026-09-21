@@ -1,0 +1,3 @@
+# Setup optimization validation
+
+Frozen source /tmp/enola-product-fastdelta3-source, binary /tmp/enola-product-fastdelta3. Full tests, race/coverage, build and vet passed. Initial failed logs record a docs archive .go fixture mistakenly treated as a standalone package; it was renamed .go.txt, and the final suite logs passed. Source manifest identifies production/test source exactly. Independent review is ../setup-review.md. Real main-transition correctness checks are archived separately. No isolated performance acceptance was run for this intermediate candidate because the user clarified a stronger near-zero no-op target; implementation proceeded toward resident sessions.

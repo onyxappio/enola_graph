@@ -1,0 +1,23 @@
+File: enola-product-block-profile
+Type: delay
+Time: 2026-09-21 07:50:56 EEST
+Showing nodes accounting for 105.88s, 99.89% of 105.99s total
+Dropped 352 nodes (cum <= 0.53s)
+      flat  flat%   sum%        cum   cum%
+   105.88s 99.89% 99.89%    105.88s 99.89%  sync.(*Mutex).Unlock (partial-inline)
+         0     0% 99.89%     82.75s 78.07%  github.com/enola-labs/enola/internal/graphstream.(*Publisher).EnableAsync.func1
+         0     0% 99.89%     82.75s 78.07%  github.com/enola-labs/enola/internal/graphstream.(*Publisher).commitPump
+         0     0% 99.89%     82.70s 78.02%  github.com/enola-labs/enola/internal/graphstream.(*Journal).Sync
+         0     0% 99.89%     20.60s 19.44%  github.com/enola-labs/enola/internal/graphstream.(*Publisher).EnableAsync.func2
+         0     0% 99.89%     20.60s 19.44%  github.com/enola-labs/enola/internal/graphstream.(*Publisher).deliverPump
+         0     0% 99.89%     20.32s 19.17%  github.com/enola-labs/enola/internal/graphstream.(*Journal).ackUnsynced
+         0     0% 99.89%      2.52s  2.38%  github.com/enola-labs/enola/internal/graphstream.(*Publisher).Publish
+         0     0% 99.89%      2.52s  2.38%  github.com/enola-labs/enola/internal/graphsession.(*session).appendPhase
+         0     0% 99.89%      2.52s  2.38%  github.com/enola-labs/enola/internal/graphsession.(*session).batch
+         0     0% 99.89%      2.52s  2.38%  github.com/enola-labs/enola/internal/graphsession.(*session).emitBatch
+         0     0% 99.89%      2.21s  2.08%  github.com/enola-labs/enola/internal/parallel.MapFiles[go.shape.struct { github.com/enola-labs/enola/internal/extractors/tsextractor.res github.com/enola-labs/enola/internal/extractors/tsextractor.tsFileResult; github.com/enola-labs/enola/internal/extractors/tsextractor.rec *github.com/enola-labs/enola/internal/extractors/tsextractor.FileRecord }].func1
+         0     0% 99.89%      2.21s  2.08%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).ExtractSession.func3
+         0     0% 99.89%      2.18s  2.06%  github.com/enola-labs/enola/internal/graphsession.(*session).publishLocal
+         0     0% 99.89%      2.18s  2.06%  github.com/enola-labs/enola/internal/graphsession.(*session).run.func2
+         0     0% 99.89%      1.38s  1.30%  github.com/enola-labs/enola/internal/graphstream.(*Journal).appendUnsynced
+         0     0% 99.89%      1.08s  1.02%  github.com/enola-labs/enola/internal/graphstream.(*Publisher).enqueue

@@ -1,11 +1,11 @@
 package rubyextractor
 
 import (
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	sitter "github.com/tree-sitter/go-tree-sitter"
 	ruby "github.com/tree-sitter/tree-sitter-ruby/bindings/go"
 )
@@ -130,8 +130,11 @@ func indexRouteFiles(files []string) routeFileIndex {
 // The scan is bounded to engine directories that actually have a route file: an engine
 // with no routes needs no mapping, and scanning every .rb in the repository for
 // `< ::Rails::Engine` would cost a second full pass for nothing.
-func engineConstants(repoPath string, idx routeFileIndex, files []string) map[string]string {
+func engineConstants(repoPath string, idx routeFileIndex, files []string, inputScopes ...*inputscope.
 	// Group candidate engine.rb files by the engine directory that contains them.
+	Scope) map[string]string {
+	inputScope := inputscope.First(inputScopes)
+
 	byDir := map[string][]string{}
 	for _, relFile := range files {
 		if filepath.Base(relFile) != "engine.rb" {
@@ -157,7 +160,7 @@ func engineConstants(repoPath string, idx routeFileIndex, files []string) map[st
 	out := map[string]string{}
 	for _, dir := range dirs {
 		for _, relFile := range byDir[dir] {
-			src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+			src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 			if err != nil {
 				continue
 			}

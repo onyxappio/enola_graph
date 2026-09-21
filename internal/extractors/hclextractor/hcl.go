@@ -3,7 +3,8 @@ package hclextractor
 
 import (
 	"context"
-	"os"
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
+
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -32,7 +33,7 @@ import (
 // draw nothing — a missing edge beats a wrong one.
 
 // Extractor extracts Terraform/HCL facts.
-type Extractor struct{}
+type Extractor struct{ inputScope *inputscope.Scope }
 
 // New creates the extractor.
 func New() *Extractor { return &Extractor{} }
@@ -43,6 +44,12 @@ func (e *Extractor) Name() string { return "hcl" }
 // OwnsFile scopes caching and test-ref handoff to HCL sources.
 func (e *Extractor) OwnsFile(relFile string) bool { return isHCLFile(relFile) }
 
+// ContentInput implements plugin.DeltaInputs; Extract reads only HCL sources.
+func (e *Extractor) ContentInput(rel string) bool { return isHCLFile(rel) }
+
+// NameSetInput implements plugin.DeltaInputs.
+func (e *Extractor) NameSetInput() bool { return false }
+
 func isHCLFile(path string) bool {
 	ext := strings.ToLower(filepath.Ext(path))
 	return ext == ".tf" || ext == ".hcl"
@@ -50,7 +57,7 @@ func isHCLFile(path string) bool {
 
 // Detect probes for any .tf/.hcl file within three directory levels.
 func (e *Extractor) Detect(repoPath string) (bool, error) {
-	return e.DetectFiles(repoPath, detectnames.Walk(repoPath))
+	return e.DetectFiles(repoPath, detectnames.Walk(repoPath, e.inputScope))
 }
 
 // DetectFiles implements plugin.FileListDetector: a .tf/.hcl file at any depth,
@@ -91,6 +98,7 @@ type hclBlock struct {
 // bare-address references resolve only against what that module actually
 // declares.
 func (e *Extractor) Extract(ctx context.Context, repoPath string, files []string) ([]facts.Fact, error) {
+	inputScope := e.inputScope
 	byDir := map[string][]string{}
 	for _, relFile := range files {
 		if isHCLFile(relFile) {
@@ -109,7 +117,7 @@ func (e *Extractor) Extract(ctx context.Context, repoPath string, files []string
 		sort.Strings(byDir[dir])
 		var blocks []hclBlock
 		for _, relFile := range byDir[dir] {
-			src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+			src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 			if err != nil {
 				continue
 			}
@@ -316,3 +324,5 @@ func hclReferences(b hclBlock, declared map[string]bool) []string {
 	sort.Strings(refs)
 	return refs
 }
+
+func NewGraph(scope *inputscope.Scope) *Extractor { return &Extractor{inputScope: scope} }

@@ -4,6 +4,9 @@ Thank you for your interest in contributing to enola. Every contribution — cod
 
 ## Getting started
 
+For this fork's policy on upstream updates and AI-assisted compatibility work, see
+[AGENTS.md](AGENTS.md#enola-fork-and-upstream-updates).
+
 1. **Fork and clone** the repository.
 2. Make sure you have **Go 1.26+** and a **C compiler** (for tree-sitter bindings).
 3. Build and verify:

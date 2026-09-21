@@ -5,13 +5,14 @@ import (
 	"context"
 	"io"
 	"log"
-	"os"
+
 	"path/filepath"
 	"strings"
 	"sync"
 
 	"github.com/enola-labs/enola/internal/extractors/detectnames"
 	"github.com/enola-labs/enola/internal/extractors/extcoverage"
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 	"github.com/enola-labs/enola/internal/parallel"
@@ -19,7 +20,7 @@ import (
 
 // RubyExtractor extracts architectural facts from Ruby source code using the
 // tree-sitter Ruby grammar (in line with the other language extractors).
-type RubyExtractor struct{}
+type RubyExtractor struct{ inputScope *inputscope.Scope }
 
 // New creates a new RubyExtractor.
 func New() *RubyExtractor {
@@ -36,7 +37,8 @@ func (e *RubyExtractor) Name() string {
 // sources or extensionless executables with a Ruby shebang — mirroring the PHP
 // extractor's containsPHPFile fallback so Gemfile-less repos still get indexed.
 func (e *RubyExtractor) Detect(repoPath string) (bool, error) {
-	if _, err := os.Stat(filepath.Join(repoPath, "Gemfile")); err == nil {
+	inputScope := e.inputScope
+	if _, err := inputScope.Stat(filepath.Join(repoPath, "Gemfile")); err == nil {
 		return true, nil
 	}
 	return e.DetectFiles(repoPath, detectnames.Walk(repoPath))
@@ -47,7 +49,8 @@ func (e *RubyExtractor) Detect(repoPath string) (bool, error) {
 // because an extensionless executable cannot be recognised from its name — it is
 // still a 256-byte read, and now only for the extensionless names in the set.
 func (e *RubyExtractor) DetectFiles(repoPath string, files []string) (bool, error) {
-	if _, err := os.Stat(filepath.Join(repoPath, "Gemfile")); err == nil {
+	inputScope := e.inputScope
+	if _, err := inputScope.Stat(filepath.Join(repoPath, "Gemfile")); err == nil {
 		return true, nil
 	}
 	var extensionless []string
@@ -63,7 +66,7 @@ func (e *RubyExtractor) DetectFiles(repoPath string, files []string) (bool, erro
 	// Deferred to a second pass so the free answer is always taken first: a repo with
 	// one .rb file never opens anything.
 	for _, rel := range extensionless {
-		if hasRubyShebang(filepath.Join(repoPath, filepath.FromSlash(rel))) {
+		if hasRubyShebang(filepath.Join(repoPath, filepath.FromSlash(rel)), inputScope) {
 			return true, nil
 		}
 	}
@@ -74,8 +77,9 @@ func (e *RubyExtractor) DetectFiles(repoPath string, files []string) (bool, erro
 // (e.g. "#!/usr/bin/env ruby"). Only the first line is read, so this is cheap
 // enough to run over extensionless files during discovery. Non-Ruby shebangs
 // (bash, node, …) and binary files return false.
-func hasRubyShebang(absPath string) bool {
-	f, err := os.Open(absPath)
+func hasRubyShebang(absPath string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	f, err := inputScope.Open(absPath)
 	if err != nil {
 		return false
 	}
@@ -92,31 +96,33 @@ func hasRubyShebang(absPath string) bool {
 // isRubySourceFile reports whether relFile should be parsed as Ruby: any file
 // isRubyFile matches by extension (no I/O), or an extensionless file carrying a
 // Ruby shebang. repoPath is needed to resolve the shebang read.
-func isRubySourceFile(repoPath, relFile string) bool {
+func isRubySourceFile(repoPath, relFile string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
 	if isRubyFile(relFile) {
 		return true
 	}
 	if filepath.Ext(relFile) == "" {
-		return hasRubyShebang(filepath.Join(repoPath, relFile))
+		return hasRubyShebang(filepath.Join(repoPath, relFile), inputScope)
 	}
 	return false
 }
 
 // Extract parses Ruby files and emits architectural facts.
 func (e *RubyExtractor) Extract(ctx context.Context, repoPath string, files []string) ([]facts.Fact, error) {
+	inputScope := e.inputScope
 	var allFacts []facts.Fact
 
-	isRails := detectRailsProject(repoPath)
+	isRails := detectRailsProject(repoPath, inputScope)
 
 	// Pass 1: parse packwerk packages (builds package map and privacy boundaries).
-	pkgInfo := parsePackwerk(repoPath)
+	pkgInfo := parsePackwerk(repoPath, inputScope)
 	allFacts = append(allFacts, pkgInfo.facts...)
 
 	// Pass 2: parse .rb files. Route files are parsed separately by the route
 	// extractor, so they are excluded here.
 	var rbFiles []string
 	for _, relFile := range files {
-		if !isRubySourceFile(repoPath, relFile) {
+		if !isRubySourceFile(repoPath, relFile, inputScope) {
 			continue
 		}
 		if isRails && isRouteFile(relFile) {
@@ -131,7 +137,7 @@ func (e *RubyExtractor) Extract(ctx context.Context, repoPath string, files []st
 	clientDerived := 0
 	clientMisses := map[string]int{}
 	perFileFacts := parallel.MapFiles(ctx, rbFiles, func(relFile string) []facts.Fact {
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			log.Printf("[ruby-extractor] error reading %s: %v", relFile, err)
 			return nil
@@ -193,16 +199,16 @@ func (e *RubyExtractor) Extract(ctx context.Context, repoPath string, files []st
 
 	// Parse Rails route files.
 	if isRails {
-		routeFacts := extractAllRoutes(repoPath, files)
+		routeFacts := extractAllRoutes(repoPath, files, inputScope)
 		allFacts = append(allFacts, routeFacts...)
 
-		assocFacts, assocUnresolved := extractAssociations(repoPath, files)
+		assocFacts, assocUnresolved := extractAssociations(repoPath, files, inputScope)
 		allFacts = append(allFacts, assocFacts...)
 		if fact, ok := associationCoverageFact(repoPath, len(assocFacts), assocUnresolved); ok {
 			allFacts = append(allFacts, fact)
 		}
 
-		allFacts = append(allFacts, extractBroadcasts(repoPath, files)...)
+		allFacts = append(allFacts, extractBroadcasts(repoPath, files, inputScope)...)
 	}
 
 	// A namespace's declared table_name_prefix corrects the models nested under
@@ -214,7 +220,7 @@ func (e *RubyExtractor) Extract(ctx context.Context, repoPath string, files []st
 
 	// Schema facts from the database's own dump, folded after the model pass so
 	// a table a model already claims lands its census on that model's fact.
-	allFacts = append(allFacts, applySchemaDump(repoPath, allFacts)...)
+	allFacts = append(allFacts, applySchemaDump(repoPath, allFacts, inputScope)...)
 
 	resolvedCalls, unresolvedCalls := countResolvedCalls(allFacts)
 	if fact, ok := callCoverageFact(repoPath, resolvedCalls, unresolvedCalls); ok {
@@ -229,7 +235,7 @@ func (e *RubyExtractor) Extract(ctx context.Context, repoPath string, files []st
 	// class is identified by transitive inheritance, which is a repo-wide question the
 	// per-file pass cannot answer; the class facts just produced are its input, so this
 	// costs no extra reads on a repository that contains no Grape.
-	allFacts = append(allFacts, extractGrapeRoutes(ctx, repoPath, allFacts)...)
+	allFacts = append(allFacts, extractGrapeRoutes(ctx, repoPath, allFacts, inputScope)...)
 
 	// Extract Ruby calls embedded in view templates (ERB/Slim/HAML) so helpers and
 	// class methods invoked only from views are not mis-reported as dead. Emits
@@ -242,14 +248,14 @@ func (e *RubyExtractor) Extract(ctx context.Context, repoPath string, files []st
 	}
 	controllers := newStimulusControllerIndex(files)
 	tmplFacts := parallel.MapFiles(ctx, tmplFiles, func(relFile string) []facts.Fact {
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			log.Printf("[ruby-extractor] error reading template %s: %v", relFile, err)
 			return nil
 		}
 		ff := extractTemplateRefs(src, relFile)
-		ff = append(ff, extractStimulusBindings(repoPath, relFile, src, controllers)...)
-		ff = append(ff, extractRenderTargets(repoPath, relFile, src)...)
+		ff = append(ff, extractStimulusBindings(repoPath, relFile, src, controllers, inputScope)...)
+		ff = append(ff, extractRenderTargets(repoPath, relFile, src, inputScope)...)
 		return append(ff, extractTurboFrames(relFile, src)...)
 	})
 	for _, ff := range tmplFacts {
@@ -275,14 +281,15 @@ func (e *RubyExtractor) Extract(ctx context.Context, repoPath string, files []st
 // prodFiles is unused: Ruby references are resolved by constant name, not against
 // the set of files that exist.
 func (e *RubyExtractor) ExtractTestRefs(ctx context.Context, repoPath string, testFiles, _ []string) ([]facts.Fact, error) {
+	inputScope := e.inputScope
 	var rbFiles []string
 	for _, relFile := range testFiles {
-		if isRubySourceFile(repoPath, relFile) {
+		if isRubySourceFile(repoPath, relFile, inputScope) {
 			rbFiles = append(rbFiles, relFile)
 		}
 	}
 	perFile := parallel.MapFiles(ctx, rbFiles, func(relFile string) []facts.Fact {
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			log.Printf("[ruby-extractor] error reading test file %s: %v", relFile, err)
 			return nil
@@ -308,25 +315,27 @@ func (e *RubyExtractor) ExtractTestRefs(ctx context.Context, repoPath string, te
 // So a third marker: any engine directory that carries both a config/routes.rb and a
 // lib/**/engine.rb. That pair is Rails by construction and cannot be produced by a
 // plain Ruby gem.
-func detectRailsProject(repoPath string) bool {
+func detectRailsProject(repoPath string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
 	candidates := []string{
 		filepath.Join(repoPath, "config", "application.rb"),
 		filepath.Join(repoPath, "bin", "rails"),
 		filepath.Join(repoPath, "config", "environment.rb"),
 	}
 	for _, p := range candidates {
-		if _, err := os.Stat(p); err == nil {
+		if _, err := inputScope.Stat(p); err == nil {
 			return true
 		}
 	}
-	return containsRailsEngine(repoPath)
+	return containsRailsEngine(repoPath, inputScope)
 }
 
 // containsRailsEngine reports whether any immediate subdirectory of root is a Rails
 // engine: it has config/routes.rb and at least one engine.rb under lib/. Bounded to one
 // level below the root, which is where a gem monorepo puts its engines.
-func containsRailsEngine(root string) bool {
-	entries, err := os.ReadDir(root)
+func containsRailsEngine(root string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	entries, err := inputScope.ReadDir(root)
 	if err != nil {
 		return false
 	}
@@ -335,10 +344,10 @@ func containsRailsEngine(root string) bool {
 			continue
 		}
 		dir := filepath.Join(root, ent.Name())
-		if _, err := os.Stat(filepath.Join(dir, "config", "routes.rb")); err != nil {
+		if _, err := inputScope.Stat(filepath.Join(dir, "config", "routes.rb")); err != nil {
 			continue
 		}
-		if hasEngineFile(filepath.Join(dir, "lib"), 3) {
+		if hasEngineFile(filepath.Join(dir, "lib"), 3, inputScope) {
 			return true
 		}
 	}
@@ -346,17 +355,18 @@ func containsRailsEngine(root string) bool {
 }
 
 // hasEngineFile reports whether an engine.rb exists within maxDepth levels of dir.
-func hasEngineFile(dir string, maxDepth int) bool {
+func hasEngineFile(dir string, maxDepth int, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
 	if maxDepth < 0 {
 		return false
 	}
-	entries, err := os.ReadDir(dir)
+	entries, err := inputScope.ReadDir(dir)
 	if err != nil {
 		return false
 	}
 	for _, ent := range entries {
 		if ent.IsDir() {
-			if hasEngineFile(filepath.Join(dir, ent.Name()), maxDepth-1) {
+			if hasEngineFile(filepath.Join(dir, ent.Name()), maxDepth-1, inputScope) {
 				return true
 			}
 			continue
@@ -452,3 +462,5 @@ func countResolvedCalls(all []facts.Fact) (int, map[string]int) {
 	}
 	return resolved, unresolved
 }
+
+func NewGraph(scope *inputscope.Scope) *RubyExtractor { return &RubyExtractor{inputScope: scope} }

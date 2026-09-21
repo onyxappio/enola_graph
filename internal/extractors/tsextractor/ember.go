@@ -2,13 +2,14 @@ package tsextractor
 
 import (
 	"github.com/enola-labs/enola/internal/extractors/tsutil"
-	"os"
+
 	"path/filepath"
 	"sort"
 	"strings"
 
 	sitter "github.com/tree-sitter/go-tree-sitter"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 	"github.com/enola-labs/enola/internal/litfold"
@@ -73,13 +74,14 @@ func isHbsFile(path string) bool {
 // The nested search is bounded and stops at the directories a JavaScript
 // project never keeps source in. A repository is Ember if any package.json it
 // contains says so.
-func detectEmber(repoPath string) bool {
-	tsRoot, _ := findTSRoot(repoPath)
-	if hasPkgDependency(tsRoot, "ember-source") ||
-		(tsRoot != repoPath && hasPkgDependency(repoPath, "ember-source")) {
+func detectEmber(repoPath string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	tsRoot, _ := findTSRoot(repoPath, inputScope)
+	if hasPkgDependency(tsRoot, "ember-source", inputScope) ||
+		(tsRoot != repoPath && hasPkgDependency(repoPath, "ember-source", inputScope)) {
 		return true
 	}
-	return nestedPkgDeclares(repoPath, "ember-source", emberSearchDepth)
+	return nestedPkgDeclares(repoPath, "ember-source", emberSearchDepth, inputScope)
 }
 
 // emberSearchDepth is how deep a nested application may sit. Two levels covers
@@ -89,11 +91,12 @@ const emberSearchDepth = 2
 
 // nestedPkgDeclares reports whether any package.json within depth levels of root
 // declares the dependency.
-func nestedPkgDeclares(root, dependency string, depth int) bool {
+func nestedPkgDeclares(root, dependency string, depth int, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
 	if depth <= 0 {
 		return false
 	}
-	entries, err := os.ReadDir(root)
+	entries, err := inputScope.ReadDir(root)
 	if err != nil {
 		return false
 	}
@@ -102,10 +105,10 @@ func nestedPkgDeclares(root, dependency string, depth int) bool {
 			continue
 		}
 		child := filepath.Join(root, entry.Name())
-		if hasPkgDependency(child, dependency) {
+		if hasPkgDependency(child, dependency, inputScope) {
 			return true
 		}
-		if nestedPkgDeclares(child, dependency, depth-1) {
+		if nestedPkgDeclares(child, dependency, depth-1, inputScope) {
 			return true
 		}
 	}

@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
-	"os"
+
 	"path/filepath"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 	"gopkg.in/yaml.v3"
@@ -18,7 +19,7 @@ import (
 // It performs its own directory scan rather than relying on the engine walker,
 // because OpenAPI specs are YAML/JSON files that are typically excluded from the
 // main walker by the global *.yml/yaml/json ignore rules.
-type OpenAPIExtractor struct{}
+type OpenAPIExtractor struct{ inputScope *inputscope.Scope }
 
 // New creates a new OpenAPIExtractor.
 func New() *OpenAPIExtractor {
@@ -31,8 +32,9 @@ func (e *OpenAPIExtractor) Name() string {
 
 // Detect returns true if the repository contains any OpenAPI spec files.
 func (e *OpenAPIExtractor) Detect(repoPath string) (bool, error) {
+	inputScope := e.inputScope
 	found := false
-	err := filepath.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+	err := inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil || found {
 			return err
 		}
@@ -42,7 +44,7 @@ func (e *OpenAPIExtractor) Detect(repoPath string) (bool, error) {
 			}
 			return nil
 		}
-		if isOpenAPICandidate(path) && hasOpenAPIContent(path) {
+		if isOpenAPICandidate(path) && hasOpenAPIContent(path, inputScope) {
 			found = true
 		}
 		return nil
@@ -55,9 +57,10 @@ func (e *OpenAPIExtractor) Detect(repoPath string) (bool, error) {
 // The files argument (from the engine walker) is intentionally ignored because
 // YAML files are typically excluded by the global ignore patterns.
 func (e *OpenAPIExtractor) Extract(ctx context.Context, repoPath string, _ []string) ([]facts.Fact, error) {
+	inputScope := e.inputScope
 	var allFacts []facts.Fact
 
-	err := filepath.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+	err := inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -84,7 +87,7 @@ func (e *OpenAPIExtractor) Extract(ctx context.Context, repoPath string, _ []str
 		}
 		relFile := factpath.Slash(rawRel)
 
-		routeFacts, parseErr := parseOpenAPIFile(path, relFile)
+		routeFacts, parseErr := parseOpenAPIFile(path, relFile, inputScope)
 		if parseErr != nil {
 			log.Printf("[openapi-extractor] skipping %s: %v", relFile, parseErr)
 			return nil
@@ -125,8 +128,9 @@ var httpMethods = map[string]string{
 
 // parseOpenAPIFile reads and parses a single OpenAPI spec file, returning
 // one KindRoute fact per operation defined in the spec.
-func parseOpenAPIFile(absPath, relFile string) ([]facts.Fact, error) {
-	data, err := os.ReadFile(absPath)
+func parseOpenAPIFile(absPath, relFile string, inputScopes ...*inputscope.Scope) ([]facts.Fact, error) {
+	inputScope := inputscope.First(inputScopes)
+	data, err := inputScope.ReadFile(absPath)
 	if err != nil {
 		return nil, err
 	}
@@ -290,8 +294,9 @@ func isOpenAPICandidate(path string) bool {
 
 // hasOpenAPIContent reads the first 512 bytes of a file and checks for the
 // presence of "openapi:" or "swagger:" keys, confirming it's a spec file.
-func hasOpenAPIContent(path string) bool {
-	f, err := os.Open(path)
+func hasOpenAPIContent(path string, inputScopes ...*inputscope.Scope) bool {
+	inputScope := inputscope.First(inputScopes)
+	f, err := inputScope.Open(path)
 	if err != nil {
 		return false
 	}
@@ -319,3 +324,5 @@ func skipDir(name string) bool {
 	}
 	return false
 }
+
+func NewGraph(scope *inputscope.Scope) *OpenAPIExtractor { return &OpenAPIExtractor{inputScope: scope} }

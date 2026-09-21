@@ -2,11 +2,12 @@ package swiftextractor
 
 import (
 	"bytes"
-	"os"
+
 	"path/filepath"
 	"regexp"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 )
@@ -581,12 +582,13 @@ var swiftPrefixRequirement = regexp.MustCompile(`urlPrefixComponent\s*:\s*[\w.]+
 // looks only in the file that declares the protocol requirement, so a concrete
 // type's single-value override (e.g. `{ "core/v3" }`) cannot be mistaken for the
 // default. Meant to run once per repo before the per-file walk.
-func detectDefaultURLPrefix(repoPath string, files []string) string {
+func detectDefaultURLPrefix(repoPath string, files []string, inputScopes ...*inputscope.Scope) string {
+	inputScope := inputscope.First(inputScopes)
 	for _, relFile := range files {
 		if !isSwiftFile(relFile) || isSwiftTestFile(relFile) {
 			continue
 		}
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			continue
 		}
@@ -944,7 +946,8 @@ func depthAt(s string) int {
 // A type with no discoverable (resolvable) call site emits nothing. The fact shape
 // matches extractEndpointFacts, so the cross-repo linker treats these identically.
 // Meant to run once per repo (iOS only).
-func extractCallSiteEndpointFacts(repoPath string, files []string, defaultPrefix string, moduleForFile func(string) string) []facts.Fact {
+func extractCallSiteEndpointFacts(repoPath string, files []string, defaultPrefix string, moduleForFile func(string) string, inputScopes ...*inputscope.Scope) []facts.Fact {
+	inputScope := inputscope.First(inputScopes)
 	var storedDefs []storedEndpointDef
 	var wrappers []wrapperDef
 	var callSites []endpointCallSite
@@ -953,7 +956,7 @@ func extractCallSiteEndpointFacts(repoPath string, files []string, defaultPrefix
 		if !isSwiftFile(relFile) || isSwiftTestFile(relFile) {
 			continue
 		}
-		src, err := os.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
 			continue
 		}

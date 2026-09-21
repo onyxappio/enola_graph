@@ -2,7 +2,8 @@ package asyncapiextractor
 
 import (
 	"fmt"
-	"os"
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
+
 	"path/filepath"
 	"strings"
 
@@ -13,8 +14,9 @@ import (
 // are confined to repoRoot: a contract cannot use ../../ or an absolute path to
 // make extraction read arbitrary files outside the repository.
 type refResolver struct {
-	repoRoot string
-	docs     map[string]map[string]any
+	inputScope *inputscope.Scope
+	repoRoot   string
+	docs       map[string]map[string]any
 }
 
 type resolvedMap struct {
@@ -86,11 +88,12 @@ func (r *refResolver) follow(ref, baseFile string) (resolvedMap, bool) {
 }
 
 func (r *refResolver) load(path string) (map[string]any, error) {
+	inputScope := r.inputScope
 	path = filepath.Clean(path) //factpath:host
 	if doc, ok := r.docs[path]; ok {
 		return doc, nil
 	}
-	data, err := os.ReadFile(path)
+	data, err := inputScope.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}

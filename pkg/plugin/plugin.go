@@ -113,6 +113,27 @@ type ConfigKeyed interface {
 	ConfigKey() string
 }
 
+// DeltaInputs is an optional, versioned contract for graphsession incremental
+// hashing. FileOwner describes output/cache ownership and is not proof of
+// which bytes the extractor reads. Extractors that do not implement this stay
+// on the conservative AllNames content digest.
+type DeltaInputs interface {
+	// ContentInput reports whether repo-relative path bytes are an extraction
+	// input. Called for production files, tests, and AllNames (ignored files).
+	ContentInput(rel string) bool
+	// NameSetInput reports whether the production inventory name set (not
+	// file bytes) is an extraction input, as with markdown link targets.
+	NameSetInput() bool
+}
+
+// DeltaContext supplements DeltaInputs with a versioned, deterministic digest of
+// repository reads outside the engine inventory, including missing inputs and
+// directory markers. It is checked again before committing a replacement.
+// Implementations must rediscover inputs on every call, not reuse prior paths.
+type DeltaContext interface {
+	DeltaContext(repoPath string) string
+}
+
 // TestRefExtractor is an optional interface an Extractor may implement to parse
 // test/spec files for their outbound references into production code only. The
 // engine calls it with the test files (matched by config.TestGlobs) that the

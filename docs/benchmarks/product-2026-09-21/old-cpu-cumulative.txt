@@ -1,0 +1,53 @@
+File: enola-product-old-profile
+Type: cpu
+Time: 2026-09-21 07:47:58 EEST
+Duration: 21.34s, Total samples = 62.30s (291.97%)
+Showing nodes accounting for 39.32s, 63.11% of 62.30s total
+Dropped 664 nodes (cum <= 0.31s)
+Showing top 45 nodes out of 196
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%     36.99s 59.37%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).Extract.func2
+         0     0%     0%     36.99s 59.37%  github.com/enola-labs/enola/internal/parallel.MapFiles[go.shape.7ed5300deb5c821fb5407498f034b50c7bc47c5b597cca8361701972925ff813].func1
+         0     0%     0%     28.86s 46.32%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).extractFile
+         0     0%     0%     22.28s 35.76%  regexp.(*Regexp).allMatches
+         0     0%     0%     22.28s 35.76%  regexp.(*Regexp).doExecute
+     1.23s  1.97%  1.97%     20.29s 32.57%  regexp.(*machine).match
+    16.05s 25.76% 27.74%     17.43s 27.98%  runtime.cgocall
+         0     0% 27.74%     16.86s 27.06%  regexp.(*Regexp).FindAllSubmatch
+         0     0% 27.74%     13.21s 21.20%  github.com/enola-labs/enola/internal/extractors/tsextractor.serverBindings
+         0     0% 27.74%     12.92s 20.74%  runtime.cgocallback
+         0     0% 27.74%     12.92s 20.74%  runtime.cgocallbackg
+         0     0% 27.74%     12.92s 20.74%  runtime.systemstack_switch
+     0.04s 0.064% 27.80%     12.86s 20.64%  runtime.cgocallbackg1
+     8.67s 13.92% 41.72%     11.37s 18.25%  regexp.(*machine).add
+     4.93s  7.91% 49.63%      9.56s 15.35%  regexp.(*machine).step
+         0     0% 49.63%      9.49s 15.23%  github.com/tree-sitter/go-tree-sitter._cgo_cmalloc
+         0     0% 49.63%      9.37s 15.04%  main.main
+         0     0% 49.63%      9.37s 15.04%  runtime.main
+     0.01s 0.016% 49.65%      9.14s 14.67%  _cgoexp_80dba3ccedfc_go_malloc
+     0.01s 0.016% 49.66%      9.10s 14.61%  github.com/tree-sitter/go-tree-sitter.SetAllocator.func2
+         0     0% 49.66%      9.10s 14.61%  github.com/tree-sitter/go-tree-sitter.go_malloc
+         0     0% 49.66%      9.09s 14.59%  github.com/tree-sitter/go-tree-sitter._Cfunc__CMalloc (inline)
+         0     0% 49.66%      9.03s 14.49%  github.com/tree-sitter/go-tree-sitter.(*Parser).Parse
+         0     0% 49.66%      9.03s 14.49%  github.com/tree-sitter/go-tree-sitter.(*Parser).ParseWith
+         0     0% 49.66%      8.96s 14.38%  github.com/tree-sitter/go-tree-sitter.(*Parser).ParseWith.func2 (inline)
+         0     0% 49.66%      8.96s 14.38%  github.com/tree-sitter/go-tree-sitter._Cfunc_ts_parser_parse
+         0     0% 49.66%      8.93s 14.33%  github.com/enola-labs/enola/internal/extractors/tsextractor.extractHTTPClientFacts
+         0     0% 49.66%      8.55s 13.72%  github.com/enola-labs/enola/internal/engine.(*Engine).GenerateSnapshot
+         0     0% 49.66%      8.55s 13.72%  github.com/enola-labs/enola/pkg/bootstrap.(*Engine).GenerateSnapshot (inline)
+     8.38s 13.45% 63.11%      8.38s 13.45%  syscall.rawsyscalln
+         0     0% 63.11%      8.38s 13.45%  syscall.syscalln
+         0     0% 63.11%      8.20s 13.16%  syscall.syscall
+         0     0% 63.11%      8.06s 12.94%  github.com/enola-labs/enola/internal/extractors/tsextractor.collectRouterFile
+         0     0% 63.11%      7.33s 11.77%  os.ignoringEINTR (inline)
+         0     0% 63.11%      7.12s 11.43%  os.open (inline)
+         0     0% 63.11%      7.12s 11.43%  syscall.Open
+         0     0% 63.11%      5.99s  9.61%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).ExtractTestRefs.func1
+         0     0% 63.11%      5.99s  9.61%  github.com/enola-labs/enola/internal/parallel.MapFiles[go.shape.[]github.com/enola-labs/enola/internal/facts.Fact].func1
+         0     0% 63.11%      5.74s  9.21%  runtime.systemstack
+         0     0% 63.11%      5.18s  8.31%  regexp.(*Regexp).FindAllSubmatchIndex
+         0     0% 63.11%      5.07s  8.14%  github.com/enola-labs/enola/internal/extractors/tsextractor.extractServerRouteFacts
+         0     0% 63.11%      4.72s  7.58%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).testRefsFromFile
+         0     0% 63.11%      4.70s  7.54%  os.Open (inline)
+         0     0% 63.11%      4.70s  7.54%  os.OpenFile
+         0     0% 63.11%      4.70s  7.54%  os.openFileNolog

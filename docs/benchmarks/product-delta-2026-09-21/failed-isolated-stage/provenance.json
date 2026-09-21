@@ -1,0 +1,10 @@
+{
+  "candidate": "/tmp/enola-final-stage",
+  "sha256": "e720c4318d38fc1f4119a95a747e3f157838c93ef6f8d5703004c64fb60f9b44",
+  "source_manifest": "../final-stage-provenance.json",
+  "suite_status": "aborted after failed initial/noop performance; incomplete repeats",
+  "profile_initial_state": "fresh",
+  "profile_noop_state": "same state/context as profile initial",
+  "profile_consumer": "none; producer acknowledged by NATS",
+  "inventory_evidence": "all six available old comparisons report actual main inventory matches candidate"
+}

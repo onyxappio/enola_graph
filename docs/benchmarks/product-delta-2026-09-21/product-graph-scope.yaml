@@ -1,0 +1,6 @@
+# Copy to Product/mcp-arch.yaml. Paths are relative to the Product checkout.
+graph_inputs:
+  # Additive to defaults and Git ignore rules. Applies to tracked files too.
+  exclude:
+    - "apps/mobile/e2e/artifacts/**"
+    - "worker-reports/**"

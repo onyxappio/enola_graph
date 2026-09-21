@@ -1,0 +1,778 @@
+[
+  {
+    "label": "r1-resident-initial",
+    "start_ns": 1789982048246907000,
+    "seconds": 32.123249083,
+    "driver": {
+      "coverage_catchup": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 1,
+          "TargetGeneration": 1,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4228,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null,
+          "Work": {
+            "PolicyBuilds": 1,
+            "BoundedContextChecks": 0,
+            "FactAssemblies": 1,
+            "CapturedReads": 0,
+            "PublishedEvents": 0,
+            "CheckpointBytes": 0,
+            "InventoryScans": 1,
+            "DetectionScans": 1,
+            "ContextScans": 1,
+            "ConfigScans": 1,
+            "HashedFiles": 5191,
+            "DirtyHashBytes": 0,
+            "VerifiedFiles": 0,
+            "Checkpoints": 0
+          },
+          "Epoch": "fs-1789982050128433000",
+          "Watermark": 10,
+          "Reconciled": true,
+          "FallbackReason": "external config watch registered; reconcile registration gap"
+        }
+      ],
+      "done_ns": 1789982080369887000,
+      "label": "initial",
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789982050128433000",
+        "From": 0,
+        "Through": 0,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": "benchmark bootstrap"
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "initial": 4128
+          }
+        },
+        "RunID": "/tmp/enola-product-history-source-enola-scoped-smoke-resident100-main1-1-1789982054724121000",
+        "BaseGeneration": 0,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 4228,
+          "files_parsed": 4128,
+          "cached_files": 0,
+          "graphql_parsed": 2,
+          "sfc_parsed": 17,
+          "summary_scans": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "manifests",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "hcl",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "python",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "swift",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 5491,
+        "ParsedFiles": 4128,
+        "EarlyLocal": 4128,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 1,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 1,
+          "CapturedReads": 59,
+          "PublishedEvents": 5198,
+          "CheckpointBytes": 51197346,
+          "InventoryScans": 1,
+          "DetectionScans": 1,
+          "ContextScans": 1,
+          "ConfigScans": 1,
+          "HashedFiles": 5191,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 4228,
+          "Checkpoints": 1
+        },
+        "Epoch": "fs-1789982050128433000",
+        "Watermark": 0,
+        "Reconciled": true,
+        "FallbackReason": "benchmark bootstrap"
+      },
+      "seconds": 31.423576583,
+      "source": "watch",
+      "started_ns": 1789982048946256000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4128
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-scoped-smoke-resident100-main1-1-1789982054724121000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4228,
+        "files_parsed": 4128,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 5491,
+      "ParsedFiles": 4128,
+      "EarlyLocal": 4128,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 1,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 1,
+        "CapturedReads": 59,
+        "PublishedEvents": 5198,
+        "CheckpointBytes": 51197346,
+        "InventoryScans": 1,
+        "DetectionScans": 1,
+        "ContextScans": 1,
+        "ConfigScans": 1,
+        "HashedFiles": 5191,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 4228,
+        "Checkpoints": 1
+      },
+      "Epoch": "fs-1789982050128433000",
+      "Watermark": 0,
+      "Reconciled": true,
+      "FallbackReason": "benchmark bootstrap"
+    },
+    "aggregate_parsed": 4128,
+    "aggregate_work": {
+      "PolicyBuilds": 2,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 2,
+      "CapturedReads": 59,
+      "PublishedEvents": 5198,
+      "CheckpointBytes": 51197346,
+      "InventoryScans": 2,
+      "DetectionScans": 2,
+      "ContextScans": 2,
+      "ConfigScans": 2,
+      "HashedFiles": 10382,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 4228,
+      "Checkpoints": 1
+    },
+    "aggregate_stats": {
+      "files_read": 4228,
+      "files_parsed": 4128,
+      "cached_files": 4228,
+      "graphql_parsed": 2,
+      "sfc_parsed": 17,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [
+      "benchmark bootstrap",
+      "external config watch registered; reconcile registration gap"
+    ],
+    "reconciliation_count": 2,
+    "wire": {
+      "broker_end_ns": 1789982075472553000,
+      "bytes": 148054552,
+      "canonical_sha256": "4ddb820e6ad926db03f9d46c60d863ee7ef6f42ec77b42934ee50176d0bde04c",
+      "consumer_end_ns": 1789982075584758000,
+      "context": "enola-scoped-smoke-resident100-main1",
+      "edges": 171533,
+      "empty_batches": 0,
+      "first_batch_ns": 1789982055425984000,
+      "first_ns": 1789982055381448000,
+      "messages": 5198,
+      "nodes": 69595,
+      "normalized_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+      "owners": 5619,
+      "run_id": "/tmp/enola-product-history-source-enola-scoped-smoke-resident100-main1-1-1789982054724121000",
+      "total_edges": 171533,
+      "total_nodes": 69595
+    },
+    "first_s": 7.134541,
+    "first_batch_s": 7.179077,
+    "broker_end_s": 27.225646,
+    "consumer_end_s": 27.337851,
+    "graph_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+    "wire_messages": 5198,
+    "lifetime_rss_bytes": 1099137024
+  },
+  {
+    "label": "r1-resident-noop",
+    "start_ns": 1789982080402759000,
+    "seconds": 0.0001299999999986312,
+    "driver": {
+      "coverage_catchup": null,
+      "done_ns": 1789982080402836000,
+      "label": "noop",
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789982050128433000",
+        "From": 10,
+        "Through": 10,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": ""
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": null
+        },
+        "RunID": "",
+        "BaseGeneration": 1,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 0,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0
+        },
+        "Fallbacks": null,
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 0,
+        "EarlyLocal": 0,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 0,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 0,
+          "CapturedReads": 0,
+          "PublishedEvents": 0,
+          "CheckpointBytes": 0,
+          "InventoryScans": 0,
+          "DetectionScans": 0,
+          "ContextScans": 0,
+          "ConfigScans": 0,
+          "HashedFiles": 0,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 0,
+          "Checkpoints": 0
+        },
+        "Epoch": "fs-1789982050128433000",
+        "Watermark": 10,
+        "Reconciled": false,
+        "FallbackReason": ""
+      },
+      "seconds": 4.125e-06,
+      "source": "watch",
+      "started_ns": 1789982080402832000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": null
+      },
+      "RunID": "",
+      "BaseGeneration": 1,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 0,
+        "files_parsed": 0,
+        "cached_files": 0,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": null,
+      "Unreadable": null,
+      "OwnersPublished": 0,
+      "ParsedFiles": 0,
+      "EarlyLocal": 0,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 0,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 0,
+        "CapturedReads": 0,
+        "PublishedEvents": 0,
+        "CheckpointBytes": 0,
+        "InventoryScans": 0,
+        "DetectionScans": 0,
+        "ContextScans": 0,
+        "ConfigScans": 0,
+        "HashedFiles": 0,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 0,
+        "Checkpoints": 0
+      },
+      "Epoch": "fs-1789982050128433000",
+      "Watermark": 10,
+      "Reconciled": false,
+      "FallbackReason": ""
+    },
+    "aggregate_parsed": 0,
+    "aggregate_work": {
+      "PolicyBuilds": 0,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 0,
+      "CapturedReads": 0,
+      "PublishedEvents": 0,
+      "CheckpointBytes": 0,
+      "InventoryScans": 0,
+      "DetectionScans": 0,
+      "ContextScans": 0,
+      "ConfigScans": 0,
+      "HashedFiles": 0,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 0,
+      "Checkpoints": 0
+    },
+    "aggregate_stats": {
+      "files_read": 0,
+      "files_parsed": 0,
+      "cached_files": 0,
+      "graphql_parsed": 0,
+      "sfc_parsed": 0,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [],
+    "reconciliation_count": 0,
+    "graph_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+    "wire_messages": 0
+  },
+  {
+    "label": "r1-resident-multifile",
+    "start_ns": 1789982080965477000,
+    "seconds": 17.500153540999996,
+    "driver": {
+      "coverage_catchup": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4244,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null,
+          "Work": {
+            "PolicyBuilds": 1,
+            "BoundedContextChecks": 0,
+            "FactAssemblies": 1,
+            "CapturedReads": 0,
+            "PublishedEvents": 0,
+            "CheckpointBytes": 0,
+            "InventoryScans": 1,
+            "DetectionScans": 1,
+            "ContextScans": 1,
+            "ConfigScans": 1,
+            "HashedFiles": 5209,
+            "DirtyHashBytes": 0,
+            "VerifiedFiles": 0,
+            "Checkpoints": 0
+          },
+          "Epoch": "fs-1789982050128433000",
+          "Watermark": 245,
+          "Reconciled": true,
+          "FallbackReason": "graph policy watch coverage refreshed"
+        }
+      ],
+      "done_ns": 1789982098465492000,
+      "label": "history",
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789982050128433000",
+        "From": 10,
+        "Through": 240,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": "filesystem name change requires reconciliation"
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": true,
+          "PolicyReconciled": true,
+          "AddedSources": 16,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "added source": 16,
+            "resolution": 364,
+            "source content": 34
+          }
+        },
+        "RunID": "/tmp/enola-product-history-source-enola-scoped-smoke-resident100-main1-2-1789982084990191000",
+        "BaseGeneration": 1,
+        "TargetGeneration": 2,
+        "Stats": {
+          "files_read": 414,
+          "files_parsed": 414,
+          "cached_files": 4146,
+          "graphql_parsed": 1,
+          "sfc_parsed": 0,
+          "summary_scans": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "manifests",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 1474,
+        "ParsedFiles": 414,
+        "EarlyLocal": 414,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 1,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 1,
+          "CapturedReads": 473,
+          "PublishedEvents": 1170,
+          "CheckpointBytes": 51316321,
+          "InventoryScans": 1,
+          "DetectionScans": 1,
+          "ContextScans": 1,
+          "ConfigScans": 1,
+          "HashedFiles": 5210,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 4244,
+          "Checkpoints": 1
+        },
+        "Epoch": "fs-1789982050128433000",
+        "Watermark": 240,
+        "Reconciled": true,
+        "FallbackReason": "filesystem name change requires reconciliation"
+      },
+      "seconds": 17.499837583,
+      "source": "watch",
+      "started_ns": 1789982080965623000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": true,
+        "PolicyReconciled": true,
+        "AddedSources": 16,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "added source": 16,
+          "resolution": 364,
+          "source content": 34
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-scoped-smoke-resident100-main1-2-1789982084990191000",
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "Stats": {
+        "files_read": 414,
+        "files_parsed": 414,
+        "cached_files": 4146,
+        "graphql_parsed": 1,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 1474,
+      "ParsedFiles": 414,
+      "EarlyLocal": 414,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 1,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 1,
+        "CapturedReads": 473,
+        "PublishedEvents": 1170,
+        "CheckpointBytes": 51316321,
+        "InventoryScans": 1,
+        "DetectionScans": 1,
+        "ContextScans": 1,
+        "ConfigScans": 1,
+        "HashedFiles": 5210,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 4244,
+        "Checkpoints": 1
+      },
+      "Epoch": "fs-1789982050128433000",
+      "Watermark": 240,
+      "Reconciled": true,
+      "FallbackReason": "filesystem name change requires reconciliation"
+    },
+    "aggregate_parsed": 414,
+    "aggregate_work": {
+      "PolicyBuilds": 2,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 2,
+      "CapturedReads": 473,
+      "PublishedEvents": 1170,
+      "CheckpointBytes": 51316321,
+      "InventoryScans": 2,
+      "DetectionScans": 2,
+      "ContextScans": 2,
+      "ConfigScans": 2,
+      "HashedFiles": 10419,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 4244,
+      "Checkpoints": 1
+    },
+    "aggregate_stats": {
+      "files_read": 414,
+      "files_parsed": 414,
+      "cached_files": 8390,
+      "graphql_parsed": 1,
+      "sfc_parsed": 0,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [
+      "filesystem name change requires reconciliation",
+      "graph policy watch coverage refreshed"
+    ],
+    "reconciliation_count": 2,
+    "wire": {
+      "broker_end_ns": 1789982093273509000,
+      "bytes": 32251376,
+      "canonical_sha256": "1cea5c69843724f6361358f8b70ecee9be6afa0d9fef79a98f71a45858621dce",
+      "consumer_end_ns": 1789982093300497000,
+      "context": "enola-scoped-smoke-resident100-main1",
+      "edges": 45301,
+      "empty_batches": 0,
+      "first_batch_ns": 1789982085920238000,
+      "first_ns": 1789982085759109000,
+      "messages": 1170,
+      "nodes": 19756,
+      "normalized_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+      "owners": 1486,
+      "run_id": "/tmp/enola-product-history-source-enola-scoped-smoke-resident100-main1-2-1789982084990191000",
+      "total_edges": 171954,
+      "total_nodes": 69754
+    },
+    "first_s": 4.793632,
+    "first_batch_s": 4.954761,
+    "broker_end_s": 12.308032,
+    "consumer_end_s": 12.33502,
+    "graph_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+    "wire_messages": 1170,
+    "checkout_seconds": 0.5358475419999991,
+    "checkout_through_apply_seconds": 18.076572291999994
+  },
+  {
+    "state_peak_sampled_bytes": 84737867,
+    "spool_peak_sampled_bytes": 39248670,
+    "state_final_bytes": 51316904,
+    "label": "cold-target",
+    "start_ns": 1789982098579779000,
+    "seconds": 27.04125525,
+    "exit": 0,
+    "process_real_s": 27.03,
+    "rss_bytes": 946651136.0,
+    "user_s": 28.7,
+    "sys_s": 2.84,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4144
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-scoped-smoke-resident100-cold-target-1-1789982104628159000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4244,
+        "files_parsed": 4144,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 5510,
+      "ParsedFiles": 4144,
+      "EarlyLocal": 4144
+    },
+    "fallbacks": [
+      "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "broker_end_ns": 1789982125293592000,
+      "bytes": 148429740,
+      "canonical_sha256": "1cea5c69843724f6361358f8b70ecee9be6afa0d9fef79a98f71a45858621dce",
+      "consumer_end_ns": 1789982125413931000,
+      "context": "enola-scoped-smoke-resident100-cold-target",
+      "edges": 171954,
+      "empty_batches": 0,
+      "first_batch_ns": 1789982105418402000,
+      "first_ns": 1789982105315683000,
+      "messages": 5211,
+      "nodes": 69754,
+      "normalized_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+      "owners": 5638,
+      "run_id": "/tmp/enola-product-history-source-enola-scoped-smoke-resident100-cold-target-1-1789982104628159000",
+      "total_edges": 171954,
+      "total_nodes": 69754
+    },
+    "first_s": 6.735904,
+    "first_batch_s": 6.838623,
+    "broker_end_s": 26.713813,
+    "consumer_end_s": 26.834152,
+    "graph_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835"
+  }
+]

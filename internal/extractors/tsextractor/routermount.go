@@ -158,9 +158,12 @@ var (
 // collectRouterFile records everything in one file that the repo-wide pass needs.
 // Returns nil when the file has nothing to contribute, which is almost every file.
 func collectRouterFile(src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool) *routerFile {
+	// A file that constructs no app/router cannot contribute a mount parent, a
+	// pending route, or an export the repo-wide pass can follow. Import-only
+	// files used to fall through into every regex below because almost every
+	// TypeScript file has an import.
 	bindings := serverBindings(src)
-	imports := collectRouterImports(src, relFile, aliases, knownFiles)
-	if len(bindings) == 0 && len(imports) == 0 {
+	if len(bindings) == 0 {
 		return nil
 	}
 
@@ -170,7 +173,7 @@ func collectRouterFile(src []byte, relFile string, aliases map[string]tsAlias, k
 		routers: map[string]bool{},
 		pending: map[string][]pendingRoute{},
 		exports: map[string]string{},
-		imports: imports,
+		imports: map[string]importRef{},
 	}
 
 	for name, b := range bindings {
@@ -186,43 +189,52 @@ func collectRouterFile(src []byte, relFile string, aliases map[string]tsAlias, k
 	}
 
 	// Routes registered on those unmounted routers, held until a prefix is known.
-	for _, m := range serverVerbCall.FindAllSubmatchIndex(src, -1) {
-		recv := string(src[m[2]:m[3]])
-		if !f.routers[recv] {
-			continue // an app root or a locally-mounted router: serverroutes.go owns it
+	if len(f.routers) > 0 {
+		for _, m := range serverVerbCall.FindAllSubmatchIndex(src, -1) {
+			recv := string(src[m[2]:m[3]])
+			if !f.routers[recv] {
+				continue // an app root or a locally-mounted router: serverroutes.go owns it
+			}
+			path, ok := cleanServerPath(firstNonEmptyGroup(src, m, 3, 4, 5))
+			if !ok {
+				continue
+			}
+			f.pending[recv] = append(f.pending[recv], pendingRoute{
+				verb:      strings.ToUpper(nodeSlice(src, m, 2)),
+				path:      path,
+				line:      1 + bytes.Count(src[:m[0]], []byte("\n")),
+				framework: bindings[recv].framework,
+			})
 		}
-		path, ok := cleanServerPath(firstNonEmptyGroup(src, m, 3, 4, 5))
-		if !ok {
-			continue
-		}
-		f.pending[recv] = append(f.pending[recv], pendingRoute{
-			verb:      strings.ToUpper(nodeSlice(src, m, 2)),
-			path:      path,
-			line:      1 + bytes.Count(src[:m[0]], []byte("\n")),
-			framework: bindings[recv].framework,
-		})
+		f.factories = collectRouterFactories(src, f.routers)
 	}
 
-	for _, m := range mountCall.FindAllSubmatch(src, -1) {
-		f.mounts = append(f.mounts, routerMountEdge{
-			file:   relFile,
-			parent: string(m[1]),
-			prefix: firstNonEmpty(m[2], m[3], m[4]),
-			child:  string(m[5]),
-		})
-	}
-	for _, m := range mountCallFactory.FindAllSubmatch(src, -1) {
-		f.mounts = append(f.mounts, routerMountEdge{
-			file:      relFile,
-			parent:    string(m[1]),
-			prefix:    firstNonEmpty(m[2], m[3], m[4]),
-			child:     string(m[5]),
-			childCall: true,
-		})
+	if hasDotKeyword(src, []byte("use")) {
+		for _, m := range mountCall.FindAllSubmatch(src, -1) {
+			f.mounts = append(f.mounts, routerMountEdge{
+				file:   relFile,
+				parent: string(m[1]),
+				prefix: firstNonEmpty(m[2], m[3], m[4]),
+				child:  string(m[5]),
+			})
+		}
+		for _, m := range mountCallFactory.FindAllSubmatch(src, -1) {
+			f.mounts = append(f.mounts, routerMountEdge{
+				file:      relFile,
+				parent:    string(m[1]),
+				prefix:    firstNonEmpty(m[2], m[3], m[4]),
+				child:     string(m[5]),
+				childCall: true,
+			})
+		}
 	}
 
-	collectRouterExports(src, f)
-	f.factories = collectRouterFactories(src, f.routers)
+	if len(f.routers) > 0 || len(f.factories) > 0 {
+		collectRouterExports(src, f)
+	}
+	if len(f.mounts) > 0 {
+		f.imports = collectRouterImports(src, relFile, aliases, knownFiles)
+	}
 
 	if f.empty() {
 		return nil

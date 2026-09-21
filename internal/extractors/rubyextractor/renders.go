@@ -2,12 +2,13 @@ package rubyextractor
 
 import (
 	"fmt"
-	"os"
+
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 )
@@ -50,7 +51,8 @@ var partialExtensions = []string{
 // extractRenderTargets scans one view template for literal render targets and
 // emits one fact per declared target, sorted by target so the file's facts are
 // a function of what it declares, not of markup order.
-func extractRenderTargets(repoPath, relFile string, src []byte) []facts.Fact {
+func extractRenderTargets(repoPath, relFile string, src []byte, inputScopes ...*inputscope.Scope) []facts.Fact {
+	inputScope := inputscope.First(inputScopes)
 	embedded := extractEmbeddedRuby(src, relFile)
 	if len(embedded) == 0 {
 		return nil
@@ -80,7 +82,7 @@ func extractRenderTargets(repoPath, relFile string, src []byte) []facts.Fact {
 				"resolution_level": "literal-declared",
 			},
 		}
-		if partial := partialFile(repoPath, relFile, target); partial != "" {
+		if partial := partialFile(repoPath, relFile, target, inputScope); partial != "" {
 			fact.Relations = []facts.Relation{{Kind: facts.RelDependsOn, Target: partial}}
 		}
 		out = append(out, fact)
@@ -94,7 +96,8 @@ func extractRenderTargets(repoPath, relFile string, src []byte) []facts.Fact {
 // bare name renders from the calling template's own directory. A template
 // outside any views tree has no root to resolve against, so its targets stay
 // name-only.
-func partialFile(repoPath, relFile, target string) string {
+func partialFile(repoPath, relFile, target string, inputScopes ...*inputscope.Scope) string {
+	inputScope := inputscope.First(inputScopes)
 	dir := factpath.Dir(relFile)
 	slash := strings.LastIndex(target, "/")
 	if slash >= 0 {
@@ -108,7 +111,7 @@ func partialFile(repoPath, relFile, target string) string {
 	}
 	for _, ext := range partialExtensions {
 		candidate := filepath.Join(dir, "_"+target+ext)
-		if _, err := os.Stat(filepath.Join(repoPath, candidate)); err == nil {
+		if _, err := inputScope.Stat(filepath.Join(repoPath, candidate)); err == nil {
 			return filepath.ToSlash(candidate)
 		}
 	}
