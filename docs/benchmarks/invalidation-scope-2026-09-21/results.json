@@ -1,0 +1,1667 @@
+{
+  "source": "/tmp/enola-product-benchmark-source",
+  "binary": "/tmp/enola-product-frozen-v2-enola",
+  "work": "/tmp/enola-invalidation-scope-2026-09-21",
+  "repeats": 1,
+  "repeat_limitation": "one pass of all 10 independent clones; three repeats skipped because each pass is a full Product initial+delta+cold (~15 min measured)",
+  "scenarios": [
+    {
+      "id": "01-body",
+      "title": "body of one symbol/function",
+      "changed_files": [
+        "packages/crypto/src/password.ts"
+      ],
+      "blocker": null,
+      "repeats": 1,
+      "initial": {
+        "exit": 0,
+        "wall_s": 23.849,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790016971499952000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "3f33bb9df7eb9f172cd4024b72d8de6b8ff7f93f9fe5882f94455b613b167232",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "delta": {
+        "exit": 0,
+        "wall_s": 21.365,
+        "parsed": 1,
+        "cached": 4243,
+        "files_read": 1,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-2-1790016997048616000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            1,
+            2
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "cb5182d2d9033e7631b9627e6c1c4eb77a0e0793f844d0d4c551606844dc9977",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 23.329,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017022552451000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "40e64204c5d93837489a2a33cb81af863e0874faa547680d20ff30ddeb3e674f",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "current_begin_scope_count": 8645,
+      "current_begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "end_batch_count": 2689,
+      "end_batch_digest": "cb5182d2d9033e7631b9627e6c1c4eb77a0e0793f844d0d4c551606844dc9977",
+      "end_owner_scope_len": 8645,
+      "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "necessary_owner_count": 0,
+      "necessary_owners_sample": [],
+      "graph_hash_equal": true,
+      "nonempty_owner_set_equal": true,
+      "all_owner_set_equal": true,
+      "applied_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "cold_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "applied_synthetic": [],
+      "cold_synthetic": [],
+      "kind": "stable-facts",
+      "scope_ratio": null
+    },
+    {
+      "id": "02-add-function",
+      "title": "add a function",
+      "changed_files": [
+        "packages/crypto/src/hmac.ts"
+      ],
+      "blocker": null,
+      "repeats": 1,
+      "initial": {
+        "exit": 0,
+        "wall_s": 23.831,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017058490374000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "d491fcf1b48e764b3525fc07be028b9198f55a15e6ab05401ce33efd8f287ab3",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "delta": {
+        "exit": 0,
+        "wall_s": 21.217,
+        "parsed": 3,
+        "cached": 4242,
+        "files_read": 3,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-2-1790017083892183000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            1,
+            2
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "501eae5d78b23381b4477cf9f21dd50efa1eeca6a8e72c75219133255c90e6a8",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 23.764,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017109315222000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "85bcf42117f2f7ebcb56ff9ba8b2d44625f8c42fd581605c5583b8e72ceb10c3",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "current_begin_scope_count": 8645,
+      "current_begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "end_batch_count": 2689,
+      "end_batch_digest": "501eae5d78b23381b4477cf9f21dd50efa1eeca6a8e72c75219133255c90e6a8",
+      "end_owner_scope_len": 8645,
+      "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "necessary_owner_count": 1,
+      "necessary_owners_sample": [
+        "file:packages/crypto/src/hmac.ts"
+      ],
+      "graph_hash_equal": true,
+      "nonempty_owner_set_equal": true,
+      "all_owner_set_equal": true,
+      "applied_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "cold_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "applied_synthetic": [],
+      "cold_synthetic": [],
+      "kind": "local",
+      "scope_ratio": 8645.0
+    },
+    {
+      "id": "03-rename-symbol",
+      "title": "rename symbol",
+      "changed_files": [
+        "packages/crypto/src/hmac.ts",
+        "packages/crypto/src/index.ts"
+      ],
+      "blocker": null,
+      "repeats": 1,
+      "initial": {
+        "exit": 0,
+        "wall_s": 23.518,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017145783295000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "b01d14cb911b80a93c4716991189ddd3ce65fd1cb4bdb9cf3fcf5072d2e8bbe3",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "delta": {
+        "exit": 0,
+        "wall_s": 21.295,
+        "parsed": 3,
+        "cached": 4243,
+        "files_read": 3,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-2-1790017170999752000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            1,
+            2
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "e171ef261cbc83ad1a97883bf9dad5b379dc5ec6ed84c58ef8885ce3062e3cf0",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 23.522,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017196513047000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "ab657a7911920d77fb497a061841148f35b2a95ec12a033698740245003781de",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "current_begin_scope_count": 8645,
+      "current_begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "end_batch_count": 2689,
+      "end_batch_digest": "e171ef261cbc83ad1a97883bf9dad5b379dc5ec6ed84c58ef8885ce3062e3cf0",
+      "end_owner_scope_len": 8645,
+      "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "necessary_owner_count": 2,
+      "necessary_owners_sample": [
+        "file:packages/crypto/src/hmac.ts",
+        "file:packages/crypto/src/index.ts"
+      ],
+      "graph_hash_equal": true,
+      "nonempty_owner_set_equal": true,
+      "all_owner_set_equal": true,
+      "applied_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "cold_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "applied_synthetic": [],
+      "cold_synthetic": [],
+      "kind": "local",
+      "scope_ratio": 4322.5
+    },
+    {
+      "id": "04-import-target-body",
+      "title": "import target body",
+      "changed_files": [
+        "packages/crypto/src/hmac.ts"
+      ],
+      "blocker": null,
+      "repeats": 1,
+      "initial": {
+        "exit": 0,
+        "wall_s": 24.037,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017232736967000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "45b519e65941716edebcf754c55adba1328ad2b04b19f5a664a31aaa968bf071",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "delta": {
+        "exit": 0,
+        "wall_s": 21.004,
+        "parsed": 1,
+        "cached": 4243,
+        "files_read": 1,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-2-1790017258343160000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            1,
+            2
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "c6b2e2fcfb2b5d2a49c747d53e5d52ebe9898300f6c3a2f8ed4fb74a852fe238",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 23.475,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017283358544000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "eddd56132c78af3b0ac5ce7de217b3d22fecda269ef827f90aae1f821a879764",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "current_begin_scope_count": 8645,
+      "current_begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "end_batch_count": 2689,
+      "end_batch_digest": "c6b2e2fcfb2b5d2a49c747d53e5d52ebe9898300f6c3a2f8ed4fb74a852fe238",
+      "end_owner_scope_len": 8645,
+      "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "necessary_owner_count": 1,
+      "necessary_owners_sample": [
+        "file:packages/crypto/src/hmac.ts"
+      ],
+      "graph_hash_equal": true,
+      "nonempty_owner_set_equal": true,
+      "all_owner_set_equal": true,
+      "applied_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "cold_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "applied_synthetic": [],
+      "cold_synthetic": [],
+      "kind": "local",
+      "scope_ratio": 8645.0
+    },
+    {
+      "id": "05-add-file-import",
+      "title": "add file and import",
+      "changed_files": [
+        "packages/crypto/src/scopeProbe.ts",
+        "packages/crypto/src/hmac.ts"
+      ],
+      "blocker": null,
+      "repeats": 1,
+      "initial": {
+        "exit": 0,
+        "wall_s": 23.919,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017320072434000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "d9843f5f3c3e8ed728d6d746cc0a06c7354a63aa0bd8be5a73472244d73964c3",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "delta": {
+        "exit": 0,
+        "wall_s": 21.753,
+        "parsed": 282,
+        "cached": 4243,
+        "files_read": 282,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 5069,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-2-1790017345399150000",
+        "manifest": {
+          "begin_count": 8646,
+          "begin_digest": "7e5b4848094f969c0a996b0862093190e2c99cc7e612091967d45cb2ef3d3fe2",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            1,
+            2
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "537f4c775c283e42d5d32af0e8260cdcb9a5aa90ca62c6fb4dc68f922a833cda",
+          "end_owner_scope_len": 8646,
+          "end_owner_scope_digest": "7e5b4848094f969c0a996b0862093190e2c99cc7e612091967d45cb2ef3d3fe2",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 23.52,
+        "parsed": 4145,
+        "cached": 0,
+        "files_read": 4245,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5069,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017371400008000",
+        "manifest": {
+          "begin_count": 8646,
+          "begin_digest": "7e5b4848094f969c0a996b0862093190e2c99cc7e612091967d45cb2ef3d3fe2",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "1c276b143c4455540bbd9227a76ada1634eecde39392708923a6f9d469c15147",
+          "end_owner_scope_len": 8646,
+          "end_owner_scope_digest": "7e5b4848094f969c0a996b0862093190e2c99cc7e612091967d45cb2ef3d3fe2",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "current_begin_scope_count": 8646,
+      "current_begin_digest": "7e5b4848094f969c0a996b0862093190e2c99cc7e612091967d45cb2ef3d3fe2",
+      "end_batch_count": 2689,
+      "end_batch_digest": "537f4c775c283e42d5d32af0e8260cdcb9a5aa90ca62c6fb4dc68f922a833cda",
+      "end_owner_scope_len": 8646,
+      "end_owner_scope_digest": "7e5b4848094f969c0a996b0862093190e2c99cc7e612091967d45cb2ef3d3fe2",
+      "necessary_owner_count": 2,
+      "necessary_owners_sample": [
+        "file:packages/crypto/src/hmac.ts",
+        "file:packages/crypto/src/scopeProbe.ts"
+      ],
+      "graph_hash_equal": true,
+      "nonempty_owner_set_equal": true,
+      "all_owner_set_equal": true,
+      "applied_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "cold_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "applied_synthetic": [],
+      "cold_synthetic": [],
+      "kind": "local",
+      "scope_ratio": 4323.0
+    },
+    {
+      "id": "06-delete-file",
+      "title": "delete file",
+      "changed_files": [
+        "packages/crypto/src/hmac.ts",
+        "packages/crypto/src/index.ts"
+      ],
+      "blocker": null,
+      "repeats": 1,
+      "initial": {
+        "exit": 0,
+        "wall_s": 23.773,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017407087275000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "f99525d8d143ede68a715f5d125b59bcf1cc27ce170a23bc295ecbb78a86989c",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "delta": {
+        "exit": 0,
+        "wall_s": 21.686,
+        "parsed": 280,
+        "cached": 3963,
+        "files_read": 280,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 5067,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-2-1790017432536961000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            1,
+            2
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "6e7131a1afa7fee2ca2700b68fb98483fa2a241d28df0c0533a4cb63d061e1ea",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 23.487,
+        "parsed": 4143,
+        "cached": 0,
+        "files_read": 4243,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5067,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017458175379000",
+        "manifest": {
+          "begin_count": 8644,
+          "begin_digest": "42ae2cccd0ecac41db8446c7bd4c63b5b1858733f11da43aba25071c87fc7ed7",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "d049e55768ef6353f8a6d7aee3e7fe43b427bab7d69690b3d53c9792a2c48e09",
+          "end_owner_scope_len": 8644,
+          "end_owner_scope_digest": "42ae2cccd0ecac41db8446c7bd4c63b5b1858733f11da43aba25071c87fc7ed7",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "current_begin_scope_count": 8645,
+      "current_begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "end_batch_count": 2689,
+      "end_batch_digest": "6e7131a1afa7fee2ca2700b68fb98483fa2a241d28df0c0533a4cb63d061e1ea",
+      "end_owner_scope_len": 8645,
+      "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "necessary_owner_count": 3,
+      "necessary_owners_sample": [
+        "file:packages/crypto/src/hmac.ts",
+        "file:packages/crypto/src/index.ts",
+        "file:packages/crypto/src/keys.ts"
+      ],
+      "graph_hash_equal": true,
+      "nonempty_owner_set_equal": true,
+      "all_owner_set_equal": false,
+      "applied_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "cold_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "applied_synthetic": [],
+      "cold_synthetic": [],
+      "kind": "import-closure",
+      "scope_ratio": 2881.67
+    },
+    {
+      "id": "07-rename-file",
+      "title": "rename file",
+      "changed_files": [
+        "packages/crypto/src/hmac.ts",
+        "packages/crypto/src/hmacSha.ts",
+        "packages/crypto/src/index.ts",
+        "packages/crypto/src/keys.ts"
+      ],
+      "blocker": null,
+      "repeats": 1,
+      "initial": {
+        "exit": 0,
+        "wall_s": 23.617,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017494194724000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "07b565fbb3d84bce871b208fabe30fd9ee7af35843e59c8a700dccde6f3ceec8",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "git_name_status": [
+        [
+          "R100",
+          "packages/crypto/src/hmac.ts",
+          "packages/crypto/src/hmacSha.ts"
+        ],
+        [
+          "M",
+          "packages/crypto/src/index.ts"
+        ],
+        [
+          "M",
+          "packages/crypto/src/keys.ts"
+        ]
+      ],
+      "rename_old_new": [
+        "packages/crypto/src/hmac.ts",
+        "packages/crypto/src/hmacSha.ts"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 21.462,
+        "parsed": 281,
+        "cached": 3963,
+        "files_read": 281,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-2-1790017531422251000",
+        "manifest": {
+          "begin_count": 8646,
+          "begin_digest": "cc07e844eb98b9be5e659731f7f87dad8753abf1f849b3da5e883302217222aa",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            1,
+            2
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "f4e699cc5ea53e53532af2ff59cbec5c9bb5f873d71d8c684652406a2c6557ff",
+          "end_owner_scope_len": 8646,
+          "end_owner_scope_digest": "cc07e844eb98b9be5e659731f7f87dad8753abf1f849b3da5e883302217222aa",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 23.321,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017557014143000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "bde803b6467ea1c88d367a2ac676175d8b9a7faebb2f625345ccce44300bd03d",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "1cff6dffadb711fb8bda982a6cb7cfd2b66a708ee29cb14487d340ee9b0b8e02",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "bde803b6467ea1c88d367a2ac676175d8b9a7faebb2f625345ccce44300bd03d",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "current_begin_scope_count": 8646,
+      "current_begin_digest": "cc07e844eb98b9be5e659731f7f87dad8753abf1f849b3da5e883302217222aa",
+      "end_batch_count": 2689,
+      "end_batch_digest": "f4e699cc5ea53e53532af2ff59cbec5c9bb5f873d71d8c684652406a2c6557ff",
+      "end_owner_scope_len": 8646,
+      "end_owner_scope_digest": "cc07e844eb98b9be5e659731f7f87dad8753abf1f849b3da5e883302217222aa",
+      "necessary_owner_count": 4,
+      "necessary_owners_sample": [
+        "file:packages/crypto/src/hmac.ts",
+        "file:packages/crypto/src/hmacSha.ts",
+        "file:packages/crypto/src/index.ts",
+        "file:packages/crypto/src/keys.ts"
+      ],
+      "graph_hash_equal": true,
+      "nonempty_owner_set_equal": true,
+      "all_owner_set_equal": false,
+      "applied_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "cold_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "applied_synthetic": [],
+      "cold_synthetic": [],
+      "kind": "local",
+      "rename_old_in_begin": true,
+      "rename_new_in_begin": true,
+      "rename_old_in_necessary": true,
+      "rename_new_in_necessary": true,
+      "scope_ratio": 2161.5
+    },
+    {
+      "id": "08-package-config",
+      "title": "package/config change",
+      "changed_files": [
+        "packages/crypto/package.json"
+      ],
+      "blocker": null,
+      "repeats": 1,
+      "initial": {
+        "exit": 0,
+        "wall_s": 23.775,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017593105879000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "d617fe55d78c2cad37c8b01779a7a92d5268abfa0cf36f5ff3c02a6a169138e6",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "delta": {
+        "exit": 0,
+        "wall_s": 20.987,
+        "parsed": 0,
+        "cached": 4244,
+        "files_read": 0,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 5069,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-2-1790017618432675000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            1,
+            2
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "88fc0d18298462bf0b31b8dabe2cdd30aa72ff3ebe0780e7ffcb768c9ba34a71",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 23.432,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5069,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017643339016000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "e7d3a6d6c5422d97691aa52c9a67b075b4f97a07a700e23c896e8a894b3b6ea3",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "current_begin_scope_count": 8645,
+      "current_begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "end_batch_count": 2689,
+      "end_batch_digest": "88fc0d18298462bf0b31b8dabe2cdd30aa72ff3ebe0780e7ffcb768c9ba34a71",
+      "end_owner_scope_len": 8645,
+      "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "necessary_owner_count": 1,
+      "necessary_owners_sample": [
+        "file:packages/crypto/package.json"
+      ],
+      "graph_hash_equal": true,
+      "nonempty_owner_set_equal": true,
+      "all_owner_set_equal": true,
+      "applied_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "cold_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "applied_synthetic": [],
+      "cold_synthetic": [],
+      "kind": "local",
+      "scope_ratio": 8645.0
+    },
+    {
+      "id": "09-lock-only",
+      "title": "lock-only",
+      "changed_files": [
+        "pnpm-lock.yaml"
+      ],
+      "blocker": null,
+      "repeats": 1,
+      "initial": {
+        "exit": 0,
+        "wall_s": 23.708,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017679434075000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "692ba72b1ce90e48e9f9118aca28a6ddef44edeaf7a545f190889bf7fecd9e8b",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "delta": {
+        "exit": 0,
+        "wall_s": 2.141,
+        "parsed": 0,
+        "cached": 4244,
+        "files_read": 0,
+        "generation": [
+          1,
+          1
+        ],
+        "owners_published": 0,
+        "events": 0,
+        "run_id": "",
+        "manifest": {
+          "begin_count": null,
+          "begin_digest": null,
+          "begin_schema": null,
+          "begin_generation": null,
+          "end_batch_count": null,
+          "end_batch_digest": null,
+          "end_owner_scope_len": null,
+          "end_owner_scope_digest": null,
+          "batch_seq_count": 0,
+          "batch_phase_set": []
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 23.335,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017708355243000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "45c6e69597575b446f397c80e04304a045677b6cfecdf4c7399be1087538caa2",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "current_begin_scope_count": 0,
+      "current_begin_digest": null,
+      "end_batch_count": null,
+      "end_batch_digest": null,
+      "end_owner_scope_len": null,
+      "end_owner_scope_digest": null,
+      "necessary_owner_count": 0,
+      "necessary_owners_sample": [],
+      "graph_hash_equal": true,
+      "nonempty_owner_set_equal": true,
+      "all_owner_set_equal": true,
+      "applied_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "cold_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "applied_synthetic": [],
+      "cold_synthetic": [],
+      "kind": "noop",
+      "scope_ratio": 1.0
+    },
+    {
+      "id": "10-multi-file",
+      "title": "multi-file change",
+      "changed_files": [
+        "packages/crypto/src/password.ts",
+        "packages/crypto/src/hmac.ts"
+      ],
+      "blocker": null,
+      "repeats": 1,
+      "initial": {
+        "exit": 0,
+        "wall_s": 23.523,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017744660723000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "ad6f9f0970e97ad6427e79d8afc814e45559adbb11dba10132fade78855093a1",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "delta": {
+        "exit": 0,
+        "wall_s": 21.098,
+        "parsed": 2,
+        "cached": 4242,
+        "files_read": 2,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-2-1790017769637521000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            1,
+            2
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "a17520b892eab576a0050efd138975b52190186c958122c016a0cfcf6dc7d33e",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 23.128,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790017794791681000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "8a4c25a6844c08c0277386611273afbaa4df19a7eab1f7e0a3043a32d7dee24f",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "current_begin_scope_count": 8645,
+      "current_begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "end_batch_count": 2689,
+      "end_batch_digest": "a17520b892eab576a0050efd138975b52190186c958122c016a0cfcf6dc7d33e",
+      "end_owner_scope_len": 8645,
+      "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "necessary_owner_count": 1,
+      "necessary_owners_sample": [
+        "file:packages/crypto/src/hmac.ts"
+      ],
+      "graph_hash_equal": true,
+      "nonempty_owner_set_equal": true,
+      "all_owner_set_equal": true,
+      "applied_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "cold_empty_owners_sample": [
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml",
+        "file:.github/workflows/pr-demo-artifacts.yml",
+        "file:.github/workflows/pr-demo-pool.yml"
+      ],
+      "applied_synthetic": [],
+      "cold_synthetic": [],
+      "kind": "local",
+      "scope_ratio": 8645.0
+    }
+  ]
+}
