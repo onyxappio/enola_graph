@@ -39,7 +39,9 @@ type Options struct {
 	Subject     string
 	BatchLimit  int
 	Watch       bool
-	WatchEvery  time.Duration
+	// WatchEvery is a fixed collection window, not a timer reset on every edit.
+	// Non-positive values use DefaultWatchEvery. Baseline analysis starts immediately.
+	WatchEvery time.Duration
 	// WatchIgnore must contain only non-input output artifacts (for example the event sink).
 	WatchIgnore   []string
 	ForceInitial  bool

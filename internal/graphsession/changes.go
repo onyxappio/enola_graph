@@ -251,6 +251,9 @@ func (s *FileChangeSource) Close() error {
 	return err
 }
 
+// DefaultWatchEvery is the fixed change-collection window after the first event.
+const DefaultWatchEvery = 5 * time.Second
+
 // Watch holds one resident writer and runs only in response to events. WatchEvery
 // is a debounce ceiling, not a polling interval or a disk-equality barrier.
 func Watch(ctx context.Context, eng *engine.Engine, repoPath string, sink graphstream.Sink, opts Options) error {
@@ -286,7 +289,7 @@ func Watch(ctx context.Context, eng *engine.Engine, repoPath string, sink graphs
 	}
 	delay := opts.WatchEvery
 	if delay <= 0 {
-		delay = 25 * time.Millisecond
+		delay = DefaultWatchEvery
 	}
 	for {
 		select {

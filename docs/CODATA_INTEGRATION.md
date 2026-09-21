@@ -73,6 +73,13 @@ base graph and validate its fork provenance. The current fork implementation
 requires the same checkout path; independent worktrees are not supported.
 
 `graph watch` uses the same replacement protocol through a resident session.
+It collects changes for **5 seconds** after the first pending event by default.
+Use `enola graph watch --watch-every 10s --nats nats://localhost:4222 /path/to/repo`
+to change that window (a positive duration, such as `5s`, `10s`, or `500ms`).
+Subsequent edits join the pending batch without resetting the timer. Baseline
+analysis starts immediately. Edits during analysis accumulate for the next
+sequential replacement; published events are never overwritten. The window adds
+to analysis, delivery, and consumer-commit latency.
 Its filesystem coverage and observed-watermark guarantees are documented in
 [Resident sessions](RESIDENT_SESSIONS.md). Fresh CLI startup and resident idle
 latency are different measurements.

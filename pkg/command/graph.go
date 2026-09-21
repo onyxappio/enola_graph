@@ -40,6 +40,7 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 	fs := flag.NewFlagSet("graph "+mode, flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
 	var (
+		watchEvery   = fs.Duration("watch-every", graphsession.DefaultWatchEvery, "with watch: fixed change-collection window after the first event (positive duration, e.g. 5s or 10s)")
 		natsURL      = fs.String("nats", "", "NATS URL (JetStream)")
 		stream       = fs.String("stream", "ENOLA_GRAPH", "JetStream stream name")
 		subject      = fs.String("subject", "enola.graph.>", "JetStream subject filter for the stream")
@@ -67,6 +68,9 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 	}
 	if err := fs.Parse(args[1:]); err != nil {
 		os.Exit(2)
+	}
+	if *watchEvery <= 0 {
+		r.cmdFatal("graph", "--watch-every must be a positive duration")
 	}
 	arg := ""
 	if rest := fs.Args(); len(rest) > 0 {
@@ -142,6 +146,7 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 
 	optsFor := func(repo string) graphsession.Options {
 		opts := graphsession.Options{
+			WatchEvery:   *watchEvery,
 			ContextID:    *contextID,
 			StateDir:     *stateDir,
 			RepoID:       *repoID,
