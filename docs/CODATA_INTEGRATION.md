@@ -55,6 +55,12 @@ unchanged.
 | `batch`, phase `resolved` | Stage authoritative owned nodes and edges. Under v2 these writes use only file owners named on Begin. |
 | `end_replace` | Verify every sequence, batch count/digest, final owner manifest and successful completeness; atomically commit the replacement. For v2, `owner_scope_len`/`owner_scope_digest` must match Begin. |
 
+Ordinary v2 content deltas announce the prior file-to-file reverse closure.
+Add, delete, and rename fall back to the full prior/current file domain because
+old import edges cannot prove a safe subset; the run fallback reason records
+that. Export or resolution expansion that would need an owner outside Begin
+fails the run instead of growing the frozen manifest.
+
 A lockfile-only add, edit, rename, or removal under v2 publishes no events and
 does not advance generation. A `PolicyIdentity` change, including repository
 `.gitignore` that alters graph admission, starts a frozen replacement; previously

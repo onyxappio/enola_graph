@@ -50,18 +50,24 @@ def replace_once(path: Path, old: str, new: str) -> None:
 
 
 def parse_events(path: Path):
+    return [record for record, _ in parse_event_records(path)]
+
+
+def parse_event_records(path: Path, offset: int = 0):
+    """Return (decoded record, exact JSON payload bytes) pairs."""
     records = []
     if not path.exists() or path.stat().st_size == 0:
         return records
-    with path.open() as fh:
+    with path.open("rb") as fh:
+        fh.seek(offset)
         for line in fh:
-            line = line.rstrip("\n")
+            line = line.rstrip(b"\n")
             if not line:
                 continue
-            parts = line.split(" ", 2)
+            parts = line.split(b" ", 2)
             if len(parts) < 3:
                 continue
-            records.append(json.loads(parts[2]))
+            records.append((json.loads(parts[2]), parts[2]))
     return records
 
 
@@ -132,6 +138,78 @@ def manifest_fields(records, after_run=None):
     out["batch_seqs"] = [b.get("seq") for b in batches]
     out["batch_phases"] = [b.get("phase") for b in batches]
     return out
+
+
+def validate_replacement(records, raw_records=None):
+    """Validate the frozen v2 complete replacement contract for one run."""
+    begins = [r for r in records if r.get("type") == "begin_replace"]
+    ends = [r for r in records if r.get("type") == "end_replace"]
+    if len(begins) != 1 or len(ends) != 1:
+        raise RuntimeError(f"expected exactly one Begin and End, got {len(begins)}/{len(ends)}")
+    begin, end = begins[0], ends[0]
+    if begin.get("schema_version") != "enola.graph.v2":
+        raise RuntimeError(f"unexpected schema_version {begin.get('schema_version')!r}")
+    if begin.get("scope_mode") != "complete":
+        raise RuntimeError(f"unexpected scope_mode {begin.get('scope_mode')!r}")
+    run_id = begin.get("run_id")
+    if end.get("run_id") != run_id:
+        raise RuntimeError("End run_id does not match Begin")
+    owners = [owner_key(o) for o in begin.get("owner_scope") or []]
+    if len(owners) != len(set(owners)) or any(not k.split(":", 1)[-1] for k in owners):
+        raise RuntimeError("Begin owner scope contains duplicate or empty owner")
+    if begin.get("owner_scope_count") != len(owners):
+        raise RuntimeError("Begin owner_scope_count mismatch")
+    expected_owner_digest = digest_owners([o for o in begin.get("owner_scope") or []])
+    if begin.get("owner_scope_digest") != expected_owner_digest:
+        raise RuntimeError("Begin owner_scope_digest mismatch")
+    if end.get("owner_scope_len") != len(owners) or end.get("owner_scope_digest") != expected_owner_digest:
+        raise RuntimeError("End owner manifest mismatch")
+    comp = end.get("completeness") or {}
+    if comp.get("status") != "success" or comp.get("files_unreadable"):
+        raise RuntimeError(f"replacement incomplete: {comp}")
+    batches = [r for r in records if r.get("type") == "batch" and r.get("run_id") == run_id]
+    seqs = [b.get("seq") for b in batches]
+    if sorted(seqs) != list(range(1, len(seqs) + 1)):
+        raise RuntimeError(f"batch sequences are not contiguous: {seqs[:20]}")
+    if any(b.get("phase") == "scope" for b in batches):
+        raise RuntimeError("v2 complete replacement contains PhaseScope")
+    scope = set(owners)
+    for b in batches:
+        for item in (b.get("nodes") or []) + (b.get("edges") or []):
+            if owner_key(item.get("owner") or {}) not in scope:
+                raise RuntimeError("batch contains owner outside Begin scope")
+    if end.get("batch_count") != len(batches):
+        raise RuntimeError("End batch_count mismatch")
+    if raw_records is not None:
+        payload_by_seq = {
+            rec.get("seq"): raw
+            for rec, raw in raw_records
+            if rec.get("type") == "batch" and rec.get("run_id") == run_id
+        }
+        payloads = [payload_by_seq[seq] for seq in sorted(payload_by_seq)]
+        if end.get("batch_digest") != digest_batches(payloads):
+            raise RuntimeError("End batch_digest mismatch")
+    elif not end.get("batch_digest"):
+        raise RuntimeError("missing End batch_digest")
+    return {"run_id": run_id, "scope": scope, "batch_count": len(batches)}
+
+
+def digest_owners(owners):
+    ordered = sorted((o.get("kind", ""), o.get("id", "")) for o in owners)
+    h = hashlib.sha256()
+    for kind, ident in ordered:
+        h.update(kind.encode())
+        h.update(b"\0")
+        h.update(ident.encode())
+        h.update(b"\0")
+    return h.hexdigest()
+
+
+def digest_batches(payloads):
+    h = hashlib.sha256()
+    for payload in payloads:
+        h.update(payload)
+    return h.hexdigest()
 
 
 class Consumer:
@@ -241,13 +319,27 @@ class Consumer:
         return hashlib.sha256(blob.encode()).hexdigest()
 
 
+def owner_canonical(cons: Consumer, key: str) -> str:
+    nodes = sorted(
+        (cons.owners.get(key) or []),
+        key=lambda n: (n.get("id") or "", n.get("occurrence") or 0, n.get("kind") or "", json.dumps(n, sort_keys=True)),
+    )
+    edges = sorted(
+        (cons.edges.get(key) or []),
+        key=lambda e: (
+            e.get("from_id") or "",
+            e.get("kind") or "",
+            e.get("target_name") or "",
+            e.get("occurrence") or 0,
+            json.dumps(e, sort_keys=True),
+        ),
+    )
+    return json.dumps({"nodes": nodes, "edges": edges}, sort_keys=True, separators=(",", ":"))
+
+
 def necessary_from_consumers(base: Consumer, cold: Consumer):
     keys = base.owner_set_all() | cold.owner_set_all()
-    nec = []
-    for k in sorted(keys):
-        if (base.owners.get(k) or []) != (cold.owners.get(k) or []) or (base.edges.get(k) or []) != (cold.edges.get(k) or []):
-            nec.append(k)
-    return nec
+    return sorted(k for k in keys if owner_canonical(base, k) != owner_canonical(cold, k))
 
 
 def classify(necessary, current, parsed, changed, graph_ok, events):
@@ -257,7 +349,9 @@ def classify(necessary, current, parsed, changed, graph_ok, events):
     if not graph_ok:
         return "equality-failed"
     if not events and nec:
-        return "missed-invalidation"
+        # Same graph hash with a nonempty "necessary" set is oracle noise, not a
+        # missed Enola invalidation. Lock-only required owners stay empty.
+        return "oracle-instability"
     if not nec:
         return "stable-facts" if events else "noop"
     if nec <= changed_owners:
@@ -467,8 +561,10 @@ def run_scenario(binary: Path, gold: Path, work: Path, name: str, title: str, mu
         if live_events.exists():
             live_events.unlink()
         initial = enola(binary, "analyze", root, out / "state-live", live_events, out / "summary-initial.json")
-        initial_recs = parse_events(live_events)
+        initial_pairs = parse_event_records(live_events)
+        initial_recs = [r for r, _ in initial_pairs]
         initial_man = manifest_fields(initial_recs)
+        validate_replacement(initial_recs, initial_pairs)
         result["initial"] = slim_run(initial, initial_man)
         base = Consumer()
         base.apply(initial_recs)
@@ -484,18 +580,28 @@ def run_scenario(binary: Path, gold: Path, work: Path, name: str, title: str, mu
             old_path, new_path = renamed[0][-2], renamed[0][-1]
             result["rename_old_new"] = [old_path, new_path]
         delta = enola(binary, "delta", root, out / "state-live", live_events, out / "summary-delta.json")
-        live_recs = parse_events(live_events)
-        delta_recs = parse_events_from_offset(live_events, before_size)
+        live_pairs = parse_event_records(live_events)
+        live_recs = [r for r, _ in live_pairs]
+        delta_pairs = parse_event_records(live_events, before_size)
+        delta_recs = [r for r, _ in delta_pairs]
         delta["events"] = len(delta_recs)
         delta_man = manifest_fields(delta_recs)
+        if name == "09-lock-only":
+            gen = delta.get("generation") or []
+            if delta_recs or (delta.get("parsed") or 0) != 0 or len(gen) != 2 or gen[0] != gen[1]:
+                raise RuntimeError("lock-only change is not a strict no-op")
+        else:
+            validate_replacement(delta_recs, delta_pairs)
         result["delta"] = slim_run(delta, delta_man)
         applied = Consumer()
         applied.apply(live_recs)
         if cold_events.exists():
             cold_events.unlink()
         cold_run = enola(binary, "analyze", root, out / "state-cold", cold_events, out / "summary-cold.json")
-        cold_recs = parse_events(cold_events)
+        cold_pairs = parse_event_records(cold_events)
+        cold_recs = [r for r, _ in cold_pairs]
         cold_man = manifest_fields(cold_recs)
+        validate_replacement(cold_recs, cold_pairs)
         result["cold"] = slim_run(cold_run, cold_man)
         cold = Consumer()
         cold.apply(cold_recs)
@@ -519,7 +625,18 @@ def run_scenario(binary: Path, gold: Path, work: Path, name: str, title: str, mu
         result["cold_empty_owners_sample"] = cold.empty_owners()[:20]
         result["applied_synthetic"] = applied.synthetic_owners()
         result["cold_synthetic"] = cold.synthetic_owners()
+        if name != "09-lock-only" and not set(nec).issubset(set(current)):
+            raise RuntimeError("required owners are outside Begin scope")
         result["kind"] = classify(nec, current, delta.get("parsed") or 0, changed, graph_ok, delta.get("events") or 0)
+        if name in {"05-add-file-import", "06-delete-file", "07-rename-file"} and len(current) > 100:
+            result["kind"] = "whole-domain-membership"
+            result["fallback"] = "add/delete/rename: prior file graph cannot prove a safe subset"
+        if name == "08-package-config" and len(current) > 100:
+            result["kind"] = "whole-domain-config"
+            result["fallback"] = "config/manifest change: conservative whole-domain fallback"
+        if name not in {"05-add-file-import", "06-delete-file", "07-rename-file", "08-package-config"} and len(current) > 100:
+            result["kind"] = "whole-domain-resolution"
+            result["fallback"] = "exported declaration set changed: conservative resolver fallback"
         if name == "07-rename-file":
             old_id = file_owner(result["rename_old_new"][0])
             new_id = file_owner(result["rename_old_new"][1])
@@ -614,6 +731,11 @@ def main():
     out_json = Path(__file__).with_name("results.json")
     out_json.write_text(json.dumps(summary, indent=2) + "\n")
     print("wrote", out_json)
+    failed = [r for r in results if r.get("blocker") or r.get("graph_hash_equal") is False]
+    if failed:
+        print(f"benchmark failed: {len(failed)} scenario(s)", file=sys.stderr)
+        return 1
+    return 0
 
 
 if __name__ == "__main__":

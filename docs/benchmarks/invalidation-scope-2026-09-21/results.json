@@ -1,9 +1,9 @@
 {
   "source": "/tmp/enola-product-benchmark-source",
   "binary": "/tmp/enola-product-frozen-v2-enola",
-  "work": "/tmp/enola-invalidation-scope-2026-09-21",
+  "work": "/tmp/enola-invalidation-scope-final4-2026-09-21",
   "repeats": 1,
-  "repeat_limitation": "one pass of all 10 independent clones; three repeats skipped because each pass is a full Product initial+delta+cold (~15 min measured)",
+  "repeat_limitation": "one pass of all 10 clones; three repeats skipped because each pass is a full Product initial+delta+cold (~8-10 min)",
   "scenarios": [
     {
       "id": "01-body",
@@ -15,7 +15,7 @@
       "repeats": 1,
       "initial": {
         "exit": 0,
-        "wall_s": 23.849,
+        "wall_s": 38.629,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -25,7 +25,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790016971499952000",
+        "run_id": "product-scope-scope-bench-1-1790027616560793000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -35,7 +35,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "3f33bb9df7eb9f172cd4024b72d8de6b8ff7f93f9fe5882f94455b613b167232",
+          "end_batch_digest": "c9fdd1b26d5a2e06c445d4ada4f7a59e8f7210611fa6d167774b6129c1516f6d",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -46,7 +46,7 @@
       },
       "delta": {
         "exit": 0,
-        "wall_s": 21.365,
+        "wall_s": 3.331,
         "parsed": 1,
         "cached": 4243,
         "files_read": 1,
@@ -54,22 +54,22 @@
           1,
           2
         ],
-        "owners_published": 5068,
-        "events": 2691,
-        "run_id": "product-scope-scope-bench-2-1790016997048616000",
+        "owners_published": 2,
+        "events": 4,
+        "run_id": "product-scope-scope-bench-2-1790027657160538000",
         "manifest": {
-          "begin_count": 8645,
-          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_count": 2,
+          "begin_digest": "56de7c105ab981538dead162651bfdc1f385e1d34a879fade23634aa95f3e082",
           "begin_schema": "enola.graph.v2",
           "begin_generation": [
             1,
             2
           ],
-          "end_batch_count": 2689,
-          "end_batch_digest": "cb5182d2d9033e7631b9627e6c1c4eb77a0e0793f844d0d4c551606844dc9977",
-          "end_owner_scope_len": 8645,
-          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
-          "batch_seq_count": 2689,
+          "end_batch_count": 2,
+          "end_batch_digest": "8ebcb63d6e6367707ca5e8ac881cbc472b14b13a2438ca4334d91068058b20c9",
+          "end_owner_scope_len": 2,
+          "end_owner_scope_digest": "56de7c105ab981538dead162651bfdc1f385e1d34a879fade23634aa95f3e082",
+          "batch_seq_count": 2,
           "batch_phase_set": [
             "resolved"
           ]
@@ -77,7 +77,7 @@
       },
       "cold": {
         "exit": 0,
-        "wall_s": 23.329,
+        "wall_s": 30.469,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -87,7 +87,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017022552451000",
+        "run_id": "product-scope-scope-bench-1-1790027662456219000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -97,7 +97,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "40e64204c5d93837489a2a33cb81af863e0874faa547680d20ff30ddeb3e674f",
+          "end_batch_digest": "3216e7f05d9ce22c12a43db43e011e3ed064169b6d557273a8daeba88d16dbca",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -106,12 +106,12 @@
           ]
         }
       },
-      "current_begin_scope_count": 8645,
-      "current_begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
-      "end_batch_count": 2689,
-      "end_batch_digest": "cb5182d2d9033e7631b9627e6c1c4eb77a0e0793f844d0d4c551606844dc9977",
-      "end_owner_scope_len": 8645,
-      "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "current_begin_scope_count": 2,
+      "current_begin_digest": "56de7c105ab981538dead162651bfdc1f385e1d34a879fade23634aa95f3e082",
+      "end_batch_count": 2,
+      "end_batch_digest": "8ebcb63d6e6367707ca5e8ac881cbc472b14b13a2438ca4334d91068058b20c9",
+      "end_owner_scope_len": 2,
+      "end_owner_scope_digest": "56de7c105ab981538dead162651bfdc1f385e1d34a879fade23634aa95f3e082",
       "necessary_owner_count": 0,
       "necessary_owners_sample": [],
       "graph_hash_equal": true,
@@ -176,7 +176,7 @@
       "repeats": 1,
       "initial": {
         "exit": 0,
-        "wall_s": 23.831,
+        "wall_s": 27.703,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -186,7 +186,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017058490374000",
+        "run_id": "product-scope-scope-bench-1-1790027724744649000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -196,7 +196,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "d491fcf1b48e764b3525fc07be028b9198f55a15e6ab05401ce33efd8f287ab3",
+          "end_batch_digest": "291c0341f026dd2d697714dbf056b132d5eb5d57d87976343be971db63912110",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -207,7 +207,7 @@
       },
       "delta": {
         "exit": 0,
-        "wall_s": 21.217,
+        "wall_s": 33.004,
         "parsed": 3,
         "cached": 4242,
         "files_read": 3,
@@ -217,7 +217,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-2-1790017083892183000",
+        "run_id": "product-scope-scope-bench-2-1790027754156160000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -227,7 +227,7 @@
             2
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "501eae5d78b23381b4477cf9f21dd50efa1eeca6a8e72c75219133255c90e6a8",
+          "end_batch_digest": "005371e1e7af42aa5373e3e23db5be28e1b6228dfc68e81e24ee80632896598e",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -238,7 +238,7 @@
       },
       "cold": {
         "exit": 0,
-        "wall_s": 23.764,
+        "wall_s": 34.006,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -248,7 +248,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017109315222000",
+        "run_id": "product-scope-scope-bench-1-1790027792517923000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -258,7 +258,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "85bcf42117f2f7ebcb56ff9ba8b2d44625f8c42fd581605c5583b8e72ceb10c3",
+          "end_batch_digest": "8c679a92223a7eb4b7b9e03a087070c85926803ce2b03de4ae7f5b67f8df8100",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -270,7 +270,7 @@
       "current_begin_scope_count": 8645,
       "current_begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
       "end_batch_count": 2689,
-      "end_batch_digest": "501eae5d78b23381b4477cf9f21dd50efa1eeca6a8e72c75219133255c90e6a8",
+      "end_batch_digest": "005371e1e7af42aa5373e3e23db5be28e1b6228dfc68e81e24ee80632896598e",
       "end_owner_scope_len": 8645,
       "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
       "necessary_owner_count": 1,
@@ -326,8 +326,9 @@
       ],
       "applied_synthetic": [],
       "cold_synthetic": [],
-      "kind": "local",
-      "scope_ratio": 8645.0
+      "kind": "whole-domain-resolution",
+      "scope_ratio": 8645.0,
+      "fallback": "exported declaration set changed: conservative resolver fallback"
     },
     {
       "id": "03-rename-symbol",
@@ -340,7 +341,7 @@
       "repeats": 1,
       "initial": {
         "exit": 0,
-        "wall_s": 23.518,
+        "wall_s": 34.857,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -350,7 +351,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017145783295000",
+        "run_id": "product-scope-scope-bench-1-1790027844604587000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -360,7 +361,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "b01d14cb911b80a93c4716991189ddd3ce65fd1cb4bdb9cf3fcf5072d2e8bbe3",
+          "end_batch_digest": "811187f1ea77613157231630811cd3b4aa87be7730d90b2909958cda501fa98b",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -371,7 +372,7 @@
       },
       "delta": {
         "exit": 0,
-        "wall_s": 21.295,
+        "wall_s": 28.146,
         "parsed": 3,
         "cached": 4243,
         "files_read": 3,
@@ -381,7 +382,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-2-1790017170999752000",
+        "run_id": "product-scope-scope-bench-2-1790027881636298000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -391,7 +392,7 @@
             2
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "e171ef261cbc83ad1a97883bf9dad5b379dc5ec6ed84c58ef8885ce3062e3cf0",
+          "end_batch_digest": "192d372e99a53da5ec5a51d8dea83dadc316b63af4f7cd3901a157319bcd0fe6",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -402,7 +403,7 @@
       },
       "cold": {
         "exit": 0,
-        "wall_s": 23.522,
+        "wall_s": 23.906,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -412,7 +413,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017196513047000",
+        "run_id": "product-scope-scope-bench-1-1790027915227155000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -422,7 +423,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "ab657a7911920d77fb497a061841148f35b2a95ec12a033698740245003781de",
+          "end_batch_digest": "ca7ece9d8f6d14f3cfd4a750cc4a537253dc1e7b5e26efce2b843022ac3f5fe3",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -434,7 +435,7 @@
       "current_begin_scope_count": 8645,
       "current_begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
       "end_batch_count": 2689,
-      "end_batch_digest": "e171ef261cbc83ad1a97883bf9dad5b379dc5ec6ed84c58ef8885ce3062e3cf0",
+      "end_batch_digest": "192d372e99a53da5ec5a51d8dea83dadc316b63af4f7cd3901a157319bcd0fe6",
       "end_owner_scope_len": 8645,
       "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
       "necessary_owner_count": 2,
@@ -491,8 +492,9 @@
       ],
       "applied_synthetic": [],
       "cold_synthetic": [],
-      "kind": "local",
-      "scope_ratio": 4322.5
+      "kind": "whole-domain-resolution",
+      "scope_ratio": 4322.5,
+      "fallback": "exported declaration set changed: conservative resolver fallback"
     },
     {
       "id": "04-import-target-body",
@@ -504,7 +506,7 @@
       "repeats": 1,
       "initial": {
         "exit": 0,
-        "wall_s": 24.037,
+        "wall_s": 25.366,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -514,7 +516,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017232736967000",
+        "run_id": "product-scope-scope-bench-1-1790027954774359000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -524,7 +526,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "45b519e65941716edebcf754c55adba1328ad2b04b19f5a664a31aaa968bf071",
+          "end_batch_digest": "b63da1cea827a24ac13fdf587c353f0cf89f632ec68b3d29e62c14845dcd2764",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -535,7 +537,7 @@
       },
       "delta": {
         "exit": 0,
-        "wall_s": 21.004,
+        "wall_s": 3.016,
         "parsed": 1,
         "cached": 4243,
         "files_read": 1,
@@ -543,22 +545,22 @@
           1,
           2
         ],
-        "owners_published": 5068,
-        "events": 2691,
-        "run_id": "product-scope-scope-bench-2-1790017258343160000",
+        "owners_published": 3,
+        "events": 4,
+        "run_id": "product-scope-scope-bench-2-1790027982094764000",
         "manifest": {
-          "begin_count": 8645,
-          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_count": 3,
+          "begin_digest": "b7028052e3904d0cd5fb3cbdabac501e086af1ad2004a2338ec7d92918706b04",
           "begin_schema": "enola.graph.v2",
           "begin_generation": [
             1,
             2
           ],
-          "end_batch_count": 2689,
-          "end_batch_digest": "c6b2e2fcfb2b5d2a49c747d53e5d52ebe9898300f6c3a2f8ed4fb74a852fe238",
-          "end_owner_scope_len": 8645,
-          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
-          "batch_seq_count": 2689,
+          "end_batch_count": 2,
+          "end_batch_digest": "d66ebd494d482212c0b99168212d853fbb272676a8db41b57c7ab5ed34a91146",
+          "end_owner_scope_len": 3,
+          "end_owner_scope_digest": "b7028052e3904d0cd5fb3cbdabac501e086af1ad2004a2338ec7d92918706b04",
+          "batch_seq_count": 2,
           "batch_phase_set": [
             "resolved"
           ]
@@ -566,7 +568,7 @@
       },
       "cold": {
         "exit": 0,
-        "wall_s": 23.475,
+        "wall_s": 24.717,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -576,7 +578,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017283358544000",
+        "run_id": "product-scope-scope-bench-1-1790027986794302000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -586,7 +588,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "eddd56132c78af3b0ac5ce7de217b3d22fecda269ef827f90aae1f821a879764",
+          "end_batch_digest": "a4e1b610e4dba658b689ca5f88faefe41c8e1d521267c6de163a83dfe8b3aea4",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -595,12 +597,12 @@
           ]
         }
       },
-      "current_begin_scope_count": 8645,
-      "current_begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
-      "end_batch_count": 2689,
-      "end_batch_digest": "c6b2e2fcfb2b5d2a49c747d53e5d52ebe9898300f6c3a2f8ed4fb74a852fe238",
-      "end_owner_scope_len": 8645,
-      "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "current_begin_scope_count": 3,
+      "current_begin_digest": "b7028052e3904d0cd5fb3cbdabac501e086af1ad2004a2338ec7d92918706b04",
+      "end_batch_count": 2,
+      "end_batch_digest": "d66ebd494d482212c0b99168212d853fbb272676a8db41b57c7ab5ed34a91146",
+      "end_owner_scope_len": 3,
+      "end_owner_scope_digest": "b7028052e3904d0cd5fb3cbdabac501e086af1ad2004a2338ec7d92918706b04",
       "necessary_owner_count": 1,
       "necessary_owners_sample": [
         "file:packages/crypto/src/hmac.ts"
@@ -655,7 +657,7 @@
       "applied_synthetic": [],
       "cold_synthetic": [],
       "kind": "local",
-      "scope_ratio": 8645.0
+      "scope_ratio": 3.0
     },
     {
       "id": "05-add-file-import",
@@ -668,7 +670,7 @@
       "repeats": 1,
       "initial": {
         "exit": 0,
-        "wall_s": 23.919,
+        "wall_s": 24.521,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -678,7 +680,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017320072434000",
+        "run_id": "product-scope-scope-bench-1-1790028027679666000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -688,7 +690,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "d9843f5f3c3e8ed728d6d746cc0a06c7354a63aa0bd8be5a73472244d73964c3",
+          "end_batch_digest": "03bb02294bcb95edc95509954cfe55a09cfed53950526ee209a9e8b71eeb2907",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -699,7 +701,7 @@
       },
       "delta": {
         "exit": 0,
-        "wall_s": 21.753,
+        "wall_s": 22.893,
         "parsed": 282,
         "cached": 4243,
         "files_read": 282,
@@ -709,7 +711,7 @@
         ],
         "owners_published": 5069,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-2-1790017345399150000",
+        "run_id": "product-scope-scope-bench-2-1790028054192096000",
         "manifest": {
           "begin_count": 8646,
           "begin_digest": "7e5b4848094f969c0a996b0862093190e2c99cc7e612091967d45cb2ef3d3fe2",
@@ -719,7 +721,7 @@
             2
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "537f4c775c283e42d5d32af0e8260cdcb9a5aa90ca62c6fb4dc68f922a833cda",
+          "end_batch_digest": "ffd38f9327132a52048a3977fd1a5191d72ee11d6389b4164dfcb73a0f42a059",
           "end_owner_scope_len": 8646,
           "end_owner_scope_digest": "7e5b4848094f969c0a996b0862093190e2c99cc7e612091967d45cb2ef3d3fe2",
           "batch_seq_count": 2689,
@@ -730,7 +732,7 @@
       },
       "cold": {
         "exit": 0,
-        "wall_s": 23.52,
+        "wall_s": 24.563,
         "parsed": 4145,
         "cached": 0,
         "files_read": 4245,
@@ -740,7 +742,7 @@
         ],
         "owners_published": 5069,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017371400008000",
+        "run_id": "product-scope-scope-bench-1-1790028081684506000",
         "manifest": {
           "begin_count": 8646,
           "begin_digest": "7e5b4848094f969c0a996b0862093190e2c99cc7e612091967d45cb2ef3d3fe2",
@@ -750,7 +752,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "1c276b143c4455540bbd9227a76ada1634eecde39392708923a6f9d469c15147",
+          "end_batch_digest": "d9f76427dfd590fb243681efa97a1f424f13c472d2dbd24b89e4e079151f7402",
           "end_owner_scope_len": 8646,
           "end_owner_scope_digest": "7e5b4848094f969c0a996b0862093190e2c99cc7e612091967d45cb2ef3d3fe2",
           "batch_seq_count": 2689,
@@ -762,7 +764,7 @@
       "current_begin_scope_count": 8646,
       "current_begin_digest": "7e5b4848094f969c0a996b0862093190e2c99cc7e612091967d45cb2ef3d3fe2",
       "end_batch_count": 2689,
-      "end_batch_digest": "537f4c775c283e42d5d32af0e8260cdcb9a5aa90ca62c6fb4dc68f922a833cda",
+      "end_batch_digest": "ffd38f9327132a52048a3977fd1a5191d72ee11d6389b4164dfcb73a0f42a059",
       "end_owner_scope_len": 8646,
       "end_owner_scope_digest": "7e5b4848094f969c0a996b0862093190e2c99cc7e612091967d45cb2ef3d3fe2",
       "necessary_owner_count": 2,
@@ -819,7 +821,8 @@
       ],
       "applied_synthetic": [],
       "cold_synthetic": [],
-      "kind": "local",
+      "kind": "whole-domain-membership",
+      "fallback": "add/delete/rename: prior file graph cannot prove a safe subset",
       "scope_ratio": 4323.0
     },
     {
@@ -833,7 +836,7 @@
       "repeats": 1,
       "initial": {
         "exit": 0,
-        "wall_s": 23.773,
+        "wall_s": 24.153,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -843,7 +846,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017407087275000",
+        "run_id": "product-scope-scope-bench-1-1790028123116470000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -853,7 +856,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "f99525d8d143ede68a715f5d125b59bcf1cc27ce170a23bc295ecbb78a86989c",
+          "end_batch_digest": "78d59dd62cf218c39d2fb64cb3a3e45e564abcfc7249c66c60d2ad6890fa4976",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -864,7 +867,7 @@
       },
       "delta": {
         "exit": 0,
-        "wall_s": 21.686,
+        "wall_s": 22.45,
         "parsed": 280,
         "cached": 3963,
         "files_read": 280,
@@ -874,7 +877,7 @@
         ],
         "owners_published": 5067,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-2-1790017432536961000",
+        "run_id": "product-scope-scope-bench-2-1790028149204094000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -884,7 +887,7 @@
             2
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "6e7131a1afa7fee2ca2700b68fb98483fa2a241d28df0c0533a4cb63d061e1ea",
+          "end_batch_digest": "a05961d598a3fe7292355c8aab41998b95d55146d5ffb9ea6e066b59f6e39194",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -895,7 +898,7 @@
       },
       "cold": {
         "exit": 0,
-        "wall_s": 23.487,
+        "wall_s": 23.778,
         "parsed": 4143,
         "cached": 0,
         "files_read": 4243,
@@ -905,7 +908,7 @@
         ],
         "owners_published": 5067,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017458175379000",
+        "run_id": "product-scope-scope-bench-1-1790028176563908000",
         "manifest": {
           "begin_count": 8644,
           "begin_digest": "42ae2cccd0ecac41db8446c7bd4c63b5b1858733f11da43aba25071c87fc7ed7",
@@ -915,7 +918,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "d049e55768ef6353f8a6d7aee3e7fe43b427bab7d69690b3d53c9792a2c48e09",
+          "end_batch_digest": "839dbc70ec5bdb8c2af564be03411be3c5ae1a30bc4be4a57461cf4976181836",
           "end_owner_scope_len": 8644,
           "end_owner_scope_digest": "42ae2cccd0ecac41db8446c7bd4c63b5b1858733f11da43aba25071c87fc7ed7",
           "batch_seq_count": 2689,
@@ -927,7 +930,7 @@
       "current_begin_scope_count": 8645,
       "current_begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
       "end_batch_count": 2689,
-      "end_batch_digest": "6e7131a1afa7fee2ca2700b68fb98483fa2a241d28df0c0533a4cb63d061e1ea",
+      "end_batch_digest": "a05961d598a3fe7292355c8aab41998b95d55146d5ffb9ea6e066b59f6e39194",
       "end_owner_scope_len": 8645,
       "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
       "necessary_owner_count": 3,
@@ -985,7 +988,8 @@
       ],
       "applied_synthetic": [],
       "cold_synthetic": [],
-      "kind": "import-closure",
+      "kind": "whole-domain-membership",
+      "fallback": "add/delete/rename: prior file graph cannot prove a safe subset",
       "scope_ratio": 2881.67
     },
     {
@@ -1001,7 +1005,7 @@
       "repeats": 1,
       "initial": {
         "exit": 0,
-        "wall_s": 23.617,
+        "wall_s": 29.803,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -1011,7 +1015,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017494194724000",
+        "run_id": "product-scope-scope-bench-1-1790028231055493000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -1021,7 +1025,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "07b565fbb3d84bce871b208fabe30fd9ee7af35843e59c8a700dccde6f3ceec8",
+          "end_batch_digest": "aece57468e209292309fd6978235204a0605860415c1f7762ce2342af29643bb",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -1051,7 +1055,7 @@
       ],
       "delta": {
         "exit": 0,
-        "wall_s": 21.462,
+        "wall_s": 27.193,
         "parsed": 281,
         "cached": 3963,
         "files_read": 281,
@@ -1061,7 +1065,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-2-1790017531422251000",
+        "run_id": "product-scope-scope-bench-2-1790028276080017000",
         "manifest": {
           "begin_count": 8646,
           "begin_digest": "cc07e844eb98b9be5e659731f7f87dad8753abf1f849b3da5e883302217222aa",
@@ -1071,7 +1075,7 @@
             2
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "f4e699cc5ea53e53532af2ff59cbec5c9bb5f873d71d8c684652406a2c6557ff",
+          "end_batch_digest": "7c47e2275926003da9140917b30388fd60208824ca32a1bbd48f8e2fecc9c6e1",
           "end_owner_scope_len": 8646,
           "end_owner_scope_digest": "cc07e844eb98b9be5e659731f7f87dad8753abf1f849b3da5e883302217222aa",
           "batch_seq_count": 2689,
@@ -1082,7 +1086,7 @@
       },
       "cold": {
         "exit": 0,
-        "wall_s": 23.321,
+        "wall_s": 25.965,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -1092,7 +1096,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017557014143000",
+        "run_id": "product-scope-scope-bench-1-1790028308709269000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "bde803b6467ea1c88d367a2ac676175d8b9a7faebb2f625345ccce44300bd03d",
@@ -1102,7 +1106,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "1cff6dffadb711fb8bda982a6cb7cfd2b66a708ee29cb14487d340ee9b0b8e02",
+          "end_batch_digest": "854f9f7958a49cfd6b4e24f0abb0d0e24e070d7a0b1bb5548bf874161d71bbd2",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "bde803b6467ea1c88d367a2ac676175d8b9a7faebb2f625345ccce44300bd03d",
           "batch_seq_count": 2689,
@@ -1114,7 +1118,7 @@
       "current_begin_scope_count": 8646,
       "current_begin_digest": "cc07e844eb98b9be5e659731f7f87dad8753abf1f849b3da5e883302217222aa",
       "end_batch_count": 2689,
-      "end_batch_digest": "f4e699cc5ea53e53532af2ff59cbec5c9bb5f873d71d8c684652406a2c6557ff",
+      "end_batch_digest": "7c47e2275926003da9140917b30388fd60208824ca32a1bbd48f8e2fecc9c6e1",
       "end_owner_scope_len": 8646,
       "end_owner_scope_digest": "cc07e844eb98b9be5e659731f7f87dad8753abf1f849b3da5e883302217222aa",
       "necessary_owner_count": 4,
@@ -1173,7 +1177,8 @@
       ],
       "applied_synthetic": [],
       "cold_synthetic": [],
-      "kind": "local",
+      "kind": "whole-domain-membership",
+      "fallback": "add/delete/rename: prior file graph cannot prove a safe subset",
       "rename_old_in_begin": true,
       "rename_new_in_begin": true,
       "rename_old_in_necessary": true,
@@ -1190,7 +1195,7 @@
       "repeats": 1,
       "initial": {
         "exit": 0,
-        "wall_s": 23.775,
+        "wall_s": 28.528,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -1200,7 +1205,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017593105879000",
+        "run_id": "product-scope-scope-bench-1-1790028352885919000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -1210,7 +1215,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "d617fe55d78c2cad37c8b01779a7a92d5268abfa0cf36f5ff3c02a6a169138e6",
+          "end_batch_digest": "67d660e4a363b3de9e2531bcd7b1d862e440074579b90b29057eba6b7a482532",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -1221,7 +1226,7 @@
       },
       "delta": {
         "exit": 0,
-        "wall_s": 20.987,
+        "wall_s": 24.966,
         "parsed": 0,
         "cached": 4244,
         "files_read": 0,
@@ -1231,7 +1236,7 @@
         ],
         "owners_published": 5069,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-2-1790017618432675000",
+        "run_id": "product-scope-scope-bench-2-1790028383387932000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -1241,7 +1246,7 @@
             2
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "88fc0d18298462bf0b31b8dabe2cdd30aa72ff3ebe0780e7ffcb768c9ba34a71",
+          "end_batch_digest": "b50976b9d051d58418d2b993363042e2364a3fc8d671b3e670e90a4e535d1a74",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -1252,7 +1257,7 @@
       },
       "cold": {
         "exit": 0,
-        "wall_s": 23.432,
+        "wall_s": 31.708,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -1262,7 +1267,7 @@
         ],
         "owners_published": 5069,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017643339016000",
+        "run_id": "product-scope-scope-bench-1-1790028414059864000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -1272,7 +1277,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "e7d3a6d6c5422d97691aa52c9a67b075b4f97a07a700e23c896e8a894b3b6ea3",
+          "end_batch_digest": "2bf21e248bb1869a3e4bd4d7994f533b051fd266915cad092cf2057d0ec761ff",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -1284,7 +1289,7 @@
       "current_begin_scope_count": 8645,
       "current_begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
       "end_batch_count": 2689,
-      "end_batch_digest": "88fc0d18298462bf0b31b8dabe2cdd30aa72ff3ebe0780e7ffcb768c9ba34a71",
+      "end_batch_digest": "b50976b9d051d58418d2b993363042e2364a3fc8d671b3e670e90a4e535d1a74",
       "end_owner_scope_len": 8645,
       "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
       "necessary_owner_count": 1,
@@ -1340,7 +1345,8 @@
       ],
       "applied_synthetic": [],
       "cold_synthetic": [],
-      "kind": "local",
+      "kind": "whole-domain-config",
+      "fallback": "config/manifest change: conservative whole-domain fallback",
       "scope_ratio": 8645.0
     },
     {
@@ -1353,7 +1359,7 @@
       "repeats": 1,
       "initial": {
         "exit": 0,
-        "wall_s": 23.708,
+        "wall_s": 28.077,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -1363,7 +1369,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017679434075000",
+        "run_id": "product-scope-scope-bench-1-1790028483495172000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -1373,7 +1379,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "692ba72b1ce90e48e9f9118aca28a6ddef44edeaf7a545f190889bf7fecd9e8b",
+          "end_batch_digest": "140dff0ce3658781f987b6e4cda81f9d812ba05054fd2ed2c2488e766293e31f",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -1384,7 +1390,7 @@
       },
       "delta": {
         "exit": 0,
-        "wall_s": 2.141,
+        "wall_s": 2.273,
         "parsed": 0,
         "cached": 4244,
         "files_read": 0,
@@ -1410,7 +1416,7 @@
       },
       "cold": {
         "exit": 0,
-        "wall_s": 23.335,
+        "wall_s": 34.786,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -1420,7 +1426,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017708355243000",
+        "run_id": "product-scope-scope-bench-1-1790028517532117000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -1430,7 +1436,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "45c6e69597575b446f397c80e04304a045677b6cfecdf4c7399be1087538caa2",
+          "end_batch_digest": "bf0c65433be5ac63f1b7e73779b75263335fd6508f3ee25f8c3c01506643e0da",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -1510,7 +1516,7 @@
       "repeats": 1,
       "initial": {
         "exit": 0,
-        "wall_s": 23.523,
+        "wall_s": 28.078,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -1520,7 +1526,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017744660723000",
+        "run_id": "product-scope-scope-bench-1-1790028589981777000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -1530,7 +1536,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "ad6f9f0970e97ad6427e79d8afc814e45559adbb11dba10132fade78855093a1",
+          "end_batch_digest": "ead03b24d6ebd48f0ded9d8610aeacbc7dd27e28aff9c1405449f87425c01935",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -1541,7 +1547,7 @@
       },
       "delta": {
         "exit": 0,
-        "wall_s": 21.098,
+        "wall_s": 3.298,
         "parsed": 2,
         "cached": 4242,
         "files_read": 2,
@@ -1549,22 +1555,22 @@
           1,
           2
         ],
-        "owners_published": 5068,
-        "events": 2691,
-        "run_id": "product-scope-scope-bench-2-1790017769637521000",
+        "owners_published": 4,
+        "events": 5,
+        "run_id": "product-scope-scope-bench-2-1790028620193163000",
         "manifest": {
-          "begin_count": 8645,
-          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_count": 4,
+          "begin_digest": "7df18fe63b3add0da945c53712d75383f86c1961e7e0698f89fac0da9d1f37a2",
           "begin_schema": "enola.graph.v2",
           "begin_generation": [
             1,
             2
           ],
-          "end_batch_count": 2689,
-          "end_batch_digest": "a17520b892eab576a0050efd138975b52190186c958122c016a0cfcf6dc7d33e",
-          "end_owner_scope_len": 8645,
-          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
-          "batch_seq_count": 2689,
+          "end_batch_count": 3,
+          "end_batch_digest": "8b674345584d3858e41c1bc25a2a74d7ea04a79931cd41b7185eff017b64909a",
+          "end_owner_scope_len": 4,
+          "end_owner_scope_digest": "7df18fe63b3add0da945c53712d75383f86c1961e7e0698f89fac0da9d1f37a2",
+          "batch_seq_count": 3,
           "batch_phase_set": [
             "resolved"
           ]
@@ -1572,7 +1578,7 @@
       },
       "cold": {
         "exit": 0,
-        "wall_s": 23.128,
+        "wall_s": 34.125,
         "parsed": 4144,
         "cached": 0,
         "files_read": 4244,
@@ -1582,7 +1588,7 @@
         ],
         "owners_published": 5068,
         "events": 2691,
-        "run_id": "product-scope-scope-bench-1-1790017794791681000",
+        "run_id": "product-scope-scope-bench-1-1790028625440998000",
         "manifest": {
           "begin_count": 8645,
           "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
@@ -1592,7 +1598,7 @@
             1
           ],
           "end_batch_count": 2689,
-          "end_batch_digest": "8a4c25a6844c08c0277386611273afbaa4df19a7eab1f7e0a3043a32d7dee24f",
+          "end_batch_digest": "e5f722d473a293a46e5a40a4efe471bd436db78d51693a53a147aab7f7abb857",
           "end_owner_scope_len": 8645,
           "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
           "batch_seq_count": 2689,
@@ -1601,12 +1607,12 @@
           ]
         }
       },
-      "current_begin_scope_count": 8645,
-      "current_begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
-      "end_batch_count": 2689,
-      "end_batch_digest": "a17520b892eab576a0050efd138975b52190186c958122c016a0cfcf6dc7d33e",
-      "end_owner_scope_len": 8645,
-      "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+      "current_begin_scope_count": 4,
+      "current_begin_digest": "7df18fe63b3add0da945c53712d75383f86c1961e7e0698f89fac0da9d1f37a2",
+      "end_batch_count": 3,
+      "end_batch_digest": "8b674345584d3858e41c1bc25a2a74d7ea04a79931cd41b7185eff017b64909a",
+      "end_owner_scope_len": 4,
+      "end_owner_scope_digest": "7df18fe63b3add0da945c53712d75383f86c1961e7e0698f89fac0da9d1f37a2",
       "necessary_owner_count": 1,
       "necessary_owners_sample": [
         "file:packages/crypto/src/hmac.ts"
@@ -1661,7 +1667,7 @@
       "applied_synthetic": [],
       "cold_synthetic": [],
       "kind": "local",
-      "scope_ratio": 8645.0
+      "scope_ratio": 4.0
     }
   ]
 }

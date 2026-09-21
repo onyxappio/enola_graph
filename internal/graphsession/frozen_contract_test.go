@@ -87,6 +87,205 @@ func TestFrozenBeginPrecedesParsingAndNeverGrows(t *testing.T) {
 	}
 }
 
+func TestFrozenNarrowContentDeltaExcludesIndependentFile(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"a.ts":           "import {b} from './b'; export const a = b;",
+		"b.ts":           "export const b = 1;",
+		"independent.ts": "export const i = 1;",
+	})
+	eng := testEngine(t, root)
+	state := t.TempDir()
+	opts := Options{StateDir: state, AuthoritativeFiles: true}
+	s1 := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, s1, opts); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "b.ts"), []byte("export const b = 2;"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	s2 := &graphstream.MemorySink{}
+	delta, err := Run(context.Background(), eng, root, s2, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if delta.ParsedFiles != 1 {
+		t.Fatalf("parsed=%d, want 1", delta.ParsedFiles)
+	}
+	bs, _, _, err := DecodeRun(s2.CloneRecords())
+	if err != nil || len(bs) != 1 {
+		t.Fatalf("begin %v %v", bs, err)
+	}
+	owners := map[string]bool{}
+	for _, o := range bs[0].OwnerScope {
+		owners[o.ID] = true
+	}
+	if !owners["a.ts"] || !owners["b.ts"] {
+		t.Fatalf("narrow scope missing importer/imported: %v", bs[0].OwnerScope)
+	}
+	if owners["independent.ts"] {
+		t.Fatalf("independent file leaked into content-delta scope: %v", bs[0].OwnerScope)
+	}
+	if delta.ParsedFiles != 1 {
+		t.Fatalf("planning extract must be reused; parsed=%d", delta.ParsedFiles)
+	}
+	cons := NewConsumer()
+	if err := cons.ApplyRecords(s1.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	if err := cons.ApplyRecords(s2.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	cold := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, cold, Options{StateDir: t.TempDir(), AuthoritativeFiles: true}); err != nil {
+		t.Fatal(err)
+	}
+	oracle := NewConsumer()
+	if err := oracle.ApplyRecords(cold.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, cons, oracle)
+}
+
+func TestFrozenImportTargetBodyStaysNarrow(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"lib.ts":   "export function lib(){ return 1; }",
+		"use.ts":   "import {lib} from './lib'; export function use(){ return lib(); }",
+		"other.ts": "export function other(){ return 0; }",
+	})
+	eng := testEngine(t, root)
+	state := t.TempDir()
+	opts := Options{StateDir: state, AuthoritativeFiles: true}
+	if _, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, opts); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "lib.ts"), []byte("export function lib(){ return 2; }"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	sink := &graphstream.MemorySink{}
+	delta, err := Run(context.Background(), eng, root, sink, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if delta.ParsedFiles != 1 {
+		t.Fatalf("parsed=%d", delta.ParsedFiles)
+	}
+	bs, _, ends, err := DecodeRun(sink.CloneRecords())
+	if err != nil || len(bs) != 1 || len(ends) != 1 {
+		t.Fatalf("envelopes %v %v", bs, err)
+	}
+	if bs[0].OwnerScopeDigest != ends[0].OwnerScopeDigest {
+		t.Fatal("scope changed after Begin")
+	}
+	owners := map[string]bool{}
+	for _, o := range bs[0].OwnerScope {
+		owners[o.ID] = true
+	}
+	if !owners["lib.ts"] || !owners["use.ts"] {
+		t.Fatalf("import-target scope %v", bs[0].OwnerScope)
+	}
+	if owners["other.ts"] {
+		t.Fatalf("unrelated file in import-target scope %v", bs[0].OwnerScope)
+	}
+}
+
+func TestFrozenAddFileUsesMembershipWholeDomain(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"a.ts":           "export const a = 1;",
+		"independent.ts": "export const i = 1;",
+	})
+	eng := testEngine(t, root)
+	state := t.TempDir()
+	opts := Options{StateDir: state, AuthoritativeFiles: true}
+	if _, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, opts); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "new.ts"), []byte("export const n = 1;"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	sink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, sink, opts); err != nil {
+		t.Fatal(err)
+	}
+	bs, _, _, err := DecodeRun(sink.CloneRecords())
+	if err != nil || len(bs) != 1 {
+		t.Fatalf("begin %v %v", bs, err)
+	}
+	owners := map[string]bool{}
+	for _, o := range bs[0].OwnerScope {
+		owners[o.ID] = true
+	}
+	if !owners["new.ts"] || !owners["independent.ts"] || !owners["a.ts"] {
+		t.Fatalf("membership fallback must announce whole domain, got %v", bs[0].OwnerScope)
+	}
+}
+
+func TestFrozenNewImportNameDeltaStaysNarrow(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"a.ts":     "export const a = 1;",
+		"b.ts":     "import {a} from './a'; export const b = a;",
+		"c.ts":     "export const c = 1;",
+		"other.ts": "export const other = 1;",
+	})
+	eng := testEngine(t, root)
+	state := t.TempDir()
+	opts := Options{StateDir: state, AuthoritativeFiles: true}
+	if _, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, opts); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "a.ts"), []byte("import {c} from './c';\nexport const a = c;"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	sink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, sink, opts); err != nil {
+		t.Fatal(err)
+	}
+	bs, _, _, err := DecodeRun(sink.CloneRecords())
+	if err != nil || len(bs) != 1 {
+		t.Fatalf("begin %v %v", bs, err)
+	}
+	owners := map[string]bool{}
+	for _, o := range bs[0].OwnerScope {
+		owners[o.ID] = true
+	}
+	if !owners["a.ts"] || !owners["b.ts"] {
+		t.Fatalf("importer/imported missing from scope %v", bs[0].OwnerScope)
+	}
+	if owners["other.ts"] {
+		t.Fatalf("unrelated file in name-delta scope %v", bs[0].OwnerScope)
+	}
+}
+
+func TestFrozenScanHashVersionStampDoesNotAdvance(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{"a.ts": "export const a=1"})
+	eng := testEngine(t, root)
+	state := t.TempDir()
+	opts := Options{StateDir: state, AuthoritativeFiles: true}
+	first, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("state: %v", err)
+	}
+	st.ScanHashVersion = ""
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	sink := &graphstream.MemorySink{}
+	again, err := Run(context.Background(), eng, root, sink, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if again.TargetGeneration != first.TargetGeneration || len(sink.CloneRecords()) != 0 {
+		t.Fatalf("scan-hash version stamp advanced generation %d→%d events=%d", first.TargetGeneration, again.TargetGeneration, len(sink.CloneRecords()))
+	}
+	st, err = loadCommittedState(state)
+	if err != nil || st.ScanHashVersion != authoritativeScanHashVersion {
+		t.Fatalf("version not stamped: %+v %v", st, err)
+	}
+}
+
 func TestFrozenOversizeBeginPublishesNothing(t *testing.T) {
 	root := setupTSRepo(t, map[string]string{"a.ts": "export const a=1"})
 	sink := &graphstream.MemorySink{}

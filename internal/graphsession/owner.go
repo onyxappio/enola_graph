@@ -302,6 +302,23 @@ func filterGraphNames(eng *engine.Engine, names []string, applyPolicy bool) []st
 	return out
 }
 
+// scanHashEquivalent reports whether stored ScanHash matches the current
+// semantic digest or a pre-version AllNames digest of the same tree. A version
+// stamp or lockfile-policy migration must not by itself advance generation.
+func scanHashEquivalent(st *State, allNames, semantic []string, hashes map[string]string, semanticDigest string) bool {
+	if st == nil {
+		return false
+	}
+	if st.ScanHash == semanticDigest {
+		return true
+	}
+	if st.ScanHashVersion == authoritativeScanHashVersion {
+		return false
+	}
+	legacy := inventoryDigest(allNames, hashes)
+	return st.ScanHash == legacy
+}
+
 func inventoryDigest(files []string, hashes map[string]string) string {
 	seen := map[string]bool{}
 	sorted := make([]string, 0, len(files))
@@ -706,8 +723,9 @@ func captureDeltaContexts(eng *engine.Engine, root string, detected map[string]b
 // Candidate changes can affect references owned by another extractor even when
 // that extractor's local facts did not change (for example a markdown file link
 // gaining a TS file_ref target). Refresh those owners without re-extraction.
-func changedResolutionOwners(groups []ownerOutput, old, next *idIndex) []graphstream.OwnerRef {
+func changedResolutionOwners(groups []ownerOutput, old, next *idIndex, ignoredFiles map[string]bool) []graphstream.OwnerRef {
 	type key struct{ repo, target string }
+	changedNames := changedCandidateNames(old, next, ignoredFiles)
 	changed := map[key]bool{}
 	seen := map[key]bool{}
 	var owners []graphstream.OwnerRef
@@ -715,6 +733,13 @@ func changedResolutionOwners(groups []ownerOutput, old, next *idIndex) []graphst
 		affected := false
 		for _, f := range g.Facts {
 			for _, rel := range f.Relations {
+				// Resolution depends only on the candidate domain for this
+				// target. Ignore cache/order differences when that canonical
+				// domain is identical; real additions, removals, and collisions
+				// remain fail-closed and invalidate the referencing owner.
+				if !changedNames[rel.Target] {
+					continue
+				}
 				k := key{f.Repo, rel.Target}
 				if !seen[k] {
 					a, as := old.resolve(k.repo, k.target)
@@ -736,6 +761,69 @@ func changedResolutionOwners(groups []ownerOutput, old, next *idIndex) []graphst
 		}
 	}
 	return owners
+}
+
+func changedCandidateNames(old, next *idIndex, ignored ...map[string]bool) map[string]bool {
+	ignoredFiles := map[string]bool{}
+	if len(ignored) > 0 && ignored[0] != nil {
+		ignoredFiles = ignored[0]
+	}
+	changed := map[string]bool{}
+	all := map[string]bool{}
+	if old != nil {
+		for name := range old.byName {
+			all[name] = true
+		}
+	}
+	if next != nil {
+		for name := range next.byName {
+			all[name] = true
+		}
+	}
+	for name := range all {
+		oldIDs := candidateIdentities(old, name, ignoredFiles)
+		nextIDs := candidateIdentities(next, name, ignoredFiles)
+		if !slicesEqual(oldIDs, nextIDs) {
+			changed[name] = true
+		}
+	}
+	return changed
+}
+
+func candidateIdentities(idx *idIndex, name string, ignoredFiles map[string]bool) []string {
+	if idx == nil {
+		return nil
+	}
+	rows := make([]string, 0, len(idx.byName[name]))
+	for _, f := range idx.byName[name] {
+		if ignoredFiles[filepath.ToSlash(f.File)] {
+			continue
+		}
+		rows = append(rows, f.Identity())
+	}
+	sort.Strings(rows)
+	if len(rows) < 2 {
+		return rows
+	}
+	unique := rows[:1]
+	for _, row := range rows[1:] {
+		if row != unique[len(unique)-1] {
+			unique = append(unique, row)
+		}
+	}
+	return unique
+}
+
+func slicesEqual(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 func stateResolutionIndex(st *State, repo string) *idIndex {

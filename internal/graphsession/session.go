@@ -226,6 +226,10 @@ type session struct {
 	fast              bool
 	work              WorkCounters
 	prof              *graphprofile.Trace
+	// preparedTS is a dirty-file ExtractSession performed before frozen Begin
+	// so name-delta planning uses composed facts. The later TS path reuses it.
+	preparedTS    *tsextractor.SessionResult
+	preparedDirty map[string]bool
 }
 
 func (s *session) analyze(ctx context.Context) (*Result, error) {
@@ -250,12 +254,19 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	inv, detectedExt, hashes := input.inventory, input.detected, input.hashes
 	contextInputs, cfgHash, capturedCfg := input.contexts, input.configHash, input.config
 	scanHash := inventoryDigest(inv.AllNames, hashes)
+	scanHashVersion := "inventory-v1"
 	if s.opts.AuthoritativeFiles {
 		scanHash = inventoryDigest(graphSemanticNames(s.eng, inv.AllNames), hashes)
+		scanHashVersion = authoritativeScanHashVersion
 	}
 	prevScan := ""
 	if s.state != nil {
 		prevScan = s.state.ScanHash
+		if s.opts.AuthoritativeFiles && scanHashEquivalent(s.state, inv.AllNames, graphSemanticNames(s.eng, inv.AllNames), hashes, scanHash) {
+			// Legacy AllNames or unversioned semantic digest of the same tree
+			// must not look like an input change to opaque extractors.
+			prevScan = scanHash
+		}
 	}
 	repoID := s.opts.RepoID
 	if repoID == "" {
@@ -426,7 +437,8 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		// the full prior/current file union, while retaining incremental parsing.
 		// Empty initial and last-file deletion still Begin before extraction so
 		// the frozen manifest is immutable for the run.
-		changed := initial || forceAll || nonTSNeed || s.state == nil || s.state.ScanHash != scanHash || s.state.ConfigHash != cfgHash || s.state.PolicyIdentity != input.policyIdentity
+		scanChanged := s.state != nil && !scanHashEquivalent(s.state, inv.AllNames, graphSemanticNames(s.eng, inv.AllNames), hashes, scanHash)
+		changed := initial || forceAll || nonTSNeed || s.state == nil || scanChanged || s.state.ConfigHash != cfgHash || s.state.PolicyIdentity != input.policyIdentity
 		if changed {
 			previous := []string{}
 			if s.state != nil {
@@ -442,14 +454,64 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			// lock files used only for extractor detection; including them would
 			// inflate Begin without creating deletable graph owners.
 			current := graphSemanticNames(s.eng, inv.Files)
-			seeds := append(append([]string{}, previous...), current...)
-			s.plan, err = planFileInvalidation(seeds, previous, current, nil, true, nil)
+			// Initial/global-context changes still require the complete domain.
+			// For an ordinary content delta, derive the manifest from changed
+			// files plus reverse file-to-file dependents in the prior state.
+			wholeDomain := initial || forceAll || nonTSNeed || s.state == nil || configChanged || s.state.ConfigHash != cfgHash || s.state.PolicyIdentity != input.policyIdentity || incompleteDependencyRecords(prevFiles)
+			if !wholeDomain && s.state != nil && s.state.FrameworkSig != "" {
+				need, ferr := s.frameworkDirtyRequiresFullScope(inv.Files, prevFiles, hashes, angular)
+				if ferr != nil {
+					return nil, ferr
+				}
+				if need {
+					wholeDomain = true
+					forceAll = true
+					fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "typescript", Scope: "all owned files", Reason: "graphql/grpc/nuxt composition context changed; re-extracting affected TypeScript files"})
+				}
+			}
+			var extraOwners []string
+			if !wholeDomain && s.state != nil {
+				dirty := map[string]bool{}
+				for _, f := range current {
+					st := lookupState(prevFiles, f)
+					h, ok := lookupHash(hashes, f)
+					if tsextractor.IsSessionSource(f, false) && (st == nil || !ok || st.Hash != h || st.Unreadable) {
+						dirty[filepath.ToSlash(f)] = true
+					}
+				}
+				preview, perr := s.prepareFrozenTS(ctx, prevFiles, inv.Files, dirty, angular)
+				if perr != nil {
+					wholeDomain = true
+					fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "planning extract of dirty files failed; using whole domain"})
+				} else {
+					extraOwners = ownersForNameDelta(prevFiles, dirty, preview)
+				}
+			}
+			var planReason string
+			s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, wholeDomain, extraOwners)
 			if err != nil {
 				return nil, err
 			}
+			if !wholeDomain && planReason == frozenScopeMembership {
+				wholeDomain = true
+			}
+			if !wholeDomain && len(s.plan.manifest()) == 0 {
+				// A scan/config input changed without a changed semantic file. Keep
+				// the frozen contract safe by replacing the complete prior/current
+				// domain rather than publishing an empty manifest.
+				wholeDomain = true
+				s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, true, nil)
+				if err != nil {
+					return nil, err
+				}
+			}
 			s.replaceScope = s.plan.manifest()
 			s.scopeLimited = true
-			fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "frozen scope: global name-resolution domain"})
+			scopeLabel := "changed files and reverse file dependents"
+			if wholeDomain || planReason == frozenScopeMembership || planReason == frozenScopeWholeDomain {
+				scopeLabel = "all prior/current file owners"
+			}
+			fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: scopeLabel, Reason: planReason})
 			phase := graphstream.PhaseResolved
 			if initial || forceAll {
 				phase = graphstream.PhaseEpoch
@@ -608,6 +670,17 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				continue
 			}
 			tr.Mark("ts_dirty_scope", fmt.Sprintf("dirty=%d scope=%d force=%v", dirtyCount(dirty), len(scopeFiles), forceAll))
+			if s.opts.AuthoritativeFiles && s.plan != nil && !forceAll {
+				for f, d := range dirty {
+					if !d {
+						continue
+					}
+					id := filepath.ToSlash(f)
+					if tsextractor.IsSessionSource(id, angular) && !s.plan.member[id] {
+						return nil, fmt.Errorf("frozen invalidation plan missed dirty file %s", id)
+					}
+				}
+			}
 			fileOwners := scopeOwnerRefs(scopeFiles, owned, s.state, forceAll)
 			fileOwners = append(fileOwners, nonTSFileOwners...)
 			graphstream.SortOwners(fileOwners)
@@ -675,9 +748,17 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 					s.publishLocal(ctx, runID, repoID, rec, &earlyLocal)
 				},
 			}
-			res, err := ts.ExtractSession(ctx, s.abs, owned, prevRecs, dirtyArg, hooks)
-			if err != nil {
-				return nil, fmt.Errorf("typescript extract: %w", err)
+			var res *tsextractor.SessionResult
+			if s.preparedTS != nil {
+				res = s.preparedTS
+				s.preparedTS = nil
+				s.preparedDirty = nil
+			} else {
+				var xerr error
+				res, xerr = ts.ExtractSession(ctx, s.abs, owned, prevRecs, dirtyArg, hooks)
+				if xerr != nil {
+					return nil, fmt.Errorf("typescript extract: %w", xerr)
+				}
 			}
 			tr.Mark("ts_extract_session", fmt.Sprintf("parsed=%d cached=%d facts=%d records=%d", res.Stats.FilesParsed, res.Stats.CachedFiles, len(res.Facts), len(res.Records)))
 			if err := s.fileLocalErr(); err != nil {
@@ -689,6 +770,23 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			}
 			for k, v := range res.Records {
 				workRecs[k] = v
+			}
+			if s.opts.AuthoritativeFiles && s.plan != nil && !forceAll {
+				for path, rec := range res.Records {
+					if rec == nil {
+						continue
+					}
+					id := filepath.ToSlash(path)
+					parsed := dirtyArg[id] || dirtyArg[path] || dirty[id] || dirty[path]
+					if !parsed {
+						continue
+					}
+					if tsextractor.IsSessionSource(id, angular) && !s.plan.member[id] {
+						return nil, fmt.Errorf("frozen invalidation plan missed extracted file %s", id)
+					}
+					// Import targets of a dirty file are edges owned by that file.
+					// They do not require the target owner to be in the replacement.
+				}
 			}
 			if !forceAll {
 				changed := map[string]bool{}
@@ -761,6 +859,14 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 					}
 					need[p] = true
 					dirty[p] = true
+				}
+				if len(need) > 0 && s.opts.AuthoritativeFiles && s.plan != nil {
+					for p := range need {
+						id := filepath.ToSlash(p)
+						if !s.plan.member[id] {
+							return nil, fmt.Errorf("frozen invalidation plan missed post-parse dependent %s", id)
+						}
+					}
 				}
 				if len(need) > 0 {
 					if s.capturedSources == nil {
@@ -1009,6 +1115,17 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				return nil, err
 			}
 		}
+		if s.opts.AuthoritativeFiles && s.state != nil && (s.state.ScanHashVersion != scanHashVersion || s.state.ScanHash != scanHash) && scanHashEquivalent(s.state, inv.AllNames, graphSemanticNames(s.eng, inv.AllNames), hashes, scanHash) {
+			st, err := cloneState(s.state)
+			if err != nil {
+				return nil, err
+			}
+			st.ScanHash = scanHash
+			st.ScanHashVersion = scanHashVersion
+			if err := saveState(s.opts.StateDir, st); err != nil {
+				return nil, err
+			}
+		}
 		return &Result{
 			Invalidation:     invalidation,
 			BaseGeneration:   base,
@@ -1026,12 +1143,6 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			if o.Kind == graphstream.OwnerSynthetic {
 				continue
 			}
-			if s.plan == nil {
-				return nil, fmt.Errorf("missing frozen invalidation plan")
-			}
-			if err := s.plan.check(o); err != nil {
-				return nil, err
-			}
 			kept = append(kept, f)
 		}
 		allFacts = kept
@@ -1044,7 +1155,15 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		if old == nil {
 			old = stateResolutionIndex(s.state, repoID)
 		}
-		s.growScope(changedResolutionOwners(grouped, old, idx))
+		resOwners := changedResolutionOwners(grouped, old, idx, nil)
+		if s.opts.AuthoritativeFiles && s.plan != nil {
+			for _, o := range resOwners {
+				if o.Kind == graphstream.OwnerFile && !s.plan.member[o.ID] {
+					return nil, fmt.Errorf("frozen invalidation plan missed resolution owner %s", o.ID)
+				}
+			}
+		}
+		s.growScope(resOwners)
 	}
 	tr.Mark("index_group_owners", fmt.Sprintf("facts=%d owners=%d", len(allFacts), len(grouped)))
 	owners := make([]graphstream.OwnerRef, 0, len(grouped)+len(s.replaceScope)+8)
@@ -1134,6 +1253,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	next.Files = newFiles
 	next.Synthetic = syn
 	next.ScanHash = scanHash
+	next.ScanHashVersion = scanHashVersion
 	next.ExtractorDigest = extractorDigest
 	next.ExtractorInputHash = extractorInput
 	next.ExtractorSynthetic = synByExt
@@ -1438,8 +1558,9 @@ func (s *session) growScope(owners []graphstream.OwnerRef) {
 				continue
 			}
 			if err := s.plan.check(o); err != nil {
-				s.localErr = err
-				return
+				// Begin froze the owner set. Cached owners outside it are not
+				// published this run and must not grow the manifest.
+				continue
 			}
 		}
 		return
@@ -1776,6 +1897,96 @@ func (s *session) end(ctx context.Context, runID string, batchCount int, owners 
 
 func recMissing(st *FileState) bool {
 	return st == nil || (st.Extractor == "typescript" && st.TS == nil)
+}
+
+func (s *session) frameworkDirtyRequiresFullScope(files []string, prevFiles map[string]*FileState, hashes map[string]string, angular bool) (bool, error) {
+	if s.state == nil || s.state.FrameworkSig == "" {
+		return false, nil
+	}
+	owned := tsextractor.SessionFiles(files, angular)
+	dirty := map[string]bool{}
+	prevRecs := map[string]*tsextractor.FileRecord{}
+	for path, rec := range prevFiles {
+		if rec != nil && rec.TS != nil {
+			prevRecs[path] = rec.TS
+		}
+	}
+	for _, f := range owned {
+		st := lookupState(prevFiles, f)
+		h, ok := lookupHash(hashes, f)
+		if !ok || st == nil || st.Hash != h || st.Unreadable {
+			dirty[filepath.ToSlash(f)] = true
+		}
+	}
+	if !anyDirty(dirty) {
+		return false, nil
+	}
+	captured := s.capturedSources
+	if captured == nil {
+		captured = map[string][]byte{}
+	}
+	for f, d := range dirty {
+		if !d {
+			continue
+		}
+		if _, ok := captured[f]; ok {
+			continue
+		}
+		b, rerr := os.ReadFile(filepath.Join(s.abs, f))
+		if rerr != nil {
+			continue
+		}
+		captured[f] = b
+	}
+	sig, err := tsextractor.CompositionSignature(s.abs, owned, prevRecs, dirty, captured, s.eng.GraphScope())
+	if err != nil {
+		return false, fmt.Errorf("unreadable required input while computing composition context: %w", err)
+	}
+	s.frameworkSig = sig
+	return s.state.FrameworkSig != sig, nil
+}
+
+func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*FileState, files []string, dirty map[string]bool, angular bool) (map[string][]facts.Fact, error) {
+	out := map[string][]facts.Fact{}
+	if len(dirty) == 0 {
+		return out, nil
+	}
+	var ts *tsextractor.TSExtractor
+	for _, ext := range s.eng.Extractors() {
+		if t, ok := ext.(*tsextractor.TSExtractor); ok {
+			ts = t
+			break
+		}
+	}
+	if ts == nil {
+		return nil, fmt.Errorf("no typescript extractor for planning extract")
+	}
+	owned := tsextractor.SessionFiles(files, angular)
+	prevRecs := map[string]*tsextractor.FileRecord{}
+	for path, st := range prevFiles {
+		if st != nil && st.TS != nil {
+			prevRecs[path] = st.TS
+		}
+	}
+	res, err := ts.ExtractSession(ctx, s.abs, owned, prevRecs, dirty, tsextractor.SessionHooks{
+		SkipConfigPaths: true,
+		Sources:         s.capturedSources,
+	})
+	if err != nil {
+		return nil, err
+	}
+	s.preparedTS = res
+	s.preparedDirty = dirty
+	for path, rec := range res.Records {
+		id := filepath.ToSlash(path)
+		if rec == nil || !dirty[id] && !dirty[path] {
+			continue
+		}
+		ff := cloneTagged(rec.Facts, "")
+		applyLocalIO(ff)
+		out[id] = ff
+	}
+	return out, nil
 }
 
 func tagRepo(ff []facts.Fact, repo string) {

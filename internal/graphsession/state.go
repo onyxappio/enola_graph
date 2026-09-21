@@ -11,6 +11,7 @@ import (
 )
 
 const stateSchema = "enola.graphstate.v1"
+const authoritativeScanHashVersion = "semantic-v1"
 
 // State is durable analysis state for one (repo, context) pair.
 type State struct {
@@ -31,6 +32,7 @@ type State struct {
 	// ScanHash is a digest of walked names (including ignore-glob files) and
 	// their content hashes. Unknown-owner extractors use it as their input set.
 	ScanHash        string            `json:"scan_hash,omitempty"`
+	ScanHashVersion string            `json:"scan_hash_version,omitempty"`
 	ExtractorDigest map[string]string `json:"extractor_digest,omitempty"`
 	// ExtractorInputHash is the file-set/context digest each extractor last
 	// consumed (inventory names and hashes passed to Extract), independent of

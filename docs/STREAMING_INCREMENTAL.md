@@ -98,11 +98,25 @@ Initial analysis must overlap extraction with bounded async broker delivery.
 The flag is opt-in and binds the state directory; a forked checkpoint keeps the
 source protocol and must be reopened with the same flag.
 
-BeginReplace publishes the complete file-owner manifest (`scope_mode=complete`)
-before any file parse. That owner set is frozen for the run. Batches are
-`resolved` file-owned replacements only. EndReplace repeats the same owner-scope
-count and digest. Empty initial analysis still publishes an epoch. Deleting the
-last contributing file publishes an empty replacement of that file owner.
+BeginReplace publishes a complete file-owner manifest (`scope_mode=complete`)
+before any file parse. That owner set is frozen for the run: later dirty-file
+discovery or export/resolution expansion that needs an owner outside Begin
+fails the run instead of growing the manifest. Batches are `resolved`
+file-owned replacements only. EndReplace repeats the same owner-scope count
+and digest.
+
+Ordinary content edits of existing files use the prior file-to-file reverse
+closure plus every cached owner (any extractor) whose **published** facts
+mention an added or removed `Fact.Name` or relation target. Those names come
+from a bounded TypeScript session on the dirty files with the full owned set
+(so GraphQL/route composition matches the later stream), `applyLocalIO`, then
+Begin. The same `SessionResult` is reused; dirty files are not parsed twice.
+Source regex over `export` identifiers is not a sound bound for generated
+facts. The coarse alternative of every owner with published edges is only
+~1.7× on Product (5047/8645) and is not used. Add, delete, and rename still
+fall back to the full prior/current file domain. Late fail-closed checks
+remain a guard. Empty initial analysis still publishes an epoch. Deleting
+the last contributing file publishes an empty replacement of that file owner.
 
 An oversized Begin fails closed with zero published events: v2 never splits the
 file-owner manifest into `PhaseScope` chunks. `--max-begin-bytes` sets that cap

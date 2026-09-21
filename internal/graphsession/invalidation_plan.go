@@ -3,10 +3,230 @@ package graphsession
 import (
 	"fmt"
 	"path"
+	"path/filepath"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/tsextractor"
+	"github.com/enola-labs/enola/internal/facts"
 	"github.com/enola-labs/enola/internal/graphstream"
 )
+
+// authoritativeFilePlan derives the immutable replacement manifest before any
+// new extraction starts. For ordinary deltas it uses the previous file-level
+// dependency graph and reverse-closes the changed file set. A whole-domain
+// fallback remains available for initial runs, config/policy changes, and
+// incomplete dependency records.
+const (
+	frozenScopeReverseClose = "frozen scope: prior file-to-file dependency closure"
+	frozenScopeWholeDomain  = "frozen scope: global name-resolution domain"
+	frozenScopeMembership   = "add/delete/rename: prior file graph cannot prove a safe subset"
+	frozenScopeNameDelta    = "frozen scope: reverse-close plus owners that reference added or removed fact names"
+)
+
+func authoritativeFilePlan(previous, current []string, prevFiles map[string]*FileState, hashes map[string]string, wholeDomain bool, extraOwners []string) (*fileInvalidationPlan, string, error) {
+	previous = graphPublishedOwners(previous)
+	current = graphSemanticNames(nil, current)
+	domain := append(append([]string{}, previous...), current...)
+	if wholeDomain {
+		p, err := planFileInvalidation(domain, previous, current, nil, true, domain)
+		return p, frozenScopeWholeDomain, err
+	}
+
+	known := make(map[string]bool, len(domain))
+	for _, f := range domain {
+		known[f] = true
+	}
+	currentSet := make(map[string]bool, len(current))
+	for _, f := range current {
+		currentSet[f] = true
+	}
+	previousSet := make(map[string]bool, len(previous))
+	for _, f := range previous {
+		previousSet[f] = true
+	}
+	changed := make(map[string]bool)
+	membershipChanged := false
+	for _, f := range current {
+		st := lookupState(prevFiles, f)
+		h, present := lookupHash(hashes, f)
+		if st == nil || !present || st.Hash != h || st.Unreadable {
+			ownedBefore := previousSet[f]
+			source := tsextractor.IsSessionSource(f, false)
+			if ownedBefore || source {
+				changed[f] = true
+			}
+			if !ownedBefore && source {
+				membershipChanged = true
+			}
+		}
+	}
+	for _, f := range previous {
+		if !currentSet[f] {
+			changed[f] = true
+			membershipChanged = true
+			continue
+		}
+		if _, present := lookupHash(hashes, f); !present {
+			changed[f] = true
+		}
+	}
+	// A new or renamed file can satisfy an import that was previously
+	// unresolved. Include those importers before Begin so resolution changes
+	// cannot escape the frozen manifest.
+	if membershipChanged {
+		// Add/delete/rename can introduce resolution edges that did not exist
+		// in the prior file graph, including name collisions against already
+		// resolved imports. Old reverse-edges cannot prove a safe subset.
+		p, err := planFileInvalidation(domain, previous, current, nil, true, domain)
+		return p, frozenScopeMembership, err
+	}
+
+	deps := make(map[string][]string)
+	for path, st := range prevFiles {
+		if st == nil {
+			continue
+		}
+		from := filepath.ToSlash(path)
+		if st.TS != nil {
+			for _, dep := range st.TS.ResolvedFiles {
+				dep = filepath.ToSlash(dep)
+				if known[dep] {
+					deps[from] = append(deps[from], dep)
+				}
+			}
+		}
+	}
+	seed := make([]string, 0, len(changed)+len(extraOwners))
+	for f := range changed {
+		seed = append(seed, f)
+	}
+	for _, f := range extraOwners {
+		f = filepath.ToSlash(f)
+		if f != "" {
+			seed = append(seed, f)
+		}
+	}
+	// planFileInvalidation reverse-closes file dependencies. extraOwners must
+	// already include every cached owner whose facts mention added/removed
+	// names; buildIndex resolves Fact.Name globally, not along import edges.
+	p, err := planFileInvalidation(seed, previous, current, deps, false, nil)
+	reason := frozenScopeReverseClose
+	if len(extraOwners) > 0 {
+		reason = frozenScopeNameDelta
+	}
+	return p, reason, err
+}
+
+func factResolutionNames(ff []facts.Fact) map[string]bool {
+	out := map[string]bool{}
+	for _, f := range ff {
+		if f.Name != "" {
+			out[f.Name] = true
+		}
+		for _, r := range f.Relations {
+			if r.Target != "" {
+				out[r.Target] = true
+			}
+		}
+	}
+	return out
+}
+
+func cachedResolutionFacts(st *FileState) []facts.Fact {
+	ff := fileFacts(st)
+	if st == nil {
+		return ff
+	}
+	for _, extra := range st.Contrib {
+		ff = append(ff, extra...)
+	}
+	return ff
+}
+
+func ownersForNameDelta(prevFiles map[string]*FileState, dirty map[string]bool, newFacts map[string][]facts.Fact) []string {
+	delta := map[string]bool{}
+	for f, isDirty := range dirty {
+		if !isDirty {
+			continue
+		}
+		key := filepath.ToSlash(f)
+		old := factResolutionNames(cachedResolutionFacts(lookupState(prevFiles, key)))
+		neu := factResolutionNames(newFacts[key])
+		if neu == nil {
+			neu = factResolutionNames(newFacts[f])
+		}
+		for n := range old {
+			if !neu[n] {
+				delta[n] = true
+			}
+		}
+		for n := range neu {
+			if !old[n] {
+				delta[n] = true
+			}
+		}
+	}
+	if len(delta) == 0 {
+		return nil
+	}
+	seen := map[string]bool{}
+	var owners []string
+	for path, st := range prevFiles {
+		path = filepath.ToSlash(path)
+		if seen[path] {
+			continue
+		}
+		names := factResolutionNames(cachedResolutionFacts(st))
+		for n := range names {
+			if delta[n] {
+				seen[path] = true
+				owners = append(owners, path)
+				break
+			}
+		}
+	}
+	return owners
+}
+
+func relationBearingOwnerCount(prevFiles map[string]*FileState) (total, withRelations int) {
+	for _, st := range prevFiles {
+		total++
+		for _, f := range cachedResolutionFacts(st) {
+			if len(f.Relations) > 0 {
+				withRelations++
+				break
+			}
+		}
+	}
+	return total, withRelations
+}
+
+func incompleteDependencyRecords(prevFiles map[string]*FileState) bool {
+	withSpecs, withResolved := 0, 0
+	for _, st := range prevFiles {
+		if st == nil || st.TS == nil {
+			continue
+		}
+		if len(st.TS.ImportSpecs) > 0 {
+			withSpecs++
+		}
+		if len(st.TS.ResolvedFiles) > 0 {
+			withResolved++
+		}
+	}
+	if withSpecs == 0 || withResolved > 0 {
+		return false
+	}
+	for _, st := range prevFiles {
+		if st == nil || st.TS == nil {
+			continue
+		}
+		if st.TS.ImportComplete || len(st.TS.UnresolvedSpecs) > 0 || len(st.TS.ResolvedFiles) > 0 {
+			return false
+		}
+	}
+	return true
+}
 
 // fileInvalidationPlan is immutable after construction. Dependencies point from
 // a source file to the files its analysis depends on. A fallback domain must be
