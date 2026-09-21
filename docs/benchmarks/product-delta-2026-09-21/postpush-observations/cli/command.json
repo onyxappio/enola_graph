@@ -1,0 +1,22 @@
+[
+  "python3",
+  "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/cli.py",
+  "--binary",
+  "/tmp/enola-postpush-stage",
+  "--root",
+  "/tmp/enola-postpush-isolated-cli",
+  "--source",
+  "/tmp/enola-product-benchmark-source",
+  "--nats",
+  "nats://127.0.0.1:14350",
+  "--repeat",
+  "3",
+  "--scope-config",
+  "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/product-graph-scope.yaml",
+  "--old",
+  "/tmp/enola-product-old",
+  "--old-config",
+  "/tmp/enola-postpush-isolated-cli/legacy-scope.json",
+  "--scope-tool",
+  "/tmp/enola-postpush-stage-benchscope"
+]

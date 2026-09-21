@@ -1,0 +1,15 @@
+{
+  "product_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "observer": "/tmp/enola-product-observer",
+  "observer_sha256": "b51f09bff5e96717190e5536bdd0a3a6d2ca2fd7b05c0c3a7074b496bb0524c1",
+  "resident": "/tmp/enola-coalesced-benchresident",
+  "resident_sha256": "f96411f7e545c9538753807c5d32e68462d59a1150de3e3146b3550464579533",
+  "binary": "/tmp/enola-coalesced-enola",
+  "binary_sha256": "2332201887aad45d8e13783d7dd60767a29f4bacc6081dd1a5ebdf1a603bb120",
+  "profile": "full",
+  "config": "repo: /tmp/enola-product-history-source\n\n# Copy to Product/mcp-arch.yaml. Paths are relative to the Product checkout.\ngraph_inputs:\n  # Additive to defaults and Git ignore rules. Applies to tracked files too.\n  exclude:\n    - \"apps/mobile/e2e/artifacts/**\"\n    - \"worker-reports/**\"\n",
+  "started_ns": 1789986098611901000,
+  "base_sha": "a6f1f3a91a36ea3dead786560412a4944a009694",
+  "target_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "changed_files": "M\t.github/workflows/prod-deploy.yml\nM\t.github/workflows/product-core-clickpipes-production.yml\nM\t.github/workflows/product-core-clickpipes-test.yml\nM\tdocs/analytics/product-core-bronze.md\nM\tinfra/pulumi/src/gcp/productCoreClickPipes.test.ts\nM\tinfra/pulumi/src/gcp/productCoreClickPipes.ts\nM\tinfra/pulumi/src/index.ts\nM\tinfra/pulumi/src/onyxEnvironment.ts\nA\tpackages/clickhouse/scripts/clickhouse/print-product-core-contract-digest.ts\nA\tpackages/clickhouse/src/productCoreBronze/contractDigest.snapshot.json\nA\tpackages/clickhouse/src/productCoreBronze/contractDigest.test.ts\nA\tpackages/clickhouse/src/productCoreBronze/contractDigest.ts\nM\tpackages/clickhouse/src/productCoreBronze/index.ts\nA\tpackages/clickhouse/src/productCoreBronze/prepareDestination.test.ts\nA\tpackages/clickhouse/src/productCoreBronze/prepareDestination.ts\nM\tpackages/clickhouse/src/productCoreContractParity.test.ts\nA\tscripts/clickhouse/print-product-core-contract-digest.ts\nM\tscripts/deploy/prod-deploy-clickpipes-continuity.test.mjs\nA\tscripts/deploy/product-core-bronze-containment-decision.mjs\nA\tscripts/deploy/product-core-bronze-containment-decision.test.mjs\nA\tscripts/deploy/product-core-bronze-pending-only.mjs\nA\tscripts/deploy/product-core-bronze-pending-only.test.mjs\nM\tscripts/deploy/product-core-clickpipes-evidence.mjs\nM\tscripts/deploy/product-core-clickpipes-evidence.test.mjs\nM\tscripts/deploy/product-core-clickpipes-production-workflow.test.mjs\nM\tscripts/deploy/product-core-clickpipes-runbook.test.mjs\nM\tscripts/deploy/product-core-clickpipes-test-workflow.test.mjs\n"
+}

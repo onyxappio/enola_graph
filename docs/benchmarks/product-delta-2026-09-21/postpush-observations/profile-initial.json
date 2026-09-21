@@ -1,0 +1,58 @@
+[
+  {
+    "Invalidation": {
+      "RawConfigChanged": false,
+      "PolicyReconciled": false,
+      "AddedSources": 0,
+      "RemovedSources": 0,
+      "ContextAffectedSources": 0,
+      "ContextReasons": null,
+      "ParsedByReason": {
+        "initial": 4144
+      }
+    },
+    "RunID": "/tmp/enola-product-benchmark-source-postpush-profile-1-1789984603182363000",
+    "BaseGeneration": 0,
+    "TargetGeneration": 1,
+    "Stats": {
+      "files_read": 4244,
+      "files_parsed": 4144,
+      "cached_files": 0,
+      "graphql_parsed": 2,
+      "sfc_parsed": 17,
+      "summary_scans": 0
+    },
+    "Fallbacks": [
+      {
+        "extractor": "manifests",
+        "scope": "all files owned by extractor",
+        "reason": "no per-file incremental session; whole-extractor re-run"
+      },
+      {
+        "extractor": "mdintent",
+        "scope": "all files owned by extractor",
+        "reason": "no per-file incremental session; whole-extractor re-run"
+      },
+      {
+        "extractor": "hcl",
+        "scope": "all files owned by extractor",
+        "reason": "no per-file incremental session; whole-extractor re-run"
+      },
+      {
+        "extractor": "python",
+        "scope": "all files owned by extractor",
+        "reason": "no per-file incremental session; whole-extractor re-run"
+      },
+      {
+        "extractor": "swift",
+        "scope": "all files owned by extractor",
+        "reason": "no per-file incremental session; whole-extractor re-run"
+      }
+    ],
+    "Unreadable": null,
+    "OwnersPublished": 5510,
+    "ParsedFiles": 4144,
+    "EarlyLocal": 4144,
+    "Facts": null
+  }
+]

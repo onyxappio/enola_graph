@@ -73,6 +73,10 @@ the CLI and multifile harnesses implement the legacy comparison below.
 Native resident measurements call ApplyChanges in a request-driven harness using
 real fsnotify batches; they do not include production Watch debounce latency.
 They prove observed-watermark processing, not instantaneous filesystem equality.
+The external configuration resides in a dedicated `config/` directory, separate
+from metrics and logs. Its parent is watched for config replacement; writing
+benchmark artifacts there would invalidate a raw native-event quiet interval.
+
 Ignored-event delivery must be explicitly observed; a sleep followed by an empty
 queue is insufficient. Excluded subtrees with no registered watches require separate
 policy/registration tests, not a claim that their absent events were observed.

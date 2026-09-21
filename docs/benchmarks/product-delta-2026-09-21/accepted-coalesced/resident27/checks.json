@@ -1,0 +1,38 @@
+[
+  {
+    "check": "r1 baseline repeat equality",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-noop zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r2 baseline repeat equality",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-noop zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r3 baseline repeat equality",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-noop zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-multifile target cold equality",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-multifile target cold equality",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-multifile target cold equality",
+    "pass": true
+  }
+]

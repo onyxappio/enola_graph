@@ -29,7 +29,10 @@ def stop_process(child):
 if subprocess.check_output(['git','status','--porcelain','--untracked-files=no'],cwd=repo).strip():raise RuntimeError('Product clone has tracked edits; refusing to overwrite')
 f=repo/'packages/crypto/src/password.ts';original=f.read_text();body=original.replace('return email.trim().toLowerCase();',"return email.normalize('NFKC').trim().toLowerCase();");assert body!=original
 structural=body+'\nexport function enolaBenchmarkEmailKey(email: string) { return normalizeEmail(email); }\n'
-cfg=root/'config.yaml';cfg.write_text('repo: '+str(repo)+'\n'+('extractors: [typescript]\nexplainers: []\nrenderers: []\n' if a.profile=='ts' else ''))
+# External config parents are watched for replacements. Keep this parent free
+# of metrics/log writes so the raw native-event quiet probe measures an idle host.
+config_dir=root/'config';config_dir.mkdir()
+cfg=config_dir/'config.yaml';cfg.write_text('repo: '+str(repo)+'\n'+('extractors: [typescript]\nexplainers: []\nrenderers: []\n' if a.profile=='ts' else ''))
 if a.scope_config:
  scope=Path(a.scope_config).read_text()
  if re.search(r'^repo(?:s)?\s*:',scope,re.M):raise RuntimeError('scope-config must not set repository')

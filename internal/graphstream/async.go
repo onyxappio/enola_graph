@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
+	"time"
 )
 
 type jobKind int
@@ -108,6 +109,8 @@ func classifyPayloadFallback(p []byte) jobKind {
 // Flush waits until pending, committing, ready, and in-flight are empty, then
 // fsyncs acks. Do not checkpoint before Flush.
 type asyncPub struct {
+	flushers        int
+	diagnostics     *transportDiagnostics
 	maxItems        int
 	maxBytes        int64
 	maxInFlight     int
@@ -229,6 +232,7 @@ func (p *Publisher) EnableAsync(maxItems int, maxBytes int64) {
 	}
 	stopCtx, stop := context.WithCancel(context.Background())
 	p.async = &asyncPub{
+		diagnostics: newTransportDiagnostics(),
 		maxItems:    maxItems,
 		maxBytes:    maxBytes,
 		maxInFlight: maxInFlight,
@@ -286,6 +290,7 @@ func (p *Publisher) commitPump() {
 			}
 			continue
 		}
+		p.coalesceLocked()
 		group := a.pending
 		groupBytes := a.pendingBytes
 		a.pending = nil
@@ -336,7 +341,9 @@ func (p *Publisher) commitPump() {
 				keepBytes += int64(len(job.payload))
 			}
 			if appendErr == nil && len(keep) > 0 {
+				started := diagnosticStart(a.diagnostics)
 				appendErr = p.Journal.Sync()
+				a.recordSync(len(keep), keepBytes, started)
 			}
 			if appendErr != nil {
 				a.setErr(appendErr)
@@ -554,6 +561,7 @@ func (p *Publisher) enqueue(ctx context.Context, msgID string, payload []byte) e
 			return nil
 		}
 		a.mu.Unlock()
+		started := diagnosticStart(a.diagnostics)
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -564,11 +572,17 @@ func (p *Publisher) enqueue(ctx context.Context, msgID string, payload []byte) e
 			return fmt.Errorf("graphstream: publisher closed")
 		case <-a.space:
 		}
+		a.recordStall(started)
 	}
 }
 
 func (p *Publisher) waitIdle(ctx context.Context) error {
 	a := p.async
+	a.mu.Lock()
+	a.flushers++
+	a.mu.Unlock()
+	a.signal(a.wake)
+	defer func() { a.mu.Lock(); a.flushers--; a.mu.Unlock() }()
 	for {
 		if err := ctx.Err(); err != nil {
 			return err
@@ -632,7 +646,46 @@ func (p *Publisher) CloseAsync() {
 	a.signal(a.space)
 	a.signal(a.idle)
 	<-a.done
+	a.reportDiagnostics()
 	if p.Journal != nil {
 		_ = p.Journal.Sync()
+	}
+}
+
+// Coalesce only within the existing queue bounds. The deadline prevents a
+// sparse producer from waiting for a full group; Flush and shutdown bypass it.
+// Called with a.mu held and returns with it held.
+func (p *Publisher) coalesceLocked() {
+	a := p.async
+	if p.Journal == nil {
+		return
+	}
+	var timer *time.Timer
+	defer func() {
+		if timer != nil {
+			timer.Stop()
+		}
+	}()
+	for len(a.pending) < 16 && len(a.pending) < a.maxItems && a.pendingBytes < a.maxBytes && a.flushers == 0 && !a.closed && a.err == nil {
+		for _, job := range a.pending {
+			if job.kind == kindBegin || job.kind == kindScope || job.kind == kindEnd {
+				return
+			}
+		}
+		if timer == nil {
+			timer = time.NewTimer(3 * time.Millisecond)
+		}
+		a.mu.Unlock()
+		expired := false
+		select {
+		case <-timer.C:
+			expired = true
+		case <-a.wake:
+		case <-a.stopCtx.Done():
+		}
+		a.mu.Lock()
+		if expired {
+			return
+		}
 	}
 }

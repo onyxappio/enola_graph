@@ -1,16 +1,32 @@
 # Product performance investigation
 
-Status: **performance acceptance is currently failing**. The latest isolated
-candidate initial took 15.270 s versus 9.906 s for the pinned old binary;
-a second initial took 14.430 s versus 10.132 s. Fresh CLI no-change took
-5.982 s versus 4.612 s. The three-repeat series was stopped to investigate.
-These are incomplete repeat observations, not medians. Correctness validation
-passed, but that does not establish performance acceptance.
+Status: **the latest repeated Product validation passes initial throughput and
+resident incremental latency checks**. All six scenarios and 114 assertions passed.
+Initial is 9.119 s versus old 10.189 s; resident idle is 0.136 ms and body delta
+0.739 s (medians). Fresh CLI idle still costs 2.078 s; broad history deltas remain
+4.37–5.00 s. Memory is higher than old Enola. These limits are explicit in the
+[verified comparison, spread and raw evidence](product-delta-2026-09-21/accepted-coalesced/README.md).
 
-See [rejected stage evidence and phase profiles](product-delta-2026-09-21/failed-isolated-stage/README.md).
-Preparation/policy overhead and publication costs are being optimized. The
-historical stages below use earlier input scopes and comparison preparation;
-their timings are not directly comparable to this latest run.
+The sections below preserve earlier stages and failed comparisons as historical
+evidence; they do not override the latest result or describe identical input scopes.
+
+## Integration checkpoint b1820aa
+
+The checkpoint is pushed to `origin/main` for Codata integration. Three isolated
+CLI repeats after admission/transport optimizations measured initial **14.870 s**,
+no-change **2.064 s**, body delta **2.936 s**, structural delta **3.064 s** (medians).
+The old initial median is **10.105 s**, so initial acceptance still fails.
+All twelve CLI assertions passed.
+
+Resident body and structural medians were **0.745 s** and **0.800 s**; thirty idle
+requests took **0.102–0.146 ms** with zero work. All nine cold graph comparisons
+passed. The resident suite nonetheless failed a raw native-event quiet diagnostic:
+its own metrics/log writes shared the watched external-config directory. A native
+fixture confirmed the cause and root isolated the harness configuration; the
+repaired full Product rerun is pending. No native production code change was needed.
+
+[Raw post-push observations](product-delta-2026-09-21/postpush-observations/README.md)
+and [native diagnostic investigation](product-delta-2026-09-21/postpush-observations/native-quiet-repair.md).
 
 ## Resident stage: preliminary single-run observation
 

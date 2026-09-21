@@ -1,0 +1,266 @@
+[
+  {
+    "check": "r1-resident-noop0 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-noop1 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-noop2 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-noop3 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-noop4 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-noop5 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-noop6 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-noop7 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-noop8 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-noop9 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-noop-native-quiet-before zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-noop-native-quiet-after zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r1 native backend quiet over 300ms",
+    "pass": false
+  },
+  {
+    "check": "r1-resident-noop-ignored-.yaml zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-noop-ignored-.yaml native event delivered",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-noop-ignored-.png zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-noop-ignored-.png native event delivered",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-body real observed input and fast path",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-structural real observed input and fast path",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-noop0 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-noop1 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-noop2 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-noop3 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-noop4 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-noop5 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-noop6 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-noop7 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-noop8 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-noop9 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-noop-native-quiet-before zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-noop-native-quiet-after zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r2 native backend quiet over 300ms",
+    "pass": false
+  },
+  {
+    "check": "r2-resident-noop-ignored-.yaml zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-noop-ignored-.yaml native event delivered",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-noop-ignored-.png zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-noop-ignored-.png native event delivered",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-body real observed input and fast path",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-structural real observed input and fast path",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-noop0 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-noop1 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-noop2 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-noop3 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-noop4 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-noop5 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-noop6 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-noop7 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-noop8 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-noop9 zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-noop-native-quiet-before zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-noop-native-quiet-after zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r3 native backend quiet over 300ms",
+    "pass": false
+  },
+  {
+    "check": "r3-resident-noop-ignored-.yaml zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-noop-ignored-.yaml native event delivered",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-noop-ignored-.png zero work/no events",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-noop-ignored-.png native event delivered",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-body real observed input and fast path",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-structural real observed input and fast path",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-initial cold equality",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-initial cold equality",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-initial cold equality",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-body cold equality",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-body cold equality",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-body cold equality",
+    "pass": true
+  },
+  {
+    "check": "r1-resident-structural cold equality",
+    "pass": true
+  },
+  {
+    "check": "r2-resident-structural cold equality",
+    "pass": true
+  },
+  {
+    "check": "r3-resident-structural cold equality",
+    "pass": true
+  }
+]

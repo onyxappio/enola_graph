@@ -1,0 +1,19 @@
+[
+  "python3",
+  "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/resident.py",
+  "--binary",
+  "/tmp/enola-postpush-stage",
+  "--root",
+  "/tmp/enola-postpush-isolated-resident",
+  "--source",
+  "/tmp/enola-product-benchmark-source",
+  "--nats",
+  "nats://127.0.0.1:14351",
+  "--repeat",
+  "3",
+  "--scope-config",
+  "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/product-graph-scope.yaml",
+  "--resident",
+  "/tmp/enola-postpush-stage-driver",
+  "--probe-ignored"
+]

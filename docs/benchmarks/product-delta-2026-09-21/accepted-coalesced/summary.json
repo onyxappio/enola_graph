@@ -1,0 +1,1149 @@
+{
+  "cli": {
+    "checks_passed": 12,
+    "groups": {
+      "old-initial": {
+        "seconds": {
+          "median": 10.188942874999995,
+          "min": 9.876884833,
+          "max": 10.192261666000007,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 582467584.0,
+          "min": 580861952.0,
+          "max": 582778880.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "parsed_files": [
+          null,
+          null,
+          null
+        ]
+      },
+      "old-noop": {
+        "seconds": {
+          "median": 4.528538583,
+          "min": 4.523308416999999,
+          "max": 4.575953874999982,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 318603264.0,
+          "min": 316456960.0,
+          "max": 323371008.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "parsed_files": [
+          null,
+          null,
+          null
+        ]
+      },
+      "new-initial": {
+        "seconds": {
+          "median": 9.119185708999993,
+          "min": 9.070739333000006,
+          "max": 9.806168583000002,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 1.847557,
+          "min": 1.800682,
+          "max": 2.589241,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 8.874272,
+          "min": 8.836569,
+          "max": 9.567811,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 8.983662,
+          "min": 8.957545,
+          "max": 9.685589,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 910524416.0,
+          "min": 871645184.0,
+          "max": 946274304.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 84994313,
+          "min": 84966156,
+          "max": 85019778,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 37197768,
+          "min": 35781629,
+          "max": 39990574,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 51339359,
+          "min": 51339358,
+          "max": 51339359,
+          "n": 3
+        },
+        "parsed_files": [
+          4144,
+          4144,
+          4144
+        ]
+      },
+      "new-noop": {
+        "seconds": {
+          "median": 2.0783610409999937,
+          "min": 2.056510000000003,
+          "max": 2.081589084000001,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 342753280.0,
+          "min": 341114880.0,
+          "max": 379273216.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 51339359,
+          "min": 51339358,
+          "max": 51339359,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 328,
+          "min": 327,
+          "max": 328,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 51339359,
+          "min": 51339358,
+          "max": 51339359,
+          "n": 3
+        },
+        "parsed_files": [
+          0,
+          0,
+          0
+        ]
+      },
+      "old-body": {
+        "seconds": {
+          "median": 10.704753999999994,
+          "min": 10.643830458000025,
+          "max": 10.825122125,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 504004608.0,
+          "min": 492519424.0,
+          "max": 509739008.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "parsed_files": [
+          null,
+          null,
+          null
+        ]
+      },
+      "new-body": {
+        "seconds": {
+          "median": 2.926941083999992,
+          "min": 2.9159687499999976,
+          "max": 2.954788250000007,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 2.118956,
+          "min": 2.09738,
+          "max": 2.130604,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 2.827704,
+          "min": 2.819591,
+          "max": 2.851994,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 2.829703,
+          "min": 2.821649,
+          "max": 2.853998,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 587644928.0,
+          "min": 573538304.0,
+          "max": 673808384.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 105049309,
+          "min": 53710970,
+          "max": 105049433,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 2371609,
+          "min": 2371485,
+          "max": 2371939,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 51339466,
+          "min": 51339465,
+          "max": 51339467,
+          "n": 3
+        },
+        "parsed_files": [
+          1,
+          1,
+          1
+        ]
+      },
+      "old-structural": {
+        "seconds": {
+          "median": 11.475536583000007,
+          "min": 11.40828441699999,
+          "max": 11.657835750000004,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 514719744.0,
+          "min": 495599616.0,
+          "max": 516374528.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "parsed_files": [
+          null,
+          null,
+          null
+        ]
+      },
+      "new-structural": {
+        "seconds": {
+          "median": 3.0387628750000033,
+          "min": 3.0020039589999925,
+          "max": 3.0858684170000004,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 2.10976,
+          "min": 2.095128,
+          "max": 2.170886,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 2.932972,
+          "min": 2.899744,
+          "max": 2.986604,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 2.934957,
+          "min": 2.901718,
+          "max": 2.988622,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 580206592.0,
+          "min": 569311232.0,
+          "max": 582434816.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 105084858,
+          "min": 53745364,
+          "max": 105085797,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 2406333,
+          "min": 2406332,
+          "max": 2407271,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 51340276,
+          "min": 51340276,
+          "max": 51340276,
+          "n": 3
+        },
+        "parsed_files": [
+          2,
+          2,
+          2
+        ]
+      }
+    }
+  },
+  "resident": {
+    "checks_passed": 66,
+    "groups": {
+      "resident-initial": {
+        "seconds": {
+          "median": 10.888926709000003,
+          "min": 10.76244625,
+          "max": 11.473875583,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 2.210475,
+          "min": 2.205522,
+          "max": 3.014954,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 9.408316,
+          "min": 9.294889,
+          "max": 10.00822,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 9.53531,
+          "min": 9.406758,
+          "max": 10.133276,
+          "n": 3
+        },
+        "lifetime_rss_bytes": {
+          "median": 1034125312,
+          "min": 1027817472,
+          "max": 1162379264,
+          "n": 3
+        },
+        "parsed_files": [
+          4144,
+          4144,
+          4144
+        ]
+      },
+      "resident-noop": {
+        "seconds": {
+          "median": 0.00013618700000250783,
+          "min": 0.00012304199999846333,
+          "max": 0.00015820800000199142,
+          "n": 30
+        },
+        "parsed_files": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "resident-body": {
+        "seconds": {
+          "median": 0.7388570419999994,
+          "min": 0.7240902079999998,
+          "max": 0.7476567920000008,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 0.169426,
+          "min": 0.164773,
+          "max": 0.17243,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 0.649638,
+          "min": 0.639137,
+          "max": 0.652702,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 0.65155,
+          "min": 0.641131,
+          "max": 0.654661,
+          "n": 3
+        },
+        "parsed_files": [
+          1,
+          1,
+          1
+        ]
+      },
+      "resident-structural": {
+        "seconds": {
+          "median": 0.7983132920000031,
+          "min": 0.7948141250000003,
+          "max": 0.82638575,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 0.15608,
+          "min": 0.155008,
+          "max": 0.158881,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 0.712224,
+          "min": 0.704653,
+          "max": 0.736484,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 0.714183,
+          "min": 0.706714,
+          "max": 0.73839,
+          "n": 3
+        },
+        "parsed_files": [
+          2,
+          2,
+          2
+        ]
+      }
+    }
+  },
+  "cli27": {
+    "checks_passed": 9,
+    "groups": {
+      "old-initial": {
+        "seconds": {
+          "median": 10.239010125000007,
+          "min": 9.967815958000001,
+          "max": 10.340377207999992,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 579796992.0,
+          "min": 548208640.0,
+          "max": 580501504.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "parsed_files": [
+          null,
+          null,
+          null
+        ]
+      },
+      "new-initial": {
+        "seconds": {
+          "median": 8.973237916999992,
+          "min": 8.889047874999989,
+          "max": 8.994786958999999,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 1.756441,
+          "min": 1.752816,
+          "max": 1.756936,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 8.743008,
+          "min": 8.658979,
+          "max": 8.763208,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 8.858917,
+          "min": 8.772417,
+          "max": 8.885947,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 934838272.0,
+          "min": 934739968.0,
+          "max": 940441600.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 84343675,
+          "min": 84341344,
+          "max": 84400222,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 39367493,
+          "min": 37562801,
+          "max": 39371583,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 51260950,
+          "min": 51260949,
+          "max": 51260950,
+          "n": 3
+        },
+        "parsed_files": [
+          4136,
+          4136,
+          4136
+        ]
+      },
+      "new-noop": {
+        "seconds": {
+          "median": 2.0774274169999956,
+          "min": 2.0576125000000047,
+          "max": 2.0845255410000014,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 336691200.0,
+          "min": 331890688.0,
+          "max": 338001920.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 51260950,
+          "min": 51260949,
+          "max": 51260950,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 328,
+          "min": 327,
+          "max": 328,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 51260950,
+          "min": 51260949,
+          "max": 51260950,
+          "n": 3
+        },
+        "parsed_files": [
+          0,
+          0,
+          0
+        ]
+      },
+      "old-multifile": {
+        "seconds": {
+          "median": 11.557352749999978,
+          "min": 11.498563000000004,
+          "max": 11.672298417,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 512589824.0,
+          "min": 499089408.0,
+          "max": 517308416.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "parsed_files": [
+          null,
+          null,
+          null
+        ]
+      },
+      "new-multifile": {
+        "seconds": {
+          "median": 4.373851040999995,
+          "min": 4.307104291000002,
+          "max": 4.397922915999999,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 2.323764,
+          "min": 2.298773,
+          "max": 2.337597,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 4.258918,
+          "min": 4.189898,
+          "max": 4.283567,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 4.282186,
+          "min": 4.212456,
+          "max": 4.305988,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 755679232.0,
+          "min": 736837632.0,
+          "max": 760430592.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 107997632,
+          "min": 107977231,
+          "max": 107999194,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 35050324,
+          "min": 34810720,
+          "max": 35459602,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 51317701,
+          "min": 51317700,
+          "max": 51317701,
+          "n": 3
+        },
+        "parsed_files": [
+          346,
+          346,
+          346
+        ]
+      }
+    }
+  },
+  "resident27": {
+    "checks_passed": 9,
+    "groups": {
+      "resident-initial": {
+        "seconds": {
+          "median": 10.492566916999998,
+          "min": 10.438168125,
+          "max": 10.555338124999999,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 2.16421,
+          "min": 2.142247,
+          "max": 2.166304,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 9.031696,
+          "min": 8.974348,
+          "max": 9.094699,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 9.144824,
+          "min": 9.092432,
+          "max": 9.202709,
+          "n": 3
+        },
+        "lifetime_rss_bytes": {
+          "median": 1008877568,
+          "min": 961085440,
+          "max": 1074479104,
+          "n": 3
+        },
+        "parsed_files": [
+          4136,
+          4136,
+          4136
+        ]
+      },
+      "resident-noop": {
+        "seconds": {
+          "median": 0.00014545799999865494,
+          "min": 0.0001437080000012969,
+          "max": 0.00015974999999457395,
+          "n": 3
+        },
+        "parsed_files": [
+          0,
+          0,
+          0
+        ]
+      },
+      "resident-multifile": {
+        "seconds": {
+          "median": 4.724342750000002,
+          "min": 4.707732500000006,
+          "max": 4.803835291999999,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 1.426393,
+          "min": 1.417633,
+          "max": 1.444381,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 3.356901,
+          "min": 3.35429,
+          "max": 3.443513,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 3.37978,
+          "min": 3.377535,
+          "max": 3.466533,
+          "n": 3
+        },
+        "checkout_seconds": {
+          "median": 0.1055234580000004,
+          "min": 0.10443787500000035,
+          "max": 0.11278100000000535,
+          "n": 3
+        },
+        "checkout_through_apply_seconds": {
+          "median": 4.8497281659999985,
+          "min": 4.839703167000003,
+          "max": 4.927993666000001,
+          "n": 3
+        },
+        "parsed_files": [
+          346,
+          346,
+          346
+        ]
+      }
+    }
+  },
+  "cli100": {
+    "checks_passed": 9,
+    "groups": {
+      "old-initial": {
+        "seconds": {
+          "median": 10.202441999999998,
+          "min": 9.817108083,
+          "max": 10.327745875000005,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 571310080.0,
+          "min": 549404672.0,
+          "max": 580894720.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "parsed_files": [
+          null,
+          null,
+          null
+        ]
+      },
+      "new-initial": {
+        "seconds": {
+          "median": 9.103721917000001,
+          "min": 8.87573879099999,
+          "max": 9.137707750000002,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 1.736255,
+          "min": 1.734895,
+          "max": 1.764102,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 8.86966,
+          "min": 8.640854,
+          "max": 8.911776,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 8.991909,
+          "min": 8.753458,
+          "max": 9.026786,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 949043200.0,
+          "min": 940965888.0,
+          "max": 1001586688.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 84057471,
+          "min": 84026330,
+          "max": 84072022,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 38370481,
+          "min": 37351651,
+          "max": 39736974,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 51198622,
+          "min": 51198620,
+          "max": 51198622,
+          "n": 3
+        },
+        "parsed_files": [
+          4128,
+          4128,
+          4128
+        ]
+      },
+      "new-noop": {
+        "seconds": {
+          "median": 2.0423142090000113,
+          "min": 2.030510249999999,
+          "max": 2.048076000000009,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 337149952.0,
+          "min": 333250560.0,
+          "max": 341016576.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 51198622,
+          "min": 51198620,
+          "max": 51198622,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 329,
+          "min": 327,
+          "max": 329,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 51198622,
+          "min": 51198620,
+          "max": 51198622,
+          "n": 3
+        },
+        "parsed_files": [
+          0,
+          0,
+          0
+        ]
+      },
+      "old-multifile": {
+        "seconds": {
+          "median": 11.56619008300001,
+          "min": 11.470220833000003,
+          "max": 11.572095125000004,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 519733248.0,
+          "min": 515997696.0,
+          "max": 521928704.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "n": 3
+        },
+        "parsed_files": [
+          null,
+          null,
+          null
+        ]
+      },
+      "new-multifile": {
+        "seconds": {
+          "median": 4.634593708000004,
+          "min": 4.598003750000004,
+          "max": 4.635119583000005,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 2.366057,
+          "min": 2.352933,
+          "max": 2.406772,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 4.489987,
+          "min": 4.458219,
+          "max": 4.503525,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 4.515043,
+          "min": 4.483018,
+          "max": 4.528547,
+          "n": 3
+        },
+        "rss_bytes": {
+          "median": 778174464.0,
+          "min": 766885888.0,
+          "max": 786563072.0,
+          "n": 3
+        },
+        "state_peak_sampled_bytes": {
+          "median": 112678055,
+          "min": 112676611,
+          "max": 112678431,
+          "n": 3
+        },
+        "spool_peak_sampled_bytes": {
+          "median": 34267254,
+          "min": 32576019,
+          "max": 34346363,
+          "n": 3
+        },
+        "state_final_bytes": {
+          "median": 51317706,
+          "min": 51317706,
+          "max": 51317706,
+          "n": 3
+        },
+        "parsed_files": [
+          414,
+          414,
+          414
+        ]
+      }
+    }
+  },
+  "resident100": {
+    "checks_passed": 9,
+    "groups": {
+      "resident-initial": {
+        "seconds": {
+          "median": 10.592481,
+          "min": 10.554276291999999,
+          "max": 10.629667542,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 2.155598,
+          "min": 2.151072,
+          "max": 2.201763,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 9.153549,
+          "min": 9.112308,
+          "max": 9.197022,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 9.26937,
+          "min": 9.232435,
+          "max": 9.312112,
+          "n": 3
+        },
+        "lifetime_rss_bytes": {
+          "median": 1018724352,
+          "min": 992116736,
+          "max": 1026408448,
+          "n": 3
+        },
+        "parsed_files": [
+          4128,
+          4128,
+          4128
+        ]
+      },
+      "resident-noop": {
+        "seconds": {
+          "median": 0.00012808299999989003,
+          "min": 0.00012183400000154165,
+          "max": 0.00015816699999859907,
+          "n": 3
+        },
+        "parsed_files": [
+          0,
+          0,
+          0
+        ]
+      },
+      "resident-multifile": {
+        "seconds": {
+          "median": 5.004674667000003,
+          "min": 4.993343040999999,
+          "max": 5.022737416999995,
+          "n": 3
+        },
+        "first_batch_s": {
+          "median": 1.502727,
+          "min": 1.498866,
+          "max": 1.507098,
+          "n": 3
+        },
+        "broker_end_s": {
+          "median": 3.615248,
+          "min": 3.611162,
+          "max": 3.627712,
+          "n": 3
+        },
+        "consumer_end_s": {
+          "median": 3.639984,
+          "min": 3.63595,
+          "max": 3.652789,
+          "n": 3
+        },
+        "checkout_seconds": {
+          "median": 0.14073341699999986,
+          "min": 0.13671216600000058,
+          "max": 0.1434033339999985,
+          "n": 3
+        },
+        "checkout_through_apply_seconds": {
+          "median": 5.164978333999997,
+          "min": 5.150433125000001,
+          "max": 5.180996292000003,
+          "n": 3
+        },
+        "parsed_files": [
+          414,
+          414,
+          414
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,2113 @@
+[
+  {
+    "label": "r1-resident-initial",
+    "start_ns": 1789986098748115000,
+    "seconds": 10.555338124999999,
+    "driver": {
+      "coverage_catchup": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 1,
+          "TargetGeneration": 1,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4236,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null,
+          "Work": {
+            "PolicyBuilds": 1,
+            "BoundedContextChecks": 0,
+            "FactAssemblies": 1,
+            "CapturedReads": 0,
+            "PublishedEvents": 0,
+            "CheckpointBytes": 0,
+            "InventoryScans": 1,
+            "DetectionScans": 1,
+            "ContextScans": 1,
+            "ConfigScans": 1,
+            "HashedFiles": 5201,
+            "DirtyHashBytes": 0,
+            "VerifiedFiles": 0,
+            "Checkpoints": 0
+          },
+          "Epoch": "fs-1789986099158258000",
+          "Watermark": 10,
+          "Reconciled": true,
+          "FallbackReason": "external config watch registered; reconcile registration gap"
+        }
+      ],
+      "done_ns": 1789986109303142000,
+      "label": "initial",
+      "native_events": 3,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789986099158258000",
+        "From": 0,
+        "Through": 0,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": "benchmark bootstrap"
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "initial": 4136
+          }
+        },
+        "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main1-1-1789986100643734000",
+        "BaseGeneration": 0,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 4236,
+          "files_parsed": 4136,
+          "cached_files": 0,
+          "graphql_parsed": 2,
+          "sfc_parsed": 17,
+          "summary_scans": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "manifests",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "hcl",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "python",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "swift",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 5501,
+        "ParsedFiles": 4136,
+        "EarlyLocal": 4136,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 1,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 1,
+          "CapturedReads": 59,
+          "PublishedEvents": 5205,
+          "CheckpointBytes": 51260396,
+          "InventoryScans": 1,
+          "DetectionScans": 1,
+          "ContextScans": 1,
+          "ConfigScans": 1,
+          "HashedFiles": 5201,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 4236,
+          "Checkpoints": 1
+        },
+        "Epoch": "fs-1789986099158258000",
+        "Watermark": 0,
+        "Reconciled": true,
+        "FallbackReason": "benchmark bootstrap"
+      },
+      "seconds": 10.5408405,
+      "source": "watch",
+      "started_ns": 1789986098762274000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4136
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main1-1-1789986100643734000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4236,
+        "files_parsed": 4136,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 5501,
+      "ParsedFiles": 4136,
+      "EarlyLocal": 4136,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 1,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 1,
+        "CapturedReads": 59,
+        "PublishedEvents": 5205,
+        "CheckpointBytes": 51260396,
+        "InventoryScans": 1,
+        "DetectionScans": 1,
+        "ContextScans": 1,
+        "ConfigScans": 1,
+        "HashedFiles": 5201,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 4236,
+        "Checkpoints": 1
+      },
+      "Epoch": "fs-1789986099158258000",
+      "Watermark": 0,
+      "Reconciled": true,
+      "FallbackReason": "benchmark bootstrap"
+    },
+    "aggregate_parsed": 4136,
+    "aggregate_work": {
+      "PolicyBuilds": 2,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 2,
+      "CapturedReads": 59,
+      "PublishedEvents": 5205,
+      "CheckpointBytes": 51260396,
+      "InventoryScans": 2,
+      "DetectionScans": 2,
+      "ContextScans": 2,
+      "ConfigScans": 2,
+      "HashedFiles": 10402,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 4236,
+      "Checkpoints": 1
+    },
+    "aggregate_stats": {
+      "files_read": 4236,
+      "files_parsed": 4136,
+      "cached_files": 4236,
+      "graphql_parsed": 2,
+      "sfc_parsed": 17,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [
+      "benchmark bootstrap",
+      "external config watch registered; reconcile registration gap"
+    ],
+    "reconciliation_count": 2,
+    "wire": {
+      "broker_end_ns": 1789986107842814000,
+      "bytes": 148271862,
+      "canonical_sha256": "8be206d0588936d2e1993f6867a887338308c4e5f3e333d9bc244035d1bf5687",
+      "consumer_end_ns": 1789986107950824000,
+      "context": "enola-coalesced-acceptance-resident27-main1",
+      "edges": 171766,
+      "empty_batches": 0,
+      "first_batch_ns": 1789986100914419000,
+      "first_ns": 1789986100898484000,
+      "messages": 5205,
+      "nodes": 69683,
+      "normalized_hash": "5ca9a8b4b04ac3f2fb74eea1fd41266034d19b5470053d5389315881bb13557e",
+      "owners": 5629,
+      "run_id": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main1-1-1789986100643734000",
+      "total_edges": 171766,
+      "total_nodes": 69683
+    },
+    "first_s": 2.150369,
+    "first_batch_s": 2.166304,
+    "broker_end_s": 9.094699,
+    "consumer_end_s": 9.202709,
+    "graph_hash": "5ca9a8b4b04ac3f2fb74eea1fd41266034d19b5470053d5389315881bb13557e",
+    "wire_messages": 5205,
+    "lifetime_rss_bytes": 961085440
+  },
+  {
+    "label": "r1-resident-noop",
+    "start_ns": 1789986109321265000,
+    "seconds": 0.0001437080000012969,
+    "driver": {
+      "coverage_catchup": null,
+      "done_ns": 1789986109321349000,
+      "label": "noop",
+      "native_events": 6,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789986099158258000",
+        "From": 10,
+        "Through": 10,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": ""
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": null
+        },
+        "RunID": "",
+        "BaseGeneration": 1,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 0,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0
+        },
+        "Fallbacks": null,
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 0,
+        "EarlyLocal": 0,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 0,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 0,
+          "CapturedReads": 0,
+          "PublishedEvents": 0,
+          "CheckpointBytes": 0,
+          "InventoryScans": 0,
+          "DetectionScans": 0,
+          "ContextScans": 0,
+          "ConfigScans": 0,
+          "HashedFiles": 0,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 0,
+          "Checkpoints": 0
+        },
+        "Epoch": "fs-1789986099158258000",
+        "Watermark": 10,
+        "Reconciled": false,
+        "FallbackReason": ""
+      },
+      "seconds": 3.917e-06,
+      "source": "watch",
+      "started_ns": 1789986109321345000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": null
+      },
+      "RunID": "",
+      "BaseGeneration": 1,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 0,
+        "files_parsed": 0,
+        "cached_files": 0,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": null,
+      "Unreadable": null,
+      "OwnersPublished": 0,
+      "ParsedFiles": 0,
+      "EarlyLocal": 0,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 0,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 0,
+        "CapturedReads": 0,
+        "PublishedEvents": 0,
+        "CheckpointBytes": 0,
+        "InventoryScans": 0,
+        "DetectionScans": 0,
+        "ContextScans": 0,
+        "ConfigScans": 0,
+        "HashedFiles": 0,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 0,
+        "Checkpoints": 0
+      },
+      "Epoch": "fs-1789986099158258000",
+      "Watermark": 10,
+      "Reconciled": false,
+      "FallbackReason": ""
+    },
+    "aggregate_parsed": 0,
+    "aggregate_work": {
+      "PolicyBuilds": 0,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 0,
+      "CapturedReads": 0,
+      "PublishedEvents": 0,
+      "CheckpointBytes": 0,
+      "InventoryScans": 0,
+      "DetectionScans": 0,
+      "ContextScans": 0,
+      "ConfigScans": 0,
+      "HashedFiles": 0,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 0,
+      "Checkpoints": 0
+    },
+    "aggregate_stats": {
+      "files_read": 0,
+      "files_parsed": 0,
+      "cached_files": 0,
+      "graphql_parsed": 0,
+      "sfc_parsed": 0,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [],
+    "reconciliation_count": 0,
+    "graph_hash": "5ca9a8b4b04ac3f2fb74eea1fd41266034d19b5470053d5389315881bb13557e",
+    "wire_messages": 0
+  },
+  {
+    "label": "r1-resident-multifile",
+    "start_ns": 1789986109441622000,
+    "seconds": 4.803835291999999,
+    "driver": {
+      "coverage_catchup": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4244,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null,
+          "Work": {
+            "PolicyBuilds": 1,
+            "BoundedContextChecks": 0,
+            "FactAssemblies": 1,
+            "CapturedReads": 0,
+            "PublishedEvents": 0,
+            "CheckpointBytes": 0,
+            "InventoryScans": 1,
+            "DetectionScans": 1,
+            "ContextScans": 1,
+            "ConfigScans": 1,
+            "HashedFiles": 5209,
+            "DirtyHashBytes": 0,
+            "VerifiedFiles": 0,
+            "Checkpoints": 0
+          },
+          "Epoch": "fs-1789986099158258000",
+          "Watermark": 88,
+          "Reconciled": true,
+          "FallbackReason": "graph policy watch coverage refreshed"
+        }
+      ],
+      "done_ns": 1789986114245286000,
+      "label": "history",
+      "native_events": 212,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789986099158258000",
+        "From": 10,
+        "Through": 83,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": "filesystem name change requires reconciliation"
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": true,
+          "PolicyReconciled": true,
+          "AddedSources": 8,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "added source": 8,
+            "resolution": 328,
+            "source content": 10
+          }
+        },
+        "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main1-2-1789986110478508000",
+        "BaseGeneration": 1,
+        "TargetGeneration": 2,
+        "Stats": {
+          "files_read": 346,
+          "files_parsed": 346,
+          "cached_files": 4187,
+          "graphql_parsed": 1,
+          "sfc_parsed": 0,
+          "summary_scans": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 1386,
+        "ParsedFiles": 346,
+        "EarlyLocal": 346,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 1,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 1,
+          "CapturedReads": 405,
+          "PublishedEvents": 1031,
+          "CheckpointBytes": 51317039,
+          "InventoryScans": 1,
+          "DetectionScans": 1,
+          "ContextScans": 1,
+          "ConfigScans": 1,
+          "HashedFiles": 5209,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 4244,
+          "Checkpoints": 1
+        },
+        "Epoch": "fs-1789986099158258000",
+        "Watermark": 83,
+        "Reconciled": true,
+        "FallbackReason": "filesystem name change requires reconciliation"
+      },
+      "seconds": 4.803539125,
+      "source": "watch",
+      "started_ns": 1789986109441734000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": true,
+        "PolicyReconciled": true,
+        "AddedSources": 8,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "added source": 8,
+          "resolution": 328,
+          "source content": 10
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main1-2-1789986110478508000",
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "Stats": {
+        "files_read": 346,
+        "files_parsed": 346,
+        "cached_files": 4187,
+        "graphql_parsed": 1,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 1386,
+      "ParsedFiles": 346,
+      "EarlyLocal": 346,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 1,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 1,
+        "CapturedReads": 405,
+        "PublishedEvents": 1031,
+        "CheckpointBytes": 51317039,
+        "InventoryScans": 1,
+        "DetectionScans": 1,
+        "ContextScans": 1,
+        "ConfigScans": 1,
+        "HashedFiles": 5209,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 4244,
+        "Checkpoints": 1
+      },
+      "Epoch": "fs-1789986099158258000",
+      "Watermark": 83,
+      "Reconciled": true,
+      "FallbackReason": "filesystem name change requires reconciliation"
+    },
+    "aggregate_parsed": 346,
+    "aggregate_work": {
+      "PolicyBuilds": 2,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 2,
+      "CapturedReads": 405,
+      "PublishedEvents": 1031,
+      "CheckpointBytes": 51317039,
+      "InventoryScans": 2,
+      "DetectionScans": 2,
+      "ContextScans": 2,
+      "ConfigScans": 2,
+      "HashedFiles": 10418,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 4244,
+      "Checkpoints": 1
+    },
+    "aggregate_stats": {
+      "files_read": 346,
+      "files_parsed": 346,
+      "cached_files": 8431,
+      "graphql_parsed": 1,
+      "sfc_parsed": 0,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [
+      "filesystem name change requires reconciliation",
+      "graph policy watch coverage refreshed"
+    ],
+    "reconciliation_count": 2,
+    "wire": {
+      "broker_end_ns": 1789986112885135000,
+      "bytes": 28757315,
+      "canonical_sha256": "1cea5c69843724f6361358f8b70ecee9be6afa0d9fef79a98f71a45858621dce",
+      "consumer_end_ns": 1789986112908155000,
+      "context": "enola-coalesced-acceptance-resident27-main1",
+      "edges": 41169,
+      "empty_batches": 0,
+      "first_batch_ns": 1789986110868015000,
+      "first_ns": 1789986110763642000,
+      "messages": 1031,
+      "nodes": 18237,
+      "normalized_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+      "owners": 1386,
+      "run_id": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main1-2-1789986110478508000",
+      "total_edges": 171954,
+      "total_nodes": 69754
+    },
+    "first_s": 1.32202,
+    "first_batch_s": 1.426393,
+    "broker_end_s": 3.443513,
+    "consumer_end_s": 3.466533,
+    "graph_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+    "wire_messages": 1031,
+    "checkout_seconds": 0.10443787500000035,
+    "checkout_through_apply_seconds": 4.927993666000001
+  },
+  {
+    "label": "r2-resident-initial",
+    "start_ns": 1789986114420263000,
+    "seconds": 10.492566916999998,
+    "driver": {
+      "coverage_catchup": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 1,
+          "TargetGeneration": 1,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4236,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null,
+          "Work": {
+            "PolicyBuilds": 1,
+            "BoundedContextChecks": 0,
+            "FactAssemblies": 1,
+            "CapturedReads": 0,
+            "PublishedEvents": 0,
+            "CheckpointBytes": 0,
+            "InventoryScans": 1,
+            "DetectionScans": 1,
+            "ContextScans": 1,
+            "ConfigScans": 1,
+            "HashedFiles": 5201,
+            "DirtyHashBytes": 0,
+            "VerifiedFiles": 0,
+            "Checkpoints": 0
+          },
+          "Epoch": "fs-1789986114834402000",
+          "Watermark": 10,
+          "Reconciled": true,
+          "FallbackReason": "external config watch registered; reconcile registration gap"
+        }
+      ],
+      "done_ns": 1789986124912260000,
+      "label": "initial",
+      "native_events": 3,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789986114834402000",
+        "From": 0,
+        "Through": 0,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": "benchmark bootstrap"
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "initial": 4136
+          }
+        },
+        "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main2-1-1789986116301264000",
+        "BaseGeneration": 0,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 4236,
+          "files_parsed": 4136,
+          "cached_files": 0,
+          "graphql_parsed": 2,
+          "sfc_parsed": 17,
+          "summary_scans": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "manifests",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "hcl",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "python",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "swift",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 5501,
+        "ParsedFiles": 4136,
+        "EarlyLocal": 4136,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 1,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 1,
+          "CapturedReads": 59,
+          "PublishedEvents": 5205,
+          "CheckpointBytes": 51260396,
+          "InventoryScans": 1,
+          "DetectionScans": 1,
+          "ContextScans": 1,
+          "ConfigScans": 1,
+          "HashedFiles": 5201,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 4236,
+          "Checkpoints": 1
+        },
+        "Epoch": "fs-1789986114834402000",
+        "Watermark": 0,
+        "Reconciled": true,
+        "FallbackReason": "benchmark bootstrap"
+      },
+      "seconds": 10.476594208,
+      "source": "watch",
+      "started_ns": 1789986114435639000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4136
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main2-1-1789986116301264000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4236,
+        "files_parsed": 4136,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 5501,
+      "ParsedFiles": 4136,
+      "EarlyLocal": 4136,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 1,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 1,
+        "CapturedReads": 59,
+        "PublishedEvents": 5205,
+        "CheckpointBytes": 51260396,
+        "InventoryScans": 1,
+        "DetectionScans": 1,
+        "ContextScans": 1,
+        "ConfigScans": 1,
+        "HashedFiles": 5201,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 4236,
+        "Checkpoints": 1
+      },
+      "Epoch": "fs-1789986114834402000",
+      "Watermark": 0,
+      "Reconciled": true,
+      "FallbackReason": "benchmark bootstrap"
+    },
+    "aggregate_parsed": 4136,
+    "aggregate_work": {
+      "PolicyBuilds": 2,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 2,
+      "CapturedReads": 59,
+      "PublishedEvents": 5205,
+      "CheckpointBytes": 51260396,
+      "InventoryScans": 2,
+      "DetectionScans": 2,
+      "ContextScans": 2,
+      "ConfigScans": 2,
+      "HashedFiles": 10402,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 4236,
+      "Checkpoints": 1
+    },
+    "aggregate_stats": {
+      "files_read": 4236,
+      "files_parsed": 4136,
+      "cached_files": 4236,
+      "graphql_parsed": 2,
+      "sfc_parsed": 17,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [
+      "benchmark bootstrap",
+      "external config watch registered; reconcile registration gap"
+    ],
+    "reconciliation_count": 2,
+    "wire": {
+      "broker_end_ns": 1789986123451959000,
+      "bytes": 148271852,
+      "canonical_sha256": "8be206d0588936d2e1993f6867a887338308c4e5f3e333d9bc244035d1bf5687",
+      "consumer_end_ns": 1789986123565087000,
+      "context": "enola-coalesced-acceptance-resident27-main2",
+      "edges": 171766,
+      "empty_batches": 0,
+      "first_batch_ns": 1789986116584473000,
+      "first_ns": 1789986116564072000,
+      "messages": 5205,
+      "nodes": 69683,
+      "normalized_hash": "5ca9a8b4b04ac3f2fb74eea1fd41266034d19b5470053d5389315881bb13557e",
+      "owners": 5629,
+      "run_id": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main2-1-1789986116301264000",
+      "total_edges": 171766,
+      "total_nodes": 69683
+    },
+    "first_s": 2.143809,
+    "first_batch_s": 2.16421,
+    "broker_end_s": 9.031696,
+    "consumer_end_s": 9.144824,
+    "graph_hash": "5ca9a8b4b04ac3f2fb74eea1fd41266034d19b5470053d5389315881bb13557e",
+    "wire_messages": 5205,
+    "lifetime_rss_bytes": 1074479104
+  },
+  {
+    "label": "r2-resident-noop",
+    "start_ns": 1789986124930011000,
+    "seconds": 0.00014545799999865494,
+    "driver": {
+      "coverage_catchup": null,
+      "done_ns": 1789986124930097000,
+      "label": "noop",
+      "native_events": 8,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789986114834402000",
+        "From": 10,
+        "Through": 10,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": ""
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": null
+        },
+        "RunID": "",
+        "BaseGeneration": 1,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 0,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0
+        },
+        "Fallbacks": null,
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 0,
+        "EarlyLocal": 0,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 0,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 0,
+          "CapturedReads": 0,
+          "PublishedEvents": 0,
+          "CheckpointBytes": 0,
+          "InventoryScans": 0,
+          "DetectionScans": 0,
+          "ContextScans": 0,
+          "ConfigScans": 0,
+          "HashedFiles": 0,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 0,
+          "Checkpoints": 0
+        },
+        "Epoch": "fs-1789986114834402000",
+        "Watermark": 10,
+        "Reconciled": false,
+        "FallbackReason": ""
+      },
+      "seconds": 4.042e-06,
+      "source": "watch",
+      "started_ns": 1789986124930093000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": null
+      },
+      "RunID": "",
+      "BaseGeneration": 1,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 0,
+        "files_parsed": 0,
+        "cached_files": 0,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": null,
+      "Unreadable": null,
+      "OwnersPublished": 0,
+      "ParsedFiles": 0,
+      "EarlyLocal": 0,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 0,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 0,
+        "CapturedReads": 0,
+        "PublishedEvents": 0,
+        "CheckpointBytes": 0,
+        "InventoryScans": 0,
+        "DetectionScans": 0,
+        "ContextScans": 0,
+        "ConfigScans": 0,
+        "HashedFiles": 0,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 0,
+        "Checkpoints": 0
+      },
+      "Epoch": "fs-1789986114834402000",
+      "Watermark": 10,
+      "Reconciled": false,
+      "FallbackReason": ""
+    },
+    "aggregate_parsed": 0,
+    "aggregate_work": {
+      "PolicyBuilds": 0,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 0,
+      "CapturedReads": 0,
+      "PublishedEvents": 0,
+      "CheckpointBytes": 0,
+      "InventoryScans": 0,
+      "DetectionScans": 0,
+      "ContextScans": 0,
+      "ConfigScans": 0,
+      "HashedFiles": 0,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 0,
+      "Checkpoints": 0
+    },
+    "aggregate_stats": {
+      "files_read": 0,
+      "files_parsed": 0,
+      "cached_files": 0,
+      "graphql_parsed": 0,
+      "sfc_parsed": 0,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [],
+    "reconciliation_count": 0,
+    "graph_hash": "5ca9a8b4b04ac3f2fb74eea1fd41266034d19b5470053d5389315881bb13557e",
+    "wire_messages": 0
+  },
+  {
+    "label": "r2-resident-multifile",
+    "start_ns": 1789986125051427000,
+    "seconds": 4.724342750000002,
+    "driver": {
+      "coverage_catchup": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4244,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null,
+          "Work": {
+            "PolicyBuilds": 1,
+            "BoundedContextChecks": 0,
+            "FactAssemblies": 1,
+            "CapturedReads": 0,
+            "PublishedEvents": 0,
+            "CheckpointBytes": 0,
+            "InventoryScans": 1,
+            "DetectionScans": 1,
+            "ContextScans": 1,
+            "ConfigScans": 1,
+            "HashedFiles": 5209,
+            "DirtyHashBytes": 0,
+            "VerifiedFiles": 0,
+            "Checkpoints": 0
+          },
+          "Epoch": "fs-1789986114834402000",
+          "Watermark": 89,
+          "Reconciled": true,
+          "FallbackReason": "graph policy watch coverage refreshed"
+        }
+      ],
+      "done_ns": 1789986129775603000,
+      "label": "history",
+      "native_events": 218,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789986114834402000",
+        "From": 10,
+        "Through": 84,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": "filesystem name change requires reconciliation"
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": true,
+          "PolicyReconciled": true,
+          "AddedSources": 8,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "added source": 8,
+            "resolution": 328,
+            "source content": 10
+          }
+        },
+        "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main2-2-1789986126081207000",
+        "BaseGeneration": 1,
+        "TargetGeneration": 2,
+        "Stats": {
+          "files_read": 346,
+          "files_parsed": 346,
+          "cached_files": 4187,
+          "graphql_parsed": 1,
+          "sfc_parsed": 0,
+          "summary_scans": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 1386,
+        "ParsedFiles": 346,
+        "EarlyLocal": 346,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 1,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 1,
+          "CapturedReads": 405,
+          "PublishedEvents": 1031,
+          "CheckpointBytes": 51317039,
+          "InventoryScans": 1,
+          "DetectionScans": 1,
+          "ContextScans": 1,
+          "ConfigScans": 1,
+          "HashedFiles": 5209,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 4244,
+          "Checkpoints": 1
+        },
+        "Epoch": "fs-1789986114834402000",
+        "Watermark": 84,
+        "Reconciled": true,
+        "FallbackReason": "filesystem name change requires reconciliation"
+      },
+      "seconds": 4.724052291,
+      "source": "watch",
+      "started_ns": 1789986125051539000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": true,
+        "PolicyReconciled": true,
+        "AddedSources": 8,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "added source": 8,
+          "resolution": 328,
+          "source content": 10
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main2-2-1789986126081207000",
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "Stats": {
+        "files_read": 346,
+        "files_parsed": 346,
+        "cached_files": 4187,
+        "graphql_parsed": 1,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 1386,
+      "ParsedFiles": 346,
+      "EarlyLocal": 346,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 1,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 1,
+        "CapturedReads": 405,
+        "PublishedEvents": 1031,
+        "CheckpointBytes": 51317039,
+        "InventoryScans": 1,
+        "DetectionScans": 1,
+        "ContextScans": 1,
+        "ConfigScans": 1,
+        "HashedFiles": 5209,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 4244,
+        "Checkpoints": 1
+      },
+      "Epoch": "fs-1789986114834402000",
+      "Watermark": 84,
+      "Reconciled": true,
+      "FallbackReason": "filesystem name change requires reconciliation"
+    },
+    "aggregate_parsed": 346,
+    "aggregate_work": {
+      "PolicyBuilds": 2,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 2,
+      "CapturedReads": 405,
+      "PublishedEvents": 1031,
+      "CheckpointBytes": 51317039,
+      "InventoryScans": 2,
+      "DetectionScans": 2,
+      "ContextScans": 2,
+      "ConfigScans": 2,
+      "HashedFiles": 10418,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 4244,
+      "Checkpoints": 1
+    },
+    "aggregate_stats": {
+      "files_read": 346,
+      "files_parsed": 346,
+      "cached_files": 8431,
+      "graphql_parsed": 1,
+      "sfc_parsed": 0,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [
+      "filesystem name change requires reconciliation",
+      "graph policy watch coverage refreshed"
+    ],
+    "reconciliation_count": 2,
+    "wire": {
+      "broker_end_ns": 1789986128408328000,
+      "bytes": 28757355,
+      "canonical_sha256": "1cea5c69843724f6361358f8b70ecee9be6afa0d9fef79a98f71a45858621dce",
+      "consumer_end_ns": 1789986128431207000,
+      "context": "enola-coalesced-acceptance-resident27-main2",
+      "edges": 41169,
+      "empty_batches": 0,
+      "first_batch_ns": 1789986126469060000,
+      "first_ns": 1789986126365768000,
+      "messages": 1031,
+      "nodes": 18237,
+      "normalized_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+      "owners": 1386,
+      "run_id": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main2-2-1789986126081207000",
+      "total_edges": 171954,
+      "total_nodes": 69754
+    },
+    "first_s": 1.314341,
+    "first_batch_s": 1.417633,
+    "broker_end_s": 3.356901,
+    "consumer_end_s": 3.37978,
+    "graph_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+    "wire_messages": 1031,
+    "checkout_seconds": 0.1055234580000004,
+    "checkout_through_apply_seconds": 4.8497281659999985
+  },
+  {
+    "label": "r3-resident-initial",
+    "start_ns": 1789986129949215000,
+    "seconds": 10.438168125,
+    "driver": {
+      "coverage_catchup": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 1,
+          "TargetGeneration": 1,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4236,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null,
+          "Work": {
+            "PolicyBuilds": 1,
+            "BoundedContextChecks": 0,
+            "FactAssemblies": 1,
+            "CapturedReads": 0,
+            "PublishedEvents": 0,
+            "CheckpointBytes": 0,
+            "InventoryScans": 1,
+            "DetectionScans": 1,
+            "ContextScans": 1,
+            "ConfigScans": 1,
+            "HashedFiles": 5201,
+            "DirtyHashBytes": 0,
+            "VerifiedFiles": 0,
+            "Checkpoints": 0
+          },
+          "Epoch": "fs-1789986130362214000",
+          "Watermark": 10,
+          "Reconciled": true,
+          "FallbackReason": "external config watch registered; reconcile registration gap"
+        }
+      ],
+      "done_ns": 1789986140386174000,
+      "label": "initial",
+      "native_events": 3,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789986130362214000",
+        "From": 0,
+        "Through": 0,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": "benchmark bootstrap"
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "initial": 4136
+          }
+        },
+        "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main3-1-1789986131825391000",
+        "BaseGeneration": 0,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 4236,
+          "files_parsed": 4136,
+          "cached_files": 0,
+          "graphql_parsed": 2,
+          "sfc_parsed": 17,
+          "summary_scans": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "manifests",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "hcl",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "python",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "swift",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 5501,
+        "ParsedFiles": 4136,
+        "EarlyLocal": 4136,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 1,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 1,
+          "CapturedReads": 59,
+          "PublishedEvents": 5205,
+          "CheckpointBytes": 51260396,
+          "InventoryScans": 1,
+          "DetectionScans": 1,
+          "ContextScans": 1,
+          "ConfigScans": 1,
+          "HashedFiles": 5201,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 4236,
+          "Checkpoints": 1
+        },
+        "Epoch": "fs-1789986130362214000",
+        "Watermark": 0,
+        "Reconciled": true,
+        "FallbackReason": "benchmark bootstrap"
+      },
+      "seconds": 10.423140792,
+      "source": "watch",
+      "started_ns": 1789986129963006000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4136
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main3-1-1789986131825391000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4236,
+        "files_parsed": 4136,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 5501,
+      "ParsedFiles": 4136,
+      "EarlyLocal": 4136,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 1,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 1,
+        "CapturedReads": 59,
+        "PublishedEvents": 5205,
+        "CheckpointBytes": 51260396,
+        "InventoryScans": 1,
+        "DetectionScans": 1,
+        "ContextScans": 1,
+        "ConfigScans": 1,
+        "HashedFiles": 5201,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 4236,
+        "Checkpoints": 1
+      },
+      "Epoch": "fs-1789986130362214000",
+      "Watermark": 0,
+      "Reconciled": true,
+      "FallbackReason": "benchmark bootstrap"
+    },
+    "aggregate_parsed": 4136,
+    "aggregate_work": {
+      "PolicyBuilds": 2,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 2,
+      "CapturedReads": 59,
+      "PublishedEvents": 5205,
+      "CheckpointBytes": 51260396,
+      "InventoryScans": 2,
+      "DetectionScans": 2,
+      "ContextScans": 2,
+      "ConfigScans": 2,
+      "HashedFiles": 10402,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 4236,
+      "Checkpoints": 1
+    },
+    "aggregate_stats": {
+      "files_read": 4236,
+      "files_parsed": 4136,
+      "cached_files": 4236,
+      "graphql_parsed": 2,
+      "sfc_parsed": 17,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [
+      "benchmark bootstrap",
+      "external config watch registered; reconcile registration gap"
+    ],
+    "reconciliation_count": 2,
+    "wire": {
+      "broker_end_ns": 1789986138923563000,
+      "bytes": 148271962,
+      "canonical_sha256": "8be206d0588936d2e1993f6867a887338308c4e5f3e333d9bc244035d1bf5687",
+      "consumer_end_ns": 1789986139041647000,
+      "context": "enola-coalesced-acceptance-resident27-main3",
+      "edges": 171766,
+      "empty_batches": 0,
+      "first_batch_ns": 1789986132091462000,
+      "first_ns": 1789986132076175000,
+      "messages": 5205,
+      "nodes": 69683,
+      "normalized_hash": "5ca9a8b4b04ac3f2fb74eea1fd41266034d19b5470053d5389315881bb13557e",
+      "owners": 5629,
+      "run_id": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main3-1-1789986131825391000",
+      "total_edges": 171766,
+      "total_nodes": 69683
+    },
+    "first_s": 2.12696,
+    "first_batch_s": 2.142247,
+    "broker_end_s": 8.974348,
+    "consumer_end_s": 9.092432,
+    "graph_hash": "5ca9a8b4b04ac3f2fb74eea1fd41266034d19b5470053d5389315881bb13557e",
+    "wire_messages": 5205,
+    "lifetime_rss_bytes": 1008877568
+  },
+  {
+    "label": "r3-resident-noop",
+    "start_ns": 1789986140407541000,
+    "seconds": 0.00015974999999457395,
+    "driver": {
+      "coverage_catchup": null,
+      "done_ns": 1789986140407643000,
+      "label": "noop",
+      "native_events": 8,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789986130362214000",
+        "From": 10,
+        "Through": 10,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": ""
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": null
+        },
+        "RunID": "",
+        "BaseGeneration": 1,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 0,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0
+        },
+        "Fallbacks": null,
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 0,
+        "EarlyLocal": 0,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 0,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 0,
+          "CapturedReads": 0,
+          "PublishedEvents": 0,
+          "CheckpointBytes": 0,
+          "InventoryScans": 0,
+          "DetectionScans": 0,
+          "ContextScans": 0,
+          "ConfigScans": 0,
+          "HashedFiles": 0,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 0,
+          "Checkpoints": 0
+        },
+        "Epoch": "fs-1789986130362214000",
+        "Watermark": 10,
+        "Reconciled": false,
+        "FallbackReason": ""
+      },
+      "seconds": 4.167e-06,
+      "source": "watch",
+      "started_ns": 1789986140407638000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": null
+      },
+      "RunID": "",
+      "BaseGeneration": 1,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 0,
+        "files_parsed": 0,
+        "cached_files": 0,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": null,
+      "Unreadable": null,
+      "OwnersPublished": 0,
+      "ParsedFiles": 0,
+      "EarlyLocal": 0,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 0,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 0,
+        "CapturedReads": 0,
+        "PublishedEvents": 0,
+        "CheckpointBytes": 0,
+        "InventoryScans": 0,
+        "DetectionScans": 0,
+        "ContextScans": 0,
+        "ConfigScans": 0,
+        "HashedFiles": 0,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 0,
+        "Checkpoints": 0
+      },
+      "Epoch": "fs-1789986130362214000",
+      "Watermark": 10,
+      "Reconciled": false,
+      "FallbackReason": ""
+    },
+    "aggregate_parsed": 0,
+    "aggregate_work": {
+      "PolicyBuilds": 0,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 0,
+      "CapturedReads": 0,
+      "PublishedEvents": 0,
+      "CheckpointBytes": 0,
+      "InventoryScans": 0,
+      "DetectionScans": 0,
+      "ContextScans": 0,
+      "ConfigScans": 0,
+      "HashedFiles": 0,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 0,
+      "Checkpoints": 0
+    },
+    "aggregate_stats": {
+      "files_read": 0,
+      "files_parsed": 0,
+      "cached_files": 0,
+      "graphql_parsed": 0,
+      "sfc_parsed": 0,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [],
+    "reconciliation_count": 0,
+    "graph_hash": "5ca9a8b4b04ac3f2fb74eea1fd41266034d19b5470053d5389315881bb13557e",
+    "wire_messages": 0
+  },
+  {
+    "label": "r3-resident-multifile",
+    "start_ns": 1789986140538495000,
+    "seconds": 4.707732500000006,
+    "driver": {
+      "coverage_catchup": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4244,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null,
+          "Work": {
+            "PolicyBuilds": 1,
+            "BoundedContextChecks": 0,
+            "FactAssemblies": 1,
+            "CapturedReads": 0,
+            "PublishedEvents": 0,
+            "CheckpointBytes": 0,
+            "InventoryScans": 1,
+            "DetectionScans": 1,
+            "ContextScans": 1,
+            "ConfigScans": 1,
+            "HashedFiles": 5209,
+            "DirtyHashBytes": 0,
+            "VerifiedFiles": 0,
+            "Checkpoints": 0
+          },
+          "Epoch": "fs-1789986130362214000",
+          "Watermark": 88,
+          "Reconciled": true,
+          "FallbackReason": "graph policy watch coverage refreshed"
+        }
+      ],
+      "done_ns": 1789986145246092000,
+      "label": "history",
+      "native_events": 211,
+      "native_observed": null,
+      "observed_batch": {
+        "Epoch": "fs-1789986130362214000",
+        "From": 10,
+        "Through": 83,
+        "Covered": true,
+        "Paths": null,
+        "Reconcile": "filesystem name change requires reconciliation"
+      },
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": true,
+          "PolicyReconciled": true,
+          "AddedSources": 8,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "added source": 8,
+            "resolution": 328,
+            "source content": 10
+          }
+        },
+        "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main3-2-1789986141596980000",
+        "BaseGeneration": 1,
+        "TargetGeneration": 2,
+        "Stats": {
+          "files_read": 346,
+          "files_parsed": 346,
+          "cached_files": 4187,
+          "graphql_parsed": 1,
+          "sfc_parsed": 0,
+          "summary_scans": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 1386,
+        "ParsedFiles": 346,
+        "EarlyLocal": 346,
+        "Facts": null,
+        "Work": {
+          "PolicyBuilds": 1,
+          "BoundedContextChecks": 0,
+          "FactAssemblies": 1,
+          "CapturedReads": 405,
+          "PublishedEvents": 1031,
+          "CheckpointBytes": 51317039,
+          "InventoryScans": 1,
+          "DetectionScans": 1,
+          "ContextScans": 1,
+          "ConfigScans": 1,
+          "HashedFiles": 5209,
+          "DirtyHashBytes": 0,
+          "VerifiedFiles": 4244,
+          "Checkpoints": 1
+        },
+        "Epoch": "fs-1789986130362214000",
+        "Watermark": 83,
+        "Reconciled": true,
+        "FallbackReason": "filesystem name change requires reconciliation"
+      },
+      "seconds": 4.707461875,
+      "source": "watch",
+      "started_ns": 1789986140538618000
+    },
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": true,
+        "PolicyReconciled": true,
+        "AddedSources": 8,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "added source": 8,
+          "resolution": 328,
+          "source content": 10
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main3-2-1789986141596980000",
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "Stats": {
+        "files_read": 346,
+        "files_parsed": 346,
+        "cached_files": 4187,
+        "graphql_parsed": 1,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 1386,
+      "ParsedFiles": 346,
+      "EarlyLocal": 346,
+      "Facts": null,
+      "Work": {
+        "PolicyBuilds": 1,
+        "BoundedContextChecks": 0,
+        "FactAssemblies": 1,
+        "CapturedReads": 405,
+        "PublishedEvents": 1031,
+        "CheckpointBytes": 51317039,
+        "InventoryScans": 1,
+        "DetectionScans": 1,
+        "ContextScans": 1,
+        "ConfigScans": 1,
+        "HashedFiles": 5209,
+        "DirtyHashBytes": 0,
+        "VerifiedFiles": 4244,
+        "Checkpoints": 1
+      },
+      "Epoch": "fs-1789986130362214000",
+      "Watermark": 83,
+      "Reconciled": true,
+      "FallbackReason": "filesystem name change requires reconciliation"
+    },
+    "aggregate_parsed": 346,
+    "aggregate_work": {
+      "PolicyBuilds": 2,
+      "BoundedContextChecks": 0,
+      "FactAssemblies": 2,
+      "CapturedReads": 405,
+      "PublishedEvents": 1031,
+      "CheckpointBytes": 51317039,
+      "InventoryScans": 2,
+      "DetectionScans": 2,
+      "ContextScans": 2,
+      "ConfigScans": 2,
+      "HashedFiles": 10418,
+      "DirtyHashBytes": 0,
+      "VerifiedFiles": 4244,
+      "Checkpoints": 1
+    },
+    "aggregate_stats": {
+      "files_read": 346,
+      "files_parsed": 346,
+      "cached_files": 8431,
+      "graphql_parsed": 1,
+      "sfc_parsed": 0,
+      "summary_scans": 0
+    },
+    "fallback_reasons": [
+      "filesystem name change requires reconciliation",
+      "graph policy watch coverage refreshed"
+    ],
+    "reconciliation_count": 2,
+    "wire": {
+      "broker_end_ns": 1789986143892785000,
+      "bytes": 28757325,
+      "canonical_sha256": "1cea5c69843724f6361358f8b70ecee9be6afa0d9fef79a98f71a45858621dce",
+      "consumer_end_ns": 1789986143916030000,
+      "context": "enola-coalesced-acceptance-resident27-main3",
+      "edges": 41169,
+      "empty_batches": 0,
+      "first_batch_ns": 1789986141982876000,
+      "first_ns": 1789986141877734000,
+      "messages": 1031,
+      "nodes": 18237,
+      "normalized_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+      "owners": 1386,
+      "run_id": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-main3-2-1789986141596980000",
+      "total_edges": 171954,
+      "total_nodes": 69754
+    },
+    "first_s": 1.339239,
+    "first_batch_s": 1.444381,
+    "broker_end_s": 3.35429,
+    "consumer_end_s": 3.377535,
+    "graph_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+    "wire_messages": 1031,
+    "checkout_seconds": 0.11278100000000535,
+    "checkout_through_apply_seconds": 4.839703167000003
+  },
+  {
+    "state_peak_sampled_bytes": 84952809,
+    "spool_peak_sampled_bytes": 36250242,
+    "state_final_bytes": 51317636,
+    "label": "cold-target",
+    "start_ns": 1789986145298340000,
+    "seconds": 8.915894125000001,
+    "exit": 0,
+    "process_real_s": 8.91,
+    "rss_bytes": 865288192.0,
+    "user_s": 20.91,
+    "sys_s": 2.03,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4144
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-cold-target-1-1789986146751970000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4244,
+        "files_parsed": 4144,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 5510,
+      "ParsedFiles": 4144,
+      "EarlyLocal": 4144
+    },
+    "fallbacks": [
+      "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "broker_end_ns": 1789986153981950000,
+      "bytes": 148466404,
+      "canonical_sha256": "1cea5c69843724f6361358f8b70ecee9be6afa0d9fef79a98f71a45858621dce",
+      "consumer_end_ns": 1789986154095236000,
+      "context": "enola-coalesced-acceptance-resident27-cold-target",
+      "edges": 171954,
+      "empty_batches": 0,
+      "first_batch_ns": 1789986147011705000,
+      "first_ns": 1789986146998576000,
+      "messages": 5211,
+      "nodes": 69754,
+      "normalized_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+      "owners": 5638,
+      "run_id": "/tmp/enola-product-history-source-enola-coalesced-acceptance-resident27-cold-target-1-1789986146751970000",
+      "total_edges": 171954,
+      "total_nodes": 69754
+    },
+    "first_s": 1.700236,
+    "first_batch_s": 1.713365,
+    "broker_end_s": 8.68361,
+    "consumer_end_s": 8.796896,
+    "graph_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835"
+  }
+]

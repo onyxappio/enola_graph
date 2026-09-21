@@ -1,0 +1,14 @@
+{
+  "product_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "observer": "/tmp/enola-product-observer",
+  "observer_sha256": "b51f09bff5e96717190e5536bdd0a3a6d2ca2fd7b05c0c3a7074b496bb0524c1",
+  "binary": "/tmp/enola-coalesced-enola",
+  "binary_sha256": "2332201887aad45d8e13783d7dd60767a29f4bacc6081dd1a5ebdf1a603bb120",
+  "resident_binary": "/tmp/enola-coalesced-benchresident",
+  "resident_sha256": "f96411f7e545c9538753807c5d32e68462d59a1150de3e3146b3550464579533",
+  "source_mode": "watch",
+  "profile": "full",
+  "config": "repo: /tmp/enola-product-benchmark-source\n\n# Copy to Product/mcp-arch.yaml. Paths are relative to the Product checkout.\ngraph_inputs:\n  # Additive to defaults and Git ignore rules. Applies to tracked files too.\n  exclude:\n    - \"apps/mobile/e2e/artifacts/**\"\n    - \"worker-reports/**\"\n",
+  "started_ns": 1789985866083354000,
+  "original_file_sha256": "b940122ddebf67b8f46073ba98a5bb3e1c82d80a9a28ac1a48cc680b5c0f80c3"
+}

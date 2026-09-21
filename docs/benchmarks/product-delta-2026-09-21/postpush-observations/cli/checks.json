@@ -1,0 +1,50 @@
+[
+  {
+    "check": "r1-new-noop no-op",
+    "pass": true
+  },
+  {
+    "check": "r2-new-noop no-op",
+    "pass": true
+  },
+  {
+    "check": "r3-new-noop no-op",
+    "pass": true
+  },
+  {
+    "check": "r1-new-initial cold graph equality",
+    "pass": true
+  },
+  {
+    "check": "r2-new-initial cold graph equality",
+    "pass": true
+  },
+  {
+    "check": "r3-new-initial cold graph equality",
+    "pass": true
+  },
+  {
+    "check": "r1-new-body cold graph equality",
+    "pass": true
+  },
+  {
+    "check": "r2-new-body cold graph equality",
+    "pass": true
+  },
+  {
+    "check": "r3-new-body cold graph equality",
+    "pass": true
+  },
+  {
+    "check": "r1-new-structural cold graph equality",
+    "pass": true
+  },
+  {
+    "check": "r2-new-structural cold graph equality",
+    "pass": true
+  },
+  {
+    "check": "r3-new-structural cold graph equality",
+    "pass": true
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "check": "r1 baseline repeat equality",
+    "pass": true
+  },
+  {
+    "check": "r1-new-noop no-op",
+    "pass": true
+  },
+  {
+    "check": "r2 baseline repeat equality",
+    "pass": true
+  },
+  {
+    "check": "r2-new-noop no-op",
+    "pass": true
+  },
+  {
+    "check": "r3 baseline repeat equality",
+    "pass": true
+  },
+  {
+    "check": "r3-new-noop no-op",
+    "pass": true
+  },
+  {
+    "check": "r1-new-multifile equals target cold",
+    "pass": true,
+    "actual": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+    "expected": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835"
+  },
+  {
+    "check": "r2-new-multifile equals target cold",
+    "pass": true,
+    "actual": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+    "expected": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835"
+  },
+  {
+    "check": "r3-new-multifile equals target cold",
+    "pass": true,
+    "actual": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+    "expected": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835"
+  }
+]

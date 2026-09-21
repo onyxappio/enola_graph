@@ -1,0 +1,53 @@
+import argparse,json,os,subprocess,time,socket,signal
+from pathlib import Path
+p=argparse.ArgumentParser();p.add_argument('--prefix',required=True);p.add_argument('--binary',required=True);p.add_argument('--resident',required=True);p.add_argument('--scope-tool',required=True);p.add_argument('--repeat',type=int,default=3);p.add_argument('--cases',nargs='+',default=['cli','resident','cli27','resident27','cli100','resident100']);a=p.parse_args()
+base=Path('/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21')
+old='/tmp/enola-product-old';observer='/tmp/enola-product-observer';nats='/tmp/enola-toolchain/bin/nats-server'
+target='a609c19f3861971930fae7b33dcb2950598953c5';bases={'27':'a6f1f3a91a36ea3dead786560412a4944a009694','100':'599575d0aa398615cde6a4ac12bc0c7734a686d9'}
+active=[]
+def stop(child):
+ if child.poll() is None:
+  os.killpg(child.pid,signal.SIGTERM)
+  try:child.wait(timeout=8)
+  except subprocess.TimeoutExpired:os.killpg(child.pid,signal.SIGKILL);child.wait()
+def interrupt(*_):raise KeyboardInterrupt()
+signal.signal(signal.SIGTERM,interrupt);signal.signal(signal.SIGINT,interrupt)
+for index,case in enumerate(a.cases):
+ output=Path(a.prefix+'-'+case);assert not output.exists(),output;output.mkdir(parents=True)
+ port=14350+index;url=f'nats://127.0.0.1:{port}';repo='/tmp/enola-product-history-source' if case.endswith(('27','100')) else '/tmp/enola-product-benchmark-source'
+ try:
+  with (output/'nats.log').open('w') as log:
+   broker=subprocess.Popen([nats,'-js','-a','127.0.0.1','-p',str(port),'-sd',str(output/'nats')],stdout=log,stderr=subprocess.STDOUT,start_new_session=True);active.append(broker)
+  deadline=time.monotonic()+15
+  while True:
+   if broker.poll() is not None:raise RuntimeError('broker died')
+   try:
+    with socket.create_connection(('127.0.0.1',port),timeout=.2):
+     if 'Server is ready' in (output/'nats.log').read_text():break
+     raise OSError('our broker not ready')
+   except OSError:
+    if time.monotonic()>deadline:raise RuntimeError('broker readiness timeout')
+    time.sleep(.05)
+  with (output/'observer.log').open('w') as log:
+   consumer=subprocess.Popen([observer,url,str(output/'consumer.jsonl')],stdout=log,stderr=subprocess.STDOUT,start_new_session=True);active.append(consumer)
+  deadline=time.monotonic()+15
+  while 'READY' not in (output/'observer.log').read_text():
+   if consumer.poll() is not None:raise RuntimeError('observer died')
+   if time.monotonic()>deadline:raise RuntimeError('observer readiness timeout')
+   time.sleep(.05)
+  cmd=['python3',str(base/({'cli':'cli.py','resident':'resident.py'}.get(case,'resident_history.py' if case.startswith('resident') else 'multifile.py'))),'--binary',a.binary,'--root',str(output),'--source',repo,'--nats',url,'--repeat',str(a.repeat),'--scope-config',str(base/'product-graph-scope.yaml')]
+  if case.startswith('resident'):cmd+=['--resident',a.resident]
+  if case=='resident':cmd+=['--probe-ignored']
+  if case=='cli':
+   legacy=subprocess.check_output([a.scope_tool,'--repo',repo,'--config',repo+'/mcp-arch.yaml']);(output/'legacy-scope.json').write_bytes(legacy);cmd+=['--old',old,'--old-config',str(output/'legacy-scope.json'),'--scope-tool',a.scope_tool]
+  if case.endswith(('27','100')):
+   count='100' if case.endswith('100') else '27';cmd+=['--base',bases[count],'--target',target]
+   if case.startswith('cli'):cmd+=['--old',old,'--scope-tool',a.scope_tool]
+  (output/'command.json').write_text(json.dumps(cmd,indent=2));print('START',case,flush=True)
+  with (output/'suite.log').open('w') as log:
+   runner=subprocess.Popen(cmd,stdout=log,stderr=subprocess.STDOUT,start_new_session=True);active.append(runner);code=runner.wait()
+  if code:raise RuntimeError(f'{case} failed: {output}/suite.log')
+  print('DONE',case,flush=True)
+ finally:
+  for child in reversed(active):stop(child)
+  active=[]

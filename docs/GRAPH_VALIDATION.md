@@ -1,20 +1,19 @@
 # Graph streaming implementation and validation
 
-Validation date: 2026-09-21. The scoped-invalidation candidate passed full
-repository tests, vet, focused race checks and independent correctness review.
-Its Product 100-path history parsed 414 TS files instead of 4,181 and matched
-the cold target graph in a contended correctness run. That run does not establish
-latency acceptance.
+Validation date: 2026-09-21. The reviewed coalescing candidate passed full
+repository tests, vet, CLI build, independent review and focused race checks.
+The repeated Product suite completed all six scenarios with **114 passing
+assertions**, including exact consumer cold/delta graph equality, zero-work idle,
+real ignored-input events, watcher quiet and 27/100-path history transitions.
 
-**Performance acceptance remains failed.** The latest isolated initial comparison
-was 15.270 s for the candidate versus 9.906 s for the pinned old binary;
-fresh CLI no-change was 5.982 s versus 4.612 s. The incomplete repeat series and
-phase profiles are archived in [the rejected stage report](benchmarks/product-delta-2026-09-21/failed-isolated-stage/README.md).
-Further preparation and publication optimizations are in progress and require
-new correctness checks and isolated timing. Historical results below do not
-validate those ongoing edits. This is validation of the fork, not an upstream release.
+Initial median is 9.119 s versus 10.189 s for pinned old Enola; resident body
+delta is 0.739 s and idle is 0.136 ms. Fresh CLI no-change remains 2.078 s,
+large history deltas 4.37–5.00 s, and memory exceeds the old binary. These limits,
+spreads, broker/consumer times and input-comparison qualifications are in
+[the verified Product report](benchmarks/product-delta-2026-09-21/accepted-coalesced/README.md).
+This validates the measured scenarios, not every possible repository or a Memgraph adapter.
 
-## Integration checkpoint
+## Earlier integration checkpoint b1820aa
 
 The integration checkpoint includes the bounded input-policy admission and transport
 optimizations described in the [preparation report](benchmarks/product-delta-2026-09-21/preparation-performance.md)
@@ -24,7 +23,7 @@ Affected-package and focused race checks are recorded in those reports.
 Full-suite results are [archived here](benchmarks/product-delta-2026-09-21/enola-integration-full-test.log);
 the [source manifest](benchmarks/product-delta-2026-09-21/integration-source-manifest.json)
 identifies the built candidate. These checks validate the integration checkpoint;
-new isolated Product timings remain outstanding. Start with the
+the subsequent measurements are linked above. Start with the
 [Codata integration guide](CODATA_INTEGRATION.md).
 
 The earlier synthetic observations below are retained as historical evidence.
@@ -44,8 +43,13 @@ and [the protocol specification](STREAMING_INCREMENTAL.md) for consumer obligati
 
 NATS JetStream is the broker adapter. Publication uses a durable journal, broker
 acknowledgments, and a bounded asynchronous queue (64 pending, committing or ready
-items / 16 MiB of queued payload, plus at most eight in-flight messages). Async
-Publish accepts volatile memory admission; the commit worker validates history,
+items / 16 MiB of queued payload, plus at most eight in-flight messages).
+The commit worker may gather data batches for up to 3 ms within the existing
+queue limits, targeting 16 pending messages. Begin/scope/End, Flush and shutdown
+bypass gathering. This reduces small durable sync groups without changing the
+wire protocol or broker acknowledgment boundary.
+
+Async Publish accepts volatile memory admission; the commit worker validates history,
 journals and fsyncs before delivery. Flush waits for all acknowledgments and
 propagates errors before checkpoint promotion. Begin and scope fences precede
 authoritative data; End waits for all prior batches. Consumers stage replacements

@@ -1,0 +1,853 @@
+[
+  {
+    "state_peak_sampled_bytes": 0,
+    "spool_peak_sampled_bytes": 0,
+    "state_final_bytes": 0,
+    "label": "r1-old-initial",
+    "start_ns": 1789986159481182000,
+    "seconds": 9.817108083,
+    "exit": 0,
+    "process_real_s": 9.81,
+    "rss_bytes": 571310080.0,
+    "user_s": 57.55,
+    "sys_s": 1.57,
+    "facts": 70092
+  },
+  {
+    "state_peak_sampled_bytes": 84026330,
+    "spool_peak_sampled_bytes": 39736974,
+    "state_final_bytes": 51198622,
+    "label": "r1-new-initial",
+    "start_ns": 1789986170066894000,
+    "seconds": 9.137707750000002,
+    "exit": 0,
+    "process_real_s": 9.13,
+    "rss_bytes": 1001586688.0,
+    "user_s": 20.94,
+    "sys_s": 2.11,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4128
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-cli100-main1-1-1789986171539372000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4228,
+        "files_parsed": 4128,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 5491,
+      "ParsedFiles": 4128,
+      "EarlyLocal": 4128
+    },
+    "fallbacks": [
+      "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "broker_end_ns": 1789986178978670000,
+      "bytes": 148070319,
+      "canonical_sha256": "4ddb820e6ad926db03f9d46c60d863ee7ef6f42ec77b42934ee50176d0bde04c",
+      "consumer_end_ns": 1789986179093680000,
+      "context": "enola-coalesced-acceptance-cli100-main1",
+      "edges": 171533,
+      "empty_batches": 0,
+      "first_batch_ns": 1789986171830996000,
+      "first_ns": 1789986171816546000,
+      "messages": 5198,
+      "nodes": 69595,
+      "normalized_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+      "owners": 5619,
+      "run_id": "/tmp/enola-product-history-source-enola-coalesced-acceptance-cli100-main1-1-1789986171539372000",
+      "total_edges": 171533,
+      "total_nodes": 69595
+    },
+    "first_s": 1.749652,
+    "first_batch_s": 1.764102,
+    "broker_end_s": 8.911776,
+    "consumer_end_s": 9.026786,
+    "graph_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134"
+  },
+  {
+    "state_peak_sampled_bytes": 51198622,
+    "spool_peak_sampled_bytes": 329,
+    "state_final_bytes": 51198622,
+    "label": "r1-new-noop",
+    "start_ns": 1789986179770040000,
+    "seconds": 2.030510249999999,
+    "exit": 0,
+    "process_real_s": 2.02,
+    "rss_bytes": 337149952.0,
+    "user_s": 1.77,
+    "sys_s": 0.78,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {}
+      },
+      "RunID": "",
+      "BaseGeneration": 1,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 0,
+        "files_parsed": 0,
+        "cached_files": 4228,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": null,
+      "Unreadable": null,
+      "OwnersPublished": 0,
+      "ParsedFiles": 0,
+      "EarlyLocal": 0
+    },
+    "fallbacks": [],
+    "graph_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+    "noop_wire_messages": 0
+  },
+  {
+    "state_peak_sampled_bytes": 0,
+    "spool_peak_sampled_bytes": 0,
+    "state_final_bytes": 0,
+    "label": "r1-old-multifile",
+    "start_ns": 1789986186778347000,
+    "seconds": 11.470220833000003,
+    "exit": 0,
+    "process_real_s": 11.46,
+    "rss_bytes": 519733248.0,
+    "user_s": 59.74,
+    "sys_s": 1.59,
+    "facts": 70253
+  },
+  {
+    "state_peak_sampled_bytes": 112678431,
+    "spool_peak_sampled_bytes": 34267254,
+    "state_final_bytes": 51317706,
+    "label": "r1-new-multifile",
+    "start_ns": 1789986199093368000,
+    "seconds": 4.634593708000004,
+    "exit": 0,
+    "process_real_s": 4.63,
+    "rss_bytes": 786563072.0,
+    "user_s": 7.57,
+    "sys_s": 1.22,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": true,
+        "PolicyReconciled": true,
+        "AddedSources": 16,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "added source": 16,
+          "resolution": 364,
+          "source content": 34
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-cli100-main1-2-1789986200980171000",
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "Stats": {
+        "files_read": 414,
+        "files_parsed": 414,
+        "cached_files": 4146,
+        "graphql_parsed": 1,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 1474,
+      "ParsedFiles": 414,
+      "EarlyLocal": 414
+    },
+    "fallbacks": [
+      "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "broker_end_ns": 1789986203583355000,
+      "bytes": 32254909,
+      "canonical_sha256": "1cea5c69843724f6361358f8b70ecee9be6afa0d9fef79a98f71a45858621dce",
+      "consumer_end_ns": 1789986203608411000,
+      "context": "enola-coalesced-acceptance-cli100-main1",
+      "edges": 45301,
+      "empty_batches": 0,
+      "first_batch_ns": 1789986201446301000,
+      "first_ns": 1789986201331623000,
+      "messages": 1170,
+      "nodes": 19756,
+      "normalized_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+      "owners": 1486,
+      "run_id": "/tmp/enola-product-history-source-enola-coalesced-acceptance-cli100-main1-2-1789986200980171000",
+      "total_edges": 171954,
+      "total_nodes": 69754
+    },
+    "first_s": 2.238255,
+    "first_batch_s": 2.352933,
+    "broker_end_s": 4.489987,
+    "consumer_end_s": 4.515043,
+    "graph_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835"
+  },
+  {
+    "state_peak_sampled_bytes": 0,
+    "spool_peak_sampled_bytes": 0,
+    "state_final_bytes": 0,
+    "label": "r2-old-initial",
+    "start_ns": 1789986209203134000,
+    "seconds": 10.202441999999998,
+    "exit": 0,
+    "process_real_s": 10.19,
+    "rss_bytes": 549404672.0,
+    "user_s": 58.11,
+    "sys_s": 1.56,
+    "facts": 70092
+  },
+  {
+    "state_peak_sampled_bytes": 84057471,
+    "spool_peak_sampled_bytes": 38370481,
+    "state_final_bytes": 51198620,
+    "label": "r2-new-initial",
+    "start_ns": 1789986220175462000,
+    "seconds": 9.103721917000001,
+    "exit": 0,
+    "process_real_s": 9.1,
+    "rss_bytes": 940965888.0,
+    "user_s": 21.44,
+    "sys_s": 2.07,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4128
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-cli100-main2-1-1789986221642665000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4228,
+        "files_parsed": 4128,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 5491,
+      "ParsedFiles": 4128,
+      "EarlyLocal": 4128
+    },
+    "fallbacks": [
+      "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "broker_end_ns": 1789986229045122000,
+      "bytes": 148070519,
+      "canonical_sha256": "4ddb820e6ad926db03f9d46c60d863ee7ef6f42ec77b42934ee50176d0bde04c",
+      "consumer_end_ns": 1789986229167371000,
+      "context": "enola-coalesced-acceptance-cli100-main2",
+      "edges": 171533,
+      "empty_batches": 0,
+      "first_batch_ns": 1789986221911717000,
+      "first_ns": 1789986221894634000,
+      "messages": 5198,
+      "nodes": 69595,
+      "normalized_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+      "owners": 5619,
+      "run_id": "/tmp/enola-product-history-source-enola-coalesced-acceptance-cli100-main2-1-1789986221642665000",
+      "total_edges": 171533,
+      "total_nodes": 69595
+    },
+    "first_s": 1.719172,
+    "first_batch_s": 1.736255,
+    "broker_end_s": 8.86966,
+    "consumer_end_s": 8.991909,
+    "graph_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134"
+  },
+  {
+    "state_peak_sampled_bytes": 51198620,
+    "spool_peak_sampled_bytes": 327,
+    "state_final_bytes": 51198620,
+    "label": "r2-new-noop",
+    "start_ns": 1789986229802268000,
+    "seconds": 2.0423142090000113,
+    "exit": 0,
+    "process_real_s": 2.03,
+    "rss_bytes": 341016576.0,
+    "user_s": 1.77,
+    "sys_s": 0.79,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {}
+      },
+      "RunID": "",
+      "BaseGeneration": 1,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 0,
+        "files_parsed": 0,
+        "cached_files": 4228,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": null,
+      "Unreadable": null,
+      "OwnersPublished": 0,
+      "ParsedFiles": 0,
+      "EarlyLocal": 0
+    },
+    "fallbacks": [],
+    "graph_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+    "noop_wire_messages": 0
+  },
+  {
+    "state_peak_sampled_bytes": 0,
+    "spool_peak_sampled_bytes": 0,
+    "state_final_bytes": 0,
+    "label": "r2-old-multifile",
+    "start_ns": 1789986236756053000,
+    "seconds": 11.572095125000004,
+    "exit": 0,
+    "process_real_s": 11.56,
+    "rss_bytes": 515997696.0,
+    "user_s": 59.95,
+    "sys_s": 1.61,
+    "facts": 70253
+  },
+  {
+    "state_peak_sampled_bytes": 112678055,
+    "spool_peak_sampled_bytes": 34346363,
+    "state_final_bytes": 51317706,
+    "label": "r2-new-multifile",
+    "start_ns": 1789986249172485000,
+    "seconds": 4.598003750000004,
+    "exit": 0,
+    "process_real_s": 4.59,
+    "rss_bytes": 766885888.0,
+    "user_s": 7.51,
+    "sys_s": 1.22,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": true,
+        "PolicyReconciled": true,
+        "AddedSources": 16,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "added source": 16,
+          "resolution": 364,
+          "source content": 34
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-cli100-main2-2-1789986251079306000",
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "Stats": {
+        "files_read": 414,
+        "files_parsed": 414,
+        "cached_files": 4146,
+        "graphql_parsed": 1,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 1474,
+      "ParsedFiles": 414,
+      "EarlyLocal": 414
+    },
+    "fallbacks": [
+      "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "broker_end_ns": 1789986253630704000,
+      "bytes": 32254799,
+      "canonical_sha256": "1cea5c69843724f6361358f8b70ecee9be6afa0d9fef79a98f71a45858621dce",
+      "consumer_end_ns": 1789986253655503000,
+      "context": "enola-coalesced-acceptance-cli100-main2",
+      "edges": 45301,
+      "empty_batches": 0,
+      "first_batch_ns": 1789986251538542000,
+      "first_ns": 1789986251421911000,
+      "messages": 1170,
+      "nodes": 19756,
+      "normalized_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+      "owners": 1486,
+      "run_id": "/tmp/enola-product-history-source-enola-coalesced-acceptance-cli100-main2-2-1789986251079306000",
+      "total_edges": 171954,
+      "total_nodes": 69754
+    },
+    "first_s": 2.249426,
+    "first_batch_s": 2.366057,
+    "broker_end_s": 4.458219,
+    "consumer_end_s": 4.483018,
+    "graph_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835"
+  },
+  {
+    "state_peak_sampled_bytes": 0,
+    "spool_peak_sampled_bytes": 0,
+    "state_final_bytes": 0,
+    "label": "r3-old-initial",
+    "start_ns": 1789986259200377000,
+    "seconds": 10.327745875000005,
+    "exit": 0,
+    "process_real_s": 10.32,
+    "rss_bytes": 580894720.0,
+    "user_s": 58.46,
+    "sys_s": 1.62,
+    "facts": 70092
+  },
+  {
+    "state_peak_sampled_bytes": 84072022,
+    "spool_peak_sampled_bytes": 37351651,
+    "state_final_bytes": 51198622,
+    "label": "r3-new-initial",
+    "start_ns": 1789986270344755000,
+    "seconds": 8.87573879099999,
+    "exit": 0,
+    "process_real_s": 8.87,
+    "rss_bytes": 949043200.0,
+    "user_s": 20.74,
+    "sys_s": 2.06,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4128
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-cli100-main3-1-1789986271812832000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4228,
+        "files_parsed": 4128,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 5491,
+      "ParsedFiles": 4128,
+      "EarlyLocal": 4128
+    },
+    "fallbacks": [
+      "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "broker_end_ns": 1789986278985609000,
+      "bytes": 148070339,
+      "canonical_sha256": "4ddb820e6ad926db03f9d46c60d863ee7ef6f42ec77b42934ee50176d0bde04c",
+      "consumer_end_ns": 1789986279098213000,
+      "context": "enola-coalesced-acceptance-cli100-main3",
+      "edges": 171533,
+      "empty_batches": 0,
+      "first_batch_ns": 1789986272079650000,
+      "first_ns": 1789986272064123000,
+      "messages": 5198,
+      "nodes": 69595,
+      "normalized_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+      "owners": 5619,
+      "run_id": "/tmp/enola-product-history-source-enola-coalesced-acceptance-cli100-main3-1-1789986271812832000",
+      "total_edges": 171533,
+      "total_nodes": 69595
+    },
+    "first_s": 1.719368,
+    "first_batch_s": 1.734895,
+    "broker_end_s": 8.640854,
+    "consumer_end_s": 8.753458,
+    "graph_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134"
+  },
+  {
+    "state_peak_sampled_bytes": 51198622,
+    "spool_peak_sampled_bytes": 329,
+    "state_final_bytes": 51198622,
+    "label": "r3-new-noop",
+    "start_ns": 1789986279699845000,
+    "seconds": 2.048076000000009,
+    "exit": 0,
+    "process_real_s": 2.04,
+    "rss_bytes": 333250560.0,
+    "user_s": 1.77,
+    "sys_s": 0.78,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {}
+      },
+      "RunID": "",
+      "BaseGeneration": 1,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 0,
+        "files_parsed": 0,
+        "cached_files": 4228,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": null,
+      "Unreadable": null,
+      "OwnersPublished": 0,
+      "ParsedFiles": 0,
+      "EarlyLocal": 0
+    },
+    "fallbacks": [],
+    "graph_hash": "f5a5dccdee04f3debe03f6905158c0ebcb9b0db162c9dba8dee5528f02841134",
+    "noop_wire_messages": 0
+  },
+  {
+    "state_peak_sampled_bytes": 0,
+    "spool_peak_sampled_bytes": 0,
+    "state_final_bytes": 0,
+    "label": "r3-old-multifile",
+    "start_ns": 1789986286694899000,
+    "seconds": 11.56619008300001,
+    "exit": 0,
+    "process_real_s": 11.56,
+    "rss_bytes": 521928704.0,
+    "user_s": 59.97,
+    "sys_s": 1.62,
+    "facts": 70253
+  },
+  {
+    "state_peak_sampled_bytes": 112676611,
+    "spool_peak_sampled_bytes": 32576019,
+    "state_final_bytes": 51317706,
+    "label": "r3-new-multifile",
+    "start_ns": 1789986299104619000,
+    "seconds": 4.635119583000005,
+    "exit": 0,
+    "process_real_s": 4.63,
+    "rss_bytes": 778174464.0,
+    "user_s": 7.38,
+    "sys_s": 1.21,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": true,
+        "PolicyReconciled": true,
+        "AddedSources": 16,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "added source": 16,
+          "resolution": 364,
+          "source content": 34
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-cli100-main3-2-1789986301042205000",
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "Stats": {
+        "files_read": 414,
+        "files_parsed": 414,
+        "cached_files": 4146,
+        "graphql_parsed": 1,
+        "sfc_parsed": 0,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 1474,
+      "ParsedFiles": 414,
+      "EarlyLocal": 414
+    },
+    "fallbacks": [
+      "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "broker_end_ns": 1789986303608144000,
+      "bytes": 32254879,
+      "canonical_sha256": "1cea5c69843724f6361358f8b70ecee9be6afa0d9fef79a98f71a45858621dce",
+      "consumer_end_ns": 1789986303633166000,
+      "context": "enola-coalesced-acceptance-cli100-main3",
+      "edges": 45301,
+      "empty_batches": 0,
+      "first_batch_ns": 1789986301511391000,
+      "first_ns": 1789986301407196000,
+      "messages": 1170,
+      "nodes": 19756,
+      "normalized_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+      "owners": 1486,
+      "run_id": "/tmp/enola-product-history-source-enola-coalesced-acceptance-cli100-main3-2-1789986301042205000",
+      "total_edges": 171954,
+      "total_nodes": 69754
+    },
+    "first_s": 2.302577,
+    "first_batch_s": 2.406772,
+    "broker_end_s": 4.503525,
+    "consumer_end_s": 4.528547,
+    "graph_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835"
+  },
+  {
+    "state_peak_sampled_bytes": 84852956,
+    "spool_peak_sampled_bytes": 38639319,
+    "state_final_bytes": 51317621,
+    "label": "cold-target",
+    "start_ns": 1789986304246715000,
+    "seconds": 8.97909420900001,
+    "exit": 0,
+    "process_real_s": 8.97,
+    "rss_bytes": 945389568.0,
+    "user_s": 20.87,
+    "sys_s": 2.09,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4144
+        }
+      },
+      "RunID": "/tmp/enola-product-history-source-enola-coalesced-acceptance-cli100-cold-target-1-1789986305705718000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4244,
+        "files_parsed": 4144,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 5510,
+      "ParsedFiles": 4144,
+      "EarlyLocal": 4144
+    },
+    "fallbacks": [
+      "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "broker_end_ns": 1789986312989605000,
+      "bytes": 148445336,
+      "canonical_sha256": "1cea5c69843724f6361358f8b70ecee9be6afa0d9fef79a98f71a45858621dce",
+      "consumer_end_ns": 1789986313098501000,
+      "context": "enola-coalesced-acceptance-cli100-cold-target",
+      "edges": 171954,
+      "empty_batches": 0,
+      "first_batch_ns": 1789986305962095000,
+      "first_ns": 1789986305950860000,
+      "messages": 5211,
+      "nodes": 69754,
+      "normalized_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835",
+      "owners": 5638,
+      "run_id": "/tmp/enola-product-history-source-enola-coalesced-acceptance-cli100-cold-target-1-1789986305705718000",
+      "total_edges": 171954,
+      "total_nodes": 69754
+    },
+    "first_s": 1.704145,
+    "first_batch_s": 1.71538,
+    "broker_end_s": 8.74289,
+    "consumer_end_s": 8.851786,
+    "graph_hash": "95d5620dfdfcae8d42a2c670f2203fad265112ed9c68a8a0744405d774739835"
+  }
+]
