@@ -112,6 +112,12 @@ func serverBindings(src []byte) map[string]serverBinding {
 			}
 		}
 	}
+	for name, b := range typedFastifyParamBindings(src) {
+		if _, taken := out[name]; taken {
+			continue
+		}
+		out[name] = b
+	}
 	if len(out) == 0 {
 		return nil
 	}
@@ -216,6 +222,63 @@ func cleanServerPath(raw string) (string, bool) {
 func isServerReceiver(bindings map[string]serverBinding, name string) bool {
 	_, ok := bindings[name]
 	return ok
+}
+
+var (
+	fastifyNamedImport = regexp.MustCompile(`(?m)import\s+(?:type\s+)?\{([^}]+)\}\s+from\s+['"]fastify['"]`)
+	fastifyTypedParam  = regexp.MustCompile(`\b([A-Za-z_$][\w$]*)\s*:\s*([A-Za-z_$][\w$]*)\b`)
+)
+
+var fastifyImportedTypes = map[string]bool{
+	"FastifyInstance":       true,
+	"FastifyPluginAsync":    true,
+	"FastifyPluginCallback": true,
+}
+
+// typedFastifyParamBindings maps parameter identifiers whose type is a name
+// imported from the `fastify` package (including `import type` and `as` aliases).
+// It does not infer from the identifier `app`. A factory binding of the same
+// name stays authoritative so an in-file Fastify() construction is not replaced.
+func typedFastifyParamBindings(src []byte) map[string]serverBinding {
+	local := map[string]bool{}
+	for _, m := range fastifyNamedImport.FindAllSubmatch(src, -1) {
+		for _, spec := range strings.Split(string(m[1]), ",") {
+			spec = strings.TrimSpace(spec)
+			spec = strings.TrimPrefix(spec, "type ")
+			spec = strings.TrimSpace(spec)
+			if spec == "" {
+				continue
+			}
+			name, alias := spec, ""
+			if parts := strings.Split(spec, " as "); len(parts) == 2 {
+				name = strings.TrimSpace(parts[0])
+				alias = strings.TrimSpace(parts[1])
+			}
+			if !fastifyImportedTypes[name] {
+				continue
+			}
+			if alias != "" {
+				local[alias] = true
+			} else {
+				local[name] = true
+			}
+		}
+	}
+	if len(local) == 0 {
+		return nil
+	}
+	out := map[string]serverBinding{}
+	for _, m := range fastifyTypedParam.FindAllSubmatch(src, -1) {
+		ident, typ := string(m[1]), string(m[2])
+		if !local[typ] {
+			continue
+		}
+		out[ident] = serverBinding{framework: "fastify", mounted: true}
+	}
+	if len(out) == 0 {
+		return nil
+	}
+	return out
 }
 
 // identifierEndingAt returns the identifier immediately preceding pos, or "".

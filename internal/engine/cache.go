@@ -2452,7 +2452,10 @@ import (
 // GraphQL Yoga resolver RelHandledBy, and imported implements qualification.
 // v278: Drizzle FK depends_on resolves only to storage tables; GraphQL Yoga/Tools
 // createSchema binding respects lexical shadowing and per-call typeDefs fields.
-const cacheVersion = "v278"
+// v279: TypeScript ESM JS-extension substitution; folder-index import symbol
+// ownership; lexically certain same-file RelCalls resolution; FastifyInstance
+// typed-parameter server routes; Nuxt default ~/ and @/ aliases without .nuxt.
+const cacheVersion = "v279"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

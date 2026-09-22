@@ -247,6 +247,9 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	if isSvelteKit {
 		aliasRoots = withSvelteKitAliasFallbacks(repoPath, aliasRoots, inputScope)
 	}
+	if isNuxt {
+		aliasRoots = withNuxtAliasFallbacks(repoPath, aliasRoots, nuxtPkgs, inputScope)
+	}
 
 	// Restrict to TypeScript files once, then parse them in parallel. The
 	// framework flags and path aliases above are read-only, and extractFile is a
@@ -659,7 +662,7 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 		isNuxt:      isNuxt,
 		isSvelteKit: isSvelteKit,
 		orms:        orms,
-		importMap:   buildImportSymbols(kinds, root, src, relFile, aliases),
+		importMap:   buildImportSymbols(kinds, root, src, relFile, aliases, knownFiles),
 		imports:     buildEmberImportBindings(kinds, root, src, relFile, aliases),
 		ioBindings:  buildIOImportBindings(kinds, root, src),
 		knownFiles:  knownFiles,
@@ -1676,7 +1679,7 @@ func detectNextJSAt(dir string, inputScopes ...
 
 func isTypeScriptFile(path string) bool {
 	ext := strings.ToLower(filepath.Ext(path))
-	return ext == ".ts" || ext == ".tsx" || ext == ".vue" || ext == ".js" || ext == ".jsx" || ext == ".mjs" ||
+	return ext == ".ts" || ext == ".tsx" || ext == ".mts" || ext == ".cts" || ext == ".vue" || ext == ".js" || ext == ".jsx" || ext == ".mjs" || ext == ".cjs" ||
 		ext == ".svelte" || ext == ".gts" || ext == ".gjs" || ext == ".hbs" || ext == ".graphql" || ext == ".gql"
 }
 
@@ -2361,7 +2364,7 @@ func resolveImportPath(importPath, fileDir string, aliases map[string]tsAlias) (
 
 // tsModuleExts are the source extensions a bare import path may resolve to, tried in
 // TS-before-JS order (a project with both prefers the typed file).
-var tsModuleExts = []string{".ts", ".tsx", ".js", ".jsx", ".mjs", ".vue", ".svelte", ".gts", ".gjs"}
+var tsModuleExts = []string{".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs", ".vue", ".svelte", ".gts", ".gjs"}
 
 // resolveModuleFile resolves an extensionless internal import path to the actual
 // source file backing it, using the set of known indexed files. It returns the
@@ -2378,6 +2381,18 @@ func resolveModuleFile(resolved string, knownFiles map[string]bool) (indexPath, 
 	// index.ts"]` — so the resolved path carries its extension, and appending another
 	// one matched nothing. Every caller then read the import as unresolvable: in one
 	// workspace that was every lazily-loaded feature module in the application.
+	// TypeScript ESM / nodenext / bundler: a specifier written with a JS emit
+	// extension substitutes onto the matching source extension. Candidates are
+	// tried before the literal .js/.mjs/.cjs/.jsx path so a .ts sibling wins
+	// when both exist; a genuine JS file is the last candidate.
+	if cands := tsExtensionSubstitutionCandidates(resolved); len(cands) > 0 {
+		for _, cand := range cands {
+			if knownFiles[cand] {
+				return cand, factpath.Dir(cand), true
+			}
+		}
+		return "", "", false
+	}
 	if knownFiles[resolved] {
 		return resolved, factpath.Dir(resolved), true
 	}
@@ -2394,13 +2409,36 @@ func resolveModuleFile(resolved string, knownFiles map[string]bool) (indexPath, 
 	return "", "", false
 }
 
+// tsExtensionSubstitutionCandidates is TypeScript's emit-extension rewrite for
+// moduleResolution node16/nodenext/bundler. Longer suffixes (.mjs/.cjs/.jsx)
+// are matched before .js. Each list is tried in the handbook order; callers
+// must not strip an unknown extension.
+func tsExtensionSubstitutionCandidates(resolved string) []string {
+	switch {
+	case strings.HasSuffix(resolved, ".mjs"):
+		stem := strings.TrimSuffix(resolved, ".mjs")
+		return []string{stem + ".mts", stem + ".d.mts", stem + ".mjs"}
+	case strings.HasSuffix(resolved, ".cjs"):
+		stem := strings.TrimSuffix(resolved, ".cjs")
+		return []string{stem + ".cts", stem + ".d.cts", stem + ".cjs"}
+	case strings.HasSuffix(resolved, ".jsx"):
+		stem := strings.TrimSuffix(resolved, ".jsx")
+		return []string{stem + ".tsx", stem + ".d.ts", stem + ".jsx"}
+	case strings.HasSuffix(resolved, ".js"):
+		stem := strings.TrimSuffix(resolved, ".js")
+		return []string{stem + ".ts", stem + ".tsx", stem + ".d.ts", stem + ".js"}
+	default:
+		return nil
+	}
+}
+
 // buildImportSymbols returns a map of locally-bound import name → canonical symbol
 // fact name for named imports from internal modules. It lets bare calls to
 // imported functions (e.g. `formatName()`) resolve to the callee's declaration
 // fact. Symbols declared in an imported module are named "<moduleDir>.<exportName>",
 // where moduleDir is the directory of the resolved module file — this matches the
 // common file-module case (e.g. import "./utils" → utils.ts → "<dir>.foo").
-func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias) map[string]string {
+func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool) map[string]string {
 	fileDir := factpath.Dir(relFile)
 	m := make(map[string]string)
 	for i := range root.ChildCount() {
@@ -2418,6 +2456,9 @@ func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, 
 			continue // external modules have no local declaration facts
 		}
 		moduleDir := factpath.Dir(resolved)
+		if _, dir, found := resolveModuleFile(resolved, knownFiles); found {
+			moduleDir = dir
+		}
 
 		clause := findChildByKind(kinds, child, "import_clause")
 		if clause == nil {
@@ -2791,6 +2832,12 @@ func (e *TSExtractor) ExtractTestRefs(ctx context.Context, repoPath string, file
 	}
 
 	aliasRoots := collectTSAliasRoots(ctx, repoPath, inputScope)
+	if detectSvelteKit(repoPath, inputScope) {
+		aliasRoots = withSvelteKitAliasFallbacks(repoPath, aliasRoots, inputScope)
+	}
+	if detectNuxt(repoPath, inputScope) {
+		aliasRoots = withNuxtAliasFallbacks(repoPath, aliasRoots, collectNuxtPackages(ctx, repoPath, inputScope), inputScope)
+	}
 
 	perFile := parallel.MapFiles(ctx, testFiles, func(relFile string) []facts.Fact {
 		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
@@ -3189,6 +3236,102 @@ type tsBodyWalker struct {
 	repeatDepth int
 	rels        []facts.Relation
 	seen        map[string]bool
+	shadows     []map[string]bool
+}
+
+func (w *tsBodyWalker) pushShadowScope(names ...string) {
+	scope := map[string]bool{}
+	for _, n := range names {
+		if n != "" {
+			scope[n] = true
+		}
+	}
+	w.shadows = append(w.shadows, scope)
+}
+
+func (w *tsBodyWalker) popShadowScope() {
+	if len(w.shadows) == 0 {
+		return
+	}
+	w.shadows = w.shadows[:len(w.shadows)-1]
+}
+
+func (w *tsBodyWalker) shadowed(name string) bool {
+	for i := len(w.shadows) - 1; i >= 0; i-- {
+		if w.shadows[i][name] {
+			return true
+		}
+	}
+	return false
+}
+
+func (w *tsBodyWalker) noteShadowBindings(n *sitter.Node) {
+	if len(w.shadows) == 0 || n == nil {
+		return
+	}
+	kind := kindOf(w.kinds, n)
+	if kind == "identifier" {
+		w.shadows[len(w.shadows)-1][nodeText(n, w.src)] = true
+		return
+	}
+	if kind != "lexical_declaration" && kind != "variable_declaration" && kind != "variable_declarator" {
+		return
+	}
+	for i := range n.ChildCount() {
+		w.noteShadowBindings(n.Child(i))
+	}
+}
+
+func tsFunctionBindingName(kinds *tsutil.KindTable, n *sitter.Node, src []byte) string {
+	if n == nil {
+		return ""
+	}
+	if id := n.ChildByFieldName("name"); id != nil {
+		return nodeText(id, src)
+	}
+	if id := findChildByKind(kinds, n, "identifier"); id != nil && kindOf(kinds, n) != "arrow_function" {
+		return nodeText(id, src)
+	}
+	return ""
+}
+
+func tsFunctionParamNames(kinds *tsutil.KindTable, n *sitter.Node, src []byte) []string {
+	if n == nil {
+		return nil
+	}
+	var names []string
+	addIdent := func(node *sitter.Node) {
+		if node == nil {
+			return
+		}
+		if kindOf(kinds, node) == "identifier" {
+			names = append(names, nodeText(node, src))
+			return
+		}
+		if id := findChildByKind(kinds, node, "identifier"); id != nil {
+			names = append(names, nodeText(id, src))
+		}
+	}
+	if params := n.ChildByFieldName("parameters"); params != nil {
+		for i := range params.ChildCount() {
+			addIdent(params.Child(i))
+		}
+		return names
+	}
+	if params := findChildByKind(kinds, n, "formal_parameters"); params != nil {
+		for i := range params.ChildCount() {
+			addIdent(params.Child(i))
+		}
+		return names
+	}
+	if kindOf(kinds, n) == "arrow_function" {
+		if id := n.ChildByFieldName("parameter"); id != nil {
+			addIdent(id)
+		} else if id := findChildByKind(kinds, n, "identifier"); id != nil {
+			addIdent(id)
+		}
+	}
+	return names
 }
 
 func (w *tsBodyWalker) recordCall(target string) {
@@ -3232,6 +3375,9 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 		return
 	}
 	kind := kindOf(w.kinds, n)
+	if kind == "lexical_declaration" || kind == "variable_declaration" {
+		w.noteShadowBindings(n)
+	}
 
 	// A nested function/arrow definition is a deferred scope: its body runs when the
 	// function is called, NOT per-iteration of the enclosing loops — so reset the
@@ -3242,9 +3388,14 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 	if w.metrics != nil && tsIsFunctionLike(kind) {
 		saved, savedScaling, savedRepeat := w.loopDepth, w.scalingDepth, w.repeatDepth
 		w.loopDepth, w.scalingDepth, w.repeatDepth = 0, 0, 0
+		if name := tsFunctionBindingName(w.kinds, n, w.src); name != "" && len(w.shadows) > 0 {
+			w.shadows[len(w.shadows)-1][name] = true
+		}
+		w.pushShadowScope(tsFunctionParamNames(w.kinds, n, w.src)...)
 		for i := range n.ChildCount() {
 			w.walk(n.Child(i))
 		}
+		w.popShadowScope()
 		w.loopDepth, w.scalingDepth, w.repeatDepth = saved, savedScaling, savedRepeat
 		return
 	}
@@ -3308,7 +3459,7 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 		if w.metrics != nil && !w.metrics.ioDirect && tsIsIOCall(w.kinds, n, w.src, w.ioBindings) {
 			w.metrics.ioDirect = true
 		}
-		if target := resolveTSCall(w.kinds, n, w.src, w.dir, w.className, w.importMap); target != "" {
+		if target := resolveTSCall(w.kinds, n, w.src, w.dir, w.className, w.importMap, w.shadowed); target != "" {
 			if !w.seen[target] {
 				w.seen[target] = true
 				w.rels = append(w.rels, facts.Relation{Kind: facts.RelCalls, Target: target})
@@ -3671,7 +3822,7 @@ func applyDirectIOContract(allFacts []facts.Fact) {
 // type). It resolves:
 //   - bare calls `foo()` → imported symbol via importMap, else same-module "<dir>.foo"
 //   - `this.method()` inside a class → "<dir>.<className>.method"
-func resolveTSCall(kinds *tsutil.KindTable, call *sitter.Node, src []byte, dir, className string, importMap map[string]string) string {
+func resolveTSCall(kinds *tsutil.KindTable, call *sitter.Node, src []byte, dir, className string, importMap map[string]string, shadowed func(string) bool) string {
 	fn := call.ChildByFieldName("function")
 	if fn == nil {
 		return ""
@@ -3679,6 +3830,9 @@ func resolveTSCall(kinds *tsutil.KindTable, call *sitter.Node, src []byte, dir, 
 	switch kindOf(kinds, fn) {
 	case "identifier":
 		name := nodeText(fn, src)
+		if shadowed != nil && shadowed(name) {
+			return ""
+		}
 		if target, ok := importMap[name]; ok {
 			return target
 		}

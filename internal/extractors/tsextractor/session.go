@@ -108,6 +108,9 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	if isSvelteKit {
 		aliasRoots = withSvelteKitAliasFallbacks(repoPath, aliasRoots, inputScope)
 	}
+	if isNuxt {
+		aliasRoots = withNuxtAliasFallbacks(repoPath, aliasRoots, nuxtPkgs, inputScope)
+	}
 	tr.Mark("ts_detect_frameworks", fmt.Sprintf("files=%d", len(files)))
 
 	var tsFiles, htmlFiles []string

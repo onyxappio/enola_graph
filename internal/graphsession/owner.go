@@ -635,13 +635,32 @@ func fkStorageTargetRequired(from facts.Fact, rel facts.Relation) bool {
 }
 
 func (idx *idIndex) resolveRel(fromRepo, fromKind, relKind, target string) (id, status string) {
-	return idx.resolveRelConstrained(fromRepo, fromKind, relKind, target, false)
+	return idx.resolveRelConstrained(fromRepo, fromKind, relKind, target, false, "")
 }
 
-func (idx *idIndex) resolveRelConstrained(fromRepo, fromKind, relKind, target string, requirePreferred bool) (id, status string) {
+func (idx *idIndex) resolveRelConstrained(fromRepo, fromKind, relKind, target string, requirePreferred bool, fromFile string) (id, status string) {
 	cands := idx.byName[target]
 	if len(cands) == 0 {
 		return "", graphstream.ResUnresolved
+	}
+	// Bare same-module calls are emitted as "<dir>.<name>". Sibling files share
+	// that name, so identity (which includes File) is distinct while the name
+	// lookup is not. A RelCalls edge from a file that itself declares exactly
+	// one matching symbol is the lexical binding, not a same-file guess: imports
+	// use a different target name, and shadowed identifiers never emit this edge.
+	if relKind == facts.RelCalls && fromFile != "" {
+		var local []facts.Fact
+		for _, f := range cands {
+			if f.Kind == facts.KindSymbol && f.File == fromFile {
+				if fromRepo != "" && f.Repo != fromRepo {
+					continue
+				}
+				local = append(local, f)
+			}
+		}
+		if len(local) == 1 {
+			return local[0].Identity(), graphstream.ResResolved
+		}
 	}
 	if prefer := preferredResolveKind(fromKind, relKind); prefer != "" {
 		var filtered []facts.Fact
@@ -742,7 +761,7 @@ func encodeOwner(o ownerOutput, idx *idIndex, pending bool) (nodes []graphstream
 			if pending {
 				e.Resolution = graphstream.ResPending
 			} else {
-				tid, st := idx.resolveRelConstrained(f.Repo, f.Kind, r.Kind, r.Target, fkStorageTargetRequired(f, r))
+				tid, st := idx.resolveRelConstrained(f.Repo, f.Kind, r.Kind, r.Target, fkStorageTargetRequired(f, r), f.File)
 				e.Resolution = st
 				e.TargetID = tid
 			}

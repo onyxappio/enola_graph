@@ -207,6 +207,96 @@ api.put(` + "`/queue`" + `, handler);
 	}
 }
 
+func TestServerRoutes_TypedFastifyInstanceParameter(t *testing.T) {
+	src := `
+import { FastifyInstance } from 'fastify';
+import type { AppDeps } from './deps';
+
+export function registerTrackRoute(app: FastifyInstance, deps: AppDeps): void {
+  app.post('/v1/track', { bodyLimit: 1024 }, async (request, reply) => {
+    return reply.send({});
+  });
+}
+`
+	ff := extractTS(t, src, "services/tracking-api/src/http/trackRoute.ts")
+	got := serverRoutes(ff)
+	if got["/v1/track"] != "POST" {
+		t.Fatalf("typed FastifyInstance parameter must emit server POST /v1/track: %+v", got)
+	}
+	var fw, role string
+	for _, f := range ff {
+		if f.Kind == facts.KindRoute && f.Name == "/v1/track" {
+			fw, _ = f.Props["framework"].(string)
+			role, _ = f.Props["role"].(string)
+		}
+	}
+	if fw != "fastify" || role != "server" {
+		t.Fatalf("framework/role = %s/%s want fastify/server", fw, role)
+	}
+	if got := clientRoutes(ff); len(got) != 0 {
+		t.Fatalf("must not also emit a client call: %+v", got)
+	}
+}
+
+func TestServerRoutes_TypedFastifyAliasAndImportType(t *testing.T) {
+	src := `
+import type { FastifyInstance as App } from 'fastify';
+export function register(server: App) {
+  server.get('/health', async () => ({ ok: true }));
+}
+`
+	ff := extractTS(t, src, "src/http/health.ts")
+	if serverRoutes(ff)["/health"] != "GET" {
+		t.Fatalf("aliased import type must bind: %+v", serverRoutes(ff))
+	}
+}
+
+func TestServerRoutes_NameAppWithoutFastifyTypeStaysClient(t *testing.T) {
+	src := `
+export function register(app) {
+  app.post('/v1/track', handler);
+}
+`
+	ff := extractTS(t, src, "src/http/trackRoute.ts")
+	if len(serverRoutes(ff)) != 0 {
+		t.Fatalf("untyped app must not become a server route: %+v", serverRoutes(ff))
+	}
+	if clientRoutes(ff)["/v1/track"] != "POST" {
+		t.Fatalf("untyped app.post must stay a client call: %+v", clientRoutes(ff))
+	}
+}
+
+func TestServerRoutes_LocalFastifyInstanceTypeIsNotImported(t *testing.T) {
+	src := `
+type FastifyInstance = { post(path: string, h: unknown): void };
+export function register(app: FastifyInstance) {
+  app.post('/v1/track', handler);
+}
+`
+	ff := extractTS(t, src, "src/http/trackRoute.ts")
+	if len(serverRoutes(ff)) != 0 {
+		t.Fatalf("local FastifyInstance type must not bind: %+v", serverRoutes(ff))
+	}
+}
+
+func TestServerRoutes_DoesNotStealAxiosWhenTypedFastifyPresent(t *testing.T) {
+	src := `
+import { FastifyInstance } from 'fastify';
+import axios from 'axios';
+export function register(app: FastifyInstance) {
+  app.get('/health', handler);
+  axios.get('/external');
+}
+`
+	ff := extractTS(t, src, "src/http/mix.ts")
+	if serverRoutes(ff)["/health"] != "GET" {
+		t.Fatalf("server route missing: %+v", serverRoutes(ff))
+	}
+	if clientRoutes(ff)["/external"] != "GET" {
+		t.Fatalf("axios call must stay client: %+v", clientRoutes(ff))
+	}
+}
+
 func TestServerRoutes_DoubleQuotedMountPrefix(t *testing.T) {
 	src := []byte(`const express = require('express');
 const app = express();

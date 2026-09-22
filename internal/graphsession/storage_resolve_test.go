@@ -16,7 +16,7 @@ func TestResolveStorageDependsOnPrefersStorageKind(t *testing.T) {
 		Relations: []facts.Relation{{Kind: facts.RelDependsOn, Target: "src.scanSubjects"}},
 	}
 	idx := buildIndex([]facts.Fact{storage, symbol, from})
-	id, status := idx.resolveRelConstrained("", from.Kind, facts.RelDependsOn, "src.scanSubjects", fkStorageTargetRequired(from, from.Relations[0]))
+	id, status := idx.resolveRelConstrained("", from.Kind, facts.RelDependsOn, "src.scanSubjects", fkStorageTargetRequired(from, from.Relations[0]), from.File)
 	if status != graphstream.ResResolved {
 		t.Fatalf("status=%s, want resolved", status)
 	}
@@ -36,7 +36,7 @@ func TestResolveFKDependsOnDoesNotBindOrdinarySymbol(t *testing.T) {
 		Relations: []facts.Relation{{Kind: facts.RelDependsOn, Target: "src.scanSubjects"}},
 	}
 	idx := buildIndex([]facts.Fact{symbol, from})
-	id, status := idx.resolveRelConstrained("", from.Kind, facts.RelDependsOn, "src.scanSubjects", fkStorageTargetRequired(from, from.Relations[0]))
+	id, status := idx.resolveRelConstrained("", from.Kind, facts.RelDependsOn, "src.scanSubjects", fkStorageTargetRequired(from, from.Relations[0]), from.File)
 	if status != graphstream.ResUnresolved {
 		t.Fatalf("status=%s id=%s, want unresolved when the table is an ordinary symbol", status, id)
 	}
@@ -49,7 +49,7 @@ func TestResolveFKDependsOnUnknownTargetStaysUnresolved(t *testing.T) {
 		Relations: []facts.Relation{{Kind: facts.RelDependsOn, Target: "src.missing"}},
 	}
 	idx := buildIndex([]facts.Fact{from})
-	id, status := idx.resolveRelConstrained("", from.Kind, facts.RelDependsOn, "src.missing", fkStorageTargetRequired(from, from.Relations[0]))
+	id, status := idx.resolveRelConstrained("", from.Kind, facts.RelDependsOn, "src.missing", fkStorageTargetRequired(from, from.Relations[0]), from.File)
 	if status != graphstream.ResUnresolved || id != "" {
 		t.Fatalf("status=%s id=%s, want unresolved empty id", status, id)
 	}
@@ -62,7 +62,7 @@ func TestResolveStorageDependsOnWithoutFKFallsBackToSymbol(t *testing.T) {
 		Relations: []facts.Relation{{Kind: facts.RelDependsOn, Target: "src.User"}},
 	}
 	idx := buildIndex([]facts.Fact{symbol, from})
-	id, status := idx.resolveRelConstrained("", from.Kind, facts.RelDependsOn, "src.User", fkStorageTargetRequired(from, from.Relations[0]))
+	id, status := idx.resolveRelConstrained("", from.Kind, facts.RelDependsOn, "src.User", fkStorageTargetRequired(from, from.Relations[0]), from.File)
 	if status != graphstream.ResResolved {
 		t.Fatalf("status=%s, want resolved fallback for non-FK storage depends_on", status)
 	}

@@ -534,7 +534,7 @@ func (e *TSExtractor) extractSvelteScriptBlock(kinds *tsutil.KindTable, block *s
 		relFile:   relFile,
 		dir:       factpath.Dir(relFile),
 		isTSX:     isTSX,
-		importMap: buildImportSymbols(kinds, root, block.Content, relFile, aliases),
+		importMap: buildImportSymbols(kinds, root, block.Content, relFile, aliases, knownFiles),
 		imports:   buildEmberImportBindings(kinds, root, block.Content, relFile, aliases),
 	}
 	decls := e.extractDeclarations(kinds, root, ctx)

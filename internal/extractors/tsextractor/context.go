@@ -86,6 +86,9 @@ func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, 
 	if detectSvelteKit(root, scope) {
 		aliases = withSvelteKitAliasFallbacks(root, aliases, scope)
 	}
+	if detectNuxt(root, scope) {
+		aliases = withNuxtAliasFallbacks(root, aliases, collectNuxtPackages(context.Background(), root, scope), scope)
+	}
 	perFile := map[string]string{}
 	type aliasValue struct {
 		Replacement, Suffix string
