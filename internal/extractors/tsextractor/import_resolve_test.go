@@ -61,33 +61,43 @@ export * from './publisher';
 `,
 	}, false)
 
-	cases := []struct {
-		file   string
-		target string
-	}{
-		{"packages/tracking-client/src/core/consumer.ts", "packages/contracts/src/index.ts"},
-		{"services/product-api/src/productUsersSync.reconciliation.ts", "services/product-api/src/productUsersSync.repair.ts"},
-		{"apps/mobile/src/behavior/mobileAppInterpreter.ts", "apps/mobile/src/state/mobileAppMachine.updates.ts"},
-		{"packages/tracking-server/src/index.ts", "packages/tracking-server/src/publisher.ts"},
-	}
-	for _, tc := range cases {
-		if !importEdgeResolves(t, ff, tc.file, tc.target) {
-			t.Errorf("%s: missing resolved import edge to %s\n%s", tc.file, tc.target, importDump(ff, tc.file))
+	t.Run("tsconfig-package-alias", func(t *testing.T) {
+		if !importEdgeResolves(t, ff, "packages/tracking-client/src/core/consumer.ts", "packages/contracts/src/index.ts") {
+			t.Fatalf("missing resolved alias import:\n%s", importDump(ff, "packages/tracking-client/src/core/consumer.ts"))
 		}
-	}
-
-	var dynamic bool
-	for _, d := range findFactsByKind(ff, facts.KindDependency) {
-		if d.File != "services/product-api/src/productUsersSync.reconciliation.ts" {
-			continue
+	})
+	t.Run("relative-import-type", func(t *testing.T) {
+		if !importEdgeResolves(t, ff, "services/product-api/src/productUsersSync.reconciliation.ts", "services/product-api/src/productUsersSync.repair.ts") {
+			t.Fatalf("missing resolved import type:\n%s", importDump(ff, "services/product-api/src/productUsersSync.reconciliation.ts"))
 		}
-		if d.Props["dynamic"] == true && hasRelation(d, facts.RelImports, "services/product-api/src/productUsersSync.repair.ts") {
-			dynamic = true
+	})
+	t.Run("runtime-dynamic-import", func(t *testing.T) {
+		var dynamic bool
+		for _, d := range findFactsByKind(ff, facts.KindDependency) {
+			if d.File != "services/product-api/src/productUsersSync.reconciliation.ts" {
+				continue
+			}
+			if d.Props["dynamic"] == true && hasRelation(d, facts.RelImports, "services/product-api/src/productUsersSync.repair.ts") {
+				dynamic = true
+			}
 		}
-	}
-	if !dynamic {
-		t.Error("runtime import() of productUsersSync.repair.ts was not emitted as a dynamic internal edge")
-	}
+		if !dynamic {
+			t.Fatal("runtime import() of productUsersSync.repair.ts was not emitted as a dynamic internal edge")
+		}
+		if !importEdgeResolves(t, ff, "services/product-api/src/productUsersSync.reconciliation.ts", "services/product-api/src/productUsersSync.repair.ts") {
+			t.Fatal("dynamic import target file_ref missing")
+		}
+	})
+	t.Run("namespace-import", func(t *testing.T) {
+		if !importEdgeResolves(t, ff, "apps/mobile/src/behavior/mobileAppInterpreter.ts", "apps/mobile/src/state/mobileAppMachine.updates.ts") {
+			t.Fatalf("missing resolved namespace import:\n%s", importDump(ff, "apps/mobile/src/behavior/mobileAppInterpreter.ts"))
+		}
+	})
+	t.Run("star-reexport", func(t *testing.T) {
+		if !importEdgeResolves(t, ff, "packages/tracking-server/src/index.ts", "packages/tracking-server/src/publisher.ts") {
+			t.Fatalf("missing resolved export *:\n%s", importDump(ff, "packages/tracking-server/src/index.ts"))
+		}
+	})
 
 	s := facts.NewStore()
 	s.Add(ff...)
@@ -95,9 +105,11 @@ export * from './publisher';
 	if err := s.WriteJSONL(&buf); err != nil {
 		t.Fatal(err)
 	}
-	want := map[string]bool{}
-	for _, tc := range cases {
-		want[tc.file+"\x00"+tc.target] = false
+	want := map[string]bool{
+		"packages/tracking-client/src/core/consumer.ts\x00packages/contracts/src/index.ts":                                   false,
+		"services/product-api/src/productUsersSync.reconciliation.ts\x00services/product-api/src/productUsersSync.repair.ts": false,
+		"apps/mobile/src/behavior/mobileAppInterpreter.ts\x00apps/mobile/src/state/mobileAppMachine.updates.ts":              false,
+		"packages/tracking-server/src/index.ts\x00packages/tracking-server/src/publisher.ts":                                 false,
 	}
 	for _, line := range strings.Split(strings.TrimSpace(buf.String()), "\n") {
 		var m map[string]any
