@@ -2459,7 +2459,10 @@ import (
 // function; Nuxt config alias/srcDir literals are honored without executing config.
 // v281: RelCalls target_file follows source-proven named/star re-exports to the
 // declaring file; colliding re-exports stay unconstrained.
-const cacheVersion = "v281"
+// v282: Failed/ambiguous named-import follow stays constrained to the import
+// file instead of unique-name fallback; importer fingerprints include reexport
+// chain side-reads so rename/remove invalidates derived target_file.
+const cacheVersion = "v282"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

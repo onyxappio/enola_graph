@@ -303,6 +303,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	grpcStubs := buildGRPCStubIndex(tsFiles, sources)
 	graphqlServer := detectGraphQLServerUsage(tsFiles, sources)
 
+	exportCache := newNamedExportCache()
 	perFile := parallel.MapFiles(ctx, tsFiles, func(relFile string) tsFileResult {
 		src := sources[relFile]
 		if src == nil {
@@ -324,7 +325,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 		var res tsFileResult
 		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, isVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, orms, aliases, knownFiles, func(rel string) []byte {
 			return sources[rel]
-		}, auto, grpcStubs)
+		}, auto, grpcStubs, exportCache, nil)
 		// Routers, mounts and held-back routes for the repo-wide mount pass below.
 		// Collected here because resolving an import needs this file's path aliases,
 		// which are in scope only during the per-file walk. Same test-path gate as
@@ -544,9 +545,11 @@ type extractCtx struct {
 	knownFiles  map[string]bool     // repo-relative (slash) paths of all indexed TS/JS files
 	aliases     map[string]tsAlias  // this directory's tsconfig path aliases, for resolving an import written as a bare specifier
 	readSrc     func(string) []byte // known file bytes for following named re-exports
+	exportCache *namedExportCache
+	sideReads   map[string]bool
 }
 
-func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, isNuxt, isSvelteKit, isEmber, isReactNav, isAngular bool, graphqlServer graphqlServerContext, orms ormFlags, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, nuxtAutoComponents map[string]string, grpcStubs *grpcStubIndex) ([]facts.Fact, angularCounts, *angularRouterFile, map[string]*angularTemplate, *angularHTTPFile, clientCounts) {
+func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, isNuxt, isSvelteKit, isEmber, isReactNav, isAngular bool, graphqlServer graphqlServerContext, orms ormFlags, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, nuxtAutoComponents map[string]string, grpcStubs *grpcStubIndex, exportCache *namedExportCache, sideReads map[string]bool) ([]facts.Fact, angularCounts, *angularRouterFile, map[string]*angularTemplate, *angularHTTPFile, clientCounts) {
 	// The grammar is chosen here, so the kind table is too: TypeScript and TSX assign
 	// different meanings to the same symbol ids, and everything below reads node kinds
 	// through this table. See kinds.go.
@@ -554,10 +557,10 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 	kinds := tsKindsFor(isTSX)
 
 	if isVueFile(relFile) {
-		return e.extractVueSFC(kinds, src, relFile, isNuxt, aliases, nuxtAutoComponents, knownFiles, readSrc), angularCounts{}, nil, nil, nil, nil
+		return e.extractVueSFC(kinds, src, relFile, isNuxt, aliases, nuxtAutoComponents, knownFiles, readSrc, exportCache, sideReads), angularCounts{}, nil, nil, nil, nil
 	}
 	if isSvelteFile(relFile) {
-		return e.extractSvelteSFC(kinds, src, relFile, isSvelteKit, aliases, knownFiles, readSrc), angularCounts{}, nil, nil, nil, nil
+		return e.extractSvelteSFC(kinds, src, relFile, isSvelteKit, aliases, knownFiles, readSrc, exportCache, sideReads), angularCounts{}, nil, nil, nil, nil
 	}
 	if isGraphQLDocFile(relFile) {
 		if facts.IsTestPath(relFile) {
@@ -672,8 +675,10 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 		knownFiles:  knownFiles,
 		aliases:     aliases,
 		readSrc:     readSrc,
+		exportCache: exportCache,
+		sideReads:   sideReads,
 	}
-	ctx.importMap, ctx.importFiles = buildImportSymbols(kinds, root, src, relFile, aliases, knownFiles, readSrc)
+	ctx.importMap, ctx.importFiles = buildImportSymbols(kinds, root, src, relFile, aliases, knownFiles, readSrc, exportCache, sideReads)
 	ctx.localNames = collectFileScopeCallNames(kinds, root, src)
 	decls := e.extractDeclarations(kinds, root, ctx)
 
@@ -2448,7 +2453,7 @@ func tsExtensionSubstitutionCandidates(resolved string) []string {
 // fact. Symbols declared in an imported module are named "<moduleDir>.<exportName>",
 // where moduleDir is the directory of the resolved module file — this matches the
 // common file-module case (e.g. import "./utils" → utils.ts → "<dir>.foo").
-func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte) (map[string]string, map[string]string) {
+func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, cache *namedExportCache, sideReads map[string]bool) (map[string]string, map[string]string) {
 	fileDir := factpath.Dir(relFile)
 	m := make(map[string]string)
 	files := make(map[string]string)
@@ -2497,7 +2502,16 @@ func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, 
 			}
 			m[local] = moduleDir + "." + exportName
 			if indexPath != "" {
-				if leaf := followNamedExportFile(indexPath, exportName, readSrc, aliases, knownFiles); leaf != "" {
+				note := func(f string) {
+					if sideReads == nil {
+						return
+					}
+					f = filepath.ToSlash(f)
+					if f != "" && f != filepath.ToSlash(relFile) {
+						sideReads[f] = true
+					}
+				}
+				if leaf := bindNamedImportFile(indexPath, exportName, readSrc, aliases, knownFiles, cache, note); leaf != "" {
 					files[local] = leaf
 				}
 			}
@@ -2655,7 +2669,16 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 						}
 						file := ""
 						if indexPath != "" {
-							file = followNamedExportFile(indexPath, exportName, ctx.readSrc, aliases, ctx.knownFiles)
+							note := func(f string) {
+								if ctx.sideReads == nil {
+									return
+								}
+								f = filepath.ToSlash(f)
+								if f != "" && f != filepath.ToSlash(ctx.relFile) {
+									ctx.sideReads[f] = true
+								}
+							}
+							file = bindNamedImportFile(indexPath, exportName, ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, note)
 						}
 						bind(local, moduleDir, exportName, file)
 					}
@@ -2682,10 +2705,15 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 					// `export { default as X } from './y'` re-exports y's default; the
 					// literal name "default" matches no symbol, so resolve it to y's
 					// default-export name (fileSymbolName) instead.
-					if name := nodeText(nameNode, src); name == "default" && indexPath != "" {
+					name := nodeText(nameNode, src)
+					if name == "default" && indexPath != "" {
 						reexports = append(reexports, moduleDir+"."+fileSymbolName(indexPath))
 					} else {
-						reexports = append(reexports, moduleDir+"."+name)
+						exported := name
+						if a := spec.ChildByFieldName("alias"); a != nil {
+							exported = nodeText(a, src)
+						}
+						reexports = append(reexports, moduleDir+"."+exported)
 					}
 				}
 			}

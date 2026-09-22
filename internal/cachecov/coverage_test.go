@@ -33,6 +33,7 @@ import (
 // test functions that assert the behavior that version introduced. v1 is the
 // implicit baseline (no changelog line), so coverage starts at v2.
 var versionCoverage = map[int][]string{
+	282: {"TestExtract_NamedReexportMissingKeepsImportFile", "TestPublishedBridgeLeafDeleteDoesNotBindUnrelated", "TestPublishedBridgeExportRenameDeltaEqualsCold", "TestPublishedNamedReexportCachedUpgradeFromV281"},
 	281: {"TestExtract_NamedReexportBridgeCallHasLeafTargetFile", "TestExtract_NamedReexportCollisionLeavesNoTargetFile", "TestPublishedNamedReexportBridgeResolvesLeaf", "TestPublishedNamedReexportCollisionStaysAmbiguous", "TestPublishedNamedReexportDeltaEqualsCold", "TestPublishedNamedReexportCachedUpgrade"},
 	280: {"TestEncodeOwnerImportedCallDoesNotBindCallerLocal", "TestPublishedImportAliasSameDirectoryDoesNotBindLocal", "TestServerRoutes_SiblingAxiosReceiverStaysClient", "TestExtract_NuxtExplicitTildeAlias", "TestExtract_NuxtDynamicSrcDirDoesNotUseDefault"},
 	279: {"TestExtract_JSESMExtensionSubstitutesTS", "TestExtract_FolderIndexImportCallsOwnModule", "TestEncodeOwnerLexicalSameFileCallResolves", "TestServerRoutes_TypedFastifyInstanceParameter", "TestExtract_NuxtDefaultTildeAliasWithoutGeneratedConfig"},

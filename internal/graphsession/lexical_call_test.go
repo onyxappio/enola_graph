@@ -278,6 +278,161 @@ func TestPublishedNamedReexportCachedUpgrade(t *testing.T) {
 	}
 }
 
+func TestPublishedNamedReexportCachedUpgradeFromV281(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"src/a.ts":      "import { round } from './bridge';\nexport function caller() { return round(1); }\n",
+		"src/bridge.ts": "export { round } from './b';\n",
+		"src/b.ts":      "export function round(n: number) { return n + 1; }\n",
+		"src/c.ts":      "export function round(n: number) { return n + 2; }\n",
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("load state: %v %#v", err, st)
+	}
+	st.ExtractorVersion = "v281"
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	up := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, dir, up, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.ParsedFiles == 0 {
+		t.Fatal("extractor version bump parsed no files")
+	}
+	c := applyGraph(t, first)
+	if err := c.ApplyRecords(up.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	assertCallResolvedToFile(t, c, "src/a.ts", "src.round", "src/b.ts")
+	if engine.ExtractorVersion() == "v281" {
+		t.Fatal("cached upgrade test requires cacheVersion newer than v281")
+	}
+}
+
+func TestPublishedBridgeTargetChangeResolvesToC(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"src/a.ts":      "import { round } from './bridge';\nexport function caller() { return round(1); }\n",
+		"src/bridge.ts": "export { round } from './b';\n",
+		"src/b.ts":      "export function round(n: number) { return n + 1; }\n",
+		"src/c.ts":      "export function round(n: number) { return n + 2; }\n",
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "live")
+	opts := Options{StateDir: state}
+	live := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, live, opts); err != nil {
+		t.Fatal(err)
+	}
+	cons := applyGraph(t, live)
+	assertCallResolvedToFile(t, cons, "src/a.ts", "src.round", "src/b.ts")
+
+	if err := os.WriteFile(filepath.Join(dir, "src/bridge.ts"), []byte("export { round } from './c';\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	deltaSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, deltaSink, opts); err != nil {
+		t.Fatal(err)
+	}
+	if err := cons.ApplyRecords(deltaSink.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	oracle := applyGraph(t, coldSink)
+	assertAppliedEqualsCold(t, cons, oracle)
+	assertCallResolvedToFile(t, cons, "src/a.ts", "src.round", "src/c.ts")
+	assertCallResolvedToFile(t, oracle, "src/a.ts", "src.round", "src/c.ts")
+}
+
+func TestPublishedBridgeLeafDeleteDoesNotBindUnrelated(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"src/a.ts":      "import { round } from './bridge';\nexport function caller() { return round(1); }\n",
+		"src/bridge.ts": "export { round } from './b';\n",
+		"src/b.ts":      "export function round(n: number) { return n + 1; }\n",
+		"src/c.ts":      "export function round(n: number) { return n + 2; }\n",
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "live")
+	opts := Options{StateDir: state}
+	live := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, live, opts); err != nil {
+		t.Fatal(err)
+	}
+	cons := applyGraph(t, live)
+	assertCallResolvedToFile(t, cons, "src/a.ts", "src.round", "src/b.ts")
+
+	if err := os.Remove(filepath.Join(dir, "src/b.ts")); err != nil {
+		t.Fatal(err)
+	}
+	deltaSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, deltaSink, opts); err != nil {
+		t.Fatal(err)
+	}
+	if err := cons.ApplyRecords(deltaSink.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	oracle := applyGraph(t, coldSink)
+	assertAppliedEqualsCold(t, cons, oracle)
+	assertCallerRoundNotResolvedTo(t, cons, "src/c.ts")
+	assertCallerRoundNotResolvedTo(t, oracle, "src/c.ts")
+}
+
+func TestPublishedBridgeExportRenameDeltaEqualsCold(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"src/a.ts":      "import { round } from './bridge';\nexport function caller() { return round(1); }\n",
+		"src/bridge.ts": "export { round } from './b';\n",
+		"src/b.ts":      "export function round(n: number) { return n + 1; }\n",
+		"src/c.ts":      "export function round(n: number) { return n + 2; }\n",
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "live")
+	opts := Options{StateDir: state}
+	live := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, live, opts); err != nil {
+		t.Fatal(err)
+	}
+	cons := applyGraph(t, live)
+	assertCallResolvedToFile(t, cons, "src/a.ts", "src.round", "src/b.ts")
+
+	if err := os.WriteFile(filepath.Join(dir, "src/bridge.ts"), []byte("export { round as renamed } from './b';\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	deltaSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, deltaSink, opts); err != nil {
+		t.Fatal(err)
+	}
+	if err := cons.ApplyRecords(deltaSink.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	oracle := applyGraph(t, coldSink)
+	assertAppliedEqualsCold(t, cons, oracle)
+	assertCallerRoundNotResolvedTo(t, cons, "src/b.ts")
+	assertCallerRoundNotResolvedTo(t, cons, "src/c.ts")
+	assertCallerRoundNotResolvedTo(t, oracle, "src/b.ts")
+	assertCallerRoundNotResolvedTo(t, oracle, "src/c.ts")
+}
+
 func TestPublishedShadowedLocalCallIsNotModuleRound(t *testing.T) {
 	dir := setupTSRepo(t, map[string]string{
 		"lib/costModel.ts": `
@@ -367,6 +522,22 @@ export function toMoneyPoint(hourlyEur: number) { return round(hourlyEur, 4); }
 	}
 	if !found {
 		t.Fatal("expected remaining call edge to lib.round")
+	}
+}
+
+func assertCallerRoundNotResolvedTo(t *testing.T, c *Consumer, forbidden string) {
+	t.Helper()
+	for _, e := range c.Edges[ownerKey("src/a.ts")] {
+		if e.Kind != facts.RelCalls || e.TargetName != "src.round" {
+			continue
+		}
+		from := nodeByID(c, e.FromID)
+		if from.Name != "src.caller" {
+			continue
+		}
+		if e.Resolution == graphstream.ResResolved && nodeByID(c, e.TargetID).File == forbidden {
+			t.Fatalf("caller resolved to forbidden %s: %+v", forbidden, e)
+		}
 	}
 }
 

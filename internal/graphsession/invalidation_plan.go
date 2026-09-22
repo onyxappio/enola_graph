@@ -95,6 +95,12 @@ func authoritativeFilePlan(previous, current []string, prevFiles map[string]*Fil
 					deps[from] = append(deps[from], dep)
 				}
 			}
+			for _, dep := range st.TS.SideReads {
+				dep = filepath.ToSlash(dep)
+				if known[dep] {
+					deps[from] = append(deps[from], dep)
+				}
+			}
 		}
 	}
 	seed := make([]string, 0, len(changed)+len(extraOwners))

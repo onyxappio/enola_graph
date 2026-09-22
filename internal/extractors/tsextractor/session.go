@@ -48,6 +48,11 @@ type FileRecord struct {
 	// ImportComplete is set after summarizeFacts runs. Empty resolved and
 	// unresolved lists are a valid graph when every import is external.
 	ImportComplete bool        `json:"import_complete,omitempty"`
+	// SideReads are other source files whose bytes were consulted to derive
+	// this file's facts (named re-export chains). Hash changes there invalidate
+	// this contribution even when this file is untouched.
+	SideReads      []string          `json:"side_reads,omitempty"`
+	SideReadHashes map[string]string `json:"side_read_hashes,omitempty"`
 	GraphQLServer  bool        `json:"graphql_server,omitempty"`
 	GraphQLSDL     []string    `json:"graphql_sdl,omitempty"`
 	GraphQLParsed  bool        `json:"graphql_parsed,omitempty"`
@@ -147,6 +152,11 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 				return true
 			}
 		}
+		for _, f := range rec.SideReads {
+			if !knownFiles[filepath.ToSlash(f)] {
+				return true
+			}
+		}
 		return false
 	}
 
@@ -235,6 +245,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		rec *FileRecord
 	}
 	tr.Mark("ts_graphql_grpc_index", fmt.Sprintf("ts_files=%d", len(tsFiles)))
+	exportCache := newNamedExportCache()
 	perFile := parallel.MapFiles(ctx, tsFiles, func(relFile string) fileOut {
 		if !need(relFile) {
 			rec := prev[relFile]
@@ -263,7 +274,8 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			auto = nuxtAutoByPkg[fileNuxt]
 		}
 		var res tsFileResult
-		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, isVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, orms, aliases, knownFiles, func(rel string) []byte {
+		sideReads := map[string]bool{}
+		readSrc := func(rel string) []byte {
 			if b, ok := sources[rel]; ok {
 				return b
 			}
@@ -272,7 +284,19 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 				return nil
 			}
 			return raw
-		}, auto, grpcIdx)
+		}
+		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, isVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, orms, aliases, knownFiles, readSrc, auto, grpcIdx, exportCache, sideReads)
+		if len(sideReads) > 0 {
+			rec.SideReads = make([]string, 0, len(sideReads))
+			rec.SideReadHashes = make(map[string]string, len(sideReads))
+			for f := range sideReads {
+				rec.SideReads = append(rec.SideReads, f)
+				b := readSrc(f)
+				sum := sha256.Sum256(b)
+				rec.SideReadHashes[f] = hex.EncodeToString(sum[:])
+			}
+			sort.Strings(rec.SideReads)
+		}
 		if !facts.IsTestPath(relFile) {
 			res.routers = collectRouterFile(src, relFile, aliases, knownFiles)
 		}
@@ -337,7 +361,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	}
 	stats.FilesParsed = parsed
 	stats.SFCParsed = sfc
-	stats.SummaryScans = len(routerFiles) + len(angularRouters)
+	stats.SummaryScans = len(routerFiles) + len(angularRouters) + exportCache.summaryScans()
 	tr.Mark("ts_mapfiles_aggregate", fmt.Sprintf("parsed=%d facts=%d routers=%d", parsed, len(allFacts), len(routerFiles)))
 
 	if mounted := composeRouterMounts(routerFiles); len(mounted) > 0 {

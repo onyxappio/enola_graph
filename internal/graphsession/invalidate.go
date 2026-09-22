@@ -124,6 +124,9 @@ func reverseClose(seeds map[string]bool, recs map[string]*tsextractor.FileRecord
 		for _, dep := range rec.ResolvedFiles {
 			importers[filepath.ToSlash(dep)] = append(importers[filepath.ToSlash(dep)], from)
 		}
+		for _, dep := range rec.SideReads {
+			importers[filepath.ToSlash(dep)] = append(importers[filepath.ToSlash(dep)], from)
+		}
 	}
 	changed := true
 	for changed {

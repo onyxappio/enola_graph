@@ -568,7 +568,7 @@ func containsCreateRouterCall(kinds *tsutil.KindTable, node *sitter.Node, src []
 }
 
 // extractVueSFC extracts architectural facts from a Vue Single File Component.
-func (e *TSExtractor) extractVueSFC(kinds *tsutil.KindTable, rawSrc []byte, relFile string, isNuxt bool, aliases map[string]tsAlias, nuxtAutoComponents map[string]string, knownFiles map[string]bool, readSrc func(string) []byte) []facts.Fact {
+func (e *TSExtractor) extractVueSFC(kinds *tsutil.KindTable, rawSrc []byte, relFile string, isNuxt bool, aliases map[string]tsAlias, nuxtAutoComponents map[string]string, knownFiles map[string]bool, readSrc func(string) []byte, exportCache *namedExportCache, sideReads map[string]bool) []facts.Fact {
 	var result []facts.Fact
 	blocks := extractVueScriptBlocks(rawSrc)
 	allBindings := emberImportBindings{internal: map[string]string{}, external: map[string]string{}, modules: map[string]string{}}
@@ -581,7 +581,7 @@ func (e *TSExtractor) extractVueSFC(kinds *tsutil.KindTable, rawSrc []byte, relF
 		if block.IsSetup {
 			isSetup = true
 		}
-		blockFacts, bindings, macros, contracts, declaredTypes := e.extractVueScriptBlock(kinds, block, relFile, isNuxt, aliases, knownFiles, readSrc)
+		blockFacts, bindings, macros, contracts, declaredTypes := e.extractVueScriptBlock(kinds, block, relFile, isNuxt, aliases, knownFiles, readSrc, exportCache, sideReads)
 		result = append(result, blockFacts...)
 		for name, target := range bindings.internal {
 			allBindings.internal[name] = target
@@ -713,7 +713,7 @@ func (e *TSExtractor) extractVueSFC(kinds *tsutil.KindTable, rawSrc []byte, relF
 
 // extractVueScriptBlock parses a single <script> block from a Vue SFC and
 // returns the extracted facts with line numbers adjusted to the original file.
-func (e *TSExtractor) extractVueScriptBlock(kinds *tsutil.KindTable, block *vueScriptBlock, relFile string, isNuxt bool, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte) ([]facts.Fact, emberImportBindings, []string, map[string][]string, map[string]string) {
+func (e *TSExtractor) extractVueScriptBlock(kinds *tsutil.KindTable, block *vueScriptBlock, relFile string, isNuxt bool, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, exportCache *namedExportCache, sideReads map[string]bool) ([]facts.Fact, emberImportBindings, []string, map[string][]string, map[string]string) {
 	isTSX := block.Lang == "tsx"
 	lang := typescript.LanguageTypescript()
 	if isTSX {
@@ -762,7 +762,9 @@ func (e *TSExtractor) extractVueScriptBlock(kinds *tsutil.KindTable, block *vueS
 	ctx.readSrc = readSrc
 	ctx.knownFiles = knownFiles
 	ctx.aliases = aliases
-	ctx.importMap, ctx.importFiles = buildImportSymbols(kinds, root, block.Content, relFile, aliases, knownFiles, readSrc)
+	ctx.exportCache = exportCache
+	ctx.sideReads = sideReads
+	ctx.importMap, ctx.importFiles = buildImportSymbols(kinds, root, block.Content, relFile, aliases, knownFiles, readSrc, exportCache, sideReads)
 	ctx.localNames = collectFileScopeCallNames(kinds, root, block.Content)
 	decls := e.extractDeclarations(kinds, root, ctx)
 

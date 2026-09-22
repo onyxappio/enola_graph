@@ -125,6 +125,33 @@ func TestExtract_NamedReexportBridgeCallHasLeafTargetFile(t *testing.T) {
 	}
 }
 
+func TestExtract_NamedReexportMissingKeepsImportFile(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/a.ts":      "import { round } from './bridge';\nexport function caller() { return round(1); }\n",
+		"src/bridge.ts": "export { round as renamed } from './b';\n",
+		"src/b.ts":      "export function round(n: number) { return n + 1; }\n",
+		"src/c.ts":      "export function round(n: number) { return n + 2; }\n",
+	}, false)
+	var caller facts.Fact
+	for _, f := range ff {
+		if f.Kind == facts.KindSymbol && f.Name == "src.caller" {
+			caller = f
+		}
+	}
+	found := false
+	for _, r := range caller.Relations {
+		if r.Kind == facts.RelCalls && r.Target == "src.round" {
+			found = true
+			if r.TargetFile != "src/bridge.ts" {
+				t.Fatalf("failed follow must keep import file, got target_file=%q relations=%+v", r.TargetFile, caller.Relations)
+			}
+		}
+	}
+	if !found {
+		t.Fatalf("missing imported call: %+v", caller.Relations)
+	}
+}
+
 func TestExtract_NamedReexportCollisionLeavesNoTargetFile(t *testing.T) {
 	ff := extractAll(t, map[string]string{
 		"src/a.ts":      "import { round } from './barrel';\nexport function caller() { return round(1); }\n",
