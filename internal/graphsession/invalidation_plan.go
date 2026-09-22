@@ -111,11 +111,88 @@ func authoritativeFilePlan(previous, current []string, prevFiles map[string]*Fil
 	// already include every cached owner whose facts mention added/removed
 	// names; buildIndex resolves Fact.Name globally, not along import edges.
 	p, err := planFileInvalidation(seed, previous, current, deps, false, nil)
+	if err != nil {
+		return p, "", err
+	}
+	if !planCoversDeclaredNameDependents(p, prevFiles, changed) {
+		// Cached reverse-edges do not include name-resolution dependents that
+		// post-parse discovery can still add. Begin must already contain them.
+		p, err = planFileInvalidation(domain, previous, current, nil, true, domain)
+		return p, frozenScopeWholeDomain, err
+	}
 	reason := frozenScopeReverseClose
 	if len(extraOwners) > 0 {
 		reason = frozenScopeNameDelta
 	}
 	return p, reason, err
+}
+
+func tsRecord(st *FileState) *tsextractor.FileRecord {
+	if st == nil {
+		return nil
+	}
+	return st.TS
+}
+
+// dependencyIndexProven is true only for a small cached graph with no
+// unresolved imports. Larger graphs and unresolved specs cannot prove that
+// reverse-closure is a complete owner set for the global name resolver.
+func dependencyIndexProven(prevFiles map[string]*FileState) bool {
+	if incompleteDependencyRecords(prevFiles) {
+		return false
+	}
+	n := 0
+	for _, st := range prevFiles {
+		rec := tsRecord(st)
+		if rec == nil {
+			continue
+		}
+		n++
+		if len(rec.UnresolvedSpecs) > 0 {
+			return false
+		}
+	}
+	return n > 0 && n <= 100
+}
+
+func planCoversDeclaredNameDependents(p *fileInvalidationPlan, prevFiles map[string]*FileState, dirty map[string]bool) bool {
+	if p == nil {
+		return false
+	}
+	declared := map[string]bool{}
+	for f, d := range dirty {
+		if !d {
+			continue
+		}
+		rec := tsRecord(lookupState(prevFiles, f))
+		if rec == nil {
+			continue
+		}
+		for _, n := range rec.Declared {
+			if n != "" {
+				declared[n] = true
+			}
+		}
+	}
+	if len(declared) == 0 {
+		return true
+	}
+	for path, st := range prevFiles {
+		rec := tsRecord(st)
+		if rec == nil {
+			continue
+		}
+		id := filepath.ToSlash(path)
+		if p.member[id] {
+			continue
+		}
+		for _, n := range rec.Referenced {
+			if declared[n] {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 func factResolutionNames(ff []facts.Fact) map[string]bool {

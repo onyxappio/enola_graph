@@ -32,6 +32,58 @@ func TestFileInvalidationPlan(t *testing.T) {
 	}
 }
 
+func TestAuthoritativePlanWholeDomainWhenNameDependentOutsideReverseClose(t *testing.T) {
+	prev := map[string]*FileState{
+		"packages/crypto/src/password.ts": {
+			Hash: "1", Extractor: "typescript",
+			TS: &tsextractor.FileRecord{
+				File: "packages/crypto/src/password.ts", Declared: []string{"normalizeEmail"},
+			},
+		},
+		"apps/architect-console/src/server/app.ts": {
+			Hash: "2", Extractor: "typescript",
+			TS: &tsextractor.FileRecord{
+				File:       "apps/architect-console/src/server/app.ts",
+				Declared:   []string{"listen"},
+				Referenced: []string{"normalizeEmail", "fastify"},
+			},
+		},
+		"independent.ts": {
+			Hash: "3", Extractor: "typescript",
+			TS: &tsextractor.FileRecord{File: "independent.ts", Declared: []string{"i"}},
+		},
+	}
+	previous := []string{"packages/crypto/src/password.ts", "apps/architect-console/src/server/app.ts", "independent.ts"}
+	hashes := map[string]string{"packages/crypto/src/password.ts": "changed", "apps/architect-console/src/server/app.ts": "2", "independent.ts": "3"}
+	p, reason, err := authoritativeFilePlan(previous, previous, prev, hashes, false, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reason != frozenScopeWholeDomain {
+		t.Fatalf("reason=%s, want whole-domain because app.ts references dirty declared names without a file edge", reason)
+	}
+	if !p.member["apps/architect-console/src/server/app.ts"] {
+		t.Fatal("post-parse name dependent omitted from Begin")
+	}
+	if !p.member["packages/crypto/src/password.ts"] {
+		t.Fatal("dirty file omitted from Begin")
+	}
+}
+
+func TestDependencyIndexProvenSmallCompleteGraph(t *testing.T) {
+	prev := map[string]*FileState{
+		"a.ts": {TS: &tsextractor.FileRecord{File: "a.ts", Declared: []string{"a"}, ResolvedFiles: []string{"b.ts"}}},
+		"b.ts": {TS: &tsextractor.FileRecord{File: "b.ts", Declared: []string{"b"}}},
+	}
+	if !dependencyIndexProven(prev) {
+		t.Fatal("small resolved graph should be treated as proven")
+	}
+	prev["c.ts"] = &FileState{TS: &tsextractor.FileRecord{File: "c.ts", UnresolvedSpecs: []string{"./missing"}}}
+	if dependencyIndexProven(prev) {
+		t.Fatal("unresolved import must not prove completeness")
+	}
+}
+
 func TestGrowScopeOutOfScopeOwnerFailsClosed(t *testing.T) {
 	p, err := planFileInvalidation([]string{"a.ts"}, nil, nil, nil, false, nil)
 	if err != nil {

@@ -463,7 +463,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			// Initial/global-context changes still require the complete domain.
 			// For an ordinary content delta, derive the manifest from changed
 			// files plus reverse file-to-file dependents in the prior state.
-			wholeDomain := initial || forceAll || s.state == nil || configChanged || s.state.ConfigHash != cfgHash || s.state.PolicyIdentity != input.policyIdentity || incompleteDependencyRecords(prevFiles)
+			wholeDomain := initial || forceAll || s.state == nil || configChanged || s.state.ConfigHash != cfgHash || s.state.PolicyIdentity != input.policyIdentity || !dependencyIndexProven(prevFiles)
 			if !wholeDomain && s.state != nil && s.state.FrameworkSig != "" {
 				need, ferr := s.frameworkDirtyRequiresFullScope(inv.Files, prevFiles, hashes, angular)
 				if ferr != nil {

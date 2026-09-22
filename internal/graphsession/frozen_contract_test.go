@@ -87,6 +87,47 @@ func TestFrozenBeginPrecedesParsingAndNeverGrows(t *testing.T) {
 	}
 }
 
+func TestFrozenPostParseDependentCannotFallOutsideBegin(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"packages/crypto/src/password.ts": "export function normalizeEmail(s: string) { return s.trim(); }",
+		"apps/architect-console/src/server/app.ts": `import "./missing-mod";
+export function listen() { return 1; }
+`,
+		"independent.ts": "export const i = 1;",
+	})
+	eng := testEngine(t, root)
+	state := t.TempDir()
+	opts := Options{StateDir: state, AuthoritativeFiles: true}
+	if _, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, opts); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "packages/crypto/src/password.ts"), []byte("export function normalizeEmail(s: string) { return s.trim().toLowerCase(); }\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	sink := &graphstream.MemorySink{}
+	delta, err := Run(context.Background(), eng, root, sink, opts)
+	if err != nil {
+		t.Fatalf("delta must not fail-closed on a post-parse dependent: %v", err)
+	}
+	bs, _, _, err := DecodeRun(sink.CloneRecords())
+	if err != nil || len(bs) != 1 {
+		t.Fatalf("begin %v %v", bs, err)
+	}
+	owners := map[string]bool{}
+	for _, o := range bs[0].OwnerScope {
+		owners[o.ID] = true
+	}
+	if !owners["packages/crypto/src/password.ts"] {
+		t.Fatalf("dirty file missing from Begin: %v", bs[0].OwnerScope)
+	}
+	if !owners["apps/architect-console/src/server/app.ts"] {
+		t.Fatalf("post-parse name dependent missing from Begin: %v", bs[0].OwnerScope)
+	}
+	if delta.ParsedFiles < 1 {
+		t.Fatalf("parsed=%d", delta.ParsedFiles)
+	}
+}
+
 func TestFrozenNarrowContentDeltaExcludesIndependentFile(t *testing.T) {
 	root := setupTSRepo(t, map[string]string{
 		"a.ts":           "import {b} from './b'; export const a = b;",

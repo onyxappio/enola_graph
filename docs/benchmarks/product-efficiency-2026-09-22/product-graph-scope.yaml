@@ -1,0 +1,5 @@
+# Overlay without repo. Paths are relative to the Product checkout.
+graph_inputs:
+  exclude:
+    - "apps/mobile/e2e/artifacts/**"
+    - "worker-reports/**"
