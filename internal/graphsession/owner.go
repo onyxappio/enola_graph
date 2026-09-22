@@ -643,11 +643,10 @@ func (idx *idIndex) resolveRelConstrained(fromRepo, fromKind, relKind, target st
 	if len(cands) == 0 {
 		return "", graphstream.ResUnresolved
 	}
-	// Bare same-module calls are emitted as "<dir>.<name>". Sibling files share
-	// that name, so identity (which includes File) is distinct while the name
-	// lookup is not. A RelCalls edge from a file that itself declares exactly
-	// one matching symbol is the lexical binding, not a same-file guess: imports
-	// use a different target name, and shadowed identifiers never emit this edge.
+	// RelCalls may carry extractor-proven TargetFile. That is lexical evidence
+	// for the callee's file (imported specifier or a locally declared name).
+	// The caller's file is not evidence: an import from a sibling can share
+	// the same "<dir>.<name>" as a local of the same spelling.
 	if relKind == facts.RelCalls && fromFile != "" {
 		var local []facts.Fact
 		for _, f := range cands {
@@ -661,6 +660,16 @@ func (idx *idIndex) resolveRelConstrained(fromRepo, fromKind, relKind, target st
 		if len(local) == 1 {
 			return local[0].Identity(), graphstream.ResResolved
 		}
+		if len(local) == 0 {
+			return "", graphstream.ResUnresolved
+		}
+		id0 := local[0].Identity()
+		for _, f := range local[1:] {
+			if f.Identity() != id0 {
+				return "", graphstream.ResAmbiguous
+			}
+		}
+		return id0, graphstream.ResResolved
 	}
 	if prefer := preferredResolveKind(fromKind, relKind); prefer != "" {
 		var filtered []facts.Fact
@@ -761,7 +770,7 @@ func encodeOwner(o ownerOutput, idx *idIndex, pending bool) (nodes []graphstream
 			if pending {
 				e.Resolution = graphstream.ResPending
 			} else {
-				tid, st := idx.resolveRelConstrained(f.Repo, f.Kind, r.Kind, r.Target, fkStorageTargetRequired(f, r), f.File)
+				tid, st := idx.resolveRelConstrained(f.Repo, f.Kind, r.Kind, r.Target, fkStorageTargetRequired(f, r), r.TargetFile)
 				e.Resolution = st
 				e.TargetID = tid
 			}

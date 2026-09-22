@@ -297,6 +297,53 @@ export function register(app: FastifyInstance) {
 	}
 }
 
+func TestServerRoutes_SiblingAxiosReceiverStaysClient(t *testing.T) {
+	src := `
+import type { FastifyInstance } from 'fastify';
+import type { AxiosInstance } from 'axios';
+export function register(app: FastifyInstance) { app.post('/server', async () => 'ok'); }
+export async function send(app: AxiosInstance) { return app.post('/client', { x: 1 }); }
+`
+	ff := extractTS(t, src, "src/routes.ts")
+	if serverRoutes(ff)["/server"] != "POST" {
+		t.Fatalf("typed Fastify register must stay server: %+v", serverRoutes(ff))
+	}
+	if _, ok := serverRoutes(ff)["/client"]; ok {
+		t.Fatalf("/client must not be a server route: %+v", serverRoutes(ff))
+	}
+	if clientRoutes(ff)["/client"] != "POST" {
+		t.Fatalf("/client must stay axios client: %+v", clientRoutes(ff))
+	}
+}
+
+func TestServerRoutes_FastifyPluginAsyncIsNotApp(t *testing.T) {
+	src := `
+import type { FastifyPluginAsync } from 'fastify';
+export const plugin: FastifyPluginAsync = async (app) => {
+  app.post('/maybe', handler);
+};
+`
+	ff := extractTS(t, src, "src/plugin.ts")
+	if len(serverRoutes(ff)) != 0 {
+		t.Fatalf("plugin function type is not an app instance: %+v", serverRoutes(ff))
+	}
+}
+
+func TestServerRoutes_CommentFastifyInstanceDoesNotBind(t *testing.T) {
+	src := `
+import type { AxiosInstance } from 'axios';
+// import type { FastifyInstance } from 'fastify';
+export async function send(app: AxiosInstance) { return app.post('/client', { x: 1 }); }
+`
+	ff := extractTS(t, src, "src/routes.ts")
+	if len(serverRoutes(ff)) != 0 {
+		t.Fatalf("commented FastifyInstance must not bind: %+v", serverRoutes(ff))
+	}
+	if clientRoutes(ff)["/client"] != "POST" {
+		t.Fatalf("want client /client, got %+v", clientRoutes(ff))
+	}
+}
+
 func TestServerRoutes_DoubleQuotedMountPrefix(t *testing.T) {
 	src := []byte(`const express = require('express');
 const app = express();

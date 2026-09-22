@@ -112,12 +112,6 @@ func serverBindings(src []byte) map[string]serverBinding {
 			}
 		}
 	}
-	for name, b := range typedFastifyParamBindings(src) {
-		if _, taken := out[name]; taken {
-			continue
-		}
-		out[name] = b
-	}
 	if len(out) == 0 {
 		return nil
 	}
@@ -158,7 +152,8 @@ func serverBindings(src []byte) map[string]serverBinding {
 // (the shape of goextractor/routeprefix.go); it is deliberately not attempted here.
 func extractServerRouteFacts(src []byte, relFile string) []facts.Fact {
 	bindings := serverBindings(src)
-	if len(bindings) == 0 {
+	scopes := typedFastifyParamScopes(src)
+	if len(bindings) == 0 && len(scopes) == 0 {
 		return nil
 	}
 	dir := factpath.Dir(relFile)
@@ -166,7 +161,11 @@ func extractServerRouteFacts(src []byte, relFile string) []facts.Fact {
 	var out []facts.Fact
 	seen := map[string]bool{}
 	for _, m := range serverVerbCall.FindAllSubmatchIndex(src, -1) {
-		b, ok := bindings[string(src[m[2]:m[3]])]
+		recv := string(src[m[2]:m[3]])
+		b, ok := bindings[recv]
+		if !ok {
+			b, ok = fastifyScopeBinding(scopes, recv, m[0])
+		}
 		if !ok || !b.mounted {
 			continue
 		}
@@ -224,25 +223,69 @@ func isServerReceiver(bindings map[string]serverBinding, name string) bool {
 	return ok
 }
 
+func isServerReceiverAt(bindings map[string]serverBinding, scopes []fastifyParamScope, name string, pos int) bool {
+	if isServerReceiver(bindings, name) {
+		return true
+	}
+	_, ok := fastifyScopeBinding(scopes, name, pos)
+	return ok
+}
+
 var (
 	fastifyNamedImport = regexp.MustCompile(`(?m)import\s+(?:type\s+)?\{([^}]+)\}\s+from\s+['"]fastify['"]`)
 	fastifyTypedParam  = regexp.MustCompile(`\b([A-Za-z_$][\w$]*)\s*:\s*([A-Za-z_$][\w$]*)\b`)
 )
 
 var fastifyImportedTypes = map[string]bool{
-	"FastifyInstance":       true,
-	"FastifyPluginAsync":    true,
-	"FastifyPluginCallback": true,
+	"FastifyInstance": true,
 }
 
-// typedFastifyParamBindings maps parameter identifiers whose type is a name
-// imported from the `fastify` package (including `import type` and `as` aliases).
-// It does not infer from the identifier `app`. A factory binding of the same
-// name stays authoritative so an in-file Fastify() construction is not replaced.
-func typedFastifyParamBindings(src []byte) map[string]serverBinding {
+type fastifyParamScope struct {
+	name       string
+	start, end int
+	binding    serverBinding
+}
+
+// typedFastifyParamScopes maps FastifyInstance parameters to the function body
+// that owns them. FastifyPluginAsync/Callback name a plugin function, not an
+// application object. The same identifier in a sibling function with another
+// type is not a server receiver.
+func typedFastifyParamScopes(src []byte) []fastifyParamScope {
+	local := importedFastifyInstanceNames(src)
+	if len(local) == 0 {
+		return nil
+	}
+	mask := tsCommentStringMask(src)
+	var out []fastifyParamScope
+	for _, m := range fastifyTypedParam.FindAllSubmatchIndex(src, -1) {
+		if mask[m[0]] {
+			continue
+		}
+		ident, typ := string(src[m[2]:m[3]]), string(src[m[4]:m[5]])
+		if !local[typ] {
+			continue
+		}
+		bodyStart, bodyEnd, ok := functionBodyAroundParam(src, mask, m[0])
+		if !ok {
+			continue
+		}
+		out = append(out, fastifyParamScope{
+			name: ident, start: bodyStart, end: bodyEnd,
+			binding: serverBinding{framework: "fastify", mounted: true},
+		})
+	}
+	return out
+}
+
+func importedFastifyInstanceNames(src []byte) map[string]bool {
 	local := map[string]bool{}
-	for _, m := range fastifyNamedImport.FindAllSubmatch(src, -1) {
-		for _, spec := range strings.Split(string(m[1]), ",") {
+	mask := tsCommentStringMask(src)
+	for _, loc := range fastifyNamedImport.FindAllSubmatchIndex(src, -1) {
+		if mask[loc[0]] {
+			continue
+		}
+		inner := string(src[loc[2]:loc[3]])
+		for _, spec := range strings.Split(inner, ",") {
 			spec = strings.TrimSpace(spec)
 			spec = strings.TrimPrefix(spec, "type ")
 			spec = strings.TrimSpace(spec)
@@ -264,16 +307,160 @@ func typedFastifyParamBindings(src []byte) map[string]serverBinding {
 			}
 		}
 	}
-	if len(local) == 0 {
-		return nil
+	return local
+}
+
+func functionBodyAroundParam(src []byte, mask []bool, paramPos int) (start, end int, ok bool) {
+	i := paramPos
+	for i > 0 && src[i] != '(' {
+		if src[i] == ')' || src[i] == '{' || src[i] == '}' {
+			return 0, 0, false
+		}
+		i--
 	}
-	out := map[string]serverBinding{}
-	for _, m := range fastifyTypedParam.FindAllSubmatch(src, -1) {
-		ident, typ := string(m[1]), string(m[2])
-		if !local[typ] {
+	if i < 0 || src[i] != '(' || mask[i] {
+		return 0, 0, false
+	}
+	depth := 0
+	for j := i; j < len(src); j++ {
+		if mask[j] {
 			continue
 		}
-		out[ident] = serverBinding{framework: "fastify", mounted: true}
+		switch src[j] {
+		case '(':
+			depth++
+		case ')':
+			depth--
+			if depth == 0 {
+				k := j + 1
+				for k < len(src) && (src[k] == ' ' || src[k] == '\t' || src[k] == '\n' || src[k] == '\r') {
+					k++
+				}
+				for k < len(src) && src[k] != '{' && src[k] != ';' && src[k] != '\n' {
+					if src[k] == '=' && k+1 < len(src) && src[k+1] == '>' {
+						k += 2
+						for k < len(src) && (src[k] == ' ' || src[k] == '\t' || src[k] == '\n' || src[k] == '\r') {
+							k++
+						}
+						break
+					}
+					k++
+				}
+				for k < len(src) && (src[k] == ' ' || src[k] == '\t' || src[k] == '\n' || src[k] == '\r') {
+					k++
+				}
+				if k >= len(src) || src[k] != '{' || mask[k] {
+					return 0, 0, false
+				}
+				end := matchBrace(src, mask, k)
+				if end < 0 {
+					return 0, 0, false
+				}
+				return k, end, true
+			}
+		}
+	}
+	return 0, 0, false
+}
+
+func matchBrace(src []byte, mask []bool, open int) int {
+	depth := 0
+	for i := open; i < len(src); i++ {
+		if mask[i] {
+			continue
+		}
+		switch src[i] {
+		case '{':
+			depth++
+		case '}':
+			depth--
+			if depth == 0 {
+				return i
+			}
+		}
+	}
+	return -1
+}
+
+func fastifyScopeBinding(scopes []fastifyParamScope, name string, pos int) (serverBinding, bool) {
+	best := -1
+	bestSpan := int(^uint(0) >> 1)
+	for i, s := range scopes {
+		if s.name != name || pos < s.start || pos > s.end {
+			continue
+		}
+		span := s.end - s.start
+		if span < bestSpan {
+			bestSpan = span
+			best = i
+		}
+	}
+	if best < 0 {
+		return serverBinding{}, false
+	}
+	return scopes[best].binding, true
+}
+
+// tsCommentStringMask is true at bytes inside comments or string/template literals.
+func tsCommentStringMask(src []byte) []bool {
+	mask := make([]bool, len(src))
+	i := 0
+	for i < len(src) {
+		switch src[i] {
+		case '/':
+			if i+1 < len(src) && src[i+1] == '/' {
+				for i < len(src) && src[i] != '\n' {
+					mask[i] = true
+					i++
+				}
+				continue
+			}
+			if i+1 < len(src) && src[i+1] == '*' {
+				mask[i] = true
+				mask[i+1] = true
+				i += 2
+				for i < len(src) {
+					mask[i] = true
+					if src[i] == '*' && i+1 < len(src) && src[i+1] == '/' {
+						mask[i+1] = true
+						i += 2
+						break
+					}
+					i++
+				}
+				continue
+			}
+		case '\'', '"', '`':
+			q := src[i]
+			mask[i] = true
+			i++
+			for i < len(src) {
+				mask[i] = true
+				if src[i] == '\\' && i+1 < len(src) {
+					mask[i+1] = true
+					i += 2
+					continue
+				}
+				if src[i] == q {
+					i++
+					break
+				}
+				i++
+			}
+			continue
+		}
+		i++
+	}
+	return mask
+}
+
+// typedFastifyParamBindings is the union of scoped FastifyInstance parameters,
+// kept for tests that inspect the file-level name set. It must not be used as
+// a global receiver map.
+func typedFastifyParamBindings(src []byte) map[string]serverBinding {
+	out := map[string]serverBinding{}
+	for _, s := range typedFastifyParamScopes(src) {
+		out[s.name] = s.binding
 	}
 	if len(out) == 0 {
 		return nil

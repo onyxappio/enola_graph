@@ -15,7 +15,7 @@ func TestEncodeOwnerLexicalSameFileCallResolves(t *testing.T) {
 	sib := facts.Fact{Kind: facts.KindSymbol, Name: "lib.round", File: "lib/billingExport.ts", Repo: "r", Props: map[string]any{"exported": false}}
 	from := facts.Fact{
 		Kind: facts.KindSymbol, Name: "lib.toMoneyPoint", File: "lib/costModel.ts", Repo: "r",
-		Relations: []facts.Relation{{Kind: facts.RelCalls, Target: "lib.round"}},
+		Relations: []facts.Relation{{Kind: facts.RelCalls, Target: "lib.round", TargetFile: "lib/costModel.ts"}},
 	}
 	idx := buildIndex([]facts.Fact{local, sib, from})
 	_, edges := encodeOwner(ownerOutput{Owner: ownerOf(from), Facts: []facts.Fact{from}}, idx, false)
@@ -27,6 +27,37 @@ func TestEncodeOwnerLexicalSameFileCallResolves(t *testing.T) {
 	}
 	if edges[0].TargetID == sib.Identity() {
 		t.Fatal("resolved the sibling declaration")
+	}
+}
+
+func TestEncodeOwnerImportedCallDoesNotBindCallerLocal(t *testing.T) {
+	local := facts.Fact{Kind: facts.KindSymbol, Name: "src.round", File: "src/a.ts", Repo: "r"}
+	remote := facts.Fact{Kind: facts.KindSymbol, Name: "src.round", File: "src/b.ts", Repo: "r"}
+	from := facts.Fact{
+		Kind: facts.KindSymbol, Name: "src.caller", File: "src/a.ts", Repo: "r",
+		Relations: []facts.Relation{{Kind: facts.RelCalls, Target: "src.round", TargetFile: "src/b.ts"}},
+	}
+	idx := buildIndex([]facts.Fact{local, remote, from})
+	_, edges := encodeOwner(ownerOutput{Owner: ownerOf(from), Facts: []facts.Fact{from}}, idx, false)
+	if len(edges) != 1 {
+		t.Fatalf("edges=%d", len(edges))
+	}
+	if edges[0].Resolution != graphstream.ResResolved || edges[0].TargetID != remote.Identity() {
+		t.Fatalf("imported round must bind b.ts, got %+v", edges[0])
+	}
+}
+
+func TestEncodeOwnerCallWithoutTargetFileStaysAmbiguousWithSibling(t *testing.T) {
+	local := facts.Fact{Kind: facts.KindSymbol, Name: "src.round", File: "src/a.ts", Repo: "r"}
+	sib := facts.Fact{Kind: facts.KindSymbol, Name: "src.round", File: "src/b.ts", Repo: "r"}
+	from := facts.Fact{
+		Kind: facts.KindSymbol, Name: "src.caller", File: "src/a.ts", Repo: "r",
+		Relations: []facts.Relation{{Kind: facts.RelCalls, Target: "src.round"}},
+	}
+	idx := buildIndex([]facts.Fact{local, sib, from})
+	_, edges := encodeOwner(ownerOutput{Owner: ownerOf(from), Facts: []facts.Fact{from}}, idx, false)
+	if edges[0].Resolution != graphstream.ResAmbiguous || edges[0].TargetID != "" {
+		t.Fatalf("same-name without target_file must stay ambiguous: %+v", edges[0])
 	}
 }
 
@@ -49,7 +80,7 @@ func TestEncodeOwnerTwoSameFileOverloadsStayAmbiguous(t *testing.T) {
 	b := facts.Fact{Kind: facts.KindSymbol, Name: "lib.round", File: "lib/costModel.ts", Repo: "r", Line: 20}
 	from := facts.Fact{
 		Kind: facts.KindSymbol, Name: "lib.toMoneyPoint", File: "lib/costModel.ts", Repo: "r",
-		Relations: []facts.Relation{{Kind: facts.RelCalls, Target: "lib.round"}},
+		Relations: []facts.Relation{{Kind: facts.RelCalls, Target: "lib.round", TargetFile: "lib/costModel.ts"}},
 	}
 	idx := buildIndex([]facts.Fact{a, b, from})
 	_, edges := encodeOwner(ownerOutput{Owner: ownerOf(from), Facts: []facts.Fact{from}}, idx, false)
@@ -81,6 +112,28 @@ export function dump() { return round(1, 0); }
 	c := applyGraph(t, sink)
 	assertCallResolvedToFile(t, c, "lib/costModel.ts", "lib.round", "lib/costModel.ts")
 	assertCallResolvedToFile(t, c, "lib/billingExport.ts", "lib.round", "lib/billingExport.ts")
+}
+
+func TestPublishedImportAliasSameDirectoryDoesNotBindLocal(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"src/a.ts": "import { round as externalRound } from './b';\nfunction round(n: number) { return n; }\nexport function caller() { return externalRound(1); }\n",
+		"src/b.ts": "export function round(n: number) { return n + 1; }\n",
+	})
+	eng := testEngine(t, dir)
+	sink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, sink, Options{StateDir: filepath.Join(dir, ".enola", "state")}); err != nil {
+		t.Fatal(err)
+	}
+	c := applyGraph(t, sink)
+	assertCallResolvedToFile(t, c, "src/a.ts", "src.round", "src/b.ts")
+	for _, e := range c.Edges[ownerKey("src/a.ts")] {
+		if e.Kind == facts.RelCalls && e.TargetName == "src.round" {
+			n := nodeByID(c, e.FromID)
+			if n.Name == "src.caller" && nodeByID(c, e.TargetID).File == "src/a.ts" {
+				t.Fatalf("caller must not bind a.ts round: %+v", e)
+			}
+		}
+	}
 }
 
 func TestPublishedShadowedLocalCallIsNotModuleRound(t *testing.T) {
@@ -188,7 +241,8 @@ func assertCallResolvedToFile(t *testing.T, c *Consumer, ownerFile, targetName, 
 	}
 	for _, e := range hits {
 		if e.Resolution != graphstream.ResResolved || e.TargetID == "" {
-			t.Fatalf("%s -> %s resolution=%s id=%q", ownerFile, targetName, e.Resolution, e.TargetID)
+			from := nodeByID(c, e.FromID)
+			t.Fatalf("%s -> %s resolution=%s id=%q from=%s name=%s kind=%s", ownerFile, targetName, e.Resolution, e.TargetID, e.FromID, from.Name, from.Kind)
 		}
 		n := nodeByID(c, e.TargetID)
 		if n.File != wantFile {

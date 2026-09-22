@@ -56,6 +56,39 @@ func TestExtract_ExplicitTSConfigTildeBeatsNuxtDefault(t *testing.T) {
 	}
 }
 
+func TestExtract_NuxtExplicitTildeAlias(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"package.json":           `{"dependencies":{"nuxt":"^4.3.1","vue":"^3.0.0"}}`,
+		"nuxt.config.ts":         "export default defineNuxtConfig({ alias: { '~': './custom' } });\n",
+		"app.vue":                "<script setup lang=\"ts\">import { choose } from '~/utils/choice'; choose();</script><template><div /></template>",
+		"utils/choice.ts":        `export function choose() { return "root"; }`,
+		"custom/utils/choice.ts": `export function choose() { return "custom"; }`,
+	}, false)
+	if !importEdgeResolves(t, ff, "app.vue", "custom/utils", "custom/utils/choice.ts") {
+		t.Fatalf("explicit Nuxt alias must bind custom/utils:\n%s", importDump(ff, "app.vue"))
+	}
+	for _, f := range ff {
+		if f.Kind == facts.KindDependency && f.File == "app.vue" && f.PropString(facts.PropTargetFile) == "utils/choice.ts" {
+			t.Fatal("must not bind root utils/choice.ts")
+		}
+	}
+}
+
+func TestExtract_NuxtDynamicSrcDirDoesNotUseDefault(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"package.json":        `{"dependencies":{"nuxt":"^4.3.1","vue":"^3.0.0"}}`,
+		"nuxt.config.ts":      "const dir = 'src';\nexport default defineNuxtConfig({ srcDir: dir });\n",
+		"utils/choice.ts":     `export function choose() { return "root"; }`,
+		"src/utils/choice.ts": `export function choose() { return "src"; }`,
+		"app.vue":             "<script setup lang=\"ts\">import { choose } from '~/utils/choice';</script><template><div /></template>",
+	}, false)
+	for _, f := range ff {
+		if f.Kind == facts.KindDependency && f.File == "app.vue" && f.PropString(facts.PropTargetFile) == "utils/choice.ts" {
+			t.Fatal("unknown srcDir must not bind default utils/choice.ts")
+		}
+	}
+}
+
 func TestExtract_NuxtSrcDirLiteralOverride(t *testing.T) {
 	ff := extractAll(t, map[string]string{
 		"package.json":                   `{"dependencies":{"nuxt":"^4.3.1","vue":"^3.0.0"}}`,

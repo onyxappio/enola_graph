@@ -50,6 +50,55 @@ export function serviceCallCount() {
 	}
 }
 
+func TestExtract_LocalSameFileCallHasTargetFile(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"lib/costModel.ts": `
+function round(value: number, digits: number): number { return value; }
+export function toMoneyPoint(hourlyEur: number) { return round(hourlyEur, 4); }
+`,
+		"lib/billingExport.ts": `
+function round(value: number, decimals: number): number { return value; }
+export function dump() { return round(1, 0); }
+`,
+	}, false)
+	var toMoney facts.Fact
+	for _, f := range ff {
+		if f.Name == "lib.toMoneyPoint" {
+			toMoney = f
+		}
+	}
+	for _, r := range toMoney.Relations {
+		if r.Kind == facts.RelCalls && r.Target == "lib.round" && r.TargetFile != "lib/costModel.ts" {
+			t.Fatalf("local call target_file=%q relations=%+v", r.TargetFile, toMoney.Relations)
+		}
+	}
+}
+
+func TestExtract_ImportAliasSameDirectoryCallHasTargetFile(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/a.ts": "import { round as externalRound } from './b';\nfunction round(n: number) { return n; }\nexport function caller() { return externalRound(1); }\n",
+		"src/b.ts": "export function round(n: number) { return n + 1; }\n",
+	}, false)
+	var caller facts.Fact
+	for _, f := range ff {
+		if f.Kind == facts.KindSymbol && f.Name == "src.caller" {
+			caller = f
+		}
+	}
+	found := false
+	for _, r := range caller.Relations {
+		if r.Kind == facts.RelCalls && r.Target == "src.round" {
+			found = true
+			if r.TargetFile != "src/b.ts" {
+				t.Fatalf("imported call target_file=%q want src/b.ts relations=%+v", r.TargetFile, caller.Relations)
+			}
+		}
+	}
+	if !found {
+		t.Fatalf("missing imported call: %+v", caller.Relations)
+	}
+}
+
 func TestExtract_FolderIndexImportTypeAndAlias(t *testing.T) {
 	ff := extractAll(t, map[string]string{
 		"lib/oracles/index.ts": `export { createVerdict as make } from './types';`,

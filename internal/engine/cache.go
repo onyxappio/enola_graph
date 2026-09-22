@@ -2455,7 +2455,9 @@ import (
 // v279: TypeScript ESM JS-extension substitution; folder-index import symbol
 // ownership; lexically certain same-file RelCalls resolution; FastifyInstance
 // typed-parameter server routes; Nuxt default ~/ and @/ aliases without .nuxt.
-const cacheVersion = "v279"
+// v280: RelCalls carry proven target_file; FastifyInstance params are scoped per
+// function; Nuxt config alias/srcDir literals are honored without executing config.
+const cacheVersion = "v280"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

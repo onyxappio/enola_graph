@@ -24,6 +24,11 @@ type Fact struct {
 type Relation struct {
 	Kind   string `json:"kind"`   // e.g. "declares", "imports", "calls", "implements", "depends_on"
 	Target string `json:"target"` // Target fact name
+	// TargetFile is extractor-proven file provenance for RelCalls. When set,
+	// graph resolution may only bind a same-name symbol in that file. An empty
+	// value means the extractor did not prove a file, so same-directory names
+	// stay ambiguous rather than guessing the caller's file.
+	TargetFile string `json:"target_file,omitempty"`
 }
 
 // Fact kind constants.
