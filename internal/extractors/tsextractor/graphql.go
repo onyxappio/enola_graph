@@ -720,7 +720,7 @@ func graphQLServerASTSignals(src []byte, relFile string) (bool, []string) {
 		case "call_expression":
 			if fn := n.ChildByFieldName("function"); fn != nil {
 				name := nodeText(fn, src)
-				if name == "buildSchema" || name == "makeExecutableSchema" || name == "graphqlHTTP" {
+				if name == "buildSchema" || name == "makeExecutableSchema" || name == "graphqlHTTP" || name == "createSchema" {
 					server = true
 				}
 			}
@@ -1077,6 +1077,142 @@ func isSDLIdentStart(c byte) bool {
 
 func isSDLIdentChar(c byte) bool {
 	return c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
+}
+
+// bindGraphQLSchemaResolvers attaches RelHandledBy from SDL/code-first root
+// fields to explicit createSchema/makeExecutableSchema resolver functions.
+func bindGraphQLSchemaResolvers(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, ff []facts.Fact, importMap map[string]string) []facts.Fact {
+	bindings := collectGraphQLImportBindings(kinds, root, src)
+	if !bindings.hasPackage("graphql-yoga") && !bindings.hasPackage("@graphql-tools/schema") {
+		return nil
+	}
+	dir := factpath.Dir(relFile)
+	routes := map[string]int{}
+	for i, f := range ff {
+		if f.Kind == facts.KindRoute && (f.Props[facts.PropRouteType] == facts.RouteTypeGraphQL || f.Props["type"] == "graphql") {
+			routes[f.Name] = i
+		}
+	}
+	var extra []facts.Fact
+	var walk func(*sitter.Node)
+	walk = func(n *sitter.Node) {
+		if n == nil {
+			return
+		}
+		if kindOf(kinds, n) == "call_expression" {
+			fn := n.ChildByFieldName("function")
+			if fn != nil {
+				exported := bindings.callExport(kinds, fn, src, "graphql-yoga")
+				if exported == "" {
+					exported = bindings.callExport(kinds, fn, src, "@graphql-tools/schema")
+				}
+				if exported == "createSchema" || exported == "makeExecutableSchema" {
+					extra = append(extra, bindSchemaResolverObject(kinds, n, src, relFile, dir, ff, routes, importMap)...)
+				}
+			}
+		}
+		for i := range n.ChildCount() {
+			walk(n.Child(i))
+		}
+	}
+	walk(root)
+	return extra
+}
+
+func bindSchemaResolverObject(kinds *tsutil.KindTable, call *sitter.Node, src []byte, relFile, dir string, ff []facts.Fact, routes map[string]int, importMap map[string]string) []facts.Fact {
+	args := call.ChildByFieldName("arguments")
+	if args == nil {
+		return nil
+	}
+	var cfg *sitter.Node
+	for i := range args.ChildCount() {
+		if kindOf(kinds, args.Child(i)) == "object" {
+			cfg = args.Child(i)
+			break
+		}
+	}
+	resolvers := objectPropValue(kinds, cfg, src, "resolvers")
+	if resolvers == nil || kindOf(kinds, resolvers) != "object" {
+		return nil
+	}
+	var extra []facts.Fact
+	for i := range resolvers.ChildCount() {
+		pair := resolvers.Child(i)
+		if kindOf(kinds, pair) != "pair" {
+			continue
+		}
+		key := pair.ChildByFieldName("key")
+		val := pair.ChildByFieldName("value")
+		if key == nil || val == nil {
+			continue
+		}
+		rootName := strings.Trim(nodeText(key, src), `"'`)
+		if rootName != "Query" && rootName != "Mutation" && rootName != "Subscription" {
+			continue
+		}
+		if kindOf(kinds, val) != "object" {
+			continue
+		}
+		for j := range val.ChildCount() {
+			field := val.Child(j)
+			if kindOf(kinds, field) != "pair" {
+				continue
+			}
+			fk := field.ChildByFieldName("key")
+			fv := field.ChildByFieldName("value")
+			if fk == nil || fv == nil {
+				continue
+			}
+			fieldName := strings.Trim(nodeText(fk, src), `"'`)
+			routeName := rootName + "." + fieldName
+			ri, ok := routes[routeName]
+			if !ok {
+				continue
+			}
+			handler, sym := graphqlResolverHandler(kinds, fv, src, relFile, dir, routeName, int(fv.StartPosition().Row)+1, importMap)
+			if handler == "" {
+				continue
+			}
+			if !ff[ri].HasRelation(facts.RelHandledBy, handler) {
+				ff[ri].Relations = append(ff[ri].Relations, facts.Relation{Kind: facts.RelHandledBy, Target: handler})
+			}
+			if ff[ri].Props == nil {
+				ff[ri].Props = map[string]any{}
+			}
+			ff[ri].Props["handler"] = handler
+			if sym != nil {
+				extra = append(extra, *sym)
+			}
+		}
+	}
+	return extra
+}
+
+func graphqlResolverHandler(kinds *tsutil.KindTable, value *sitter.Node, src []byte, relFile, dir, routeName string, line int, importMap map[string]string) (string, *facts.Fact) {
+	switch kindOf(kinds, value) {
+	case "identifier":
+		name := nodeText(value, src)
+		if canon := importMap[name]; canon != "" {
+			return canon, nil
+		}
+		return dir + "." + name, nil
+	case "arrow_function", "function_expression", "function_declaration":
+		name := dir + "." + routeName
+		return name, &facts.Fact{
+			Kind: facts.KindSymbol,
+			Name: name,
+			File: relFile,
+			Line: line,
+			Props: map[string]any{
+				"symbol_kind": facts.SymbolFunc,
+				"exported":    false,
+				"language":    "typescript",
+			},
+			Relations: []facts.Relation{{Kind: facts.RelDeclares, Target: dir}},
+		}
+	default:
+		return "", nil
+	}
 }
 
 // gqlTagOpen matches the opening of a gql`…` / graphql`…` tagged template.

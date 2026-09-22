@@ -33,6 +33,7 @@ import (
 // test functions that assert the behavior that version introduced. v1 is the
 // implicit baseline (no changelog line), so coverage starts at v2.
 var versionCoverage = map[int][]string{
+	277: {"TestExtract_NestedNuxtPackageEmitsPackageRelativeRoute", "TestExtract_NuxtLazyAliasDoesNotOverrideRealLazyComponent", "TestExtract_RootNuxtDoesNotBindNestedPackageComponents", "TestStorage_DrizzleExplicitReferences", "TestGraphQLYogaCreateSchemaBindsQueryHealthHandler", "TestGraphQLYogaDoesNotBindLocalCreateSchema", "TestExtract_ImportedImplementsQualifiesTarget", "TestResolveStorageDependsOnPrefersStorageKind"},
 	276: {"TestExtract_ImportEdgesResolveToExistingFiles", "TestPublishedImportEdgesResolveToFileFacts", "TestPublishedReexportMatchesEvidenceShape"},
 	275: {"TestExtract_ImportEdgesResolveToExistingFiles", "TestExtract_PackageJSONNameAliasWithoutTSConfigPaths", "TestExtract_TSConfigPathsBeatPackageJSONName"},
 	274: {"TestPolicyDiscoveryAllowedFacts", "TestScopedPackageReadersStableContext", "TestScopedDiscoveryCacheMigration"},

@@ -2448,7 +2448,9 @@ import (
 // v276: TS RelImports target the owning module directory (KindModule.Name) and keep
 // the exact file on target_file for ResolvedFiles; empty file_refs are not emitted
 // for every source file.
-const cacheVersion = "v276"
+// v277: Nested Nuxt packages, Lazy auto-components, Drizzle .references() FKs,
+// GraphQL Yoga resolver RelHandledBy, and imported implements qualification.
+const cacheVersion = "v277"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

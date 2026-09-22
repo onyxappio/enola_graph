@@ -668,6 +668,9 @@ func objectBoolProp(kinds *tsutil.KindTable, obj *sitter.Node, src []byte, key s
 
 // objectPropValue returns the value node of a named property of an object literal.
 func objectPropValue(kinds *tsutil.KindTable, obj *sitter.Node, src []byte, key string) *sitter.Node {
+	if obj == nil {
+		return nil
+	}
 	for i := range obj.ChildCount() {
 		pair := obj.Child(i)
 		if kindOf(kinds, pair) != "pair" {

@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/enola-labs/enola/internal/extractors/tsutil"
+	"io/fs"
 
 	"path/filepath"
 	"regexp"
@@ -104,9 +105,7 @@ func detectVueAt(dir string, inputScopes ...*inputscope.Scope) bool {
 }
 
 func detectNuxt(repoPath string, inputScopes ...*inputscope.Scope) bool {
-	inputScope := inputscope.First(inputScopes)
-	tsRoot, _ := findTSRoot(repoPath, inputScope)
-	return detectNuxtAt(tsRoot, inputScope) || (tsRoot != repoPath && detectNuxtAt(repoPath, inputScope))
+	return len(collectNuxtPackages(context.Background(), repoPath, inputScopes...)) > 0
 }
 
 func detectNuxtAt(dir string, inputScopes ...*inputscope.Scope) bool {
@@ -117,6 +116,54 @@ func detectNuxtAt(dir string, inputScopes ...*inputscope.Scope) bool {
 		}
 	}
 	return hasPkgDependency(dir, "nuxt", inputScope)
+}
+
+// collectNuxtPackages lists every directory that declares Nuxt (nuxt.config.* or
+// a package.json nuxt dependency), including nested monorepo apps. Longest
+// prefix first so a nested landings app wins over a parent.
+func collectNuxtPackages(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) []string {
+	inputScope := inputscope.First(inputScopes)
+	var out []string
+	_ = inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return nil
+		}
+		if !d.IsDir() {
+			return nil
+		}
+		name := d.Name()
+		if path != repoPath && (strings.HasPrefix(name, ".") || tsSkipDirs[name] || name == "testdata") {
+			return filepath.SkipDir
+		}
+		if !detectNuxtAt(path, inputScope) {
+			return nil
+		}
+		rel, err := filepath.Rel(repoPath, path)
+		if err != nil {
+			return nil
+		}
+		rel = factpath.Slash(rel)
+		if rel == "." {
+			rel = ""
+		}
+		out = append(out, rel)
+		return nil
+	})
+	sort.Slice(out, func(i, j int) bool { return len(out[i]) > len(out[j]) })
+	return out
+}
+
+func nuxtPackageForFile(pkgs []string, relFile string) (string, bool) {
+	file := filepath.ToSlash(relFile)
+	for _, p := range pkgs {
+		if p == "" {
+			return "", true
+		}
+		if file == p || strings.HasPrefix(file, p+"/") {
+			return p, true
+		}
+	}
+	return "", false
 }
 
 func hasPkgDependency(dir, pkg string, inputScopes ...*inputscope.Scope) bool {
@@ -266,11 +313,18 @@ func buildVueImportBindings(kinds *tsutil.KindTable, root *sitter.Node, src []by
 
 // nuxtAutoComponentIndex returns only unambiguous convention-derived component
 // names. Both basename and path-prefixed forms are indexed because Nuxt projects
-// may configure pathPrefix off.
-func nuxtAutoComponentIndex(knownFiles map[string]bool) map[string]string {
+// may configure pathPrefix off. pkgDir limits the index to one Nuxt package
+// (empty means the repository root package). Lazy* aliases are Nuxt's async
+// wrapper convention for the same component.
+func nuxtAutoComponentIndex(knownFiles map[string]bool, pkgDir string, pkgs []string) map[string]string {
 	candidates := make(map[string]map[string]bool)
 	for file := range knownFiles {
 		if !isVueFile(file) {
+			continue
+		}
+		file = filepath.ToSlash(file)
+		owner, ok := nuxtPackageForFile(pkgs, file)
+		if !ok || owner != pkgDir {
 			continue
 		}
 		parts := strings.Split(filepath.ToSlash(file), "/")
@@ -301,33 +355,108 @@ func nuxtAutoComponentIndex(knownFiles map[string]bool) map[string]string {
 	}
 	index := make(map[string]string)
 	for name, targets := range candidates {
-		if len(targets) == 1 {
-			for target := range targets {
-				index[name] = target
-			}
+		if len(targets) != 1 {
+			continue
+		}
+		for target := range targets {
+			index[name] = target
+		}
+	}
+	// Lazy* is Nuxt's async wrapper for an auto-imported component. Only add the
+	// alias when the name is unique and does not collide with a real Lazy* file.
+	lazyHits := map[string]map[string]bool{}
+	for name, target := range index {
+		if strings.HasPrefix(name, "Lazy") {
+			continue
+		}
+		lazy := "Lazy" + name
+		if lazyHits[lazy] == nil {
+			lazyHits[lazy] = map[string]bool{}
+		}
+		lazyHits[lazy][target] = true
+	}
+	for lazy, targets := range lazyHits {
+		if _, exists := index[lazy]; exists {
+			continue
+		}
+		if len(targets) != 1 {
+			continue
+		}
+		for target := range targets {
+			index[lazy] = target
 		}
 	}
 	return index
 }
 
-// vueTemplateContent returns the first SFC template body. Vue permits at most one
-// top-level template block; malformed/unclosed blocks deliberately produce no refs.
+// vueTemplateContent returns the first SFC template body, including nested
+// `<template #slot>` blocks. Vue permits one top-level template; the first
+// `</template>` is often a slot closer, not the SFC closer.
 func vueTemplateContent(src []byte) []byte {
 	start := indexCaseInsensitive(src, []byte("<template"))
 	if start < 0 {
 		return nil
+	}
+	if start+9 < len(src) {
+		n := src[start+9]
+		if n != '>' && n != ' ' && n != '\t' && n != '\n' && n != '\r' && n != '/' {
+			return vueTemplateContent(src[start+9:])
+		}
 	}
 	openEnd := bytes.IndexByte(src[start:], '>')
 	if openEnd < 0 {
 		return nil
 	}
 	openEnd += start
-	closeStart := indexCaseInsensitive(src[openEnd+1:], []byte("</template>"))
-	if closeStart < 0 {
+	if openEnd > start && src[openEnd-1] == '/' {
 		return nil
 	}
-	closeStart += openEnd + 1
-	return src[openEnd+1 : closeStart]
+	bodyStart := openEnd + 1
+	lower := bytes.ToLower(src)
+	depth := 1
+	for i := bodyStart; i < len(src); {
+		if src[i] != '<' {
+			i++
+			continue
+		}
+		rest := lower[i:]
+		if bytes.HasPrefix(rest, []byte("<!--")) {
+			end := bytes.Index(src[i+4:], []byte("-->"))
+			if end < 0 {
+				return nil
+			}
+			i += 4 + end + 3
+			continue
+		}
+		if bytes.HasPrefix(rest, []byte("</template>")) {
+			depth--
+			if depth == 0 {
+				return src[bodyStart:i]
+			}
+			i += len("</template>")
+			continue
+		}
+		if bytes.HasPrefix(rest, []byte("<template")) && (len(rest) == 9 || !isVueTagNameChar(rest[9])) {
+			gt := bytes.IndexByte(src[i:], '>')
+			if gt < 0 {
+				return nil
+			}
+			abs := i + gt
+			if abs > i && src[abs-1] == '/' {
+				i = abs + 1
+				continue
+			}
+			depth++
+			i = abs + 1
+			continue
+		}
+		i++
+	}
+	return nil
+}
+
+func isVueTagNameChar(c byte) bool {
+	return c == '-' || c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
 }
 
 // vueTemplateRefs resolves names used by a Vue template against declarations and

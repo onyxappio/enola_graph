@@ -609,9 +609,35 @@ func buildIndex(ff []facts.Fact) *idIndex {
 }
 
 func (idx *idIndex) resolve(fromRepo, target string) (id, status string) {
+	return idx.resolveRel(fromRepo, "", "", target)
+}
+
+func preferredResolveKind(fromKind, relKind string) string {
+	if fromKind == facts.KindStorage && relKind == facts.RelDependsOn {
+		return facts.KindStorage
+	}
+	return ""
+}
+
+func (idx *idIndex) resolveRel(fromRepo, fromKind, relKind, target string) (id, status string) {
 	cands := idx.byName[target]
 	if len(cands) == 0 {
 		return "", graphstream.ResUnresolved
+	}
+	if prefer := preferredResolveKind(fromKind, relKind); prefer != "" {
+		var filtered []facts.Fact
+		for _, f := range cands {
+			if fromRepo != "" && f.Repo != fromRepo {
+				continue
+			}
+			if f.Kind == prefer {
+				filtered = append(filtered, f)
+			}
+		}
+		if len(filtered) > 0 {
+			cands = filtered
+			fromRepo = ""
+		}
 	}
 	pick := -1
 	for i, f := range cands {
@@ -695,7 +721,7 @@ func encodeOwner(o ownerOutput, idx *idIndex, pending bool) (nodes []graphstream
 			if pending {
 				e.Resolution = graphstream.ResPending
 			} else {
-				tid, st := idx.resolve(f.Repo, r.Target)
+				tid, st := idx.resolveRel(f.Repo, f.Kind, r.Kind, r.Target)
 				e.Resolution = st
 				e.TargetID = tid
 			}

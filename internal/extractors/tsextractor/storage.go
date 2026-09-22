@@ -161,19 +161,128 @@ func drizzleTableStorage(kinds *tsutil.KindTable, call *sitter.Node, src []byte,
 	if table == "" {
 		table = constName
 	}
-	return &facts.Fact{
-		Kind: facts.KindStorage,
-		Name: dir + "." + constName,
-		File: relFile,
-		Line: line,
-		Props: map[string]any{
-			"storage_kind": "entity",
-			"language":     "typescript",
-			"framework":    "drizzle",
-			"table":        table,
-		},
-		Relations: []facts.Relation{{Kind: facts.RelDeclares, Target: dir}},
+	rels := []facts.Relation{{Kind: facts.RelDeclares, Target: dir}}
+	props := map[string]any{
+		"storage_kind": "entity",
+		"language":     "typescript",
+		"framework":    "drizzle",
+		"table":        table,
 	}
+	if fks := drizzleExplicitReferences(kinds, call, src); len(fks) > 0 {
+		props["fk_constraints"] = strings.Join(fks, " ")
+		seen := map[string]bool{}
+		for _, spec := range fks {
+			// "subjectId->scanSubjects.subjectId"
+			right := spec
+			if i := strings.IndexByte(spec, '>'); i >= 0 && i+1 < len(spec) {
+				right = spec[i+1:]
+			}
+			tableIdent := right
+			if i := strings.IndexByte(right, '.'); i >= 0 {
+				tableIdent = right[:i]
+			}
+			target := dir + "." + tableIdent
+			if tableIdent == "" || seen[target] {
+				continue
+			}
+			seen[target] = true
+			rels = append(rels, facts.Relation{Kind: facts.RelDependsOn, Target: target})
+		}
+	}
+	return &facts.Fact{
+		Kind:      facts.KindStorage,
+		Name:      dir + "." + constName,
+		File:      relFile,
+		Line:      line,
+		Props:     props,
+		Relations: rels,
+	}
+}
+
+// drizzleExplicitReferences reads `.references(() => table.column)` on pgTable
+// column builders. Naming-only guesses and a bare `references()` identifier are
+// ignored.
+func drizzleExplicitReferences(kinds *tsutil.KindTable, call *sitter.Node, src []byte) []string {
+	args := call.ChildByFieldName("arguments")
+	if args == nil {
+		return nil
+	}
+	var columns *sitter.Node
+	for i := range args.ChildCount() {
+		ch := args.Child(i)
+		if kindOf(kinds, ch) == "object" {
+			columns = ch
+			break
+		}
+	}
+	if columns == nil {
+		return nil
+	}
+	var out []string
+	for i := range columns.ChildCount() {
+		pair := columns.Child(i)
+		if kindOf(kinds, pair) != "pair" {
+			continue
+		}
+		key := pair.ChildByFieldName("key")
+		val := pair.ChildByFieldName("value")
+		if key == nil || val == nil {
+			continue
+		}
+		col := strings.Trim(nodeText(key, src), `"'`)
+		tableIdent, tcol, ok := drizzleReferencesTarget(kinds, val, src)
+		if !ok {
+			continue
+		}
+		out = append(out, col+"->"+tableIdent+"."+tcol)
+	}
+	return out
+}
+
+func drizzleReferencesTarget(kinds *tsutil.KindTable, expr *sitter.Node, src []byte) (table, column string, ok bool) {
+	n := expr
+	for n != nil && kindOf(kinds, n) == "call_expression" {
+		fn := n.ChildByFieldName("function")
+		if fn != nil && kindOf(kinds, fn) == "member_expression" {
+			if prop := fn.ChildByFieldName("property"); prop != nil && nodeText(prop, src) == "references" {
+				return drizzleReferencesArrowTarget(kinds, n.ChildByFieldName("arguments"), src)
+			}
+			n = fn.ChildByFieldName("object")
+			continue
+		}
+		break
+	}
+	return "", "", false
+}
+
+func drizzleReferencesArrowTarget(kinds *tsutil.KindTable, args *sitter.Node, src []byte) (table, column string, ok bool) {
+	if args == nil {
+		return "", "", false
+	}
+	var fn *sitter.Node
+	for i := range args.ChildCount() {
+		ch := args.Child(i)
+		k := kindOf(kinds, ch)
+		if k == "arrow_function" || k == "function_expression" {
+			fn = ch
+			break
+		}
+	}
+	if fn == nil {
+		return "", "", false
+	}
+	body := fn.ChildByFieldName("body")
+	if body == nil {
+		return "", "", false
+	}
+	if kindOf(kinds, body) != "member_expression" {
+		return "", "", false
+	}
+	obj, prop := body.ChildByFieldName("object"), body.ChildByFieldName("property")
+	if obj == nil || prop == nil || kindOf(kinds, obj) != "identifier" {
+		return "", "", false
+	}
+	return nodeText(obj, src), nodeText(prop, src), true
 }
 
 // firstStringArg returns the text of the first string literal in an argument list.

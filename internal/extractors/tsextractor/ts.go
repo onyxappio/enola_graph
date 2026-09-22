@@ -227,7 +227,8 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	// Detect frameworks
 	isNextJS := detectNextJS(repoPath, inputScope)
 	isVue := detectVue(repoPath, inputScope)
-	isNuxt := detectNuxt(repoPath, inputScope)
+	nuxtPkgs := collectNuxtPackages(ctx, repoPath, inputScope)
+	isNuxt := len(nuxtPkgs) > 0
 	isSvelteKit := detectSvelteKit(repoPath, inputScope)
 	isEmber := detectEmber(repoPath, inputScope)
 	isReactNav := detectReactNavigation(repoPath, inputScope)
@@ -267,9 +268,9 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 			htmlFiles = append(htmlFiles, relFile)
 		}
 	}
-	var nuxtAutoComponents map[string]string
-	if isNuxt {
-		nuxtAutoComponents = nuxtAutoComponentIndex(knownFiles)
+	nuxtAutoByPkg := map[string]map[string]string{}
+	for _, p := range nuxtPkgs {
+		nuxtAutoByPkg[p] = nuxtAutoComponentIndex(knownFiles, p, nuxtPkgs)
 	}
 
 	// Repo-wide pre-pass: resolve generated gRPC-web client stubs (service FQN +
@@ -312,8 +313,13 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 			return tsFileResult{}
 		}
 		aliases := mergePackageAliases(aliasesForDir(aliasRoots, factpath.Dir(relFile)), pkgAliases)
+		fileNuxt, inNuxt := nuxtPackageForFile(nuxtPkgs, relFile)
+		var auto map[string]string
+		if inNuxt {
+			auto = nuxtAutoByPkg[fileNuxt]
+		}
 		var res tsFileResult
-		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, isVue, isNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, orms, aliases, knownFiles, nuxtAutoComponents, grpcStubs)
+		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, isVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, orms, aliases, knownFiles, auto, grpcStubs)
 		// Routers, mounts and held-back routes for the repo-wide mount pass below.
 		// Collected here because resolving an import needs this file's path aliases,
 		// which are in scope only during the per-file walk. Same test-path gate as
@@ -676,6 +682,12 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 		}
 	}
 	result = append(result, decls...)
+	qualifyImplements(result, ctx.importMap, ctx.dir)
+	if !facts.IsTestPath(relFile) {
+		if extra := bindGraphQLSchemaResolvers(kinds, root, src, relFile, result, ctx.importMap); len(extra) > 0 {
+			result = append(result, extra...)
+		}
+	}
 
 	// Whole-file reference pass (JSX component rendering, imported-identifier values
 	// like route configs, namespace member access, require()-bound names). Emitted as
@@ -1234,6 +1246,43 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 	}
 
 	return result
+}
+
+// qualifyImplements rewrites implements targets through import bindings, and
+// same-file declarations, so graphsession resolves `implements TrackerStorage`
+// to `src/core.TrackerStorage` instead of the bare local name.
+func qualifyImplements(ff []facts.Fact, importMap map[string]string, dir string) {
+	declared := map[string]string{}
+	for _, f := range ff {
+		if f.Kind != facts.KindSymbol {
+			continue
+		}
+		short := f.Name
+		if i := strings.LastIndexByte(short, '.'); i >= 0 {
+			short = short[i+1:]
+		}
+		if _, exists := declared[short]; exists {
+			declared[short] = ""
+			continue
+		}
+		declared[short] = f.Name
+	}
+	for i := range ff {
+		for j, r := range ff[i].Relations {
+			if r.Kind != facts.RelImplements || strings.Contains(r.Target, ".") {
+				continue
+			}
+			if canon := importMap[r.Target]; canon != "" {
+				ff[i].Relations[j].Target = canon
+				continue
+			}
+			if canon := declared[r.Target]; canon != "" {
+				ff[i].Relations[j].Target = canon
+				continue
+			}
+			ff[i].Relations[j].Target = dir + "." + r.Target
+		}
+	}
 }
 
 // funcSymbol builds a function/component symbol fact. declNode supplies the source

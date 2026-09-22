@@ -406,6 +406,122 @@ import { UserCard as Card } from './cards'
 	}
 }
 
+func TestExtract_NestedNuxtPackageEmitsPackageRelativeRoute(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"apps/web/package.json":                        `{"dependencies":{"vue":"^3.0.0"}}`,
+		"apps/web/src/Plain.vue":                       `<template><p>plain</p></template>`,
+		"apps/landings/land-localtest1/package.json":   `{"dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"apps/landings/land-localtest1/nuxt.config.ts": `export default defineNuxtConfig({ components: [{ path: './components/', pathPrefix: true }] })`,
+		"apps/landings/land-localtest1/pages/index.vue": `<template>
+  <Stepper>
+    <template #step1>
+      <StepIndexWelcome />
+    </template>
+    <template #step2>
+      <LazyStepIndexElement />
+    </template>
+  </Stepper>
+</template>`,
+		"apps/landings/land-localtest1/components/step/index/StepIndexWelcome.vue": `<template><h1>welcome</h1></template>`,
+		"apps/landings/land-localtest1/components/step/index/StepIndexElement.vue": `<template><h1>element</h1></template>`,
+	}, false)
+	page, ok := findFact(ff, "apps/landings/land-localtest1/pages.PagesIndex")
+	if !ok {
+		t.Fatalf("nested page component missing; got %v", factNames(ff))
+	}
+	if page.Props["framework"] != "nuxt" {
+		t.Errorf("nested page framework = %v, want nuxt", page.Props["framework"])
+	}
+	routes := findFactsByKind(ff, facts.KindRoute)
+	found := false
+	for _, r := range routes {
+		if r.Name == "/" && r.Props["framework"] == "nuxt" && r.File == "apps/landings/land-localtest1/pages/index.vue" {
+			found = true
+		}
+	}
+	if !found {
+		t.Errorf("expected nested Nuxt route / on the package page; routes=%v", routes)
+	}
+	plain, ok := findFact(ff, "apps/web/src.Plain")
+	if !ok {
+		t.Fatal("ordinary Vue sibling missing")
+	}
+	if plain.Props["framework"] == "nuxt" {
+		t.Fatal("ordinary Vue sibling was attributed as Nuxt")
+	}
+	if !page.HasRelation(facts.RelCalls, "apps/landings/land-localtest1/components/step/index.StepIndexWelcome") {
+		t.Errorf("StepIndexWelcome not bound: %+v", page.Relations)
+	}
+	if !page.HasRelation(facts.RelCalls, "apps/landings/land-localtest1/components/step/index.StepIndexElement") {
+		t.Errorf("LazyStepIndexElement not bound: %+v", page.Relations)
+	}
+}
+
+func TestExtract_NuxtLazyAliasDoesNotOverrideRealLazyComponent(t *testing.T) {
+	ff := extractVue(t, map[string]string{
+		"app/components/step/index/StepIndexElement.vue": `<template><span>plain</span></template>`,
+		"app/components/LazyStepIndexElement.vue":        `<template><span>lazy-file</span></template>`,
+		"app/pages/index.vue":                            `<template><LazyStepIndexElement /></template>`,
+	}, true)
+	page, ok := findFact(ff, "app/pages.PagesIndex")
+	if !ok {
+		t.Fatal("page missing")
+	}
+	if !page.HasRelation(facts.RelCalls, "app/components.LazyStepIndexElement") {
+		t.Fatalf("real Lazy* component lost the tag: %+v", page.Relations)
+	}
+	if page.HasRelation(facts.RelCalls, "app/components/step/index.StepIndexElement") {
+		t.Fatal("Lazy alias overwrote a real Lazy* component")
+	}
+}
+
+func TestExtract_RootNuxtDoesNotBindNestedPackageComponents(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"package.json":    `{"dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"nuxt.config.ts":  `export default defineNuxtConfig({})`,
+		"pages/index.vue": `<template><LazyStepIndexElement /></template>`,
+		"apps/landings/package.json":   `{"dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"apps/landings/nuxt.config.ts": `export default defineNuxtConfig({})`,
+		"apps/landings/components/step/index/StepIndexElement.vue": `<template><h1>nested</h1></template>`,
+	}, false)
+	page, ok := findFact(ff, "pages.PagesIndex")
+	if !ok {
+		t.Fatal("root page missing")
+	}
+	if page.HasRelation(facts.RelCalls, "apps/landings/components/step/index.StepIndexElement") {
+		t.Fatal("root Nuxt page bound a nested package auto-component")
+	}
+}
+
+func TestExtract_NuxtLazyMissingComponentDoesNotBind(t *testing.T) {
+	ff := extractVue(t, map[string]string{
+		"app/pages/index.vue": `<template><LazyStepIndexElement /></template>`,
+	}, true)
+	page, ok := findFact(ff, "app/pages.PagesIndex")
+	if !ok {
+		t.Fatal("page missing")
+	}
+	for _, r := range page.Relations {
+		if r.Kind == facts.RelCalls && strings.Contains(r.Target, "StepIndexElement") {
+			t.Fatalf("Lazy target bound without a component file: %+v", page.Relations)
+		}
+	}
+}
+
+func TestExtract_NuxtLazyPrefixIsNotAppliedToPlainVue(t *testing.T) {
+	ff := extractVue(t, map[string]string{
+		"src/components/StepIndexElement.vue": `<template><span /></template>`,
+		"src/pages/index.vue":                 `<template><LazyStepIndexElement /></template>`,
+	}, false)
+	page, ok := findFact(ff, "src/pages.PagesIndex")
+	if !ok {
+		t.Fatal("page missing")
+	}
+	if page.HasRelation(facts.RelCalls, "src/components.StepIndexElement") {
+		t.Fatal("Lazy prefix was applied outside Nuxt")
+	}
+}
+
 func TestExtract_NuxtTemplateResolvesAutoImportedComponent(t *testing.T) {
 	ff := extractVue(t, map[string]string{
 		"app/components/UserCard.vue": `<template><article>User</article></template>`,

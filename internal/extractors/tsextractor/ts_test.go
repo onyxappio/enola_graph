@@ -236,6 +236,26 @@ func TestExtract_ArrowFunction(t *testing.T) {
 	}
 }
 
+func TestExtract_ImportedImplementsQualifiesTarget(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/core/types.ts": `export interface TrackerStorage { get(key: string): string | null }`,
+		"src/native/index.ts": `import type { TrackerStorage } from '../core/types';
+class NativeTrackerStorage implements TrackerStorage {}
+`,
+		"src/other.ts": `export interface TrackerStorage { other(): void }`,
+	}, false)
+	f, ok := findFact(ff, "src/native.NativeTrackerStorage")
+	if !ok {
+		t.Fatalf("NativeTrackerStorage missing; %v", factNames(ff))
+	}
+	if !hasRelation(f, facts.RelImplements, "src/core.TrackerStorage") {
+		t.Fatalf("imported implements target = %v, want src/core.TrackerStorage", f.Relations)
+	}
+	if hasRelation(f, facts.RelImplements, "src.TrackerStorage") || hasRelation(f, facts.RelImplements, "TrackerStorage") {
+		t.Fatal("implements bound an unrelated same-name interface")
+	}
+}
+
 func TestExtract_ClassWithImplements(t *testing.T) {
 	ff := extractAll(t, map[string]string{
 		"src/service.ts": `export class UserService implements Service, Loggable {}`,
@@ -249,11 +269,11 @@ func TestExtract_ClassWithImplements(t *testing.T) {
 		t.Errorf("symbol_kind = %v, want class", f.Props["symbol_kind"])
 	}
 
-	if !hasRelation(f, facts.RelImplements, "Service") {
-		t.Error("expected implements relation for Service")
+	if !hasRelation(f, facts.RelImplements, "src.Service") {
+		t.Error("expected implements relation for src.Service")
 	}
-	if !hasRelation(f, facts.RelImplements, "Loggable") {
-		t.Error("expected implements relation for Loggable")
+	if !hasRelation(f, facts.RelImplements, "src.Loggable") {
+		t.Error("expected implements relation for src.Loggable")
 	}
 }
 

@@ -95,7 +95,8 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 
 	isNextJS := detectNextJS(repoPath, inputScope)
 	isVue := detectVue(repoPath, inputScope)
-	isNuxt := detectNuxt(repoPath, inputScope)
+	nuxtPkgs := collectNuxtPackages(ctx, repoPath, inputScope)
+	isNuxt := len(nuxtPkgs) > 0
 	isSvelteKit := detectSvelteKit(repoPath, inputScope)
 	isEmber := detectEmber(repoPath, inputScope)
 	isReactNav := detectReactNavigation(repoPath, inputScope)
@@ -130,7 +131,20 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			return true
 		}
 		rec := prev[rel]
-		return rec == nil
+		if rec == nil {
+			return true
+		}
+		for _, f := range rec.ResolvedFiles {
+			if !knownFiles[filepath.ToSlash(f)] {
+				return true
+			}
+		}
+		for _, spec := range rec.UnresolvedSpecs {
+			if _, ok := NormalizeImportTarget(spec, knownFiles); ok {
+				return true
+			}
+		}
+		return false
 	}
 
 	var stats ExtractStats
@@ -208,9 +222,9 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		grpcIdx = nil
 	}
 
-	var nuxtAutoComponents map[string]string
-	if isNuxt {
-		nuxtAutoComponents = nuxtAutoComponentIndex(knownFiles)
+	nuxtAutoByPkg := map[string]map[string]string{}
+	for _, p := range nuxtPkgs {
+		nuxtAutoByPkg[p] = nuxtAutoComponentIndex(knownFiles, p, nuxtPkgs)
 	}
 
 	type fileOut struct {
@@ -240,8 +254,13 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			hooks.OnBeforeParse(relFile)
 		}
 		aliases := mergePackageAliases(aliasesForDir(aliasRoots, factpath.Dir(relFile)), pkgAliases)
+		fileNuxt, inNuxt := nuxtPackageForFile(nuxtPkgs, relFile)
+		var auto map[string]string
+		if inNuxt {
+			auto = nuxtAutoByPkg[fileNuxt]
+		}
 		var res tsFileResult
-		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, isVue, isNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, orms, aliases, knownFiles, nuxtAutoComponents, grpcIdx)
+		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, isVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, orms, aliases, knownFiles, auto, grpcIdx)
 		if !facts.IsTestPath(relFile) {
 			res.routers = collectRouterFile(src, relFile, aliases, knownFiles)
 		}
@@ -858,12 +877,13 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 	}
 	sort.Strings(grpcParts)
 	var nuxt []string
-	if detectNuxt(repoPath, inputScope) {
-		for n, t := range nuxtAutoComponentIndex(known) {
-			nuxt = append(nuxt, n+"="+t)
+	nuxtPkgs := collectNuxtPackages(ctx, repoPath, inputScope)
+	for _, pkg := range nuxtPkgs {
+		for n, t := range nuxtAutoComponentIndex(known, pkg, nuxtPkgs) {
+			nuxt = append(nuxt, pkg+"/"+n+"="+t)
 		}
-		sort.Strings(nuxt)
 	}
+	sort.Strings(nuxt)
 	h := sha256.New()
 	if gql.enabled {
 		h.Write([]byte("gql-on"))

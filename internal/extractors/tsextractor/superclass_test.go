@@ -216,15 +216,15 @@ export class Job extends Model implements Readable, Countable {}
 	}
 
 	plain := classFact(t, ff, "src.Plain")
-	if got := implemented(plain); len(got) != 1 || got[0] != "Readable" {
-		t.Errorf("Plain implements %v, want [Readable]", got)
+	if got := implemented(plain); len(got) != 1 || got[0] != "src.Readable" {
+		t.Errorf("Plain implements %v, want [src.Readable]", got)
 	}
 	wantSuperclass(t, plain, "", "")
 
 	job := classFact(t, ff, "src.Job")
 	got := implemented(job)
-	if len(got) != 2 || got[0] != "Readable" || got[1] != "Countable" {
-		t.Errorf("Job implements %v, want [Readable Countable]", got)
+	if len(got) != 2 || got[0] != "src.Readable" || got[1] != "src.Countable" {
+		t.Errorf("Job implements %v, want [src.Readable src.Countable]", got)
 	}
 	wantSuperclass(t, job, "Model", "@acme/orm")
 

@@ -29,6 +29,7 @@ func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, 
 		"version":                 "ts-effective-context-v2",
 		"selected root":           digest([]any{tsRoot, found}),
 		"framework and ORM gates": digest([]bool{detectNextJS(root, scope), detectVue(root, scope), detectNuxt(root, scope), detectSvelteKit(root, scope), detectEmber(root, scope), detectReactNavigation(root, scope), detectAngular(root, scope), typeORM, drizzle, prisma}),
+		"nuxt packages":           digest(collectNuxtPackages(context.Background(), root, scope)),
 
 		"configured clients": e.ConfigKey(),
 	}

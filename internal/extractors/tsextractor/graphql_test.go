@@ -243,6 +243,81 @@ func TestGraphQLServerSDL_FrameworkNeutralForms(t *testing.T) {
 	}
 }
 
+func TestGraphQLYogaCreateSchemaBindsQueryHealthHandler(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"package.json": `{"dependencies":{"graphql-yoga":"^5.0.0"}}`,
+		"src/schema.ts": `import { createSchema } from 'graphql-yoga';
+const typeDefs = ` + "`" + `type Query { health: Health! }
+type Mutation { health: Boolean! }` + "`" + `;
+export function buildSchema() {
+  return createSchema({
+    typeDefs,
+    resolvers: {
+      Query: { health: () => ({ status: 'ok' }) },
+      Mutation: { health: () => true },
+    },
+  });
+}
+`,
+	}, false)
+	q, ok := findFact(ff, "Query.health")
+	if !ok {
+		t.Fatalf("Query.health missing; facts=%v", factNames(ff))
+	}
+	if !hasRelation(q, facts.RelHandledBy, "src.Query.health") {
+		t.Fatalf("Query.health handler unbound: %+v", q.Relations)
+	}
+	m, ok := findFact(ff, "Mutation.health")
+	if !ok {
+		t.Fatal("Mutation.health missing")
+	}
+	if hasRelation(m, facts.RelHandledBy, "src.Query.health") {
+		t.Fatal("Mutation.health bound to Query.health handler")
+	}
+	if !hasRelation(m, facts.RelHandledBy, "src.Mutation.health") {
+		t.Fatalf("Mutation.health handler unbound: %+v", m.Relations)
+	}
+}
+
+func TestGraphQLYogaDoesNotBindLocalCreateSchema(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"package.json": `{"dependencies":{"graphql-yoga":"^5.0.0"}}`,
+		"src/schema.ts": `import { createYoga } from 'graphql-yoga';
+const typeDefs = ` + "`" + `type Query { health: String }` + "`" + `;
+function createSchema(cfg: { resolvers: unknown }) { return cfg; }
+export function build() {
+  return createSchema({
+    resolvers: { Query: { health: () => 'nope' } },
+  });
+}
+createYoga({});
+`,
+	}, false)
+	q, ok := findFact(ff, "Query.health")
+	if !ok {
+		return
+	}
+	if hasRelation(q, facts.RelHandledBy, "src.Query.health") {
+		t.Fatal("local createSchema bound GraphQL resolvers")
+	}
+}
+
+func TestGraphQLYogaDoesNotBindArbitraryObjects(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"package.json": `{"dependencies":{"graphql-yoga":"^5.0.0"}}`,
+		"src/schema.ts": `const unrelated = { Query: { health: () => 1 } };
+export const typeDefs = ` + "`" + `type Query { health: String }` + "`" + `;
+`,
+	}, false)
+	q, ok := findFact(ff, "Query.health")
+	if !ok {
+		return
+	}
+	if hasRelation(q, facts.RelHandledBy, "src.Query.health") {
+		t.Fatal("arbitrary object bound as GraphQL resolver")
+	}
+}
+
 func TestGraphQLServerSDL_YogaDocumentedTypeDefinitionsBinding(t *testing.T) {
 	src := []byte("import { createSchema } from 'graphql-yoga';\nconst typeDefinitions = `type Query { hello: String! }`;\ncreateSchema({ typeDefs: [typeDefinitions] });")
 	ff := extractGraphQLServerSDL(src, "src/schema.ts")
