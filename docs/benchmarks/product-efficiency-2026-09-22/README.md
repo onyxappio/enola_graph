@@ -155,8 +155,10 @@ graph.
 
 ### Provenance is precise, not blunt
 
-Every snapshot carries harness-only packages (`cmd/benchresident`,
-`cmd/benchobserver`, `bin/`), so Go stamps **`vcs.modified=true` in both kinds**.
+Every snapshot carries generated harness-only command packages named
+`benchresident` and `benchobserver`, plus their build outputs; these are injected
+into the temporary snapshot, not stored in this checkout. Go therefore stamps
+**`vcs.modified=true` in both kinds**.
 The provenance therefore never makes a single "equals the rev" claim. It records:
 
 - `product_source_equals_committed_rev` — true only for a committed snapshot
