@@ -356,8 +356,32 @@ func tsPatternBindsName(kinds *tsutil.KindTable, n *sitter.Node, src []byte, nam
 		return false
 	}
 	switch kindOf(kinds, n) {
-	case "identifier":
+	case "identifier", "shorthand_property_identifier_pattern":
+		// Shorthand `{ createSchema }` is a leaf whose text is the bound name.
 		return nodeText(n, src) == name
+	case "pair_pattern":
+		// `{ createSchema: unrelated }` binds `unrelated` only. The property key
+		// is not a lexical binding even when it matches the imported name.
+		if v := n.ChildByFieldName("value"); v != nil {
+			return tsPatternBindsName(kinds, v, src, name)
+		}
+		if p := n.ChildByFieldName("pattern"); p != nil {
+			return tsPatternBindsName(kinds, p, src, name)
+		}
+		return false
+	case "assignment_pattern", "object_assignment_pattern":
+		// Defaults are expressions, not declarations: `{ createSchema = fn }`
+		// binds `createSchema`; identifiers inside the default do not.
+		if p := n.ChildByFieldName("left"); p != nil {
+			return tsPatternBindsName(kinds, p, src, name)
+		}
+		if p := n.ChildByFieldName("name"); p != nil {
+			return tsPatternBindsName(kinds, p, src, name)
+		}
+		if n.ChildCount() > 0 {
+			return tsPatternBindsName(kinds, n.Child(0), src, name)
+		}
+		return false
 	case "variable_declarator", "required_parameter", "optional_parameter", "rest_parameter", "rest_pattern":
 		if p := n.ChildByFieldName("name"); p != nil {
 			return tsPatternBindsName(kinds, p, src, name)
@@ -368,14 +392,14 @@ func tsPatternBindsName(kinds *tsutil.KindTable, n *sitter.Node, src []byte, nam
 		for i := range n.ChildCount() {
 			ch := n.Child(i)
 			k := kindOf(kinds, ch)
-			if k == "identifier" || k == "object_pattern" || k == "array_pattern" || k == "rest_pattern" || k == "assignment_pattern" {
+			if k == "identifier" || k == "shorthand_property_identifier_pattern" || k == "object_pattern" || k == "array_pattern" || k == "rest_pattern" || k == "assignment_pattern" || k == "object_assignment_pattern" {
 				if tsPatternBindsName(kinds, ch, src, name) {
 					return true
 				}
 			}
 		}
 		return false
-	case "object_pattern", "array_pattern", "pair_pattern", "shorthand_property_identifier_pattern", "assignment_pattern", "formal_parameters", "lexical_declaration", "variable_declaration", "catch_clause":
+	case "object_pattern", "array_pattern", "formal_parameters", "lexical_declaration", "variable_declaration", "catch_clause":
 		for i := range n.ChildCount() {
 			if tsPatternBindsName(kinds, n.Child(i), src, name) {
 				return true
