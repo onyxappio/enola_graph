@@ -32,7 +32,7 @@ func TestFileInvalidationPlan(t *testing.T) {
 	}
 }
 
-func TestAuthoritativePlanWholeDomainWhenNameDependentOutsideReverseClose(t *testing.T) {
+func TestAuthoritativePlanSeedsNameDependentOutsideReverseClose(t *testing.T) {
 	prev := map[string]*FileState{
 		"packages/crypto/src/password.ts": {
 			Hash: "1", Extractor: "typescript",
@@ -59,14 +59,17 @@ func TestAuthoritativePlanWholeDomainWhenNameDependentOutsideReverseClose(t *tes
 	if err != nil {
 		t.Fatal(err)
 	}
-	if reason != frozenScopeWholeDomain {
-		t.Fatalf("reason=%s, want whole-domain because app.ts references dirty declared names without a file edge", reason)
+	if reason != frozenScopeNameDelta {
+		t.Fatalf("reason=%s, want the name-delta scope: app.ts is seeded, not a reason to widen to the whole domain", reason)
 	}
 	if !p.member["apps/architect-console/src/server/app.ts"] {
 		t.Fatal("post-parse name dependent omitted from Begin")
 	}
 	if !p.member["packages/crypto/src/password.ts"] {
 		t.Fatal("dirty file omitted from Begin")
+	}
+	if p.member["independent.ts"] {
+		t.Fatalf("scope %v widened past the name dependents", p.manifest())
 	}
 }
 
@@ -1044,5 +1047,214 @@ func TestIncompleteDependencyRecordsRequireFallback(t *testing.T) {
 		"a.ts": {TS: &tsextractor.FileRecord{ImportSpecs: []string{"./b"}, ImportComplete: true}},
 	}) {
 		t.Fatal("complete external-only resolution required fallback")
+	}
+}
+
+// A bare package subpath and a still-broken relative import resolve in neither
+// the prior nor the new file set, so adding an unrelated file cannot have moved
+// them. Reporting them as rebound dirtied every importer of a subpath package on
+// any add, which then fed the declared-name check a repository-wide dirty set.
+func TestMembershipScopeIgnoresSpecsUnresolvedInBothUniverses(t *testing.T) {
+	prev := []string{"src/a.ts", "src/b.ts"}
+	current := []string{"src/a.ts", "src/b.ts", "src/new.ts"}
+	state := map[string]*FileState{
+		"src/a.ts": {Hash: "a1", Extractor: "typescript", TS: &tsextractor.FileRecord{
+			File:           "src/a.ts",
+			ImportSpecs:    []string{"node:fs/promises", "react-native/Libraries/Text", "src/missing/widget"},
+			ResolvedFiles:  nil,
+			ImportComplete: true,
+			Declared:       []string{"A"},
+		}},
+		"src/b.ts": {Hash: "b1", Extractor: "typescript", TS: &tsextractor.FileRecord{
+			File:            "src/b.ts",
+			ImportSpecs:     []string{"src/missing/widget"},
+			UnresolvedSpecs: []string{"src/missing/widget"},
+			ImportComplete:  true,
+			Declared:        []string{"B"},
+		}},
+	}
+	md := membershipScope(prev, current, current, state)
+	if !md.changed || !md.proven {
+		t.Fatalf("membership changed=%v proven=%v, want a proven addition", md.changed, md.proven)
+	}
+	if len(md.rebound) != 0 {
+		t.Fatalf("rebound=%v, want none: no cached specifier resolves differently", md.rebound)
+	}
+}
+
+// The same record set, but the added file is what the broken specifier names.
+// That specifier does move, so both replay paths - ImportSpecs and the cached
+// UnresolvedSpecs list - have to report their importer.
+func TestMembershipScopeReportsSpecThatTheAdditionResolves(t *testing.T) {
+	prev := []string{"src/a.ts", "src/b.ts"}
+	current := []string{"src/a.ts", "src/b.ts", "src/missing/widget.ts"}
+	state := map[string]*FileState{
+		"src/a.ts": {Hash: "a1", Extractor: "typescript", TS: &tsextractor.FileRecord{
+			File:           "src/a.ts",
+			ImportSpecs:    []string{"node:fs/promises", "src/missing/widget"},
+			ImportComplete: true,
+		}},
+		"src/b.ts": {Hash: "b1", Extractor: "typescript", TS: &tsextractor.FileRecord{
+			File:            "src/b.ts",
+			ImportSpecs:     []string{"node:fs/promises"},
+			UnresolvedSpecs: []string{"src/missing/widget"},
+			ImportComplete:  true,
+		}},
+	}
+	md := membershipScope(prev, current, current, state)
+	if !md.proven {
+		t.Fatalf("membership unproven: %s", md.reason)
+	}
+	want := []string{"src/a.ts", "src/b.ts"}
+	if !reflect.DeepEqual(md.rebound, want) {
+		t.Fatalf("rebound=%v, want %v", md.rebound, want)
+	}
+}
+
+// invalidateTS and membershipScope must stay the same predicate, or the frozen
+// scope stops being a superset of the reparse set.
+func TestInvalidateTSMatchesMembershipReboundOnUnresolvedSpecs(t *testing.T) {
+	recs := map[string]*tsextractor.FileRecord{
+		"src/a.ts": {File: "src/a.ts", ImportSpecs: []string{"node:fs/promises", "src/missing/widget"}, ImportComplete: true},
+		"src/b.ts": {File: "src/b.ts", ImportSpecs: []string{"lodash/debounce"}, ImportComplete: true},
+	}
+	owned := []string{"src/a.ts", "src/b.ts", "src/new.ts"}
+	hashes := map[string]string{"src/a.ts": "a1", "src/b.ts": "b1", "src/new.ts": "n1"}
+	dirty, broaden, reason := invalidateTS(map[string]bool{}, recs, owned, hashes)
+	if broaden {
+		t.Fatalf("broadened: %s", reason)
+	}
+	if !dirty["src/new.ts"] {
+		t.Fatal("the added file itself must be dirty")
+	}
+	if dirty["src/a.ts"] || dirty["src/b.ts"] {
+		t.Fatalf("dirty=%v, want only the added file: no cached specifier rebinds to it", dirty)
+	}
+}
+
+// A record whose specifier list was truncated away while its unresolved list
+// survived cannot be replayed: recordRebound would read it as an importer with
+// no imports, while invalidateTS replays the same unresolved specifier and marks
+// the file dirty. That is exactly the scope-narrower-than-parses hole, so the
+// membership delta has to fail closed instead.
+func TestMembershipScopeFallsBackForUnresolvedOnlyRecordWithoutSpecs(t *testing.T) {
+	prev := []string{"src/a.ts", "src/b.ts"}
+	current := []string{"src/a.ts", "src/b.ts", "src/missing/widget.ts"}
+	state := map[string]*FileState{
+		"src/a.ts": {Hash: "a1", Extractor: "typescript", TS: &tsextractor.FileRecord{
+			File:            "src/a.ts",
+			UnresolvedSpecs: []string{"src/missing/widget"},
+		}},
+		"src/b.ts": {Hash: "b1", Extractor: "typescript", TS: &tsextractor.FileRecord{
+			File: "src/b.ts", ImportSpecs: []string{"src/a.ts"}, ResolvedFiles: []string{"src/a.ts"}, ImportComplete: true,
+		}},
+	}
+	md := membershipScope(prev, current, current, state)
+	if !md.changed {
+		t.Fatal("addition not detected")
+	}
+	if md.proven {
+		t.Fatalf("proven with a truncated record; invalidateTS would dirty src/a.ts outside the frozen scope (rebound=%v)", md.rebound)
+	}
+	if md.reason != frozenScopeMembership {
+		t.Fatalf("reason=%q, want %q", md.reason, frozenScopeMembership)
+	}
+	p, reason, err := planForTest(prev, current, state, map[string]string{"src/a.ts": "a1", "src/b.ts": "b1", "src/missing/widget.ts": "w1"}, false, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reason != frozenScopeMembership {
+		t.Fatalf("plan reason=%q, want the conservative membership fallback", reason)
+	}
+	if !p.member["src/a.ts"] {
+		t.Fatalf("scope %v omits the file extraction will reparse", p.manifest())
+	}
+}
+
+// Deleting the target of a resolved specifier is the mirror of the addition
+// case: the importer has to be reported even though its own bytes did not move.
+func TestMembershipScopeReportsSpecLosingItsTarget(t *testing.T) {
+	prev := []string{"src/a.ts", "src/gone.ts"}
+	current := []string{"src/a.ts"}
+	state := map[string]*FileState{
+		"src/a.ts": {Hash: "a1", Extractor: "typescript", TS: &tsextractor.FileRecord{
+			File: "src/a.ts", ImportSpecs: []string{"src/gone", "lodash/debounce"},
+			ResolvedFiles: []string{"src/gone.ts"}, ImportComplete: true,
+		}},
+		"src/gone.ts": {Hash: "g1", Extractor: "typescript", TS: &tsextractor.FileRecord{
+			File: "src/gone.ts", Declared: []string{"gone"}, ImportComplete: true,
+		}},
+	}
+	md := membershipScope(prev, current, current, state)
+	if !md.proven {
+		t.Fatalf("membership unproven: %s", md.reason)
+	}
+	if !reflect.DeepEqual(md.rebound, []string{"src/a.ts"}) {
+		t.Fatalf("rebound=%v, want [src/a.ts]", md.rebound)
+	}
+	if !reflect.DeepEqual(md.retired, []string{"src/gone.ts"}) {
+		t.Fatalf("retired=%v, want [src/gone.ts]", md.retired)
+	}
+}
+
+// An added file that wins resolveModuleFile's exact-file precedence over the
+// folder index the specifier used to reach. Nothing is added or removed from the
+// importer's text, and both universes resolve the specifier, so only comparing
+// the resolved targets catches it.
+func TestMembershipScopeReportsShadowedResolutionTarget(t *testing.T) {
+	prev := []string{"src/a.ts", "src/util/index.ts"}
+	current := []string{"src/a.ts", "src/util/index.ts", "src/util.ts"}
+	state := map[string]*FileState{
+		"src/a.ts": {Hash: "a1", Extractor: "typescript", TS: &tsextractor.FileRecord{
+			File: "src/a.ts", ImportSpecs: []string{"src/util"},
+			ResolvedFiles: []string{"src/util/index.ts"}, ImportComplete: true,
+		}},
+		"src/util/index.ts": {Hash: "u1", Extractor: "typescript", TS: &tsextractor.FileRecord{
+			File: "src/util/index.ts", Declared: []string{"helper"}, ImportComplete: true,
+		}},
+	}
+	md := membershipScope(prev, current, current, state)
+	if !md.proven {
+		t.Fatalf("membership unproven: %s", md.reason)
+	}
+	if !reflect.DeepEqual(md.rebound, []string{"src/a.ts"}) {
+		t.Fatalf("rebound=%v, want [src/a.ts]: src/util.ts shadows src/util/index.ts", md.rebound)
+	}
+}
+
+// The seeded name dependent brings its own reverse dependents with it, and an
+// owner that references nothing declared by the change stays outside Begin.
+func TestAuthoritativePlanSeedsNameDependentWithReverseClosure(t *testing.T) {
+	prev := []string{"src/main.ts", "src/viewer.ts", "src/shell.ts", "src/unrelated.ts"}
+	state := map[string]*FileState{
+		"src/main.ts": {Hash: "m1", Extractor: "typescript", TS: &tsextractor.FileRecord{
+			File: "src/main.ts", Declared: []string{"escapeHtml"}, ImportComplete: true,
+		}},
+		"src/viewer.ts": {Hash: "v1", Extractor: "typescript", TS: &tsextractor.FileRecord{
+			File: "src/viewer.ts", Declared: []string{"render"}, Referenced: []string{"escapeHtml"}, ImportComplete: true,
+		}},
+		"src/shell.ts": {Hash: "s1", Extractor: "typescript", TS: &tsextractor.FileRecord{
+			File: "src/shell.ts", ImportSpecs: []string{"src/viewer"},
+			ResolvedFiles: []string{"src/viewer.ts"}, ImportComplete: true,
+		}},
+		"src/unrelated.ts": {Hash: "u1", Extractor: "typescript", TS: &tsextractor.FileRecord{
+			File: "src/unrelated.ts", Referenced: []string{"lodash"}, ImportComplete: true,
+		}},
+	}
+	hashes := map[string]string{"src/main.ts": "m2", "src/viewer.ts": "v1", "src/shell.ts": "s1", "src/unrelated.ts": "u1"}
+	p, reason, err := planForTest(prev, prev, state, hashes, false, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reason != frozenScopeNameDelta {
+		t.Fatalf("reason=%q, want the name-delta scope", reason)
+	}
+	for _, want := range []string{"src/main.ts", "src/viewer.ts", "src/shell.ts"} {
+		if !p.member[want] {
+			t.Fatalf("scope %v omits %s", p.manifest(), want)
+		}
+	}
+	if p.member["src/unrelated.ts"] {
+		t.Fatalf("scope %v widened past the name dependents and their importers", p.manifest())
 	}
 }

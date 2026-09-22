@@ -130,11 +130,23 @@ func authoritativeFilePlan(previous, current []string, prevFiles map[string]*Fil
 	if err != nil {
 		return p, "", err
 	}
-	if !planCoversDeclaredNameDependents(p, prevFiles, changed) {
-		// Cached reverse-edges do not include name-resolution dependents that
-		// post-parse discovery can still add. Begin must already contain them.
-		p, err = planFileInvalidation(domain, previous, current, nil, true, domain)
-		return p, frozenScopeWholeDomain, err
+	// Cached reverse-edges do not include name-resolution dependents that
+	// post-parse discovery can still add. Begin must already contain them - but
+	// they are enumerable from the same cached records, so seed them and replan
+	// instead of discarding the plan for the whole domain. The enlarged plan is
+	// a superset, so the second check can only fail if the records stopped
+	// naming them; the global fallback stays for that case.
+	nameDeps := declaredNameDependents(p, prevFiles, changed)
+	if len(nameDeps) > 0 {
+		extraOwners = append(extraOwners, nameDeps...)
+		p, err = planFileInvalidation(append(seed, nameDeps...), previous, current, deps, false, nil)
+		if err != nil {
+			return p, "", err
+		}
+		if len(declaredNameDependents(p, prevFiles, changed)) > 0 {
+			p, err = planFileInvalidation(domain, previous, current, nil, true, domain)
+			return p, frozenScopeWholeDomain, err
+		}
 	}
 	reason := frozenScopeReverseClose
 	if len(extraOwners) > 0 {
@@ -165,10 +177,10 @@ type membershipDelta struct {
 	// non-TypeScript owners such as a markdown link - land inside Begin.
 	retired []string
 	// rebound lists cached importers whose module resolution the new file set
-	// moves. It applies invalidateTS's own rule (importRebound, plus the
-	// record-level unresolved-spec clause) to the same record map and the same
-	// two known sets, so the frozen scope stays a superset of the reparse set
-	// extraction will compute: no dirty file can land outside Begin.
+	// moves. It applies invalidateTS's own rule (recordRebound) to the same
+	// record map and the same two known sets, so the frozen scope stays a
+	// superset of the reparse set extraction will compute: no dirty file can
+	// land outside Begin.
 	rebound []string
 }
 
@@ -257,9 +269,13 @@ func membershipScope(previous, current, sessionFiles []string, prevFiles map[str
 	}
 	for file, rec := range prevRecs {
 		if len(rec.ImportSpecs) == 0 {
-			if len(rec.ResolvedFiles) > 0 {
-				// Resolved edges without the specifiers that produced them, so
-				// this importer's resolution cannot be replayed at all.
+			if len(rec.ResolvedFiles) > 0 || len(rec.UnresolvedSpecs) > 0 {
+				// Resolution outcomes without the specifiers that produced them,
+				// so this importer's resolution cannot be replayed at all. The
+				// unresolved half matters as much as the resolved one: recordRebound
+				// replays UnresolvedSpecs, so reading a truncated record as an
+				// importer with no imports would let extraction dirty a file the
+				// frozen scope never named.
 				return membershipDelta{changed: true, proven: false, reason: frozenScopeMembership, retired: md.retired}
 			}
 			continue
@@ -269,15 +285,8 @@ func membershipScope(previous, current, sessionFiles []string, prevFiles map[str
 			// replay below would read absence as "never resolved".
 			return membershipDelta{changed: true, proven: false, reason: frozenScopeMembership, retired: md.retired}
 		}
-		if len(rec.UnresolvedSpecs) > 0 {
+		if recordRebound(rec, priorKnown, known) {
 			md.rebound = append(md.rebound, file)
-			continue
-		}
-		for _, spec := range rec.ImportSpecs {
-			if importRebound(spec, priorKnown, known) {
-				md.rebound = append(md.rebound, file)
-				break
-			}
 		}
 	}
 	sort.Strings(md.rebound)
@@ -496,9 +505,15 @@ func composedRouteOwnerDelta(prevFiles map[string]*FileState, dirty map[string]b
 	return out
 }
 
-func planCoversDeclaredNameDependents(p *fileInvalidationPlan, prevFiles map[string]*FileState, dirty map[string]bool) bool {
+// declaredNameDependents lists cached owners outside the plan that reference a
+// name declared by a dirty file. buildIndex resolves Fact.Name globally rather
+// than along import edges, so such an owner can gain or lose an edge without any
+// file dependency connecting it to the change; it has to be inside Begin for the
+// frozen replacement to be able to rewrite it. Returning them lets the caller
+// widen the plan by exactly this set instead of falling back to the whole domain.
+func declaredNameDependents(p *fileInvalidationPlan, prevFiles map[string]*FileState, dirty map[string]bool) []string {
 	if p == nil {
-		return false
+		return nil
 	}
 	declared := map[string]bool{}
 	for f, d := range dirty {
@@ -516,8 +531,9 @@ func planCoversDeclaredNameDependents(p *fileInvalidationPlan, prevFiles map[str
 		}
 	}
 	if len(declared) == 0 {
-		return true
+		return nil
 	}
+	var out []string
 	for path, st := range prevFiles {
 		rec := tsRecord(st)
 		if rec == nil {
@@ -529,11 +545,13 @@ func planCoversDeclaredNameDependents(p *fileInvalidationPlan, prevFiles map[str
 		}
 		for _, n := range rec.Referenced {
 			if declared[n] {
-				return false
+				out = append(out, id)
+				break
 			}
 		}
 	}
-	return true
+	sort.Strings(out)
+	return out
 }
 
 func factResolutionNames(ff []facts.Fact) map[string]bool {
