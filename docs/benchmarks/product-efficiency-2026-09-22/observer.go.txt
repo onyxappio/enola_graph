@@ -80,6 +80,11 @@ func main() {
 		firstBrokerNS    int64
 		firstBatchBroker int64
 		endBrokerNS      int64
+		schemaVersion    string
+		scopeMode        string
+		ownerScopeCount  int
+		baseGeneration   int
+		targetGeneration int
 	}
 	byContext := map[string]*graphsession.Consumer{}
 	byRun := map[string]*runFrame{}
@@ -117,9 +122,22 @@ func main() {
 			if err := c.Apply(rec); err != nil {
 				fail("begin apply: %v", err)
 			}
+			var begin struct {
+				SchemaVersion    string `json:"schema_version"`
+				ScopeMode        string `json:"scope_mode"`
+				OwnerScopeCount  int    `json:"owner_scope_count"`
+				BaseGeneration   int    `json:"base_generation"`
+				TargetGeneration int    `json:"target_generation"`
+			}
+			if err := json.Unmarshal(payload, &begin); err != nil {
+				fail("begin payload: %v", err)
+			}
 			byRun[probe.RunID] = &runFrame{
 				cons: c, contextID: probe.ContextID, repoID: probe.RepoID,
 				runID: probe.RunID, firstBrokerNS: brokerNS,
+				schemaVersion: begin.SchemaVersion, scopeMode: begin.ScopeMode,
+				ownerScopeCount: begin.OwnerScopeCount,
+				baseGeneration:  begin.BaseGeneration, targetGeneration: begin.TargetGeneration,
 			}
 		case graphstream.TypeBatch, graphstream.TypeEndReplace:
 			fr := byRun[probe.RunID]
@@ -150,6 +168,12 @@ func main() {
 					"consumer_applied_ns":   appliedNS,
 					"time_base":             "broker_metadata_timestamp",
 					"normalized_hash":       hex.EncodeToString(sum[:]),
+					"schema_version":        fr.schemaVersion,
+					"scope_mode":            fr.scopeMode,
+					"owner_scope_count":     fr.ownerScopeCount,
+					"base_generation":       fr.baseGeneration,
+					"target_generation":     fr.targetGeneration,
+					"applied_generation":    fr.cons.LastGeneration,
 				}); err != nil {
 					fail("write frame: %v", err)
 				}

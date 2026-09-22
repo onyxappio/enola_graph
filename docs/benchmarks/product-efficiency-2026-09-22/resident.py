@@ -4,6 +4,9 @@
 Mutates only an isolated Product snapshot. Real NATS JetStream and an
 independent observer built from the same Enola revision. Not a performance
 acceptance result until coordinator runs it.
+
+This driver is request-driven ApplyChanges (benchresident). It is not
+production `enola graph watch`. Watch measurements live in watch.py.
 """
 from __future__ import annotations
 
@@ -150,6 +153,8 @@ def save():
             "observer": args.observer,
             "observer_sha256": hashlib.sha256(Path(args.observer).read_bytes()).hexdigest(),
             "nats": args.nats,
+            "measurement_kind": "request-driven-resident",
+            "not_production_graph_watch": True,
             "authoritative_files": True,
             "max_begin_bytes": 1048576,
             "source_mode": args.source_mode,

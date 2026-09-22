@@ -197,6 +197,16 @@ func composedRouteFacts(recs map[string]*tsextractor.FileRecord) []facts.Fact {
 	return tsextractor.ComposeEngineMounts(ff)
 }
 
+func routeCandidateFacts(ff []facts.Fact) []facts.Fact {
+	out := make([]facts.Fact, 0, len(ff))
+	for _, f := range ff {
+		if f.Kind == facts.KindRoute {
+			out = append(out, f)
+		}
+	}
+	return out
+}
+
 func mountFingerprint(dto *tsextractor.RouterDTO) string {
 	if dto == nil || len(dto.Mounts) == 0 {
 		return ""
@@ -302,7 +312,12 @@ func composedRouteOwnerDelta(prevFiles map[string]*FileState, dirty map[string]b
 	prevRecs := tsRecordsFromState(prevFiles)
 	nextRecs := overlayTSRecords(prevRecs, newRecs)
 	scope := map[string]bool{}
-	addChangedRouteFiles(scope, composedRouteFacts(prevRecs), composedRouteFacts(nextRecs))
+	oldComposed := composedRouteFacts(prevRecs)
+	newComposed := composedRouteFacts(nextRecs)
+	addChangedRouteFiles(scope, oldComposed, newComposed)
+	for _, id := range ownersForCandidateNameDelta(prevFiles, routeCandidateFacts(oldComposed), routeCandidateFacts(newComposed)) {
+		scope[id] = true
+	}
 	for _, id := range dirtyRouterMountChildren(prevFiles, dirty, newRecs) {
 		scope[id] = true
 	}
@@ -460,6 +475,14 @@ func ownersForNameDelta(prevFiles map[string]*FileState, dirty map[string]bool, 
 			delta[n] = true
 		}
 	}
+	return ownersForChangedCandidateNames(prevFiles, delta)
+}
+
+func ownersForCandidateNameDelta(prevFiles map[string]*FileState, old, neu []facts.Fact) []string {
+	return ownersForChangedCandidateNames(prevFiles, changedResolutionCandidateNames(old, neu))
+}
+
+func ownersForChangedCandidateNames(prevFiles map[string]*FileState, delta map[string]bool) []string {
 	if len(delta) == 0 {
 		return nil
 	}

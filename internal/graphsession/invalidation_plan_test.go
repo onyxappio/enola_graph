@@ -190,6 +190,26 @@ func TestDirtyRouterMountChildrenNestedBeforeBegin(t *testing.T) {
 
 func TestComposedRouteOwnerDeltaNestedMounts(t *testing.T) {
 	prev := nestedMountStates()
+	prev["src/consumer.ts"] = &FileState{
+		Hash: "5", Extractor: "typescript",
+		TS: &tsextractor.FileRecord{
+			File: "src/consumer.ts",
+			Facts: []facts.Fact{{
+				Kind: facts.KindSymbol, Name: "routeConsumer", File: "src/consumer.ts",
+				Relations: []facts.Relation{{Kind: facts.RelCalls, Target: "/api/v1/orders"}},
+			}},
+		},
+	}
+	prev["src/new-consumer.ts"] = &FileState{
+		Hash: "6", Extractor: "typescript",
+		TS: &tsextractor.FileRecord{
+			File: "src/new-consumer.ts",
+			Facts: []facts.Fact{{
+				Kind: facts.KindSymbol, Name: "newRouteConsumer", File: "src/new-consumer.ts",
+				Relations: []facts.Relation{{Kind: facts.RelCalls, Target: "/v2/v1/orders"}},
+			}},
+		},
+	}
 	dirty := map[string]bool{"src/server.ts": true}
 	newRecs := map[string]*tsextractor.FileRecord{
 		"src/server.ts": {
@@ -209,6 +229,12 @@ func TestComposedRouteOwnerDeltaNestedMounts(t *testing.T) {
 	}
 	if !found["src/api/orders.ts"] {
 		t.Fatalf("composed nested child omitted: %v", got)
+	}
+	if !found["src/consumer.ts"] {
+		t.Fatalf("consumer of old composed route candidate omitted: %v", got)
+	}
+	if !found["src/new-consumer.ts"] {
+		t.Fatalf("consumer of new composed route candidate omitted: %v", got)
 	}
 	if found["packages/crypto/src/password.ts"] {
 		t.Fatalf("unrelated owner entered composed route delta: %v", got)
