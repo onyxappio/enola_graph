@@ -2445,7 +2445,10 @@ import (
 // v275: TypeScript import edges bind specifiers to the known source file (package.json
 // name aliases plus RelImports targeting the file path / KindFileRef), so internal
 // alias, import-type, dynamic, namespace, and re-export edges resolve.
-const cacheVersion = "v275"
+// v276: TS RelImports target the owning module directory (KindModule.Name) and keep
+// the exact file on target_file for ResolvedFiles; empty file_refs are not emitted
+// for every source file.
+const cacheVersion = "v276"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

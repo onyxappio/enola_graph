@@ -511,12 +511,19 @@ func summarizeFacts(ff []facts.Fact, knownFiles map[string]bool) (specs, resolve
 				seenRef[r.Target] = true
 				referenced = append(referenced, r.Target)
 			}
-			if r.Kind != facts.RelImports || seenSpec[r.Target] {
+			if r.Kind != facts.RelImports {
 				continue
 			}
-			seenSpec[r.Target] = true
-			specs = append(specs, r.Target)
-			slash := filepath.ToSlash(r.Target)
+			spec := r.Target
+			if tf := f.PropString(facts.PropTargetFile); tf != "" {
+				spec = tf
+			}
+			if seenSpec[spec] {
+				continue
+			}
+			seenSpec[spec] = true
+			specs = append(specs, spec)
+			slash := filepath.ToSlash(spec)
 			if file, ok := NormalizeImportTarget(slash, knownFiles); ok {
 				if !seenRes[file] {
 					seenRes[file] = true

@@ -769,7 +769,7 @@ func (e *TSExtractor) extractImports(kinds *tsutil.KindTable, root *sitter.Node,
 	var result []facts.Fact
 	dir := factpath.Dir(relFile)
 	emit := func(importPath string, line int, isReexport, dynamic bool) {
-		resolved, isExternal := bindImportTarget(importPath, dir, aliases, knownFiles)
+		file, moduleDir, isExternal := bindImportTarget(importPath, dir, aliases, knownFiles)
 		importSource := "internal"
 		if isExternal {
 			importSource = "external"
@@ -787,14 +787,19 @@ func (e *TSExtractor) extractImports(kinds *tsutil.KindTable, root *sitter.Node,
 		if dynamic {
 			props["dynamic"] = true
 		}
+		target := file
+		if moduleDir != "" {
+			target = moduleDir
+			props[facts.PropTargetFile] = file
+		}
 		result = append(result, facts.Fact{
 			Kind:  facts.KindDependency,
-			Name:  dir + " -> " + resolved,
+			Name:  dir + " -> " + target,
 			File:  relFile,
 			Line:  line,
 			Props: props,
 			Relations: []facts.Relation{
-				{Kind: facts.RelImports, Target: resolved},
+				{Kind: facts.RelImports, Target: target},
 			},
 		})
 	}
@@ -833,8 +838,8 @@ func (e *TSExtractor) extractImports(kinds *tsutil.KindTable, root *sitter.Node,
 			return
 		}
 		if importPath, ok := dynamicImportSpecifier(kinds, n, src); ok {
-			resolved, _ := bindImportTarget(importPath, dir, aliases, knownFiles)
-			name := dir + " -> " + resolved
+			file, _, _ := bindImportTarget(importPath, dir, aliases, knownFiles)
+			name := dir + " -> " + file
 			if !seenDep[name] {
 				seenDep[name] = true
 				emit(importPath, int(n.StartPosition().Row)+1, false, true)
@@ -2237,21 +2242,20 @@ func parseTSConfigAliases(config tsConfigAliasFile, declaringPath, originDir str
 	return aliases, len(aliases) > 0
 }
 
-// bindImportTarget resolves a specifier to the known source file it names when
-// that file is in the extract set. RelImports.Target must be a Fact.Name for
-// store/graphsession resolution; module facts are directories and symbols are
-// `dir.name`, so the file path (the KindFileRef name) is the node an import
-// edge can bind to. An unresolved internal path is left as resolveImportPath
-// returned it — missing files stay unresolved rather than guessed.
-func bindImportTarget(importPath, fileDir string, aliases map[string]tsAlias, knownFiles map[string]bool) (string, bool) {
+// bindImportTarget maps a specifier onto a known source file and the module
+// directory that file belongs to. RelImports.Target must match KindModule.Name
+// (the directory) so graphsession idIndex can resolve the edge. The exact file
+// is returned separately and stored as target_file so ResolvedFiles / invalidation
+// keep file granularity. Missing internals stay on the unresolved path.
+func bindImportTarget(importPath, fileDir string, aliases map[string]tsAlias, knownFiles map[string]bool) (file, moduleDir string, external bool) {
 	resolved, external := resolveImportPath(importPath, fileDir, aliases)
 	if external {
-		return resolved, true
+		return resolved, "", true
 	}
-	if file, _, ok := resolveModuleFile(resolved, knownFiles); ok {
-		return file, false
+	if file, dir, ok := resolveModuleFile(resolved, knownFiles); ok {
+		return file, dir, false
 	}
-	return resolved, false
+	return resolved, "", false
 }
 
 // resolveImportPath normalizes a TypeScript import path to a filesystem-relative path.
@@ -2652,19 +2656,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 		add(t)
 	}
 	if len(targets) == 0 {
-		if kind != facts.KindFileRef {
-			return nil
-		}
-		// Every source file is a resolvable import target. RelImports bind to
-		// this name (the file path); omitting the node left internal imports
-		// unresolved even when the destination file existed.
-		return []facts.Fact{{
-			Kind:  kind,
-			Name:  ctx.relFile,
-			File:  ctx.relFile,
-			Line:  1,
-			Props: map[string]any{"language": "typescript"},
-		}}
+		return nil
 	}
 
 	rels := make([]facts.Relation, 0, len(targets))

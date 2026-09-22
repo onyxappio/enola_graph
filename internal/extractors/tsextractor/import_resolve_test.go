@@ -10,8 +10,8 @@ import (
 )
 
 // The five Product import forms that arrived as "target exists, edge unresolved"
-// are one resolver pipeline: bind the specifier to a known file, then name that
-// file as RelImports.Target so it matches the KindFileRef fact of the destination.
+// are one resolver pipeline: bind the specifier to a known file, then name the
+// owning module directory as RelImports.Target so it matches KindModule.Name.
 func TestExtract_ImportEdgesResolveToExistingFiles(t *testing.T) {
 	ff := extractAll(t, map[string]string{
 		"packages/contracts/package.json": `{
@@ -62,12 +62,12 @@ export * from './publisher';
 	}, false)
 
 	t.Run("tsconfig-package-alias", func(t *testing.T) {
-		if !importEdgeResolves(t, ff, "packages/tracking-client/src/core/consumer.ts", "packages/contracts/src/index.ts") {
+		if !importEdgeResolves(t, ff, "packages/tracking-client/src/core/consumer.ts", "packages/contracts/src", "packages/contracts/src/index.ts") {
 			t.Fatalf("missing resolved alias import:\n%s", importDump(ff, "packages/tracking-client/src/core/consumer.ts"))
 		}
 	})
 	t.Run("relative-import-type", func(t *testing.T) {
-		if !importEdgeResolves(t, ff, "services/product-api/src/productUsersSync.reconciliation.ts", "services/product-api/src/productUsersSync.repair.ts") {
+		if !importEdgeResolves(t, ff, "services/product-api/src/productUsersSync.reconciliation.ts", "services/product-api/src", "services/product-api/src/productUsersSync.repair.ts") {
 			t.Fatalf("missing resolved import type:\n%s", importDump(ff, "services/product-api/src/productUsersSync.reconciliation.ts"))
 		}
 	})
@@ -77,24 +77,25 @@ export * from './publisher';
 			if d.File != "services/product-api/src/productUsersSync.reconciliation.ts" {
 				continue
 			}
-			if d.Props["dynamic"] == true && hasRelation(d, facts.RelImports, "services/product-api/src/productUsersSync.repair.ts") {
+			if d.Props["dynamic"] == true && hasRelation(d, facts.RelImports, "services/product-api/src") &&
+				d.PropString(facts.PropTargetFile) == "services/product-api/src/productUsersSync.repair.ts" {
 				dynamic = true
 			}
 		}
 		if !dynamic {
 			t.Fatal("runtime import() of productUsersSync.repair.ts was not emitted as a dynamic internal edge")
 		}
-		if !importEdgeResolves(t, ff, "services/product-api/src/productUsersSync.reconciliation.ts", "services/product-api/src/productUsersSync.repair.ts") {
-			t.Fatal("dynamic import target file_ref missing")
+		if !importEdgeResolves(t, ff, "services/product-api/src/productUsersSync.reconciliation.ts", "services/product-api/src", "services/product-api/src/productUsersSync.repair.ts") {
+			t.Fatal("dynamic import module edge missing")
 		}
 	})
 	t.Run("namespace-import", func(t *testing.T) {
-		if !importEdgeResolves(t, ff, "apps/mobile/src/behavior/mobileAppInterpreter.ts", "apps/mobile/src/state/mobileAppMachine.updates.ts") {
+		if !importEdgeResolves(t, ff, "apps/mobile/src/behavior/mobileAppInterpreter.ts", "apps/mobile/src/state", "apps/mobile/src/state/mobileAppMachine.updates.ts") {
 			t.Fatalf("missing resolved namespace import:\n%s", importDump(ff, "apps/mobile/src/behavior/mobileAppInterpreter.ts"))
 		}
 	})
 	t.Run("star-reexport", func(t *testing.T) {
-		if !importEdgeResolves(t, ff, "packages/tracking-server/src/index.ts", "packages/tracking-server/src/publisher.ts") {
+		if !importEdgeResolves(t, ff, "packages/tracking-server/src/index.ts", "packages/tracking-server/src", "packages/tracking-server/src/publisher.ts") {
 			t.Fatalf("missing resolved export *:\n%s", importDump(ff, "packages/tracking-server/src/index.ts"))
 		}
 	})
@@ -106,10 +107,10 @@ export * from './publisher';
 		t.Fatal(err)
 	}
 	want := map[string]bool{
-		"packages/tracking-client/src/core/consumer.ts\x00packages/contracts/src/index.ts":                                   false,
-		"services/product-api/src/productUsersSync.reconciliation.ts\x00services/product-api/src/productUsersSync.repair.ts": false,
-		"apps/mobile/src/behavior/mobileAppInterpreter.ts\x00apps/mobile/src/state/mobileAppMachine.updates.ts":              false,
-		"packages/tracking-server/src/index.ts\x00packages/tracking-server/src/publisher.ts":                                 false,
+		"packages/tracking-client/src/core/consumer.ts\x00packages/contracts/src":                 false,
+		"services/product-api/src/productUsersSync.reconciliation.ts\x00services/product-api/src": false,
+		"apps/mobile/src/behavior/mobileAppInterpreter.ts\x00apps/mobile/src/state":               false,
+		"packages/tracking-server/src/index.ts\x00packages/tracking-server/src":                   false,
 	}
 	for _, line := range strings.Split(strings.TrimSpace(buf.String()), "\n") {
 		var m map[string]any
@@ -152,7 +153,7 @@ func TestExtract_PackageJSONNameAliasWithoutTSConfigPaths(t *testing.T) {
 		"packages/contracts/src/index.ts": `export const Token = 1;`,
 		"apps/mobile/src/app.ts":          `import { Token } from '@onyx/contracts'; export const t = Token;`,
 	}, false)
-	if !importEdgeResolves(t, ff, "apps/mobile/src/app.ts", "packages/contracts/src/index.ts") {
+	if !importEdgeResolves(t, ff, "apps/mobile/src/app.ts", "packages/contracts/src", "packages/contracts/src/index.ts") {
 		t.Fatalf("package.json name alias did not bind @onyx/contracts:\n%s", importDump(ff, "apps/mobile/src/app.ts"))
 	}
 }
@@ -165,29 +166,28 @@ func TestExtract_TSConfigPathsBeatPackageJSONName(t *testing.T) {
 		"packages/app/tsconfig.json":         `{"compilerOptions":{"paths":{"@onyx/contracts":["../contracts/src/override.ts"]}}}`,
 		"packages/app/src/main.ts":           `import { fromPath } from '@onyx/contracts'; export const v = fromPath;`,
 	}, false)
-	if !importEdgeResolves(t, ff, "packages/app/src/main.ts", "packages/contracts/src/override.ts") {
+	if !importEdgeResolves(t, ff, "packages/app/src/main.ts", "packages/contracts/src", "packages/contracts/src/override.ts") {
 		t.Fatalf("tsconfig paths should win over package.json main:\n%s", importDump(ff, "packages/app/src/main.ts"))
 	}
-	if importEdgeResolves(t, ff, "packages/app/src/main.ts", "packages/contracts/src/index.ts") {
+	if importEdgeResolves(t, ff, "packages/app/src/main.ts", "packages/contracts/src", "packages/contracts/src/index.ts") {
 		t.Fatal("package.json main leaked through an overlapping tsconfig paths entry")
 	}
 }
 
-func importEdgeResolves(t *testing.T, ff []facts.Fact, file, target string) bool {
+func importEdgeResolves(t *testing.T, ff []facts.Fact, file, module, targetFile string) bool {
 	t.Helper()
-	var hasEdge, hasNode bool
+	var hasEdge, hasModule bool
 	for _, f := range ff {
-		if f.Kind == facts.KindFileRef && f.Name == target {
-			hasNode = true
+		if f.Kind == facts.KindModule && f.Name == module {
+			hasModule = true
 		}
-		if f.Kind == facts.KindDependency && f.File == file && hasRelation(f, facts.RelImports, target) {
-			src, _ := f.Props["source"].(string)
-			if src == "internal" {
+		if f.Kind == facts.KindDependency && f.File == file && hasRelation(f, facts.RelImports, module) {
+			if f.PropString("source") == "internal" && f.PropString(facts.PropTargetFile) == targetFile {
 				hasEdge = true
 			}
 		}
 	}
-	return hasEdge && hasNode
+	return hasEdge && hasModule
 }
 
 func importDump(ff []facts.Fact, file string) string {

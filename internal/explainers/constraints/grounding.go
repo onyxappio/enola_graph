@@ -186,7 +186,7 @@ func (g *grounding) resolvedPathIn(rel facts.Relation, from facts.Fact, ok func(
 	if !pathTargetEdge(rel, from) {
 		return false
 	}
-	path, resolved := g.resolve(rel.Target, from.Repo)
+	path, resolved := g.resolve(importGroundingPath(rel, from), from.Repo)
 	if !resolved {
 		return false
 	}
@@ -207,8 +207,20 @@ func (g *grounding) resolves(rel facts.Relation, from facts.Fact) bool {
 	if !pathTargetEdge(rel, from) {
 		return false
 	}
-	_, ok := g.resolve(rel.Target, from.Repo)
+	_, ok := g.resolve(importGroundingPath(rel, from), from.Repo)
 	return ok
+}
+
+// importGroundingPath is the file an imports edge should join to a component.
+// RelImports.Target is the KindModule directory so graphsession can resolve the
+// edge by name; the extractor keeps the exact file on target_file.
+func importGroundingPath(rel facts.Relation, from facts.Fact) string {
+	if rel.Kind == facts.RelImports {
+		if file := from.PropString(facts.PropTargetFile); file != "" {
+			return file
+		}
+	}
+	return rel.Target
 }
 
 // groundedMembers names the members a path-targeting edge lands on when its
@@ -219,7 +231,7 @@ func groundedMembers(rel facts.Relation, from facts.Fact, memberFacts []facts.Fa
 	if !pathTargetEdge(rel, from) {
 		return nil
 	}
-	path, ok := g.resolve(rel.Target, from.Repo)
+	path, ok := g.resolve(importGroundingPath(rel, from), from.Repo)
 	if !ok {
 		return nil
 	}

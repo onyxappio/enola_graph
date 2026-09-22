@@ -39,17 +39,6 @@ func ownerKey(file string) string {
 	return graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: file}.String()
 }
 
-func fileNodeByName(c *Consumer, name string) (graphstream.Node, bool) {
-	for _, nodes := range c.Owners {
-		for _, n := range nodes {
-			if n.Kind == facts.KindFileRef && n.Name == name {
-				return n, true
-			}
-		}
-	}
-	return graphstream.Node{}, false
-}
-
 func moduleNode(c *Consumer, name string) (graphstream.Node, bool) {
 	for _, nodes := range c.Owners {
 		for _, n := range nodes {
@@ -61,36 +50,30 @@ func moduleNode(c *Consumer, name string) (graphstream.Node, bool) {
 	return graphstream.Node{}, false
 }
 
-// assertFileImportResolved checks the authoritative (resolved-phase) import edge
-// from importer to destFile. TargetID must be the destination file_ref, not a
-// parent directory module.
-func assertFileImportResolved(t *testing.T, c *Consumer, importer, destFile string) graphstream.Edge {
+// assertModuleImportResolved checks the authoritative import edge from importer
+// lands on the KindModule that owns destFile (directory Fact.Name).
+func assertModuleImportResolved(t *testing.T, c *Consumer, importer, destFile string) graphstream.Edge {
 	t.Helper()
-	dest, ok := fileNodeByName(c, destFile)
+	modName := filepath.ToSlash(filepath.Dir(destFile))
+	dest, ok := moduleNode(c, modName)
 	if !ok {
-		t.Fatalf("%s: no file_ref node named %s", importer, destFile)
-	}
-	if dest.Owner.Kind != graphstream.OwnerFile || dest.Owner.ID != destFile || dest.File != destFile {
-		t.Fatalf("%s: file_ref for %s is not file-owned: %+v", importer, destFile, dest)
+		t.Fatalf("%s: no module node named %s (owner of %s)", importer, modName, destFile)
 	}
 	var hits []graphstream.Edge
 	for _, e := range c.Edges[ownerKey(importer)] {
-		if e.Kind == facts.RelImports && e.TargetName == destFile {
+		if e.Kind == facts.RelImports && e.TargetName == modName {
 			hits = append(hits, e)
 		}
 	}
 	if len(hits) == 0 {
-		t.Fatalf("%s: no imports edge targeting %s; edges=%v", importer, destFile, c.Edges[ownerKey(importer)])
+		t.Fatalf("%s: no imports edge targeting module %s; edges=%v", importer, modName, c.Edges[ownerKey(importer)])
 	}
 	for _, e := range hits {
 		if e.Resolution != graphstream.ResResolved || e.TargetID == "" {
-			t.Fatalf("%s -> %s resolution=%s target_id=%q", importer, destFile, e.Resolution, e.TargetID)
+			t.Fatalf("%s -> %s resolution=%s target_id=%q", importer, modName, e.Resolution, e.TargetID)
 		}
 		if e.TargetID != dest.ID {
-			t.Fatalf("%s -> %s target_id=%s want file_ref %s", importer, destFile, e.TargetID, dest.ID)
-		}
-		if dir, ok := moduleNode(c, filepath.ToSlash(filepath.Dir(destFile))); ok && e.TargetID == dir.ID {
-			t.Fatalf("%s -> %s collapsed onto directory module %s", importer, destFile, dir.Name)
+			t.Fatalf("%s -> %s target_id=%s want module %s", importer, modName, e.TargetID, dest.ID)
 		}
 	}
 	return hits[0]
@@ -129,16 +112,19 @@ func TestPublishedImportEdgesResolveToFileFacts(t *testing.T) {
 	c := applyGraph(t, sink)
 
 	t.Run("tsconfig-package-alias", func(t *testing.T) {
-		assertFileImportResolved(t, c, "packages/tracking-client/src/core/consumer.ts", "packages/contracts/src/index.ts")
+		assertModuleImportResolved(t, c, "packages/tracking-client/src/core/consumer.ts", "packages/contracts/src/index.ts")
 	})
 	t.Run("relative-import-type", func(t *testing.T) {
-		assertFileImportResolved(t, c, "services/product-api/src/productUsersSync.reconciliation.ts", "services/product-api/src/productUsersSync.repair.ts")
+		assertModuleImportResolved(t, c, "services/product-api/src/productUsersSync.reconciliation.ts", "services/product-api/src/productUsersSync.repair.ts")
 	})
 	t.Run("runtime-dynamic-import", func(t *testing.T) {
 		n := 0
-		dest, _ := fileNodeByName(c, "services/product-api/src/productUsersSync.repair.ts")
+		dest, ok := moduleNode(c, "services/product-api/src")
+		if !ok {
+			t.Fatal("missing module services/product-api/src")
+		}
 		for _, e := range c.Edges[ownerKey("services/product-api/src/productUsersSync.reconciliation.ts")] {
-			if e.Kind == facts.RelImports && e.TargetName == "services/product-api/src/productUsersSync.repair.ts" {
+			if e.Kind == facts.RelImports && e.TargetName == "services/product-api/src" {
 				n++
 				if e.Resolution != graphstream.ResResolved || e.TargetID != dest.ID {
 					t.Fatalf("dynamic/type import resolution=%s id=%s want %s", e.Resolution, e.TargetID, dest.ID)
@@ -146,14 +132,14 @@ func TestPublishedImportEdgesResolveToFileFacts(t *testing.T) {
 			}
 		}
 		if n < 2 {
-			t.Fatalf("import type + import() should publish two file edges, got %d", n)
+			t.Fatalf("import type + import() should publish two module edges, got %d", n)
 		}
 	})
 	t.Run("namespace-import", func(t *testing.T) {
-		assertFileImportResolved(t, c, "apps/mobile/src/behavior/mobileAppInterpreter.ts", "apps/mobile/src/state/mobileAppMachine.updates.ts")
+		assertModuleImportResolved(t, c, "apps/mobile/src/behavior/mobileAppInterpreter.ts", "apps/mobile/src/state/mobileAppMachine.updates.ts")
 	})
 	t.Run("star-reexport", func(t *testing.T) {
-		assertFileImportResolved(t, c, "packages/tracking-server/src/index.ts", "packages/tracking-server/src/publisher.ts")
+		assertModuleImportResolved(t, c, "packages/tracking-server/src/index.ts", "packages/tracking-server/src/publisher.ts")
 	})
 
 	t.Run("no-change-zero-events", func(t *testing.T) {
@@ -179,7 +165,7 @@ func TestPublishedReexportMatchesEvidenceShape(t *testing.T) {
 		t.Fatal(err)
 	}
 	c := applyGraph(t, sink)
-	assertFileImportResolved(t, c, "packages/tracking-server/src/index.ts", "packages/tracking-server/src/publisher.ts")
+	assertModuleImportResolved(t, c, "packages/tracking-server/src/index.ts", "packages/tracking-server/src/publisher.ts")
 }
 
 func TestPublishedImportMissingAndExternalStayUnresolved(t *testing.T) {
@@ -212,9 +198,9 @@ func TestPublishedImportBindsFileNotDirectoryModule(t *testing.T) {
 		t.Fatal(err)
 	}
 	c := applyGraph(t, sink)
-	e := assertFileImportResolved(t, c, "src/use.ts", "src/foo.ts")
+	e := assertModuleImportResolved(t, c, "src/use.ts", "src/foo.ts")
 	if dirMod, ok := moduleNode(c, "src/foo"); ok && e.TargetID == dirMod.ID {
-		t.Fatal("import ./foo bound to the folder module instead of foo.ts")
+		t.Fatal("import ./foo bound to folder module src/foo instead of owning module src")
 	}
 }
 
@@ -260,7 +246,7 @@ func TestPublishedImportTargetAddDeleteRename(t *testing.T) {
 		if err := c.ApplyRecords(addSink.CloneRecords()); err != nil {
 			t.Fatal(err)
 		}
-		assertFileImportResolved(t, c, "src/index.ts", "src/publisher.ts")
+		assertModuleImportResolved(t, c, "src/index.ts", "src/publisher.ts")
 	})
 
 	t.Run("delete", func(t *testing.T) {
@@ -301,7 +287,7 @@ func TestPublishedImportTargetAddDeleteRename(t *testing.T) {
 		if err := c.ApplyRecords(renSink.CloneRecords()); err != nil {
 			t.Fatal(err)
 		}
-		assertFileImportResolved(t, c, "src/index.ts", "src/shipped.ts")
+		assertModuleImportResolved(t, c, "src/index.ts", "src/shipped.ts")
 	})
 }
 
@@ -341,6 +327,6 @@ func TestPublishedImportDeltaEqualsCold(t *testing.T) {
 	}
 	oracle := applyGraph(t, coldSink)
 	assertAppliedEqualsCold(t, cons, oracle)
-	assertFileImportResolved(t, cons, "src/index.ts", "src/publisher.ts")
-	assertFileImportResolved(t, oracle, "src/index.ts", "src/publisher.ts")
+	assertModuleImportResolved(t, cons, "src/index.ts", "src/publisher.ts")
+	assertModuleImportResolved(t, oracle, "src/index.ts", "src/publisher.ts")
 }

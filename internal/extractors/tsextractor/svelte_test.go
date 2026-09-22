@@ -380,13 +380,13 @@ func TestExtract_SvelteKit_LibAlias(t *testing.T) {
 	found := false
 	for _, d := range deps {
 		for _, r := range d.Relations {
-			if r.Target == "src/lib/utils.ts" {
+			if r.Target == "src/lib" {
 				found = true
 			}
 		}
 	}
 	if !found {
-		t.Error("expected $lib/utils to resolve to src/lib/utils.ts")
+		t.Error("expected $lib/utils to resolve to module src/lib")
 	}
 }
 
