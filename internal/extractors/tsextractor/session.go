@@ -263,7 +263,16 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			auto = nuxtAutoByPkg[fileNuxt]
 		}
 		var res tsFileResult
-		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, isVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, orms, aliases, knownFiles, auto, grpcIdx)
+		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, isVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, orms, aliases, knownFiles, func(rel string) []byte {
+			if b, ok := sources[rel]; ok {
+				return b
+			}
+			raw, err := overlayReadFile(ctx, filepath.Join(repoPath, rel), inputScope)
+			if err != nil {
+				return nil
+			}
+			return raw
+		}, auto, grpcIdx)
 		if !facts.IsTestPath(relFile) {
 			res.routers = collectRouterFile(src, relFile, aliases, knownFiles)
 		}

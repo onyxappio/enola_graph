@@ -2457,7 +2457,9 @@ import (
 // typed-parameter server routes; Nuxt default ~/ and @/ aliases without .nuxt.
 // v280: RelCalls carry proven target_file; FastifyInstance params are scoped per
 // function; Nuxt config alias/srcDir literals are honored without executing config.
-const cacheVersion = "v280"
+// v281: RelCalls target_file follows source-proven named/star re-exports to the
+// declaring file; colliding re-exports stay unconstrained.
+const cacheVersion = "v281"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

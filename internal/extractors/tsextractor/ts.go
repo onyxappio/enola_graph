@@ -322,7 +322,9 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 			auto = nuxtAutoByPkg[fileNuxt]
 		}
 		var res tsFileResult
-		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, isVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, orms, aliases, knownFiles, auto, grpcStubs)
+		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, isVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, orms, aliases, knownFiles, func(rel string) []byte {
+			return sources[rel]
+		}, auto, grpcStubs)
 		// Routers, mounts and held-back routes for the repo-wide mount pass below.
 		// Collected here because resolving an import needs this file's path aliases,
 		// which are in scope only during the per-file walk. Same test-path gate as
@@ -541,9 +543,10 @@ type extractCtx struct {
 	ioBindings  map[string]bool     // local names bound to imports from a network module (I/O sinks)
 	knownFiles  map[string]bool     // repo-relative (slash) paths of all indexed TS/JS files
 	aliases     map[string]tsAlias  // this directory's tsconfig path aliases, for resolving an import written as a bare specifier
+	readSrc     func(string) []byte // known file bytes for following named re-exports
 }
 
-func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, isNuxt, isSvelteKit, isEmber, isReactNav, isAngular bool, graphqlServer graphqlServerContext, orms ormFlags, aliases map[string]tsAlias, knownFiles map[string]bool, nuxtAutoComponents map[string]string, grpcStubs *grpcStubIndex) ([]facts.Fact, angularCounts, *angularRouterFile, map[string]*angularTemplate, *angularHTTPFile, clientCounts) {
+func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, isNuxt, isSvelteKit, isEmber, isReactNav, isAngular bool, graphqlServer graphqlServerContext, orms ormFlags, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, nuxtAutoComponents map[string]string, grpcStubs *grpcStubIndex) ([]facts.Fact, angularCounts, *angularRouterFile, map[string]*angularTemplate, *angularHTTPFile, clientCounts) {
 	// The grammar is chosen here, so the kind table is too: TypeScript and TSX assign
 	// different meanings to the same symbol ids, and everything below reads node kinds
 	// through this table. See kinds.go.
@@ -551,10 +554,10 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 	kinds := tsKindsFor(isTSX)
 
 	if isVueFile(relFile) {
-		return e.extractVueSFC(kinds, src, relFile, isNuxt, aliases, nuxtAutoComponents, knownFiles), angularCounts{}, nil, nil, nil, nil
+		return e.extractVueSFC(kinds, src, relFile, isNuxt, aliases, nuxtAutoComponents, knownFiles, readSrc), angularCounts{}, nil, nil, nil, nil
 	}
 	if isSvelteFile(relFile) {
-		return e.extractSvelteSFC(kinds, src, relFile, isSvelteKit, aliases, knownFiles), angularCounts{}, nil, nil, nil, nil
+		return e.extractSvelteSFC(kinds, src, relFile, isSvelteKit, aliases, knownFiles, readSrc), angularCounts{}, nil, nil, nil, nil
 	}
 	if isGraphQLDocFile(relFile) {
 		if facts.IsTestPath(relFile) {
@@ -668,8 +671,9 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 		ioBindings:  buildIOImportBindings(kinds, root, src),
 		knownFiles:  knownFiles,
 		aliases:     aliases,
+		readSrc:     readSrc,
 	}
-	ctx.importMap, ctx.importFiles = buildImportSymbols(kinds, root, src, relFile, aliases, knownFiles)
+	ctx.importMap, ctx.importFiles = buildImportSymbols(kinds, root, src, relFile, aliases, knownFiles, readSrc)
 	ctx.localNames = collectFileScopeCallNames(kinds, root, src)
 	decls := e.extractDeclarations(kinds, root, ctx)
 
@@ -2444,7 +2448,7 @@ func tsExtensionSubstitutionCandidates(resolved string) []string {
 // fact. Symbols declared in an imported module are named "<moduleDir>.<exportName>",
 // where moduleDir is the directory of the resolved module file — this matches the
 // common file-module case (e.g. import "./utils" → utils.ts → "<dir>.foo").
-func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool) (map[string]string, map[string]string) {
+func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte) (map[string]string, map[string]string) {
 	fileDir := factpath.Dir(relFile)
 	m := make(map[string]string)
 	files := make(map[string]string)
@@ -2466,12 +2470,7 @@ func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, 
 		indexPath := ""
 		if idx, dir, found := resolveModuleFile(resolved, knownFiles); found {
 			moduleDir = dir
-			// Folder-index barrels re-export other files; constraining RelCalls to
-			// index.ts would unresolve the leaf symbols. Named imports from a
-			// concrete file keep that file as provenance.
-			if !strings.HasPrefix(filepath.Base(idx), "index.") {
-				indexPath = idx
-			}
+			indexPath = idx
 		}
 
 		clause := findChildByKind(kinds, child, "import_clause")
@@ -2498,7 +2497,9 @@ func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, 
 			}
 			m[local] = moduleDir + "." + exportName
 			if indexPath != "" {
-				files[local] = indexPath
+				if leaf := followNamedExportFile(indexPath, exportName, readSrc, aliases, knownFiles); leaf != "" {
+					files[local] = leaf
+				}
 			}
 		}
 	}
@@ -2652,9 +2653,9 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 						if a := spec.ChildByFieldName("alias"); a != nil {
 							local = nodeText(a, src)
 						}
-						file := indexPath
-						if strings.HasPrefix(filepath.Base(indexPath), "index.") {
-							file = ""
+						file := ""
+						if indexPath != "" {
+							file = followNamedExportFile(indexPath, exportName, ctx.readSrc, aliases, ctx.knownFiles)
 						}
 						bind(local, moduleDir, exportName, file)
 					}

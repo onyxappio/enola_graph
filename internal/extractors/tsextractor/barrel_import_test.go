@@ -99,6 +99,52 @@ func TestExtract_ImportAliasSameDirectoryCallHasTargetFile(t *testing.T) {
 	}
 }
 
+func TestExtract_NamedReexportBridgeCallHasLeafTargetFile(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/a.ts":      "import { round } from './bridge';\nexport function caller() { return round(1); }\n",
+		"src/bridge.ts": "export { round } from './b';\n",
+		"src/b.ts":      "export function round(n: number) { return n + 1; }\n",
+	}, false)
+	var caller facts.Fact
+	for _, f := range ff {
+		if f.Kind == facts.KindSymbol && f.Name == "src.caller" {
+			caller = f
+		}
+	}
+	found := false
+	for _, r := range caller.Relations {
+		if r.Kind == facts.RelCalls && r.Target == "src.round" {
+			found = true
+			if r.TargetFile != "src/b.ts" {
+				t.Fatalf("named reexport target_file=%q want src/b.ts relations=%+v", r.TargetFile, caller.Relations)
+			}
+		}
+	}
+	if !found {
+		t.Fatalf("missing imported call: %+v", caller.Relations)
+	}
+}
+
+func TestExtract_NamedReexportCollisionLeavesNoTargetFile(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/a.ts":      "import { round } from './barrel';\nexport function caller() { return round(1); }\n",
+		"src/barrel.ts": "export * from './b';\nexport * from './c';\n",
+		"src/b.ts":      "export function round(n: number) { return n + 1; }\n",
+		"src/c.ts":      "export function round(n: number) { return n + 2; }\n",
+	}, false)
+	var caller facts.Fact
+	for _, f := range ff {
+		if f.Kind == facts.KindSymbol && f.Name == "src.caller" {
+			caller = f
+		}
+	}
+	for _, r := range caller.Relations {
+		if r.Kind == facts.RelCalls && r.Target == "src.round" && r.TargetFile != "" {
+			t.Fatalf("colliding star reexports must not pin target_file=%q relations=%+v", r.TargetFile, caller.Relations)
+		}
+	}
+}
+
 func TestExtract_FolderIndexImportTypeAndAlias(t *testing.T) {
 	ff := extractAll(t, map[string]string{
 		"lib/oracles/index.ts": `export { createVerdict as make } from './types';`,
