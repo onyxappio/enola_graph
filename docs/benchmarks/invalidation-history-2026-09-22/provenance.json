@@ -1,0 +1,31 @@
+{
+  "note": "first-parent history; persistent delta state; cold oracle per commit",
+  "source_tree": "/tmp/enola-product-benchmark-source",
+  "source_dirty_untracked": "?? .enola/\n?? mcp-arch.yaml",
+  "fetch_clone": "/tmp/enola-invalidation-history-2026-09-22/product-fetch",
+  "ref": "origin/main",
+  "ref_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "first_parent_shas": [
+    "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+    "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+    "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+    "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+    "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+    "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+    "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+    "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+    "a6f1f3a91a36ea3dead786560412a4944a009694",
+    "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+    "a609c19f3861971930fae7b33dcb2950598953c5"
+  ],
+  "enola": {
+    "revision": "e85c8d6181d77c9ce8232020e81facf9bcdd514b",
+    "dirty": true,
+    "status_porcelain": "M docs/benchmarks/invalidation-scope-2026-09-21/README.md\n M docs/benchmarks/invalidation-scope-2026-09-21/run.py\n M internal/graphsession/frozen_contract_test.go\n M internal/graphsession/invalidation_plan.go\n M internal/graphsession/invalidation_plan_test.go\n M internal/graphsession/owner.go\n M internal/graphsession/owner_resolution_test.go\n M internal/graphsession/session.go\n?? docs/benchmarks/invalidation-history-2026-09-22/",
+    "diff_sha256": "607aa34040817da3e19d07b35409267f4d90555806e461ade9f314682818e4a7"
+  },
+  "binary": "/tmp/enola-product-frozen-v2-enola",
+  "binary_sha256": "1aeade82dcf3038b5739b10e291d783715101e154433d21676bcdf857d35d2ea",
+  "input_policy": "mcp-arch.yaml overlay from source when present; lockfiles excluded from required owners",
+  "baseline": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/invalidation-history-2026-09-22/results.baseline-invalid-chronology.json"
+}

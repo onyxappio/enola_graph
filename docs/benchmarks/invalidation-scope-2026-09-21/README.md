@@ -1,14 +1,18 @@
 # Frozen invalidation scope on Product — 2026-09-21
 
-Scratch harness, not a performance-acceptance rerun. It measures how wide the
-current frozen v2 Begin owner manifest is, compared with the owners whose
-contributions actually change between a completed pre-mutation graph and a cold
-analysis of the mutated tree.
+Scratch harness for frozen v2 scope and replacement-contract checks. It is
+diagnostic correctness evidence. One pass of wall-clock numbers is not a
+performance-acceptance run and is not an SLA.
 
-The tracked Product checkout is never written.
-Clones, event logs, and state directories live under
-/tmp/enola-invalidation-scope-2026-09-21. This docs folder holds only the
-harness script and the numeric summary.
+It measures how wide the current frozen v2 Begin owner manifest is, compared
+with the owners whose contributions actually change between a completed
+pre-mutation graph and a cold analysis of the mutated tree.
+
+The tracked Product checkout is never written. Clones, event logs, and state
+directories live under the `--work` directory (default
+`/tmp/enola-invalidation-scope-2026-09-21`). This docs folder holds the harness
+script and a committed numeric snapshot. The harness writes `results.json` next
+to `--work` and does not overwrite the tracked snapshot.
 
 ## Method
 
@@ -27,7 +31,8 @@ state directory on the mutated clone.
 3. Mutate only that clone.
 4. Frozen delta on the same state directory. Persist Begin
    owner_scope_count/digest and End batch_count, batch_digest,
-   owner_scope_len/digest.
+   owner_scope_len/digest. Recompute owner and batch digests from the
+   published payloads; do not trust the envelope fields alone.
 5. Cold frozen analysis of the mutated tree.
 6. Apply initial+delta to one Consumer and cold events to another.
 7. Compare **graph hash** (non-empty owned nodes/edges, Canonical-style) and
@@ -41,8 +46,35 @@ state directory on the mutated clone.
 Rename (07) uses `git mv` then `git diff --name-status -M HEAD`, and asserts
 that Begin and the necessary set contain both the old and new file owner IDs.
 
-One pass of all ten clones. Three repeats were skipped: the measured pass took
-about 15 minutes of Product initial+delta+cold work.
+Every publishing run (initial, delta, cold) must satisfy the frozen v2
+complete immutable contract or the harness exits nonzero:
+
+- `schema_version=enola.graph.v2` and `scope_mode=complete` on Begin.
+- Begin owner scope is unique nonempty `file` owners. Count and SHA-256
+  owner digest are recomputed from the sorted kind/id pairs.
+- `target_generation == base_generation + 1`.
+- Batch `seq` values are unique contiguous `1..N`. File-sink line order may
+  interleave under async publish; the digest uses seq order.
+- No `phase=scope` batches and no batch `owners` additions after Begin.
+- Resolved batches only. Every node/edge owner is inside the Begin scope.
+- End `owner_scope_len` / `owner_scope_digest` match Begin. End
+  `batch_count` matches the number of batches. End `batch_digest` is the
+  SHA-256 of the raw batch payloads in seq order.
+- End completeness `status=success` with no unreadable files.
+- Necessary owners are a subset of the delta Begin scope.
+- `09-lock-only` is a strict no-op: zero Begin/End/batch events, zero parses,
+  zero published owners, generation unchanged, empty necessary set.
+
+Any blocker, graph-hash mismatch, missed required owner, rename missing an
+old/new owner id, lock-only leak, or ordinary TS edit (01–04, 10) that
+announces a whole-domain Begin exits with status 1. `growScope` is
+fail-closed: an owner required after Begin that is outside the frozen
+manifest aborts with no successful End. Resolver-domain widening uses
+sorted per-name `Fact.Identity()` multisets; unchanged candidate
+fingerprints do not expand scope.
+
+One diagnostic pass of all ten clones. Three repeats are skipped. Wall times
+from that pass are observations, not a performance-acceptance result.
 
 ## Kinds
 
@@ -93,22 +125,30 @@ python3 docs/benchmarks/invalidation-scope-2026-09-21/run.py \
   --work /tmp/enola-invalidation-scope-2026-09-21
 ```
 
-Numeric dump: [results.json](results.json).
+The harness writes `$WORK/results.json`. The tracked
+[results.json](results.json) is the committed snapshot from the earlier
+diagnostic pass and is not updated by later `--work` runs.
 
-## Results (one diagnostic repeat)
+## Results (provisional, not performance acceptance)
+
+Provisional dump from the completed process:
+`/tmp/enola-invalidation-scope-narrow2-2026-09-21/results.json`.
+Zero blockers. Graph hash matched cold in all ten. These numbers are one-pass
+scope/correctness evidence. They are not a performance-acceptance result, and
+another harness run is not queued.
 
 | ID | wall s | parsed | gen | events | Begin | necessary | kind |
 | --- | ---: | ---: | --- | ---: | ---: | ---: | --- |
-| 01-body | 3.331 | 1 | 1→2 | 4 | 2 | 0 | stable-facts |
-| 02-add-function | 33.004 | 3 | 1→2 | 2691 | 8645 | 1 | whole-domain-resolution |
-| 03-rename-symbol | 28.146 | 3 | 1→2 | 2691 | 8645 | 2 | whole-domain-resolution |
-| 04-import-target-body | 3.016 | 1 | 1→2 | 4 | 3 | 1 | local |
-| 05-add-file-import | 22.893 | 282 | 1→2 | 2691 | 8646 | 2 | whole-domain-membership |
-| 06-delete-file | 22.450 | 280 | 1→2 | 2691 | 8645 | 3 | whole-domain-membership |
-| 07-rename-file | 27.193 | 281 | 1→2 | 2691 | 8646 | 4 | whole-domain-membership |
-| 08-package-config | 24.966 | 0 | 1→2 | 2691 | 8645 | 1 | whole-domain-config |
-| 09-lock-only | 2.273 | 0 | 1→1 | 0 | 0 | 0 | noop |
-| 10-multi-file | 3.298 | 2 | 1→2 | 5 | 4 | 1 | local |
+| 01-body | 2.876 | 1 | 1→2 | 4 | 2 | 0 | stable-facts |
+| 02-add-function | 2.990 | 3 | 1→2 | 4 | 3 | 1 | local |
+| 03-rename-symbol | 2.960 | 3 | 1→2 | 4 | 3 | 2 | local |
+| 04-import-target-body | 2.908 | 1 | 1→2 | 4 | 3 | 1 | local |
+| 05-add-file-import | 21.339 | 282 | 1→2 | 2691 | 8646 | 2 | whole-domain-membership |
+| 06-delete-file | 24.571 | 280 | 1→2 | 2691 | 8645 | 3 | whole-domain-membership |
+| 07-rename-file | 23.480 | 281 | 1→2 | 2691 | 8646 | 4 | whole-domain-membership |
+| 08-package-config | 21.030 | 0 | 1→2 | 2691 | 8645 | 1 | whole-domain-config |
+| 09-lock-only | 2.125 | 0 | 1→1 | 0 | 0 | 0 | noop |
+| 10-multi-file | 2.906 | 2 | 1→2 | 5 | 4 | 1 | local |
 
 Graph hash matched cold in all ten. End digest matched Begin on every publishing
 delta. 07 rename: `git diff --name-status -M` is R100 hmac.ts→hmacSha.ts; Begin
@@ -122,17 +162,15 @@ compare had labeled this `missed-invalidation` with 9 package.json owners while
 compare is empty. That is **oracle instability**, not a missed Enola
 invalidation.
 
-Body-only and import-target content deltas use reverse-closure Begin (2–4
-owners, 4–5 events). Adding or renaming an exported declaration uses the
-`whole-domain-resolution` fallback because the old file graph cannot prove all
-name-resolution dependents. Add/delete/rename use `whole-domain-membership`,
-and config uses `whole-domain-config`; all preserve graph equality. Membership
-cases still parse about 280 TS files.
+Provisional narrow2 Begin/parsed: 01=2/1, 02=3/3, 03=3/3, 04=3/1, 10=4/2.
+Membership 05/06/07 and config 08 remain the full prior/current union
+(Begin 8645–8646). Lock-only is a no-op. Graph equality holds on all ten.
 
 ## Limitations
 
-- One diagnostic repeat of all 10 clones (~15 min). Three repeats were not run;
-  these numbers are scope/correctness evidence, not a performance SLA.
+- One diagnostic pass of all 10 clones. Three repeats were not run. Wall
+  times in the table are observations from that pass. They are not a
+  performance-acceptance result and are not an SLA.
 - Python in-harness Consumer and file-sink events, not a NATS observer.
 - Necessary scope uses sorted owner equality. Unsorted list compare is unstable
   (see 09) and must not be read as Enola missing a lockfile change.

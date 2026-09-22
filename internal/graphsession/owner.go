@@ -723,44 +723,39 @@ func captureDeltaContexts(eng *engine.Engine, root string, detected map[string]b
 // Candidate changes can affect references owned by another extractor even when
 // that extractor's local facts did not change (for example a markdown file link
 // gaining a TS file_ref target). Refresh those owners without re-extraction.
+//
+// The resolver domain for a name is the sorted Fact.Identity() multiset in
+// idIndex.byName. changedResolutionOwners skips relation targets whose old and
+// new fingerprints match, so timing/cache assembly cannot widen a stable owner
+// such as app.ts. Additions, removals, and collisions change the fingerprint
+// and remain fail-closed. Ordinary TypeScript edits do not fall back to the
+// whole TS domain unless this check reports a real candidate change.
 func changedResolutionOwners(groups []ownerOutput, old, next *idIndex, ignoredFiles map[string]bool) []graphstream.OwnerRef {
-	type key struct{ repo, target string }
 	changedNames := changedCandidateNames(old, next, ignoredFiles)
-	changed := map[key]bool{}
-	seen := map[key]bool{}
+	if len(changedNames) == 0 {
+		return nil
+	}
 	var owners []graphstream.OwnerRef
 	for _, g := range groups {
-		affected := false
-		for _, f := range g.Facts {
-			for _, rel := range f.Relations {
-				// Resolution depends only on the candidate domain for this
-				// target. Ignore cache/order differences when that canonical
-				// domain is identical; real additions, removals, and collisions
-				// remain fail-closed and invalidate the referencing owner.
-				if !changedNames[rel.Target] {
-					continue
-				}
-				k := key{f.Repo, rel.Target}
-				if !seen[k] {
-					a, as := old.resolve(k.repo, k.target)
-					b, bs := next.resolve(k.repo, k.target)
-					changed[k] = a != b || as != bs
-					seen[k] = true
-				}
-				if changed[k] {
-					affected = true
-					break
-				}
-			}
-			if affected {
-				break
-			}
-		}
-		if affected {
+		if ownerReferencesChangedCandidates(g, changedNames) {
 			owners = append(owners, g.Owner)
 		}
 	}
 	return owners
+}
+
+func ownerReferencesChangedCandidates(g ownerOutput, changedNames map[string]bool) bool {
+	if g.Owner.Kind != graphstream.OwnerFile {
+		return false
+	}
+	for _, f := range g.Facts {
+		for _, rel := range f.Relations {
+			if rel.Target != "" && changedNames[rel.Target] {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func changedCandidateNames(old, next *idIndex, ignored ...map[string]bool) map[string]bool {
@@ -781,37 +776,44 @@ func changedCandidateNames(old, next *idIndex, ignored ...map[string]bool) map[s
 		}
 	}
 	for name := range all {
-		oldIDs := candidateIdentities(old, name, ignoredFiles)
-		nextIDs := candidateIdentities(next, name, ignoredFiles)
-		if !slicesEqual(oldIDs, nextIDs) {
+		if !slicesEqual(candidateFingerprint(old, name, ignoredFiles), candidateFingerprint(next, name, ignoredFiles)) {
 			changed[name] = true
 		}
 	}
 	return changed
 }
 
-func candidateIdentities(idx *idIndex, name string, ignoredFiles map[string]bool) []string {
+// candidateFingerprint is the canonical resolver-domain key for one name: the
+// sorted Fact.Identity() multiset from idx.byName. Line, column, and props are
+// outside Identity, so a body-only edit does not change the fingerprint.
+func candidateFingerprint(idx *idIndex, name string, ignoredFiles map[string]bool) []string {
 	if idx == nil {
 		return nil
 	}
+	if ignoredFiles == nil {
+		ignoredFiles = map[string]bool{}
+	}
 	rows := make([]string, 0, len(idx.byName[name]))
 	for _, f := range idx.byName[name] {
-		if ignoredFiles[filepath.ToSlash(f.File)] {
+		if ignoredFiles[canonicalFactFile(f.File)] {
 			continue
 		}
-		rows = append(rows, f.Identity())
+		rows = append(rows, candidateIdentity(f))
 	}
 	sort.Strings(rows)
-	if len(rows) < 2 {
-		return rows
-	}
-	unique := rows[:1]
-	for _, row := range rows[1:] {
-		if row != unique[len(unique)-1] {
-			unique = append(unique, row)
-		}
-	}
-	return unique
+	return rows
+}
+
+func canonicalFactFile(file string) string {
+	return filepath.ToSlash(strings.ReplaceAll(file, "\\", "/"))
+}
+
+// candidateIdentity is Fact.Identity after slash-normalizing File so cache and
+// assembled indexes do not diverge on path separators. Repo/kind/name/file are
+// the resolver domain; line, column, and props are not.
+func candidateIdentity(f facts.Fact) string {
+	f.File = canonicalFactFile(f.File)
+	return f.Identity()
 }
 
 func slicesEqual(a, b []string) bool {
@@ -827,8 +829,25 @@ func slicesEqual(a, b []string) bool {
 }
 
 func stateResolutionIndex(st *State, repo string) *idIndex {
+	if st == nil {
+		return fileResolutionIndex(nil, repo)
+	}
+	return fileResolutionIndex(st.Files, repo)
+}
+
+// fileResolutionIndex builds the name-resolution domain from cached file
+// contributions (FileRecord facts plus contrib). Session-level composition
+// extras (router mounts, coverage aggregates, directory modules) live on
+// ExtractSession.Facts and must not be mixed into this index: a CLI delta
+// has no prior composed index, so comparing cache against published
+// composition looks like a global candidate change.
+func fileResolutionIndex(files map[string]*FileState, repo string) *idIndex {
+	return buildIndex(fileContributionFacts(files, repo))
+}
+
+func fileContributionFacts(files map[string]*FileState, repo string) []facts.Fact {
 	var ff []facts.Fact
-	for _, rec := range st.Files {
+	for _, rec := range files {
 		ff = append(ff, fileFacts(rec)...)
 		if rec != nil {
 			for _, contrib := range rec.Contrib {
@@ -836,14 +855,72 @@ func stateResolutionIndex(st *State, repo string) *idIndex {
 			}
 		}
 	}
-	for _, syn := range st.Synthetic {
-		ff = append(ff, syn...)
+	return publishedResolutionFacts(ff, repo)
+}
+
+func publishedResolutionFacts(ff []facts.Fact, repo string) []facts.Fact {
+	out := make([]facts.Fact, 0, len(ff))
+	for _, f := range ff {
+		if ownerOf(f).Kind == graphstream.OwnerSynthetic {
+			continue
+		}
+		out = append(out, canonResolutionFact(f, repo))
 	}
-	// The index only uses value identity fields; do not mutate retained fact maps.
-	for i := range ff {
-		if ff[i].Repo == "" {
-			ff[i].Repo = repo
+	return out
+}
+
+func canonResolutionFact(f facts.Fact, repo string) facts.Fact {
+	if f.Repo == "" {
+		f.Repo = repo
+	}
+	f.File = filepath.ToSlash(f.File)
+	return f
+}
+
+func changedContentOwners(prev, next map[string]*FileState) map[string]bool {
+	out := map[string]bool{}
+	for path, st := range next {
+		slash := filepath.ToSlash(path)
+		old := lookupState(prev, path)
+		if old == nil || st == nil || old.Hash != st.Hash {
+			out[slash] = true
 		}
 	}
-	return buildIndex(ff)
+	for path := range prev {
+		if lookupState(next, path) == nil {
+			out[filepath.ToSlash(path)] = true
+		}
+	}
+	return out
+}
+
+// overlayStablePublished copies assembled/composed facts for hash-stable owners
+// onto the cached index so old and next share the current publish semantics.
+// Facts owned by content-changed files stay on the next side only (fail-closed
+// for new names and collisions).
+func overlayStablePublished(base, published []facts.Fact, unstable map[string]bool) []facts.Fact {
+	have := make(map[string]bool, len(base))
+	for _, f := range base {
+		have[candidateIdentity(f)] = true
+	}
+	out := append([]facts.Fact(nil), base...)
+	for _, f := range published {
+		o := ownerOf(f)
+		if o.Kind == graphstream.OwnerFile && unstable[o.ID] {
+			continue
+		}
+		k := candidateIdentity(f)
+		if have[k] {
+			continue
+		}
+		out = append(out, f)
+		have[k] = true
+	}
+	return out
+}
+
+func resolutionIndexes(prev, nextFiles map[string]*FileState, assembled []facts.Fact, repo string) (oldIdx, nextIdx *idIndex) {
+	published := publishedResolutionFacts(assembled, repo)
+	oldFacts := overlayStablePublished(fileContributionFacts(prev, repo), published, changedContentOwners(prev, nextFiles))
+	return buildIndex(oldFacts), buildIndex(published)
 }

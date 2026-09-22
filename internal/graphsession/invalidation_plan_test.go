@@ -32,6 +32,27 @@ func TestFileInvalidationPlan(t *testing.T) {
 	}
 }
 
+func TestGrowScopeOutOfScopeOwnerFailsClosed(t *testing.T) {
+	p, err := planFileInvalidation([]string{"a.ts"}, nil, nil, nil, false, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := &session{opts: Options{AuthoritativeFiles: true}, plan: p}
+	s.growScope([]graphstream.OwnerRef{{Kind: graphstream.OwnerFile, ID: "apps/architect-console/src/server/app.ts"}})
+	got := s.fileLocalErr()
+	if got == nil {
+		t.Fatal("out-of-scope owner did not fail closed")
+	}
+	want := "invalidation plan: owner file:apps/architect-console/src/server/app.ts outside frozen scope"
+	if got.Error() != want {
+		t.Fatalf("localErr = %q, want %q", got.Error(), want)
+	}
+	s.growScope([]graphstream.OwnerRef{{Kind: graphstream.OwnerFile, ID: "a.ts"}})
+	if s.fileLocalErr().Error() != want {
+		t.Fatal("fail-closed localErr was cleared by a later in-scope growScope")
+	}
+}
+
 func TestFileInvalidationFallbackRetainsDeletedAndRenamedOwners(t *testing.T) {
 	p, err := planFileInvalidation([]string{"old.ts", "new.ts"}, []string{"old.ts", "empty.ts"}, []string{"new.ts", "consumer.ts"}, nil, true, nil)
 	if err != nil {

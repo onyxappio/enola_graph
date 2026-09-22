@@ -146,6 +146,49 @@ func TestFrozenNarrowContentDeltaExcludesIndependentFile(t *testing.T) {
 	assertAppliedEqualsCold(t, cons, oracle)
 }
 
+func TestFrozenBodyOnlyStableOwnerGraphDoesNotExpandScope(t *testing.T) {
+	app := filepath.Join("apps", "architect-console", "src", "server", "app.ts")
+	password := filepath.Join("packages", "crypto", "src", "password.ts")
+	root := setupTSRepo(t, map[string]string{
+		password: "export function normalizeEmail(s: string) { return s.trim().toLowerCase(); }",
+		app: `import Fastify from 'fastify';
+export function listen() { return Fastify(); }
+`,
+		"independent.ts": "export const i = 1;",
+	})
+	eng := testEngine(t, root)
+	state := t.TempDir()
+	opts := Options{StateDir: state, AuthoritativeFiles: true}
+	if _, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, opts); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, password), []byte("export function normalizeEmail(s: string) { return s.normalize('NFKC').trim().toLowerCase(); }\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	sink := &graphstream.MemorySink{}
+	delta, err := Run(context.Background(), eng, root, sink, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	bs, _, _, err := DecodeRun(sink.CloneRecords())
+	if err != nil || len(bs) != 1 {
+		t.Fatalf("begin %v %v", bs, err)
+	}
+	owners := map[string]bool{}
+	for _, o := range bs[0].OwnerScope {
+		owners[o.ID] = true
+	}
+	if !owners[filepath.ToSlash(password)] {
+		t.Fatalf("body-only Begin omitted dirty file: %v", bs[0].OwnerScope)
+	}
+	if owners[filepath.ToSlash(app)] || owners["independent.ts"] {
+		t.Fatalf("body-only stable owners expanded scope: %v", bs[0].OwnerScope)
+	}
+	if delta.ParsedFiles != 1 {
+		t.Fatalf("parsed=%d, want 1", delta.ParsedFiles)
+	}
+}
+
 func TestFrozenImportTargetBodyStaysNarrow(t *testing.T) {
 	root := setupTSRepo(t, map[string]string{
 		"lib.ts":   "export function lib(){ return 1; }",

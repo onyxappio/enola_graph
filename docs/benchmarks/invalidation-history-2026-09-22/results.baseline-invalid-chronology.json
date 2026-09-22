@@ -1,0 +1,190 @@
+{
+  "source": "/tmp/enola-product-benchmark-source",
+  "binary": "/tmp/enola-product-frozen-v2-enola",
+  "count": 10,
+  "transitions": [
+    {
+      "id": "5dfb2c8f276d..a609c19f3861",
+      "parent": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "child": "a609c19f3861971930fae7b33dcb2950598953c",
+      "changed_files": [
+        [
+          "M",
+          ".github/workflows/prod-deploy.yml"
+        ],
+        [
+          "M",
+          ".github/workflows/product-core-clickpipes-production.yml"
+        ],
+        [
+          "M",
+          ".github/workflows/product-core-clickpipes-test.yml"
+        ],
+        [
+          "M",
+          "docs/analytics/product-core-bronze.md"
+        ],
+        [
+          "M",
+          "infra/pulumi/src/gcp/productCoreClickPipes.test.ts"
+        ],
+        [
+          "M",
+          "infra/pulumi/src/gcp/productCoreClickPipes.ts"
+        ],
+        [
+          "M",
+          "infra/pulumi/src/index.ts"
+        ],
+        [
+          "M",
+          "infra/pulumi/src/onyxEnvironment.ts"
+        ],
+        [
+          "A",
+          "packages/clickhouse/scripts/clickhouse/print-product-core-contract-digest.ts"
+        ],
+        [
+          "A",
+          "packages/clickhouse/src/productCoreBronze/contractDigest.snapshot.json"
+        ],
+        [
+          "A",
+          "packages/clickhouse/src/productCoreBronze/contractDigest.test.ts"
+        ],
+        [
+          "A",
+          "packages/clickhouse/src/productCoreBronze/contractDigest.ts"
+        ],
+        [
+          "M",
+          "packages/clickhouse/src/productCoreBronze/index.ts"
+        ],
+        [
+          "M",
+          "packages/clickhouse/src/productCoreContractParity.test.ts"
+        ],
+        [
+          "A",
+          "scripts/clickhouse/print-product-core-contract-digest.ts"
+        ],
+        [
+          "M",
+          "scripts/deploy/prod-deploy-clickpipes-continuity.test.mjs"
+        ],
+        [
+          "M",
+          "scripts/deploy/product-core-clickpipes-production-workflow.test.mjs"
+        ],
+        [
+          "M",
+          "scripts/deploy/product-core-clickpipes-runbook.test.mjs"
+        ],
+        [
+          "M",
+          "scripts/deploy/product-core-clickpipes-test-workflow.test.mjs"
+        ]
+      ],
+      "changed_file_count": 19,
+      "initial": {
+        "exit": 0,
+        "wall_s": 24.823,
+        "parsed": 4141,
+        "cached": 0,
+        "files_read": 4241,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5065,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790050610747702000",
+        "manifest": {
+          "begin_count": 8641,
+          "begin_digest": "3993f83452d6e4fb389de55d8834f45899b8e50850cb7d293cac182959571445",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "47f442891833afdff89f00a393e78a8c005077a856e21bdaea88d1951623ed50",
+          "end_owner_scope_len": 8641,
+          "end_owner_scope_digest": "3993f83452d6e4fb389de55d8834f45899b8e50850cb7d293cac182959571445",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "delta": {
+        "exit": 0,
+        "wall_s": 23.147,
+        "parsed": 287,
+        "cached": 4242,
+        "files_read": 287,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-2-1790050637997533000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            1,
+            2
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "3c83f1d45ade69bec43bdcd31e419e002fe420462375d076f4ac0000961c9ea7",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 24.859,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790050666317155000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "171fbee93e391c2ae9ac0d50e8ed516181a10ae65ae06994d06bd8d29c062d06",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 8645,
+      "necessary_owner_count": 9,
+      "graph_hash_equal": true,
+      "nonempty_owner_set_equal": true,
+      "kind": "broad",
+      "blocker": null
+    }
+  ]
+}

@@ -1,0 +1,789 @@
+{
+  "provenance": {
+    "note": "first-parent history; persistent delta state; cold oracle per commit",
+    "source_tree": "/tmp/enola-product-benchmark-source",
+    "source_dirty_untracked": "?? .enola/\n?? mcp-arch.yaml",
+    "fetch_clone": "/tmp/enola-invalidation-history-2026-09-22/product-fetch",
+    "ref": "origin/main",
+    "ref_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+    "first_parent_shas": [
+      "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+      "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+      "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+      "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+      "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+      "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+      "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "a6f1f3a91a36ea3dead786560412a4944a009694",
+      "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "a609c19f3861971930fae7b33dcb2950598953c5"
+    ],
+    "enola": {
+      "revision": "e85c8d6181d77c9ce8232020e81facf9bcdd514b",
+      "dirty": true,
+      "status_porcelain": "M docs/benchmarks/invalidation-scope-2026-09-21/README.md\n M docs/benchmarks/invalidation-scope-2026-09-21/run.py\n M internal/graphsession/frozen_contract_test.go\n M internal/graphsession/invalidation_plan.go\n M internal/graphsession/invalidation_plan_test.go\n M internal/graphsession/owner.go\n M internal/graphsession/owner_resolution_test.go\n M internal/graphsession/session.go\n?? docs/benchmarks/invalidation-history-2026-09-22/",
+      "diff_sha256": "607aa34040817da3e19d07b35409267f4d90555806e461ade9f314682818e4a7"
+    },
+    "binary": "/tmp/enola-product-frozen-v2-enola",
+    "binary_sha256": "1aeade82dcf3038b5739b10e291d783715101e154433d21676bcdf857d35d2ea",
+    "input_policy": "mcp-arch.yaml overlay from source when present; lockfiles excluded from required owners",
+    "baseline": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/invalidation-history-2026-09-22/results.baseline-invalid-chronology.json"
+  },
+  "initial_sha": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+  "transitions": [
+    {
+      "id": "00-4d104e600f89..07fb4a41ddaf",
+      "index": 0,
+      "parent": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+      "child": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+      "changed_file_count": 6,
+      "delta": {
+        "exit": 0,
+        "wall_s": 21.793,
+        "parsed": 3,
+        "cached": 4219,
+        "files_read": 3,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 5039,
+        "events": 2673,
+        "run_id": "product-scope-scope-bench-2-1790056095069584000",
+        "manifest": {
+          "begin_count": 8609,
+          "begin_digest": "fcfd526d24136fb8fd446fd6c9cec72c0b132bdf06f5bb4aa63df2e3fdec94a5",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            1,
+            2
+          ],
+          "end_batch_count": 2671,
+          "end_batch_digest": "c7c7c6a56992c1c9ec16c4bc2ac40cfb1d7b49fcedbca6124fb972fcb9ce2111",
+          "end_owner_scope_len": 8609,
+          "end_owner_scope_digest": "fcfd526d24136fb8fd446fd6c9cec72c0b132bdf06f5bb4aa63df2e3fdec94a5",
+          "batch_seq_count": 2671,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 24.866,
+        "parsed": 4120,
+        "cached": 0,
+        "files_read": 4220,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5039,
+        "events": 2673,
+        "run_id": "product-scope-scope-bench-1-1790056148366811000",
+        "manifest": {
+          "begin_count": 8609,
+          "begin_digest": "fcfd526d24136fb8fd446fd6c9cec72c0b132bdf06f5bb4aa63df2e3fdec94a5",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2671,
+          "end_batch_digest": "6d26caa6ce4565c425c4fb90a350133d758a5b5c80ef31e68289ffe7ec78443f",
+          "end_owner_scope_len": 8609,
+          "end_owner_scope_digest": "fcfd526d24136fb8fd446fd6c9cec72c0b132bdf06f5bb4aa63df2e3fdec94a5",
+          "batch_seq_count": 2671,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 8609,
+      "necessary_owner_count": 3,
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 2,
+      "blocker": null
+    },
+    {
+      "id": "01-07fb4a41ddaf..fec1eac346c4",
+      "index": 1,
+      "parent": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+      "child": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+      "changed_file_count": 9345,
+      "delta": {
+        "exit": 0,
+        "wall_s": 23.581,
+        "parsed": 1923,
+        "cached": 2661,
+        "files_read": 1925,
+        "generation": [
+          2,
+          3
+        ],
+        "owners_published": 5043,
+        "events": 2679,
+        "run_id": "product-scope-scope-bench-3-1790056179357189000",
+        "manifest": {
+          "begin_count": 8613,
+          "begin_digest": "23837d126fe83712f0e485c4eb3bb39f4b865d1d634e451678c0b63836361289",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            2,
+            3
+          ],
+          "end_batch_count": 2677,
+          "end_batch_digest": "bf6e9c3d683254029c32ebcd92ab592371b90b4f4899432720416e39241bdd32",
+          "end_owner_scope_len": 8613,
+          "end_owner_scope_digest": "23837d126fe83712f0e485c4eb3bb39f4b865d1d634e451678c0b63836361289",
+          "batch_seq_count": 2677,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 25.087,
+        "parsed": 4124,
+        "cached": 0,
+        "files_read": 4224,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5043,
+        "events": 2679,
+        "run_id": "product-scope-scope-bench-1-1790056235307374000",
+        "manifest": {
+          "begin_count": 8613,
+          "begin_digest": "23837d126fe83712f0e485c4eb3bb39f4b865d1d634e451678c0b63836361289",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2677,
+          "end_batch_digest": "ff38d4fce8cae4ba057de5cb7e1f1966da0fec0d7524ba9cc08910c736a090a5",
+          "end_owner_scope_len": 8613,
+          "end_owner_scope_digest": "23837d126fe83712f0e485c4eb3bb39f4b865d1d634e451678c0b63836361289",
+          "batch_seq_count": 2677,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 8613,
+      "necessary_owner_count": 97,
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 3,
+      "blocker": null
+    },
+    {
+      "id": "02-fec1eac346c4..9fc7ae5b4c3f",
+      "index": 2,
+      "parent": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+      "child": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+      "changed_file_count": 8125,
+      "delta": {
+        "exit": 0,
+        "wall_s": 24.234,
+        "parsed": 1858,
+        "cached": 2658,
+        "files_read": 1858,
+        "generation": [
+          3,
+          4
+        ],
+        "owners_published": 5046,
+        "events": 2681,
+        "run_id": "product-scope-scope-bench-4-1790056266336662000",
+        "manifest": {
+          "begin_count": 8616,
+          "begin_digest": "6f472cde2c810f6c11a376e6dbf358a7d58ad75739f0206108043b148f58cc9e",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            3,
+            4
+          ],
+          "end_batch_count": 2679,
+          "end_batch_digest": "d3817eca1d185f948c1b294bf7b41fdf8fe3c37d3a33261e1f83a2eca12f3a68",
+          "end_owner_scope_len": 8616,
+          "end_owner_scope_digest": "6f472cde2c810f6c11a376e6dbf358a7d58ad75739f0206108043b148f58cc9e",
+          "batch_seq_count": 2679,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 25.03,
+        "parsed": 4126,
+        "cached": 0,
+        "files_read": 4226,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5046,
+        "events": 2681,
+        "run_id": "product-scope-scope-bench-1-1790056324585733000",
+        "manifest": {
+          "begin_count": 8616,
+          "begin_digest": "6f472cde2c810f6c11a376e6dbf358a7d58ad75739f0206108043b148f58cc9e",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2679,
+          "end_batch_digest": "192d54b489d4760426553579fddcd157ba929f963485b2cee73edf9fff46e147",
+          "end_owner_scope_len": 8616,
+          "end_owner_scope_digest": "6f472cde2c810f6c11a376e6dbf358a7d58ad75739f0206108043b148f58cc9e",
+          "batch_seq_count": 2679,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 8616,
+      "necessary_owner_count": 17,
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 4,
+      "blocker": null
+    },
+    {
+      "id": "03-9fc7ae5b4c3f..1c2607479b6d",
+      "index": 3,
+      "parent": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+      "child": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+      "changed_file_count": 70,
+      "delta": {
+        "exit": 0,
+        "wall_s": 23.547,
+        "parsed": 318,
+        "cached": 4215,
+        "files_read": 318,
+        "generation": [
+          4,
+          5
+        ],
+        "owners_published": 5050,
+        "events": 2685,
+        "run_id": "product-scope-scope-bench-5-1790056354287792000",
+        "manifest": {
+          "begin_count": 8622,
+          "begin_digest": "1440b93fa3b61a13a891593915c3906a509ae5c43d25016347ebbd87ed32d1d8",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            4,
+            5
+          ],
+          "end_batch_count": 2683,
+          "end_batch_digest": "654f7b2477253d1ac81842f54d1831650b6946675efe62f3b8ca6da07f7e12e7",
+          "end_owner_scope_len": 8622,
+          "end_owner_scope_digest": "1440b93fa3b61a13a891593915c3906a509ae5c43d25016347ebbd87ed32d1d8",
+          "batch_seq_count": 2683,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 25.196,
+        "parsed": 4128,
+        "cached": 0,
+        "files_read": 4228,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5050,
+        "events": 2685,
+        "run_id": "product-scope-scope-bench-1-1790056412519805000",
+        "manifest": {
+          "begin_count": 8622,
+          "begin_digest": "1440b93fa3b61a13a891593915c3906a509ae5c43d25016347ebbd87ed32d1d8",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2683,
+          "end_batch_digest": "6b317f669ea7b634d9a87041db6acbcae11092b09882422a51ce165d1998dfc0",
+          "end_owner_scope_len": 8622,
+          "end_owner_scope_digest": "1440b93fa3b61a13a891593915c3906a509ae5c43d25016347ebbd87ed32d1d8",
+          "batch_seq_count": 2683,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 8622,
+      "necessary_owner_count": 49,
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 5,
+      "blocker": null
+    },
+    {
+      "id": "04-1c2607479b6d..599575d0aa39",
+      "index": 4,
+      "parent": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+      "child": "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+      "changed_file_count": 15,
+      "delta": {
+        "exit": 0,
+        "wall_s": 22.989,
+        "parsed": 8,
+        "cached": 4220,
+        "files_read": 8,
+        "generation": [
+          5,
+          6
+        ],
+        "owners_published": 5050,
+        "events": 2685,
+        "run_id": "product-scope-scope-bench-6-1790056441844316000",
+        "manifest": {
+          "begin_count": 8622,
+          "begin_digest": "1440b93fa3b61a13a891593915c3906a509ae5c43d25016347ebbd87ed32d1d8",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            5,
+            6
+          ],
+          "end_batch_count": 2683,
+          "end_batch_digest": "f89796d75d666f2134410032cf76a46cf6b874c92f51d0bb7145c3e32182e137",
+          "end_owner_scope_len": 8622,
+          "end_owner_scope_digest": "1440b93fa3b61a13a891593915c3906a509ae5c43d25016347ebbd87ed32d1d8",
+          "batch_seq_count": 2683,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 24.924,
+        "parsed": 4128,
+        "cached": 0,
+        "files_read": 4228,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5050,
+        "events": 2685,
+        "run_id": "product-scope-scope-bench-1-1790056500972338000",
+        "manifest": {
+          "begin_count": 8622,
+          "begin_digest": "1440b93fa3b61a13a891593915c3906a509ae5c43d25016347ebbd87ed32d1d8",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2683,
+          "end_batch_digest": "4aad83272c797fd3ecc4a4ec3e3ce6e009b6d0312047ab052aa983f0058c3fd6",
+          "end_owner_scope_len": 8622,
+          "end_owner_scope_digest": "1440b93fa3b61a13a891593915c3906a509ae5c43d25016347ebbd87ed32d1d8",
+          "batch_seq_count": 2683,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 8622,
+      "necessary_owner_count": 10,
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 6,
+      "blocker": null
+    },
+    {
+      "id": "05-599575d0aa39..ae233c5f5695",
+      "index": 5,
+      "parent": "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+      "child": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "changed_file_count": 60,
+      "delta": {
+        "exit": 0,
+        "wall_s": 23.362,
+        "parsed": 342,
+        "cached": 4187,
+        "files_read": 342,
+        "generation": [
+          6,
+          7
+        ],
+        "owners_published": 5059,
+        "events": 2687,
+        "run_id": "product-scope-scope-bench-7-1790056530095702000",
+        "manifest": {
+          "begin_count": 8636,
+          "begin_digest": "61990e16729808e82b64974b380ba69adb2220e0825cedcb8dd621bff16108ba",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            6,
+            7
+          ],
+          "end_batch_count": 2685,
+          "end_batch_digest": "5cb057f29fa7ed5002af4973ff4284d44ea007cea47644e97020442bcfeaf0bb",
+          "end_owner_scope_len": 8636,
+          "end_owner_scope_digest": "61990e16729808e82b64974b380ba69adb2220e0825cedcb8dd621bff16108ba",
+          "batch_seq_count": 2685,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 24.888,
+        "parsed": 4135,
+        "cached": 0,
+        "files_read": 4235,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5059,
+        "events": 2687,
+        "run_id": "product-scope-scope-bench-1-1790056590707741000",
+        "manifest": {
+          "begin_count": 8635,
+          "begin_digest": "e454cc22af7c7f5f74e62ca473c88b6191a0fd9cdc66e17b92f131ca967fdf63",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2685,
+          "end_batch_digest": "f3ee736a097d258b1c05d26f1fe048fa384446ab4e2e92c113840feda2552aa7",
+          "end_owner_scope_len": 8635,
+          "end_owner_scope_digest": "e454cc22af7c7f5f74e62ca473c88b6191a0fd9cdc66e17b92f131ca967fdf63",
+          "batch_seq_count": 2685,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 8636,
+      "necessary_owner_count": 42,
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 7,
+      "blocker": null
+    },
+    {
+      "id": "06-ae233c5f5695..4168360e2e7f",
+      "index": 6,
+      "parent": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "child": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "changed_file_count": 15,
+      "delta": {
+        "exit": 0,
+        "wall_s": 23.568,
+        "parsed": 289,
+        "cached": 4231,
+        "files_read": 289,
+        "generation": [
+          7,
+          8
+        ],
+        "owners_published": 5060,
+        "events": 2688,
+        "run_id": "product-scope-scope-bench-8-1790056619750908000",
+        "manifest": {
+          "begin_count": 8636,
+          "begin_digest": "4733f83f35f5c9666f5caf1c0b7deae16df0d5d773abd5361c697ff9f132bfae",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            7,
+            8
+          ],
+          "end_batch_count": 2686,
+          "end_batch_digest": "73235753329a6dd147ca1daba10eabfa7627a40d032bb5bcc30d809274232e32",
+          "end_owner_scope_len": 8636,
+          "end_owner_scope_digest": "4733f83f35f5c9666f5caf1c0b7deae16df0d5d773abd5361c697ff9f132bfae",
+          "batch_seq_count": 2686,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 24.722,
+        "parsed": 4136,
+        "cached": 0,
+        "files_read": 4236,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5060,
+        "events": 2688,
+        "run_id": "product-scope-scope-bench-1-1790056680728959000",
+        "manifest": {
+          "begin_count": 8636,
+          "begin_digest": "4733f83f35f5c9666f5caf1c0b7deae16df0d5d773abd5361c697ff9f132bfae",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2686,
+          "end_batch_digest": "348a2b99593be5536845fda1cf74b8cc3792471f0f94729e32ed47f1665e4394",
+          "end_owner_scope_len": 8636,
+          "end_owner_scope_digest": "4733f83f35f5c9666f5caf1c0b7deae16df0d5d773abd5361c697ff9f132bfae",
+          "batch_seq_count": 2686,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 8636,
+      "necessary_owner_count": 10,
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 8,
+      "blocker": null
+    },
+    {
+      "id": "07-4168360e2e7f..a6f1f3a91a36",
+      "index": 7,
+      "parent": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "child": "a6f1f3a91a36ea3dead786560412a4944a009694",
+      "changed_file_count": 5,
+      "delta": {
+        "exit": 0,
+        "wall_s": 22.699,
+        "parsed": 4,
+        "cached": 4232,
+        "files_read": 4,
+        "generation": [
+          8,
+          9
+        ],
+        "owners_published": 5060,
+        "events": 2688,
+        "run_id": "product-scope-scope-bench-9-1790056710272078000",
+        "manifest": {
+          "begin_count": 8636,
+          "begin_digest": "4733f83f35f5c9666f5caf1c0b7deae16df0d5d773abd5361c697ff9f132bfae",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            8,
+            9
+          ],
+          "end_batch_count": 2686,
+          "end_batch_digest": "55b3961e3bbaa633af15742dfdc8b6fa51e4b24ecbd0a01fcd35eec203ad6a48",
+          "end_owner_scope_len": 8636,
+          "end_owner_scope_digest": "4733f83f35f5c9666f5caf1c0b7deae16df0d5d773abd5361c697ff9f132bfae",
+          "batch_seq_count": 2686,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 24.898,
+        "parsed": 4136,
+        "cached": 0,
+        "files_read": 4236,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5060,
+        "events": 2688,
+        "run_id": "product-scope-scope-bench-1-1790056771490960000",
+        "manifest": {
+          "begin_count": 8636,
+          "begin_digest": "4733f83f35f5c9666f5caf1c0b7deae16df0d5d773abd5361c697ff9f132bfae",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2686,
+          "end_batch_digest": "56214a9359add7b404c429fcf9fe6e8fd937155e7b7006b6c07d247405b6bac8",
+          "end_owner_scope_len": 8636,
+          "end_owner_scope_digest": "4733f83f35f5c9666f5caf1c0b7deae16df0d5d773abd5361c697ff9f132bfae",
+          "batch_seq_count": 2686,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 8636,
+      "necessary_owner_count": 4,
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 9,
+      "blocker": null
+    },
+    {
+      "id": "08-a6f1f3a91a36..5dfb2c8f276d",
+      "index": 8,
+      "parent": "a6f1f3a91a36ea3dead786560412a4944a009694",
+      "child": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "changed_file_count": 15,
+      "delta": {
+        "exit": 0,
+        "wall_s": 23.531,
+        "parsed": 340,
+        "cached": 4184,
+        "files_read": 340,
+        "generation": [
+          9,
+          10
+        ],
+        "owners_published": 5065,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-10-1790056801241811000",
+        "manifest": {
+          "begin_count": 8641,
+          "begin_digest": "3993f83452d6e4fb389de55d8834f45899b8e50850cb7d293cac182959571445",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            9,
+            10
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "82e5cecb9b56e6d026144cf0a50db1829ad3f974b59385260943c262f3585819",
+          "end_owner_scope_len": 8641,
+          "end_owner_scope_digest": "3993f83452d6e4fb389de55d8834f45899b8e50850cb7d293cac182959571445",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 24.964,
+        "parsed": 4141,
+        "cached": 0,
+        "files_read": 4241,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5065,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790056864129703000",
+        "manifest": {
+          "begin_count": 8641,
+          "begin_digest": "3993f83452d6e4fb389de55d8834f45899b8e50850cb7d293cac182959571445",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "e23231bb4a8fa0226a404598a49815d1f126740f97297b5632201bdb147aade1",
+          "end_owner_scope_len": 8641,
+          "end_owner_scope_digest": "3993f83452d6e4fb389de55d8834f45899b8e50850cb7d293cac182959571445",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 8641,
+      "necessary_owner_count": 13,
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 10,
+      "blocker": null
+    },
+    {
+      "id": "09-5dfb2c8f276d..a609c19f3861",
+      "index": 9,
+      "parent": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "child": "a609c19f3861971930fae7b33dcb2950598953c5",
+      "changed_file_count": 19,
+      "delta": {
+        "exit": 0,
+        "wall_s": 23.242,
+        "parsed": 287,
+        "cached": 4242,
+        "files_read": 287,
+        "generation": [
+          10,
+          11
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-11-1790056894322261000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            10,
+            11
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "79f3b355e342294e9bf305b891b9f2a671549bb231f8bc90c8d13e93c84fe4a0",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 24.99,
+        "parsed": 4144,
+        "cached": 0,
+        "files_read": 4244,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 5068,
+        "events": 2691,
+        "run_id": "product-scope-scope-bench-1-1790056959059417000",
+        "manifest": {
+          "begin_count": 8645,
+          "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2689,
+          "end_batch_digest": "e1e1227f5fc5949287bd899579b53da5ecef3071dc7ab40318a89ea0b1f1b6ca",
+          "end_owner_scope_len": 8645,
+          "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+          "batch_seq_count": 2689,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 8645,
+      "necessary_owner_count": 16,
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 11,
+      "blocker": null
+    }
+  ],
+  "work": "/tmp/enola-invalidation-history-2026-09-22",
+  "output": "/tmp/enola-invalidation-history-2026-09-22/results.json",
+  "repeat_limitation": "not a performance-acceptance run; launch the 10-case only when agreed"
+}

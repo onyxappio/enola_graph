@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 """Frozen invalidation-scope harness for Product.
 
-Ten independent clones under /tmp. Never writes the tracked Product tree and
+Ten independent clones under --work. Never writes the tracked Product tree and
 never edits Enola production Go. Initial+delta share one events file so SinkID
 matches. Owner-set comparison is separate from the graph hash. Rename uses
 git diff --name-status -M and requires both old and new file owner IDs.
+
+Writes $WORK/results.json. Does not overwrite the tracked docs snapshot.
+One diagnostic pass is not a performance-acceptance run. Any contract,
+graph-hash, required-owner, or lock-only failure exits nonzero.
 """
 from __future__ import annotations
 
@@ -141,7 +145,12 @@ def manifest_fields(records, after_run=None):
 
 
 def validate_replacement(records, raw_records=None):
-    """Validate the frozen v2 complete replacement contract for one run."""
+    """Validate the frozen v2 complete immutable replacement contract for one run."""
+    if raw_records is None:
+        raise RuntimeError("raw batch payloads are required to recompute End batch_digest")
+    extra_types = sorted({r.get("type") for r in records if r.get("type") not in {"begin_replace", "end_replace", "batch"}})
+    if extra_types:
+        raise RuntimeError(f"replacement contains non-replacement events: {extra_types}")
     begins = [r for r in records if r.get("type") == "begin_replace"]
     ends = [r for r in records if r.get("type") == "end_replace"]
     if len(begins) != 1 or len(ends) != 1:
@@ -151,28 +160,41 @@ def validate_replacement(records, raw_records=None):
         raise RuntimeError(f"unexpected schema_version {begin.get('schema_version')!r}")
     if begin.get("scope_mode") != "complete":
         raise RuntimeError(f"unexpected scope_mode {begin.get('scope_mode')!r}")
+    base_gen = begin.get("base_generation")
+    target_gen = begin.get("target_generation")
+    if type(base_gen) is not int or type(target_gen) is not int or target_gen != base_gen + 1:
+        raise RuntimeError(f"target_generation must be base_generation+1, got {base_gen!r}->{target_gen!r}")
     run_id = begin.get("run_id")
     if end.get("run_id") != run_id:
         raise RuntimeError("End run_id does not match Begin")
-    owners = [owner_key(o) for o in begin.get("owner_scope") or []]
-    if len(owners) != len(set(owners)) or any(not k.split(":", 1)[-1] for k in owners):
-        raise RuntimeError("Begin owner scope contains duplicate or empty owner")
+    raw_owners = list(begin.get("owner_scope") or [])
+    for owner in raw_owners:
+        if not isinstance(owner, dict) or owner.get("kind") != "file" or not owner.get("id"):
+            raise RuntimeError("Begin owner scope must contain nonempty file owners only")
+    owners = [owner_key(o) for o in raw_owners]
+    if len(owners) != len(set(owners)):
+        raise RuntimeError("Begin owner scope contains duplicate owner")
     if begin.get("owner_scope_count") != len(owners):
         raise RuntimeError("Begin owner_scope_count mismatch")
-    expected_owner_digest = digest_owners([o for o in begin.get("owner_scope") or []])
+    expected_owner_digest = digest_owners(raw_owners)
     if begin.get("owner_scope_digest") != expected_owner_digest:
         raise RuntimeError("Begin owner_scope_digest mismatch")
     if end.get("owner_scope_len") != len(owners) or end.get("owner_scope_digest") != expected_owner_digest:
         raise RuntimeError("End owner manifest mismatch")
-    comp = end.get("completeness") or {}
-    if comp.get("status") != "success" or comp.get("files_unreadable"):
+    comp = end.get("completeness")
+    if not isinstance(comp, dict) or comp.get("status") != "success":
+        raise RuntimeError(f"replacement incomplete: {comp}")
+    unread = comp.get("files_unreadable") or []
+    if unread:
         raise RuntimeError(f"replacement incomplete: {comp}")
     batches = [r for r in records if r.get("type") == "batch" and r.get("run_id") == run_id]
     seqs = [b.get("seq") for b in batches]
-    if sorted(seqs) != list(range(1, len(seqs) + 1)):
-        raise RuntimeError(f"batch sequences are not contiguous: {seqs[:20]}")
-    if any(b.get("phase") == "scope" for b in batches):
-        raise RuntimeError("v2 complete replacement contains PhaseScope")
+    if len(seqs) != len(set(seqs)) or sorted(seqs) != list(range(1, len(seqs) + 1)):
+        raise RuntimeError(f"batch sequences are not unique contiguous 1..N: {seqs[:20]}")
+    if any(b.get("phase") == "scope" or (b.get("owners") or []) for b in batches):
+        raise RuntimeError("v2 complete replacement contains PhaseScope additions")
+    if any(b.get("phase") != "resolved" for b in batches):
+        raise RuntimeError("v2 complete replacement contains a non-resolved batch")
     scope = set(owners)
     for b in batches:
         for item in (b.get("nodes") or []) + (b.get("edges") or []):
@@ -180,18 +202,37 @@ def validate_replacement(records, raw_records=None):
                 raise RuntimeError("batch contains owner outside Begin scope")
     if end.get("batch_count") != len(batches):
         raise RuntimeError("End batch_count mismatch")
-    if raw_records is not None:
-        payload_by_seq = {
-            rec.get("seq"): raw
-            for rec, raw in raw_records
-            if rec.get("type") == "batch" and rec.get("run_id") == run_id
-        }
-        payloads = [payload_by_seq[seq] for seq in sorted(payload_by_seq)]
-        if end.get("batch_digest") != digest_batches(payloads):
-            raise RuntimeError("End batch_digest mismatch")
-    elif not end.get("batch_digest"):
-        raise RuntimeError("missing End batch_digest")
-    return {"run_id": run_id, "scope": scope, "batch_count": len(batches)}
+    payload_by_seq = {}
+    for rec, raw in raw_records:
+        if rec.get("type") != "batch" or rec.get("run_id") != run_id:
+            continue
+        seq = rec.get("seq")
+        if seq in payload_by_seq:
+            raise RuntimeError(f"duplicate raw batch seq {seq}")
+        payload_by_seq[seq] = raw
+    if sorted(payload_by_seq) != list(range(1, len(batches) + 1)):
+        raise RuntimeError("raw batch payloads missing or extra relative to seq 1..N")
+    payloads = [payload_by_seq[seq] for seq in range(1, len(batches) + 1)]
+    expected_batch_digest = digest_batches(payloads)
+    if end.get("batch_digest") != expected_batch_digest:
+        raise RuntimeError("End batch_digest mismatch")
+    return {"run_id": run_id, "scope": scope, "batch_count": len(batches), "base_generation": base_gen, "target_generation": target_gen}
+
+
+def validate_lock_only_noop(records, info):
+    """Lock-only deltas must publish nothing and must not advance generation."""
+    if records:
+        types = sorted({r.get("type") for r in records})
+        raise RuntimeError(f"lock-only published events: {types}")
+    if (info.get("parsed") or 0) != 0:
+        raise RuntimeError("lock-only parsed files")
+    if (info.get("events") or 0) != 0:
+        raise RuntimeError("lock-only published events")
+    if (info.get("owners_published") or 0) != 0:
+        raise RuntimeError("lock-only published owners")
+    gen = info.get("generation") or []
+    if len(gen) != 2 or gen[0] != gen[1]:
+        raise RuntimeError(f"lock-only advanced generation: {gen}")
 
 
 def digest_owners(owners):
@@ -587,11 +628,12 @@ def run_scenario(binary: Path, gold: Path, work: Path, name: str, title: str, mu
         delta["events"] = len(delta_recs)
         delta_man = manifest_fields(delta_recs)
         if name == "09-lock-only":
-            gen = delta.get("generation") or []
-            if delta_recs or (delta.get("parsed") or 0) != 0 or len(gen) != 2 or gen[0] != gen[1]:
-                raise RuntimeError("lock-only change is not a strict no-op")
+            validate_lock_only_noop(delta_recs, delta)
         else:
-            validate_replacement(delta_recs, delta_pairs)
+            validated = validate_replacement(delta_recs, delta_pairs)
+            gen = delta.get("generation") or []
+            if gen != [validated["base_generation"], validated["target_generation"]]:
+                raise RuntimeError(f"summary generation {gen} does not match Begin {validated['base_generation']}->{validated['target_generation']}")
         result["delta"] = slim_run(delta, delta_man)
         applied = Consumer()
         applied.apply(live_recs)
@@ -611,6 +653,7 @@ def run_scenario(binary: Path, gold: Path, work: Path, name: str, title: str, mu
         nonempty_ok = applied.owner_set_nonempty() == cold.owner_set_nonempty()
         all_ok = applied.owner_set_all() == cold.owner_set_all()
         result["current_begin_scope_count"] = len(current)
+        result["begin_owners"] = current
         result["current_begin_digest"] = delta_man.get("begin_digest")
         result["end_batch_count"] = delta_man.get("end_batch_count")
         result["end_batch_digest"] = delta_man.get("end_batch_digest")
@@ -625,8 +668,12 @@ def run_scenario(binary: Path, gold: Path, work: Path, name: str, title: str, mu
         result["cold_empty_owners_sample"] = cold.empty_owners()[:20]
         result["applied_synthetic"] = applied.synthetic_owners()
         result["cold_synthetic"] = cold.synthetic_owners()
-        if name != "09-lock-only" and not set(nec).issubset(set(current)):
+        if not set(nec).issubset(set(current)):
             raise RuntimeError("required owners are outside Begin scope")
+        if name == "09-lock-only" and (current or nec or delta_recs or (delta.get("events") or 0)):
+            raise RuntimeError("lock-only Begin/necessary/events must all be empty")
+        if not graph_ok:
+            raise RuntimeError("initial+delta graph hash does not match cold")
         result["kind"] = classify(nec, current, delta.get("parsed") or 0, changed, graph_ok, delta.get("events") or 0)
         if name in {"05-add-file-import", "06-delete-file", "07-rename-file"} and len(current) > 100:
             result["kind"] = "whole-domain-membership"
@@ -634,9 +681,8 @@ def run_scenario(binary: Path, gold: Path, work: Path, name: str, title: str, mu
         if name == "08-package-config" and len(current) > 100:
             result["kind"] = "whole-domain-config"
             result["fallback"] = "config/manifest change: conservative whole-domain fallback"
-        if name not in {"05-add-file-import", "06-delete-file", "07-rename-file", "08-package-config"} and len(current) > 100:
-            result["kind"] = "whole-domain-resolution"
-            result["fallback"] = "exported declaration set changed: conservative resolver fallback"
+        if name in {"01-body", "02-add-function", "03-rename-symbol", "04-import-target-body", "10-multi-file"} and len(current) > 100:
+            raise RuntimeError(f"ordinary TS edit fell back to whole-domain Begin ({len(current)} owners)")
         if name == "07-rename-file":
             old_id = file_owner(result["rename_old_new"][0])
             new_id = file_owner(result["rename_old_new"][1])
@@ -644,8 +690,8 @@ def run_scenario(binary: Path, gold: Path, work: Path, name: str, title: str, mu
             result["rename_new_in_begin"] = new_id in current
             result["rename_old_in_necessary"] = old_id in nec
             result["rename_new_in_necessary"] = new_id in nec
-            if current and (old_id not in current or new_id not in current):
-                result["kind"] = "rename-missing-owner-ids"
+            if old_id not in current or new_id not in current:
+                raise RuntimeError(f"rename Begin omitted old or new file owner: {old_id} / {new_id}")
         if current and nec:
             result["scope_ratio"] = round(len(current) / max(len(nec), 1), 2)
         elif not current and not nec:
@@ -682,7 +728,10 @@ def main():
     p.add_argument("--binary", default="/tmp/enola-product-frozen-v2-enola")
     p.add_argument("--work", default="/tmp/enola-invalidation-scope-2026-09-21")
     p.add_argument("--only", default="")
+    p.add_argument("--self-test", action="store_true", help="validate the harness against unit cases and optional narrow2 events")
     args = p.parse_args()
+    if args.self_test:
+        return self_test()
     source = Path(args.source)
     binary = Path(args.binary)
     work = Path(args.work)
@@ -725,16 +774,128 @@ def main():
         "binary": str(binary),
         "work": str(work),
         "repeats": 1,
-        "repeat_limitation": "one pass of all 10 clones; three repeats skipped because each pass is a full Product initial+delta+cold (~8-10 min)",
+        "repeat_limitation": "one diagnostic pass of all 10 clones; not a performance-acceptance run. Three repeats skipped because each pass is a full Product initial+delta+cold.",
         "scenarios": results,
     }
-    out_json = Path(__file__).with_name("results.json")
+    out_json = work / "results.json"
     out_json.write_text(json.dumps(summary, indent=2) + "\n")
     print("wrote", out_json)
-    failed = [r for r in results if r.get("blocker") or r.get("graph_hash_equal") is False]
+    failed = [r for r in results if scenario_failed(r)]
     if failed:
         print(f"benchmark failed: {len(failed)} scenario(s)", file=sys.stderr)
+        for row in failed:
+            print(f"  {row.get('id')}: kind={row.get('kind')} blocker={row.get('blocker')!r} graph_eq={row.get('graph_hash_equal')}", file=sys.stderr)
         return 1
+    return 0
+
+
+def scenario_failed(row: dict) -> bool:
+    if row.get("blocker") or row.get("kind") == "blocker":
+        return True
+    if row.get("graph_hash_equal") is not True:
+        return True
+    if row.get("kind") in {"equality-failed", "missed-invalidation", "rename-missing-owner-ids"}:
+        return True
+    if row.get("id") == "09-lock-only":
+        delta = row.get("delta") or {}
+        gen = delta.get("generation") or []
+        if (delta.get("events") or 0) != 0 or (delta.get("parsed") or 0) != 0:
+            return True
+        if len(gen) != 2 or gen[0] != gen[1]:
+            return True
+        if row.get("current_begin_scope_count"):
+            return True
+        if row.get("necessary_owner_count"):
+            return True
+    if row.get("id") in {"01-body", "02-add-function", "03-rename-symbol", "04-import-target-body", "10-multi-file"}:
+        if (row.get("current_begin_scope_count") or 0) > 100:
+            return True
+    return False
+
+
+def split_runs(path: Path):
+    pairs = parse_event_records(path)
+    runs = []
+    cur = []
+    for rec, raw in pairs:
+        if rec.get("type") == "begin_replace" and cur:
+            runs.append(cur)
+            cur = []
+        cur.append((rec, raw))
+    if cur:
+        runs.append(cur)
+    return runs
+
+
+def self_test() -> int:
+    """Focused harness checks. Uses narrow2 artifacts when present; does not start a Product run."""
+    owners = [{"kind": "file", "id": "b.ts"}, {"kind": "file", "id": "a.ts"}]
+    if digest_owners(owners) != digest_owners(list(reversed(owners))):
+        print("self-test FAIL: owner digest not order-stable", file=sys.stderr)
+        return 1
+    if not scenario_failed({"id": "01-body", "kind": "local", "graph_hash_equal": True, "current_begin_scope_count": 8645}):
+        print("self-test FAIL: whole-domain ordinary TS edit must fail", file=sys.stderr)
+        return 1
+    if scenario_failed({"id": "01-body", "kind": "stable-facts", "graph_hash_equal": True, "current_begin_scope_count": 2, "necessary_owner_count": 0, "delta": {"parsed": 1, "events": 4, "generation": [1, 2]}}):
+        print("self-test FAIL: narrow 01-body marked failed", file=sys.stderr)
+        return 1
+    lock_row = {"id": "09-lock-only", "kind": "noop", "graph_hash_equal": True, "current_begin_scope_count": 0, "necessary_owner_count": 0, "delta": {"parsed": 0, "events": 0, "generation": [1, 1]}}
+    if scenario_failed(lock_row):
+        print("self-test FAIL: lock-only no-op marked failed", file=sys.stderr)
+        return 1
+    narrow = Path("/tmp/enola-invalidation-scope-narrow2-2026-09-21")
+    expect_delta = {
+        "01-body": 2,
+        "02-add-function": 3,
+        "03-rename-symbol": 3,
+        "04-import-target-body": 3,
+        "10-multi-file": 4,
+    }
+    for name, begin_n in expect_delta.items():
+        live = narrow / name / "events-live.jsonl"
+        if not live.is_file():
+            continue
+        runs = split_runs(live)
+        if len(runs) != 2:
+            print(f"self-test FAIL: {name} expected 2 runs, got {len(runs)}", file=sys.stderr)
+            return 1
+        recs = [r for r, _ in runs[-1]]
+        out = validate_replacement(recs, runs[-1])
+        if out["base_generation"] != 1 or out["target_generation"] != 2 or len(out["scope"]) != begin_n:
+            print(f"self-test FAIL: {name} delta contract {out} want Begin {begin_n}", file=sys.stderr)
+            return 1
+        begin = [r for r, _ in runs[-1] if r.get("type") == "begin_replace"][0]
+        if digest_owners(begin.get("owner_scope") or []) != begin.get("owner_scope_digest"):
+            print(f"self-test FAIL: {name} owner digest recompute mismatch", file=sys.stderr)
+            return 1
+        print(f"self-test {name} delta v2 complete Begin {begin_n} seq 1..N End success")
+    for name in ("05-add-file-import", "06-delete-file", "07-rename-file", "08-package-config"):
+        live = narrow / name / "events-live.jsonl"
+        if not live.is_file():
+            continue
+        runs = split_runs(live)
+        if len(runs) != 2:
+            print(f"self-test FAIL: {name} expected 2 runs, got {len(runs)}", file=sys.stderr)
+            return 1
+        out = validate_replacement([r for r, _ in runs[-1]], runs[-1])
+        if out["base_generation"] != 1 or out["target_generation"] != 2 or len(out["scope"]) < 100:
+            print(f"self-test FAIL: {name} membership/config contract {out}", file=sys.stderr)
+            return 1
+        print(f"self-test {name} delta v2 complete whole-domain Begin {len(out['scope'])}")
+    lock_live = narrow / "09-lock-only" / "events-live.jsonl"
+    if lock_live.is_file():
+        runs = split_runs(lock_live)
+        if len(runs) != 1:
+            print(f"self-test FAIL: lock-only expected only initial run, got {len(runs)}", file=sys.stderr)
+            return 1
+        print("self-test 09-lock-only no delta Begin")
+    lock_row_path = narrow / "09-lock-only" / "result.json"
+    if lock_row_path.is_file():
+        row = json.loads(lock_row_path.read_text())
+        if scenario_failed(row):
+            print("self-test FAIL: stored 09-lock-only row failed", file=sys.stderr)
+            return 1
+    print("self-test ok")
     return 0
 
 

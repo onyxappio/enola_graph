@@ -457,7 +457,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			// Initial/global-context changes still require the complete domain.
 			// For an ordinary content delta, derive the manifest from changed
 			// files plus reverse file-to-file dependents in the prior state.
-			wholeDomain := initial || forceAll || nonTSNeed || s.state == nil || configChanged || s.state.ConfigHash != cfgHash || s.state.PolicyIdentity != input.policyIdentity || incompleteDependencyRecords(prevFiles)
+			wholeDomain := initial || forceAll || s.state == nil || configChanged || s.state.ConfigHash != cfgHash || s.state.PolicyIdentity != input.policyIdentity || incompleteDependencyRecords(prevFiles)
 			if !wholeDomain && s.state != nil && s.state.FrameworkSig != "" {
 				need, ferr := s.frameworkDirtyRequiresFullScope(inv.Files, prevFiles, hashes, angular)
 				if ferr != nil {
@@ -471,6 +471,29 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			}
 			var extraOwners []string
 			if !wholeDomain && s.state != nil {
+				// Non-TypeScript extractors without per-file incremental support
+				// still have a bounded owner domain. Seed the frozen plan with
+				// those files and prior contributions instead of every repository
+				// owner; the extractor will replace exactly that owner set below.
+				for name, need := range needByExt {
+					if !need || name == "typescript" {
+						continue
+					}
+					for _, ext := range s.eng.Extractors() {
+						if ext.Name() != name {
+							continue
+						}
+						for _, file := range ownedFiles(ext, inv.Files) {
+							extraOwners = append(extraOwners, filepath.ToSlash(file))
+						}
+						for _, owner := range retireExtractorOwners(s.state, prevFiles, name) {
+							if owner.Kind == graphstream.OwnerFile {
+								extraOwners = append(extraOwners, filepath.ToSlash(owner.ID))
+							}
+						}
+						break
+					}
+				}
 				dirty := map[string]bool{}
 				for _, f := range current {
 					st := lookupState(prevFiles, f)
@@ -484,7 +507,20 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 					wholeDomain = true
 					fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "planning extract of dirty files failed; using whole domain"})
 				} else {
-					extraOwners = ownersForNameDelta(prevFiles, dirty, preview)
+					extraOwners = append(extraOwners, ownersForNameDelta(prevFiles, dirty, preview)...)
+					if len(prevFiles) > 100 && resolutionCandidatesChanged(prevFiles, dirty, preview) {
+						wholeDomain = true
+						forceAll = true
+						fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "frozen scope: resolver candidate identity changed"})
+					}
+					if !wholeDomain && s.state.FrameworkSig != "" && len(prevFiles) > 100 && len(dirty) > 1 {
+						// Framework composition can synthesize resolver candidates from
+						// files outside the dirty set. Until that domain is indexed
+						// before Begin, use the conservative immutable fallback.
+						wholeDomain = true
+						forceAll = true
+						fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "frozen scope: framework composition resolver domain"})
+					}
 				}
 			}
 			var planReason string
@@ -931,6 +967,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			graphstream.SortOwners(fileOwners)
 			fileOwners = dedupeOwners(fileOwners)
 			s.growScope(fileOwners)
+			if err := s.fileLocalErr(); err != nil {
+				return nil, err
+			}
 			if err := s.publishScope(ctx, runID, s.replaceScope); err != nil {
 				return nil, err
 			}
@@ -1037,6 +1076,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		}
 	}
 	s.growScope(nonTSFileOwners)
+	if err := s.fileLocalErr(); err != nil {
+		return nil, err
+	}
 
 	// Deleted TS files: empty replacement later; drop from state.
 	newFiles := map[string]*FileState{}
@@ -1151,11 +1193,8 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	s.inputs.resolution = idx
 	grouped := groupOwners(allFacts)
 	if s.state != nil && s.scopeLimited {
-		old := s.priorResolution
-		if old == nil {
-			old = stateResolutionIndex(s.state, repoID)
-		}
-		resOwners := changedResolutionOwners(grouped, old, idx, nil)
+		old, next := resolutionIndexes(s.state.Files, newFiles, allFacts, repoID)
+		resOwners := changedResolutionOwners(grouped, old, next, nil)
 		if s.opts.AuthoritativeFiles && s.plan != nil {
 			for _, o := range resOwners {
 				if o.Kind == graphstream.OwnerFile && !s.plan.member[o.ID] {
@@ -1164,6 +1203,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			}
 		}
 		s.growScope(resOwners)
+		if err := s.fileLocalErr(); err != nil {
+			return nil, err
+		}
 	}
 	tr.Mark("index_group_owners", fmt.Sprintf("facts=%d owners=%d", len(allFacts), len(grouped)))
 	owners := make([]graphstream.OwnerRef, 0, len(grouped)+len(s.replaceScope)+8)
@@ -1181,6 +1223,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		}
 	}
 	s.growScope(owners)
+	if err := s.fileLocalErr(); err != nil {
+		return nil, err
+	}
 	inScope := map[string]bool{}
 	for _, o := range s.replaceScope {
 		inScope[o.String()] = true
@@ -1543,6 +1588,9 @@ func (s *session) fileLocalErr() error {
 
 func (s *session) growScope(owners []graphstream.OwnerRef) {
 	if s.opts.AuthoritativeFiles {
+		if s.localErr != nil {
+			return
+		}
 		if s.plan == nil {
 			for _, o := range owners {
 				if o.Kind == graphstream.OwnerSynthetic || o.Kind == "" {
@@ -1558,9 +1606,8 @@ func (s *session) growScope(owners []graphstream.OwnerRef) {
 				continue
 			}
 			if err := s.plan.check(o); err != nil {
-				// Begin froze the owner set. Cached owners outside it are not
-				// published this run and must not grow the manifest.
-				continue
+				s.localErr = err
+				return
 			}
 		}
 		return

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/enola-labs/enola/internal/extractors/tsextractor"
@@ -186,6 +187,53 @@ func ownersForNameDelta(prevFiles map[string]*FileState, dirty map[string]bool, 
 		}
 	}
 	return owners
+}
+
+// resolutionCandidatesChanged reports a same-name candidate identity change
+// before Begin. A resolver can invalidate consumers even when the declared
+// name itself is unchanged (for example a route/module candidate whose
+// identity or kind changed). In that case a file-level reverse dependency
+// closure is not a proven complete scope, so callers must use the global
+// fallback rather than discover an out-of-scope owner after Begin.
+func resolutionCandidatesChanged(prevFiles map[string]*FileState, dirty map[string]bool, newFacts map[string][]facts.Fact) bool {
+	for file, isDirty := range dirty {
+		if !isDirty {
+			continue
+		}
+		oldByName := map[string][]string{}
+		for _, f := range cachedResolutionFacts(lookupState(prevFiles, filepath.ToSlash(file))) {
+			if f.Name != "" {
+				oldByName[f.Name] = append(oldByName[f.Name], f.Identity())
+			}
+		}
+		factsNow := newFacts[filepath.ToSlash(file)]
+		if factsNow == nil {
+			factsNow = newFacts[file]
+		}
+		newByName := map[string][]string{}
+		for _, f := range factsNow {
+			if f.Name != "" {
+				newByName[f.Name] = append(newByName[f.Name], f.Identity())
+			}
+		}
+		for name, oldIDs := range oldByName {
+			if !slicesEqual(sortedStrings(oldIDs), sortedStrings(newByName[name])) {
+				return true
+			}
+		}
+		for name, newIDs := range newByName {
+			if _, existed := oldByName[name]; !existed && len(newIDs) > 0 {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func sortedStrings(in []string) []string {
+	out := append([]string(nil), in...)
+	sort.Strings(out)
+	return out
 }
 
 func relationBearingOwnerCount(prevFiles map[string]*FileState) (total, withRelations int) {
