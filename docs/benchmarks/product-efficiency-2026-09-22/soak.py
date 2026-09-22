@@ -56,6 +56,17 @@ eff = _load("efficiency_run", HERE / "run.py")
 wt = _load("efficiency_watch", HERE / "watch.py")
 
 REPO_ID = wt.REPO_ID
+
+# How the save timestamps in THIS run's series were obtained. A scripted write
+# is stamped after fsync(2) returns; an external editor is stamped from the
+# filesystem mtime the poller found. Those are different physical events, so the
+# report carries the label of the basis actually used, never a fixed string.
+SAVE_NS_BASIS = {
+    "fsync-completion": "durable write+fsync completion",
+    "filesystem-mtime":
+        "filesystem mtime observed by polling the checkout (external editor; "
+        "no durability guarantee, no editor cooperation assumed)",
+}
 WATCH_CTX = "soak-watch"
 COLD_CTX = "soak-cold"
 
@@ -402,6 +413,13 @@ def join_generations(frames: list, edits: list) -> list:
         row["begin_to_end_ms"] = _ms(begin, end)
         row["end_to_consumer_ms"] = _ms(end, cons)
         row["time_since_latest_observed_save_at_consumer_ms"] = _ms(save_ns, cons)
+        # Volume metadata for the same generation, projected straight off the
+        # frame. Keys the row already carries are not re-derived here, and a
+        # frame from an older observer contributes nulls, not zeros.
+        telemetry = wt.generation_telemetry(fr)
+        row["telemetry_available"] = telemetry["telemetry_available"]
+        for key in ("generation_kind",) + wt.TELEMETRY_KEYS:
+            row.setdefault(key, telemetry[key])
         rows.append(row)
     return rows
 
@@ -535,9 +553,22 @@ def run_soak(args) -> int:
         watch_log = watch_log_path.open("w")
         # Stable-input claims require that only our editor writes this tree.
         wt.assert_isolated_inputs(repo, work)
+        # Everything before the spawn is harness setup and is reported on its
+        # own, so it can never be folded into the observed startup interval.
+        setup_before_launch_s = round(time.monotonic() - t0, 3)
+        watch_launch_monotonic = time.monotonic()
+        watch_launch_wall_ns = time.time_ns()
         watch_proc = start_watch(enola_bin, repo, cfg, work, url, args.watch_every, watch_log)
         stderr_paths = {"observer": obs_err_path, "watch": watch_log_path}
-        wt.wait_frames(jsonl, 1, max(every_s * 6, 60), obs_proc, watch_proc, stderr_paths)
+        initial_frames = wt.wait_frames(
+            jsonl, 1, max(every_s * 6, 60), obs_proc, watch_proc, stderr_paths)
+        # Ends where the harness NOTICED the frame, so it includes detection
+        # lag; the apply-stamped variant ends inside the observer instead.
+        launch_to_initial_frame_observed_ms = round(
+            (time.monotonic() - watch_launch_monotonic) * 1000.0, 3
+        )
+        launch_to_initial_applied_ms = wt._ms_from_ns(
+            watch_launch_wall_ns, initial_frames[0].get("consumer_end_ns"))
         lifecycle_available = bool(wt.read_lifecycle(lifecycle_path))
         if not lifecycle_available and not args.allow_legacy_observer:
             raise RuntimeError(
@@ -900,7 +931,12 @@ def run_soak(args) -> int:
             "equality_inconclusive_reason": equality_inconclusive,
             "input_files_hashed": len(frozen_inputs),
             "inputs_isolated_under_work": True,
-            "save_ns_basis": "durable write+fsync completion",
+            "save_ns_basis": SAVE_NS_BASIS[save_basis],
+            "harness_setup_before_watch_launch_s": setup_before_launch_s,
+            "watch_launch_to_initial_frame_observed_ms": launch_to_initial_frame_observed_ms,
+            "watch_launch_to_initial_consumer_applied_ms": launch_to_initial_applied_ms,
+            "frame_detection_poll_interval_s": wt.FRAME_POLL_INTERVAL_S,
+            "observed_startup_note": wt.OBSERVED_STARTUP_NOTE,
             "clock_basis": wt.CLOCK_BASIS,
             "clock_assumption": wt.CLOCK_ASSUMPTION,
             "causality_note": wt.CAUSALITY_NOTE,
@@ -923,6 +959,7 @@ def run_soak(args) -> int:
             "input_files_hashed": len(frozen_inputs),
             "generation_count": len(watch_frames),
             "generations": rows,
+            "telemetry_totals": wt.telemetry_totals(watch_frames),
             "latency_summary": {
                 "write_to_durable_ms": summarize([r["write_to_durable_ms"] for r in rows]),
                 "time_since_latest_observed_save_at_begin_ms":
@@ -1012,6 +1049,59 @@ def self_test() -> int:
     count_wait = "len(frames)" + " + 1"
     check("cold wait not by frame count", count_wait not in text)
     check("durable save basis", "durable write+fsync completion" in text)
+    # The report must carry the basis of the series it actually recorded: an
+    # external-editor run is timed from filesystem mtime, not from fsync.
+    # Built at runtime: written literally, this token would be its own
+    # counterexample and the check could never pass.
+    fixed_basis = '"save_ns_basis": ' + '"durable write+fsync completion"'
+    check("save basis label is derived, not fixed",
+          '"save_ns_basis": SAVE_NS_BASIS[save_basis]' in text
+          and fixed_basis not in text)
+    check("external editor basis is filesystem mtime",
+          "mtime" in SAVE_NS_BASIS["filesystem-mtime"]
+          and "fsync" not in SAVE_NS_BASIS["filesystem-mtime"])
+    check("scripted basis keeps its fsync label",
+          SAVE_NS_BASIS["fsync-completion"] == "durable write+fsync completion")
+    check("both editor modes have a label",
+          set(SAVE_NS_BASIS) == set(wt.SAVE_OBSERVATION_BASIS))
+
+    # --- per-generation telemetry on joined rows ---------------------------
+    tel_rows = join_generations(
+        [wt._telemetry_frame(1, 0, nodes=40, edges=12, batches=2, node_records=40),
+         wt._telemetry_frame(2, 1, nodes=42, edges=13, batches=3, node_records=37,
+                             prev_nodes=40, prev_edges=12)],
+        [{"ns": 1}],
+    )
+    check("rows carry per-generation volume metadata",
+          all(r["telemetry_available"] for r in tel_rows)
+          and tel_rows[1]["batches_observed"] == 3, str(tel_rows[1]))
+    check("rows keep latency columns alongside telemetry",
+          "begin_to_end_ms" in tel_rows[0] and "payload_bytes_total" in tel_rows[0])
+    check("rows distinguish initial from delta",
+          [r["generation_kind"] for r in tel_rows] == ["initial", "delta"])
+    check("rows separate records sent from net entity change",
+          tel_rows[1]["node_records_sent"] == 37 and tel_rows[1]["graph_nodes_delta"] == 2)
+    legacy_rows = join_generations(
+        [{"target_generation": 2, "base_generation": 1, "first_ns": 300,
+          "broker_end_ns": 500}], [{"ns": 1}])
+    check("older observer rows report null telemetry",
+          legacy_rows[0]["telemetry_available"] is False
+          and legacy_rows[0]["node_records_sent"] is None, str(legacy_rows[0]))
+
+    totals = wt.telemetry_totals(
+        [wt._telemetry_frame(1, 0, nodes=40, edges=12, batches=2, node_records=40)])
+    check("soak reports completed-only totals",
+          '"telemetry_totals": wt.telemetry_totals(watch_frames)' in text
+          and totals["aborted_or_in_flight_included"] is False)
+    check("startup intervals are measured at the spawn and named for their endpoints",
+          "watch_launch_monotonic = time.monotonic()" in text
+          and "watch_launch_wall_ns = time.time_ns()" in text
+          and '"watch_launch_to_initial_frame_observed_ms"' in text
+          and '"watch_launch_to_initial_consumer_applied_ms"' in text
+          and '"harness_setup_before_watch_launch_s": setup_before_launch_s' in text)
+    check("soak uses the same interval definitions as watch",
+          '"frame_detection_poll_interval_s": wt.FRAME_POLL_INTERVAL_S' in text
+          and "wt._ms_from_ns(" in text)
 
     # --- broker outage verdicts: never upgrade a bounce to acceptance -----
     check("no outage requested is untested",

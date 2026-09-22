@@ -8,11 +8,56 @@
 // An in-flight generation -- Begin published, End not yet -- is invisible there,
 // so a harness cannot tell "nothing queued" from "analysis still running".
 // Set OBSERVER_LIFECYCLE_FILE to also append one record per Begin and per End:
-//   {"record":"begin","run_id":...,"context":...,"broker_ns":...}
-//   {"record":"end","run_id":...,"context":...,"broker_ns":...}
+//
+//	{"record":"begin","run_id":...,"context":...,"broker_ns":...}
+//	{"record":"end","run_id":...,"context":...,"broker_ns":...}
+//
 // Begin run_ids with no matching end record are OBSERVED incomplete Begin/End
-// pairs. This is additive: when the env var is unset, output is byte-identical
-// to before, so resident.py and older readers are unaffected.
+// pairs. With the env var unset no lifecycle file is written at all.
+//
+// consumer.jsonl frames are NOT byte-identical to earlier runs any more: they
+// carry the extra keys described below. Every original key is kept under the
+// same name with the same meaning and the new ones are appended, so resident.py
+// and other older readers are unaffected.
+//
+// Each COMPLETED frame also carries optional volume metadata, added alongside
+// -- never in place of -- the original fields, so resident.py and any older
+// reader keep working. These are counters accumulated while the messages of the
+// replacement pass through; no payload and no graph copy is retained beyond the
+// message being applied, and the normalized-hash / digest / owner-scope
+// validation the Consumer already performs is untouched:
+//
+//	messages_observed        Begin + batches + End seen for this run
+//	batches_observed         batches actually received
+//	batch_count_end          batch_count declared on EndReplace
+//	batch_count_matches_end  cross-check of the two
+//	node_records_sent        node records carried by those batches (all phases)
+//	edge_records_sent        edge records carried by those batches
+//	node_records_sent_resolved / edge_records_sent_resolved
+//	                         the subset in resolved batches, i.e. the records a
+//	                         consumer applies
+//	payload_bytes_begin/batches/end/total
+//	                         JSON payload bytes INCLUDING Begin and End and
+//	                         EXCLUDING broker framing (see payload_bytes_basis)
+//	graph_nodes_total / graph_edges_total
+//	                         NET size of the graph this context's consumer holds
+//	                         once the replacement is applied: the sum over
+//	                         owners of the records each owner contributes, which
+//	                         is what the consumer stores. It is NOT a count of
+//	                         distinct ids -- if two owners contribute the same
+//	                         node id it is counted under each of them. A
+//	                         replacement resends every owner it covers, so
+//	                         records_sent is traffic and graph_*_total is the
+//	                         resulting graph size
+//	graph_nodes_delta / graph_edges_delta
+//	                         change in those net totals since this context's
+//	                         previous COMPLETED frame
+//	completeness_*           status and counters declared on EndReplace
+//	generation_kind          "initial" (base generation 0) or "delta"
+//
+// A Begin whose End never arrives still writes no frame here, so an aborted or
+// in-flight attempt contributes nothing to any of these totals; it is visible
+// only as an unmatched begin record in the lifecycle file.
 package main
 
 import (
@@ -115,9 +160,23 @@ func main() {
 		ownerScopeCount  int
 		baseGeneration   int
 		targetGeneration int
+		// Volume counters. Lengths and byte totals only; nothing is buffered.
+		messages            int
+		batchesObserved     int
+		nodeRecords         int
+		edgeRecords         int
+		nodeRecordsResolved int
+		edgeRecordsResolved int
+		beginBytes          int
+		batchBytes          int
+		endBytes            int
 	}
 	byContext := map[string]*graphsession.Consumer{}
 	byRun := map[string]*runFrame{}
+	// Net entity totals of the previous COMPLETED frame, per repo|context, so a
+	// frame can report how much the graph itself moved as opposed to how many
+	// records the replacement resent.
+	prevEntities := map[string][2]int{}
 	enc := json.NewEncoder(out)
 	pending := map[uint64]jetstream.Msg{}
 
@@ -168,6 +227,8 @@ func main() {
 				schemaVersion: begin.SchemaVersion, scopeMode: begin.ScopeMode,
 				ownerScopeCount: begin.OwnerScopeCount,
 				baseGeneration:  begin.BaseGeneration, targetGeneration: begin.TargetGeneration,
+				messages:   1,
+				beginBytes: len(payload),
 			}
 			lifecycle(map[string]any{
 				"record":            "begin",
@@ -189,33 +250,110 @@ func main() {
 			if probe.Type == graphstream.TypeBatch && fr.firstBatchBroker == 0 {
 				fr.firstBatchBroker = brokerNS
 			}
+			fr.messages++
+			if probe.Type == graphstream.TypeBatch {
+				// Empty element structs give the record counts without keeping
+				// any node or edge: this stays a counter, not a second graph.
+				var counts struct {
+					Phase string     `json:"phase"`
+					Nodes []struct{} `json:"nodes"`
+					Edges []struct{} `json:"edges"`
+				}
+				if err := json.Unmarshal(payload, &counts); err != nil {
+					fail("batch payload: %v", err)
+				}
+				fr.batchesObserved++
+				fr.batchBytes += len(payload)
+				fr.nodeRecords += len(counts.Nodes)
+				fr.edgeRecords += len(counts.Edges)
+				if counts.Phase == graphstream.PhaseResolved {
+					fr.nodeRecordsResolved += len(counts.Nodes)
+					fr.edgeRecordsResolved += len(counts.Edges)
+				}
+			}
 			if err := fr.cons.Apply(rec); err != nil {
 				fail("apply %s: %v", probe.Type, err)
 			}
 			if probe.Type == graphstream.TypeEndReplace {
 				fr.endBrokerNS = brokerNS
+				fr.endBytes = len(payload)
 				appliedNS := time.Now().UnixNano()
+				// Decoded through the protocol type itself: files_unreadable
+				// is a []string and fallbacks are objects, so a hand-rolled
+				// placeholder shape here would fail on the first nonempty
+				// unreadable list and take the observer down with it.
+				var end struct {
+					BatchCount   int                      `json:"batch_count"`
+					Completeness graphstream.Completeness `json:"completeness"`
+				}
+				if err := json.Unmarshal(payload, &end); err != nil {
+					fail("end payload: %v", err)
+				}
+				// Net size of the graph the consumer holds for this context
+				// once the replacement is applied, read off the state it
+				// already keeps: per-owner record counts summed, not distinct
+				// ids (a node id contributed by two owners counts twice).
+				nodesTotal, edgesTotal := 0, 0
+				for _, nodes := range fr.cons.Owners {
+					nodesTotal += len(nodes)
+				}
+				for _, edges := range fr.cons.Edges {
+					edgesTotal += len(edges)
+				}
+				ck := fr.repoID + "|" + fr.contextID
+				prev := prevEntities[ck]
+				prevEntities[ck] = [2]int{nodesTotal, edgesTotal}
+				genKind := "delta"
+				if fr.baseGeneration == 0 {
+					genKind = "initial"
+				}
 				sum := sha256.Sum256([]byte(fr.cons.Canonical()))
 				if err := enc.Encode(map[string]any{
-					"context":               fr.contextID,
-					"repo_id":               fr.repoID,
-					"run_id":                fr.runID,
-					"first_ns":              fr.firstBrokerNS,
-					"first_batch_ns":        fr.firstBatchBroker,
-					"broker_end_ns":         fr.endBrokerNS,
-					"consumer_end_ns":       appliedNS,
-					"first_broker_ns":       fr.firstBrokerNS,
-					"first_batch_broker_ns": fr.firstBatchBroker,
-					"end_broker_ns":         fr.endBrokerNS,
-					"consumer_applied_ns":   appliedNS,
-					"time_base":             "broker_metadata_timestamp",
-					"normalized_hash":       hex.EncodeToString(sum[:]),
-					"schema_version":        fr.schemaVersion,
-					"scope_mode":            fr.scopeMode,
-					"owner_scope_count":     fr.ownerScopeCount,
-					"base_generation":       fr.baseGeneration,
-					"target_generation":     fr.targetGeneration,
-					"applied_generation":    fr.cons.LastGeneration,
+					"context":                       fr.contextID,
+					"repo_id":                       fr.repoID,
+					"run_id":                        fr.runID,
+					"first_ns":                      fr.firstBrokerNS,
+					"first_batch_ns":                fr.firstBatchBroker,
+					"broker_end_ns":                 fr.endBrokerNS,
+					"consumer_end_ns":               appliedNS,
+					"first_broker_ns":               fr.firstBrokerNS,
+					"first_batch_broker_ns":         fr.firstBatchBroker,
+					"end_broker_ns":                 fr.endBrokerNS,
+					"consumer_applied_ns":           appliedNS,
+					"time_base":                     "broker_metadata_timestamp",
+					"normalized_hash":               hex.EncodeToString(sum[:]),
+					"schema_version":                fr.schemaVersion,
+					"scope_mode":                    fr.scopeMode,
+					"owner_scope_count":             fr.ownerScopeCount,
+					"base_generation":               fr.baseGeneration,
+					"target_generation":             fr.targetGeneration,
+					"applied_generation":            fr.cons.LastGeneration,
+					"generation_kind":               genKind,
+					"messages_observed":             fr.messages,
+					"batches_observed":              fr.batchesObserved,
+					"batch_count_end":               end.BatchCount,
+					"batch_count_matches_end":       fr.batchesObserved == end.BatchCount,
+					"node_records_sent":             fr.nodeRecords,
+					"edge_records_sent":             fr.edgeRecords,
+					"node_records_sent_resolved":    fr.nodeRecordsResolved,
+					"edge_records_sent_resolved":    fr.edgeRecordsResolved,
+					"payload_bytes_begin":           fr.beginBytes,
+					"payload_bytes_batches":         fr.batchBytes,
+					"payload_bytes_end":             fr.endBytes,
+					"payload_bytes_total":           fr.beginBytes + fr.batchBytes + fr.endBytes,
+					"payload_bytes_basis":           "json_payload_bytes_including_begin_and_end_excluding_broker_framing",
+					"graph_nodes_total":             nodesTotal,
+					"graph_edges_total":             edgesTotal,
+					"graph_nodes_delta":             nodesTotal - prev[0],
+					"graph_edges_delta":             edgesTotal - prev[1],
+					"completeness_status":           end.Completeness.Status,
+					"completeness_files_analyzed":   end.Completeness.FilesAnalyzed,
+					"completeness_parsed_files":     end.Completeness.ParsedFiles,
+					"completeness_cached_files":     end.Completeness.CachedFiles,
+					"completeness_summary_scans":    end.Completeness.SummaryScans,
+					"completeness_early_local":      end.Completeness.EarlyLocal,
+					"completeness_files_unreadable": len(end.Completeness.FilesUnreadable),
+					"completeness_fallbacks":        len(end.Completeness.Fallbacks),
 				}); err != nil {
 					fail("write frame: %v", err)
 				}

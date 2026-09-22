@@ -104,6 +104,69 @@ Two save-observation bases are kept apart and never mixed in one series
 (`save_observation_basis`): `fsync-completion` for scripted writes, and
 `filesystem-mtime` for an external editor — the latter being when the editor's
 write landed, with no durability guarantee and no editor cooperation assumed.
+`soak.py` derives its `save_ns_basis` label from the mode it actually ran in, so
+an external-editor run is no longer labelled as fsync completion.
+
+### Startup: two intervals, each named for where it ends
+
+Both run from spawning the `graph watch` process to the **first completed
+generation**, and differ only in the endpoint:
+
+- `watch_launch_to_initial_frame_observed_ms` — monotonic, ending when **this
+  harness read the frame**. The honest observable, and it includes up to one
+  `frame_detection_poll_interval_s` of detection lag.
+- `watch_launch_to_initial_consumer_applied_ms` — ending at the apply timestamp
+  the **observer stamped into the frame**. No polling lag, but it compares a
+  Python clock read with a Go clock read on this host.
+
+Both cover process start, config load, the first full repository scan,
+publication and consumer apply — cold-start figures for this harness on this
+fixture. Neither is a user-save latency and neither is a total run time: harness
+setup before the spawn (overlay build, broker, fixture) is reported separately
+as `harness_setup_before_watch_launch_s`, and `begin_to_end_ms` stays a
+broker-side interval of a single generation and is never relabelled an initial
+total (`observed_startup_note`).
+
+### Per-generation volume telemetry
+
+Each completed observer frame carries optional counters, added **alongside** the
+original fields, so `resident.py` and other older readers are unaffected.
+`watch.py` and `soak.py` surface them per generation
+(`telemetry_generations` / the `generations` rows) and summed
+(`telemetry_totals`):
+
+| Field | Meaning |
+|-------|---------|
+| `generation_kind` | `initial` (base generation 0) or `delta` |
+| `messages_observed` | Begin + batches + End seen for this run |
+| `batches_observed` / `batch_count_end` / `batch_count_matches_end` | batches actually received, the count `EndReplace` declared, and the cross-check |
+| `node_records_sent` / `edge_records_sent` (`*_resolved`) | records carried by those batches; the `_resolved` subset is what a consumer applies |
+| `payload_bytes_begin/batches/end/total` | JSON payload bytes **including** Begin and End, **excluding** broker framing (`payload_bytes_basis`) |
+| `graph_nodes_total` / `graph_edges_total` | net graph **size** after the replacement is applied |
+| `graph_nodes_delta` / `graph_edges_delta` | change in that size since this context's previous completed generation |
+| `completeness_*` | status, `files_analyzed`, `parsed_files`, `cached_files`, `summary_scans`, `early_local`, and the lengths of `files_unreadable` / `fallbacks` |
+
+Two distinctions the numbers are there to make:
+
+- **Sent records are traffic, not new entities.** A replacement resends every
+  owner in its frozen scope, so a generation can send many records and leave the
+  graph the same size. Read `*_records_sent` against `graph_*_delta`
+  (`records_vs_entities_note`). A zero delta means the size did not change, it
+  does **not** mean the same facts came back — ids, edge targets and properties
+  can all change at constant counts, and `normalized_hash` is the only equality
+  evidence. `graph_*_total` sums per-owner record counts and is not a count of
+  distinct ids: an id contributed by two owners counts twice.
+- **Only completed generations are counted.** The observer writes a frame at
+  End, so an aborted or still-in-flight Begin contributes nothing to any count
+  or byte total (`aborted_or_in_flight_included: false`). Those attempts remain
+  visible only through the lifecycle records, reported as
+  `incomplete_begin_end_pairs_at_selection` and `abandoned_begins`.
+
+These are counters accumulated as messages pass through: nothing extra is
+buffered, no payload or graph copy is retained, and the normalized-hash, digest
+and owner-scope validation the consumer already performs is untouched. The
+fields are optional, so a frame written by an older observer reports them as
+`null` — never as zero — and `telemetry_available` says which is the case.
 
 ### External-editor mode (`--external-editor`)
 
@@ -373,6 +436,12 @@ Start **one** `benchobserver` per NATS server **before** the first
 `analyze`/`watch`/`resident` process. Wait for the READY file. Stop all child
 processes on failure — including the editor process in `soak.py`. Messages are
 pulled and applied in strict JetStream `Metadata.Sequence.Stream` order.
+
+Frames are extended additively: every original key keeps its name and meaning,
+so `consumer.jsonl` is no longer byte-identical to older runs but stays readable
+by older readers. `EndReplace` is decoded through `graphstream.Completeness`
+itself — `files_unreadable` is a `[]string`, and a placeholder element type
+there would fail on the first partial analysis.
 
 Toolchain: `/tmp/enola-toolchain/go/bin/go`, `/tmp/enola-toolchain/go/bin/gofmt`,
 `/tmp/enola-toolchain/bin/nats-server`.

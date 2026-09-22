@@ -59,6 +59,13 @@ CLOCK_BASIS = {
     "final_convergence_ms":
         "local_wall(last observed edit) -> local_wall(first final-cold-equal "
         "completion) [single]",
+    "watch_launch_to_initial_frame_observed_ms":
+        "monotonic(watch process spawn) -> monotonic(harness READ the initial "
+        "frame) [single; includes up to one FRAME_POLL_INTERVAL_S of detection "
+        "lag]",
+    "watch_launch_to_initial_consumer_applied_ms":
+        "local_wall(watch process spawn) -> local_wall(observer applied the "
+        "initial End, as stamped in the frame) [single host, two processes]",
 }
 
 # Pairing a generation with the nearest prior save is bookkeeping, not a causal
@@ -91,6 +98,151 @@ VISIBILITY_NOTE = (
     "legitimately NEGATIVE when the watcher sampled during the write; negative "
     "offsets are reported and labelled, never clamped away."
 )
+# The one startup number this harness can honestly observe, and what it is not.
+OBSERVED_STARTUP_NOTE = (
+    "Two startup numbers, both from spawning the `graph watch` process to the "
+    "FIRST completed generation, and neither of them a total. "
+    "watch_launch_to_initial_frame_observed_ms is the honest observable: a "
+    "monotonic interval ending when THIS HARNESS read the frame, so it includes "
+    "up to one poll interval of detection lag "
+    "(frame_detection_poll_interval_s). "
+    "watch_launch_to_initial_consumer_applied_ms ends at the apply timestamp "
+    "the observer stamped into the frame instead, which drops the polling lag "
+    "but compares a Python clock read with a Go clock read on this host. Both "
+    "cover process start, config load, the first full repository scan, "
+    "publication and consumer apply, so they are cold-start figures for THIS "
+    "harness on THIS fixture. Neither is a user-save latency: harness setup "
+    "before the spawn is reported separately as "
+    "harness_setup_before_watch_launch_s, and begin_to_end_ms stays a "
+    "broker-side interval of a single generation, never an initial total."
+)
+
+# Records on the wire and entities in the graph are different quantities.
+RECORDS_VS_ENTITIES_NOTE = (
+    "*_records_sent counts records the replacement PUT ON THE WIRE. A "
+    "replacement resends every owner in its frozen scope, so most of those "
+    "records REPLACE facts the consumer already held: they are traffic, not new "
+    "entities. graph_*_total is the resulting net graph SIZE and graph_*_delta "
+    "the change in that size since this context's previous completed "
+    "generation. A zero delta therefore means the graph did not change size, "
+    "NOT that the same facts came back: ids, edge targets and properties can "
+    "all change at constant counts. normalized_hash is the only equality "
+    "evidence here. graph_*_total sums per-owner record counts; it is not a "
+    "count of distinct ids, so an id contributed by two owners counts twice."
+)
+
+# Totals are over completed generations, because that is all a frame can be.
+COMPLETED_ONLY_NOTE = (
+    "All telemetry here comes from COMPLETED generations: the observer writes a "
+    "frame at End, so an aborted or still-in-flight Begin contributes nothing "
+    "to any count or byte total. Those attempts are visible only through the "
+    "lifecycle records, reported separately as incomplete_begin_end_pairs_* and "
+    "abandoned_begins."
+)
+
+# Telemetry is optional so an older observer binary still produces readable
+# frames; a missing key is reported as null, never silently read as zero.
+TELEMETRY_KEYS = (
+    "generation_kind",
+    "messages_observed",
+    "batches_observed",
+    "batch_count_end",
+    "batch_count_matches_end",
+    "node_records_sent",
+    "edge_records_sent",
+    "node_records_sent_resolved",
+    "edge_records_sent_resolved",
+    "payload_bytes_begin",
+    "payload_bytes_batches",
+    "payload_bytes_end",
+    "payload_bytes_total",
+    "payload_bytes_basis",
+    "graph_nodes_total",
+    "graph_edges_total",
+    "graph_nodes_delta",
+    "graph_edges_delta",
+    "completeness_status",
+    "completeness_files_analyzed",
+    "completeness_parsed_files",
+    "completeness_cached_files",
+    "completeness_summary_scans",
+    "completeness_early_local",
+    "completeness_files_unreadable",
+    "completeness_fallbacks",
+)
+
+# Summed across generations. Everything else is a label, a cross-check or a
+# level (graph_*_total), and adding those up would be meaningless.
+TELEMETRY_SUM_KEYS = (
+    "messages_observed",
+    "batches_observed",
+    "node_records_sent",
+    "edge_records_sent",
+    "node_records_sent_resolved",
+    "edge_records_sent_resolved",
+    "payload_bytes_begin",
+    "payload_bytes_batches",
+    "payload_bytes_end",
+    "payload_bytes_total",
+    "completeness_files_analyzed",
+    "completeness_parsed_files",
+    "completeness_cached_files",
+)
+
+
+def generation_telemetry(frame: dict) -> dict:
+    """Per-generation volume metadata, as the observer recorded it.
+
+    Pure projection of one COMPLETED frame: no re-derivation, no defaulting of
+    an absent key to zero. `telemetry_available` says whether the observer that
+    wrote the frame emits these fields at all.
+    """
+    row = {
+        "generation": frame.get("target_generation"),
+        "base_generation": frame.get("base_generation"),
+        "run_id": frame.get("run_id"),
+        "context": frame.get("context"),
+        "owner_scope_count": frame.get("owner_scope_count"),
+        "telemetry_available": "messages_observed" in frame,
+    }
+    for key in TELEMETRY_KEYS:
+        row[key] = frame.get(key)
+    # base_generation 0 is the initial replacement; the observer labels it, and
+    # this fallback keeps the distinction readable against an older observer.
+    if row["generation_kind"] is None and row["base_generation"] is not None:
+        row["generation_kind"] = "initial" if row["base_generation"] == 0 else "delta"
+    return row
+
+
+def telemetry_totals(frames: list) -> dict:
+    """Totals over COMPLETED generations only (see COMPLETED_ONLY_NOTE)."""
+    rows = [generation_telemetry(fr) for fr in frames]
+    counted = [r for r in rows if r["telemetry_available"]]
+    totals = {
+        "completed_generations_counted": len(counted),
+        "completed_generations_without_telemetry": len(rows) - len(counted),
+        "initial_generations": sum(1 for r in counted if r["generation_kind"] == "initial"),
+        "delta_generations": sum(1 for r in counted if r["generation_kind"] == "delta"),
+        "aborted_or_in_flight_included": False,
+    }
+    for key in TELEMETRY_SUM_KEYS:
+        totals[key] = sum(r[key] or 0 for r in counted)
+    # A batch-count mismatch means received batches disagreed with the count
+    # EndReplace declared; one is enough to distrust every volume number here.
+    totals["batch_count_mismatches"] = sum(
+        1 for r in counted if r["batch_count_matches_end"] is False
+    )
+    totals["net_graph_nodes_after_last_generation"] = (
+        counted[-1]["graph_nodes_total"] if counted else None
+    )
+    totals["net_graph_edges_after_last_generation"] = (
+        counted[-1]["graph_edges_total"] if counted else None
+    )
+    totals["records_vs_entities_note"] = RECORDS_VS_ENTITIES_NOTE
+    totals["completed_only_note"] = COMPLETED_ONLY_NOTE
+    return totals
+
+
 CLOCK_ASSUMPTION = (
     "single host; broker metadata timestamps and local wall clock are the same "
     "physical clock read through different paths; CROSS intervals include "
@@ -213,6 +365,21 @@ def classify_begins(records: list, context: str | None = None, restart_ns: int =
     return {"active": active, "abandoned": abandoned}
 
 
+# How often the harness looks for a new frame. Any interval that ends on the
+# harness NOTICING a frame carries up to this much detection lag, so the number
+# is reported next to those intervals rather than left implicit.
+FRAME_POLL_INTERVAL_S = 0.05
+
+
+def _ms_from_ns(start_ns, end_ns):
+    """Milliseconds between two nanosecond wall stamps, or None if either is absent."""
+    if not isinstance(start_ns, int) or not isinstance(end_ns, int):
+        return None
+    if start_ns <= 0 or end_ns <= 0:
+        return None
+    return round((end_ns - start_ns) / 1e6, 3)
+
+
 def wait_frames(path: Path, n: int, timeout: float, obs_proc, watch_proc, stderr_paths) -> list:
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
@@ -223,7 +390,7 @@ def wait_frames(path: Path, n: int, timeout: float, obs_proc, watch_proc, stderr
         frames = read_frames(path)
         if len(frames) >= n:
             return frames
-        time.sleep(0.05)
+        time.sleep(FRAME_POLL_INTERVAL_S)
     raise RuntimeError(
         f"timeout waiting for {n} observer frames, have {len(read_frames(path))}\n"
         + (path.read_text() if path.is_file() else "")
@@ -904,6 +1071,12 @@ def run_watch(args) -> int:
             str(cfg),
             str(repo),
         ]
+        # Everything up to here -- overlay build, broker, fixture, config -- is
+        # harness setup and is reported on its own, so it can never be folded
+        # into the observed startup interval below.
+        setup_before_launch_s = round(time.monotonic() - t0, 3)
+        watch_launch_monotonic = time.monotonic()
+        watch_launch_wall_ns = time.time_ns()
         watch_proc = subprocess.Popen(
             watch_cmd,
             stdout=watch_err,
@@ -912,7 +1085,14 @@ def run_watch(args) -> int:
         )
         stderr_paths = {"observer": obs_err_path, "watch": watch_err_path}
         frames = wait_frames(jsonl, 1, 120 if fixture == "product" else 40, obs_proc, watch_proc, stderr_paths)
+        # Ends where the harness NOTICED the frame, so it includes detection
+        # lag; the apply-stamped variant below ends inside the observer.
+        launch_to_initial_frame_observed_ms = round(
+            (time.monotonic() - watch_launch_monotonic) * 1000.0, 3
+        )
         initial = frames[0]
+        launch_to_initial_applied_ms = _ms_from_ns(
+            watch_launch_wall_ns, initial.get("consumer_end_ns"))
         assert_frozen_begin(initial, "watch-initial")
         seq_after_initial = last_seq(observer_bin, url)
         # The initial generation must have left a Begin and an End record. If it
@@ -1048,6 +1228,11 @@ def run_watch(args) -> int:
             "input_scope_excluded_dirs": sorted(IGNORED_INPUT_DIRS),
             "input_files_hashed": len(frozen_inputs),
             "inputs_isolated_under_work": True,
+            "harness_setup_before_watch_launch_s": setup_before_launch_s,
+            "watch_launch_to_initial_frame_observed_ms": launch_to_initial_frame_observed_ms,
+            "watch_launch_to_initial_consumer_applied_ms": launch_to_initial_applied_ms,
+            "frame_detection_poll_interval_s": FRAME_POLL_INTERVAL_S,
+            "observed_startup_note": OBSERVED_STARTUP_NOTE,
             "save_observation_basis": "fsync-completion",
             "save_observation_basis_note": SAVE_OBSERVATION_BASIS["fsync-completion"],
             "fsync_visibility_note": VISIBILITY_NOTE,
@@ -1070,6 +1255,9 @@ def run_watch(args) -> int:
             "broker_first_batch_ns": final.get("first_batch_ns"),
             "broker_end_ns": final.get("broker_end_ns"),
             "consumer_end_ns": final.get("consumer_end_ns"),
+            "telemetry_generations": [generation_telemetry(fr) for fr in frames],
+            "telemetry_totals": telemetry_totals(frames),
+            "cold_telemetry": generation_telemetry(cold_frame),
             "cold_summary": {
                 "BaseGeneration": cold.get("BaseGeneration"),
                 "TargetGeneration": cold.get("TargetGeneration"),
@@ -1104,6 +1292,43 @@ def _frame(gen, begin, ctx="watch-bench", run=None, hsh=None):
         "owner_scope_count": 3,
         "schema_version": "enola.graph.v2",
     }
+
+
+def _telemetry_frame(gen, base, nodes, edges, batches, node_records,
+                     prev_nodes=0, prev_edges=0, ctx="watch-bench"):
+    """Completed frame as an observer WITH volume metadata writes it."""
+    fr = _frame(gen, gen * 1000, ctx=ctx)
+    fr["base_generation"] = base
+    fr.update({
+        "generation_kind": "initial" if base == 0 else "delta",
+        "messages_observed": batches + 2,
+        "batches_observed": batches,
+        "batch_count_end": batches,
+        "batch_count_matches_end": True,
+        "node_records_sent": node_records,
+        "edge_records_sent": node_records // 3,
+        "node_records_sent_resolved": node_records,
+        "edge_records_sent_resolved": node_records // 3,
+        "payload_bytes_begin": 300,
+        "payload_bytes_batches": node_records * 120,
+        "payload_bytes_end": 200,
+        "payload_bytes_total": 500 + node_records * 120,
+        "payload_bytes_basis":
+            "json_payload_bytes_including_begin_and_end_excluding_broker_framing",
+        "graph_nodes_total": nodes,
+        "graph_edges_total": edges,
+        "graph_nodes_delta": nodes - prev_nodes,
+        "graph_edges_delta": edges - prev_edges,
+        "completeness_status": "complete",
+        "completeness_files_analyzed": node_records,
+        "completeness_parsed_files": node_records,
+        "completeness_cached_files": 0,
+        "completeness_summary_scans": 0,
+        "completeness_early_local": False,
+        "completeness_files_unreadable": 0,
+        "completeness_fallbacks": 0,
+    })
+    return fr
 
 
 def _begin(run, ctx="watch-bench", gen=2, broker_ns=None):
@@ -1480,6 +1705,85 @@ def self_test() -> int:
     check("scope overlay repointing repo rejected", caught)
     check("parse 5s", parse_every("5s") == 5.0)
     check("parse 1s", parse_every("1s") == 1.0)
+
+    # --- per-generation telemetry ------------------------------------------
+    obs_src = (HERE / "observer.go.txt").read_text()
+    # files_unreadable is a JSON string array: decoding it into a placeholder
+    # element type kills the observer on the first partial analysis.
+    check("observer decodes End through the protocol type",
+          "Completeness graphstream.Completeness" in obs_src
+          and '[]struct{} `json:"files_unreadable"`' not in obs_src)
+    check("observer emits payload byte basis",
+          "json_payload_bytes_including_begin_and_end_excluding_broker_framing" in obs_src)
+    for key in TELEMETRY_KEYS:
+        check(f"observer emits {key}", f'"{key}"' in obs_src)
+
+    initial_fr = _telemetry_frame(1, 0, nodes=40, edges=12, batches=2, node_records=40)
+    delta_fr = _telemetry_frame(2, 1, nodes=42, edges=13, batches=3, node_records=37,
+                                prev_nodes=40, prev_edges=12)
+    rows = [generation_telemetry(initial_fr), generation_telemetry(delta_fr)]
+    check("initial and delta are distinguished",
+          [r["generation_kind"] for r in rows] == ["initial", "delta"], str(rows))
+    check("records sent are kept apart from net entities",
+          rows[1]["node_records_sent"] == 37 and rows[1]["graph_nodes_delta"] == 2,
+          str(rows[1]))
+    check("telemetry is a projection, not a re-derivation",
+          rows[1]["payload_bytes_total"] == delta_fr["payload_bytes_total"])
+    legacy = generation_telemetry(_frame(3, 10))
+    check("older observer frames report null, not zero",
+          legacy["telemetry_available"] is False
+          and legacy["messages_observed"] is None
+          and legacy["generation_kind"] == "delta", str(legacy))
+
+    totals = telemetry_totals([initial_fr, delta_fr, _frame(3, 10)])
+    check("totals count only frames that carry telemetry",
+          totals["completed_generations_counted"] == 2
+          and totals["completed_generations_without_telemetry"] == 1, str(totals))
+    check("totals split initial from delta",
+          totals["initial_generations"] == 1 and totals["delta_generations"] == 1)
+    check("totals sum sent records across generations",
+          totals["node_records_sent"] == 77, str(totals["node_records_sent"]))
+    check("totals sum payload bytes including Begin and End",
+          totals["payload_bytes_total"]
+          == initial_fr["payload_bytes_total"] + delta_fr["payload_bytes_total"])
+    check("totals report the net graph, not the sum of totals",
+          totals["net_graph_nodes_after_last_generation"] == 42)
+    check("aborted attempts are excluded and said to be",
+          totals["aborted_or_in_flight_included"] is False
+          and "aborted" in totals["completed_only_note"])
+    mismatched = dict(delta_fr, batch_count_matches_end=False)
+    check("batch count mismatch is surfaced",
+          telemetry_totals([mismatched])["batch_count_mismatches"] == 1)
+
+    check("startup intervals name their real endpoints",
+          "harness READ the initial frame"
+          in CLOCK_BASIS["watch_launch_to_initial_frame_observed_ms"]
+          and "monotonic(watch process spawn)"
+          in CLOCK_BASIS["watch_launch_to_initial_frame_observed_ms"]
+          and "as stamped in the frame"
+          in CLOCK_BASIS["watch_launch_to_initial_consumer_applied_ms"])
+    check("polled interval admits its detection lag",
+          "detection lag" in CLOCK_BASIS["watch_launch_to_initial_frame_observed_ms"]
+          and "frame_detection_poll_interval_s" in OBSERVED_STARTUP_NOTE)
+    check("poll interval is the one wait_frames actually sleeps",
+          "time.sleep(FRAME_POLL_INTERVAL_S)" in text)
+    check("startup intervals are measured at the spawn",
+          "watch_launch_monotonic = time.monotonic()" in text
+          and "watch_launch_wall_ns = time.time_ns()" in text
+          and "harness_setup_before_watch_launch_s" in text)
+    check("apply-stamped interval is computed from the frame",
+          'launch_to_initial_applied_ms = _ms_from_ns(' in text
+          and _ms_from_ns(1_000_000, 4_000_000) == 3.0
+          and _ms_from_ns(1_000_000, None) is None)
+    check("begin_to_end is never relabelled an initial total",
+          "neither of them a total" in OBSERVED_STARTUP_NOTE
+          and "never an initial total" in OBSERVED_STARTUP_NOTE)
+    check("startup intervals are not sold as save latency",
+          "Neither is a user-save latency" in OBSERVED_STARTUP_NOTE)
+    check("a zero delta is not called equality",
+          "did not change size" in RECORDS_VS_ENTITIES_NOTE
+          and "normalized_hash is the only equality evidence"
+          in RECORDS_VS_ENTITIES_NOTE)
 
     if failures:
         print("self-test FAIL", file=sys.stderr)
