@@ -239,6 +239,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 
 	// Parse tsconfig.json path aliases, one root per package for monorepos.
 	aliasRoots := collectTSAliasRoots(ctx, repoPath, inputScope)
+	pkgAliases := collectPackageAliases(ctx, repoPath, inputScope)
 
 	// SvelteKit maps $lib by convention and may declare literal aliases in its
 	// config even before `svelte-kit sync` has generated a tsconfig.
@@ -310,7 +311,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 			log.Printf("[ts-extractor] skipping minified/bundled file %s", relFile)
 			return tsFileResult{}
 		}
-		aliases := aliasesForDir(aliasRoots, factpath.Dir(relFile))
+		aliases := mergePackageAliases(aliasesForDir(aliasRoots, factpath.Dir(relFile)), pkgAliases)
 		var res tsFileResult
 		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, isVue, isNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, orms, aliases, knownFiles, nuxtAutoComponents, grpcStubs)
 		// Routers, mounts and held-back routes for the repo-wide mount pass below.
@@ -539,10 +540,10 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 	kinds := tsKindsFor(isTSX)
 
 	if isVueFile(relFile) {
-		return e.extractVueSFC(kinds, src, relFile, isNuxt, aliases, nuxtAutoComponents), angularCounts{}, nil, nil, nil, nil
+		return e.extractVueSFC(kinds, src, relFile, isNuxt, aliases, nuxtAutoComponents, knownFiles), angularCounts{}, nil, nil, nil, nil
 	}
 	if isSvelteFile(relFile) {
-		return e.extractSvelteSFC(kinds, src, relFile, isSvelteKit, aliases), angularCounts{}, nil, nil, nil, nil
+		return e.extractSvelteSFC(kinds, src, relFile, isSvelteKit, aliases, knownFiles), angularCounts{}, nil, nil, nil, nil
 	}
 	if isGraphQLDocFile(relFile) {
 		if facts.IsTestPath(relFile) {
@@ -640,7 +641,7 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 	}
 
 	// Extract from the tree
-	result = append(result, e.extractImports(kinds, root, src, relFile, aliases, isSvelteKit)...)
+	result = append(result, e.extractImports(kinds, root, src, relFile, aliases, knownFiles, isSvelteKit)...)
 
 	ctx := &extractCtx{
 		src:         src,
@@ -764,9 +765,39 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 	return result, angular, router, inlineTemplates, httpFile, clients
 }
 
-func (e *TSExtractor) extractImports(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, isSvelteKit bool) []facts.Fact {
+func (e *TSExtractor) extractImports(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool, isSvelteKit bool) []facts.Fact {
 	var result []facts.Fact
 	dir := factpath.Dir(relFile)
+	emit := func(importPath string, line int, isReexport, dynamic bool) {
+		resolved, isExternal := bindImportTarget(importPath, dir, aliases, knownFiles)
+		importSource := "internal"
+		if isExternal {
+			importSource = "external"
+		}
+		if isSvelteKit && isSvelteKitVirtualImport(importPath) {
+			importSource = facts.DepSourceFramework
+		}
+		props := map[string]any{
+			"language": "typescript",
+			"source":   importSource,
+		}
+		if isReexport {
+			props["reexport"] = true
+		}
+		if dynamic {
+			props["dynamic"] = true
+		}
+		result = append(result, facts.Fact{
+			Kind:  facts.KindDependency,
+			Name:  dir + " -> " + resolved,
+			File:  relFile,
+			Line:  line,
+			Props: props,
+			Relations: []facts.Relation{
+				{Kind: facts.RelImports, Target: resolved},
+			},
+		})
+	}
 
 	for i := range root.ChildCount() {
 		child := root.Child(i)
@@ -787,83 +818,28 @@ func (e *TSExtractor) extractImports(kinds *tsutil.KindTable, root *sitter.Node,
 		if source == nil {
 			continue
 		}
-
-		importPath := strings.Trim(nodeText(source, src), `"'`)
-
-		// Resolve path aliases and relative imports to filesystem-relative paths
-		resolved, isExternal := resolveImportPath(importPath, dir, aliases)
-
-		importSource := "internal"
-		if isExternal {
-			importSource = "external"
-		}
-		if isSvelteKit && isSvelteKitVirtualImport(importPath) {
-			importSource = facts.DepSourceFramework
-		}
-
-		props := map[string]any{
-			"language": "typescript",
-			"source":   importSource,
-		}
-		if isReexport {
-			props["reexport"] = true
-		}
-
-		result = append(result, facts.Fact{
-			Kind:  facts.KindDependency,
-			Name:  dir + " -> " + resolved,
-			File:  relFile,
-			Line:  int(child.StartPosition().Row) + 1,
-			Props: props,
-			Relations: []facts.Relation{
-				{Kind: facts.RelImports, Target: resolved},
-			},
-		})
+		emit(strings.Trim(nodeText(source, src), `"'`), int(child.StartPosition().Row)+1, isReexport, false)
 	}
 
 	// CommonJS require() and dynamic import() calls are the only import mechanism in
 	// server/build/task trees and code-split call sites; capture them as dependency
-	// edges too so those graphs are not invisible. These calls can be nested anywhere,
-	// so walk the whole tree; a dir-pair is deduped against the static imports above.
+	// edges too so those graphs are not invisible. These calls can be nested anywhere.
+	// A static `import type` of the same module is a different site (and a different
+	// fact line) than `await import()`; do not drop the dynamic edge as a duplicate.
 	seenDep := make(map[string]bool)
-	for _, r := range result {
-		seenDep[r.Name] = true
-	}
 	var walkDeps func(n *sitter.Node)
 	walkDeps = func(n *sitter.Node) {
 		if n == nil {
 			return
 		}
-		if kindOf(kinds, n) == "call_expression" {
-			if fn := n.ChildByFieldName("function"); fn != nil {
-				isRequire := kindOf(kinds, fn) == "identifier" && nodeText(fn, src) == "require"
-				isDynImport := kindOf(kinds, fn) == "import"
-				if isRequire || isDynImport {
-					if strArg := findChildByKind(kinds, n.ChildByFieldName("arguments"), "string"); strArg != nil {
-						importPath := strings.Trim(nodeText(strArg, src), `"'`)
-						resolved, isExternal := resolveImportPath(importPath, dir, aliases)
-						name := dir + " -> " + resolved
-						if !seenDep[name] {
-							seenDep[name] = true
-							source := "internal"
-							if isExternal {
-								source = "external"
-							}
-							if isSvelteKit && isSvelteKitVirtualImport(importPath) {
-								source = facts.DepSourceFramework
-							}
-							result = append(result, facts.Fact{
-								Kind:      facts.KindDependency,
-								Name:      name,
-								File:      relFile,
-								Line:      int(n.StartPosition().Row) + 1,
-								Props:     map[string]any{"language": "typescript", "source": source, "dynamic": true},
-								Relations: []facts.Relation{{Kind: facts.RelImports, Target: resolved}},
-							})
-						}
-					}
-				}
+		if importPath, ok := dynamicImportSpecifier(kinds, n, src); ok {
+			resolved, _ := bindImportTarget(importPath, dir, aliases, knownFiles)
+			name := dir + " -> " + resolved
+			if !seenDep[name] {
+				seenDep[name] = true
+				emit(importPath, int(n.StartPosition().Row)+1, false, true)
 			}
+			return
 		}
 		for i := range n.ChildCount() {
 			walkDeps(n.Child(i))
@@ -872,6 +848,36 @@ func (e *TSExtractor) extractImports(kinds *tsutil.KindTable, root *sitter.Node,
 	walkDeps(root)
 
 	return result
+}
+
+// dynamicImportSpecifier returns the string specifier of require("x") or import("x").
+func dynamicImportSpecifier(kinds *tsutil.KindTable, n *sitter.Node, src []byte) (string, bool) {
+	if n == nil {
+		return "", false
+	}
+	switch kindOf(kinds, n) {
+	case "call_expression":
+		fn := n.ChildByFieldName("function")
+		if fn == nil {
+			return "", false
+		}
+		isRequire := kindOf(kinds, fn) == "identifier" && nodeText(fn, src) == "require"
+		isDynImport := kindOf(kinds, fn) == "import" || kindOf(kinds, fn) == "import_expression"
+		if !isRequire && !isDynImport {
+			return "", false
+		}
+		if strArg := findChildByKind(kinds, n.ChildByFieldName("arguments"), "string"); strArg != nil {
+			return strings.Trim(nodeText(strArg, src), `"'`), true
+		}
+	case "import_expression":
+		if strArg := findChildByKind(kinds, n, "string"); strArg != nil {
+			return strings.Trim(nodeText(strArg, src), `"'`), true
+		}
+		if strArg := findChildByKind(kinds, n.ChildByFieldName("arguments"), "string"); strArg != nil {
+			return strings.Trim(nodeText(strArg, src), `"'`), true
+		}
+	}
+	return "", false
 }
 
 func (e *TSExtractor) extractDeclarations(kinds *tsutil.KindTable, root *sitter.Node, ctx *extractCtx) []facts.Fact {
@@ -1470,6 +1476,97 @@ func collectPackageNames(repoPath string, inputScopes ...*inputscope.Scope) map[
 		out[factpath.Slash(rel)] = pkg.Name
 		return nil
 	})
+	return out
+}
+
+// collectPackageAliases maps each published package name to the repo-relative
+// entry file its package.json names. Workspace specifiers such as
+// `import { x } from '@onyx/contracts'` have no tsconfig `paths` entry in some
+// packages (Expo/mobile, Bundler resolution); without this map they stay
+// external and the import edge never binds to the file that exists in-tree.
+func collectPackageAliases(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) map[string]tsAlias {
+	inputScope := inputscope.First(inputScopes)
+	out := map[string]tsAlias{}
+	_ = inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return nil
+		}
+		if d.IsDir() {
+			name := d.Name()
+			if path != repoPath && (strings.HasPrefix(name, ".") || tsSkipDirs[name] || name == "testdata") {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if d.Name() != "package.json" {
+			return nil
+		}
+		data, err := overlayReadFile(ctx, path, inputScope)
+		if err != nil {
+			return nil
+		}
+		var pkg struct {
+			Name    string          `json:"name"`
+			Main    string          `json:"main"`
+			Types   string          `json:"types"`
+			Typings string          `json:"typings"`
+			Module  string          `json:"module"`
+			Exports json.RawMessage `json:"exports"`
+		}
+		if err := json.Unmarshal(data, &pkg); err != nil || pkg.Name == "" {
+			return nil
+		}
+		if _, exists := out[pkg.Name]; exists {
+			return nil
+		}
+		rel, err := filepath.Rel(repoPath, filepath.Dir(path)) //factpath:host
+		if err != nil {
+			return nil
+		}
+		pkgDir := factpath.Slash(rel)
+		if pkgDir == "." {
+			pkgDir = ""
+		}
+		entry := packageJSONEntry(pkg.Types, pkg.Typings, pkg.Module, pkg.Main, pkg.Exports)
+		if entry == "" {
+			entry = "src/index"
+		}
+		replacement := factpath.Clean(factpath.Join(pkgDir, entry))
+		out[pkg.Name] = tsAlias{replacement: replacement, exact: true}
+		return nil
+	})
+	return out
+}
+
+func packageJSONEntry(types, typings, module, main string, exports json.RawMessage) string {
+	for _, s := range []string{types, typings, module, main} {
+		if strings.TrimSpace(s) != "" {
+			return strings.TrimSpace(s)
+		}
+	}
+	if len(exports) == 0 || exports[0] != '"' {
+		return ""
+	}
+	var s string
+	if err := json.Unmarshal(exports, &s); err != nil {
+		return ""
+	}
+	return strings.TrimSpace(s)
+}
+
+// mergePackageAliases copies package.json name aliases then overlays tsconfig
+// `paths`, so an explicit paths entry wins for the same specifier.
+func mergePackageAliases(tsconfig, packages map[string]tsAlias) map[string]tsAlias {
+	if len(packages) == 0 {
+		return tsconfig
+	}
+	out := make(map[string]tsAlias, len(tsconfig)+len(packages))
+	for k, v := range packages {
+		out[k] = v
+	}
+	for k, v := range tsconfig {
+		out[k] = v
+	}
 	return out
 }
 
@@ -2140,6 +2237,23 @@ func parseTSConfigAliases(config tsConfigAliasFile, declaringPath, originDir str
 	return aliases, len(aliases) > 0
 }
 
+// bindImportTarget resolves a specifier to the known source file it names when
+// that file is in the extract set. RelImports.Target must be a Fact.Name for
+// store/graphsession resolution; module facts are directories and symbols are
+// `dir.name`, so the file path (the KindFileRef name) is the node an import
+// edge can bind to. An unresolved internal path is left as resolveImportPath
+// returned it — missing files stay unresolved rather than guessed.
+func bindImportTarget(importPath, fileDir string, aliases map[string]tsAlias, knownFiles map[string]bool) (string, bool) {
+	resolved, external := resolveImportPath(importPath, fileDir, aliases)
+	if external {
+		return resolved, true
+	}
+	if file, _, ok := resolveModuleFile(resolved, knownFiles); ok {
+		return file, false
+	}
+	return resolved, false
+}
+
 // resolveImportPath normalizes a TypeScript import path to a filesystem-relative path.
 // It handles path aliases (@/), relative imports (./), and identifies external packages.
 //
@@ -2538,7 +2652,19 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 		add(t)
 	}
 	if len(targets) == 0 {
-		return nil
+		if kind != facts.KindFileRef {
+			return nil
+		}
+		// Every source file is a resolvable import target. RelImports bind to
+		// this name (the file path); omitting the node left internal imports
+		// unresolved even when the destination file existed.
+		return []facts.Fact{{
+			Kind:  kind,
+			Name:  ctx.relFile,
+			File:  ctx.relFile,
+			Line:  1,
+			Props: map[string]any{"language": "typescript"},
+		}}
 	}
 
 	rels := make([]facts.Relation, 0, len(targets))

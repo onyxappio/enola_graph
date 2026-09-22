@@ -2442,7 +2442,10 @@ import (
 // includes/iOS markers; detectors retain their independent discovery scopes.
 // v274: Graph policy controls manifest/Markdown discovery, no-lock graph inputs,
 // and versioned effective TS contexts separate raw validity from scoped reparsing.
-const cacheVersion = "v274"
+// v275: TypeScript import edges bind specifiers to the known source file (package.json
+// name aliases plus RelImports targeting the file path / KindFileRef), so internal
+// alias, import-type, dynamic, namespace, and re-export edges resolve.
+const cacheVersion = "v275"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

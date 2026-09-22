@@ -353,12 +353,12 @@ func TestExtract_Monorepo_NestedTSConfigAlias(t *testing.T) {
 	deps := findFactsByKind(ff, facts.KindDependency)
 	var found *facts.Fact
 	for i := range deps {
-		if hasRelation(deps[i], facts.RelImports, "app/ui/src/components/Foo") {
+		if hasRelation(deps[i], facts.RelImports, "app/ui/src/components/Foo.tsx") {
 			found = &deps[i]
 		}
 	}
 	if found == nil {
-		t.Fatal("expected ~/components/Foo to resolve to app/ui/src/components/Foo")
+		t.Fatal("expected ~/components/Foo to resolve to app/ui/src/components/Foo.tsx")
 	}
 	if found.Props["source"] != "internal" {
 		t.Errorf("source = %v, want internal (paths-less root tsconfig should not short-circuit nested package alias discovery)", found.Props["source"])
@@ -379,23 +379,23 @@ func TestExtract_Monorepo_SiblingPackagesSameAliasDifferentTarget(t *testing.T) 
 	deps := findFactsByKind(ff, facts.KindDependency)
 	wantA, wantB := false, false
 	for _, d := range deps {
-		if hasRelation(d, facts.RelImports, "packages/app-a/src/foo") {
+		if hasRelation(d, facts.RelImports, "packages/app-a/src/foo.ts") {
 			wantA = true
 		}
-		if hasRelation(d, facts.RelImports, "packages/app-b/lib/foo") {
+		if hasRelation(d, facts.RelImports, "packages/app-b/lib/foo.ts") {
 			wantB = true
 		}
 		// Neither package's ~/foo should ever resolve against the other's mapping.
-		if hasRelation(d, facts.RelImports, "packages/app-b/src/foo") ||
-			hasRelation(d, facts.RelImports, "packages/app-a/lib/foo") {
+		if hasRelation(d, facts.RelImports, "packages/app-b/src/foo.ts") ||
+			hasRelation(d, facts.RelImports, "packages/app-a/lib/foo.ts") {
 			t.Errorf("alias resolved against the wrong package's tsconfig: %+v", d)
 		}
 	}
 	if !wantA {
-		t.Error("expected app-a's ~/foo to resolve to packages/app-a/src/foo")
+		t.Error("expected app-a's ~/foo to resolve to packages/app-a/src/foo.ts")
 	}
 	if !wantB {
-		t.Error("expected app-b's ~/foo to resolve to packages/app-b/lib/foo")
+		t.Error("expected app-b's ~/foo to resolve to packages/app-b/lib/foo.ts")
 	}
 }
 
@@ -418,9 +418,9 @@ export * from 'some-external-lib'
 		target     string
 		wantSource string
 	}{
-		{"src/client", "internal"},
-		{"src/HomePage", "internal"},
-		{"src/types", "internal"},
+		{"src/client.ts", "internal"},
+		{"src/HomePage.tsx", "internal"},
+		{"src/types.ts", "internal"},
 		{"some-external-lib", "external"},
 	}
 	for _, tc := range cases {
@@ -1074,7 +1074,7 @@ func TestExtract_DynamicAndRequireDependencyEdges(t *testing.T) {
 	}, false)
 
 	deps := findFactsByKind(ff, facts.KindDependency)
-	wantTargets := []string{"src/heavy", "src/cfg"}
+	wantTargets := []string{"src/heavy.ts", "src/cfg.ts"}
 	for _, want := range wantTargets {
 		found := false
 		for i := range deps {

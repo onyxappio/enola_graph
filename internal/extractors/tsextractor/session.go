@@ -103,6 +103,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	isTypeORM, isDrizzle, isPrisma := detectORMs(repoPath, inputScope)
 	orms := ormFlags{typeORM: isTypeORM, drizzle: isDrizzle}
 	aliasRoots := collectTSAliasRoots(ctx, repoPath, inputScope)
+	pkgAliases := collectPackageAliases(ctx, repoPath, inputScope)
 	if isSvelteKit {
 		aliasRoots = withSvelteKitAliasFallbacks(repoPath, aliasRoots, inputScope)
 	}
@@ -238,7 +239,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		if hooks.OnBeforeParse != nil {
 			hooks.OnBeforeParse(relFile)
 		}
-		aliases := aliasesForDir(aliasRoots, factpath.Dir(relFile))
+		aliases := mergePackageAliases(aliasesForDir(aliasRoots, factpath.Dir(relFile)), pkgAliases)
 		var res tsFileResult
 		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, isVue, isNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, orms, aliases, knownFiles, nuxtAutoComponents, grpcIdx)
 		if !facts.IsTestPath(relFile) {
