@@ -70,7 +70,173 @@ func TestAuthoritativePlanWholeDomainWhenNameDependentOutsideReverseClose(t *tes
 	}
 }
 
-func TestDependencyIndexProvenSmallCompleteGraph(t *testing.T) {
+func TestDirtyRouterMountChildrenBeforeBegin(t *testing.T) {
+	prev := map[string]*FileState{
+		"src/server.ts": {
+			Hash: "1", Extractor: "typescript",
+			TS: &tsextractor.FileRecord{
+				File: "src/server.ts",
+				Router: &tsextractor.RouterDTO{
+					RelFile: "src/server.ts",
+					Mounts:  []tsextractor.MountDTO{{File: "src/server.ts", Parent: "app", Prefix: "/api", Child: "ordersRouter"}},
+					Imports: map[string]tsextractor.ImportRefDTO{"ordersRouter": {File: "src/api/orders.ts", Export: "default"}},
+				},
+			},
+		},
+		"src/api/orders.ts": {Hash: "2", Extractor: "typescript", TS: &tsextractor.FileRecord{File: "src/api/orders.ts"}},
+	}
+	dirty := map[string]bool{"src/server.ts": true}
+	newRecs := map[string]*tsextractor.FileRecord{
+		"src/server.ts": {
+			File: "src/server.ts",
+			Router: &tsextractor.RouterDTO{
+				RelFile: "src/server.ts",
+				Mounts:  []tsextractor.MountDTO{{File: "src/server.ts", Parent: "app", Prefix: "/v2", Child: "ordersRouter"}},
+				Imports: map[string]tsextractor.ImportRefDTO{"ordersRouter": {File: "src/api/orders.ts", Export: "default"}},
+			},
+		},
+	}
+	got := dirtyRouterMountChildren(prev, dirty, newRecs)
+	found := false
+	for _, id := range got {
+		if id == "src/api/orders.ts" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("mount prefix change omitted child: %v", got)
+	}
+	unchanged := dirtyRouterMountChildren(prev, dirty, map[string]*tsextractor.FileRecord{"src/server.ts": prev["src/server.ts"].TS})
+	if len(unchanged) != 0 {
+		t.Fatalf("unchanged mounts produced children %v", unchanged)
+	}
+}
+
+func nestedMountStates() map[string]*FileState {
+	return map[string]*FileState{
+		"src/server.ts": {
+			Hash: "1", Extractor: "typescript",
+			TS: &tsextractor.FileRecord{
+				File: "src/server.ts",
+				Router: &tsextractor.RouterDTO{
+					RelFile: "src/server.ts",
+					Roots:   map[string]bool{"app": true},
+					Mounts:  []tsextractor.MountDTO{{File: "src/server.ts", Parent: "app", Prefix: "/api", Child: "apiRouter"}},
+					Imports: map[string]tsextractor.ImportRefDTO{"apiRouter": {File: "src/api.ts", Export: "default"}},
+				},
+			},
+		},
+		"src/api.ts": {
+			Hash: "2", Extractor: "typescript",
+			TS: &tsextractor.FileRecord{
+				File: "src/api.ts",
+				Router: &tsextractor.RouterDTO{
+					RelFile: "src/api.ts",
+					Routers: map[string]bool{"router": true},
+					Exports: map[string]string{"default": "router"},
+					Mounts:  []tsextractor.MountDTO{{File: "src/api.ts", Parent: "router", Prefix: "/v1", Child: "ordersRouter"}},
+					Imports: map[string]tsextractor.ImportRefDTO{"ordersRouter": {File: "src/api/orders.ts", Export: "default"}},
+				},
+			},
+		},
+		"src/api/orders.ts": {
+			Hash: "3", Extractor: "typescript",
+			TS: &tsextractor.FileRecord{
+				File:  "src/api/orders.ts",
+				Facts: []facts.Fact{{Kind: facts.KindSymbol, Name: "listOrders", File: "src/api/orders.ts"}},
+				Router: &tsextractor.RouterDTO{
+					RelFile: "src/api/orders.ts",
+					Routers: map[string]bool{"router": true},
+					Exports: map[string]string{"default": "router"},
+					Pending: map[string][]tsextractor.PendingRouteDTO{
+						"router": {{Verb: "GET", Path: "/orders", Line: 4, Framework: "express"}},
+					},
+				},
+			},
+		},
+		"packages/crypto/src/password.ts": {
+			Hash: "4", Extractor: "typescript",
+			TS: &tsextractor.FileRecord{
+				File:  "packages/crypto/src/password.ts",
+				Facts: []facts.Fact{{Kind: facts.KindSymbol, Name: "normalizeEmail", File: "packages/crypto/src/password.ts"}},
+			},
+		},
+	}
+}
+
+func TestDirtyRouterMountChildrenNestedBeforeBegin(t *testing.T) {
+	prev := nestedMountStates()
+	dirty := map[string]bool{"src/server.ts": true}
+	newRecs := map[string]*tsextractor.FileRecord{
+		"src/server.ts": {
+			File: "src/server.ts",
+			Router: &tsextractor.RouterDTO{
+				RelFile: "src/server.ts",
+				Roots:   map[string]bool{"app": true},
+				Mounts:  []tsextractor.MountDTO{{File: "src/server.ts", Parent: "app", Prefix: "/v2", Child: "apiRouter"}},
+				Imports: map[string]tsextractor.ImportRefDTO{"apiRouter": {File: "src/api.ts", Export: "default"}},
+			},
+		},
+	}
+	got := dirtyRouterMountChildren(prev, dirty, newRecs)
+	found := map[string]bool{}
+	for _, id := range got {
+		found[id] = true
+	}
+	if !found["src/api.ts"] || !found["src/api/orders.ts"] {
+		t.Fatalf("nested mount omitted descendants: %v", got)
+	}
+}
+
+func TestComposedRouteOwnerDeltaNestedMounts(t *testing.T) {
+	prev := nestedMountStates()
+	dirty := map[string]bool{"src/server.ts": true}
+	newRecs := map[string]*tsextractor.FileRecord{
+		"src/server.ts": {
+			File: "src/server.ts",
+			Router: &tsextractor.RouterDTO{
+				RelFile: "src/server.ts",
+				Roots:   map[string]bool{"app": true},
+				Mounts:  []tsextractor.MountDTO{{File: "src/server.ts", Parent: "app", Prefix: "/v2", Child: "apiRouter"}},
+				Imports: map[string]tsextractor.ImportRefDTO{"apiRouter": {File: "src/api.ts", Export: "default"}},
+			},
+		},
+	}
+	got := composedRouteOwnerDelta(prev, dirty, newRecs)
+	found := map[string]bool{}
+	for _, id := range got {
+		found[id] = true
+	}
+	if !found["src/api/orders.ts"] {
+		t.Fatalf("composed nested child omitted: %v", got)
+	}
+	if found["packages/crypto/src/password.ts"] {
+		t.Fatalf("unrelated owner entered composed route delta: %v", got)
+	}
+	bodyDirty := map[string]bool{"packages/crypto/src/password.ts": true}
+	bodyNew := map[string]*tsextractor.FileRecord{
+		"packages/crypto/src/password.ts": {
+			File:  "packages/crypto/src/password.ts",
+			Facts: []facts.Fact{{Kind: facts.KindSymbol, Name: "normalizeEmail", File: "packages/crypto/src/password.ts"}},
+		},
+	}
+	if extra := composedRouteOwnerDelta(prev, bodyDirty, bodyNew); len(extra) != 0 {
+		t.Fatalf("body edit grew composed route owners %v", extra)
+	}
+}
+
+func TestComposedRouteFactsBlankVersusTaggedRepo(t *testing.T) {
+	app := "apps/architect-console/src/server/app.ts"
+	blank := []facts.Fact{{Kind: facts.KindRoute, Name: "/health", File: app, Relations: []facts.Relation{{Kind: "handler", Target: "listen"}}}}
+	tagged := []facts.Fact{{Repo: "product-scope", Kind: facts.KindRoute, Name: "/health", File: app, Relations: []facts.Relation{{Kind: "handler", Target: "listen"}}}}
+	scope := map[string]bool{}
+	addChangedRouteFiles(scope, append(blank, tsextractor.ComposedMountRoutes(nil)...), append(tagged, tsextractor.ComposedMountRoutes(nil)...))
+	if len(scope) != 0 {
+		t.Fatalf("blank vs tagged composed domain grew scope %v", scope)
+	}
+}
+
+func TestDependencyIndexProvenIgnoresUnresolvedSpecs(t *testing.T) {
 	prev := map[string]*FileState{
 		"a.ts": {TS: &tsextractor.FileRecord{File: "a.ts", Declared: []string{"a"}, ResolvedFiles: []string{"b.ts"}}},
 		"b.ts": {TS: &tsextractor.FileRecord{File: "b.ts", Declared: []string{"b"}}},
@@ -78,9 +244,15 @@ func TestDependencyIndexProvenSmallCompleteGraph(t *testing.T) {
 	if !dependencyIndexProven(prev) {
 		t.Fatal("small resolved graph should be treated as proven")
 	}
-	prev["c.ts"] = &FileState{TS: &tsextractor.FileRecord{File: "c.ts", UnresolvedSpecs: []string{"./missing"}}}
-	if dependencyIndexProven(prev) {
-		t.Fatal("unresolved import must not prove completeness")
+	prev["c.ts"] = &FileState{TS: &tsextractor.FileRecord{File: "c.ts", UnresolvedSpecs: []string{"./theme.css"}}}
+	if !dependencyIndexProven(prev) {
+		t.Fatal("unresolved CSS/external specs must not unprove reverse-close")
+	}
+	incomplete := map[string]*FileState{
+		"a.ts": {TS: &tsextractor.FileRecord{File: "a.ts", ImportSpecs: []string{"./b"}}},
+	}
+	if dependencyIndexProven(incomplete) {
+		t.Fatal("incomplete import records must not prove completeness")
 	}
 }
 
@@ -226,6 +398,120 @@ func TestAuthoritativeFilePlanDeleteKeepsRetiredOwner(t *testing.T) {
 	}
 	if err := p.check(graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: "kept.ts"}); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestComposedRouteFactsAppliesEmberEngineMounts(t *testing.T) {
+	engine := "lib/shop/addon/routes.js"
+	prev := map[string]*tsextractor.FileRecord{
+		"app/router.ts": {
+			File: "app/router.ts",
+			Facts: []facts.Fact{{
+				Kind: facts.KindRoute, Name: "/store", File: "app/router.ts",
+				Props: map[string]any{"type": "engine_mount", "ember_engine": "shop", "router": "map", "method": "GET", "framework": "ember"},
+			}},
+		},
+		engine: {
+			File: engine,
+			Facts: []facts.Fact{{
+				Kind: facts.KindRoute, Name: "/cart", File: engine,
+				Props: map[string]any{"router": "engine", "ember_engine": "shop", "method": "GET", "framework": "ember"},
+			}},
+		},
+	}
+	got := composedRouteFacts(prev)
+	found := false
+	for _, f := range got {
+		if f.File == engine && f.Name == "/store/cart" && f.PropBool("ember_mounted") {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("ember composition missing /store/cart: %+v", got)
+	}
+	if prev[engine].Facts[0].Name != "/cart" {
+		t.Fatal("ComposeEngineMounts mutated cached FileRecord facts")
+	}
+	next := overlayTSRecords(prev, map[string]*tsextractor.FileRecord{
+		"app/router.ts": {
+			File: "app/router.ts",
+			Facts: []facts.Fact{{
+				Kind: facts.KindRoute, Name: "/v2", File: "app/router.ts",
+				Props: map[string]any{"type": "engine_mount", "ember_engine": "shop", "router": "map", "method": "GET", "framework": "ember"},
+			}},
+		},
+	})
+	scope := map[string]bool{}
+	addChangedRouteFiles(scope, composedRouteFacts(prev), composedRouteFacts(next))
+	if !scope[engine] {
+		t.Fatalf("ember mount rewrite omitted child owner: %v", scope)
+	}
+}
+
+func TestOwnersForNameDeltaSameNameKindChangeIncludesReferencers(t *testing.T) {
+	prev := map[string]*FileState{
+		"a.ts": {
+			TS: &tsextractor.FileRecord{
+				File:     "a.ts",
+				Declared: []string{"Foo"},
+				Facts:    []facts.Fact{{Kind: facts.KindSymbol, Name: "Foo", File: "a.ts"}},
+			},
+		},
+		"b.ts": {
+			TS: &tsextractor.FileRecord{
+				File:       "b.ts",
+				Referenced: []string{"Foo"},
+				Facts:      []facts.Fact{{Kind: facts.KindSymbol, Name: "use", File: "b.ts", Relations: []facts.Relation{{Kind: facts.RelCalls, Target: "Foo"}}}},
+			},
+		},
+		"independent.ts": {TS: &tsextractor.FileRecord{File: "independent.ts", Facts: []facts.Fact{{Kind: facts.KindSymbol, Name: "i", File: "independent.ts"}}}},
+	}
+	got := ownersForNameDelta(prev, map[string]bool{"a.ts": true}, map[string][]facts.Fact{
+		"a.ts": {{Kind: facts.KindRoute, Name: "Foo", File: "a.ts"}},
+	})
+	seen := map[string]bool{}
+	for _, n := range got {
+		seen[n] = true
+	}
+	if !seen["a.ts"] || !seen["b.ts"] {
+		t.Fatalf("same-name kind change omitted referencer: %v", got)
+	}
+	if seen["independent.ts"] {
+		t.Fatalf("unrelated owner in kind-change delta %v", got)
+	}
+}
+
+func TestOwnersForNameDeltaUnresolvedBecomingDeclarationIncludesReferencers(t *testing.T) {
+	prev := map[string]*FileState{
+		"a.ts": {
+			TS: &tsextractor.FileRecord{
+				File:            "a.ts",
+				Referenced:      []string{"Foo"},
+				UnresolvedSpecs: []string{"./missing"},
+				Facts:           []facts.Fact{{Kind: facts.KindSymbol, Name: "x", File: "a.ts"}},
+			},
+		},
+		"b.ts": {
+			TS: &tsextractor.FileRecord{
+				File:       "b.ts",
+				Referenced: []string{"Foo"},
+				Facts:      []facts.Fact{{Kind: facts.KindSymbol, Name: "y", File: "b.ts"}},
+			},
+		},
+		"independent.ts": {TS: &tsextractor.FileRecord{File: "independent.ts", Facts: []facts.Fact{{Kind: facts.KindSymbol, Name: "i", File: "independent.ts"}}}},
+	}
+	got := ownersForNameDelta(prev, map[string]bool{"a.ts": true}, map[string][]facts.Fact{
+		"a.ts": {{Kind: facts.KindSymbol, Name: "Foo", File: "a.ts"}, {Kind: facts.KindSymbol, Name: "x", File: "a.ts"}},
+	})
+	seen := map[string]bool{}
+	for _, n := range got {
+		seen[n] = true
+	}
+	if !seen["b.ts"] {
+		t.Fatalf("unresolved name becoming declaration omitted b.ts: %v", got)
+	}
+	if seen["independent.ts"] {
+		t.Fatalf("unrelated owner in unresolved-declaration delta %v", got)
 	}
 }
 

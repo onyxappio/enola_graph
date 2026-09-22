@@ -463,7 +463,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			// Initial/global-context changes still require the complete domain.
 			// For an ordinary content delta, derive the manifest from changed
 			// files plus reverse file-to-file dependents in the prior state.
-			wholeDomain := initial || forceAll || s.state == nil || configChanged || s.state.ConfigHash != cfgHash || s.state.PolicyIdentity != input.policyIdentity || !dependencyIndexProven(prevFiles)
+			wholeDomain := initial || forceAll || s.state == nil || configChanged || s.state.ConfigHash != cfgHash || s.state.PolicyIdentity != input.policyIdentity || incompleteDependencyRecords(prevFiles)
 			if !wholeDomain && s.state != nil && s.state.FrameworkSig != "" {
 				need, ferr := s.frameworkDirtyRequiresFullScope(inv.Files, prevFiles, hashes, angular)
 				if ferr != nil {
@@ -514,19 +514,11 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 					fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "planning extract of dirty files failed; using whole domain"})
 				} else {
 					extraOwners = append(extraOwners, ownersForNameDelta(prevFiles, dirty, preview)...)
-					if len(prevFiles) > 100 && resolutionCandidatesChanged(prevFiles, dirty, preview) {
-						wholeDomain = true
-						forceAll = true
-						fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "frozen scope: resolver candidate identity changed"})
+					var previewRecs map[string]*tsextractor.FileRecord
+					if s.preparedTS != nil {
+						previewRecs = s.preparedTS.Records
 					}
-					if !wholeDomain && s.state.FrameworkSig != "" && len(prevFiles) > 100 && len(dirty) > 1 {
-						// Framework composition can synthesize resolver candidates from
-						// files outside the dirty set. Until that domain is indexed
-						// before Begin, use the conservative immutable fallback.
-						wholeDomain = true
-						forceAll = true
-						fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "frozen scope: framework composition resolver domain"})
-					}
+					extraOwners = append(extraOwners, composedRouteOwnerDelta(prevFiles, dirty, previewRecs)...)
 				}
 			}
 			var planReason string
@@ -951,18 +943,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			tagRepo(res.Facts, repoID)
 			allFacts = append(allFacts, res.Facts...)
 			appendExtractorSynthetic(synByExt, "typescript", res.Facts)
-			var oldFacts []facts.Fact
-			if s.state != nil {
-				for _, st := range s.state.Files {
-					oldFacts = append(oldFacts, fileFacts(st)...)
-					if st != nil && st.Contrib != nil {
-						for _, ff := range st.Contrib {
-							oldFacts = append(oldFacts, ff...)
-						}
-					}
-				}
-			}
-			addChangedRouteFiles(scopeFiles, oldFacts, res.Facts)
+			addChangedRouteFiles(scopeFiles, composedRouteFacts(tsRecordsFromState(prevFiles)), composedRouteFacts(res.Records))
 			for f, d := range dirty {
 				if d {
 					scopeFiles[filepath.ToSlash(f)] = true

@@ -31,6 +31,8 @@ DOCS_BENCH = HERE.parent
 ENOLA_ROOT = HERE.parents[2]
 SCOPE_RUN = DOCS_BENCH / "invalidation-scope-2026-09-21" / "run.py"
 BASELINE_NAME = "results.baseline-invalid-chronology.json"
+PINNED_POLICY = DOCS_BENCH / "product-delta-2026-09-21" / "product-mcp-arch.yaml"
+GO_BIN_CANDIDATES = (Path("/tmp/enola-toolchain/go/bin/go"),)
 LOCK_BASENAMES = {
     "package-lock.json",
     "npm-shrinkwrap.json",
@@ -136,35 +138,72 @@ def required_owners(name_status: list[list[str]]) -> list[str]:
     return out
 
 
-def overlay_input_policy(snapshot: Path, source: Path) -> str:
-    """Layer repository-local Enola config onto a snapshot. Never writes source."""
-    src = source / "mcp-arch.yaml"
+def semantic_required_owners(name_status: list[list[str]], prior_owners, cold_scope) -> list[str]:
+    """Keep changed-path owners that existed on the prior graph or the target cold scope.
+
+    Deleted and old-rename owners live on the prior semantic set. New and
+    renamed-to owners live on the target cold scope. Paths that never entered
+    either set (ignored fixtures) are dropped. Target-only filtering would
+    omit deleted/old-rename owners.
+    """
+    allowed = set(prior_owners) | set(cold_scope)
+    return [owner for owner in required_owners(name_status) if owner in allowed]
+
+
+def load_pinned_policy(source: Path) -> dict:
+    """Freeze overlay bytes for the run. Do not copy a drifting live source file."""
+    if not PINNED_POLICY.is_file():
+        raise RuntimeError(f"missing pinned policy {PINNED_POLICY}")
+    pinned_bytes = PINNED_POLICY.read_bytes()
+    source_cfg = source / "mcp-arch.yaml"
+    source_hash = sha256_file(source_cfg) if source_cfg.is_file() else ""
+    return {
+        "path": str(PINNED_POLICY),
+        "sha256": sha256_bytes(pinned_bytes),
+        "bytes": pinned_bytes,
+        "source_mcp_arch": str(source_cfg) if source_cfg.is_file() else "",
+        "source_mcp_arch_sha256": source_hash,
+        "source_matches_pin": bool(source_hash) and source_hash == sha256_bytes(pinned_bytes),
+    }
+
+
+def git_tracked_file(repo: Path, rel: str) -> bool:
+    out = run(["git", "-C", str(repo), "ls-files", "--", rel])
+    return bool(out.stdout.strip())
+
+
+def apply_pinned_policy(snapshot: Path, policy: dict) -> dict:
+    """Write the pinned overlay unless the SHA already has a tracked config."""
     dest = snapshot / "mcp-arch.yaml"
-    if src.is_file():
-        dest.write_bytes(src.read_bytes())
-        return str(src)
-    fallback = DOCS_BENCH / "product-delta-2026-09-21" / "product-graph-scope.yaml"
-    if fallback.is_file() and not dest.exists():
-        text = fallback.read_text()
-        if not text.startswith("repo:"):
-            text = "repo: .\n" + text
-        dest.write_text(text)
-        return str(fallback)
-    return ""
+    tracked = git_tracked_file(snapshot, "mcp-arch.yaml")
+    info = {
+        "dest": str(dest),
+        "pinned_source": policy["path"],
+        "pinned_sha256": policy["sha256"],
+        "tracked": tracked,
+        "applied": False,
+        "historical_config_sha256": None,
+    }
+    if tracked:
+        info["historical_config_sha256"] = sha256_file(dest)
+        return info
+    dest.write_bytes(policy["bytes"])
+    info["applied"] = True
+    return info
 
 
-def snapshot_at(fetch: Path, sha: str, dest: Path, source: Path) -> None:
+def snapshot_at(fetch: Path, sha: str, dest: Path, policy: dict) -> dict:
     if dest.exists():
         shutil.rmtree(dest)
     dest.parent.mkdir(parents=True, exist_ok=True)
     run(["git", "clone", "--quiet", "--no-checkout", str(fetch), str(dest)])
     run(["git", "-C", str(dest), "checkout", "--quiet", "--detach", sha])
-    overlay_input_policy(dest, source)
+    return apply_pinned_policy(dest, policy)
 
 
-def checkout_sha(repo: Path, sha: str, source: Path) -> None:
+def checkout_sha(repo: Path, sha: str, policy: dict) -> dict:
     run(["git", "-C", str(repo), "checkout", "--quiet", "--detach", sha])
-    overlay_input_policy(repo, source)
+    return apply_pinned_policy(repo, policy)
 
 
 def prepare_fetch_clone(source: Path, dest: Path, ref: str) -> str:
@@ -179,30 +218,81 @@ def prepare_fetch_clone(source: Path, dest: Path, ref: str) -> str:
     return tip
 
 
+def go_bin() -> str:
+    for cand in GO_BIN_CANDIDATES:
+        if cand.is_file():
+            return str(cand)
+    return "go"
+
+
+def go_env() -> dict:
+    env = os.environ.copy()
+    extra = "/tmp/enola-toolchain/go/bin:/tmp/enola-toolchain/bin"
+    env["PATH"] = extra + ":" + env.get("PATH", "")
+    return env
+
+
 def enola_identity(enola_root: Path) -> dict:
     rev = git_out(enola_root, "rev-parse", "HEAD")
     porcelain = git_out(enola_root, "status", "--porcelain")
     diff = run(["git", "-C", str(enola_root), "diff", "HEAD"]).stdout.encode()
     cached = run(["git", "-C", str(enola_root), "diff", "--cached"]).stdout.encode()
+    untracked = []
+    for line in porcelain.splitlines():
+        if line.startswith("?? "):
+            untracked.append(line[3:])
+    untracked_blob = "\n".join(untracked).encode()
     return {
         "revision": rev,
         "dirty": bool(porcelain.strip()),
         "status_porcelain": porcelain,
         "diff_sha256": sha256_bytes(diff + b"\0" + cached),
+        "untracked_names_sha256": sha256_bytes(untracked_blob),
+    }
+
+
+def go_version_m(binary: Path) -> str:
+    proc = subprocess.run(
+        [go_bin(), "version", "-m", str(binary)],
+        env=go_env(),
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0:
+        raise RuntimeError(f"go version -m failed:\n{(proc.stderr or proc.stdout)[-2000:]}")
+    return proc.stdout
+
+
+def binary_provenance(binary: Path) -> dict:
+    text = go_version_m(binary)
+    vcs_revision = ""
+    vcs_modified = ""
+    go_version = ""
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("go ") or stripped.endswith("go1.") or ": go" in stripped:
+            go_version = stripped
+        if "build" in stripped and "vcs.revision=" in stripped:
+            vcs_revision = stripped.split("vcs.revision=", 1)[-1]
+        if "build" in stripped and "vcs.modified=" in stripped:
+            vcs_modified = stripped.split("vcs.modified=", 1)[-1]
+    return {
+        "path": str(binary),
+        "sha256": sha256_file(binary),
+        "go_version_m": text,
+        "go_version_m_sha256": sha256_bytes(text.encode()),
+        "go_version": go_version,
+        "vcs_revision": vcs_revision,
+        "vcs_modified": vcs_modified,
     }
 
 
 def build_enola(enola_root: Path, dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
-    go = Path("/tmp/enola-toolchain/go/bin/go")
-    go_bin = str(go) if go.is_file() else "go"
-    env = os.environ.copy()
-    extra = "/tmp/enola-toolchain/go/bin:/tmp/enola-toolchain/bin"
-    env["PATH"] = extra + ":" + env.get("PATH", "")
     proc = subprocess.run(
-        [go_bin, "build", "-o", str(dest), "./cmd/enola"],
+        [go_bin(), "build", "-o", str(dest), "./cmd/enola"],
         cwd=enola_root,
-        env=env,
+        env=go_env(),
         capture_output=True,
         text=True,
     )
@@ -255,16 +345,48 @@ def _only_match(token: str, index: int, parent: str, child: str) -> bool:
 
 
 def filter_transitions(transitions: list[tuple[str, str]], only: str) -> list[tuple[str, str]]:
+    """Require a contiguous prefix of the first-parent chain starting at index 0."""
     if not only.strip():
         return transitions
     wanted = [item.strip() for item in only.split(",") if item.strip()]
-    out = []
+    matched = []
     for index, (parent, child) in enumerate(transitions):
         if any(_only_match(token, index, parent, child) for token in wanted):
-            out.append((parent, child))
-    if not out:
+            matched.append(index)
+    if not matched:
         raise RuntimeError(f"--only {only!r} matched no first-parent transitions")
-    return out
+    expected = list(range(matched[0], matched[-1] + 1))
+    if matched != expected:
+        raise RuntimeError(
+            f"noncontiguous --only {only!r} indexes {matched}; require a contiguous first-parent chain"
+        )
+    if matched[0] != 0:
+        raise RuntimeError(
+            f"--only {only!r} skips earlier transitions {list(range(matched[0]))}; "
+            "require a contiguous prefix from the initial SHA so the parent is initialized"
+        )
+    return [transitions[i] for i in matched]
+
+
+def require_fresh_work(work: Path) -> None:
+    if work.exists():
+        raise SystemExit(
+            f"refusing to reuse existing work dir {work}; pass a fresh nonexistent path "
+            "so persisted state cannot contaminate initial"
+        )
+
+
+def transition_failed(row: dict) -> bool:
+    return bool(row.get("blocker")) or row.get("graph_hash_equal") is not True
+
+
+def walk_until_failure(outcomes):
+    rows = []
+    for outcome in outcomes:
+        rows.append(outcome)
+        if transition_failed(outcome):
+            break
+    return rows
 
 
 def write_json(path: Path, data) -> None:
@@ -289,7 +411,8 @@ def run_history(args) -> dict:
     if source.resolve() == Path("/tmp/enola-product-benchmark-source").resolve():
         # Read-only: dedicated clone only.
         pass
-    work.mkdir(parents=True, exist_ok=True)
+    require_fresh_work(work)
+    work.mkdir(parents=True, exist_ok=False)
     assert_not_tracked_output(Path(args.output))
 
     ident = enola_identity(enola_root)
@@ -298,7 +421,8 @@ def run_history(args) -> dict:
         build_enola(enola_root, binary)
     elif not binary.is_file():
         raise SystemExit(f"missing enola binary {binary}")
-    binary_hash = sha256_file(binary)
+    bin_prov = binary_provenance(binary)
+    policy = load_pinned_policy(source)
 
     fetch = work / "product-fetch"
     ref = args.ref
@@ -308,26 +432,33 @@ def run_history(args) -> dict:
     transitions = filter_transitions(transitions, args.only)
 
     provenance = {
-        "note": "first-parent history; persistent delta state; cold oracle per commit",
+        "note": "first-parent history; persistent delta state; cold oracle per commit; file-sink --events JSONL timings, not NATS JetStream",
+        "sink": "file",
         "source_tree": str(source),
         "source_dirty_untracked": git_out(source, "status", "--porcelain") if (source / ".git").exists() else "",
         "fetch_clone": str(fetch),
         "ref": ref,
         "ref_sha": tip,
         "first_parent_shas": shas,
+        "selected_transitions": [case_id(p, c) for p, c in transitions],
         "enola": ident,
-        "binary": str(binary),
-        "binary_sha256": binary_hash,
-        "input_policy": "mcp-arch.yaml overlay from source when present; lockfiles excluded from required owners",
+        "binary": bin_prov,
+        "input_policy": {
+            "pinned_source": policy["path"],
+            "pinned_sha256": policy["sha256"],
+            "source_mcp_arch": policy["source_mcp_arch"],
+            "source_mcp_arch_sha256": policy["source_mcp_arch_sha256"],
+            "source_matches_pin": policy["source_matches_pin"],
+            "note": "pinned overlay applied only when the SHA has no tracked mcp-arch.yaml; historical tracked config is left in place",
+            "lockfiles_excluded_from_required_owners": True,
+        },
         "baseline": str(HERE / BASELINE_NAME),
     }
     write_json(work / "provenance.json", provenance)
 
     live = work / "live"
-    snapshot_at(fetch, shas[0], live, source)
+    snapshot_at(fetch, shas[0], live, policy)
     events = work / "events-live.jsonl"
-    if events.exists():
-        events.unlink()
     state_live = work / "state-live"
     initial_case = work / "cases" / f"00-initial-{shas[0][:12]}"
     initial_case.mkdir(parents=True, exist_ok=True)
@@ -342,6 +473,7 @@ def run_history(args) -> dict:
             "sha": shas[0],
             "initial": scope.slim_run(initial, scope.manifest_fields(initial_records)),
             "begin_scope_count": len(validated_initial["scope"]),
+            "sink": "file",
         },
     )
     applied = scope.Consumer()
@@ -356,24 +488,18 @@ def run_history(args) -> dict:
         print(f"== {ident_case} {parent[:12]} -> {child[:12]}", flush=True)
         try:
             changed = changed_name_status(fetch, parent, child)
-            required = required_owners(changed)
-            write_json(case / "changed.json", {"name_status": changed, "required_owners": required})
+            prior = applied.snapshot()
+            prior_owners = prior.owner_set_all()
+            write_json(case / "changed.json", {"name_status": changed, "changed_owners": required_owners(changed)})
             before = events.stat().st_size if events.exists() else 0
-            checkout_sha(live, child, source)
+            checkout_sha(live, child, policy)
             delta = scope.enola(binary, "delta", live, state_live, events, case / "summary-delta.json")
             delta_pairs = scope.parse_event_records(events, before)
             delta_records = [rec for rec, _ in delta_pairs]
             delta["events"] = len(delta_records)
-            # Validate the protocol before applying; changed files that produce
-            # no Enola facts (for example ignored test fixtures) are filtered
-            # against the cold manifest below rather than treated as missing
-            # authoritative owners.
             validated = validate_publishing_or_noop(delta_records, delta_pairs, delta, completed, [])
-            if delta_records:
-                applied.apply(delta_records)
-                completed = validated["target_generation"]
             cold_root = case / "cold-src"
-            snapshot_at(fetch, child, cold_root, source)
+            snapshot_at(fetch, child, cold_root, policy)
             cold_events = case / "events-cold.jsonl"
             if cold_events.exists():
                 cold_events.unlink()
@@ -382,16 +508,21 @@ def run_history(args) -> dict:
             cold_records = [rec for rec, _ in cold_pairs]
             cold_validated = scope.validate_replacement(cold_records, cold_pairs)
             cold_scope = set(cold_validated.get("scope") or [])
-            required = [owner for owner in required if owner in cold_scope]
-            if not set(required).issubset(set(validated.get("scope") or [])):
-                missing = sorted(set(required) - set(validated.get("scope") or []))
+            required = semantic_required_owners(changed, prior_owners, cold_scope)
+            begin_scope = set(validated.get("scope") or [])
+            if not set(required).issubset(begin_scope):
+                missing = sorted(set(required) - begin_scope)
                 raise RuntimeError(f"required owners outside Begin: {missing[:20]}")
             expected = scope.Consumer()
             expected.apply(cold_records)
+            if delta_records:
+                applied.apply(delta_records)
+                completed = validated["target_generation"]
             graph_equal = applied.graph_hash() == expected.graph_hash()
             if not graph_equal:
                 raise RuntimeError("initial+deltas graph hash does not match cold")
-            begin_scope = sorted(validated.get("scope") or [])
+            nec = scope.necessary_from_consumers(prior, expected)
+            extra_begin = sorted(begin_scope - set(nec))
             row = {
                 "id": ident_case,
                 "index": index,
@@ -399,13 +530,18 @@ def run_history(args) -> dict:
                 "child": child,
                 "changed_file_count": len(changed),
                 "required_owner_count": len(required),
+                "required_owners_sample": required[:25],
                 "delta": scope.slim_run(delta, scope.manifest_fields(delta_records)),
                 "cold": scope.slim_run(cold, scope.manifest_fields(cold_records)),
                 "begin_scope_count": len(begin_scope),
-                "necessary_owner_count": len(required),
+                "necessary_owner_count": len(nec),
+                "necessary_owners_sample": nec[:25],
+                "extra_begin_owner_count": len(extra_begin),
+                "extra_begin_owners_sample": extra_begin[:25],
                 "graph_hash_equal": True,
                 "kind": validated.get("kind") or "delta",
                 "completed_generation": completed,
+                "sink": "file",
                 "blocker": None,
             }
         except Exception as exc:
@@ -425,12 +561,17 @@ def run_history(args) -> dict:
                     "id": row.get("id"),
                     "changed_file_count": row.get("changed_file_count"),
                     "begin_scope_count": row.get("begin_scope_count"),
+                    "necessary_owner_count": row.get("necessary_owner_count"),
                     "graph_hash_equal": row.get("graph_hash_equal"),
                     "blocker": bool(row.get("blocker")),
+                    "sink": "file",
                 }
             ),
             flush=True,
         )
+        if transition_failed(row):
+            print(f"stopping after first failed transition {ident_case}", file=sys.stderr)
+            break
 
     summary = {
         "provenance": provenance,
@@ -438,7 +579,8 @@ def run_history(args) -> dict:
         "transitions": rows,
         "work": str(work),
         "output": args.output,
-        "repeat_limitation": "not a performance-acceptance run; launch the 10-case only when agreed",
+        "sink": "file",
+        "repeat_limitation": "file-sink diagnostic; not a NATS JetStream or performance-acceptance run; launch the 10-case only when agreed",
     }
     output = Path(args.output)
     write_json(output, summary)
@@ -498,10 +640,32 @@ def self_test() -> int:
         check("linear oldest is first commit", chain[0] == linear_shas[0], f"{chain} vs {linear_shas}")
         check("linear newest is HEAD", chain[-1] == linear_shas[-1])
         trans = list(zip(chain[:-1], chain[1:]))
-        only = filter_transitions(trans, "1")
-        check("--only index", only == [trans[1]], str(only))
-        only_sha = filter_transitions(trans, linear_shas[2][:8])
-        check("--only sha", any(linear_shas[2] in pair for pair in only_sha), str(only_sha))
+        only0 = filter_transitions(trans, "0")
+        check("--only prefix 0", only0 == [trans[0]], str(only0))
+        only01 = filter_transitions(trans, "0,1")
+        check("--only prefix 0,1", only01 == trans[:2], str(only01))
+        only_sha = filter_transitions(trans, linear_shas[0][:8])
+        check("--only first parent sha", only_sha == [trans[0]], str(only_sha))
+        only_id = filter_transitions(trans, case_id(*trans[0]))
+        check("--only case id", only_id == [trans[0]], str(only_id))
+        raised = False
+        try:
+            filter_transitions(trans, "1")
+        except RuntimeError:
+            raised = True
+        check("--only non-prefix index rejected", raised)
+        raised = False
+        try:
+            filter_transitions(trans, "0,2")
+        except RuntimeError:
+            raised = True
+        check("--only gap rejected", raised)
+        raised = False
+        try:
+            filter_transitions(trans, linear_shas[2][:8])
+        except RuntimeError:
+            raised = True
+        check("--only later sha rejected", raised)
         raised = False
         try:
             filter_transitions(trans, "no-such")
@@ -515,6 +679,17 @@ def self_test() -> int:
         check("rename both ids", "file:old.ts" in req and "file:new.ts" in req, str(req))
         check("source kept", "file:packages/crypto/src/a.ts" in req, str(req))
         check("lock-only required empty", required_owners([["M", "pnpm-lock.yaml"]]) == [])
+
+        prior = {"file:old.ts", "file:packages/crypto/src/a.ts"}
+        cold = {"file:new.ts", "file:packages/crypto/src/a.ts"}
+        semantic = semantic_required_owners(rows, prior, cold)
+        check("deleted/old rename kept vs prior", "file:old.ts" in semantic, str(semantic))
+        check("rename new kept vs cold", "file:new.ts" in semantic, str(semantic))
+        target_only = [o for o in required_owners(rows) if o in cold]
+        check("target-only would drop old rename", "file:old.ts" not in target_only, str(target_only))
+        ignored = semantic_required_owners([["M", "ignored.fixture.ts"], ["D", "old.ts"]], prior, cold)
+        check("ignored path dropped", "file:ignored.fixture.ts" not in ignored, str(ignored))
+        check("deleted owner kept from prior", "file:old.ts" in ignored, str(ignored))
 
         info_ok = {"parsed": 0, "events": 0, "owners_published": 0, "generation": [3, 3]}
         try:
@@ -535,14 +710,67 @@ def self_test() -> int:
             raised = True
         check("noop with required owners", raised)
 
+        walked = walk_until_failure(
+            [
+                {"id": "00", "graph_hash_equal": True, "blocker": None},
+                {"id": "01", "graph_hash_equal": False, "blocker": "boom"},
+                {"id": "02", "graph_hash_equal": True, "blocker": None},
+            ]
+        )
+        check("stop after first failure", [r["id"] for r in walked] == ["00", "01"], str(walked))
+
+        existing = root / "existing-work"
+        existing.mkdir()
+        raised = False
+        try:
+            require_fresh_work(existing)
+        except SystemExit:
+            raised = True
+        check("refuse existing work dir", raised)
+        require_fresh_work(root / "fresh-work")
+        check("nonexistent work dir allowed", True)
+
         src = root / "src"
         src.mkdir()
-        (src / "mcp-arch.yaml").write_text("repo: .\ngraph_inputs:\n  exclude: [worker-reports/**]\n")
+        (src / "mcp-arch.yaml").write_text("repo: .\ngraph_inputs:\n  exclude: [live-source-should-not-be-copied/**]\n")
+        policy = load_pinned_policy(src)
+        check("pin path recorded", Path(policy["path"]) == PINNED_POLICY)
+        check("pin hash recorded", len(policy["sha256"]) == 64)
+        check("live source not used as pin", "live-source-should-not-be-copied" not in policy["bytes"].decode())
         snap = root / "snap"
         snap.mkdir()
-        overlay_input_policy(snap, src)
-        check("overlay copies dirty config", (snap / "mcp-arch.yaml").is_file())
-        check("overlay content", "worker-reports/**" in (snap / "mcp-arch.yaml").read_text())
+        init_repo(snap)
+        applied = apply_pinned_policy(snap, policy)
+        check("overlay applied on untracked", applied["applied"] and (snap / "mcp-arch.yaml").is_file())
+        check("overlay is pinned bytes", sha256_file(snap / "mcp-arch.yaml") == policy["sha256"])
+        hist = root / "hist"
+        init_repo(hist)
+        (hist / "mcp-arch.yaml").write_text("repo: .\nhistorical: true\n")
+        run(["git", "add", "mcp-arch.yaml"], cwd=hist)
+        run(["git", "commit", "-q", "-m", "tracked policy"], cwd=hist)
+        skipped = apply_pinned_policy(hist, policy)
+        check("historical tracked config not overwritten", not skipped["applied"], str(skipped))
+        check("historical content preserved", "historical: true" in (hist / "mcp-arch.yaml").read_text())
+
+        prior_c = scope.Consumer()
+        prior_c.owners["file:old.ts"] = [{"id": "o", "kind": "sym", "occurrence": 0, "name": "old"}]
+        prior_c.owners["file:keep.ts"] = [{"id": "k", "kind": "sym", "occurrence": 0, "name": "keep"}]
+        cold_c = scope.Consumer()
+        cold_c.owners["file:keep.ts"] = [{"id": "k", "kind": "sym", "occurrence": 0, "name": "keep"}]
+        nec = scope.necessary_from_consumers(prior_c, cold_c)
+        check("necessary includes deleted owner", "file:old.ts" in nec, str(nec))
+        check("necessary omits unchanged owner", "file:keep.ts" not in nec, str(nec))
+        n1 = {"id": "a", "occurrence": 0, "kind": "k", "props": {"z": 1, "a": 2}}
+        n2 = {"id": "a", "occurrence": 0, "kind": "k", "props": {"a": 2, "z": 1}}
+        n3 = {"id": "a", "occurrence": 0, "kind": "k", "props": {"z": 1, "a": 3}}
+        ca = scope.Consumer()
+        cb = scope.Consumer()
+        ca.owners["file:x.ts"] = [n1, n3, n1]
+        cb.owners["file:x.ts"] = [n3, n2, n2]
+        check("complete JSON hash order-independent", ca.graph_hash() == cb.graph_hash())
+        cc = scope.Consumer()
+        cc.owners["file:x.ts"] = [n1, n3]
+        check("complete JSON hash keeps duplicates", ca.graph_hash() != cc.graph_hash())
 
         owners = [{"kind": "file", "id": "b.ts"}, {"kind": "file", "id": "a.ts"}]
         check("digest order-stable", scope.digest_owners(owners) == scope.digest_owners(list(reversed(owners))))
@@ -567,27 +795,29 @@ def self_test() -> int:
             print(" ", item, file=sys.stderr)
         return 1
     print("self-test ok")
-    print("first-parent oldest->newest, lockfile policy, no-op generation, overlay, --only")
+    print("first-parent oldest->newest, lockfile policy, no-op generation, pinned overlay, contiguous --only")
     print("baseline", HERE / BASELINE_NAME)
-    print("readiness: harness self-test passed; latest full run is recorded in the benchmark README")
+    print("readiness: harness self-test passed; Product10 first-parent run is gated on a fresh work dir")
     return 0
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--source", default="/tmp/enola-product-benchmark-source")
-    parser.add_argument("--work", default="/tmp/enola-invalidation-history-2026-09-22")
+    parser.add_argument("--source", default="/tmp/enola-product-history-source")
+    parser.add_argument("--work", default="", help="fresh nonexistent work directory (required for a real run)")
     parser.add_argument("--output", default="")
     parser.add_argument("--enola-root", default=str(ENOLA_ROOT))
     parser.add_argument("--binary", default="", help="optional prebuilt binary; default builds from --enola-root")
     parser.add_argument("--skip-build", action="store_true")
-    parser.add_argument("--ref", default="origin/main")
+    parser.add_argument("--ref", default="a609c19f3861971930fae7b33dcb2950598953c5")
     parser.add_argument("--count", type=int, default=10)
     parser.add_argument("--only", default="")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
     if args.self_test:
         return self_test()
+    if not args.work:
+        raise SystemExit("pass a fresh nonexistent --work directory")
     if not args.output:
         args.output = str(Path(args.work) / "results.json")
     result = run_history(args)

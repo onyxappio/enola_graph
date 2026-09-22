@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -87,28 +88,8 @@ func TestFrozenBeginPrecedesParsingAndNeverGrows(t *testing.T) {
 	}
 }
 
-func TestFrozenPostParseDependentCannotFallOutsideBegin(t *testing.T) {
-	root := setupTSRepo(t, map[string]string{
-		"packages/crypto/src/password.ts": "export function normalizeEmail(s: string) { return s.trim(); }",
-		"apps/architect-console/src/server/app.ts": `import "./missing-mod";
-export function listen() { return 1; }
-`,
-		"independent.ts": "export const i = 1;",
-	})
-	eng := testEngine(t, root)
-	state := t.TempDir()
-	opts := Options{StateDir: state, AuthoritativeFiles: true}
-	if _, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, opts); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(root, "packages/crypto/src/password.ts"), []byte("export function normalizeEmail(s: string) { return s.trim().toLowerCase(); }\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	sink := &graphstream.MemorySink{}
-	delta, err := Run(context.Background(), eng, root, sink, opts)
-	if err != nil {
-		t.Fatalf("delta must not fail-closed on a post-parse dependent: %v", err)
-	}
+func beginOwnerSet(t *testing.T, sink *graphstream.MemorySink) map[string]bool {
+	t.Helper()
 	bs, _, _, err := DecodeRun(sink.CloneRecords())
 	if err != nil || len(bs) != 1 {
 		t.Fatalf("begin %v %v", bs, err)
@@ -117,15 +98,383 @@ export function listen() { return 1; }
 	for _, o := range bs[0].OwnerScope {
 		owners[o.ID] = true
 	}
+	return owners
+}
+
+func publishedRouteNames(c *Consumer) map[string]bool {
+	out := map[string]bool{}
+	if c == nil {
+		return out
+	}
+	for _, ns := range c.Owners {
+		for _, n := range ns {
+			if n.Kind == facts.KindRoute {
+				out[n.Name] = true
+			}
+		}
+	}
+	return out
+}
+
+func sortedRouteNames(names map[string]bool) []string {
+	out := make([]string, 0, len(names))
+	for n := range names {
+		out = append(out, n)
+	}
+	sort.Strings(out)
+	return out
+}
+
+func requireRouteNames(t *testing.T, names map[string]bool, want ...string) {
+	t.Helper()
+	for _, n := range want {
+		if !names[n] {
+			t.Fatalf("missing route %q; have %v", n, sortedRouteNames(names))
+		}
+	}
+}
+
+func requireGoneRouteNames(t *testing.T, names map[string]bool, gone ...string) {
+	t.Helper()
+	for _, n := range gone {
+		if names[n] {
+			t.Fatalf("stale route %q still present in %v", n, sortedRouteNames(names))
+		}
+	}
+}
+
+func TestFrozenBodyEditExcludesUnchangedRouteOwners(t *testing.T) {
+	// Replaces TestFrozenPostParseDependentCannotFallOutsideBegin, which only
+	// imported "./missing-mod" and forced app.ts into Begin instead of reproducing
+	// blank-vs-tagged / composition-only route growth.
+	root := setupTSRepo(t, map[string]string{
+		"packages/crypto/src/password.ts": "export function normalizeEmail(s: string) { return s.trim(); }",
+		"src/server.ts": `
+import express from "express";
+import ordersRouter from "./api/orders";
+const app = express();
+app.use("/api", ordersRouter);
+`,
+		"src/api/orders.ts": `
+import express from "express";
+const router = express.Router();
+router.get("/orders", listOrders);
+export default router;
+`,
+		"src/ui.ts": `import "./theme.css";
+export const theme = 1;
+`,
+	})
+	eng := testEngine(t, root)
+	state := t.TempDir()
+	opts := Options{StateDir: state, AuthoritativeFiles: true}
+	s1 := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, s1, opts); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "packages/crypto/src/password.ts"), []byte("export function normalizeEmail(s: string) { return s.trim().toLowerCase(); }\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	s2 := &graphstream.MemorySink{}
+	delta, err := Run(context.Background(), eng, root, s2, opts)
+	if err != nil {
+		t.Fatalf("body delta must not fail-closed on unchanged routes: %v", err)
+	}
+	owners := beginOwnerSet(t, s2)
 	if !owners["packages/crypto/src/password.ts"] {
-		t.Fatalf("dirty file missing from Begin: %v", bs[0].OwnerScope)
+		t.Fatalf("dirty file missing: %v", owners)
 	}
-	if !owners["apps/architect-console/src/server/app.ts"] {
-		t.Fatalf("post-parse name dependent missing from Begin: %v", bs[0].OwnerScope)
+	if owners["src/api/orders.ts"] || owners["src/server.ts"] || owners["src/ui.ts"] {
+		t.Fatalf("unchanged route/unresolved-css owners in body-delta Begin: %v", owners)
 	}
-	if delta.ParsedFiles < 1 {
-		t.Fatalf("parsed=%d", delta.ParsedFiles)
+	if delta.ParsedFiles != 1 {
+		t.Fatalf("parsed=%d, want 1", delta.ParsedFiles)
 	}
+	cons := NewConsumer()
+	if err := cons.ApplyRecords(s1.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	if err := cons.ApplyRecords(s2.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	cold := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, cold, Options{StateDir: t.TempDir(), AuthoritativeFiles: true}); err != nil {
+		t.Fatal(err)
+	}
+	oracle := NewConsumer()
+	if err := oracle.ApplyRecords(cold.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, cons, oracle)
+}
+
+func TestFrozenMountPathChangeIncludesChildOwnersBeforeBegin(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"src/server.ts": `
+import express from "express";
+import ordersRouter from "./api/orders";
+const app = express();
+app.use("/api", ordersRouter);
+`,
+		"src/api/orders.ts": `
+import express from "express";
+const router = express.Router();
+router.get("/orders", listOrders);
+export default router;
+`,
+	})
+	eng := testEngine(t, root)
+	state := t.TempDir()
+	opts := Options{StateDir: state, AuthoritativeFiles: true}
+	s1 := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, s1, opts); err != nil {
+		t.Fatal(err)
+	}
+	cons := NewConsumer()
+	if err := cons.ApplyRecords(s1.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	requireRouteNames(t, publishedRouteNames(cons), "/api/orders")
+	if err := os.WriteFile(filepath.Join(root, "src/server.ts"), []byte(`
+import express from "express";
+import ordersRouter from "./api/orders";
+const app = express();
+app.use("/v2", ordersRouter);
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	s2 := &graphstream.MemorySink{}
+	opts.OnBeforeParse = func(string) {
+		owners := beginOwnerSet(t, s2)
+		if !owners["src/api/orders.ts"] {
+			t.Errorf("child route owner missing from Begin before parse: %v", owners)
+		}
+	}
+	if _, err := Run(context.Background(), eng, root, s2, opts); err != nil {
+		t.Fatalf("mount-path delta failed: %v", err)
+	}
+	opts.OnBeforeParse = nil
+	owners := beginOwnerSet(t, s2)
+	if !owners["src/server.ts"] {
+		t.Fatalf("dirty mount file missing: %v", owners)
+	}
+	if !owners["src/api/orders.ts"] {
+		t.Fatalf("child route owner missing from Begin: %v", owners)
+	}
+	if err := cons.ApplyRecords(s2.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	deltaRoutes := publishedRouteNames(cons)
+	requireRouteNames(t, deltaRoutes, "/v2/orders")
+	requireGoneRouteNames(t, deltaRoutes, "/api/orders")
+	cold := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, cold, Options{StateDir: t.TempDir(), AuthoritativeFiles: true}); err != nil {
+		t.Fatal(err)
+	}
+	oracle := NewConsumer()
+	if err := oracle.ApplyRecords(cold.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, cons, oracle)
+}
+
+func TestFrozenNestedMountPathChangeIncludesChildOwnersBeforeBegin(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"src/server.ts": `
+import express from "express";
+import apiRouter from "./apiRouter";
+const app = express();
+app.use("/api", apiRouter);
+`,
+		"src/apiRouter.ts": `
+import express from "express";
+import ordersRouter from "./api/orders";
+const router = express.Router();
+router.use("/v1", ordersRouter);
+export default router;
+`,
+		"src/api/orders.ts": `
+import express from "express";
+const router = express.Router();
+router.get("/orders", listOrders);
+export default router;
+`,
+	})
+	eng := testEngine(t, root)
+	state := t.TempDir()
+	opts := Options{StateDir: state, AuthoritativeFiles: true}
+	s1 := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, s1, opts); err != nil {
+		t.Fatal(err)
+	}
+	cons := NewConsumer()
+	if err := cons.ApplyRecords(s1.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	requireRouteNames(t, publishedRouteNames(cons), "/api/v1/orders")
+	if err := os.WriteFile(filepath.Join(root, "src/server.ts"), []byte(`
+import express from "express";
+import apiRouter from "./apiRouter";
+const app = express();
+app.use("/v2", apiRouter);
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	s2 := &graphstream.MemorySink{}
+	opts.OnBeforeParse = func(string) {
+		owners := beginOwnerSet(t, s2)
+		if !owners["src/api/orders.ts"] {
+			t.Errorf("nested child missing from Begin before parse: %v", owners)
+		}
+	}
+	if _, err := Run(context.Background(), eng, root, s2, opts); err != nil {
+		t.Fatalf("nested mount-path delta failed: %v", err)
+	}
+	opts.OnBeforeParse = nil
+	owners := beginOwnerSet(t, s2)
+	if !owners["src/server.ts"] {
+		t.Fatalf("dirty mount file missing: %v", owners)
+	}
+	if !owners["src/api/orders.ts"] {
+		t.Fatalf("nested child route owner missing from Begin: %v", owners)
+	}
+	if err := cons.ApplyRecords(s2.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	deltaRoutes := publishedRouteNames(cons)
+	requireRouteNames(t, deltaRoutes, "/v2/v1/orders")
+	requireGoneRouteNames(t, deltaRoutes, "/api/v1/orders")
+	cold := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, cold, Options{StateDir: t.TempDir(), AuthoritativeFiles: true}); err != nil {
+		t.Fatal(err)
+	}
+	oracle := NewConsumer()
+	if err := oracle.ApplyRecords(cold.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, cons, oracle)
+}
+
+func TestFrozenEmberEngineMountPathChangeIncludesChildOwners(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"package.json": `{"name":"app","type":"module","devDependencies":{"ember-source":"^6.0.0"}}`,
+		"app/router.ts": `import EmberRouter from '@ember/routing/router';
+export default class Router extends EmberRouter {}
+Router.map(function () {
+  this.mount('shop', { path: '/store' });
+});
+`,
+		"lib/shop/addon/routes.ts": `import buildRoutes from 'ember-engines/routes';
+export default buildRoutes(function () {
+  this.route('cart');
+});
+`,
+		"independent.ts": "export const i = 1;",
+	})
+	eng := testEngine(t, root)
+	state := t.TempDir()
+	opts := Options{StateDir: state, AuthoritativeFiles: true}
+	s1 := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, s1, opts); err != nil {
+		t.Fatal(err)
+	}
+	cons := NewConsumer()
+	if err := cons.ApplyRecords(s1.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	requireRouteNames(t, publishedRouteNames(cons), "/store/cart")
+	if err := os.WriteFile(filepath.Join(root, "app/router.ts"), []byte(`import EmberRouter from '@ember/routing/router';
+export default class Router extends EmberRouter {}
+Router.map(function () {
+  this.mount('shop', { path: '/v2' });
+});
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	s2 := &graphstream.MemorySink{}
+	opts.OnBeforeParse = func(string) {
+		owners := beginOwnerSet(t, s2)
+		if !owners["lib/shop/addon/routes.ts"] {
+			t.Errorf("ember engine child missing from Begin before parse: %v", owners)
+		}
+	}
+	if _, err := Run(context.Background(), eng, root, s2, opts); err != nil {
+		t.Fatalf("ember mount-path delta failed: %v", err)
+	}
+	opts.OnBeforeParse = nil
+	owners := beginOwnerSet(t, s2)
+	if !owners["app/router.ts"] {
+		t.Fatalf("dirty ember router missing: %v", owners)
+	}
+	if !owners["lib/shop/addon/routes.ts"] {
+		t.Fatalf("ember engine child missing from Begin: %v", owners)
+	}
+	if owners["independent.ts"] {
+		t.Fatalf("independent file in ember mount Begin: %v", owners)
+	}
+	if err := cons.ApplyRecords(s2.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	deltaRoutes := publishedRouteNames(cons)
+	requireRouteNames(t, deltaRoutes, "/v2/cart")
+	requireGoneRouteNames(t, deltaRoutes, "/store/cart")
+	cold := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, cold, Options{StateDir: t.TempDir(), AuthoritativeFiles: true}); err != nil {
+		t.Fatal(err)
+	}
+	oracle := NewConsumer()
+	if err := oracle.ApplyRecords(cold.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, cons, oracle)
+}
+
+func TestFrozenUnresolvedNameBecomingDeclarationIncludesReferencers(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"src/a.ts":           "export const x = 1;",
+		"src/b.ts":           "export function y() { return Foo(); }",
+		"src/independent.ts": "export const i = 1;",
+	})
+	eng := testEngine(t, root)
+	state := t.TempDir()
+	opts := Options{StateDir: state, AuthoritativeFiles: true}
+	s1 := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, s1, opts); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "src/a.ts"), []byte("export function Foo() { return 1; }\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	s2 := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, s2, opts); err != nil {
+		t.Fatalf("unresolved-to-declaration delta failed: %v", err)
+	}
+	owners := beginOwnerSet(t, s2)
+	if !owners["src/a.ts"] {
+		t.Fatalf("dirty file missing: %v", owners)
+	}
+	if !owners["src/b.ts"] {
+		t.Fatalf("referencer of newly declared Foo missing from Begin: %v", owners)
+	}
+	if owners["src/independent.ts"] {
+		t.Fatalf("independent file in unresolved-declaration Begin: %v", owners)
+	}
+	cons := NewConsumer()
+	if err := cons.ApplyRecords(s1.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	if err := cons.ApplyRecords(s2.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	cold := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, cold, Options{StateDir: t.TempDir(), AuthoritativeFiles: true}); err != nil {
+		t.Fatal(err)
+	}
+	oracle := NewConsumer()
+	if err := oracle.ApplyRecords(cold.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, cons, oracle)
 }
 
 func TestFrozenNarrowContentDeltaExcludesIndependentFile(t *testing.T) {

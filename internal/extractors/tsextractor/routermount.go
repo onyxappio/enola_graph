@@ -433,6 +433,21 @@ func collectRouterFactories(src []byte, routers map[string]bool) map[string]stri
 
 // --- the repo-wide pass ---
 
+// ComposedMountRoutes rebuilds cross-file mounted KindRoute facts from persisted
+// Router DTOs so a delta can compare previous and current composed domains.
+func ComposedMountRoutes(records map[string]*FileRecord) []facts.Fact {
+	var files []*routerFile
+	for _, rec := range records {
+		if rec == nil || rec.Router == nil {
+			continue
+		}
+		if rf := routerFromDTO(rec.Router); rf != nil {
+			files = append(files, rf)
+		}
+	}
+	return composeRouterMounts(files)
+}
+
 // composeRouterMounts emits the routes that per-file extraction had to hold back:
 // those on routers mounted from another file. Files are keyed by their path; the
 // result is deterministic (files, then units, then prefixes, all sorted).

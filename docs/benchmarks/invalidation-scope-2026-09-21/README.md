@@ -40,8 +40,13 @@ state directory on the mutated clone.
    replacements. Deleted owners that remain as empty keys on the delta path
    but are dropped by a cold epoch are reported, not hidden.
 8. **Necessary scope** = owners whose canonical contribution differs between
-   the pre-mutation graph and the cold graph. List order is sorted before
-   comparison so two equivalent batches are not treated as a change.
+   the pre-mutation graph and the cold graph. Node and edge JSON is
+   canonicalized in full (sorted object keys, complete fields) and sorted as
+   a multiset so list order does not matter and duplicate rows are preserved.
+9. File-sink `--events` JSONL timings. These are not NATS JetStream broker
+   ACK times. The replacement validator requires Begin first and End last,
+   rejects malformed event lines, and rejects batches whose `run_id` is not
+   the Begin run.
 
 Rename (07) uses `git mv` then `git diff --name-status -M HEAD`, and asserts
 that Begin and the necessary set contain both the old and new file owner IDs.
@@ -49,6 +54,8 @@ that Begin and the necessary set contain both the old and new file owner IDs.
 Every publishing run (initial, delta, cold) must satisfy the frozen v2
 complete immutable contract or the harness exits nonzero:
 
+- File-sink line order: Begin is first, End is last, one run_id. Malformed
+  lines and foreign-run batches fail the run.
 - `schema_version=enola.graph.v2` and `scope_mode=complete` on Begin.
 - Begin owner scope is unique nonempty `file` owners. Count and SHA-256
   owner digest are recomputed from the sorted kind/id pairs.
@@ -171,8 +178,9 @@ Membership 05/06/07 and config 08 remain the full prior/current union
 - One diagnostic pass of all 10 clones. Three repeats were not run. Wall
   times in the table are observations from that pass. They are not a
   performance-acceptance result and are not an SLA.
-- Python in-harness Consumer and file-sink events, not a NATS observer.
-- Necessary scope uses sorted owner equality. Unsorted list compare is unstable
-  (see 09) and must not be read as Enola missing a lockfile change.
+- Python in-harness Consumer and file-sink events, not a NATS JetStream observer.
+  Wall times in this folder are file-sink `--events` JSONL.
+- Necessary scope uses complete JSON owner equality. Unsorted list compare is
+  unstable (see 09) and must not be read as Enola missing a lockfile change.
 - Delete/rename retain empty old-owner keys on the incremental path; graph hash
   and non-empty owner sets still match cold exactly.

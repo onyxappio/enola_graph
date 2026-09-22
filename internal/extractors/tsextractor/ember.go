@@ -1991,6 +1991,15 @@ func extractEmberEngineRoutes(kinds *tsutil.KindTable, root *sitter.Node, src []
 	return routes
 }
 
+// ComposeEngineMounts clones facts and rewrites engine-relative KindRoute names
+// onto a unique mount, matching ExtractSession composition. Cached FileRecord
+// facts stay relative; callers compare previous and next composed domains.
+func ComposeEngineMounts(all []facts.Fact) []facts.Fact {
+	out := cloneFactSlice(all)
+	composeEngineMounts(out)
+	return out
+}
+
 // composeEngineMounts rewrites engine-relative route paths onto their mount
 // point when the repo mounts that engine exactly once. Two mounts genuinely
 // serve both paths, and picking one would be a wrong fact — those skip, and

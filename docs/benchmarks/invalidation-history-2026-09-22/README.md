@@ -1,12 +1,15 @@
 # Frozen invalidation history — 2026-09-22
 
 First-parent Product commit chain, oldest to newest. Diagnostic correctness
-harness. One pass is not a performance-acceptance run.
+harness. One pass is not a performance-acceptance run. Wall times are
+file-sink `--events` JSONL, not NATS JetStream.
 
-The tracked Product checkout `/tmp/enola-product-benchmark-source` is never
-written. `mcp-arch.yaml` there is untracked Product graph-input policy
-(`apps/mobile/e2e/artifacts/**`, `worker-reports/**`) and is overlaid onto
-isolated snapshots after each checkout.
+The dedicated Product checkout `/tmp/enola-product-history-source` is never
+written. Analysis uses a pinned overlay from
+`docs/benchmarks/product-delta-2026-09-21/product-mcp-arch.yaml`
+(`apps/mobile/e2e/artifacts/**`, `worker-reports/**`). The overlay is
+hash-recorded in provenance and applied only when a SHA has no git-tracked
+`mcp-arch.yaml`. Tracked historical config is left in place.
 
 ## What was wrong with the previous dump
 
@@ -22,19 +25,30 @@ binary path. Do not treat those numbers as the history contract.
    untouched, including dirty/untracked config.
 2. Pin the latest **ten first-parent** commits of `origin/main`, oldest first
    (`main~10` … `main` on that parent chain).
-3. Isolated snapshot at the oldest SHA. Overlay `mcp-arch.yaml`. One frozen
-   **initial** analysis.
+3. Isolated snapshot at the oldest SHA. Apply the pinned overlay when the SHA
+   has no tracked `mcp-arch.yaml`. One frozen **initial** analysis on a fresh
+   work directory (existing work dirs are refused).
 4. Persistent `--state-dir` on that live snapshot. For each child SHA, check
-   out the child in the live tree and run **delta**.
+   out the child in the live tree and run **delta**. Stop after the first
+   failed transition.
 5. Isolated cold snapshot at the same child SHA. Fresh frozen **analyze**.
    Incremental graph (initial + all deltas so far) must hash-equal cold.
 6. Required owners from `git diff --name-status -M` parent→child, minus
-   lockfiles. That set must be a subset of Begin. Lock-only transitions must
-   no-op with generation equal to the previous completed generation.
-7. Raw Begin/End owner and batch digests are recomputed from payloads.
+   lockfiles, kept when the owner is in the **prior semantic owner set or the
+   target cold scope**. Deleted and old-rename owners stay required.
+   Lock-only transitions must no-op with generation equal to the previous
+   completed generation.
+7. `necessary_owner_count` is the prior-versus-cold owner canonical
+   contribution diff (overinvalidation = Begin owners minus that set).
+   Changed-path counts are not a minimal invalidation proof.
+8. Raw Begin/End owner and batch digests are recomputed from payloads.
+   The imported validator requires Begin-first/End-last ordering, rejects
+   malformed records and foreign-run batches, and hashes complete node/edge
+   JSON (order-independent, duplicates preserved).
 
 The Enola binary is **built from the current Enola source**. Provenance records
-source revision, dirty diff hash, and binary SHA-256.
+source revision, dirty/untracked identifiers, binary SHA-256, and
+`go version -m`.
 
 ## Flags
 
@@ -42,22 +56,28 @@ source revision, dirty diff hash, and binary SHA-256.
 python3 docs/benchmarks/invalidation-history-2026-09-22/run.py --self-test
 
 python3 docs/benchmarks/invalidation-history-2026-09-22/run.py \
-  --source /tmp/enola-product-benchmark-source \
-  --work /tmp/enola-invalidation-history-2026-09-22 \
-  --output /tmp/enola-invalidation-history-2026-09-22/results.json \
-  --only 0
+  --source /tmp/enola-product-history-source \
+  --ref a609c19f3861971930fae7b33dcb2950598953c5 \
+  --count 10 \
+  --work /tmp/enola-invalidation-history-2026-09-22-a609c19f \
+  --output /tmp/enola-invalidation-history-2026-09-22-a609c19f/results.json
 ```
 
-`--only` accepts transition indexes (`0` is oldest→next), SHA prefixes, or
-`parent[:12]..child[:12]` ids. `--output` must not be the tracked
-`results.json` or the baseline file. Per-case dumps live under `$WORK/cases/`.
+`--work` must not already exist. `--only` accepts a **contiguous prefix** of
+first-parent transitions starting at index 0 (`0` is oldest→next), or matching
+SHA prefixes / `parent[:12]..child[:12]` ids of that prefix. Gaps and later-only
+selections are rejected because the persistent delta parent would not be
+initialized. `--output` must not be the tracked `results.json` or the baseline
+file. Per-case dumps live under `$WORK/cases/`.
 
-## Completed run
+## Completed run (file-sink, earlier dump)
 
-The pinned run completed all ten transitions with `graph_hash_equal=true` and no
-blockers. Initial analysis at `4d104e600f89` took 25.238 s (4,120 parsed
-files, 8,609 owners). Delta rows below include the delta wall time and the
-fresh cold oracle time.
+The earlier dump completed all ten transitions with `graph_hash_equal=true` and
+no blockers. Those walls are file-sink `--events` JSONL, not JetStream.
+`necessary_owner_count` in that dump followed changed paths; the harness now
+records prior-versus-cold contribution diffs. Initial analysis at `4d104e600f89`
+took 25.238 s (4,120 parsed files, 8,609 owners). Delta rows below include the
+delta wall time and the fresh cold oracle time.
 
 | # | transition | changed files | Begin owners | delta parsed | delta s | cold s | graph equal |
 |---:|---|---:|---:|---:|---:|---:|:---:|
@@ -77,4 +97,19 @@ keep Begin authoritative and immutable, these deltas use the conservative
 prior/current file fallback (about 8.6k owners). Narrow file-level scopes remain
 available when the resolver domain is proven isolated; otherwise the run fails
 closed before End rather than expanding scope after Begin.
+
+## Limitations
+
+- The ten first-parent Product transitions at
+  `a609c19f3861971930fae7b33dcb2950598953c5` have not been re-run after these
+  harness fixes. Launch them with the invocation above into a fresh `--work`
+  directory after production graphsession edits settle.
+- Timings are file-sink `--events` JSONL. They are not NATS JetStream broker
+  ACK times and are not performance acceptance.
+- Whole-domain Begin (~8.6k owners) remains the observed Product history
+  fallback while the framework-composition resolver domain is active.
+- `--only` is a contiguous prefix from the initial SHA. It does not jump into
+  the middle of the chain.
+- Pinned overlay bytes are the tracked `product-mcp-arch.yaml`. A live dirty
+  `mcp-arch.yaml` on the Product clone is hash-compared and is not copied.
 

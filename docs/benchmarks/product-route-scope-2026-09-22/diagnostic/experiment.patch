@@ -1,0 +1,807 @@
+diff --git a/internal/extractors/tsextractor/routermount.go b/internal/extractors/tsextractor/routermount.go
+index 7858d11..def1844 100644
+--- a/internal/extractors/tsextractor/routermount.go
++++ b/internal/extractors/tsextractor/routermount.go
+@@ -433,6 +433,21 @@ func collectRouterFactories(src []byte, routers map[string]bool) map[string]stri
+ 
+ // --- the repo-wide pass ---
+ 
++// ComposedMountRoutes rebuilds cross-file mounted KindRoute facts from persisted
++// Router DTOs so a delta can compare previous and current composed domains.
++func ComposedMountRoutes(records map[string]*FileRecord) []facts.Fact {
++	var files []*routerFile
++	for _, rec := range records {
++		if rec == nil || rec.Router == nil {
++			continue
++		}
++		if rf := routerFromDTO(rec.Router); rf != nil {
++			files = append(files, rf)
++		}
++	}
++	return composeRouterMounts(files)
++}
++
+ // composeRouterMounts emits the routes that per-file extraction had to hold back:
+ // those on routers mounted from another file. Files are keyed by their path; the
+ // result is deterministic (files, then units, then prefixes, all sorted).
+diff --git a/internal/graphsession/frozen_contract_test.go b/internal/graphsession/frozen_contract_test.go
+index fd31843..9f878cc 100644
+--- a/internal/graphsession/frozen_contract_test.go
++++ b/internal/graphsession/frozen_contract_test.go
+@@ -87,45 +87,221 @@ func TestFrozenBeginPrecedesParsingAndNeverGrows(t *testing.T) {
+ 	}
+ }
+ 
+-func TestFrozenPostParseDependentCannotFallOutsideBegin(t *testing.T) {
++func beginOwnerSet(t *testing.T, sink *graphstream.MemorySink) map[string]bool {
++	t.Helper()
++	bs, _, _, err := DecodeRun(sink.CloneRecords())
++	if err != nil || len(bs) != 1 {
++		t.Fatalf("begin %v %v", bs, err)
++	}
++	owners := map[string]bool{}
++	for _, o := range bs[0].OwnerScope {
++		owners[o.ID] = true
++	}
++	return owners
++}
++
++func TestFrozenBodyEditExcludesUnchangedRouteOwners(t *testing.T) {
++	// Replaces TestFrozenPostParseDependentCannotFallOutsideBegin, which only
++	// imported "./missing-mod" and forced app.ts into Begin instead of reproducing
++	// blank-vs-tagged / composition-only route growth.
+ 	root := setupTSRepo(t, map[string]string{
+ 		"packages/crypto/src/password.ts": "export function normalizeEmail(s: string) { return s.trim(); }",
+-		"apps/architect-console/src/server/app.ts": `import "./missing-mod";
+-export function listen() { return 1; }
++		"src/server.ts": `
++import express from "express";
++import ordersRouter from "./api/orders";
++const app = express();
++app.use("/api", ordersRouter);
++`,
++		"src/api/orders.ts": `
++import express from "express";
++const router = express.Router();
++router.get("/orders", listOrders);
++export default router;
++`,
++		"src/ui.ts": `import "./theme.css";
++export const theme = 1;
+ `,
+-		"independent.ts": "export const i = 1;",
+ 	})
+ 	eng := testEngine(t, root)
+ 	state := t.TempDir()
+ 	opts := Options{StateDir: state, AuthoritativeFiles: true}
+-	if _, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, opts); err != nil {
++	s1 := &graphstream.MemorySink{}
++	if _, err := Run(context.Background(), eng, root, s1, opts); err != nil {
+ 		t.Fatal(err)
+ 	}
+ 	if err := os.WriteFile(filepath.Join(root, "packages/crypto/src/password.ts"), []byte("export function normalizeEmail(s: string) { return s.trim().toLowerCase(); }\n"), 0o644); err != nil {
+ 		t.Fatal(err)
+ 	}
+-	sink := &graphstream.MemorySink{}
+-	delta, err := Run(context.Background(), eng, root, sink, opts)
++	s2 := &graphstream.MemorySink{}
++	delta, err := Run(context.Background(), eng, root, s2, opts)
+ 	if err != nil {
+-		t.Fatalf("delta must not fail-closed on a post-parse dependent: %v", err)
++		t.Fatalf("body delta must not fail-closed on unchanged routes: %v", err)
+ 	}
+-	bs, _, _, err := DecodeRun(sink.CloneRecords())
+-	if err != nil || len(bs) != 1 {
+-		t.Fatalf("begin %v %v", bs, err)
++	owners := beginOwnerSet(t, s2)
++	if !owners["packages/crypto/src/password.ts"] {
++		t.Fatalf("dirty file missing: %v", owners)
+ 	}
+-	owners := map[string]bool{}
+-	for _, o := range bs[0].OwnerScope {
+-		owners[o.ID] = true
++	if owners["src/api/orders.ts"] || owners["src/server.ts"] || owners["src/ui.ts"] {
++		t.Fatalf("unchanged route/unresolved-css owners in body-delta Begin: %v", owners)
+ 	}
+-	if !owners["packages/crypto/src/password.ts"] {
+-		t.Fatalf("dirty file missing from Begin: %v", bs[0].OwnerScope)
++	if delta.ParsedFiles != 1 {
++		t.Fatalf("parsed=%d, want 1", delta.ParsedFiles)
+ 	}
+-	if !owners["apps/architect-console/src/server/app.ts"] {
+-		t.Fatalf("post-parse name dependent missing from Begin: %v", bs[0].OwnerScope)
++	cons := NewConsumer()
++	if err := cons.ApplyRecords(s1.CloneRecords()); err != nil {
++		t.Fatal(err)
+ 	}
+-	if delta.ParsedFiles < 1 {
+-		t.Fatalf("parsed=%d", delta.ParsedFiles)
++	if err := cons.ApplyRecords(s2.CloneRecords()); err != nil {
++		t.Fatal(err)
++	}
++	cold := &graphstream.MemorySink{}
++	if _, err := Run(context.Background(), eng, root, cold, Options{StateDir: t.TempDir(), AuthoritativeFiles: true}); err != nil {
++		t.Fatal(err)
++	}
++	oracle := NewConsumer()
++	if err := oracle.ApplyRecords(cold.CloneRecords()); err != nil {
++		t.Fatal(err)
+ 	}
++	assertAppliedEqualsCold(t, cons, oracle)
++}
++
++func TestFrozenMountPathChangeIncludesChildOwnersBeforeBegin(t *testing.T) {
++	root := setupTSRepo(t, map[string]string{
++		"src/server.ts": `
++import express from "express";
++import ordersRouter from "./api/orders";
++const app = express();
++app.use("/api", ordersRouter);
++`,
++		"src/api/orders.ts": `
++import express from "express";
++const router = express.Router();
++router.get("/orders", listOrders);
++export default router;
++`,
++	})
++	eng := testEngine(t, root)
++	state := t.TempDir()
++	opts := Options{StateDir: state, AuthoritativeFiles: true}
++	s1 := &graphstream.MemorySink{}
++	if _, err := Run(context.Background(), eng, root, s1, opts); err != nil {
++		t.Fatal(err)
++	}
++	if err := os.WriteFile(filepath.Join(root, "src/server.ts"), []byte(`
++import express from "express";
++import ordersRouter from "./api/orders";
++const app = express();
++app.use("/v2", ordersRouter);
++`), 0o644); err != nil {
++		t.Fatal(err)
++	}
++	s2 := &graphstream.MemorySink{}
++	opts.OnBeforeParse = func(string) {
++		owners := beginOwnerSet(t, s2)
++		if !owners["src/api/orders.ts"] {
++			t.Errorf("child route owner missing from Begin before parse: %v", owners)
++		}
++	}
++	if _, err := Run(context.Background(), eng, root, s2, opts); err != nil {
++		t.Fatalf("mount-path delta failed: %v", err)
++	}
++	opts.OnBeforeParse = nil
++	owners := beginOwnerSet(t, s2)
++	if !owners["src/server.ts"] {
++		t.Fatalf("dirty mount file missing: %v", owners)
++	}
++	if !owners["src/api/orders.ts"] {
++		t.Fatalf("child route owner missing from Begin: %v", owners)
++	}
++	cons := NewConsumer()
++	if err := cons.ApplyRecords(s1.CloneRecords()); err != nil {
++		t.Fatal(err)
++	}
++	if err := cons.ApplyRecords(s2.CloneRecords()); err != nil {
++		t.Fatal(err)
++	}
++	cold := &graphstream.MemorySink{}
++	if _, err := Run(context.Background(), eng, root, cold, Options{StateDir: t.TempDir(), AuthoritativeFiles: true}); err != nil {
++		t.Fatal(err)
++	}
++	oracle := NewConsumer()
++	if err := oracle.ApplyRecords(cold.CloneRecords()); err != nil {
++		t.Fatal(err)
++	}
++	assertAppliedEqualsCold(t, cons, oracle)
++}
++
++func TestFrozenNestedMountPathChangeIncludesChildOwnersBeforeBegin(t *testing.T) {
++	root := setupTSRepo(t, map[string]string{
++		"src/server.ts": `
++import express from "express";
++import apiRouter from "./apiRouter";
++const app = express();
++app.use("/api", apiRouter);
++`,
++		"src/apiRouter.ts": `
++import express from "express";
++import ordersRouter from "./api/orders";
++const router = express.Router();
++router.use("/v1", ordersRouter);
++export default router;
++`,
++		"src/api/orders.ts": `
++import express from "express";
++const router = express.Router();
++router.get("/orders", listOrders);
++export default router;
++`,
++	})
++	eng := testEngine(t, root)
++	state := t.TempDir()
++	opts := Options{StateDir: state, AuthoritativeFiles: true}
++	s1 := &graphstream.MemorySink{}
++	if _, err := Run(context.Background(), eng, root, s1, opts); err != nil {
++		t.Fatal(err)
++	}
++	if err := os.WriteFile(filepath.Join(root, "src/server.ts"), []byte(`
++import express from "express";
++import apiRouter from "./apiRouter";
++const app = express();
++app.use("/v2", apiRouter);
++`), 0o644); err != nil {
++		t.Fatal(err)
++	}
++	s2 := &graphstream.MemorySink{}
++	opts.OnBeforeParse = func(string) {
++		owners := beginOwnerSet(t, s2)
++		if !owners["src/api/orders.ts"] {
++			t.Errorf("nested child missing from Begin before parse: %v", owners)
++		}
++	}
++	if _, err := Run(context.Background(), eng, root, s2, opts); err != nil {
++		t.Fatalf("nested mount-path delta failed: %v", err)
++	}
++	opts.OnBeforeParse = nil
++	owners := beginOwnerSet(t, s2)
++	if !owners["src/server.ts"] {
++		t.Fatalf("dirty mount file missing: %v", owners)
++	}
++	if !owners["src/api/orders.ts"] {
++		t.Fatalf("nested child route owner missing from Begin: %v", owners)
++	}
++	cons := NewConsumer()
++	if err := cons.ApplyRecords(s1.CloneRecords()); err != nil {
++		t.Fatal(err)
++	}
++	if err := cons.ApplyRecords(s2.CloneRecords()); err != nil {
++		t.Fatal(err)
++	}
++	cold := &graphstream.MemorySink{}
++	if _, err := Run(context.Background(), eng, root, cold, Options{StateDir: t.TempDir(), AuthoritativeFiles: true}); err != nil {
++		t.Fatal(err)
++	}
++	oracle := NewConsumer()
++	if err := oracle.ApplyRecords(cold.CloneRecords()); err != nil {
++		t.Fatal(err)
++	}
++	assertAppliedEqualsCold(t, cons, oracle)
+ }
+ 
+ func TestFrozenNarrowContentDeltaExcludesIndependentFile(t *testing.T) {
+diff --git a/internal/graphsession/invalidation_plan.go b/internal/graphsession/invalidation_plan.go
+index a7eee2a..91b727d 100644
+--- a/internal/graphsession/invalidation_plan.go
++++ b/internal/graphsession/invalidation_plan.go
+@@ -134,25 +134,196 @@ func tsRecord(st *FileState) *tsextractor.FileRecord {
+ 	return st.TS
+ }
+ 
+-// dependencyIndexProven is true only for a small cached graph with no
+-// unresolved imports. Larger graphs and unresolved specs cannot prove that
+-// reverse-closure is a complete owner set for the global name resolver.
++// dependencyIndexProven is true when cached TS records can support reverse-close.
++// Unresolved specs (external modules, CSS) do not unprove an otherwise complete
++// import graph; incompleteDependencyRecords remains the completeness guard.
+ func dependencyIndexProven(prevFiles map[string]*FileState) bool {
+ 	if incompleteDependencyRecords(prevFiles) {
+ 		return false
+ 	}
+-	n := 0
+ 	for _, st := range prevFiles {
+-		rec := tsRecord(st)
+-		if rec == nil {
++		if tsRecord(st) != nil {
++			return true
++		}
++	}
++	return false
++}
++
++func routerDTO(st *FileState) *tsextractor.RouterDTO {
++	rec := tsRecord(st)
++	if rec == nil {
++		return nil
++	}
++	return rec.Router
++}
++
++func tsRecordsFromState(prevFiles map[string]*FileState) map[string]*tsextractor.FileRecord {
++	out := map[string]*tsextractor.FileRecord{}
++	for path, st := range prevFiles {
++		if rec := tsRecord(st); rec != nil {
++			out[filepath.ToSlash(path)] = rec
++		}
++	}
++	return out
++}
++
++func overlayTSRecords(base, neu map[string]*tsextractor.FileRecord) map[string]*tsextractor.FileRecord {
++	out := map[string]*tsextractor.FileRecord{}
++	for k, v := range base {
++		if v != nil {
++			out[filepath.ToSlash(k)] = v
++		}
++	}
++	for k, v := range neu {
++		if v != nil {
++			out[filepath.ToSlash(k)] = v
++		}
++	}
++	return out
++}
++
++func kindRouteFacts(ff []facts.Fact) []facts.Fact {
++	var out []facts.Fact
++	for _, f := range ff {
++		if f.Kind == facts.KindRoute {
++			out = append(out, f)
++		}
++	}
++	return out
++}
++
++func recordFactsFromTS(recs map[string]*tsextractor.FileRecord) []facts.Fact {
++	var out []facts.Fact
++	for _, rec := range recs {
++		if rec != nil {
++			out = append(out, rec.Facts...)
++		}
++	}
++	return out
++}
++
++func composedRouteFacts(recs map[string]*tsextractor.FileRecord) []facts.Fact {
++	return append(kindRouteFacts(recordFactsFromTS(recs)), tsextractor.ComposedMountRoutes(recs)...)
++}
++
++func mountFingerprint(dto *tsextractor.RouterDTO) string {
++	if dto == nil || len(dto.Mounts) == 0 {
++		return ""
++	}
++	parts := make([]string, 0, len(dto.Mounts))
++	for _, m := range dto.Mounts {
++		parts = append(parts, strings.Join([]string{m.Parent, m.Prefix, m.Child, m.File}, "|"))
++	}
++	sort.Strings(parts)
++	return strings.Join(parts, "\n")
++}
++
++func resolveMountChildFile(dto *tsextractor.RouterDTO, m tsextractor.MountDTO) string {
++	child := filepath.ToSlash(m.Child)
++	if child == "" {
++		return ""
++	}
++	if strings.Contains(child, "/") || strings.HasSuffix(child, ".ts") || strings.HasSuffix(child, ".js") || strings.HasSuffix(child, ".mts") || strings.HasSuffix(child, ".cts") {
++		return child
++	}
++	if dto != nil && dto.Imports != nil {
++		if ref, ok := dto.Imports[m.Child]; ok && ref.File != "" {
++			return filepath.ToSlash(ref.File)
++		}
++	}
++	return ""
++}
++
++func mountOwnerFilesDeep(recs map[string]*tsextractor.FileRecord, dto *tsextractor.RouterDTO) []string {
++	if dto == nil {
++		return nil
++	}
++	var out []string
++	seen := map[string]bool{}
++	var walk func(*tsextractor.RouterDTO)
++	walk = func(d *tsextractor.RouterDTO) {
++		if d == nil {
++			return
++		}
++		for _, m := range d.Mounts {
++			child := resolveMountChildFile(d, m)
++			if child == "" || seen[child] {
++				continue
++			}
++			seen[child] = true
++			out = append(out, child)
++			if recs != nil {
++				if rec := recs[child]; rec != nil {
++					walk(rec.Router)
++				}
++			}
++		}
++	}
++	walk(dto)
++	return out
++}
++
++// dirtyRouterMountChildren returns child route owners whose mount prefix or
++// parent changed on a dirty file, including nested mount descendants. They
++// must be in Begin before extract because composed KindRoute facts are owned
++// by the child files.
++func dirtyRouterMountChildren(prevFiles map[string]*FileState, dirty map[string]bool, newRecs map[string]*tsextractor.FileRecord) []string {
++	prevRecs := tsRecordsFromState(prevFiles)
++	nextRecs := overlayTSRecords(prevRecs, newRecs)
++	seen := map[string]bool{}
++	var out []string
++	add := func(id string) {
++		id = filepath.ToSlash(id)
++		if id == "" || seen[id] {
++			return
++		}
++		seen[id] = true
++		out = append(out, id)
++	}
++	for f, d := range dirty {
++		if !d {
+ 			continue
+ 		}
+-		n++
+-		if len(rec.UnresolvedSpecs) > 0 {
+-			return false
++		key := filepath.ToSlash(f)
++		oldDTO := routerDTO(lookupState(prevFiles, f))
++		var newDTO *tsextractor.RouterDTO
++		if rec := nextRecs[key]; rec != nil {
++			newDTO = rec.Router
++		}
++		if mountFingerprint(oldDTO) == mountFingerprint(newDTO) {
++			continue
++		}
++		for _, id := range mountOwnerFilesDeep(prevRecs, oldDTO) {
++			add(id)
++		}
++		for _, id := range mountOwnerFilesDeep(nextRecs, newDTO) {
++			add(id)
+ 		}
+ 	}
+-	return n > 0 && n <= 100
++	return out
++}
++
++// composedRouteOwnerDelta returns owners whose composed or per-file KindRoute
++// domain changed after overlaying dirty preview records onto the cached graph.
++// Previous raw FileRecord.Facts omit composition-only routes, so both sides
++// reconstruct composeRouterMounts from Router DTOs.
++func composedRouteOwnerDelta(prevFiles map[string]*FileState, dirty map[string]bool, newRecs map[string]*tsextractor.FileRecord) []string {
++	prevRecs := tsRecordsFromState(prevFiles)
++	nextRecs := overlayTSRecords(prevRecs, newRecs)
++	scope := map[string]bool{}
++	addChangedRouteFiles(scope, composedRouteFacts(prevRecs), composedRouteFacts(nextRecs))
++	for _, id := range dirtyRouterMountChildren(prevFiles, dirty, newRecs) {
++		scope[id] = true
++	}
++	if len(scope) == 0 {
++		return nil
++	}
++	out := make([]string, 0, len(scope))
++	for id := range scope {
++		out = append(out, id)
++	}
++	sort.Strings(out)
++	return out
+ }
+ 
+ func planCoversDeclaredNameDependents(p *fileInvalidationPlan, prevFiles map[string]*FileState, dirty map[string]bool) bool {
+diff --git a/internal/graphsession/invalidation_plan_test.go b/internal/graphsession/invalidation_plan_test.go
+index daaa474..d7becf5 100644
+--- a/internal/graphsession/invalidation_plan_test.go
++++ b/internal/graphsession/invalidation_plan_test.go
+@@ -70,7 +70,173 @@ func TestAuthoritativePlanWholeDomainWhenNameDependentOutsideReverseClose(t *tes
+ 	}
+ }
+ 
+-func TestDependencyIndexProvenSmallCompleteGraph(t *testing.T) {
++func TestDirtyRouterMountChildrenBeforeBegin(t *testing.T) {
++	prev := map[string]*FileState{
++		"src/server.ts": {
++			Hash: "1", Extractor: "typescript",
++			TS: &tsextractor.FileRecord{
++				File: "src/server.ts",
++				Router: &tsextractor.RouterDTO{
++					RelFile: "src/server.ts",
++					Mounts:  []tsextractor.MountDTO{{File: "src/server.ts", Parent: "app", Prefix: "/api", Child: "ordersRouter"}},
++					Imports: map[string]tsextractor.ImportRefDTO{"ordersRouter": {File: "src/api/orders.ts", Export: "default"}},
++				},
++			},
++		},
++		"src/api/orders.ts": {Hash: "2", Extractor: "typescript", TS: &tsextractor.FileRecord{File: "src/api/orders.ts"}},
++	}
++	dirty := map[string]bool{"src/server.ts": true}
++	newRecs := map[string]*tsextractor.FileRecord{
++		"src/server.ts": {
++			File: "src/server.ts",
++			Router: &tsextractor.RouterDTO{
++				RelFile: "src/server.ts",
++				Mounts:  []tsextractor.MountDTO{{File: "src/server.ts", Parent: "app", Prefix: "/v2", Child: "ordersRouter"}},
++				Imports: map[string]tsextractor.ImportRefDTO{"ordersRouter": {File: "src/api/orders.ts", Export: "default"}},
++			},
++		},
++	}
++	got := dirtyRouterMountChildren(prev, dirty, newRecs)
++	found := false
++	for _, id := range got {
++		if id == "src/api/orders.ts" {
++			found = true
++		}
++	}
++	if !found {
++		t.Fatalf("mount prefix change omitted child: %v", got)
++	}
++	unchanged := dirtyRouterMountChildren(prev, dirty, map[string]*tsextractor.FileRecord{"src/server.ts": prev["src/server.ts"].TS})
++	if len(unchanged) != 0 {
++		t.Fatalf("unchanged mounts produced children %v", unchanged)
++	}
++}
++
++func nestedMountStates() map[string]*FileState {
++	return map[string]*FileState{
++		"src/server.ts": {
++			Hash: "1", Extractor: "typescript",
++			TS: &tsextractor.FileRecord{
++				File: "src/server.ts",
++				Router: &tsextractor.RouterDTO{
++					RelFile: "src/server.ts",
++					Roots:   map[string]bool{"app": true},
++					Mounts:  []tsextractor.MountDTO{{File: "src/server.ts", Parent: "app", Prefix: "/api", Child: "apiRouter"}},
++					Imports: map[string]tsextractor.ImportRefDTO{"apiRouter": {File: "src/api.ts", Export: "default"}},
++				},
++			},
++		},
++		"src/api.ts": {
++			Hash: "2", Extractor: "typescript",
++			TS: &tsextractor.FileRecord{
++				File: "src/api.ts",
++				Router: &tsextractor.RouterDTO{
++					RelFile: "src/api.ts",
++					Routers: map[string]bool{"router": true},
++					Exports: map[string]string{"default": "router"},
++					Mounts:  []tsextractor.MountDTO{{File: "src/api.ts", Parent: "router", Prefix: "/v1", Child: "ordersRouter"}},
++					Imports: map[string]tsextractor.ImportRefDTO{"ordersRouter": {File: "src/api/orders.ts", Export: "default"}},
++				},
++			},
++		},
++		"src/api/orders.ts": {
++			Hash: "3", Extractor: "typescript",
++			TS: &tsextractor.FileRecord{
++				File:  "src/api/orders.ts",
++				Facts: []facts.Fact{{Kind: facts.KindSymbol, Name: "listOrders", File: "src/api/orders.ts"}},
++				Router: &tsextractor.RouterDTO{
++					RelFile: "src/api/orders.ts",
++					Routers: map[string]bool{"router": true},
++					Exports: map[string]string{"default": "router"},
++					Pending: map[string][]tsextractor.PendingRouteDTO{
++						"router": {{Verb: "GET", Path: "/orders", Line: 4, Framework: "express"}},
++					},
++				},
++			},
++		},
++		"packages/crypto/src/password.ts": {
++			Hash: "4", Extractor: "typescript",
++			TS: &tsextractor.FileRecord{
++				File:  "packages/crypto/src/password.ts",
++				Facts: []facts.Fact{{Kind: facts.KindSymbol, Name: "normalizeEmail", File: "packages/crypto/src/password.ts"}},
++			},
++		},
++	}
++}
++
++func TestDirtyRouterMountChildrenNestedBeforeBegin(t *testing.T) {
++	prev := nestedMountStates()
++	dirty := map[string]bool{"src/server.ts": true}
++	newRecs := map[string]*tsextractor.FileRecord{
++		"src/server.ts": {
++			File: "src/server.ts",
++			Router: &tsextractor.RouterDTO{
++				RelFile: "src/server.ts",
++				Roots:   map[string]bool{"app": true},
++				Mounts:  []tsextractor.MountDTO{{File: "src/server.ts", Parent: "app", Prefix: "/v2", Child: "apiRouter"}},
++				Imports: map[string]tsextractor.ImportRefDTO{"apiRouter": {File: "src/api.ts", Export: "default"}},
++			},
++		},
++	}
++	got := dirtyRouterMountChildren(prev, dirty, newRecs)
++	found := map[string]bool{}
++	for _, id := range got {
++		found[id] = true
++	}
++	if !found["src/api.ts"] || !found["src/api/orders.ts"] {
++		t.Fatalf("nested mount omitted descendants: %v", got)
++	}
++}
++
++func TestComposedRouteOwnerDeltaNestedMounts(t *testing.T) {
++	prev := nestedMountStates()
++	dirty := map[string]bool{"src/server.ts": true}
++	newRecs := map[string]*tsextractor.FileRecord{
++		"src/server.ts": {
++			File: "src/server.ts",
++			Router: &tsextractor.RouterDTO{
++				RelFile: "src/server.ts",
++				Roots:   map[string]bool{"app": true},
++				Mounts:  []tsextractor.MountDTO{{File: "src/server.ts", Parent: "app", Prefix: "/v2", Child: "apiRouter"}},
++				Imports: map[string]tsextractor.ImportRefDTO{"apiRouter": {File: "src/api.ts", Export: "default"}},
++			},
++		},
++	}
++	got := composedRouteOwnerDelta(prev, dirty, newRecs)
++	found := map[string]bool{}
++	for _, id := range got {
++		found[id] = true
++	}
++	if !found["src/api/orders.ts"] {
++		t.Fatalf("composed nested child omitted: %v", got)
++	}
++	if found["packages/crypto/src/password.ts"] {
++		t.Fatalf("unrelated owner entered composed route delta: %v", got)
++	}
++	bodyDirty := map[string]bool{"packages/crypto/src/password.ts": true}
++	bodyNew := map[string]*tsextractor.FileRecord{
++		"packages/crypto/src/password.ts": {
++			File:  "packages/crypto/src/password.ts",
++			Facts: []facts.Fact{{Kind: facts.KindSymbol, Name: "normalizeEmail", File: "packages/crypto/src/password.ts"}},
++		},
++	}
++	if extra := composedRouteOwnerDelta(prev, bodyDirty, bodyNew); len(extra) != 0 {
++		t.Fatalf("body edit grew composed route owners %v", extra)
++	}
++}
++
++func TestComposedRouteFactsBlankVersusTaggedRepo(t *testing.T) {
++	app := "apps/architect-console/src/server/app.ts"
++	blank := []facts.Fact{{Kind: facts.KindRoute, Name: "/health", File: app, Relations: []facts.Relation{{Kind: "handler", Target: "listen"}}}}
++	tagged := []facts.Fact{{Repo: "product-scope", Kind: facts.KindRoute, Name: "/health", File: app, Relations: []facts.Relation{{Kind: "handler", Target: "listen"}}}}
++	scope := map[string]bool{}
++	addChangedRouteFiles(scope, append(blank, tsextractor.ComposedMountRoutes(nil)...), append(tagged, tsextractor.ComposedMountRoutes(nil)...))
++	if len(scope) != 0 {
++		t.Fatalf("blank vs tagged composed domain grew scope %v", scope)
++	}
++}
++
++func TestDependencyIndexProvenIgnoresUnresolvedSpecs(t *testing.T) {
+ 	prev := map[string]*FileState{
+ 		"a.ts": {TS: &tsextractor.FileRecord{File: "a.ts", Declared: []string{"a"}, ResolvedFiles: []string{"b.ts"}}},
+ 		"b.ts": {TS: &tsextractor.FileRecord{File: "b.ts", Declared: []string{"b"}}},
+@@ -78,9 +244,15 @@ func TestDependencyIndexProvenSmallCompleteGraph(t *testing.T) {
+ 	if !dependencyIndexProven(prev) {
+ 		t.Fatal("small resolved graph should be treated as proven")
+ 	}
+-	prev["c.ts"] = &FileState{TS: &tsextractor.FileRecord{File: "c.ts", UnresolvedSpecs: []string{"./missing"}}}
+-	if dependencyIndexProven(prev) {
+-		t.Fatal("unresolved import must not prove completeness")
++	prev["c.ts"] = &FileState{TS: &tsextractor.FileRecord{File: "c.ts", UnresolvedSpecs: []string{"./theme.css"}}}
++	if !dependencyIndexProven(prev) {
++		t.Fatal("unresolved CSS/external specs must not unprove reverse-close")
++	}
++	incomplete := map[string]*FileState{
++		"a.ts": {TS: &tsextractor.FileRecord{File: "a.ts", ImportSpecs: []string{"./b"}}},
++	}
++	if dependencyIndexProven(incomplete) {
++		t.Fatal("incomplete import records must not prove completeness")
+ 	}
+ }
+ 
+diff --git a/internal/graphsession/owner.go b/internal/graphsession/owner.go
+index 78437a4..18cef75 100644
+--- a/internal/graphsession/owner.go
++++ b/internal/graphsession/owner.go
+@@ -488,7 +488,9 @@ func routeDigestByFile(ff []facts.Fact) map[string]string {
+ 			continue
+ 		}
+ 		file := filepath.ToSlash(f.File)
+-		parts := []string{f.Identity(), f.Name}
++		// Repo is omitted: cached FileRecord facts often have a blank Repo while
++		// session Facts are tagged. Kind/name/file/relations identify the route.
++		parts := []string{f.Kind, f.Name, file}
+ 		for _, r := range f.Relations {
+ 			parts = append(parts, r.Kind+"->"+r.Target)
+ 		}
+diff --git a/internal/graphsession/owner_resolution_test.go b/internal/graphsession/owner_resolution_test.go
+index 91fd816..c59d108 100644
+--- a/internal/graphsession/owner_resolution_test.go
++++ b/internal/graphsession/owner_resolution_test.go
+@@ -334,6 +334,49 @@ func TestChangedResolutionOwnersDetectsFileRecordCollision(t *testing.T) {
+ 	}
+ }
+ 
++func TestAddChangedRouteFilesIgnoresBlankVersusTaggedRepo(t *testing.T) {
++	app := "apps/architect-console/src/server/app.ts"
++	blank := []facts.Fact{{Kind: facts.KindRoute, Name: "/health", File: app, Relations: []facts.Relation{{Kind: "handler", Target: "listen"}}}}
++	tagged := []facts.Fact{{Repo: "product-scope", Kind: facts.KindRoute, Name: "/health", File: app, Relations: []facts.Relation{{Kind: "handler", Target: "listen"}}}}
++	scope := map[string]bool{}
++	addChangedRouteFiles(scope, blank, tagged)
++	if len(scope) != 0 {
++		t.Fatalf("blank vs tagged repo grew scope %v", scope)
++	}
++}
++
++func TestAddChangedRouteFilesEquivalentComposedDomainsDoNotGrow(t *testing.T) {
++	orders := "src/api/orders.ts"
++	prev := map[string]*tsextractor.FileRecord{
++		"src/server.ts": {
++			File: "src/server.ts",
++			Router: &tsextractor.RouterDTO{
++				RelFile: "src/server.ts",
++				Roots:   map[string]bool{"app": true},
++				Mounts:  []tsextractor.MountDTO{{File: "src/server.ts", Parent: "app", Prefix: "/api", Child: "ordersRouter"}},
++				Imports: map[string]tsextractor.ImportRefDTO{"ordersRouter": {File: orders, Export: "default"}},
++			},
++		},
++		orders: {
++			File:  orders,
++			Facts: []facts.Fact{{Kind: facts.KindSymbol, Name: "listOrders", File: orders}},
++			Router: &tsextractor.RouterDTO{
++				RelFile: orders,
++				Routers: map[string]bool{"router": true},
++				Exports: map[string]string{"default": "router"},
++				Pending: map[string][]tsextractor.PendingRouteDTO{
++					"router": {{Verb: "GET", Path: "/orders", Line: 4, Framework: "express"}},
++				},
++			},
++		},
++	}
++	scope := map[string]bool{}
++	addChangedRouteFiles(scope, composedRouteFacts(prev), composedRouteFacts(prev))
++	if len(scope) != 0 {
++		t.Fatalf("equivalent composed domains grew scope %v", scope)
++	}
++}
++
+ func TestAddChangedRouteFilesComparesRecordRoutes(t *testing.T) {
+ 	app := "apps/architect-console/src/server/app.ts"
+ 	records := []facts.Fact{{Kind: facts.KindSymbol, Name: "listen", File: app}}
+diff --git a/internal/graphsession/session.go b/internal/graphsession/session.go
+index 58dcc17..594cd7e 100644
+--- a/internal/graphsession/session.go
++++ b/internal/graphsession/session.go
+@@ -463,7 +463,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
+ 			// Initial/global-context changes still require the complete domain.
+ 			// For an ordinary content delta, derive the manifest from changed
+ 			// files plus reverse file-to-file dependents in the prior state.
+-			wholeDomain := initial || forceAll || s.state == nil || configChanged || s.state.ConfigHash != cfgHash || s.state.PolicyIdentity != input.policyIdentity || !dependencyIndexProven(prevFiles)
++			wholeDomain := initial || forceAll || s.state == nil || configChanged || s.state.ConfigHash != cfgHash || s.state.PolicyIdentity != input.policyIdentity || incompleteDependencyRecords(prevFiles)
+ 			if !wholeDomain && s.state != nil && s.state.FrameworkSig != "" {
+ 				need, ferr := s.frameworkDirtyRequiresFullScope(inv.Files, prevFiles, hashes, angular)
+ 				if ferr != nil {
+@@ -514,19 +514,11 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
+ 					fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "planning extract of dirty files failed; using whole domain"})
+ 				} else {
+ 					extraOwners = append(extraOwners, ownersForNameDelta(prevFiles, dirty, preview)...)
+-					if len(prevFiles) > 100 && resolutionCandidatesChanged(prevFiles, dirty, preview) {
+-						wholeDomain = true
+-						forceAll = true
+-						fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "frozen scope: resolver candidate identity changed"})
+-					}
+-					if !wholeDomain && s.state.FrameworkSig != "" && len(prevFiles) > 100 && len(dirty) > 1 {
+-						// Framework composition can synthesize resolver candidates from
+-						// files outside the dirty set. Until that domain is indexed
+-						// before Begin, use the conservative immutable fallback.
+-						wholeDomain = true
+-						forceAll = true
+-						fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "frozen scope: framework composition resolver domain"})
++					var previewRecs map[string]*tsextractor.FileRecord
++					if s.preparedTS != nil {
++						previewRecs = s.preparedTS.Records
+ 					}
++					extraOwners = append(extraOwners, composedRouteOwnerDelta(prevFiles, dirty, previewRecs)...)
+ 				}
+ 			}
+ 			var planReason string
+@@ -951,18 +943,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
+ 			tagRepo(res.Facts, repoID)
+ 			allFacts = append(allFacts, res.Facts...)
+ 			appendExtractorSynthetic(synByExt, "typescript", res.Facts)
+-			var oldFacts []facts.Fact
+-			if s.state != nil {
+-				for _, st := range s.state.Files {
+-					oldFacts = append(oldFacts, fileFacts(st)...)
+-					if st != nil && st.Contrib != nil {
+-						for _, ff := range st.Contrib {
+-							oldFacts = append(oldFacts, ff...)
+-						}
+-					}
+-				}
+-			}
+-			addChangedRouteFiles(scopeFiles, oldFacts, res.Facts)
++			addChangedRouteFiles(scopeFiles, composedRouteFacts(tsRecordsFromState(prevFiles)), composedRouteFacts(res.Records))
+ 			for f, d := range dirty {
+ 				if d {
+ 					scopeFiles[filepath.ToSlash(f)] = true

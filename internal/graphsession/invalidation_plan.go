@@ -134,25 +134,187 @@ func tsRecord(st *FileState) *tsextractor.FileRecord {
 	return st.TS
 }
 
-// dependencyIndexProven is true only for a small cached graph with no
-// unresolved imports. Larger graphs and unresolved specs cannot prove that
-// reverse-closure is a complete owner set for the global name resolver.
+// dependencyIndexProven is true when cached TS records can support reverse-close.
+// Unresolved specs (external modules, CSS) do not unprove an otherwise complete
+// import graph; incompleteDependencyRecords remains the completeness guard.
 func dependencyIndexProven(prevFiles map[string]*FileState) bool {
 	if incompleteDependencyRecords(prevFiles) {
 		return false
 	}
-	n := 0
 	for _, st := range prevFiles {
-		rec := tsRecord(st)
-		if rec == nil {
-			continue
-		}
-		n++
-		if len(rec.UnresolvedSpecs) > 0 {
-			return false
+		if tsRecord(st) != nil {
+			return true
 		}
 	}
-	return n > 0 && n <= 100
+	return false
+}
+
+func routerDTO(st *FileState) *tsextractor.RouterDTO {
+	rec := tsRecord(st)
+	if rec == nil {
+		return nil
+	}
+	return rec.Router
+}
+
+func tsRecordsFromState(prevFiles map[string]*FileState) map[string]*tsextractor.FileRecord {
+	out := map[string]*tsextractor.FileRecord{}
+	for path, st := range prevFiles {
+		if rec := tsRecord(st); rec != nil {
+			out[filepath.ToSlash(path)] = rec
+		}
+	}
+	return out
+}
+
+func overlayTSRecords(base, neu map[string]*tsextractor.FileRecord) map[string]*tsextractor.FileRecord {
+	out := map[string]*tsextractor.FileRecord{}
+	for k, v := range base {
+		if v != nil {
+			out[filepath.ToSlash(k)] = v
+		}
+	}
+	for k, v := range neu {
+		if v != nil {
+			out[filepath.ToSlash(k)] = v
+		}
+	}
+	return out
+}
+
+func recordFactsFromTS(recs map[string]*tsextractor.FileRecord) []facts.Fact {
+	var out []facts.Fact
+	for _, rec := range recs {
+		if rec != nil {
+			out = append(out, rec.Facts...)
+		}
+	}
+	return out
+}
+
+func composedRouteFacts(recs map[string]*tsextractor.FileRecord) []facts.Fact {
+	ff := append(recordFactsFromTS(recs), tsextractor.ComposedMountRoutes(recs)...)
+	return tsextractor.ComposeEngineMounts(ff)
+}
+
+func mountFingerprint(dto *tsextractor.RouterDTO) string {
+	if dto == nil || len(dto.Mounts) == 0 {
+		return ""
+	}
+	parts := make([]string, 0, len(dto.Mounts))
+	for _, m := range dto.Mounts {
+		parts = append(parts, strings.Join([]string{m.Parent, m.Prefix, m.Child, m.File}, "|"))
+	}
+	sort.Strings(parts)
+	return strings.Join(parts, "\n")
+}
+
+func resolveMountChildFile(dto *tsextractor.RouterDTO, m tsextractor.MountDTO) string {
+	child := filepath.ToSlash(m.Child)
+	if child == "" {
+		return ""
+	}
+	if strings.Contains(child, "/") || strings.HasSuffix(child, ".ts") || strings.HasSuffix(child, ".js") || strings.HasSuffix(child, ".mts") || strings.HasSuffix(child, ".cts") {
+		return child
+	}
+	if dto != nil && dto.Imports != nil {
+		if ref, ok := dto.Imports[m.Child]; ok && ref.File != "" {
+			return filepath.ToSlash(ref.File)
+		}
+	}
+	return ""
+}
+
+func mountOwnerFilesDeep(recs map[string]*tsextractor.FileRecord, dto *tsextractor.RouterDTO) []string {
+	if dto == nil {
+		return nil
+	}
+	var out []string
+	seen := map[string]bool{}
+	var walk func(*tsextractor.RouterDTO)
+	walk = func(d *tsextractor.RouterDTO) {
+		if d == nil {
+			return
+		}
+		for _, m := range d.Mounts {
+			child := resolveMountChildFile(d, m)
+			if child == "" || seen[child] {
+				continue
+			}
+			seen[child] = true
+			out = append(out, child)
+			if recs != nil {
+				if rec := recs[child]; rec != nil {
+					walk(rec.Router)
+				}
+			}
+		}
+	}
+	walk(dto)
+	return out
+}
+
+// dirtyRouterMountChildren returns child route owners whose mount prefix or
+// parent changed on a dirty file, including nested mount descendants. They
+// must be in Begin before extract because composed KindRoute facts are owned
+// by the child files.
+func dirtyRouterMountChildren(prevFiles map[string]*FileState, dirty map[string]bool, newRecs map[string]*tsextractor.FileRecord) []string {
+	prevRecs := tsRecordsFromState(prevFiles)
+	nextRecs := overlayTSRecords(prevRecs, newRecs)
+	seen := map[string]bool{}
+	var out []string
+	add := func(id string) {
+		id = filepath.ToSlash(id)
+		if id == "" || seen[id] {
+			return
+		}
+		seen[id] = true
+		out = append(out, id)
+	}
+	for f, d := range dirty {
+		if !d {
+			continue
+		}
+		key := filepath.ToSlash(f)
+		oldDTO := routerDTO(lookupState(prevFiles, f))
+		var newDTO *tsextractor.RouterDTO
+		if rec := nextRecs[key]; rec != nil {
+			newDTO = rec.Router
+		}
+		if mountFingerprint(oldDTO) == mountFingerprint(newDTO) {
+			continue
+		}
+		for _, id := range mountOwnerFilesDeep(prevRecs, oldDTO) {
+			add(id)
+		}
+		for _, id := range mountOwnerFilesDeep(nextRecs, newDTO) {
+			add(id)
+		}
+	}
+	return out
+}
+
+// composedRouteOwnerDelta returns owners whose composed or per-file KindRoute
+// domain changed after overlaying dirty preview records onto the cached graph.
+// Previous raw FileRecord.Facts omit composition-only routes, so both sides
+// reconstruct composeRouterMounts from Router DTOs.
+func composedRouteOwnerDelta(prevFiles map[string]*FileState, dirty map[string]bool, newRecs map[string]*tsextractor.FileRecord) []string {
+	prevRecs := tsRecordsFromState(prevFiles)
+	nextRecs := overlayTSRecords(prevRecs, newRecs)
+	scope := map[string]bool{}
+	addChangedRouteFiles(scope, composedRouteFacts(prevRecs), composedRouteFacts(nextRecs))
+	for _, id := range dirtyRouterMountChildren(prevFiles, dirty, newRecs) {
+		scope[id] = true
+	}
+	if len(scope) == 0 {
+		return nil
+	}
+	out := make([]string, 0, len(scope))
+	for id := range scope {
+		out = append(out, id)
+	}
+	sort.Strings(out)
+	return out
 }
 
 func planCoversDeclaredNameDependents(p *fileInvalidationPlan, prevFiles map[string]*FileState, dirty map[string]bool) bool {
@@ -221,6 +383,67 @@ func cachedResolutionFacts(st *FileState) []facts.Fact {
 	return ff
 }
 
+func comparableCandidateID(f facts.Fact) string {
+	f.Repo = ""
+	f.File = canonicalFactFile(f.File)
+	return f.Identity()
+}
+
+func candidateIDSetByName(ff []facts.Fact) map[string][]string {
+	sets := map[string]map[string]bool{}
+	for _, f := range ff {
+		if f.Name == "" {
+			continue
+		}
+		if sets[f.Name] == nil {
+			sets[f.Name] = map[string]bool{}
+		}
+		sets[f.Name][comparableCandidateID(f)] = true
+	}
+	out := map[string][]string{}
+	for name, ids := range sets {
+		for id := range ids {
+			out[name] = append(out[name], id)
+		}
+		sort.Strings(out[name])
+	}
+	return out
+}
+
+func changedResolutionCandidateNames(old, neu []facts.Fact) map[string]bool {
+	a := candidateIDSetByName(old)
+	b := candidateIDSetByName(neu)
+	changed := map[string]bool{}
+	for name, ids := range a {
+		if !slicesEqual(ids, b[name]) {
+			changed[name] = true
+		}
+	}
+	for name, ids := range b {
+		if !slicesEqual(ids, a[name]) {
+			changed[name] = true
+		}
+	}
+	return changed
+}
+
+func ownerMentionsNames(st *FileState) map[string]bool {
+	names := factResolutionNames(cachedResolutionFacts(st))
+	if rec := tsRecord(st); rec != nil {
+		for _, n := range rec.Declared {
+			if n != "" {
+				names[n] = true
+			}
+		}
+		for _, n := range rec.Referenced {
+			if n != "" {
+				names[n] = true
+			}
+		}
+	}
+	return names
+}
+
 func ownersForNameDelta(prevFiles map[string]*FileState, dirty map[string]bool, newFacts map[string][]facts.Fact) []string {
 	delta := map[string]bool{}
 	for f, isDirty := range dirty {
@@ -228,20 +451,13 @@ func ownersForNameDelta(prevFiles map[string]*FileState, dirty map[string]bool, 
 			continue
 		}
 		key := filepath.ToSlash(f)
-		old := factResolutionNames(cachedResolutionFacts(lookupState(prevFiles, key)))
-		neu := factResolutionNames(newFacts[key])
+		old := cachedResolutionFacts(lookupState(prevFiles, key))
+		neu := newFacts[key]
 		if neu == nil {
-			neu = factResolutionNames(newFacts[f])
+			neu = newFacts[f]
 		}
-		for n := range old {
-			if !neu[n] {
-				delta[n] = true
-			}
-		}
-		for n := range neu {
-			if !old[n] {
-				delta[n] = true
-			}
+		for n := range changedResolutionCandidateNames(old, neu) {
+			delta[n] = true
 		}
 	}
 	if len(delta) == 0 {
@@ -254,7 +470,7 @@ func ownersForNameDelta(prevFiles map[string]*FileState, dirty map[string]bool, 
 		if seen[path] {
 			continue
 		}
-		names := factResolutionNames(cachedResolutionFacts(st))
+		names := ownerMentionsNames(st)
 		for n := range names {
 			if delta[n] {
 				seen[path] = true
@@ -264,53 +480,6 @@ func ownersForNameDelta(prevFiles map[string]*FileState, dirty map[string]bool, 
 		}
 	}
 	return owners
-}
-
-// resolutionCandidatesChanged reports a same-name candidate identity change
-// before Begin. A resolver can invalidate consumers even when the declared
-// name itself is unchanged (for example a route/module candidate whose
-// identity or kind changed). In that case a file-level reverse dependency
-// closure is not a proven complete scope, so callers must use the global
-// fallback rather than discover an out-of-scope owner after Begin.
-func resolutionCandidatesChanged(prevFiles map[string]*FileState, dirty map[string]bool, newFacts map[string][]facts.Fact) bool {
-	for file, isDirty := range dirty {
-		if !isDirty {
-			continue
-		}
-		oldByName := map[string][]string{}
-		for _, f := range cachedResolutionFacts(lookupState(prevFiles, filepath.ToSlash(file))) {
-			if f.Name != "" {
-				oldByName[f.Name] = append(oldByName[f.Name], f.Identity())
-			}
-		}
-		factsNow := newFacts[filepath.ToSlash(file)]
-		if factsNow == nil {
-			factsNow = newFacts[file]
-		}
-		newByName := map[string][]string{}
-		for _, f := range factsNow {
-			if f.Name != "" {
-				newByName[f.Name] = append(newByName[f.Name], f.Identity())
-			}
-		}
-		for name, oldIDs := range oldByName {
-			if !slicesEqual(sortedStrings(oldIDs), sortedStrings(newByName[name])) {
-				return true
-			}
-		}
-		for name, newIDs := range newByName {
-			if _, existed := oldByName[name]; !existed && len(newIDs) > 0 {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-func sortedStrings(in []string) []string {
-	out := append([]string(nil), in...)
-	sort.Strings(out)
-	return out
 }
 
 func relationBearingOwnerCount(prevFiles map[string]*FileState) (total, withRelations int) {

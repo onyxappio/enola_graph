@@ -18,6 +18,7 @@ import json
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -58,20 +59,30 @@ def parse_events(path: Path):
 
 
 def parse_event_records(path: Path, offset: int = 0):
-    """Return (decoded record, exact JSON payload bytes) pairs."""
+    """Return (decoded record, exact JSON payload bytes) pairs.
+
+    File-sink lines are `subject msg_id JSON`. Malformed lines are rejected;
+    they are not skipped.
+    """
     records = []
     if not path.exists() or path.stat().st_size == 0:
         return records
     with path.open("rb") as fh:
         fh.seek(offset)
-        for line in fh:
+        for lineno, line in enumerate(fh, start=1):
             line = line.rstrip(b"\n")
             if not line:
                 continue
             parts = line.split(b" ", 2)
             if len(parts) < 3:
-                continue
-            records.append((json.loads(parts[2]), parts[2]))
+                raise RuntimeError(f"{path}:{lineno}: malformed event line (need subject, id, JSON)")
+            try:
+                rec = json.loads(parts[2])
+            except json.JSONDecodeError as exc:
+                raise RuntimeError(f"{path}:{lineno}: malformed event JSON: {exc}") from exc
+            if not isinstance(rec, dict) or not rec.get("type"):
+                raise RuntimeError(f"{path}:{lineno}: malformed event record")
+            records.append((rec, parts[2]))
     return records
 
 
@@ -148,14 +159,24 @@ def validate_replacement(records, raw_records=None):
     """Validate the frozen v2 complete immutable replacement contract for one run."""
     if raw_records is None:
         raise RuntimeError("raw batch payloads are required to recompute End batch_digest")
+    if not records:
+        raise RuntimeError("expected exactly one Begin and End, got 0/0")
     extra_types = sorted({r.get("type") for r in records if r.get("type") not in {"begin_replace", "end_replace", "batch"}})
     if extra_types:
         raise RuntimeError(f"replacement contains non-replacement events: {extra_types}")
+    if records[0].get("type") != "begin_replace":
+        raise RuntimeError(f"Begin must be first; got {records[0].get('type')!r}")
+    if records[-1].get("type") != "end_replace":
+        raise RuntimeError(f"End must be last; got {records[-1].get('type')!r}")
     begins = [r for r in records if r.get("type") == "begin_replace"]
     ends = [r for r in records if r.get("type") == "end_replace"]
     if len(begins) != 1 or len(ends) != 1:
         raise RuntimeError(f"expected exactly one Begin and End, got {len(begins)}/{len(ends)}")
     begin, end = begins[0], ends[0]
+    if any(r.get("type") == "begin_replace" for r in records[1:]):
+        raise RuntimeError("Begin must be first")
+    if any(r.get("type") == "end_replace" for r in records[:-1]):
+        raise RuntimeError("End must be last")
     if begin.get("schema_version") != "enola.graph.v2":
         raise RuntimeError(f"unexpected schema_version {begin.get('schema_version')!r}")
     if begin.get("scope_mode") != "complete":
@@ -165,8 +186,16 @@ def validate_replacement(records, raw_records=None):
     if type(base_gen) is not int or type(target_gen) is not int or target_gen != base_gen + 1:
         raise RuntimeError(f"target_generation must be base_generation+1, got {base_gen!r}->{target_gen!r}")
     run_id = begin.get("run_id")
+    if not run_id:
+        raise RuntimeError("Begin missing run_id")
     if end.get("run_id") != run_id:
         raise RuntimeError("End run_id does not match Begin")
+    foreign = [r.get("run_id") for r in records if r.get("run_id") != run_id]
+    if foreign:
+        raise RuntimeError(f"foreign-run records in replacement: {sorted(set(foreign))[:8]}")
+    for rec, _raw in raw_records:
+        if rec.get("run_id") != run_id:
+            raise RuntimeError(f"foreign-run raw payload run_id={rec.get('run_id')!r}")
     raw_owners = list(begin.get("owner_scope") or [])
     for owner in raw_owners:
         if not isinstance(owner, dict) or owner.get("kind") != "file" or not owner.get("id"):
@@ -272,6 +301,14 @@ class Consumer:
             elif typ == "end_replace":
                 self._end(rec)
 
+    def snapshot(self):
+        """Copy committed owner contributions. Open replacements are not copied."""
+        other = Consumer()
+        other.owners = {k: list(v) for k, v in self.owners.items()}
+        other.edges = {k: list(v) for k, v in self.edges.items()}
+        other.generation = self.generation
+        return other
+
     def _begin(self, b):
         scope = {owner_key(o): o for o in b.get("owner_scope") or []}
         self.open[b["run_id"]] = {
@@ -340,42 +377,22 @@ class Consumer:
 
     def graph_hash(self):
         rows = []
-        keys = sorted(self.owner_set_nonempty())
-        for k in keys:
-            nodes = sorted(
-                (self.owners.get(k) or []),
-                key=lambda n: (n.get("id") or "", n.get("occurrence") or 0, n.get("kind") or ""),
-            )
-            edges = sorted(
-                (self.edges.get(k) or []),
-                key=lambda e: (
-                    e.get("from_id") or "",
-                    e.get("kind") or "",
-                    e.get("target_name") or "",
-                    e.get("occurrence") or 0,
-                ),
-            )
-            rows.append({"owner": k, "nodes": nodes, "edges": edges})
-        blob = json.dumps(rows, sort_keys=True, separators=(",", ":"))
+        for k in sorted(self.owner_set_nonempty()):
+            rows.append({"owner": k, "contrib": owner_canonical(self, k)})
+        blob = json.dumps(rows, separators=(",", ":"))
         return hashlib.sha256(blob.encode()).hexdigest()
 
 
+def canonical_json(value) -> str:
+    """Complete JSON encoding: dict keys sorted, list order preserved, duplicates kept."""
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+
+
 def owner_canonical(cons: Consumer, key: str) -> str:
-    nodes = sorted(
-        (cons.owners.get(key) or []),
-        key=lambda n: (n.get("id") or "", n.get("occurrence") or 0, n.get("kind") or "", json.dumps(n, sort_keys=True)),
-    )
-    edges = sorted(
-        (cons.edges.get(key) or []),
-        key=lambda e: (
-            e.get("from_id") or "",
-            e.get("kind") or "",
-            e.get("target_name") or "",
-            e.get("occurrence") or 0,
-            json.dumps(e, sort_keys=True),
-        ),
-    )
-    return json.dumps({"nodes": nodes, "edges": edges}, sort_keys=True, separators=(",", ":"))
+    """Order-independent owner contribution. Duplicate node/edge JSON rows are preserved."""
+    nodes = sorted(canonical_json(n) for n in (cons.owners.get(key) or []))
+    edges = sorted(canonical_json(e) for e in (cons.edges.get(key) or []))
+    return json.dumps({"nodes": nodes, "edges": edges}, separators=(",", ":"))
 
 
 def necessary_from_consumers(base: Consumer, cold: Consumer):
@@ -444,6 +461,7 @@ def enola(binary: Path, mode: str, repo: Path, state: Path, events: Path, summar
     return {
         "exit": 0,
         "wall_s": wall,
+        "sink": "file",
         "parsed": out.get("ParsedFiles"),
         "cached": (out.get("Stats") or {}).get("cached_files"),
         "files_read": (out.get("Stats") or {}).get("files_read"),
@@ -570,7 +588,9 @@ SCENARIOS = [
 
 
 def slim_run(info: dict, manifest=None) -> dict:
-    out = {k: info.get(k) for k in ("exit", "wall_s", "parsed", "cached", "files_read", "generation", "owners_published", "events", "run_id")}
+    out = {k: info.get(k) for k in ("exit", "wall_s", "sink", "parsed", "cached", "files_read", "generation", "owners_published", "events", "run_id")}
+    if not out.get("sink"):
+        out["sink"] = "file"
     if manifest:
         out["manifest"] = {
             k: manifest.get(k)
@@ -706,20 +726,7 @@ def run_scenario(binary: Path, gold: Path, work: Path, name: str, title: str, mu
 
 
 def parse_events_from_offset(path: Path, offset: int):
-    if not path.exists():
-        return []
-    records = []
-    with path.open() as fh:
-        fh.seek(offset)
-        for line in fh:
-            line = line.rstrip("\n")
-            if not line:
-                continue
-            parts = line.split(" ", 2)
-            if len(parts) < 3:
-                continue
-            records.append(json.loads(parts[2]))
-    return records
+    return [rec for rec, _ in parse_event_records(path, offset)]
 
 
 def main():
@@ -827,6 +834,39 @@ def split_runs(path: Path):
     return runs
 
 
+def _pair(rec: dict):
+    return rec, json.dumps(rec, separators=(",", ":")).encode()
+
+
+def _synthetic_begin_end(run_id="r1", owners=None, batches=None):
+    owners = owners or [{"kind": "file", "id": "a.ts"}]
+    batches = list(batches or [])
+    begin = {
+        "type": "begin_replace",
+        "schema_version": "enola.graph.v2",
+        "scope_mode": "complete",
+        "run_id": run_id,
+        "base_generation": 0,
+        "target_generation": 1,
+        "owner_scope": owners,
+        "owner_scope_count": len(owners),
+        "owner_scope_digest": digest_owners(owners),
+    }
+    raw_batches = [_pair(b) for b in batches]
+    end = {
+        "type": "end_replace",
+        "run_id": run_id,
+        "batch_count": len(batches),
+        "batch_digest": digest_batches([raw for _rec, raw in raw_batches]),
+        "owner_scope_len": len(owners),
+        "owner_scope_digest": begin["owner_scope_digest"],
+        "completeness": {"status": "success", "files_unreadable": []},
+    }
+    recs = [begin, *batches, end]
+    pairs = [_pair(begin), *raw_batches, _pair(end)]
+    return recs, pairs
+
+
 def self_test() -> int:
     """Focused harness checks. Uses narrow2 artifacts when present; does not start a Product run."""
     owners = [{"kind": "file", "id": "b.ts"}, {"kind": "file", "id": "a.ts"}]
@@ -895,6 +935,84 @@ def self_test() -> int:
         if scenario_failed(row):
             print("self-test FAIL: stored 09-lock-only row failed", file=sys.stderr)
             return 1
+
+    recs, pairs = _synthetic_begin_end()
+    try:
+        validate_replacement(recs, pairs)
+    except Exception as exc:
+        print(f"self-test FAIL: synthetic Begin/End rejected: {exc}", file=sys.stderr)
+        return 1
+
+    recs_end_mid, pairs_end_mid = _synthetic_begin_end()
+    recs_end_mid = [recs_end_mid[0], recs_end_mid[-1], recs_end_mid[0]]
+    try:
+        validate_replacement(recs_end_mid, pairs_end_mid)
+        print("self-test FAIL: End-not-last accepted", file=sys.stderr)
+        return 1
+    except RuntimeError:
+        pass
+
+    batch = {"type": "batch", "run_id": "r1", "seq": 1, "phase": "resolved", "nodes": [], "edges": []}
+    recs_batch_first, pairs_batch_first = _synthetic_begin_end(batches=[batch])
+    recs_batch_first = [recs_batch_first[1], recs_batch_first[0], recs_batch_first[2]]
+    try:
+        validate_replacement(recs_batch_first, pairs_batch_first)
+        print("self-test FAIL: Begin-not-first accepted", file=sys.stderr)
+        return 1
+    except RuntimeError:
+        pass
+
+    foreign = {"type": "batch", "run_id": "other", "seq": 1, "phase": "resolved", "nodes": [], "edges": []}
+    recs_f, pairs_f = _synthetic_begin_end()
+    recs_f = [recs_f[0], foreign, recs_f[-1]]
+    pairs_f = [pairs_f[0], _pair(foreign), pairs_f[-1]]
+    try:
+        validate_replacement(recs_f, pairs_f)
+        print("self-test FAIL: foreign-run batch accepted", file=sys.stderr)
+        return 1
+    except RuntimeError:
+        pass
+
+    with tempfile.TemporaryDirectory() as tmp:
+        bad = Path(tmp) / "events.jsonl"
+        bad.write_bytes(b"not-an-event-line\n")
+        try:
+            parse_event_records(bad)
+            print("self-test FAIL: malformed event line accepted", file=sys.stderr)
+            return 1
+        except RuntimeError:
+            pass
+        bad.write_bytes(b"subj id {not-json\n")
+        try:
+            parse_event_records(bad)
+            print("self-test FAIL: malformed JSON accepted", file=sys.stderr)
+            return 1
+        except RuntimeError:
+            pass
+
+    n1 = {"id": "a", "occurrence": 0, "kind": "sym", "props": {"z": 1, "a": 2}}
+    n1b = {"kind": "sym", "props": {"a": 2, "z": 1}, "id": "a", "occurrence": 0}
+    n2 = {"id": "a", "occurrence": 0, "kind": "sym", "props": {"z": 1, "a": 3}}
+    e1 = {"from_id": "a", "kind": "imports", "target_name": "b", "occurrence": 0, "extra": "x"}
+    e2 = {"from_id": "a", "kind": "imports", "target_name": "b", "occurrence": 0, "extra": "y"}
+    c1 = Consumer()
+    c2 = Consumer()
+    c1.owners["file:x.ts"] = [n1, n2, n1]
+    c1.edges["file:x.ts"] = [e1, e2]
+    c2.owners["file:x.ts"] = [n2, n1b, n1b]
+    c2.edges["file:x.ts"] = [e2, e1]
+    if c1.graph_hash() != c2.graph_hash():
+        print("self-test FAIL: complete JSON graph hash is order-dependent", file=sys.stderr)
+        return 1
+    if owner_canonical(c1, "file:x.ts") != owner_canonical(c2, "file:x.ts"):
+        print("self-test FAIL: owner canonical is order-dependent", file=sys.stderr)
+        return 1
+    c3 = Consumer()
+    c3.owners["file:x.ts"] = [n1, n2]
+    if c1.graph_hash() == c3.graph_hash():
+        print("self-test FAIL: duplicate node rows were collapsed", file=sys.stderr)
+        return 1
+    print("self-test validator Begin-first/End-last, foreign-run, malformed records, complete JSON canonicalization")
     print("self-test ok")
     return 0
 
