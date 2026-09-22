@@ -619,7 +619,26 @@ func preferredResolveKind(fromKind, relKind string) string {
 	return ""
 }
 
+// fkStorageTargetRequired is true for storage depends_on edges that encode a
+// foreign key (fk_constraints). Those must resolve to a storage table, not an
+// ordinary same-name symbol. Other storage depends_on edges still prefer
+// storage but may fall back (for example EF Core DbContext → entity types).
+func fkStorageTargetRequired(from facts.Fact, rel facts.Relation) bool {
+	if from.Kind != facts.KindStorage || rel.Kind != facts.RelDependsOn {
+		return false
+	}
+	if from.Props == nil {
+		return false
+	}
+	spec, _ := from.Props["fk_constraints"].(string)
+	return spec != ""
+}
+
 func (idx *idIndex) resolveRel(fromRepo, fromKind, relKind, target string) (id, status string) {
+	return idx.resolveRelConstrained(fromRepo, fromKind, relKind, target, false)
+}
+
+func (idx *idIndex) resolveRelConstrained(fromRepo, fromKind, relKind, target string, requirePreferred bool) (id, status string) {
 	cands := idx.byName[target]
 	if len(cands) == 0 {
 		return "", graphstream.ResUnresolved
@@ -637,6 +656,8 @@ func (idx *idIndex) resolveRel(fromRepo, fromKind, relKind, target string) (id, 
 		if len(filtered) > 0 {
 			cands = filtered
 			fromRepo = ""
+		} else if requirePreferred {
+			return "", graphstream.ResUnresolved
 		}
 	}
 	pick := -1
@@ -721,7 +742,7 @@ func encodeOwner(o ownerOutput, idx *idIndex, pending bool) (nodes []graphstream
 			if pending {
 				e.Resolution = graphstream.ResPending
 			} else {
-				tid, st := idx.resolveRel(f.Repo, f.Kind, r.Kind, r.Target)
+				tid, st := idx.resolveRelConstrained(f.Repo, f.Kind, r.Kind, r.Target, fkStorageTargetRequired(f, r))
 				e.Resolution = st
 				e.TargetID = tid
 			}
