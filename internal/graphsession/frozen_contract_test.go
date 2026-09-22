@@ -621,7 +621,12 @@ func TestFrozenImportTargetBodyStaysNarrow(t *testing.T) {
 	}
 }
 
-func TestFrozenAddFileUsesMembershipWholeDomain(t *testing.T) {
+// TestFrozenAddFileNarrowsMembershipScope is the end-to-end form of the
+// membership rule: adding a helper nothing imports used to announce the whole
+// domain, because any add/delete/rename fell back. Neither existing file has a
+// cached specifier that can rebind and no declared name moves, so Begin now
+// carries the added file alone - and the applied graph still equals cold.
+func TestFrozenAddFileNarrowsMembershipScope(t *testing.T) {
 	root := setupTSRepo(t, map[string]string{
 		"a.ts":           "export const a = 1;",
 		"independent.ts": "export const i = 1;",
@@ -629,27 +634,116 @@ func TestFrozenAddFileUsesMembershipWholeDomain(t *testing.T) {
 	eng := testEngine(t, root)
 	state := t.TempDir()
 	opts := Options{StateDir: state, AuthoritativeFiles: true}
-	if _, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, opts); err != nil {
+	initial := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, initial, opts); err != nil {
+		t.Fatal(err)
+	}
+	cons := NewConsumer()
+	if err := cons.ApplyRecords(initial.CloneRecords()); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(filepath.Join(root, "new.ts"), []byte("export const n = 1;"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	sink := &graphstream.MemorySink{}
-	if _, err := Run(context.Background(), eng, root, sink, opts); err != nil {
+	delta, err := Run(context.Background(), eng, root, sink, opts)
+	if err != nil {
 		t.Fatal(err)
 	}
-	bs, _, _, err := DecodeRun(sink.CloneRecords())
-	if err != nil || len(bs) != 1 {
+	if err := cons.ApplyRecords(sink.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	bs, _, ends, err := DecodeRun(sink.CloneRecords())
+	if err != nil || len(bs) != 1 || len(ends) != 1 {
 		t.Fatalf("begin %v %v", bs, err)
+	}
+	if bs[0].OwnerScopeDigest != ends[0].OwnerScopeDigest {
+		t.Fatal("scope changed after Begin")
 	}
 	owners := map[string]bool{}
 	for _, o := range bs[0].OwnerScope {
 		owners[o.ID] = true
 	}
-	if !owners["new.ts"] || !owners["independent.ts"] || !owners["a.ts"] {
-		t.Fatalf("membership fallback must announce whole domain, got %v", bs[0].OwnerScope)
+	if !owners["new.ts"] {
+		t.Fatalf("added file missing from scope %v", bs[0].OwnerScope)
 	}
+	if owners["a.ts"] || owners["independent.ts"] {
+		t.Fatalf("unrelated helper add widened scope to %v", bs[0].OwnerScope)
+	}
+	if delta.ParsedFiles != 1 {
+		t.Fatalf("parsed=%d, want only the added file", delta.ParsedFiles)
+	}
+	cold := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, cold, Options{StateDir: t.TempDir(), AuthoritativeFiles: true}); err != nil {
+		t.Fatal(err)
+	}
+	oracle := NewConsumer()
+	if err := oracle.ApplyRecords(cold.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, cons, oracle)
+}
+
+// TestFrozenDeleteChainCoversTransitiveImporter guards the ordering hazard the
+// narrowed scope introduces: top.ts imports mid.ts, whose specifier still
+// resolves after leaf.ts is deleted, so no cached import of top.ts rebinds.
+// Only the reverse closure of the deleted seed reaches it, and the planning
+// extract has to parse it before Begin rather than serve a cached record.
+func TestFrozenDeleteChainCoversTransitiveImporter(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"leaf.ts":  "export const leaf = 1;",
+		"mid.ts":   "import {leaf} from './leaf'; export const mid = leaf;",
+		"top.ts":   "import {mid} from './mid'; export const top = mid;",
+		"other.ts": "export const other = 1;",
+	})
+	eng := testEngine(t, root)
+	opts := Options{StateDir: t.TempDir(), AuthoritativeFiles: true}
+	initial := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, initial, opts); err != nil {
+		t.Fatal(err)
+	}
+	cons := NewConsumer()
+	if err := cons.ApplyRecords(initial.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Remove(filepath.Join(root, "leaf.ts")); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "mid.ts"), []byte("export const mid = 1;"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	sink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, sink, opts); err != nil {
+		t.Fatal(err)
+	}
+	if err := cons.ApplyRecords(sink.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	bs, _, ends, err := DecodeRun(sink.CloneRecords())
+	if err != nil || len(bs) != 1 || len(ends) != 1 {
+		t.Fatalf("begin %v %v", bs, err)
+	}
+	if bs[0].OwnerScopeDigest != ends[0].OwnerScopeDigest {
+		t.Fatal("scope changed after Begin")
+	}
+	owners := map[string]bool{}
+	for _, o := range bs[0].OwnerScope {
+		owners[o.ID] = true
+	}
+	for _, want := range []string{"leaf.ts", "mid.ts", "top.ts"} {
+		if !owners[want] {
+			t.Fatalf("deletion chain missing %s: %v", want, bs[0].OwnerScope)
+		}
+	}
+	cold := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, cold, Options{StateDir: t.TempDir(), AuthoritativeFiles: true}); err != nil {
+		t.Fatal(err)
+	}
+	oracle := NewConsumer()
+	if err := oracle.ApplyRecords(cold.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, cons, oracle)
 }
 
 func TestFrozenNewImportNameDeltaStaysNarrow(t *testing.T) {

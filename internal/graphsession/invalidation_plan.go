@@ -22,9 +22,15 @@ const (
 	frozenScopeWholeDomain  = "frozen scope: global name-resolution domain"
 	frozenScopeMembership   = "add/delete/rename: prior file graph cannot prove a safe subset"
 	frozenScopeNameDelta    = "frozen scope: reverse-close plus owners that reference added or removed fact names"
+	frozenScopeMembershipRe = "add/delete/rename: reverse-close plus owners whose cached import resolution changes"
 )
 
-func authoritativeFilePlan(previous, current []string, prevFiles map[string]*FileState, hashes map[string]string, wholeDomain bool, extraOwners []string) (*fileInvalidationPlan, string, error) {
+// authoritativeFilePlan consumes the membershipDelta the caller already used to
+// seed the pre-Begin preview, rather than deriving one of its own afterwards:
+// the importers a membership change rebinds are reparses whose names and route
+// mounts can move, so they have to be previewed before the name and composed
+// route deltas run, not discovered once those have finished.
+func authoritativeFilePlan(previous, current []string, prevFiles map[string]*FileState, hashes map[string]string, wholeDomain bool, extraOwners []string, membership membershipDelta) (*fileInvalidationPlan, string, error) {
 	previous = graphPublishedOwners(previous)
 	current = graphSemanticNames(nil, current)
 	domain := append(append([]string{}, previous...), current...)
@@ -46,7 +52,6 @@ func authoritativeFilePlan(previous, current []string, prevFiles map[string]*Fil
 		previousSet[f] = true
 	}
 	changed := make(map[string]bool)
-	membershipChanged := false
 	for _, f := range current {
 		st := lookupState(prevFiles, f)
 		h, present := lookupHash(hashes, f)
@@ -56,32 +61,23 @@ func authoritativeFilePlan(previous, current []string, prevFiles map[string]*Fil
 			if ownedBefore || source {
 				changed[f] = true
 			}
-			if !ownedBefore && source {
-				membershipChanged = true
-			}
+			// A file that is neither a prior owner nor a session source is not
+			// claimed here. The prior owner map records contributions, not the
+			// prior input inventory, so it cannot tell a genuinely new
+			// JSON/media file from a pre-existing one that never contributed.
+			// Those owners are planned from real input hashes by the
+			// extractor-need path in session.go instead.
 		}
 	}
 	for _, f := range previous {
 		if !currentSet[f] {
 			changed[f] = true
-			membershipChanged = true
 			continue
 		}
 		if _, present := lookupHash(hashes, f); !present {
 			changed[f] = true
 		}
 	}
-	// A new or renamed file can satisfy an import that was previously
-	// unresolved. Include those importers before Begin so resolution changes
-	// cannot escape the frozen manifest.
-	if membershipChanged {
-		// Add/delete/rename can introduce resolution edges that did not exist
-		// in the prior file graph, including name collisions against already
-		// resolved imports. Old reverse-edges cannot prove a safe subset.
-		p, err := planFileInvalidation(domain, previous, current, nil, true, domain)
-		return p, frozenScopeMembership, err
-	}
-
 	deps := make(map[string][]string)
 	for path, st := range prevFiles {
 		if st == nil {
@@ -95,6 +91,26 @@ func authoritativeFilePlan(previous, current []string, prevFiles map[string]*Fil
 					deps[from] = append(deps[from], dep)
 				}
 			}
+		}
+	}
+	// A new, renamed or deleted file changes module resolution for importers
+	// whose own bytes did not change: a previously unresolved specifier can
+	// become satisfiable, and an already resolved one can rebind to a different
+	// file when the added path wins the extension/index precedence. Those
+	// importers must be in Begin, but the cached import surface enumerates
+	// them, so the whole domain is not required.
+	if membership.changed {
+		if !membership.proven {
+			// Consumers the TypeScript import graph cannot see, or importers
+			// whose cached surface cannot be replayed. Old reverse-edges cannot
+			// prove a safe subset.
+			p, err := planFileInvalidation(domain, previous, current, nil, true, domain)
+			return p, frozenScopeMembership, err
+		}
+		// Merged into changed, not just the seed, so the declared-name
+		// post-check below also covers the names these owners republish.
+		for _, f := range membership.rebound {
+			changed[f] = true
 		}
 	}
 	seed := make([]string, 0, len(changed)+len(extraOwners))
@@ -124,7 +140,148 @@ func authoritativeFilePlan(previous, current []string, prevFiles map[string]*Fil
 	if len(extraOwners) > 0 {
 		reason = frozenScopeNameDelta
 	}
+	if membership.changed {
+		reason = frozenScopeMembershipRe
+	}
 	return p, reason, err
+}
+
+// membershipDelta is the pre-Begin answer to what an add, delete or rename
+// moves besides the files themselves. It is computed once, before the planning
+// extract, because the importers it names are reparses like any other: their
+// declared names and composed route mounts can move, and those consumers have
+// to be inside Begin too.
+type membershipDelta struct {
+	// changed is true when a file identity entered or left either the published
+	// owner set or the TypeScript resolution universe.
+	changed bool
+	// proven is false when no safe subset can be derived and the caller must
+	// take the wider fallback; reason then carries the published explanation.
+	proven bool
+	reason string
+	// retired lists prior owners absent from the current set. They are never
+	// parsed, but they must reach the name and route deltas as old->empty
+	// contributions so global consumers of a deleted candidate - including
+	// non-TypeScript owners such as a markdown link - land inside Begin.
+	retired []string
+	// rebound lists cached importers whose module resolution the new file set
+	// moves. It applies invalidateTS's own rule (importRebound, plus the
+	// record-level unresolved-spec clause) to the same record map and the same
+	// two known sets, so the frozen scope stays a superset of the reparse set
+	// extraction will compute: no dirty file can land outside Begin.
+	rebound []string
+}
+
+// membershipScope derives that answer from the cached import surface.
+//
+// The two resolution universes are deliberately the ones the extractor itself
+// uses: priorKnownFiles rebuilds the TypeScript sources the cached records were
+// parsed against, and sessionFiles is the inventory ExtractSession receives, not
+// the policy-filtered semantic name list - a name the graph policy drops is
+// still a resolution target for the next parse.
+func membershipScope(previous, current, sessionFiles []string, prevFiles map[string]*FileState) membershipDelta {
+	md := membershipDelta{proven: true}
+	previousSet := make(map[string]bool, len(previous))
+	for _, f := range graphPublishedOwners(previous) {
+		previousSet[filepath.ToSlash(f)] = true
+	}
+	currentSet := make(map[string]bool, len(current))
+	for _, f := range graphSemanticNames(nil, current) {
+		currentSet[f] = true
+	}
+	// An addition is not detected here. previousSet is a contribution map, not
+	// the prior input inventory: a JSON or media file that existed but never
+	// emitted a fact is absent from it, so "not previously an owner" would read
+	// as "new" on nearly every delta. TypeScript additions are detected below
+	// against the resolution universe, which the cached records do record
+	// faithfully; other additions are planned by the owning extractor.
+	for f := range previousSet {
+		if currentSet[f] {
+			continue
+		}
+		md.changed = true
+		md.retired = append(md.retired, f)
+		if !tsextractor.IsSessionSource(f, false) {
+			// A published owner that left the tree without ever being a
+			// TypeScript source: its consumers are outside the cached import
+			// graph and the prior owner map cannot enumerate them.
+			md.proven = false
+			md.reason = frozenScopeMembership
+		}
+	}
+	sort.Strings(md.retired)
+
+	prevRecs := tsRecordsFromState(prevFiles)
+	priorKnown := priorKnownFiles(prevRecs)
+	known := sessionKnownFiles(sessionFiles)
+	// A TypeScript source entering or leaving the resolution universe is what
+	// invalidateTS reports as filenameChanged, even when the published owner set
+	// did not move. If such a file is neither a current nor a prior owner it is
+	// not a plannable identity at all: extraction will reparse it, the frozen
+	// manifest cannot name it, and only the wider fallback stays safe.
+	resolutionChanged := false
+	for f := range known {
+		if !priorKnown[f] {
+			resolutionChanged = true
+			if !currentSet[f] && !previousSet[f] {
+				md.proven = false
+				md.reason = frozenScopeMembership
+			}
+		}
+	}
+	for f := range priorKnown {
+		if !known[f] {
+			resolutionChanged = true
+			if !currentSet[f] && !previousSet[f] {
+				md.proven = false
+				md.reason = frozenScopeMembership
+			}
+		}
+	}
+	if resolutionChanged {
+		md.changed = true
+	}
+	if !md.changed || !md.proven {
+		return md
+	}
+	if !resolutionChanged {
+		// An owner retired without the TypeScript resolution universe moving,
+		// so no cached specifier can rebind. The retired identity still needs
+		// the name and route deltas, which the caller seeds from md.retired.
+		return md
+	}
+	if !dependencyIndexProven(prevFiles) {
+		md.proven = false
+		md.reason = frozenScopeMembership
+		return md
+	}
+	for file, rec := range prevRecs {
+		if len(rec.ImportSpecs) == 0 {
+			if len(rec.ResolvedFiles) > 0 {
+				// Resolved edges without the specifiers that produced them, so
+				// this importer's resolution cannot be replayed at all.
+				return membershipDelta{changed: true, proven: false, reason: frozenScopeMembership, retired: md.retired}
+			}
+			continue
+		}
+		if !rec.ImportComplete && len(rec.UnresolvedSpecs) == 0 && len(rec.ResolvedFiles) == 0 {
+			// Specs stored without any evidence that resolution ran, so the
+			// replay below would read absence as "never resolved".
+			return membershipDelta{changed: true, proven: false, reason: frozenScopeMembership, retired: md.retired}
+		}
+		if len(rec.UnresolvedSpecs) > 0 {
+			md.rebound = append(md.rebound, file)
+			continue
+		}
+		for _, spec := range rec.ImportSpecs {
+			if importRebound(spec, priorKnown, known) {
+				md.rebound = append(md.rebound, file)
+				break
+			}
+		}
+	}
+	sort.Strings(md.rebound)
+	return md
 }
 
 func tsRecord(st *FileState) *tsextractor.FileRecord {
@@ -167,12 +324,19 @@ func tsRecordsFromState(prevFiles map[string]*FileState) map[string]*tsextractor
 	return out
 }
 
-func overlayTSRecords(base, neu map[string]*tsextractor.FileRecord) map[string]*tsextractor.FileRecord {
+// overlayTSRecords projects the next record set: cached records, replaced by the
+// previewed ones, minus the identities that left the tree. Without the removal
+// step a deleted router file keeps its cached mounts in the "after" graph, so a
+// delete would look like no route change at all.
+func overlayTSRecords(base, neu map[string]*tsextractor.FileRecord, retired map[string]bool) map[string]*tsextractor.FileRecord {
 	out := map[string]*tsextractor.FileRecord{}
 	for k, v := range base {
 		if v != nil {
 			out[filepath.ToSlash(k)] = v
 		}
+	}
+	for k := range retired {
+		delete(out, filepath.ToSlash(k))
 	}
 	for k, v := range neu {
 		if v != nil {
@@ -268,9 +432,9 @@ func mountOwnerFilesDeep(recs map[string]*tsextractor.FileRecord, dto *tsextract
 // parent changed on a dirty file, including nested mount descendants. They
 // must be in Begin before extract because composed KindRoute facts are owned
 // by the child files.
-func dirtyRouterMountChildren(prevFiles map[string]*FileState, dirty map[string]bool, newRecs map[string]*tsextractor.FileRecord) []string {
+func dirtyRouterMountChildren(prevFiles map[string]*FileState, dirty map[string]bool, newRecs map[string]*tsextractor.FileRecord, retired map[string]bool) []string {
 	prevRecs := tsRecordsFromState(prevFiles)
-	nextRecs := overlayTSRecords(prevRecs, newRecs)
+	nextRecs := overlayTSRecords(prevRecs, newRecs, retired)
 	seen := map[string]bool{}
 	var out []string
 	add := func(id string) {
@@ -308,9 +472,9 @@ func dirtyRouterMountChildren(prevFiles map[string]*FileState, dirty map[string]
 // domain changed after overlaying dirty preview records onto the cached graph.
 // Previous raw FileRecord.Facts omit composition-only routes, so both sides
 // reconstruct composeRouterMounts from Router DTOs.
-func composedRouteOwnerDelta(prevFiles map[string]*FileState, dirty map[string]bool, newRecs map[string]*tsextractor.FileRecord) []string {
+func composedRouteOwnerDelta(prevFiles map[string]*FileState, dirty map[string]bool, newRecs map[string]*tsextractor.FileRecord, retired map[string]bool) []string {
 	prevRecs := tsRecordsFromState(prevFiles)
-	nextRecs := overlayTSRecords(prevRecs, newRecs)
+	nextRecs := overlayTSRecords(prevRecs, newRecs, retired)
 	scope := map[string]bool{}
 	oldComposed := composedRouteFacts(prevRecs)
 	newComposed := composedRouteFacts(nextRecs)
@@ -318,7 +482,7 @@ func composedRouteOwnerDelta(prevFiles map[string]*FileState, dirty map[string]b
 	for _, id := range ownersForCandidateNameDelta(prevFiles, routeCandidateFacts(oldComposed), routeCandidateFacts(newComposed)) {
 		scope[id] = true
 	}
-	for _, id := range dirtyRouterMountChildren(prevFiles, dirty, newRecs) {
+	for _, id := range dirtyRouterMountChildren(prevFiles, dirty, newRecs, retired) {
 		scope[id] = true
 	}
 	if len(scope) == 0 {

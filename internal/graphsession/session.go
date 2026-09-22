@@ -476,6 +476,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				}
 			}
 			var extraOwners []string
+			var membership membershipDelta
 			if !wholeDomain && s.state != nil {
 				// Non-TypeScript extractors without per-file incremental support
 				// still have a bounded owner domain. Seed the frozen plan with
@@ -489,6 +490,15 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 						if ext.Name() != name {
 							continue
 						}
+						if !declaresFileOwnership(ext) {
+							// The extractor is about to rerun but declares no owner
+							// domain, so the files it will emit cannot be enumerated
+							// before Begin. Announce the full domain rather than
+							// freeze a manifest its output can escape.
+							wholeDomain = true
+							fallbacks = append(fallbacks, graphstream.Fallback{Extractor: name, Scope: "all prior/current file owners", Reason: "extractor declares no file-owner domain; its owners cannot be planned before Begin"})
+							break
+						}
 						for _, file := range ownedFiles(ext, inv.Files) {
 							extraOwners = append(extraOwners, filepath.ToSlash(file))
 						}
@@ -500,29 +510,66 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 						break
 					}
 				}
-				dirty := map[string]bool{}
-				for _, f := range current {
-					st := lookupState(prevFiles, f)
-					h, ok := lookupHash(hashes, f)
-					if tsextractor.IsSessionSource(f, false) && (st == nil || !ok || st.Hash != h || st.Unreadable) {
-						dirty[filepath.ToSlash(f)] = true
-					}
-				}
-				preview, perr := s.prepareFrozenTS(ctx, prevFiles, inv.Files, dirty, angular)
-				if perr != nil {
+				// Membership is settled before the preview, never after it. An
+				// importer the new file set rebinds is a reparse like any other:
+				// its declared names and route mounts can move, so it has to be
+				// previewed before the name and composed route deltas run.
+				// inv.Files, not the policy-filtered current list, is the
+				// resolution universe the extractor itself will use.
+				membership = membershipScope(previous, current, inv.Files, prevFiles)
+				if membership.changed && !membership.proven {
 					wholeDomain = true
-					fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "planning extract of dirty files failed; using whole domain"})
-				} else {
-					extraOwners = append(extraOwners, ownersForNameDelta(prevFiles, dirty, preview)...)
-					var previewRecs map[string]*tsextractor.FileRecord
-					if s.preparedTS != nil {
-						previewRecs = s.preparedTS.Records
+					fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: membership.reason})
+				}
+				if !wholeDomain {
+					dirty := map[string]bool{}
+					for _, f := range current {
+						st := lookupState(prevFiles, f)
+						h, ok := lookupHash(hashes, f)
+						if tsextractor.IsSessionSource(f, false) && (st == nil || !ok || st.Hash != h || st.Unreadable || recMissing(st)) {
+							dirty[filepath.ToSlash(f)] = true
+						}
 					}
-					extraOwners = append(extraOwners, composedRouteOwnerDelta(prevFiles, dirty, previewRecs)...)
+					for _, f := range membership.rebound {
+						dirty[f] = true
+					}
+					// Retired identities carry an old contribution and no new one.
+					// They are absent from the owned set, so the planning extract
+					// never reads them, but they must reach the deltas below as
+					// old->empty so a global consumer of a deleted candidate - a
+					// markdown link, a route mount - is inside Begin. Reverse
+					// import edges alone cannot reach those.
+					retired := make(map[string]bool, len(membership.retired))
+					for _, f := range membership.retired {
+						retired[f] = true
+						dirty[f] = true
+					}
+					// Deleting a file changes what its importers see, and that reaches
+					// further than one edge: invalidateTS reverse-closes the same seeds
+					// at extraction time. Closing here too keeps the previewed parse set
+					// equal to the one extraction will ask for, so the planning extract
+					// stays reusable instead of being recomputed on every delete.
+					for p, d := range reverseClose(retired, tsRecordsFromState(prevFiles)) {
+						if d {
+							dirty[p] = true
+						}
+					}
+					preview, perr := s.prepareFrozenTS(ctx, prevFiles, inv.Files, dirty, angular)
+					if perr != nil {
+						wholeDomain = true
+						fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "planning extract of dirty files failed; using whole domain"})
+					} else {
+						extraOwners = append(extraOwners, ownersForNameDelta(prevFiles, dirty, preview)...)
+						var previewRecs map[string]*tsextractor.FileRecord
+						if s.preparedTS != nil {
+							previewRecs = s.preparedTS.Records
+						}
+						extraOwners = append(extraOwners, composedRouteOwnerDelta(prevFiles, dirty, previewRecs, retired)...)
+					}
 				}
 			}
 			var planReason string
-			s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, wholeDomain, extraOwners)
+			s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, wholeDomain, extraOwners, membership)
 			if err != nil {
 				return nil, err
 			}
@@ -534,7 +581,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				// the frozen contract safe by replacing the complete prior/current
 				// domain rather than publishing an empty manifest.
 				wholeDomain = true
-				s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, true, nil)
+				s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, true, nil, membership)
 				if err != nil {
 					return nil, err
 				}
@@ -542,6 +589,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			s.replaceScope = s.plan.manifest()
 			s.scopeLimited = true
 			scopeLabel := "changed files and reverse file dependents"
+			if planReason == frozenScopeMembershipRe {
+				scopeLabel = "changed files, resolution-rebound importers and reverse file dependents"
+			}
 			if wholeDomain || planReason == frozenScopeMembership || planReason == frozenScopeWholeDomain {
 				scopeLabel = "all prior/current file owners"
 			}
@@ -783,11 +833,18 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				},
 			}
 			var res *tsextractor.SessionResult
-			if s.preparedTS != nil {
+			// The planning extract is reusable only when it already parsed everything
+			// this extraction asks for. dirtyArg is recomputed from the extraction
+			// context and can be wider - a context-dirty source, an owned file the
+			// graph policy keeps out of the plan - and the preview carries a cached
+			// record for anything it did not parse, so reusing it there would freeze
+			// a stale surface into the graph.
+			if s.preparedTS != nil && coversDirty(s.preparedDirty, dirtyArg) {
 				res = s.preparedTS
-				s.preparedTS = nil
-				s.preparedDirty = nil
-			} else {
+			}
+			s.preparedTS = nil
+			s.preparedDirty = nil
+			if res == nil {
 				var xerr error
 				res, xerr = ts.ExtractSession(ctx, s.abs, owned, prevRecs, dirtyArg, hooks)
 				if xerr != nil {
@@ -1978,6 +2035,24 @@ func (s *session) frameworkDirtyRequiresFullScope(files []string, prevFiles map[
 	}
 	s.frameworkSig = sig
 	return s.state.FrameworkSig != sig, nil
+}
+
+// coversDirty reports whether a planning extract that parsed prepared satisfies
+// a later request for want. A nil want means every owned file, which no
+// dirty-file preview covers.
+func coversDirty(prepared, want map[string]bool) bool {
+	if want == nil {
+		return false
+	}
+	for f, d := range want {
+		if !d {
+			continue
+		}
+		if !prepared[f] && !prepared[filepath.ToSlash(f)] {
+			return false
+		}
+	}
+	return true
 }
 
 func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*FileState, files []string, dirty map[string]bool, angular bool) (map[string][]facts.Fact, error) {

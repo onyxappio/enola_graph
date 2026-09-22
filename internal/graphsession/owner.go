@@ -23,6 +23,20 @@ type factFileOwner interface {
 	OwnsFactFile(relFile string) bool
 }
 
+// declaresFileOwnership reports whether an extractor names the files it owns.
+// ownedFiles returns nil both for an extractor that owns nothing in this
+// inventory and for one that cannot answer the question at all; only the latter
+// makes a frozen manifest unprovable, so the two are distinguished here rather
+// than by the emptiness of the result.
+func declaresFileOwnership(ext plugin.Extractor) bool {
+	switch ext.(type) {
+	case plugin.FileOwner, factFileOwner:
+		return true
+	default:
+		return false
+	}
+}
+
 func ownedFiles(ext plugin.Extractor, files []string) []string {
 	if ext == nil {
 		return nil

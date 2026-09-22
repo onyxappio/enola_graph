@@ -55,7 +55,7 @@ func TestAuthoritativePlanWholeDomainWhenNameDependentOutsideReverseClose(t *tes
 	}
 	previous := []string{"packages/crypto/src/password.ts", "apps/architect-console/src/server/app.ts", "independent.ts"}
 	hashes := map[string]string{"packages/crypto/src/password.ts": "changed", "apps/architect-console/src/server/app.ts": "2", "independent.ts": "3"}
-	p, reason, err := authoritativeFilePlan(previous, previous, prev, hashes, false, nil)
+	p, reason, err := planForTest(previous, previous, prev, hashes, false, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,7 +96,7 @@ func TestDirtyRouterMountChildrenBeforeBegin(t *testing.T) {
 			},
 		},
 	}
-	got := dirtyRouterMountChildren(prev, dirty, newRecs)
+	got := dirtyRouterMountChildren(prev, dirty, newRecs, nil)
 	found := false
 	for _, id := range got {
 		if id == "src/api/orders.ts" {
@@ -106,7 +106,7 @@ func TestDirtyRouterMountChildrenBeforeBegin(t *testing.T) {
 	if !found {
 		t.Fatalf("mount prefix change omitted child: %v", got)
 	}
-	unchanged := dirtyRouterMountChildren(prev, dirty, map[string]*tsextractor.FileRecord{"src/server.ts": prev["src/server.ts"].TS})
+	unchanged := dirtyRouterMountChildren(prev, dirty, map[string]*tsextractor.FileRecord{"src/server.ts": prev["src/server.ts"].TS}, nil)
 	if len(unchanged) != 0 {
 		t.Fatalf("unchanged mounts produced children %v", unchanged)
 	}
@@ -178,7 +178,7 @@ func TestDirtyRouterMountChildrenNestedBeforeBegin(t *testing.T) {
 			},
 		},
 	}
-	got := dirtyRouterMountChildren(prev, dirty, newRecs)
+	got := dirtyRouterMountChildren(prev, dirty, newRecs, nil)
 	found := map[string]bool{}
 	for _, id := range got {
 		found[id] = true
@@ -222,7 +222,7 @@ func TestComposedRouteOwnerDeltaNestedMounts(t *testing.T) {
 			},
 		},
 	}
-	got := composedRouteOwnerDelta(prev, dirty, newRecs)
+	got := composedRouteOwnerDelta(prev, dirty, newRecs, nil)
 	found := map[string]bool{}
 	for _, id := range got {
 		found[id] = true
@@ -246,7 +246,7 @@ func TestComposedRouteOwnerDeltaNestedMounts(t *testing.T) {
 			Facts: []facts.Fact{{Kind: facts.KindSymbol, Name: "normalizeEmail", File: "packages/crypto/src/password.ts"}},
 		},
 	}
-	if extra := composedRouteOwnerDelta(prev, bodyDirty, bodyNew); len(extra) != 0 {
+	if extra := composedRouteOwnerDelta(prev, bodyDirty, bodyNew, nil); len(extra) != 0 {
 		t.Fatalf("body edit grew composed route owners %v", extra)
 	}
 }
@@ -338,6 +338,14 @@ func TestFileInvalidationRejectsInvalidPaths(t *testing.T) {
 	}
 }
 
+// planForTest derives the membership delta the same way session.go does, from a
+// fixture whose current file list is also the whole inventory. Production passes
+// inv.Files, which can be wider than the policy-filtered current list.
+func planForTest(previous, current []string, prevFiles map[string]*FileState, hashes map[string]string, wholeDomain bool, extraOwners []string) (*fileInvalidationPlan, string, error) {
+	return authoritativeFilePlan(previous, current, prevFiles, hashes, wholeDomain, extraOwners,
+		membershipScope(previous, current, current, prevFiles))
+}
+
 func TestAuthoritativeFilePlanUsesChangedFilesAndReverseDependents(t *testing.T) {
 	prev := []string{"src/a.ts", "src/b.ts", "src/c.ts", "src/independent.ts"}
 	current := append([]string(nil), prev...)
@@ -348,7 +356,7 @@ func TestAuthoritativeFilePlanUsesChangedFilesAndReverseDependents(t *testing.T)
 		"src/independent.ts": {Hash: "i1", TS: &tsextractor.FileRecord{File: "src/independent.ts"}},
 	}
 	hashes := map[string]string{"src/a.ts": "a1", "src/b.ts": "b1", "src/c.ts": "c2", "src/independent.ts": "i1"}
-	p, reason, err := authoritativeFilePlan(prev, current, state, hashes, false, nil)
+	p, reason, err := planForTest(prev, current, state, hashes, false, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -367,7 +375,7 @@ func TestAuthoritativeFilePlanUsesChangedFilesAndReverseDependents(t *testing.T)
 func TestAuthoritativeFilePlanKeepsWholeDomainForGlobalFallback(t *testing.T) {
 	prev := []string{"a.ts", "b.ts"}
 	current := []string{"a.ts", "b.ts"}
-	p, reason, err := authoritativeFilePlan(prev, current, nil, map[string]string{"a.ts": "a", "b.ts": "b"}, true, nil)
+	p, reason, err := planForTest(prev, current, nil, map[string]string{"a.ts": "a", "b.ts": "b"}, true, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -379,7 +387,9 @@ func TestAuthoritativeFilePlanKeepsWholeDomainForGlobalFallback(t *testing.T) {
 	}
 }
 
-func TestAuthoritativeFilePlanMembershipUsesWholeDomain(t *testing.T) {
+// src/a.ts carries resolved edges but no cached specifiers, so its resolution
+// cannot be replayed against the new file set and membership must widen.
+func TestAuthoritativeFilePlanMembershipWithoutCachedSpecsUsesWholeDomain(t *testing.T) {
 	prev := []string{"src/a.ts", "src/b.ts"}
 	current := []string{"src/a.ts", "src/b.ts", "src/new.ts"}
 	state := map[string]*FileState{
@@ -387,7 +397,7 @@ func TestAuthoritativeFilePlanMembershipUsesWholeDomain(t *testing.T) {
 		"src/b.ts": {Hash: "b1", TS: &tsextractor.FileRecord{File: "src/b.ts", Declared: []string{"B"}}},
 	}
 	hashes := map[string]string{"src/a.ts": "a1", "src/b.ts": "b1", "src/new.ts": "n1"}
-	p, reason, err := authoritativeFilePlan(prev, current, state, hashes, false, nil)
+	p, reason, err := planForTest(prev, current, state, hashes, false, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -412,18 +422,427 @@ func TestAuthoritativeFilePlanDeleteKeepsRetiredOwner(t *testing.T) {
 		"gone.ts": {Hash: "g1", TS: &tsextractor.FileRecord{File: "gone.ts", Declared: []string{"Gone"}}},
 		"kept.ts": {Hash: "k1", TS: &tsextractor.FileRecord{File: "kept.ts"}},
 	}
-	p, reason, err := authoritativeFilePlan(prev, current, state, map[string]string{"kept.ts": "k1"}, false, nil)
+	p, reason, err := planForTest(prev, current, state, map[string]string{"kept.ts": "k1"}, false, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reason != frozenScopeMembershipRe {
+		t.Fatalf("reason = %q", reason)
+	}
+	// The retired owner stays in scope so its prior contribution is cleared.
+	if err := p.check(graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: "gone.ts"}); err != nil {
+		t.Fatal(err)
+	}
+	// kept.ts neither imports nor references gone.ts, so it is not republished.
+	if p.member["kept.ts"] {
+		t.Fatalf("plan = %v, want kept.ts excluded", p.member)
+	}
+}
+
+// Adding a file nothing resolves to must not pull unrelated owners into Begin.
+func TestAuthoritativeFilePlanUnrelatedAddStaysBounded(t *testing.T) {
+	prev := []string{"src/a.ts", "src/b.ts"}
+	current := []string{"src/a.ts", "src/b.ts", "src/helper.ts"}
+	state := map[string]*FileState{
+		"src/a.ts": {Hash: "a1", TS: &tsextractor.FileRecord{
+			File: "src/a.ts", ImportSpecs: []string{"src/b"}, ResolvedFiles: []string{"src/b.ts"},
+			Declared: []string{"A"}, ImportComplete: true,
+		}},
+		"src/b.ts": {Hash: "b1", TS: &tsextractor.FileRecord{File: "src/b.ts", Declared: []string{"B"}, ImportComplete: true}},
+	}
+	hashes := map[string]string{"src/a.ts": "a1", "src/b.ts": "b1", "src/helper.ts": "h1"}
+	p, reason, err := planForTest(prev, current, state, hashes, false, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reason != frozenScopeMembershipRe {
+		t.Fatalf("reason = %q", reason)
+	}
+	if err := p.check(graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: "src/helper.ts"}); err != nil {
+		t.Fatal(err)
+	}
+	if len(p.manifest()) != 1 {
+		t.Fatalf("manifest = %v, want only the added file", p.manifest())
+	}
+}
+
+// A previously unresolved internal import becomes satisfiable once its folder
+// index is added, so the importer must already be a frozen owner.
+func TestAuthoritativeFilePlanAddedIndexSatisfiesUnresolvedImport(t *testing.T) {
+	prev := []string{"src/consumer.ts", "src/other.ts"}
+	current := []string{"src/consumer.ts", "src/other.ts", "src/widgets/index.ts"}
+	state := map[string]*FileState{
+		"src/consumer.ts": {Hash: "c1", TS: &tsextractor.FileRecord{
+			File: "src/consumer.ts", ImportSpecs: []string{"src/widgets"},
+			UnresolvedSpecs: []string{"src/widgets"}, ImportComplete: true,
+		}},
+		"src/other.ts": {Hash: "o1", TS: &tsextractor.FileRecord{
+			File: "src/other.ts", ImportSpecs: []string{"react"}, ImportComplete: true,
+		}},
+	}
+	hashes := map[string]string{"src/consumer.ts": "c1", "src/other.ts": "o1", "src/widgets/index.ts": "w1"}
+	p, reason, err := planForTest(prev, current, state, hashes, false, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reason != frozenScopeMembershipRe {
+		t.Fatalf("reason = %q", reason)
+	}
+	for _, want := range []string{"src/consumer.ts", "src/widgets/index.ts"} {
+		if err := p.check(graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: want}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if p.member["src/other.ts"] {
+		t.Fatalf("plan = %v, want src/other.ts excluded", p.member)
+	}
+}
+
+// An already resolved specifier rebinds when the added path wins the extension
+// precedence over the folder index it used to resolve to. Nothing about the
+// importer's own bytes changed, so only the resolution replay can find it.
+func TestAuthoritativeFilePlanAddedFileWinsOverExistingIndex(t *testing.T) {
+	prev := []string{"src/consumer.ts", "src/foo/index.ts", "src/other.ts"}
+	current := []string{"src/consumer.ts", "src/foo/index.ts", "src/other.ts", "src/foo.ts"}
+	state := map[string]*FileState{
+		"src/consumer.ts": {Hash: "c1", TS: &tsextractor.FileRecord{
+			File: "src/consumer.ts", ImportSpecs: []string{"src/foo"},
+			ResolvedFiles: []string{"src/foo/index.ts"}, ImportComplete: true,
+		}},
+		"src/foo/index.ts": {Hash: "i1", TS: &tsextractor.FileRecord{
+			File: "src/foo/index.ts", Declared: []string{"Foo"}, ImportComplete: true,
+		}},
+		"src/other.ts": {Hash: "o1", TS: &tsextractor.FileRecord{
+			File: "src/other.ts", ImportSpecs: []string{"react"}, ImportComplete: true,
+		}},
+	}
+	hashes := map[string]string{
+		"src/consumer.ts": "c1", "src/foo/index.ts": "i1", "src/other.ts": "o1", "src/foo.ts": "f1",
+	}
+	p, reason, err := planForTest(prev, current, state, hashes, false, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reason != frozenScopeMembershipRe {
+		t.Fatalf("reason = %q", reason)
+	}
+	for _, want := range []string{"src/consumer.ts", "src/foo.ts"} {
+		if err := p.check(graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: want}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	// src/other.ts imports only an external module, so no added path can rebind
+	// it and it must stay out of the frozen scope.
+	if p.member["src/other.ts"] {
+		t.Fatalf("plan = %v, want src/other.ts excluded", p.member)
+	}
+}
+
+// Renaming a file module to a folder index rebinds its importer and retires the
+// old owner, both before Begin.
+func TestAuthoritativeFilePlanRenameRebindsImporterAndClearsOldOwner(t *testing.T) {
+	prev := []string{"src/consumer.ts", "src/target.ts"}
+	current := []string{"src/consumer.ts", "src/target/index.ts"}
+	state := map[string]*FileState{
+		"src/consumer.ts": {Hash: "c1", TS: &tsextractor.FileRecord{
+			File: "src/consumer.ts", ImportSpecs: []string{"src/target"},
+			ResolvedFiles: []string{"src/target.ts"}, ImportComplete: true,
+		}},
+		"src/target.ts": {Hash: "t1", TS: &tsextractor.FileRecord{
+			File: "src/target.ts", Declared: []string{"Target"}, ImportComplete: true,
+		}},
+	}
+	hashes := map[string]string{"src/consumer.ts": "c1", "src/target/index.ts": "t2"}
+	p, reason, err := planForTest(prev, current, state, hashes, false, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reason != frozenScopeMembershipRe {
+		t.Fatalf("reason = %q", reason)
+	}
+	for _, want := range []string{"src/consumer.ts", "src/target.ts", "src/target/index.ts"} {
+		if err := p.check(graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: want}); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+// A removed owner that is not a TypeScript source has consumers the import
+// graph cannot see, so membership keeps the wider fallback.
+func TestAuthoritativeFilePlanNonTSRemovalKeepsWholeDomain(t *testing.T) {
+	prev := []string{"src/a.ts", "src/b.ts", "config/routes.json"}
+	current := []string{"src/a.ts", "src/b.ts"}
+	state := map[string]*FileState{
+		"src/a.ts": {Hash: "a1", TS: &tsextractor.FileRecord{
+			File: "src/a.ts", ImportSpecs: []string{"src/b"}, ResolvedFiles: []string{"src/b.ts"}, ImportComplete: true,
+		}},
+		"src/b.ts":           {Hash: "b1", TS: &tsextractor.FileRecord{File: "src/b.ts", ImportComplete: true}},
+		"config/routes.json": {Hash: "r1"},
+	}
+	hashes := map[string]string{"src/a.ts": "a1", "src/b.ts": "b1"}
+	p, reason, err := planForTest(prev, current, state, hashes, false, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if reason != frozenScopeMembership {
 		t.Fatalf("reason = %q", reason)
 	}
-	if err := p.check(graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: "gone.ts"}); err != nil {
+	for _, want := range []string{"src/a.ts", "src/b.ts", "config/routes.json"} {
+		if err := p.check(graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: want}); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+// An added file that no cached import can reach is not claimed by the planner.
+// The prior owner map records contributions, not the prior inventory, so it
+// cannot prove such a file is new; session.go plans it from the extractor that
+// owns it (ownedFiles plus retireExtractorOwners), which reads real input
+// hashes. The TypeScript add still narrows instead of widening the domain.
+func TestAuthoritativeFilePlanNonTSAddComesFromExtractorOwners(t *testing.T) {
+	prev := []string{"src/a.ts"}
+	current := []string{"src/a.ts", "src/new.ts", "openapi/spec.yaml"}
+	state := map[string]*FileState{
+		"src/a.ts": {Hash: "a1", TS: &tsextractor.FileRecord{
+			File: "src/a.ts", ImportSpecs: []string{"react"}, ImportComplete: true,
+		}},
+	}
+	hashes := map[string]string{"src/a.ts": "a1", "src/new.ts": "n1", "openapi/spec.yaml": "y1"}
+	yaml := graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: "openapi/spec.yaml"}
+
+	p, reason, err := planForTest(prev, current, state, hashes, false, nil)
+	if err != nil {
 		t.Fatal(err)
 	}
-	if err := p.check(graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: "kept.ts"}); err != nil {
+	if reason != frozenScopeMembershipRe {
+		t.Fatalf("reason = %q", reason)
+	}
+	if err := p.check(graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: "src/new.ts"}); err != nil {
 		t.Fatal(err)
+	}
+	if err := p.check(yaml); err == nil {
+		t.Fatal("planner claimed an owner it cannot prove; session.go must supply it")
+	}
+	if err := p.check(graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: "src/a.ts"}); err == nil {
+		t.Fatal("src/a.ts imports only a bare external specifier and must stay out of scope")
+	}
+
+	withOwner, _, err := planForTest(prev, current, state, hashes, false, []string{"openapi/spec.yaml"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := withOwner.check(yaml); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// A retired owner that is not a TypeScript source reaches the caller as a
+// retired identity, so the pre-Begin name and route deltas can seed it as an
+// old->empty contribution instead of discovering it after Begin is frozen.
+func TestMembershipScopeReportsRetiredNonTSOwner(t *testing.T) {
+	prev := []string{"src/a.ts", "docs/guide.md"}
+	current := []string{"src/a.ts"}
+	state := map[string]*FileState{
+		"src/a.ts":      {Hash: "a1", TS: &tsextractor.FileRecord{File: "src/a.ts", ImportComplete: true}},
+		"docs/guide.md": {Hash: "g1", Extractor: "mdintent"},
+	}
+	md := membershipScope(prev, current, current, state)
+	if !md.changed {
+		t.Fatal("membership did not report the removal")
+	}
+	if md.proven {
+		t.Fatal("a retired non-TypeScript owner has consumers the import graph cannot enumerate")
+	}
+	if len(md.retired) != 1 || md.retired[0] != "docs/guide.md" {
+		t.Fatalf("retired = %v", md.retired)
+	}
+}
+
+// A deleted TypeScript router file must disappear from the projected record set.
+// While overlayTSRecords could only add records, the cached mounts survived into
+// the "after" graph and a delete looked like no route change at all.
+func TestOverlayDropsRetiredRecords(t *testing.T) {
+	prev := map[string]*tsextractor.FileRecord{
+		"src/a.ts": {File: "src/a.ts"},
+		"src/b.ts": {File: "src/b.ts"},
+	}
+	next := overlayTSRecords(prev, nil, map[string]bool{"src/b.ts": true})
+	if next["src/a.ts"] == nil {
+		t.Fatal("kept record lost")
+	}
+	if next["src/b.ts"] != nil {
+		t.Fatal("retired record survived the overlay")
+	}
+}
+
+// A retired provider has to reach the pre-Begin name delta as an old->empty
+// contribution. Its consumers are resolved by global name, not along import
+// edges, so a markdown owner that mentions the deleted symbol is unreachable by
+// reverse-closing the TypeScript graph: seeding the retired identity is the only
+// thing that puts it inside Begin.
+func TestNameDeltaSeedsRetiredOwnerForNonTSConsumers(t *testing.T) {
+	prev := map[string]*FileState{
+		"src/gone.ts": {Hash: "g1", TS: &tsextractor.FileRecord{
+			File:     "src/gone.ts",
+			Declared: []string{"Widget"},
+			Facts:    []facts.Fact{{Kind: facts.KindSymbol, Name: "Widget", File: "src/gone.ts"}},
+		}},
+		"docs/guide.md": {Hash: "d1", Extractor: "mdintent", Facts: []facts.Fact{
+			{Kind: facts.KindIntent, Name: "guide", File: "docs/guide.md",
+				Relations: []facts.Relation{{Kind: facts.RelNames, Target: "Widget"}}},
+		}},
+		"src/unrelated.ts": {Hash: "u1", TS: &tsextractor.FileRecord{
+			File:  "src/unrelated.ts",
+			Facts: []facts.Fact{{Kind: facts.KindSymbol, Name: "Other", File: "src/unrelated.ts"}},
+		}},
+	}
+	// The retired identity has no preview record, so its contribution is empty.
+	got := ownersForNameDelta(prev, map[string]bool{"src/gone.ts": true}, map[string][]facts.Fact{})
+	seen := map[string]bool{}
+	for _, n := range got {
+		seen[n] = true
+	}
+	if !seen["docs/guide.md"] {
+		t.Fatalf("markdown consumer of the retired symbol missing: %v", got)
+	}
+	if seen["src/unrelated.ts"] {
+		t.Fatalf("unrelated owner pulled in: %v", got)
+	}
+}
+
+// Deleting one of two providers of the same global name changes which candidate
+// wins, so every owner that mentions the name has to be republished even though
+// the surviving provider's own bytes did not change.
+func TestNameDeltaSeedsRetiredOwnerOnCandidateCollision(t *testing.T) {
+	prev := map[string]*FileState{
+		"src/a.ts": {Hash: "a1", TS: &tsextractor.FileRecord{
+			File:     "src/a.ts",
+			Declared: []string{"Widget"},
+			Facts:    []facts.Fact{{Kind: facts.KindSymbol, Name: "Widget", File: "src/a.ts"}},
+		}},
+		"src/b.ts": {Hash: "b1", TS: &tsextractor.FileRecord{
+			File:     "src/b.ts",
+			Declared: []string{"Widget"},
+			Facts:    []facts.Fact{{Kind: facts.KindSymbol, Name: "Widget", File: "src/b.ts"}},
+		}},
+		"src/uses.ts": {Hash: "u1", TS: &tsextractor.FileRecord{
+			File:       "src/uses.ts",
+			Referenced: []string{"Widget"},
+			Facts: []facts.Fact{{Kind: facts.KindSymbol, Name: "uses", File: "src/uses.ts",
+				Relations: []facts.Relation{{Kind: facts.RelCalls, Target: "Widget"}}}},
+		}},
+		"src/independent.ts": {Hash: "i1", TS: &tsextractor.FileRecord{
+			File:  "src/independent.ts",
+			Facts: []facts.Fact{{Kind: facts.KindSymbol, Name: "i", File: "src/independent.ts"}},
+		}},
+	}
+	got := ownersForNameDelta(prev, map[string]bool{"src/a.ts": true}, map[string][]facts.Fact{})
+	seen := map[string]bool{}
+	for _, n := range got {
+		seen[n] = true
+	}
+	for _, want := range []string{"src/b.ts", "src/uses.ts"} {
+		if !seen[want] {
+			t.Fatalf("collision consumer %s missing: %v", want, got)
+		}
+	}
+	if seen["src/independent.ts"] {
+		t.Fatalf("unrelated owner pulled in: %v", got)
+	}
+}
+
+// Cached ImportSpecs are the extractor's own post-resolution targets, so an
+// alias-mapped import is stored as its repo-relative path and a file added at
+// that path rebinds the importer. A specifier that still looks like a bare
+// package is not claimed, which is what keeps an ordinary content edit narrow.
+func TestMembershipReboundFollowsResolvedAliasTarget(t *testing.T) {
+	previous := []string{"src/app.ts", "src/lib/util/index.ts", "src/pkg.ts"}
+	current := append(append([]string{}, previous...), "src/lib/util.ts")
+	state := map[string]*FileState{
+		"src/app.ts": {Hash: "a1", TS: &tsextractor.FileRecord{
+			File: "src/app.ts", ImportSpecs: []string{"src/lib/util"},
+			ResolvedFiles: []string{"src/lib/util/index.ts"}, ImportComplete: true,
+		}},
+		"src/lib/util/index.ts": {Hash: "i1", TS: &tsextractor.FileRecord{
+			File: "src/lib/util/index.ts", ImportComplete: true,
+		}},
+		"src/pkg.ts": {Hash: "p1", TS: &tsextractor.FileRecord{
+			File: "src/pkg.ts", ImportSpecs: []string{"@scope/ui"}, ImportComplete: true,
+		}},
+	}
+	md := membershipScope(previous, current, current, state)
+	if !md.changed || !md.proven {
+		t.Fatalf("membership = %+v", md)
+	}
+	if len(md.rebound) != 1 || md.rebound[0] != "src/app.ts" {
+		t.Fatalf("rebound = %v, want only src/app.ts", md.rebound)
+	}
+}
+
+// The frozen scope must be a superset of the reparse set extraction computes:
+// scope owners and parses are distinct sets, and a dirty file outside the plan
+// is a hard failure at extraction time.
+func TestMembershipScopeCoversReparseSet(t *testing.T) {
+	prev := []string{"src/consumer.ts", "src/foo/index.ts", "src/broken.ts"}
+	current := []string{"src/consumer.ts", "src/foo/index.ts", "src/broken.ts", "src/foo.ts"}
+	state := map[string]*FileState{
+		"src/consumer.ts": {Hash: "c1", TS: &tsextractor.FileRecord{
+			File: "src/consumer.ts", ImportSpecs: []string{"src/foo"},
+			ResolvedFiles: []string{"src/foo/index.ts"}, ImportComplete: true,
+		}},
+		"src/foo/index.ts": {Hash: "i1", TS: &tsextractor.FileRecord{File: "src/foo/index.ts", ImportComplete: true}},
+		"src/broken.ts": {Hash: "k1", TS: &tsextractor.FileRecord{
+			File: "src/broken.ts", ImportSpecs: []string{"src/never"},
+			UnresolvedSpecs: []string{"src/never"}, ImportComplete: true,
+		}},
+	}
+	hashes := map[string]string{
+		"src/consumer.ts": "c1", "src/foo/index.ts": "i1", "src/broken.ts": "k1", "src/foo.ts": "f1",
+	}
+	p, reason, err := planForTest(prev, current, state, hashes, false, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reason != frozenScopeMembershipRe {
+		t.Fatalf("reason = %q", reason)
+	}
+	dirty, broaden, _ := invalidateTS(map[string]bool{}, tsRecordsFromState(state), current, hashes)
+	if broaden {
+		t.Fatal("fixture forced the extraction-side fallback")
+	}
+	for f, d := range dirty {
+		if !d {
+			continue
+		}
+		if err := p.check(graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: f}); err != nil {
+			t.Fatalf("reparsed file outside frozen scope: %v", err)
+		}
+	}
+}
+
+// Whole-domain and delta runs must agree on the owner set for the same delta
+// whenever the delta path is not allowed to narrow.
+func TestMembershipDeltaMatchesColdWhenFallbackApplies(t *testing.T) {
+	prev := []string{"src/a.ts", "src/b.ts", "config/routes.json"}
+	current := []string{"src/a.ts", "src/b.ts"}
+	state := map[string]*FileState{
+		"src/a.ts": {Hash: "a1", TS: &tsextractor.FileRecord{
+			File: "src/a.ts", ImportSpecs: []string{"src/b"}, ResolvedFiles: []string{"src/b.ts"}, ImportComplete: true,
+		}},
+		"src/b.ts":           {Hash: "b1", TS: &tsextractor.FileRecord{File: "src/b.ts", ImportComplete: true}},
+		"config/routes.json": {Hash: "r1"},
+	}
+	hashes := map[string]string{"src/a.ts": "a1", "src/b.ts": "b1"}
+	delta, _, err := planForTest(prev, current, state, hashes, false, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cold, _, err := planForTest(prev, current, state, hashes, true, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if delta.digest != cold.digest {
+		t.Fatalf("delta digest %q != cold digest %q", delta.digest, cold.digest)
 	}
 }
 
@@ -466,7 +885,7 @@ func TestComposedRouteFactsAppliesEmberEngineMounts(t *testing.T) {
 				Props: map[string]any{"type": "engine_mount", "ember_engine": "shop", "router": "map", "method": "GET", "framework": "ember"},
 			}},
 		},
-	})
+	}, nil)
 	scope := map[string]bool{}
 	addChangedRouteFiles(scope, composedRouteFacts(prev), composedRouteFacts(next))
 	if !scope[engine] {

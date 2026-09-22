@@ -21,10 +21,7 @@ func invalidateTS(dirty map[string]bool, prev map[string]*tsextractor.FileRecord
 	if prev == nil {
 		prev = map[string]*tsextractor.FileRecord{}
 	}
-	known := map[string]bool{}
-	for _, f := range owned {
-		known[filepath.ToSlash(f)] = true
-	}
+	known := sessionKnownFiles(owned)
 
 	withSpecs := 0
 	withResolved := 0
@@ -86,6 +83,7 @@ func invalidateTS(dirty map[string]bool, prev map[string]*tsextractor.FileRecord
 	}
 
 	if filenameChanged {
+		priorKnown := priorKnownFiles(prev)
 		for path, rec := range prev {
 			if rec == nil {
 				continue
@@ -95,17 +93,61 @@ func invalidateTS(dirty map[string]bool, prev map[string]*tsextractor.FileRecord
 				continue
 			}
 			for _, spec := range rec.ImportSpecs {
-				if _, ok := tsextractor.NormalizeImportTarget(spec, known); !ok {
-					if internalSpec(spec) {
-						dirty[path] = true
-						break
-					}
+				if importRebound(spec, priorKnown, known) {
+					dirty[path] = true
+					break
 				}
 			}
 		}
 	}
 
 	return dirty, false, ""
+}
+
+// sessionKnownFiles mirrors the extractor's knownFiles: TypeScript sources only,
+// so Angular templates in the owned set are not resolution targets here either.
+// The planner builds the new resolution context with the same function, from the
+// same inventory the extractor receives.
+func sessionKnownFiles(files []string) map[string]bool {
+	known := make(map[string]bool, len(files))
+	for _, f := range files {
+		if slash := filepath.ToSlash(f); tsextractor.IsSessionSource(slash, false) {
+			known[slash] = true
+		}
+	}
+	return known
+}
+
+// priorKnownFiles rebuilds the resolution context the cached records were parsed
+// against, so an old target can be compared with the new one.
+func priorKnownFiles(prev map[string]*tsextractor.FileRecord) map[string]bool {
+	known := make(map[string]bool, len(prev))
+	for path := range prev {
+		if slash := filepath.ToSlash(path); tsextractor.IsSessionSource(slash, false) {
+			known[slash] = true
+		}
+	}
+	return known
+}
+
+// importRebound reports whether a membership change moves where one cached import
+// specifier resolves: it becomes satisfiable, it stops resolving, or it still
+// resolves but now names a different file because an added path wins the exact /
+// extension / folder-index precedence in resolveModuleFile. Cached specs are the
+// extractor's own RelImports targets, already carrying tsconfig alias and
+// relative-directory resolution, so this replay is what the next extraction sees.
+// An internal-looking specifier that resolves in neither context stays reported,
+// keeping the prior conservative behaviour for a still-broken import.
+func importRebound(spec string, priorKnown, known map[string]bool) bool {
+	spec = filepath.ToSlash(spec)
+	// summarizeFacts resolves against known files before it classifies a
+	// specifier as external, so no specifier is exempt from this comparison.
+	after, hasAfter := tsextractor.NormalizeImportTarget(spec, known)
+	before, hadBefore := tsextractor.NormalizeImportTarget(spec, priorKnown)
+	if hadBefore != hasAfter || before != after {
+		return true
+	}
+	return !hasAfter && internalSpec(spec)
 }
 
 func reverseClose(seeds map[string]bool, recs map[string]*tsextractor.FileRecord) map[string]bool {
