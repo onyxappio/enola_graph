@@ -2450,7 +2450,9 @@ import (
 // for every source file.
 // v277: Nested Nuxt packages, Lazy auto-components, Drizzle .references() FKs,
 // GraphQL Yoga resolver RelHandledBy, and imported implements qualification.
-const cacheVersion = "v277"
+// v278: Drizzle FK depends_on resolves only to storage tables; GraphQL Yoga/Tools
+// createSchema binding respects lexical shadowing and per-call typeDefs fields.
+const cacheVersion = "v278"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

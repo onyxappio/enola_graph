@@ -279,6 +279,159 @@ export function buildSchema() {
 	}
 }
 
+func TestGraphQLYogaDoesNotBindParameterShadowedCreateSchema(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"package.json": `{"dependencies":{"graphql-yoga":"^5.0.0"}}`,
+		"src/schema.ts": `import { createSchema } from 'graphql-yoga';
+const typeDefs = ` + "`" + `type Query { health: String }` + "`" + `;
+export function buildSchema(dependencies: unknown, createSchema: (options: unknown) => unknown) {
+  return createSchema({
+    typeDefs,
+    resolvers: { Query: { health: () => 'nope' } },
+  });
+}
+`,
+	}, false)
+	q, ok := findFact(ff, "Query.health")
+	if !ok {
+		t.Fatal("Query.health missing")
+	}
+	if hasRelation(q, facts.RelHandledBy, "src.Query.health") {
+		t.Fatal("parameter-shadowed createSchema bound GraphQL resolvers")
+	}
+}
+
+func TestGraphQLYogaDoesNotBindBlockLocalShadowedCreateSchema(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"package.json": `{"dependencies":{"graphql-yoga":"^5.0.0"}}`,
+		"src/schema.ts": `import { createSchema } from 'graphql-yoga';
+const typeDefs = ` + "`" + `type Query { health: String }` + "`" + `;
+export function build() {
+  const createSchema = (cfg: { resolvers: unknown }) => cfg;
+  return createSchema({
+    typeDefs,
+    resolvers: { Query: { health: () => 'nope' } },
+  });
+}
+`,
+	}, false)
+	q, ok := findFact(ff, "Query.health")
+	if !ok {
+		t.Fatal("Query.health missing")
+	}
+	if hasRelation(q, facts.RelHandledBy, "src.Query.health") {
+		t.Fatal("block-local createSchema bound GraphQL resolvers")
+	}
+}
+
+func TestGraphQLYogaUnshadowedCallStillBindsWhenSiblingIsShadowed(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"package.json": `{"dependencies":{"graphql-yoga":"^5.0.0"}}`,
+		"src/schema.ts": `import { createSchema } from 'graphql-yoga';
+createSchema({
+  typeDefs: ` + "`" + `type Query { ping: String }` + "`" + `,
+  resolvers: { Query: { ping: () => 'ok' } },
+});
+export function buildSchema(createSchema: (options: unknown) => unknown) {
+  return createSchema({
+    typeDefs: ` + "`" + `type Query { health: String }` + "`" + `,
+    resolvers: { Query: { health: () => 'nope' } },
+  });
+}
+`,
+	}, false)
+	ping, ok := findFact(ff, "Query.ping")
+	if !ok {
+		t.Fatal("Query.ping missing")
+	}
+	if !hasRelation(ping, facts.RelHandledBy, "src.Query.ping") {
+		t.Fatalf("unshadowed createSchema lost handler: %+v", ping.Relations)
+	}
+	health, ok := findFact(ff, "Query.health")
+	if !ok {
+		t.Fatal("Query.health missing")
+	}
+	if hasRelation(health, facts.RelHandledBy, "src.Query.health") {
+		t.Fatal("shadowed sibling createSchema bound GraphQL resolvers")
+	}
+}
+
+func TestGraphQLYogaAliasedImportStillBinds(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"package.json": `{"dependencies":{"graphql-yoga":"^5.0.0"}}`,
+		"src/schema.ts": `import { createSchema as makeSchema } from 'graphql-yoga';
+const typeDefs = ` + "`" + `type Query { health: String }` + "`" + `;
+makeSchema({
+  typeDefs,
+  resolvers: { Query: { health: () => ({ status: 'ok' }) } },
+});
+`,
+	}, false)
+	q, ok := findFact(ff, "Query.health")
+	if !ok {
+		t.Fatal("Query.health missing")
+	}
+	if !hasRelation(q, facts.RelHandledBy, "src.Query.health") {
+		t.Fatalf("aliased createSchema unbound: %+v", q.Relations)
+	}
+}
+
+func TestGraphQLYogaNamespaceImportStillBinds(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"package.json": `{"dependencies":{"graphql-yoga":"^5.0.0"}}`,
+		"src/schema.ts": `import * as Yoga from 'graphql-yoga';
+const typeDefs = ` + "`" + `type Query { health: String }` + "`" + `;
+Yoga.createSchema({
+  typeDefs,
+  resolvers: { Query: { health: () => ({ status: 'ok' }) } },
+});
+`,
+	}, false)
+	q, ok := findFact(ff, "Query.health")
+	if !ok {
+		t.Fatal("Query.health missing")
+	}
+	if !hasRelation(q, facts.RelHandledBy, "src.Query.health") {
+		t.Fatalf("namespace createSchema unbound: %+v", q.Relations)
+	}
+}
+
+func TestGraphQLYogaIndependentSchemasDoNotCrossBindResolvers(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"package.json": `{"dependencies":{"graphql-yoga":"^5.0.0"}}`,
+		"src/schema.ts": `import { createSchema } from 'graphql-yoga';
+createSchema({
+  typeDefs: ` + "`" + `type Query { health: String }` + "`" + `,
+  resolvers: { Query: { health: healthA, ping: pingLeak } },
+});
+createSchema({
+  typeDefs: ` + "`" + `type Query { ping: String }` + "`" + `,
+  resolvers: { Query: { ping: pingB, health: healthLeak } },
+});
+`,
+	}, false)
+	health, ok := findFact(ff, "Query.health")
+	if !ok {
+		t.Fatal("Query.health missing")
+	}
+	if !hasRelation(health, facts.RelHandledBy, "src.healthA") {
+		t.Fatalf("Query.health missing own handler: %+v", health.Relations)
+	}
+	if hasRelation(health, facts.RelHandledBy, "src.healthLeak") {
+		t.Fatal("Query.health bound to unrelated schema resolver")
+	}
+	ping, ok := findFact(ff, "Query.ping")
+	if !ok {
+		t.Fatal("Query.ping missing")
+	}
+	if !hasRelation(ping, facts.RelHandledBy, "src.pingB") {
+		t.Fatalf("Query.ping missing own handler: %+v", ping.Relations)
+	}
+	if hasRelation(ping, facts.RelHandledBy, "src.pingLeak") {
+		t.Fatal("Query.ping bound to unrelated schema resolver")
+	}
+}
+
 func TestGraphQLYogaDoesNotBindLocalCreateSchema(t *testing.T) {
 	ff := extractAll(t, map[string]string{
 		"package.json": `{"dependencies":{"graphql-yoga":"^5.0.0"}}`,
