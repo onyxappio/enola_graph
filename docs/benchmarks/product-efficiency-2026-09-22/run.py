@@ -36,6 +36,15 @@ HISTORICAL_SHAS = {
     "6430d258694073b90c5c6847da239bdf4407f582": "archived 2026-09-22 parent dump (not a default pin)",
 }
 SOURCE_COPY_PREFIXES = ("internal/", "pkg/", "cmd/", "go.mod", "go.sum")
+# Harness-only packages copied into every snapshot. They make the snapshot tree
+# differ from the committed revision (Go stamps vcs.modified=true), so the
+# provenance never claims the whole tree equals the requested SHA.
+HARNESS_INJECTED = (
+    "cmd/benchresident/",
+    "cmd/benchobserver/",
+    "bin/",
+    "snapshot-provenance.json",
+)
 
 
 def run(cmd, cwd=None, check=True, **kw):
@@ -93,6 +102,49 @@ def source_identity(enola_root: Path) -> dict:
         "diff_sha256": sha256_bytes(diff + b"\0" + cached),
         "untracked_names_sha256": sha256_bytes("\n".join(untracked).encode()),
     }
+
+
+def snapshot_tree_state(dest: Path) -> dict:
+    """Classify a snapshot worktree: tracked edits vs harness-only additions."""
+    porcelain = git_out(dest, "status", "--porcelain", "--untracked-files=all")
+    tracked_modified, untracked, unexpected = [], [], []
+    for line in porcelain.splitlines():
+        if not line.strip():
+            continue
+        if line.startswith("?? "):
+            rel = line[3:]
+            untracked.append(rel)
+            if not any(rel.rstrip("/") == h.rstrip("/") or rel.startswith(h) for h in HARNESS_INJECTED):
+                unexpected.append(rel)
+        else:
+            tracked_modified.append(line)
+    return {
+        "tracked_modified": tracked_modified,
+        "untracked": untracked,
+        "untracked_outside_harness": unexpected,
+    }
+
+
+def vcs_stamp(go_version_m_text: str) -> dict:
+    """Read the vcs.* stamps Go embeds in the binary."""
+    out = {"vcs_revision": "", "vcs_modified": None}
+    for line in go_version_m_text.splitlines():
+        parts = line.strip().split("\t")
+        if not parts or parts[0] != "build" or len(parts) < 2:
+            continue
+        # `go version -m` emits build settings as "build\tkey=value"; tolerate
+        # a tab-separated "build\tkey\tvalue" spelling too.
+        if "=" in parts[1]:
+            key, _, value = parts[1].partition("=")
+        elif len(parts) >= 3:
+            key, value = parts[1], parts[2]
+        else:
+            continue
+        if key == "vcs.revision":
+            out["vcs_revision"] = value
+        elif key == "vcs.modified":
+            out["vcs_modified"] = value == "true"
+    return out
 
 
 def refuse_stale(path: Path) -> None:
@@ -183,13 +235,30 @@ def prepare_snapshot(enola_root: Path, dest: Path, rev: str, kind: str) -> dict:
     shutil.copyfile(HERE / "observer.go.txt", dest / "cmd" / "benchobserver" / "main.go")
     env = go_env()
     run([str(GOFMT), "-w", "cmd/benchresident/main.go", "cmd/benchobserver/main.go"], cwd=dest, env=env)
+    tree = snapshot_tree_state(dest)
+    if tree["untracked_outside_harness"]:
+        raise RuntimeError(
+            "unexpected untracked files in snapshot: " + "; ".join(tree["untracked_outside_harness"])
+        )
+    if not contains_uncommitted and tree["tracked_modified"]:
+        raise RuntimeError(
+            "committed snapshot has modified tracked files; refusing to label it committed: "
+            + "; ".join(tree["tracked_modified"])
+        )
     prov = {
         "kind": kind,
         "requested_rev": rev,
         "snapshot_commit": snapshot_commit,
         "source_worktree": ident,
         "snapshot_contains_uncommitted": contains_uncommitted,
-        "equate_snapshot_to_committed_rev": False if contains_uncommitted else True,
+        # Product source (tracked files) equals the requested SHA only for a
+        # committed snapshot with no tracked edits -- verified above, not assumed.
+        "product_source_equals_committed_rev": not contains_uncommitted,
+        # The full tree NEVER equals the SHA: harness packages are injected, so
+        # the built binary is stamped vcs.modified=true in both kinds.
+        "snapshot_tree_equals_committed_rev": False,
+        "snapshot_tree": tree,
+        "harness_injected_paths": list(HARNESS_INJECTED),
         "label": "experimental-patch" if contains_uncommitted else "committed",
         "copied_untracked_source": copied,
         "historical_note": HISTORICAL_SHAS.get(snapshot_commit, ""),
@@ -202,12 +271,16 @@ def prepare_snapshot(enola_root: Path, dest: Path, rev: str, kind: str) -> dict:
 
 def binary_record(path: Path) -> dict:
     text = go_version_m(path)
-    return {
+    rec = {
         "path": str(path),
         "sha256": sha256_file(path),
         "go_version_m": text,
         "go_version_m_sha256": sha256_bytes(text.encode()),
     }
+    rec.update(vcs_stamp(text))
+    # Always true for harness snapshots: injected bench packages are untracked.
+    rec["vcs_modified_explained_by_harness_injection"] = bool(rec.get("vcs_modified"))
+    return rec
 
 
 def build_snapshot(dest: Path) -> dict:
@@ -231,9 +304,31 @@ def build_snapshot(dest: Path) -> dict:
         if proc.returncode:
             raise RuntimeError(f"build {name} failed:\n{proc.stderr[-4000:]}")
         built[name] = binary_record(out)
-    info = {"dest": str(dest), "binaries": built}
     snap_prov = dest / "snapshot-provenance.json"
     data = json.loads(snap_prov.read_text()) if snap_prov.is_file() else {}
+    snapshot_commit = data.get("snapshot_commit", "")
+    if snapshot_commit:
+        for name, rec in built.items():
+            stamped = rec.get("vcs_revision") or ""
+            if not stamped:
+                raise RuntimeError(
+                    f"refusing unstamped binary {name}: no vcs.revision, so it cannot be "
+                    f"bound to snapshot commit {snapshot_commit}"
+                )
+            if stamped != snapshot_commit:
+                raise RuntimeError(
+                    f"binary {name} stamped vcs.revision {stamped} != snapshot commit {snapshot_commit}"
+                )
+    # Re-check the tree AFTER building so a build that mutated tracked sources
+    # cannot pass as a committed snapshot.
+    tree = snapshot_tree_state(dest)
+    if data.get("label") == "committed" and tree["tracked_modified"]:
+        raise RuntimeError(
+            "tracked files changed during build; snapshot is no longer the committed rev: "
+            + "; ".join(tree["tracked_modified"])
+        )
+    data["snapshot_tree_after_build"] = tree
+    info = {"dest": str(dest), "binaries": built}
     data["binaries"] = built
     data["built_ns"] = time.time_ns()
     snap_prov.write_text(json.dumps(data, indent=2) + "\n")
@@ -564,6 +659,22 @@ def self_test() -> int:
     check("resident not production watch", "not_production_graph_watch" in resident)
     check("driver comment not production watch", "not production `graph watch`" in driver or "not production" in driver)
     check("explicit rev required", "candidate/parent is not a pin" in me)
+    check("precise source claim", "product_source_equals_committed_rev" in me)
+    check("tree never equals rev", "snapshot_tree_equals_committed_rev" in me)
+    check("binary vcs stamp recorded", "vcs_revision" in me and "vcs_modified" in me)
+    check("binary bound to snapshot commit", "!= snapshot commit" in me)
+    check("post-build tracked recheck", "snapshot_tree_after_build" in me)
+    check("watch refuses to delete isolated copy", "refusing to delete existing isolated copy" in watch)
+    check(
+        "vcs_stamp parses go's key=value spelling",
+        vcs_stamp("\tbuild\tvcs.revision=abc123\n\tbuild\tvcs.modified=true\n")
+        == {"vcs_revision": "abc123", "vcs_modified": True},
+    )
+    check(
+        "vcs_stamp tolerates tab spelling",
+        vcs_stamp("\tbuild\tvcs.revision\tabc123\n")["vcs_revision"] == "abc123",
+    )
+    check("binary stamp required", "refusing unstamped binary" in me)
     check("never rmtree snapshot dest", "refusing to delete existing snapshot" in me)
     check("experimental patch kind", "experimental-patch" in me)
     check("watch harness graph watch", "graph watch" in watch)
@@ -592,6 +703,20 @@ def self_test() -> int:
             check("reject candidate alias", False)
         except SystemExit:
             check("reject candidate alias", True)
+        repo = tmp_path / "treerepo"
+        repo.mkdir()
+        run(["git", "init", "--quiet", str(repo)])
+        (repo / "tracked.txt").write_text("v1\n")
+        run(["git", "-C", str(repo), "add", "tracked.txt"])
+        run(["git", "-C", str(repo), "-c", "user.email=b@b", "-c", "user.name=b", "commit", "--quiet", "-m", "x"])
+        (repo / "cmd" / "benchobserver").mkdir(parents=True)
+        (repo / "cmd" / "benchobserver" / "main.go").write_text("package main\n")
+        state = snapshot_tree_state(repo)
+        check("harness additions are not tracked edits", not state["tracked_modified"], str(state))
+        check("harness additions recognised", not state["untracked_outside_harness"], str(state))
+        (repo / "tracked.txt").write_text("v2\n")
+        state = snapshot_tree_state(repo)
+        check("tracked edit detected", bool(state["tracked_modified"]), str(state))
         for name in ("resident-driver.go.txt", "observer.go.txt"):
             src = (HERE / name).read_text()
             dest = tmp_path / (name.replace(".txt", ""))

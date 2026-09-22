@@ -3,6 +3,16 @@
 //
 // Batches and EndReplace carry run_id only. BeginReplace registers that run on a
 // persistent Consumer keyed by repo_id+context_id so deltas keep LastGeneration.
+//
+// consumer.jsonl still carries exactly one frame per COMPLETED generation (End).
+// An in-flight generation -- Begin published, End not yet -- is invisible there,
+// so a harness cannot tell "nothing queued" from "analysis still running".
+// Set OBSERVER_LIFECYCLE_FILE to also append one record per Begin and per End:
+//   {"record":"begin","run_id":...,"context":...,"broker_ns":...}
+//   {"record":"end","run_id":...,"context":...,"broker_ns":...}
+// Begin run_ids with no matching end record are OBSERVED incomplete Begin/End
+// pairs. This is additive: when the env var is unset, output is byte-identical
+// to before, so resident.py and older readers are unaffected.
 package main
 
 import (
@@ -45,6 +55,26 @@ func main() {
 		fail("open jsonl: %v", err)
 	}
 	defer out.Close()
+	// Optional second stream: Begin/End lifecycle records for open-pair tracking.
+	var lcEnc *json.Encoder
+	var lcFile *os.File
+	if lcPath := os.Getenv("OBSERVER_LIFECYCLE_FILE"); lcPath != "" {
+		lcFile, err = os.OpenFile(lcPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o644)
+		if err != nil {
+			fail("open lifecycle jsonl: %v", err)
+		}
+		defer lcFile.Close()
+		lcEnc = json.NewEncoder(lcFile)
+	}
+	lifecycle := func(rec map[string]any) {
+		if lcEnc == nil {
+			return
+		}
+		if err := lcEnc.Encode(rec); err != nil {
+			fail("write lifecycle record: %v", err)
+		}
+		_ = lcFile.Sync()
+	}
 	ctx := context.Background()
 	nc, err := nats.Connect(url, nats.Name("enola-bench-observer"), nats.Timeout(5*time.Second))
 	if err != nil {
@@ -139,6 +169,18 @@ func main() {
 				ownerScopeCount: begin.OwnerScopeCount,
 				baseGeneration:  begin.BaseGeneration, targetGeneration: begin.TargetGeneration,
 			}
+			lifecycle(map[string]any{
+				"record":            "begin",
+				"run_id":            probe.RunID,
+				"context":           probe.ContextID,
+				"repo_id":           probe.RepoID,
+				"broker_ns":         brokerNS,
+				"observed_local_ns": time.Now().UnixNano(),
+				"base_generation":   begin.BaseGeneration,
+				"target_generation": begin.TargetGeneration,
+				"scope_mode":        begin.ScopeMode,
+				"owner_scope_count": begin.OwnerScopeCount,
+			})
 		case graphstream.TypeBatch, graphstream.TypeEndReplace:
 			fr := byRun[probe.RunID]
 			if fr == nil {
@@ -178,6 +220,15 @@ func main() {
 					fail("write frame: %v", err)
 				}
 				_ = out.Sync()
+				lifecycle(map[string]any{
+					"record":            "end",
+					"run_id":            probe.RunID,
+					"context":           fr.contextID,
+					"repo_id":           fr.repoID,
+					"broker_ns":         brokerNS,
+					"observed_local_ns": appliedNS,
+					"target_generation": fr.targetGeneration,
+				})
 				delete(byRun, probe.RunID)
 			}
 		}
