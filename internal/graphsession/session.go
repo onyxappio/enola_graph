@@ -332,12 +332,18 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	tsRecords := map[string]*tsextractor.FileRecord{}
 
 	prevFiles := map[string]*FileState{}
+	prevFilesStart := time.Now()
 	if s.state != nil {
 		for k, v := range s.state.Files {
-			prevFiles[k] = cloneFileState(v)
+			// FileState records are immutable for the duration of a run. Keep a
+			// shallow owner map here and let the existing mutation helpers clone
+			// only records they actually replace or retire. Cloning every
+			// contribution map on a no-op used to make a 5k-file state pay a
+			// repository-sized copy before it could return zero work.
+			prevFiles[k] = v
 		}
 	}
-	tr.Mark("clone_file_state", fmt.Sprintf("n=%d", len(prevFiles)))
+	graphprofile.Since("clone_file_state_copy", prevFilesStart, fmt.Sprintf("n=%d", len(prevFiles)))
 	extractorDigest := map[string]string{}
 	if s.state != nil && s.state.ExtractorDigest != nil {
 		for k, v := range s.state.ExtractorDigest {
