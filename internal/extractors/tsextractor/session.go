@@ -30,6 +30,12 @@ type ExtractStats struct {
 	GraphQLParsed int `json:"graphql_parsed"`
 	SFCParsed     int `json:"sfc_parsed"`
 	SummaryScans  int `json:"summary_scans"`
+	// DerivedIndexes counts export indexes taken from a tree the extractor had
+	// already parsed. It is reported beside SummaryScans, never inside it:
+	// SummaryScans stays a count of actual parses so a drop in it is a drop in
+	// real work, and this says how much of that drop was work moved rather than
+	// work skipped.
+	DerivedIndexes int `json:"derived_indexes"`
 }
 
 // FileRecord is the immutable per-file contribution persisted between generations.
@@ -121,19 +127,43 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	}
 	ctx = withFileOverlay(ctx, newFileOverlay(repoPath, hooks.Sources))
 	allDirty := dirty == nil
-	tr := graphprofile.Start()
+	tr := graphprofile.StartNamed("ts")
 
+	// Each of these is an independent repository walk, and a delta that parses
+	// four files can still pay for all of them. One ts_detect_frameworks mark
+	// could not say which; timing them separately is what makes the discovery
+	// cost attributable before anything tries to share it. graphprofile.Since
+	// is a no-op unless ENOLA_GRAPH_PROFILE is set, so this is two clock reads
+	// per walk when profiling is off.
+	tDisc := time.Now()
 	isNextJS := detectNextJS(repoPath, inputScope)
+	graphprofile.Since("ts_disc_nextjs", tDisc, "")
+	tDisc = time.Now()
 	nuxtPkgs := collectNuxtPackages(ctx, repoPath, inputScope)
+	graphprofile.Since("ts_disc_nuxt_packages", tDisc, fmt.Sprintf("pkgs=%d", len(nuxtPkgs)))
 	isNuxt := len(nuxtPkgs) > 0
+	tDisc = time.Now()
 	isSvelteKit := detectSvelteKit(repoPath, inputScope)
+	graphprofile.Since("ts_disc_sveltekit", tDisc, "")
+	tDisc = time.Now()
 	isEmber := detectEmber(repoPath, inputScope)
+	graphprofile.Since("ts_disc_ember", tDisc, "")
+	tDisc = time.Now()
 	isReactNav := detectReactNavigation(repoPath, inputScope)
+	graphprofile.Since("ts_disc_react_navigation", tDisc, "")
+	tDisc = time.Now()
 	isAngular := detectAngular(repoPath, inputScope)
+	graphprofile.Since("ts_disc_angular", tDisc, "")
+	tDisc = time.Now()
 	pkgGates := collectPackageGates(ctx, repoPath, inputScope)
+	graphprofile.Since("ts_disc_package_gates", tDisc, "")
+	tDisc = time.Now()
 	pkgNamesEarly := collectPackageNames(repoPath, inputScope)
+	graphprofile.Since("ts_disc_package_names", tDisc, fmt.Sprintf("names=%d", len(pkgNamesEarly)))
 	isPrisma := pkgGates.anyPrisma
+	tDisc = time.Now()
 	aliasRoots := collectTSAliasRoots(ctx, repoPath, inputScope)
+	graphprofile.Since("ts_disc_alias_roots", tDisc, fmt.Sprintf("roots=%d", len(aliasRoots)))
 	if isSvelteKit {
 		aliasRoots = withSvelteKitAliasFallbacks(repoPath, aliasRoots, inputScope)
 	}
@@ -154,7 +184,9 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			htmlFiles = append(htmlFiles, relFile)
 		}
 	}
+	tAliases := time.Now()
 	pkgAliases := collectPackageAliases(ctx, repoPath, knownFiles, inputScope)
+	graphprofile.Since("ts_disc_package_aliases", tAliases, fmt.Sprintf("aliases=%d", len(pkgAliases)))
 
 	need := func(rel string) bool {
 		if allDirty {
@@ -403,7 +435,8 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	stats.FilesParsed = parsed
 	stats.SFCParsed = sfc
 	stats.SummaryScans = len(routerFiles) + len(angularRouters) + exportCache.summaryScans()
-	tr.Mark("ts_mapfiles_aggregate", fmt.Sprintf("parsed=%d facts=%d routers=%d", parsed, len(allFacts), len(routerFiles)))
+	stats.DerivedIndexes = exportCache.derivedIndexes()
+	tr.Mark("ts_mapfiles_aggregate", fmt.Sprintf("parsed=%d facts=%d routers=%d scans=%d derived=%d", parsed, len(allFacts), len(routerFiles), stats.SummaryScans, stats.DerivedIndexes))
 
 	if mounted := composeRouterMounts(routerFiles); len(mounted) > 0 {
 		allFacts = append(allFacts, mounted...)

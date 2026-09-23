@@ -379,6 +379,81 @@ func factsFingerprint(ff []facts.Fact) string {
 	return hex.EncodeToString(sum.Sum(nil))
 }
 
+// setExtractorSeenHash records hash as the input this extractor was last run
+// against for one file, leaving the facts it contributed alone. It is the write
+// that nonTSExtractorNeed reads back: without it the file keeps a hash the
+// extractor has in fact already seen, and the next run re-extracts for the same
+// reason, forever.
+func setExtractorSeenHash(prev map[string]*FileState, key, extName, hash string) {
+	st := prev[key]
+	if st == nil {
+		// A file the extractor owns but derived nothing from has no entry at
+		// all, and an empty seen hash never matches, so without this the
+		// newcomer retriggers the extractor on every later run. This is the
+		// same entry storeExtractorContribution would have created had the
+		// extractor produced no facts for it.
+		prev[key] = &FileState{
+			Hash:        hash,
+			Extractor:   extName,
+			ContribHash: map[string]string{extName: hash},
+		}
+		return
+	}
+	if extractorSeenHash(st, extName) == hash {
+		return
+	}
+	st = cloneFileState(st)
+	prev[key] = st
+	if st.ContribHash == nil {
+		st.ContribHash = map[string]string{}
+	}
+	st.ContribHash[extName] = hash
+	if st.Extractor == extName && st.TS == nil {
+		st.Hash = hash
+	}
+}
+
+// refreshExtractorObservedInputs closes the whole-output short-circuit over the
+// same file set nonTSExtractorNeed inspects. The short-circuit is taken when a
+// re-extraction proved the extractor's facts identical, which is exactly when
+// nothing is published - so the per-file bookkeeping is the only place the new
+// input can be recorded. A semantically neutral edit (a package version bump)
+// otherwise leaves every later run needing the extractor again, announcing a
+// Begin and advancing a generation on an unchanged repository.
+//
+// Facts are deliberately not rewritten: the fingerprint is taken over whole
+// marshalled facts including their file, so an identical fingerprint means the
+// per-file contributions are identical too, and a file that left the repository
+// can only have contributed nothing.
+func refreshExtractorObservedInputs(prev map[string]*FileState, owned []string, hashes map[string]string, extName string) {
+	if prev == nil {
+		return
+	}
+	seen := make(map[string]bool, len(owned))
+	for _, f := range owned {
+		f = filepath.ToSlash(f)
+		seen[f] = true
+		if h, ok := lookupHash(hashes, f); ok {
+			setExtractorSeenHash(prev, f, extName, h)
+		}
+	}
+	var gone []string
+	for path, st := range prev {
+		if seen[filepath.ToSlash(path)] || !extractorOwnsState(st, extName) {
+			continue
+		}
+		h, still := lookupHash(hashes, path)
+		if !still {
+			gone = append(gone, path)
+			continue
+		}
+		setExtractorSeenHash(prev, path, extName, h)
+	}
+	for _, path := range gone {
+		dropExtractorContributionAt(prev, path, extName)
+	}
+}
+
 func nonTSExtractorNeed(owned []string, prevFiles map[string]*FileState, hashes map[string]string, extName, prevScan, scanHash string, forceAll, configChanged bool) bool {
 	if forceAll || configChanged {
 		return true

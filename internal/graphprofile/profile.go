@@ -27,20 +27,28 @@ func Log(phase string, d time.Duration, extra string) {
 	fmt.Fprintf(os.Stderr, "[graph-profile] %-32s %7.3fs  %s\n", phase, d.Seconds(), extra)
 }
 
-// Trace is a sequential phase timer from a single start point.
+// Trace is a sequential phase timer from a single start point. A process runs
+// several of these at once and they nest, so every Mark line carries the name
+// of the trace it belongs to: only the Marks of one trace partition that
+// trace's window, and summing across names double counts the nested ones.
 type Trace struct {
 	mu   sync.Mutex
+	name string
 	t0   time.Time
 	last time.Time
 }
 
-// Start begins a trace. Returns nil when profiling is off so calls stay cheap.
-func Start() *Trace {
+// Start begins an unnamed trace. Returns nil when profiling is off so calls
+// stay cheap.
+func Start() *Trace { return StartNamed("") }
+
+// StartNamed begins a trace that labels its Mark lines with name.
+func StartNamed(name string) *Trace {
 	if !Enabled() {
 		return nil
 	}
 	now := time.Now()
-	return &Trace{t0: now, last: now}
+	return &Trace{name: name, t0: now, last: now}
 }
 
 // Mark records elapsed time since the previous Mark (or Start).
@@ -54,11 +62,15 @@ func (t *Trace) Mark(phase string, extra string) {
 	total := now.Sub(t.t0)
 	t.last = now
 	t.mu.Unlock()
+	name := t.name
+	if name == "" {
+		name = "unnamed"
+	}
 	if extra == "" {
-		fmt.Fprintf(os.Stderr, "[graph-profile] %-32s %7.3fs  total=%6.3fs\n", phase, dt.Seconds(), total.Seconds())
+		fmt.Fprintf(os.Stderr, "[graph-profile] %-32s %7.3fs  total=%6.3fs  trace=%s\n", phase, dt.Seconds(), total.Seconds(), name)
 		return
 	}
-	fmt.Fprintf(os.Stderr, "[graph-profile] %-32s %7.3fs  total=%6.3fs  %s\n", phase, dt.Seconds(), total.Seconds(), extra)
+	fmt.Fprintf(os.Stderr, "[graph-profile] %-32s %7.3fs  total=%6.3fs  trace=%s  %s\n", phase, dt.Seconds(), total.Seconds(), name, extra)
 }
 
 // Since logs a duration measured by the caller.

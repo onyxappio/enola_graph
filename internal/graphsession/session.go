@@ -182,7 +182,7 @@ func Run(ctx context.Context, eng *engine.Engine, repoPath string, sink graphstr
 
 // OpenSession owns the single-writer lock and recovers durable delivery before use.
 func OpenSession(ctx context.Context, eng *engine.Engine, repoPath string, sink graphstream.Sink, opts Options) (*Resident, error) {
-	tr := graphprofile.Start()
+	tr := graphprofile.StartNamed("open")
 	abs, err := filepath.Abs(repoPath)
 	if err != nil {
 		return nil, err
@@ -738,6 +738,10 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 						}
 					}
 					previewFacts, previewProof, perr := s.prepareFrozenTS(ctx, prevFiles, inv.Files, hashes, dirty, retired, angular)
+					// The planning extract is a full TS session of its own; without
+					// its own mark its cost hides inside the gap between load_state
+					// and ts_extract_session.
+					tr.Mark("ts_frozen_preview", fmt.Sprintf("dirty=%d err=%v", dirtyCount(dirty), perr != nil))
 					if perr != nil {
 						wholeDomain = true
 						fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "planning extract of dirty files failed; using whole domain"})
@@ -758,6 +762,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			}
 			var planReason string
 			s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, wholeDomain, extraOwners, membership, proof)
+			tr.Mark("invalidation_plan", fmt.Sprintf("reason=%s whole=%v extra=%d", planReason, wholeDomain, len(extraOwners)))
 			if err != nil {
 				return nil, err
 			}
@@ -770,6 +775,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				// domain rather than publishing an empty manifest.
 				wholeDomain = true
 				s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, true, nil, membership, nil)
+				tr.Mark("invalidation_plan_retry", fmt.Sprintf("reason=%s", planReason))
 				if err != nil {
 					return nil, err
 				}
@@ -794,6 +800,10 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			if err := s.pub.Flush(ctx); err != nil {
 				return nil, err
 			}
+			// Begin carries the whole replace scope, so this mark is the encode
+			// and transport cost of the frozen scope itself, separate from the
+			// resolved-fact publication measured later by publish_resolved.
+			tr.Mark("begin_publish", fmt.Sprintf("scope=%d", len(s.replaceScope)))
 		}
 	}
 
@@ -1195,6 +1205,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 					res.Stats.GraphQLParsed = acc.GraphQLParsed + more.Stats.GraphQLParsed
 					res.Stats.SFCParsed = acc.SFCParsed + more.Stats.SFCParsed
 					res.Stats.SummaryScans = acc.SummaryScans + more.Stats.SummaryScans
+					res.Stats.DerivedIndexes = acc.DerivedIndexes + more.Stats.DerivedIndexes
 					workRecs = more.Records
 					for p := range need {
 						seen[p] = true
@@ -1304,6 +1315,13 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				syn := cloneTagged(syntheticFactsFor(s.state, ext.Name()), repoID)
 				allFacts = append(allFacts, syn...)
 				appendExtractorSynthetic(synByExt, ext.Name(), syn)
+				// Record the inputs this proof was made against. Returning here
+				// without doing so is what left a version-only manifest edit
+				// needing the extractor on every later run: each run re-extracted,
+				// proved nothing changed, published a Begin anyway because the
+				// plan had already frozen, and advanced a generation on an
+				// unchanged repository.
+				refreshExtractorObservedInputs(prevFiles, owned, hashes, ext.Name())
 				needByExt[ext.Name()] = false
 				continue
 			}
@@ -1555,8 +1573,11 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		if err := s.pub.Flush(ctx); err != nil {
 			return nil, err
 		}
+		tr.Mark("begin_publish_late", fmt.Sprintf("scope=%d", len(s.replaceScope)))
 	} else if err := s.publishScope(ctx, runID, s.replaceScope); err != nil {
 		return nil, err
+	} else {
+		tr.Mark("publish_scope", fmt.Sprintf("scope=%d", len(s.replaceScope)))
 	}
 
 	if len(unreadable) > 0 {
@@ -1577,6 +1598,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		}
 		published++
 	}
+	tr.Mark("encode_append_owners", fmt.Sprintf("published=%d", published))
 	if err := s.flushPhase(ctx, runID, graphstream.PhaseResolved); err != nil {
 		return nil, err
 	}
@@ -1699,6 +1721,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	if !journalHasAckedEnd(journal, runID) {
 		return nil, fmt.Errorf("graphsession: EndReplace for %s was not acknowledged; leaving pending-state in place", runID)
 	}
+	tr.Mark("end_flush_ack", "")
 	if err := promotePendingState(s.opts.StateDir); err != nil {
 		return nil, err
 	}
@@ -1707,7 +1730,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	}
 	_ = os.Remove(filepath.Join(s.opts.StateDir, "pending.json"))
 	s.state = next
-	tr.Mark("end_flush_promote", fmt.Sprintf("parsed=%d published=%d", stats.FilesParsed, published))
+	tr.Mark("promote_compact_state", fmt.Sprintf("parsed=%d published=%d", stats.FilesParsed, published))
 
 	classified := 0
 	for _, n := range invalidation.ParsedByReason {
@@ -2444,6 +2467,7 @@ func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*Fil
 		stats.GraphQLParsed += r.Stats.GraphQLParsed
 		stats.SFCParsed += r.Stats.SFCParsed
 		stats.SummaryScans += r.Stats.SummaryScans
+		stats.DerivedIndexes += r.Stats.DerivedIndexes
 		for _, u := range r.Unreadable {
 			unreadable[u] = true
 		}

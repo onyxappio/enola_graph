@@ -10,6 +10,7 @@ import (
 
 	"github.com/enola-labs/enola/internal/config"
 	"github.com/enola-labs/enola/internal/engine"
+	"github.com/enola-labs/enola/internal/graphprofile"
 	"github.com/enola-labs/enola/internal/graphsession"
 	"github.com/enola-labs/enola/internal/graphstream"
 	"github.com/enola-labs/enola/pkg/bootstrap"
@@ -82,7 +83,15 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 		arg = rest[0]
 	}
 
+	// Everything from process start to the first session trace was an untraced
+	// residual in root's profile: config discovery, repository selection and
+	// engine construction happen here, before any graph hop exists to attribute
+	// them to. This trace is the outermost of the five and never nests inside
+	// another, so its marks partition the CLI's own wall time.
+	ctr := graphprofile.StartNamed("cli")
+	ctr.Mark("flags_parsed", "mode="+mode)
 	tgt := r.resolveGraphTarget(arg, *configPath, []string{*stateDir, *events})
+	ctr.Mark("resolve_graph_target", fmt.Sprintf("repos=%d", len(tgt.repoPaths)))
 	fmt.Fprintf(os.Stderr, r.name()+" graph: %s\n", tgt.configNote)
 	tgt.engine.SetPersistCache(false)
 
@@ -152,6 +161,7 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 		defer fsink.Close()
 		sink = fsink
 	}
+	ctr.Mark("connect_sink", fmt.Sprintf("nats=%v", *natsURL != ""))
 
 	optsFor := func(repo string) graphsession.Options {
 		opts := graphsession.Options{
@@ -221,6 +231,7 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 	var results []*graphsession.Result
 	for _, repo := range tgt.repoPaths {
 		opts := optsFor(repo)
+		ctr.Mark("session_options", "repo="+repo)
 		if (mode == "delta" || mode == "analyze") && *baseStateDir != "" {
 			if opts.StateDir == "" {
 				r.cmdFatal("graph", "--base-state-dir requires --state-dir for the new context")
@@ -245,6 +256,10 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 		if err != nil {
 			r.cmdFatal("graph", "%s: %v", repo, err)
 		}
+		// Covers the whole of Run, which the open/session traces partition from
+		// the inside; the cli trace only needs it as one block so that whatever
+		// remains after it is genuinely CLI-side.
+		ctr.Mark("graph_session_run", fmt.Sprintf("repo=%s parsed=%d", repo, res.ParsedFiles))
 		results = append(results, res)
 		fmt.Fprintf(os.Stderr, "[graph] %s: generation %d→%d parsed=%d cached=%d early_local=%d fallbacks=%d\n",
 			repo, res.BaseGeneration, res.TargetGeneration, res.ParsedFiles, res.Stats.CachedFiles, res.EarlyLocal, len(res.Fallbacks))
@@ -266,6 +281,9 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 		}
 		fmt.Println(string(out))
 	}
+	// Terminal mark: result marshalling of a full --json run is not free, and
+	// without this it lands after the last mark and outside the trace.
+	ctr.Mark("cli_complete", fmt.Sprintf("results=%d", len(results)))
 }
 
 type eventFileSink struct {
