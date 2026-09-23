@@ -795,7 +795,7 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 		}
 	}
 	if !facts.IsTestPath(relFile) {
-		result = append(result, extractNitroFacts(src, relFile, isNuxt, aliases, knownFiles)...)
+		result = append(result, extractNitroFacts(kinds, root, src, relFile, isNuxt, aliases, knownFiles)...)
 	}
 
 	return result, angular, router, inlineTemplates, httpFile, clients

@@ -240,6 +240,28 @@ export function registerServerProxy() {
 function addServerHandler(opts: { route: string }) {}
 addServerHandler({ route: '/invented' })
 `,
+		"src/shadow.ts": `
+import { addServerHandler } from '@nuxt/kit'
+export function registerReal() {
+  addServerHandler({ route: '/real-handler', handler: './handler' })
+}
+function shadow(addServerHandler: any) {
+  addServerHandler({ route: '/fake-handler', handler: './handler' })
+}
+export function nested() {
+  function addServerHandler(_opts: any) {}
+  addServerHandler({ route: '/local-shadow', handler: './handler' })
+  {
+    const inner = () => {
+      addServerHandler({ route: '/still-local', handler: './handler' })
+    }
+    inner()
+  }
+}
+export function recovered() {
+  addServerHandler({ route: '/recovered', handler: './handler' })
+}
+`,
 		"server/middleware/auth.ts": `export default defineEventHandler(() => {})`,
 	}, false)
 	var names []string
@@ -269,6 +291,16 @@ addServerHandler({ route: '/invented' })
 	if !foundPage {
 		t.Fatalf("missing nuxt page /: %v", names)
 	}
+	shadow := byFile["src/shadow.ts"]
+	shadowGot := map[string]bool{}
+	for _, f := range shadow {
+		shadowGot[f.Name] = true
+	}
+	for _, p := range []string{"/real-handler", "/recovered"} {
+		if !shadowGot[p] {
+			t.Errorf("missing lexical addServerHandler %s in %+v", p, shadowGot)
+		}
+	}
 	reg := byFile["src/registerServerProxy.ts"]
 	got := map[string]bool{}
 	for _, f := range reg {
@@ -292,8 +324,8 @@ addServerHandler({ route: '/invented' })
 		t.Errorf("want one /land/** declaration, got %d", landCount)
 	}
 	for _, f := range ff {
-		if f.Kind == facts.KindRoute && f.Name == "/invented" {
-			t.Fatal("fake addServerHandler fabricated a route")
+		if f.Kind == facts.KindRoute && (f.Name == "/invented" || f.Name == "/fake-handler" || f.Name == "/local-shadow" || f.Name == "/still-local") {
+			t.Fatalf("shadowed addServerHandler fabricated %s", f.Name)
 		}
 		if f.Kind == facts.KindRoute && f.File == "server/middleware/auth.ts" {
 			t.Fatal("middleware must not emit a route")

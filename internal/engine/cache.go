@@ -2488,7 +2488,9 @@ import (
 // v290: reconcile parallel accuracy and main branches: retain import replay
 // specifiers with exact file provenance alongside all wave5 extraction fixes.
 // Both branches used v288 independently; no old cache may cross this merge.
-const cacheVersion = "v290"
+// v291: addServerHandler routes require a source-proven @nuxt/kit lexical
+// binding at the call site (parameter/local shadows are not Nitro).
+const cacheVersion = "v291"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

@@ -1295,6 +1295,60 @@ func TestFrozenInterruptedPublishReopen(t *testing.T) {
 	assertAppliedEqualsCold(t, cons, oracle)
 }
 
+func TestFrozenSFCSiblingDeleteStaysInBeginAndEqualsCold(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"package.json": `{"name":"app","dependencies":{"vue":"*"}}`,
+		"src/A.vue":    `<script setup lang="ts">function onClick(){return 1;}</script><template><button @click="onClick()"/></template>`,
+		"src/B.vue":    `<script setup lang="ts">function onClick(){return 2;}</script><template><button @click="onClick()"/></template>`,
+	})
+	eng := testEngine(t, root)
+	state := t.TempDir()
+	opts := Options{StateDir: state, AuthoritativeFiles: true}
+	s1 := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, s1, opts); err != nil {
+		t.Fatal(err)
+	}
+	cons := NewConsumer()
+	if err := cons.ApplyRecords(s1.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Remove(filepath.Join(root, "src/B.vue")); err != nil {
+		t.Fatal(err)
+	}
+	s2 := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, s2, opts); err != nil {
+		t.Fatal(err)
+	}
+	owners := beginOwnerSet(t, s2)
+	if !owners["src/B.vue"] {
+		t.Fatalf("deleted SFC missing from frozen Begin: %v", owners)
+	}
+	if err := cons.ApplyRecords(s2.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	var aCalls int
+	for _, e := range cons.Edges[ownerKey("src/A.vue")] {
+		if e.Kind == facts.RelCalls && e.TargetName == "src.onClick" {
+			aCalls++
+			if e.Resolution != graphstream.ResResolved || e.TargetID == "" {
+				t.Fatalf("A.vue own onClick resolution=%s target=%q", e.Resolution, e.TargetID)
+			}
+		}
+	}
+	if aCalls == 0 {
+		t.Fatalf("surviving SFC lost own-file src.onClick call; edges=%+v", cons.Edges[ownerKey("src/A.vue")])
+	}
+	cold := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, cold, Options{StateDir: t.TempDir(), AuthoritativeFiles: true}); err != nil {
+		t.Fatal(err)
+	}
+	oracle := NewConsumer()
+	if err := oracle.ApplyRecords(cold.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, cons, oracle)
+}
+
 func TestFrozenOutOfScopeFactAfterBegin(t *testing.T) {
 	c := NewConsumer()
 	owner := graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: "a.ts"}

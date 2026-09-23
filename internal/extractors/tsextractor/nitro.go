@@ -6,13 +6,14 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/tsutil"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
+	sitter "github.com/tree-sitter/go-tree-sitter"
 )
 
 var (
-	addServerHandlerCall = regexp.MustCompile(`(?:^|[^.$\w])addServerHandler\s*\(\s*\{`)
-	nitroMethodSuffixes  = map[string]string{
+	nitroMethodSuffixes = map[string]string{
 		"get": "GET", "post": "POST", "put": "PUT", "patch": "PATCH",
 		"delete": "DELETE", "options": "OPTIONS", "head": "HEAD",
 		"all": "*",
@@ -20,7 +21,7 @@ var (
 	handlerResolvePath = regexp.MustCompile(`(?:^|[,{])\s*handler\s*:\s*(?:[A-Za-z_$][\w$]*\s*\.\s*resolve\s*\(\s*)?["'](\./[^"']+)["']`)
 )
 
-func extractNitroFacts(src []byte, relFile string, isNuxt bool, aliases map[string]tsAlias, knownFiles map[string]bool) []facts.Fact {
+func extractNitroFacts(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, isNuxt bool, aliases map[string]tsAlias, knownFiles map[string]bool) []facts.Fact {
 	var out []facts.Fact
 	if isNuxt {
 		if route := detectNitroFileRoute(relFile); route != nil {
@@ -28,7 +29,7 @@ func extractNitroFacts(src []byte, relFile string, isNuxt bool, aliases map[stri
 		}
 	}
 	if bytes.Contains(src, []byte("@nuxt/kit")) {
-		out = append(out, extractAddServerHandlerFacts(src, relFile, aliases, knownFiles)...)
+		out = append(out, extractAddServerHandlerFacts(kinds, root, src, relFile, aliases, knownFiles)...)
 	}
 	return out
 }
@@ -106,34 +107,29 @@ func detectNitroFileRoute(relFile string) *facts.Fact {
 	}
 }
 
-func extractAddServerHandlerFacts(src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool) []facts.Fact {
+func extractAddServerHandlerFacts(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool) []facts.Fact {
 	if !bytes.Contains(src, []byte("addServerHandler")) {
 		return nil
 	}
-	mask := tsCommentStringMask(src)
+	locals := nuxtKitAddServerHandlerLocals(kinds, root, src)
+	if len(locals) == 0 {
+		return nil
+	}
 	type decl struct {
 		path, handler, method string
 		line                  int
 	}
 	var decls []decl
-	for _, loc := range addServerHandlerCall.FindAllIndex(src, -1) {
-		if mask[loc[0]] {
-			continue
-		}
-		brace := bytes.IndexByte(src[loc[0]:], '{')
-		if brace < 0 {
-			continue
-		}
-		open := loc[0] + brace
+	addObj := func(open int) {
 		end, ok := matchObjectLiteral(src, open)
 		if !ok {
-			continue
+			return
 		}
 		obj := src[open : end+1]
 		raw := objectLiteralStringField(obj, "route")
 		path, ok := cleanServerPath(raw)
 		if !ok {
-			continue
+			return
 		}
 		handler := ""
 		if hm := handlerResolvePath.FindSubmatch(obj); hm != nil {
@@ -158,6 +154,34 @@ func extractAddServerHandlerFacts(src []byte, relFile string, aliases map[string
 			method:  method,
 		})
 	}
+	var walk func(*sitter.Node)
+	walk = func(n *sitter.Node) {
+		if n == nil {
+			return
+		}
+		if kindOf(kinds, n) == "call_expression" {
+			fn := n.ChildByFieldName("function")
+			if fn != nil && kindOf(kinds, fn) == "identifier" {
+				name := nodeText(fn, src)
+				if locals[name] && !graphqlImportedNameShadowed(kinds, fn, src, name) {
+					args := n.ChildByFieldName("arguments")
+					if args != nil {
+						for i := range args.NamedChildCount() {
+							arg := args.NamedChild(i)
+							if arg != nil && kindOf(kinds, arg) == "object" {
+								addObj(int(arg.StartByte()))
+								break
+							}
+						}
+					}
+				}
+			}
+		}
+		for i := range n.NamedChildCount() {
+			walk(n.NamedChild(i))
+		}
+	}
+	walk(root)
 	if len(decls) == 0 {
 		return nil
 	}
@@ -210,6 +234,54 @@ func extractAddServerHandlerFacts(src []byte, relFile string, aliases map[string
 			}
 		}
 		out = append(out, f)
+	}
+	return out
+}
+
+func nuxtKitAddServerHandlerLocals(kinds *tsutil.KindTable, root *sitter.Node, src []byte) map[string]bool {
+	out := map[string]bool{}
+	if kinds == nil || root == nil {
+		return out
+	}
+	for i := range root.ChildCount() {
+		stmt := root.Child(i)
+		if kindOf(kinds, stmt) != "import_statement" {
+			continue
+		}
+		source := findChildByKind(kinds, stmt, "string")
+		if source == nil {
+			continue
+		}
+		pkg := strings.Trim(nodeText(source, src), `"'`)
+		if pkg != "@nuxt/kit" {
+			continue
+		}
+		var walkClause func(*sitter.Node)
+		walkClause = func(n *sitter.Node) {
+			if n == nil {
+				return
+			}
+			switch kindOf(kinds, n) {
+			case "import_specifier":
+				imported := n.ChildByFieldName("name")
+				local := n.ChildByFieldName("alias")
+				if local == nil {
+					local = imported
+				}
+				if imported != nil && nodeText(imported, src) == "addServerHandler" && local != nil {
+					if name := nodeText(local, src); name != "" {
+						out[name] = true
+					}
+				}
+			case "namespace_import":
+				// kit.addServerHandler is not a bare identifier call.
+			default:
+				for j := range n.NamedChildCount() {
+					walkClause(n.NamedChild(j))
+				}
+			}
+		}
+		walkClause(stmt)
 	}
 	return out
 }
