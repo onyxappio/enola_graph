@@ -1982,11 +1982,17 @@ func objectPatternImportBindings(kinds *tsutil.KindTable, n *sitter.Node, src []
 			val = n.NamedChild(1)
 		}
 		exportName := strings.TrimSpace(nodeText(key, src))
-		locals := bindingNamesFromPattern(kinds, val, src)
-		if exportName == "" || len(locals) == 0 {
+		if exportName == "" || val == nil {
 			break
 		}
-		out = append(out, objectImportBinding{export: exportName, local: locals[0]})
+		switch kindOf(kinds, val) {
+		case "identifier", "shorthand_property_identifier_pattern", "shorthand_property_identifier":
+			local := strings.TrimSpace(nodeText(val, src))
+			if local != "" {
+				out = append(out, objectImportBinding{export: exportName, local: local})
+			}
+		}
+		// Nested object/array patterns are not proven module-export aliases.
 	}
 	return out
 }

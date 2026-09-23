@@ -2511,7 +2511,10 @@ import (
 // calls; awaited literal dynamic-import destructuring binds in lexical scope;
 // extensionless relative imports fall back to declaration-only .d.ts after
 // implementation candidates.
-const cacheVersion = "v296"
+// v297: awaited dynamic-import object patterns bind only proven export aliases
+// (shorthand and identifier rename). Nested object patterns stay unbound instead
+// of mapping the inner local to the outer container export.
+const cacheVersion = "v297"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

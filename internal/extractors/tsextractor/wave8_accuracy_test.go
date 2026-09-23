@@ -1,6 +1,7 @@
 package tsextractor
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/enola-labs/enola/internal/facts"
@@ -252,8 +253,16 @@ export async function nonliteral(path: string) {
   const { work } = await import(path);
   work();
 }
+export async function nestedPattern() {
+  const { nested: { work } } = await import('./deps/a');
+  work();
+}
+export function unawaited() {
+  const { work } = import('./deps/a');
+  work();
+}
 `,
-		"src/deps/a.ts": "export function work() { return 'a' }\n",
+		"src/deps/a.ts": "export function work() { return 'a' }\nexport const nested = { work() { return 1 } }\n",
 		"src/deps/b.ts": "export function work() { return 'b' }\n",
 	}, false)
 	want := map[string]string{
@@ -280,12 +289,24 @@ export async function nonliteral(path: string) {
 			t.Fatalf("%s missing imported work call: %+v", name, f.Relations)
 		}
 	}
-	for _, name := range []string{"src.parameter", "src.localShadow", "src.outsider", "src.nonliteral"} {
+	for _, name := range []string{"src.parameter", "src.localShadow", "src.outsider", "src.nonliteral", "src.unawaited"} {
 		f, _ := findFact(ff, name)
 		for _, r := range f.Relations {
 			if r.Kind == facts.RelCalls && (r.TargetFile == "src/deps/a.ts" || r.TargetFile == "src/deps/b.ts") {
 				t.Fatalf("%s leaked a dynamic import binding: %+v", name, f.Relations)
 			}
+		}
+	}
+	nestedFact, ok := findFact(ff, "src.nestedPattern")
+	if !ok {
+		t.Fatal("missing src.nestedPattern")
+	}
+	for _, r := range nestedFact.Relations {
+		if r.Kind != facts.RelCalls {
+			continue
+		}
+		if r.Target == "src/deps.nested" || strings.HasSuffix(r.Target, ".nested") {
+			t.Fatalf("nested pattern bound work to container export: %+v", nestedFact.Relations)
 		}
 	}
 	caller, _ := findFact(ff, "src.caller.ts")

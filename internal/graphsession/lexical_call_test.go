@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/enola-labs/enola/internal/engine"
@@ -368,6 +369,65 @@ export function handleNextClick() { nextDelayed('other') }
 	assertCallResolvedToFile(t, c, "src/a.ts", "src.nextDelayed", "src/a.ts")
 	if engine.ExtractorVersion() == "v295" {
 		t.Fatal("cached upgrade test requires cacheVersion newer than v295")
+	}
+}
+
+func TestPublishedWave8CachedUpgradeFromV296(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"src/deps/a.ts": "export function work() { return 'a' }\nexport const nested = { work() { return 1 } }\n",
+		"src/caller.ts": `export async function nestedPattern() {
+  const { nested: { work } } = await import('./deps/a');
+  work();
+}
+`,
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("load state: %v %#v", err, st)
+	}
+	st.ExtractorVersion = "v296"
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	up := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, dir, up, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.ParsedFiles == 0 {
+		t.Fatal("v296 migration parsed no files")
+	}
+	c := applyGraph(t, first)
+	if err := c.ApplyRecords(up.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, coldSink))
+	for _, e := range c.Edges[ownerKey("src/caller.ts")] {
+		if e.Kind != facts.RelCalls || e.Resolution != graphstream.ResResolved {
+			continue
+		}
+		from := nodeByID(c, e.FromID)
+		if from.Name != "src.nestedPattern" {
+			continue
+		}
+		tgt := nodeByID(c, e.TargetID)
+		if strings.HasSuffix(tgt.Name, ".nested") {
+			t.Fatalf("nestedPattern resolved work to container: %+v target=%s", e, tgt.Name)
+		}
+	}
+	if engine.ExtractorVersion() == "v296" {
+		t.Fatal("cached upgrade test requires cacheVersion newer than v296")
 	}
 }
 
