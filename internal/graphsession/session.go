@@ -1399,7 +1399,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			}
 			unreadable = append(unreadable, res.Unreadable...)
 			if s.frameworkSig == "" {
-				if sig, sigErr := tsextractor.CompositionSignature(s.abs, owned, res.Records, nil, s.capturedSources, s.eng.GraphScope()); sigErr == nil {
+				if sig, sigErr := tsextractor.CompositionSignature(s.abs, owned, res.Records, map[string]bool{}, s.capturedSources, s.eng.GraphScope()); sigErr == nil {
 					s.frameworkSig = sig
 				}
 			}

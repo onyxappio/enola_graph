@@ -1044,8 +1044,11 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 		extraSeen[d] = true
 		extraDirs = append(extraDirs, d)
 	}
-	for _, rec := range prev {
+	for rel, rec := range prev {
 		if rec == nil {
+			continue
+		}
+		if dirty != nil && dirty[rel] {
 			continue
 		}
 		for _, d := range rec.AutoImportDirs {
@@ -1056,7 +1059,7 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 		if src == nil {
 			continue
 		}
-		if !allDirty && dirty != nil && !dirty[rel] {
+		if dirty != nil && !dirty[rel] && prev[rel] != nil {
 			continue
 		}
 		for _, d := range addImportsDirsFromFile(rel, src) {
@@ -1122,6 +1125,20 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 		}
 	}
 	sort.Strings(auto)
+	visExtra := extraDirsByNuxtPackageRead(sources, known, readAuto, nuxtPkgs, pkgDirSet)
+	visCons := nuxtModuleConsumersRead(sources, known, readAuto, nuxtPkgs, invertPackageNames(collectPackageNames(ctx, repoPath, inputScope)), pkgDirSet)
+	var vis []string
+	for pkg, dirs := range visExtra {
+		cp := append([]string{}, dirs...)
+		sort.Strings(cp)
+		vis = append(vis, "extra:"+pkg+"="+strings.Join(cp, ","))
+	}
+	for consumer, mods := range visCons {
+		cp := append([]string{}, mods...)
+		sort.Strings(cp)
+		vis = append(vis, "mod:"+consumer+"="+strings.Join(cp, ","))
+	}
+	sort.Strings(vis)
 	h := sha256.New()
 	if gql.enabled {
 		h.Write([]byte("gql-on"))
@@ -1136,5 +1153,7 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 	h.Write([]byte(strings.Join(nuxt, ";")))
 	h.Write([]byte{0})
 	h.Write([]byte(strings.Join(auto, ";")))
+	h.Write([]byte{0})
+	h.Write([]byte(strings.Join(vis, ";")))
 	return hex.EncodeToString(h.Sum(nil)), nil
 }

@@ -265,6 +265,7 @@ export async function provision(input: { fetchImpl?: typeof fetch; baseUrl: stri
 		{name: "same_spelling_member", extra: "\nexport function localCallback(obj: {fetchImpl: (s: string, o: unknown) => unknown}) { return obj.fetchImpl(\"/guard/not-http\", {method:\"POST\"}); }\n", want: true, bad: "/guard/not-http"},
 		{name: "shadow_global", replace: "const globalThis = {fetch: (url: string, opts: unknown): any => ({})};\n  const fetchImpl = globalThis.fetch;", want: false},
 		{name: "reassigned", replace: "let fetchImpl = globalThis.fetch;\n  fetchImpl = ((url: string, opts: unknown): any => ({}));", want: false},
+		{name: "shadow_function_fetch", replace: "const fetchImpl = fetch;", extra: "\nfunction fetch(url: string, opts: unknown): any { return {}; }\n", want: false},
 	}
 	needle := "const fetchImpl = input.fetchImpl ?? globalThis.fetch"
 	for _, tc := range cases {
@@ -287,6 +288,23 @@ export async function provision(input: { fetchImpl?: typeof fetch; baseUrl: stri
 	restore := extractAll(t, map[string]string{"src/web2app.ts": base}, false)
 	if _, ok := wave10Route(restore, "/internal/billing/web2app-provision"); !ok {
 		t.Fatalf("restore missing real route: %v", clientRouteNames(restore))
+	}
+	imported := "import { readFile as fetch } from 'node:fs/promises';\n" + strings.Replace(base, needle, "const fetchImpl = fetch;", 1)
+	ffImport := extractAll(t, map[string]string{"src/web2app.ts": imported}, false)
+	if _, ok := wave10Route(ffImport, "/internal/billing/web2app-provision"); ok {
+		t.Fatalf("imported fetch binding still emitted route: %v", clientRouteNames(ffImport))
+	}
+	directShadow := "import { readFile as fetch } from 'node:fs/promises';\nexport async function go() { await fetch('/internal/billing/web2app-provision', { method: 'POST' }) }\n"
+	ffDirect := extractAll(t, map[string]string{"src/web2app.ts": directShadow}, false)
+	if _, ok := wave10Route(ffDirect, "/internal/billing/web2app-provision"); ok {
+		t.Fatalf("direct fetch spelling ignored import binding: %v", clientRouteNames(ffDirect))
+	}
+	aliasOk := extractAll(t, map[string]string{"src/web2app.ts": base + "\nexport async function other(send: typeof fetch = fetch) { await send('/v1/kept-alias', { method: 'POST' }) }\n"}, false)
+	if _, ok := wave10Route(aliasOk, "/internal/billing/web2app-provision"); !ok {
+		t.Fatalf("sibling default-param alias lost: %v", clientRouteNames(aliasOk))
+	}
+	if _, ok := wave10Route(aliasOk, "/v1/kept-alias"); !ok {
+		t.Fatalf("valid alias lost: %v", clientRouteNames(aliasOk))
 	}
 }
 
@@ -335,6 +353,93 @@ useStep()
 	other := fileRefTargets(ff, "apps/other/pages/index.vue")
 	if hasTarget(other, want) {
 		t.Errorf("unregistered app bound re-export: %v", other)
+	}
+}
+
+func wave11NuxtLandingsFiles(moduleSetup string) map[string]string {
+	return map[string]string{
+		"apps/landings/package.json": `{"name":"landings","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0","landings-module":"workspace:*"}}`,
+		"apps/landings/nuxt.config.ts": `
+import landingModule from 'landings-module'
+export default defineNuxtConfig({ modules: [landingModule] })
+`,
+		"apps/landings/pages/CommunityProof.vue": `<script setup lang="ts">
+const { nextDelayed } = useStep()
+setLandPageMetadata({ page: 'x' })
+</script><template><p /></template>`,
+		"apps/landings/composables/useLocalFlag.ts": `export function useLocalFlag() { return true }`,
+		"apps/landings/pages/Local.vue":             `<script setup lang="ts">useLocalFlag()</script><template><p /></template>`,
+		"packages/landings-module/package.json":     `{"name":"landings-module","dependencies":{"nuxt":"^3.0.0"}}`,
+		"packages/landings-module/src/module.ts":    moduleSetup,
+		"packages/landings-module/src/runtime/composables/useStep.ts":             `export { useStep } from 'shared-lands-components'`,
+		"packages/landings-module/src/runtime/composables/setLandPageMetadata.ts": `export function setLandPageMetadata(meta: Record<string, string>) {}`,
+		"packages/shared-lands-components/package.json":                           `{"name":"shared-lands-components"}`,
+		"packages/shared-lands-components/src/index.ts":                           `export { useStep } from './Stepper/useStep'`,
+		"packages/shared-lands-components/src/Stepper/useStep.ts":                 `export function useStep() { return { nextDelayed() {} } }`,
+	}
+}
+
+func TestExtract_Wave11NuxtRegisterUnregisterRestore(t *testing.T) {
+	registered := `export default function setup() {
+  addImportsDir(resolver.resolve('./runtime/composables/'))
+}
+`
+	unregistered := `export default function setup() {
+}
+`
+	origin := "packages/shared-lands-components/src/Stepper.useStep"
+	local := "apps/landings/composables.useLocalFlag"
+	meta := "packages/landings-module/src/runtime/composables.setLandPageMetadata"
+	assertBound := func(label string, files map[string]string, wantStep, wantMeta bool) {
+		t.Helper()
+		ff := extractAll(t, files, false)
+		got := fileRefTargets(ff, "apps/landings/pages/CommunityProof.vue")
+		if hasTarget(got, origin) != wantStep {
+			t.Errorf("%s useStep bound=%v want=%v refs=%v", label, hasTarget(got, origin), wantStep, got)
+		}
+		if hasTarget(got, meta) != wantMeta {
+			t.Errorf("%s setLandPageMetadata bound=%v want=%v refs=%v", label, hasTarget(got, meta), wantMeta, got)
+		}
+		loc := fileRefTargets(ff, "apps/landings/pages/Local.vue")
+		if !hasTarget(loc, local) {
+			t.Errorf("%s locally declared composable lost: %v", label, loc)
+		}
+	}
+	assertBound("register", wave11NuxtLandingsFiles(registered), true, true)
+	assertBound("unregister", wave11NuxtLandingsFiles(unregistered), false, false)
+	assertBound("restore", wave11NuxtLandingsFiles(registered), true, true)
+	assertBound("initially-unregistered", wave11NuxtLandingsFiles(unregistered), false, false)
+	assertBound("then-register", wave11NuxtLandingsFiles(registered), true, true)
+}
+
+func TestNuxtOracleVisibleWithPartialSources(t *testing.T) {
+	files := wave11NuxtLandingsFiles(`export default function setup() {
+  addImportsDir(resolver.resolve('./runtime/composables/'))
+}
+`)
+	bytesOf := map[string][]byte{}
+	known := map[string]bool{}
+	for k, v := range files {
+		bytesOf[k] = []byte(v)
+		known[k] = true
+	}
+	nuxtPkgs := []string{"apps/landings", "packages/landings-module"}
+	pkgDirs := map[string]bool{"apps/landings": true, "packages/landings-module": true, "packages/shared-lands-components": true}
+	pkgDirByName := map[string]string{"landings": "apps/landings", "landings-module": "packages/landings-module"}
+	partial := map[string][]byte{
+		"packages/landings-module/src/module.ts": bytesOf["packages/landings-module/src/module.ts"],
+		"apps/landings/pages/CommunityProof.vue": bytesOf["apps/landings/pages/CommunityProof.vue"],
+	}
+	read := func(rel string) []byte { return bytesOf[rel] }
+	fullExtra := extraDirsByNuxtPackageRead(bytesOf, known, read, nuxtPkgs, pkgDirs)
+	partExtra := extraDirsByNuxtPackageRead(partial, known, read, nuxtPkgs, pkgDirs)
+	if len(fullExtra["packages/landings-module"]) == 0 || len(partExtra["packages/landings-module"]) == 0 {
+		t.Fatalf("extra dirs missing full=%v partial=%v", fullExtra, partExtra)
+	}
+	fullC := nuxtModuleConsumersRead(bytesOf, known, read, nuxtPkgs, pkgDirByName, pkgDirs)
+	partC := nuxtModuleConsumersRead(partial, known, read, nuxtPkgs, pkgDirByName, pkgDirs)
+	if len(fullC["apps/landings"]) == 0 || len(partC["apps/landings"]) == 0 {
+		t.Fatalf("consumers missing without nuxt.config in sources: full=%v partial=%v", fullC, partC)
 	}
 }
 

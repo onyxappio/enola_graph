@@ -121,8 +121,13 @@ func baselineCollectRouterFile(src []byte, relFile string, aliases map[string]ts
 	return f
 }
 
+// baselineExtractHTTPClientFacts is the ungated reference extractor: every
+// HTTP-client pass runs even when possibleHTTPClientSignal is false. It does
+// not call the gated production entrypoint. Equality with extractHTTPClientFacts
+// proves the prefilter is a necessary condition (no dropped matches) rather
+// than comparing the gated implementation with itself.
 func baselineExtractHTTPClientFacts(src []byte, relFile string) []facts.Fact {
-	return extractHTTPClientFacts(src, relFile)
+	return extractHTTPClientFactsUngated(src, relFile)
 }
 
 func baselinePossibleGraphQLServerSignal(src []byte) bool {

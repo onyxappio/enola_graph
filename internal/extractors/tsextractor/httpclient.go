@@ -320,6 +320,17 @@ func extractHTTPClientFactsDeps(src []byte, relFile string, deps httpClientDeps)
 	if !hasFetch && !hasUpper && !hasLower && !hasURL {
 		return nil
 	}
+	return extractHTTPClientFactsPasses(src, relFile, deps, hasFetch, hasUpper, hasLower, hasURL)
+}
+
+// extractHTTPClientFactsUngated runs every HTTP-client pass without the
+// possibleHTTPClientSignal prefilter. Scanopt tests compare this reference
+// against the gated production path so the gate cannot silently drop facts.
+func extractHTTPClientFactsUngated(src []byte, relFile string) []facts.Fact {
+	return extractHTTPClientFactsPasses(src, relFile, httpClientDeps{}, true, true, true, true)
+}
+
+func extractHTTPClientFactsPasses(src []byte, relFile string, deps httpClientDeps, hasFetch, hasUpper, hasLower, hasURL bool) []facts.Fact {
 
 	dir := factpath.Dir(relFile)
 	api := tsAPIHint(relFile)
@@ -402,7 +413,11 @@ func extractHTTPClientFactsDeps(src []byte, relFile string, deps httpClientDeps)
 	// offset is the verb start (m[2]) — not m[0], which now includes the leading
 	// word-boundary char and would mis-count the line when that char is a newline.
 	if hasFetch {
+		lexCalls, skipFetch := lexicalFetchAnalysis(src, relFile)
 		for _, m := range httpClientCall.FindAllSubmatchIndex(src, -1) {
+			if skipFetch[m[2]] {
+				continue
+			}
 			raw := firstNonEmptyGroup(src, m, 2, 3, 4)
 			method := "GET"
 			if opts := optionsObjectAfter(src, m[1]); opts != nil {
@@ -413,6 +428,9 @@ func extractHTTPClientFactsDeps(src []byte, relFile string, deps httpClientDeps)
 			add(raw, method, "fetch", m[2], "")
 		}
 		for _, m := range identArgCall.FindAllSubmatchIndex(src, -1) {
+			if skipFetch[m[2]] {
+				continue
+			}
 			raw, ok := folds.Resolve(string(src[m[4]:m[5]]))
 			if !ok {
 				continue
@@ -425,7 +443,7 @@ func extractHTTPClientFactsDeps(src []byte, relFile string, deps httpClientDeps)
 			}
 			add(raw, method, "fetch", m[2], "single-assignment")
 		}
-		for _, call := range lexicalFetchCalls(src, relFile) {
+		for _, call := range lexCalls {
 			raw := call.raw
 			derived := ""
 			if call.identArg {

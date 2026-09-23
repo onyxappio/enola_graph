@@ -427,12 +427,19 @@ func collectAddImportsDirs(sources map[string][]byte) []string {
 }
 
 func extraDirsByNuxtPackage(sources map[string][]byte, nuxtPkgs []string, pkgDirs map[string]bool) map[string][]string {
+	return extraDirsByNuxtPackageRead(sources, nil, nil, nuxtPkgs, pkgDirs)
+}
+
+func extraDirsByNuxtPackageRead(sources map[string][]byte, knownFiles map[string]bool, readSrc func(string) []byte, nuxtPkgs []string, pkgDirs map[string]bool) map[string][]string {
 	out := map[string][]string{}
 	seen := map[string]map[string]bool{}
-	for file, src := range sources {
+	visit := func(file string, src []byte) {
+		if src == nil {
+			return
+		}
 		pkg, ok := nuxtPackageForFile(nuxtPkgs, file, pkgDirs)
 		if !ok {
-			continue
+			return
 		}
 		for _, dir := range addImportsDirsFromFile(file, src) {
 			if seen[pkg][dir] {
@@ -445,6 +452,7 @@ func extraDirsByNuxtPackage(sources map[string][]byte, nuxtPkgs []string, pkgDir
 			out[pkg] = append(out[pkg], dir)
 		}
 	}
+	eachOracleSource(sources, knownFiles, readSrc, visit)
 	return out
 }
 
@@ -462,7 +470,30 @@ func isNuxtConfigFile(file string) bool {
 
 // nuxtModuleConsumers maps a consuming Nuxt package to packages whose addImportsDir
 // trees it registered via nuxt.config modules (identifier or string specifier).
+func eachOracleSource(sources map[string][]byte, knownFiles map[string]bool, readSrc func(string) []byte, visit func(file string, src []byte)) {
+	seen := map[string]bool{}
+	for file, src := range sources {
+		file = filepath.ToSlash(file)
+		seen[file] = true
+		visit(file, src)
+	}
+	if readSrc == nil || knownFiles == nil {
+		return
+	}
+	for file := range knownFiles {
+		file = filepath.ToSlash(file)
+		if seen[file] {
+			continue
+		}
+		visit(file, readSrc(file))
+	}
+}
+
 func nuxtModuleConsumers(sources map[string][]byte, nuxtPkgs []string, pkgDirByName map[string]string, pkgDirs map[string]bool) map[string][]string {
+	return nuxtModuleConsumersRead(sources, nil, nil, nuxtPkgs, pkgDirByName, pkgDirs)
+}
+
+func nuxtModuleConsumersRead(sources map[string][]byte, knownFiles map[string]bool, readSrc func(string) []byte, nuxtPkgs []string, pkgDirByName map[string]string, pkgDirs map[string]bool) map[string][]string {
 	out := map[string][]string{}
 	seen := map[string]map[string]bool{}
 	add := func(consumer, mod string) {
@@ -478,13 +509,13 @@ func nuxtModuleConsumers(sources map[string][]byte, nuxtPkgs []string, pkgDirByN
 		seen[consumer][mod] = true
 		out[consumer] = append(out[consumer], mod)
 	}
-	for file, src := range sources {
+	eachOracleSource(sources, knownFiles, readSrc, func(file string, src []byte) {
 		if src == nil || !isNuxtConfigFile(file) {
-			continue
+			return
 		}
 		consumer, ok := nuxtPackageForFile(nuxtPkgs, file, pkgDirs)
 		if !ok {
-			continue
+			return
 		}
 		idents := map[string]string{}
 		for _, m := range nuxtDefaultImport.FindAllSubmatch(src, -1) {
@@ -497,7 +528,7 @@ func nuxtModuleConsumers(sources map[string][]byte, nuxtPkgs []string, pkgDirByN
 		}
 		block := nuxtModulesArray.FindSubmatch(src)
 		if block == nil {
-			continue
+			return
 		}
 		inner := block[1]
 		for _, m := range nuxtModulesString.FindAllSubmatch(inner, -1) {
@@ -510,7 +541,7 @@ func nuxtModuleConsumers(sources map[string][]byte, nuxtPkgs []string, pkgDirByN
 				add(consumer, mod)
 			}
 		}
-	}
+	})
 	return out
 }
 
@@ -652,8 +683,8 @@ func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []stri
 			}
 		}
 	}
-	extraByPkg := extraDirsByNuxtPackage(sources, nuxtPkgs, pkgDirs)
-	consumes := nuxtModuleConsumers(sources, nuxtPkgs, pkgDirByName, pkgDirs)
+	extraByPkg := extraDirsByNuxtPackageRead(sources, knownFiles, readSrc, nuxtPkgs, pkgDirs)
+	consumes := nuxtModuleConsumersRead(sources, knownFiles, readSrc, nuxtPkgs, pkgDirByName, pkgDirs)
 	visibleDirs := func(pkg string) []string {
 		seen := map[string]bool{}
 		var dirs []string

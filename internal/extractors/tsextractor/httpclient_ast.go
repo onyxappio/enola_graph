@@ -84,15 +84,24 @@ func parseHTTPClientTree(src []byte, relFile string) (*sitter.Parser, *sitter.Tr
 }
 
 func lexicalFetchCalls(src []byte, relFile string) []lexicalFetchCall {
+	calls, _ := lexicalFetchAnalysis(src, relFile)
+	return calls
+}
+
+func lexicalFetchAnalysis(src []byte, relFile string) ([]lexicalFetchCall, map[int]bool) {
 	parser, tree, kinds := parseHTTPClientTree(src, relFile)
 	if parser == nil || tree == nil {
-		return nil
+		return nil, nil
 	}
 	defer parser.Close()
 	defer tree.Close()
 	var out []lexicalFetchCall
-	walkFetchAST(kinds, tree.RootNode(), src, childFetchEnv(nil), &out)
-	return out
+	skip := map[int]bool{}
+	root := tree.RootNode()
+	env := childFetchEnv(nil)
+	hoistFetchScope(kinds, root, src, env)
+	walkFetchAST(kinds, root, src, env, &out, skip)
+	return out, skip
 }
 
 func functionValuedURLProperties(src []byte, relFile string) []functionURLProp {
@@ -107,7 +116,7 @@ func functionValuedURLProperties(src []byte, relFile string) []functionURLProp {
 	return out
 }
 
-func walkFetchAST(kinds *tsutil.KindTable, n *sitter.Node, src []byte, env *fetchEnv, out *[]lexicalFetchCall) {
+func walkFetchAST(kinds *tsutil.KindTable, n *sitter.Node, src []byte, env *fetchEnv, out *[]lexicalFetchCall, skip map[int]bool) {
 	if n == nil {
 		return
 	}
@@ -125,19 +134,30 @@ func walkFetchAST(kinds *tsutil.KindTable, n *sitter.Node, src []byte, env *fetc
 			bindFetchParams(kinds, params, src, child)
 		}
 		if body := n.ChildByFieldName("body"); body != nil {
-			walkFetchAST(kinds, body, src, child, out)
+			hoistFetchScope(kinds, body, src, child)
+			walkFetchAST(kinds, body, src, child, out, skip)
 		} else {
 			for i := range n.NamedChildCount() {
 				c := n.NamedChild(i)
 				if kindOf(kinds, c) == "formal_parameters" {
 					continue
 				}
-				walkFetchAST(kinds, c, src, child, out)
+				walkFetchAST(kinds, c, src, child, out, skip)
 			}
+		}
+		return
+	case "class_declaration", "abstract_class_declaration":
+		if name := n.ChildByFieldName("name"); name != nil && kindOf(kinds, name) == "identifier" {
+			env.declare(nodeText(name, src), false)
+		}
+		child := childFetchEnv(env)
+		if body := n.ChildByFieldName("body"); body != nil {
+			walkFetchAST(kinds, body, src, child, out, skip)
 		}
 		return
 	case "statement_block", "for_statement", "for_in_statement", "for_of_statement", "catch_clause":
 		child := childFetchEnv(env)
+		hoistFetchScope(kinds, n, src, child)
 		if kind == "catch_clause" {
 			if param := n.ChildByFieldName("parameter"); param != nil {
 				for _, name := range tsPatternBindingNames(kinds, param, src) {
@@ -146,20 +166,20 @@ func walkFetchAST(kinds *tsutil.KindTable, n *sitter.Node, src []byte, env *fetc
 			}
 		}
 		for i := range n.NamedChildCount() {
-			walkFetchAST(kinds, n.NamedChild(i), src, child, out)
+			walkFetchAST(kinds, n.NamedChild(i), src, child, out, skip)
 		}
 		return
 	case "lexical_declaration", "variable_declaration":
 		for i := range n.NamedChildCount() {
 			d := n.NamedChild(i)
 			if kindOf(kinds, d) != "variable_declarator" {
-				walkFetchAST(kinds, d, src, env, out)
+				walkFetchAST(kinds, d, src, env, out, skip)
 				continue
 			}
 			nameN := d.ChildByFieldName("name")
 			val := d.ChildByFieldName("value")
 			if val != nil {
-				walkFetchAST(kinds, val, src, env, out)
+				walkFetchAST(kinds, val, src, env, out, skip)
 			}
 			if nameN != nil && kindOf(kinds, nameN) == "identifier" {
 				env.declare(nodeText(nameN, src), exprIsProvenFetch(kinds, val, src, env))
@@ -174,12 +194,12 @@ func walkFetchAST(kinds *tsutil.KindTable, n *sitter.Node, src []byte, env *fetc
 		left := n.ChildByFieldName("left")
 		right := n.ChildByFieldName("right")
 		if right != nil {
-			walkFetchAST(kinds, right, src, env, out)
+			walkFetchAST(kinds, right, src, env, out, skip)
 		}
 		if left != nil && kindOf(kinds, left) == "identifier" {
 			env.set(nodeText(left, src), exprIsProvenFetch(kinds, right, src, env))
 		} else if left != nil {
-			walkFetchAST(kinds, left, src, env, out)
+			walkFetchAST(kinds, left, src, env, out, skip)
 		}
 		return
 	case "call_expression":
@@ -187,15 +207,82 @@ func walkFetchAST(kinds *tsutil.KindTable, n *sitter.Node, src []byte, env *fetc
 		args := n.ChildByFieldName("arguments")
 		if fn != nil && kindOf(kinds, fn) == "identifier" && args != nil {
 			name := nodeText(fn, src)
+			off := int(fn.StartByte())
 			if identifierIsFetchCallee(env, name) {
-				if call, ok := fetchCallFromArgs(kinds, args, src, int(fn.StartByte())); ok {
+				if call, ok := fetchCallFromArgs(kinds, args, src, off); ok {
 					*out = append(*out, call)
 				}
+			} else if skip != nil && (name == "fetch" || name == "makeRequest") {
+				skip[off] = true
 			}
 		}
 	}
 	for i := range n.NamedChildCount() {
-		walkFetchAST(kinds, n.NamedChild(i), src, env, out)
+		walkFetchAST(kinds, n.NamedChild(i), src, env, out, skip)
+	}
+}
+
+func hoistFetchScope(kinds *tsutil.KindTable, n *sitter.Node, src []byte, env *fetchEnv) {
+	if n == nil || env == nil {
+		return
+	}
+	for i := range n.NamedChildCount() {
+		stmt := n.NamedChild(i)
+		hoistFetchStmt(kinds, stmt, src, env)
+	}
+}
+
+func hoistFetchStmt(kinds *tsutil.KindTable, stmt *sitter.Node, src []byte, env *fetchEnv) {
+	if stmt == nil {
+		return
+	}
+	switch kindOf(kinds, stmt) {
+	case "import_statement":
+		bindFetchImport(kinds, stmt, src, env)
+	case "function_declaration", "generator_function_declaration":
+		if name := stmt.ChildByFieldName("name"); name != nil && kindOf(kinds, name) == "identifier" {
+			env.declare(nodeText(name, src), false)
+		}
+	case "class_declaration", "abstract_class_declaration":
+		if name := stmt.ChildByFieldName("name"); name != nil && kindOf(kinds, name) == "identifier" {
+			env.declare(nodeText(name, src), false)
+		}
+	case "export_statement":
+		for i := range stmt.NamedChildCount() {
+			hoistFetchStmt(kinds, stmt.NamedChild(i), src, env)
+		}
+	}
+}
+
+func bindFetchImport(kinds *tsutil.KindTable, stmt *sitter.Node, src []byte, env *fetchEnv) {
+	clause := findChildByKind(kinds, stmt, "import_clause")
+	if clause == nil {
+		return
+	}
+	for i := range clause.NamedChildCount() {
+		child := clause.NamedChild(i)
+		switch kindOf(kinds, child) {
+		case "identifier":
+			env.declare(nodeText(child, src), false)
+		case "namespace_import":
+			if id := findChildByKind(kinds, child, "identifier"); id != nil {
+				env.declare(nodeText(id, src), false)
+			}
+		case "named_imports":
+			for j := range child.NamedChildCount() {
+				spec := child.NamedChild(j)
+				if kindOf(kinds, spec) != "import_specifier" {
+					continue
+				}
+				local := spec.ChildByFieldName("alias")
+				if local == nil {
+					local = spec.ChildByFieldName("name")
+				}
+				if local != nil && kindOf(kinds, local) == "identifier" {
+					env.declare(nodeText(local, src), false)
+				}
+			}
+		}
 	}
 }
 
