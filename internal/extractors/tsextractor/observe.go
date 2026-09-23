@@ -88,7 +88,7 @@ func overlayWalkDir(ctx context.Context, root string, inputScope *inputscope.Sco
 	err := inputScope.WalkDir(root, func(path string, d fs.DirEntry, walkErr error) error {
 		parent := ""
 		if d != nil && path != root {
-			parent = absOverlayKey(filepath.Dir(path))
+			parent = absOverlayKey(filepath.Dir(path)) //factpath:host
 			set, ok := names[parent]
 			if !ok {
 				set = map[string]string{}

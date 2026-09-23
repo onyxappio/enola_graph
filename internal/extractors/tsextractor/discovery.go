@@ -188,7 +188,7 @@ func (d *Discovery) reusableFor(root string, scope *inputscope.Scope, ov *fileOv
 			// snapshot holds rests on the bytes, only on the name.
 			continue
 		}
-		if names, walked := d.walkedDirs[absOverlayKey(filepath.Dir(key))]; walked {
+		if names, walked := d.walkedDirs[absOverlayKey(filepath.Dir(key))]; walked { //factpath:host
 			// The snapshot enumerated this directory, so it can answer both
 			// whether this name was in it and what it was. A package.json or a
 			// config that appears in a walked directory afterwards is a

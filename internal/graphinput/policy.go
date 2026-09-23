@@ -87,6 +87,12 @@ type Policy struct {
 	options                   Options
 	identity                  string
 	admission                 string
+
+	// What the repository walk and the Git discovery observed, kept so a later
+	// caller can ask whether observing again would answer the same. Neither is
+	// hashed into an identity: they are not facts about the projection, they
+	// are the record of how this policy came to be one.
+	walkIgnoreFiles []string
 }
 
 var defaultCaches = []string{
@@ -231,6 +237,139 @@ func (p *Policy) ClassifyEvent(name string, directory bool, event Event) Action 
 
 func (p *Policy) Identity() string           { return p.identity }
 func (p *Policy) Dependencies() []Dependency { return append([]Dependency(nil), p.deps...) }
+
+// ReusableOver asks whether building a policy over this tree now would read
+// the same things this one read, and names the first thing that says otherwise.
+// It exists for one caller: a process that constructed a policy resolving its
+// target and is about to construct a byte-for-byte identical one at the top of
+// its first run. The second build is a repository walk, a Git discovery, an
+// index read, a check-ignore pass over every name and an identity computation;
+// this is the declared reads, the Git discovery and the walk, and nothing else.
+//
+// That is a proof rather than an assumption because the stages it does not
+// repeat are functions of the ones it does. Git discovery is not derived from
+// anything else here, because nothing else can answer it: the declared control
+// files live inside whichever git dir was found and do not move when discovery
+// moves to another repository, an ancestor gitfile is never declared at all,
+// and the walk cannot see a .git appear because hard() prunes it. So discovery
+// is rerun and its whole projection compared. Tracking is then decided by that
+// projection and by the control files, which are declared and re-read here; the
+// ignore evaluation is decided by the walked names, the .gitignore contents and
+// the index, all of which are covered. What is left - the temporary bare
+// repository, the check-ignore pass and the identity computation - is pure
+// computation over inputs this has just shown unmoved.
+//
+// It is deliberately strict about the walk. Any name appearing, disappearing or
+// changing between file and directory refuses, because the built policy's
+// entry map is what every later classification reads and a policy that never
+// saw a name is not a policy that admits it. Ordinary content edits do not move
+// that map, which is the case this is for.
+//
+// The window it proves across is the caller's to bound: this says the tree
+// answers the same now, not that it never differed in between.
+func (p *Policy) ReusableOver() (string, bool) {
+	for _, d := range p.deps {
+		digest := "missing"
+		b, err := os.ReadFile(d.Path)
+		switch {
+		case err == nil:
+			sum := sha256.Sum256(b)
+			digest = hex.EncodeToString(sum[:])
+		case !os.IsNotExist(err):
+			// Unreadable is not unchanged. Report it as moved and let the
+			// caller take the path that reads it again properly.
+			return "declared input unreadable: " + d.Path, false
+		}
+		if digest != d.Digest {
+			return "declared input moved: " + d.Path, false
+		}
+	}
+	// Discovery is re-asked rather than inferred from the files above. The
+	// declared control files live inside whichever git dir was found, so a
+	// redirect moving the discovery to a different repository leaves every one
+	// of them unmoved; hard() prunes any path segment named .git before the walk
+	// records anything, so the entry map cannot see a repository appear either;
+	// and an ancestor gitfile is not declared at all, because Build declares only
+	// the gitfile at the root it was given. Nothing already read answers this, so
+	// Git is asked the same question Build asked it.
+	st, _, err := discoverGit(p.root)
+	if err != nil {
+		return "git discovery failed: " + err.Error(), false
+	}
+	if st.Repository != p.git.Repository {
+		if st.Repository {
+			return "repository appeared: " + st.TopLevel, false
+		}
+		return "repository disappeared: " + p.git.TopLevel, false
+	}
+	if st.TopLevel != p.git.TopLevel {
+		return "repository moved: " + p.git.TopLevel + " -> " + st.TopLevel, false
+	}
+	if len(st.Dirs) != len(p.git.Dirs) {
+		return "git directory set changed", false
+	}
+	for i, dir := range st.Dirs {
+		if dir != p.git.Dirs[i] {
+			return "git directory moved: " + p.git.Dirs[i] + " -> " + dir, false
+		}
+	}
+	seen := map[string]bool{}
+	var ignoreFiles []string
+	err = filepath.WalkDir(p.root, func(abs string, entry fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		rel, _ := p.relative(abs)
+		if rel == "." {
+			return nil
+		}
+		if p.hard(rel) != "" {
+			if entry.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		dir, known := p.entries[rel]
+		if !known {
+			return fmt.Errorf("entry appeared: %s", rel)
+		}
+		if dir != entry.IsDir() {
+			return fmt.Errorf("entry changed kind: %s", rel)
+		}
+		seen[rel] = true
+		if entry.Name() == ".gitignore" && entry.Type()&os.ModeSymlink == 0 {
+			ignoreFiles = append(ignoreFiles, rel)
+		}
+		return nil
+	})
+	if err != nil {
+		return err.Error(), false
+	}
+	if len(seen) != len(p.entries) {
+		for rel := range p.entries {
+			if !seen[rel] {
+				return "entry disappeared: " + rel, false
+			}
+		}
+	}
+	// The admitted subset of these is already covered as declared dependencies;
+	// this is the raw set, so a rule file becoming a symlink - which the build
+	// would stop treating as a rule file while its bytes read identically -
+	// cannot pass as unchanged.
+	if len(ignoreFiles) != len(p.walkIgnoreFiles) {
+		return "ignore file set changed", false
+	}
+	was := map[string]bool{}
+	for _, name := range p.walkIgnoreFiles {
+		was[name] = true
+	}
+	for _, name := range ignoreFiles {
+		if !was[name] {
+			return "ignore file changed kind: " + name, false
+		}
+	}
+	return "", true
+}
 
 // AdmissionIdentity fingerprints the policy's admission rules rather than the
 // index that happens to satisfy them. Identity hashes every non-hard-excluded
@@ -444,6 +583,7 @@ func Build(root string, options Options) (*Policy, error) {
 			}
 		}
 	}
+	p.walkIgnoreFiles = append([]string(nil), ignoreFiles...)
 	for _, name := range ignoreFiles {
 		if !p.gitIgnored(filepath.ToSlash(filepath.Dir(name))) {
 			if err := addDep(name); err != nil {

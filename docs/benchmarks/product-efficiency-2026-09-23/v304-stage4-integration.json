@@ -1,0 +1,64 @@
+{
+  "base_main": "819678e",
+  "files": {
+    "internal/graphinput/policy.go": "17d159bc096b7e034f7e1121cc6d123f61f7d2f92459705f88102caf8d88d39c",
+    "internal/graphsession/resident.go": "a11ea98bb2823fc9d59f3ca6f13b6c490c7c87fa83d29915c0d606c960c73fab",
+    "internal/graphsession/session.go": "f9960653fb66c377536412420fe067d152f7043d606a116194e4e56192deed6d",
+    "pkg/command/graph.go": "3fe7a8bab00a455b325a8001a0a954df5ae12dd0b8a52bb10399f5f133c57522",
+    "internal/graphinput/independent_inherited_gitfile_test.go": "48946271a0bc29fbc9718a7a43e5c6b41d59abd2b4165f2b76d9f3812fbce746",
+    "internal/graphinput/policy_reuse_regression_test.go": "9f55554a1538cb141560664b46412e47d3c42343e442a02d4ccb43a16614ec28",
+    "internal/graphsession/graph_input_membership_regression_test.go": "6b5838d37975d86c4a0584f6542bc244ebf8947f497caa2a6b2985fdc50c2b49",
+    "internal/graphsession/graph_input_proof_regression_test.go": "ebf6487e91fe81467fed81b5ced0808dbcf8e0aafbaa6d6867da5c3a7f307ab8"
+  },
+  "validation": {
+    "actual_main_targeted": {
+      "exit": 0,
+      "log_sha256": "38291b8ab8950e32413ec43710d5fc4e03d525d622ad027d770b27fa1c4ad86b",
+      "graphinput_s": 1.328,
+      "graphsession_s": 55.954
+    },
+    "fresh_engine_tests": {
+      "exit": 0,
+      "graphsession_s": 5.171
+    },
+    "full_suite_original": {
+      "exit": 1,
+      "log_sha256": "e5c81d6764de22abca39b5b98a6c2fe3804e57a6c4b2e0f8746667a4277ee1b2",
+      "failure": "internal/facts pathcontract static guard: missing host path annotations in discovery.go191 and observe.go91",
+      "graphsession_s": 265.948
+    },
+    "independent_git_redirect_tests": {
+      "positive_exit": 0,
+      "positive_package_seconds": 1.219,
+      "negative_commondir_exit": 1,
+      "negative_package_seconds": 1.294,
+      "negative_policy": "/tmp/enola-stage4-independent-review/policy.go",
+      "tests": [
+        "TestIndependentReuseRejectsInheritedGitfileRedirect",
+        "TestIndependentReuseRejectsCommonDirRedirect"
+      ]
+    },
+    "facts_after_annotation": {
+      "exit": 0,
+      "seconds": 2.797,
+      "log_sha256": "61e3703c7f495b10c7c5b8135b2ea8092993b9c37d1ad413686fa2c21dc50a9c"
+    }
+  },
+  "benchmarks": [
+    "v304-stage4-cli-noop.json",
+    "v304-stage4-cli-delta.json"
+  ],
+  "annotations": [
+    {
+      "file": "internal/extractors/tsextractor/discovery.go",
+      "before": "de46c3196095b5a2d60214848bc104c9c56808d1aa6ccfc697ab5db0fd27efdc",
+      "after": "4912ad8f6b6d40235fa7bd1da7e14ebfc51bd638c2e05ed93fc5ea866be416a7"
+    },
+    {
+      "file": "internal/extractors/tsextractor/observe.go",
+      "before": "cc77e3140ede99ced44c67627357c4ea8a0ec026a00599cda4bf67caafce97ae",
+      "after": "6f0d7dd448035d57e4f95b3a3e260e6f414b9ef8d5aa6201c9c8d5a3add9bfc6"
+    }
+  ],
+  "status": "all packages passed across full original suite plus comment-only correction and facts rerun; original exit1 preserved"
+}

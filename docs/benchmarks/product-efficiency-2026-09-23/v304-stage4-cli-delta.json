@@ -1,0 +1,225 @@
+{
+  "provenance": {
+    "binaries": {
+      "baseline": {
+        "path": "/tmp/enola-stage4-baseline-main/enola",
+        "sha256": "781bbfae35e0642c69b80d8532661b89b3836f4a09b7a52b8acc8c479589e5c3"
+      },
+      "candidate": {
+        "path": "/tmp/enola-stage4-main-review/enola",
+        "sha256": "a81fc4bfbad931d14c341f21ff9d6b83797feb374ef8373536c4e32f01b185e2"
+      }
+    },
+    "file": "/tmp/enola-stage4-main-history10/live/packages/clickhouse/src/readQueryPolicy.ts",
+    "mutation": "\nexport async function enolaStage4LatencyProbe() { return fetch(\"/enola-stage4-latency-probe\"); }\n",
+    "mode": "fresh CLI; file sink; paired state restored; source restored in finally; cold oracle for target"
+  },
+  "restore": {
+    "source_restored": true,
+    "sha256": "214a66fd193cc8ddf74742092e426acded2c827a3f66982bf16936a501822912"
+  },
+  "rows": [
+    {
+      "iteration": 0,
+      "build": "baseline",
+      "wall_s": 4.019607208,
+      "parsed": 32,
+      "owners": 32,
+      "summary": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 31,
+            "source content": 1
+          }
+        },
+        "RunID": "product-scope-stage4-paired-12-1790178001911474000",
+        "BaseGeneration": 11,
+        "TargetGeneration": 12,
+        "Stats": {
+          "files_read": 32,
+          "files_parsed": 32,
+          "cached_files": 4054,
+          "graphql_parsed": 1,
+          "sfc_parsed": 0,
+          "summary_scans": 186,
+          "derived_indexes": 26,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: reverse-close plus owners that reference added or removed fact names"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 32,
+        "ParsedFiles": 32,
+        "EarlyLocal": 0,
+        "Facts": null
+      },
+      "event_bytes": 580584,
+      "exact_cold": true,
+      "graph_hash": "f517d4f640c351039fe5958cb1d1bdd2b0dbd444de13ace1e7adaf1a715a3bbb",
+      "cold_wall_s": 21.889990708
+    },
+    {
+      "iteration": 1,
+      "build": "candidate",
+      "wall_s": 3.46184375,
+      "parsed": 32,
+      "owners": 32,
+      "summary": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 31,
+            "source content": 1
+          }
+        },
+        "RunID": "product-scope-stage4-paired-12-1790178009542195000",
+        "BaseGeneration": 11,
+        "TargetGeneration": 12,
+        "Stats": {
+          "files_read": 32,
+          "files_parsed": 32,
+          "cached_files": 4054,
+          "graphql_parsed": 1,
+          "sfc_parsed": 0,
+          "summary_scans": 186,
+          "derived_indexes": 26,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: reverse-close plus owners that reference added or removed fact names"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 32,
+        "ParsedFiles": 32,
+        "EarlyLocal": 0,
+        "Facts": null
+      },
+      "event_bytes": 580584,
+      "exact_cold": true,
+      "graph_hash": "f517d4f640c351039fe5958cb1d1bdd2b0dbd444de13ace1e7adaf1a715a3bbb",
+      "cold_wall_s": 21.889990708
+    },
+    {
+      "iteration": 2,
+      "build": "candidate",
+      "wall_s": 3.701050666999997,
+      "parsed": 32,
+      "owners": 32,
+      "summary": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 31,
+            "source content": 1
+          }
+        },
+        "RunID": "product-scope-stage4-paired-12-1790178017206001000",
+        "BaseGeneration": 11,
+        "TargetGeneration": 12,
+        "Stats": {
+          "files_read": 32,
+          "files_parsed": 32,
+          "cached_files": 4054,
+          "graphql_parsed": 1,
+          "sfc_parsed": 0,
+          "summary_scans": 185,
+          "derived_indexes": 27,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: reverse-close plus owners that reference added or removed fact names"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 32,
+        "ParsedFiles": 32,
+        "EarlyLocal": 0,
+        "Facts": null
+      },
+      "event_bytes": 580584,
+      "exact_cold": true,
+      "graph_hash": "f517d4f640c351039fe5958cb1d1bdd2b0dbd444de13ace1e7adaf1a715a3bbb",
+      "cold_wall_s": 21.889990708
+    },
+    {
+      "iteration": 3,
+      "build": "baseline",
+      "wall_s": 4.424526,
+      "parsed": 32,
+      "owners": 32,
+      "summary": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 31,
+            "source content": 1
+          }
+        },
+        "RunID": "product-scope-stage4-paired-12-1790178025764966000",
+        "BaseGeneration": 11,
+        "TargetGeneration": 12,
+        "Stats": {
+          "files_read": 32,
+          "files_parsed": 32,
+          "cached_files": 4054,
+          "graphql_parsed": 1,
+          "sfc_parsed": 0,
+          "summary_scans": 187,
+          "derived_indexes": 25,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: reverse-close plus owners that reference added or removed fact names"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 32,
+        "ParsedFiles": 32,
+        "EarlyLocal": 0,
+        "Facts": null
+      },
+      "event_bytes": 580584,
+      "exact_cold": true,
+      "graph_hash": "f517d4f640c351039fe5958cb1d1bdd2b0dbd444de13ace1e7adaf1a715a3bbb",
+      "cold_wall_s": 21.889990708
+    }
+  ],
+  "protocol": "strict validate_replacement passed on all four deltas and cold oracle",
+  "runner_sha256": "a944d38977d2db812f086897b44c248763bd9a3e904a3e8cc30c6e6743e535db"
+}

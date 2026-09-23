@@ -173,6 +173,11 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 			RepoID:             *repoID,
 			ForceInitial:       mode == "analyze" && *force,
 			Subject:            *subject,
+			// tgt.engine was constructed by resolveGraphTarget a few statements
+			// ago, in this process, and nothing has run against it. That is the
+			// whole of the claim; the session still has to prove the policy's
+			// declared inputs unmoved before it acts on it.
+			FreshEngine: true,
 		}
 		if opts.StateDir == "" {
 			opts.StateDir = filepath.Join(repo, tgt.engine.Config().Output.Dir, "graphstate")
