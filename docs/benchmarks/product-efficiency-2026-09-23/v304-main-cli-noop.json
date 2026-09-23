@@ -1,0 +1,537 @@
+{
+  "kind": "three sequential instrumented main fresh CLI no-op runs, TS-only matched watch scope, file sink, shared host with worker tests; not resident or performance acceptance",
+  "binary_sha256": "593243a102800475686fcd3de4f8a15841ec044d70ba61f7916b35d586775fe8",
+  "binary_revision": "a211e0a",
+  "config_sha256": "539ca94904c77dec2de164825155e6c201431d141a0476487f556b3a2bf9d6e4",
+  "rows": [
+    {
+      "iteration": 0,
+      "wall_s": 2.830125042,
+      "summary": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {}
+        },
+        "RunID": "",
+        "BaseGeneration": 2,
+        "TargetGeneration": 2,
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 4064,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0,
+          "derived_indexes": 0,
+          "discovery_passes": 0
+        },
+        "Fallbacks": null,
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 0,
+        "EarlyLocal": 0,
+        "Facts": null
+      },
+      "stages_s": {
+        "flags_parsed": [
+          0.0
+        ],
+        "resolve_graph_target": [
+          0.586
+        ],
+        "connect_sink": [
+          0.0
+        ],
+        "session_options": [
+          0.0
+        ],
+        "lock": [
+          0.0
+        ],
+        "bind_identity": [
+          0.0
+        ],
+        "open_journal": [
+          0.0
+        ],
+        "replay_unacked": [
+          0.0
+        ],
+        "state_read_bytes": [
+          0.008
+        ],
+        "state_json_unmarshal": [
+          0.245
+        ],
+        "load_state": [
+          0.253
+        ],
+        "transaction_enter": [
+          0.0
+        ],
+        "effective_config_before": [
+          0.0
+        ],
+        "rebuild_graph_inputs": [
+          0.588
+        ],
+        "effective_config": [
+          0.0
+        ],
+        "reconcile_complete": [
+          0.0
+        ],
+        "engine_walk_repo": [
+          0.125
+        ],
+        "inventory": [
+          0.125
+        ],
+        "detect_typescript": [
+          0.003
+        ],
+        "detect_extractors": [
+          0.003
+        ],
+        "select_hash_targets": [
+          0.009
+        ],
+        "engine_hash_files": [
+          0.679
+        ],
+        "hash_content_inputs": [
+          0.679
+        ],
+        "capture_contexts": [
+          0.0
+        ],
+        "ts_config_inputs": [
+          0.075,
+          0.065
+        ],
+        "analysis_fingerprint": [
+          0.083
+        ],
+        "angular_probe": [
+          0.004
+        ],
+        "policy_identity": [
+          0.0
+        ],
+        "engine_context_fingerprint": [
+          0.0
+        ],
+        "ts_disc_nuxt_packages": [
+          0.1
+        ],
+        "ts_disc_package_gates": [
+          0.06
+        ],
+        "ts_disc_package_names": [
+          0.063
+        ],
+        "ts_disc_alias_roots": [
+          0.003
+        ],
+        "ts_disc_package_exports": [
+          0.059
+        ],
+        "ts_discovery_build": [
+          0.296
+        ],
+        "ts_discovery": [
+          0.296
+        ],
+        "ts_session_context": [
+          0.04
+        ],
+        "runtime_inputs_complete": [
+          0.0
+        ],
+        "clone_file_state_copy": [
+          0.0
+        ],
+        "extractor_need": [
+          1.264
+        ],
+        "changed_terms": [
+          0.007
+        ],
+        "ts_reuse_cache": [
+          0.036
+        ],
+        "assemble_new_files": [
+          0.002
+        ],
+        "skip_publish_return": [
+          0.067
+        ],
+        "graph_session_run": [
+          2.228
+        ],
+        "cli_complete": [
+          0.0
+        ]
+      },
+      "state_sha256": "85a2bcdc4f12e87856809f29a50e3269799ce60783d8e13b7b1bca9aba958d6b"
+    },
+    {
+      "iteration": 1,
+      "wall_s": 2.351160459,
+      "summary": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {}
+        },
+        "RunID": "",
+        "BaseGeneration": 2,
+        "TargetGeneration": 2,
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 4064,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0,
+          "derived_indexes": 0,
+          "discovery_passes": 0
+        },
+        "Fallbacks": null,
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 0,
+        "EarlyLocal": 0,
+        "Facts": null
+      },
+      "stages_s": {
+        "flags_parsed": [
+          0.0
+        ],
+        "resolve_graph_target": [
+          0.626
+        ],
+        "connect_sink": [
+          0.0
+        ],
+        "session_options": [
+          0.0
+        ],
+        "lock": [
+          0.0
+        ],
+        "bind_identity": [
+          0.0
+        ],
+        "open_journal": [
+          0.0
+        ],
+        "replay_unacked": [
+          0.0
+        ],
+        "state_read_bytes": [
+          0.01
+        ],
+        "state_json_unmarshal": [
+          0.244
+        ],
+        "load_state": [
+          0.255
+        ],
+        "transaction_enter": [
+          0.0
+        ],
+        "effective_config_before": [
+          0.0
+        ],
+        "rebuild_graph_inputs": [
+          0.599
+        ],
+        "effective_config": [
+          0.0
+        ],
+        "reconcile_complete": [
+          0.0
+        ],
+        "engine_walk_repo": [
+          0.124
+        ],
+        "inventory": [
+          0.124
+        ],
+        "detect_typescript": [
+          0.001
+        ],
+        "detect_extractors": [
+          0.001
+        ],
+        "select_hash_targets": [
+          0.009
+        ],
+        "engine_hash_files": [
+          0.182
+        ],
+        "hash_content_inputs": [
+          0.182
+        ],
+        "capture_contexts": [
+          0.0
+        ],
+        "ts_config_inputs": [
+          0.068,
+          0.064
+        ],
+        "analysis_fingerprint": [
+          0.07
+        ],
+        "angular_probe": [
+          0.004
+        ],
+        "policy_identity": [
+          0.0
+        ],
+        "engine_context_fingerprint": [
+          0.0
+        ],
+        "ts_disc_nuxt_packages": [
+          0.094
+        ],
+        "ts_disc_package_gates": [
+          0.06
+        ],
+        "ts_disc_package_names": [
+          0.057
+        ],
+        "ts_disc_alias_roots": [
+          0.003
+        ],
+        "ts_disc_package_exports": [
+          0.056
+        ],
+        "ts_discovery_build": [
+          0.28
+        ],
+        "ts_discovery": [
+          0.28
+        ],
+        "ts_session_context": [
+          0.041
+        ],
+        "runtime_inputs_complete": [
+          0.0
+        ],
+        "clone_file_state_copy": [
+          0.0
+        ],
+        "extractor_need": [
+          0.736
+        ],
+        "changed_terms": [
+          0.008
+        ],
+        "ts_reuse_cache": [
+          0.028
+        ],
+        "assemble_new_files": [
+          0.001
+        ],
+        "skip_publish_return": [
+          0.066
+        ],
+        "graph_session_run": [
+          1.706
+        ],
+        "cli_complete": [
+          0.0
+        ]
+      },
+      "state_sha256": "85a2bcdc4f12e87856809f29a50e3269799ce60783d8e13b7b1bca9aba958d6b"
+    },
+    {
+      "iteration": 2,
+      "wall_s": 2.3120150420000005,
+      "summary": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {}
+        },
+        "RunID": "",
+        "BaseGeneration": 2,
+        "TargetGeneration": 2,
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 4064,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0,
+          "derived_indexes": 0,
+          "discovery_passes": 0
+        },
+        "Fallbacks": null,
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 0,
+        "EarlyLocal": 0,
+        "Facts": null
+      },
+      "stages_s": {
+        "flags_parsed": [
+          0.0
+        ],
+        "resolve_graph_target": [
+          0.586
+        ],
+        "connect_sink": [
+          0.0
+        ],
+        "session_options": [
+          0.0
+        ],
+        "lock": [
+          0.0
+        ],
+        "bind_identity": [
+          0.0
+        ],
+        "open_journal": [
+          0.0
+        ],
+        "replay_unacked": [
+          0.0
+        ],
+        "state_read_bytes": [
+          0.012
+        ],
+        "state_json_unmarshal": [
+          0.243
+        ],
+        "load_state": [
+          0.255
+        ],
+        "transaction_enter": [
+          0.0
+        ],
+        "effective_config_before": [
+          0.0
+        ],
+        "rebuild_graph_inputs": [
+          0.596
+        ],
+        "effective_config": [
+          0.0
+        ],
+        "reconcile_complete": [
+          0.0
+        ],
+        "engine_walk_repo": [
+          0.123
+        ],
+        "inventory": [
+          0.123
+        ],
+        "detect_typescript": [
+          0.001
+        ],
+        "detect_extractors": [
+          0.001
+        ],
+        "select_hash_targets": [
+          0.009
+        ],
+        "engine_hash_files": [
+          0.174
+        ],
+        "hash_content_inputs": [
+          0.174
+        ],
+        "capture_contexts": [
+          0.0
+        ],
+        "ts_config_inputs": [
+          0.072,
+          0.066
+        ],
+        "analysis_fingerprint": [
+          0.074
+        ],
+        "angular_probe": [
+          0.004
+        ],
+        "policy_identity": [
+          0.0
+        ],
+        "engine_context_fingerprint": [
+          0.0
+        ],
+        "ts_disc_nuxt_packages": [
+          0.092
+        ],
+        "ts_disc_package_gates": [
+          0.061
+        ],
+        "ts_disc_package_names": [
+          0.059
+        ],
+        "ts_disc_alias_roots": [
+          0.003
+        ],
+        "ts_disc_package_exports": [
+          0.06
+        ],
+        "ts_discovery_build": [
+          0.285
+        ],
+        "ts_discovery": [
+          0.285
+        ],
+        "ts_session_context": [
+          0.042
+        ],
+        "runtime_inputs_complete": [
+          0.0
+        ],
+        "clone_file_state_copy": [
+          0.0
+        ],
+        "extractor_need": [
+          0.736
+        ],
+        "changed_terms": [
+          0.007
+        ],
+        "ts_reuse_cache": [
+          0.035
+        ],
+        "assemble_new_files": [
+          0.002
+        ],
+        "skip_publish_return": [
+          0.068
+        ],
+        "graph_session_run": [
+          1.709
+        ],
+        "cli_complete": [
+          0.0
+        ]
+      },
+      "state_sha256": "85a2bcdc4f12e87856809f29a50e3269799ce60783d8e13b7b1bca9aba958d6b"
+    }
+  ],
+  "median_s": 2.351160459
+}
