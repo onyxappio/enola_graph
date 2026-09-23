@@ -55,7 +55,12 @@ type FileRecord struct {
 	// ImportSpecs are alias/relative-normalized replay paths (resolveImportPath
 	// output), not the exact bound file. Membership replay compares these
 	// against old/new filename universes; ResolvedFiles hold exact provenance.
-	ImportSpecs     []string `json:"import_specs,omitempty"`
+	ImportSpecs []string `json:"import_specs,omitempty"`
+	// ResolutionSpecs are normalized literal paths passed to framework resolvers
+	// (for example Nuxt's resolver.resolve in extendPages). Unlike import specs,
+	// these may describe an absent target; membership replay must notice when that
+	// path appears, disappears, or resolves to another candidate.
+	ResolutionSpecs []string `json:"resolution_specs,omitempty"`
 	ResolvedFiles   []string `json:"resolved_files,omitempty"`
 	Declared        []string `json:"declared,omitempty"`
 	Referenced      []string `json:"referenced,omitempty"`
@@ -429,6 +434,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		}
 		var res tsFileResult
 		sideReads := map[string]bool{}
+		resolutionSpecs := map[string]bool{}
 		readSrc := func(rel string) []byte {
 			if b, ok := sources[rel]; ok {
 				return b
@@ -440,7 +446,14 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			return raw
 		}
 		fileOrms, fileVue := pkgGates.forFile(pkgNamesEarly, relFile)
-		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, fileVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, fileOrms, aliases, knownFiles, readSrc, auto, grpcIdx, exportCache, sideReads)
+		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, fileVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, fileOrms, aliases, knownFiles, readSrc, auto, grpcIdx, exportCache, sideReads, resolutionSpecs)
+		if len(resolutionSpecs) > 0 {
+			rec.ResolutionSpecs = make([]string, 0, len(resolutionSpecs))
+			for spec := range resolutionSpecs {
+				rec.ResolutionSpecs = append(rec.ResolutionSpecs, filepath.ToSlash(spec))
+			}
+			sort.Strings(rec.ResolutionSpecs)
+		}
 		rec.AutoImportDirs = addImportsDirsFromFile(relFile, src)
 		rec.NuxtAliases = nuxtRuntimeAliasesFromFile(relFile, src)
 		if len(sideReads) > 0 {

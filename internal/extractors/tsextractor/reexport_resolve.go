@@ -33,6 +33,7 @@ type namedExportEntry struct {
 type namedExportIndex struct {
 	local       map[string]bool
 	named       map[string][][2]string // exported name → (module file, original name)
+	unresolved  map[string]bool        // imported locals whose module origin is not indexed
 	stars       []string
 	defaultName string // proven default export symbol; empty if the file has none
 	empty       bool
@@ -116,7 +117,7 @@ func (c *namedExportCache) index(file string, readSrc func(string) []byte, alias
 }
 
 func parseNamedExportIndex(file string, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool) *namedExportIndex {
-	idx := &namedExportIndex{local: map[string]bool{}, named: map[string][][2]string{}}
+	idx := &namedExportIndex{local: map[string]bool{}, named: map[string][][2]string{}, unresolved: map[string]bool{}}
 	if file == "" || readSrc == nil {
 		idx.empty = true
 		return idx
@@ -178,6 +179,9 @@ func mergeNamedExportIndex(dst, src *namedExportIndex) {
 	for k, v := range src.named {
 		dst.named[k] = append(dst.named[k], v...)
 	}
+	for k, v := range src.unresolved {
+		dst.unresolved[k] = v
+	}
 	dst.stars = append(dst.stars, src.stars...)
 	if dst.defaultName == "" {
 		dst.defaultName = src.defaultName
@@ -185,7 +189,7 @@ func mergeNamedExportIndex(dst, src *namedExportIndex) {
 }
 
 func parseNamedExportIndexBytes(file string, src []byte, aliases map[string]tsAlias, knownFiles map[string]bool) *namedExportIndex {
-	idx := &namedExportIndex{local: map[string]bool{}, named: map[string][][2]string{}}
+	idx := &namedExportIndex{local: map[string]bool{}, named: map[string][][2]string{}, unresolved: map[string]bool{}}
 	if len(src) == 0 {
 		idx.empty = true
 		return idx
@@ -216,7 +220,7 @@ func parseNamedExportIndexBytes(file string, src []byte, aliases map[string]tsAl
 // emits no entry, so an index that looks empty can still be one alias away from
 // naming a module.
 func buildNamedExportIndex(file string, src []byte, kinds *tsutil.KindTable, root *sitter.Node, aliases map[string]tsAlias, knownFiles map[string]bool) (*namedExportIndex, bool) {
-	idx := &namedExportIndex{local: map[string]bool{}, named: map[string][][2]string{}}
+	idx := &namedExportIndex{local: map[string]bool{}, named: map[string][][2]string{}, unresolved: map[string]bool{}}
 	if root == nil {
 		idx.empty = true
 		return idx, false
@@ -235,8 +239,10 @@ func buildNamedExportIndex(file string, src []byte, kinds *tsutil.KindTable, roo
 	contextFree := true
 	fileDir := factpath.Dir(file)
 	imported := map[string][2]string{}
+	unresolved := map[string]bool{}
 	localBind := map[string]bool{}
-	collectModuleBindings(kinds, root, src, fileDir, aliases, knownFiles, imported, localBind)
+	collectModuleBindings(kinds, root, src, fileDir, aliases, knownFiles, imported, unresolved, localBind)
+	idx.unresolved = unresolved
 
 	for i := range root.ChildCount() {
 		child := root.Child(i)
@@ -314,6 +320,9 @@ func buildNamedExportIndex(file string, src []byte, kinds *tsutil.KindTable, roo
 					// context-dependent either way, so record that before the
 					// lookup rather than only on a hit.
 					contextFree = false
+					if unresolved[local] {
+						continue
+					}
 					if bind, ok := imported[local]; ok {
 						idx.named[exported] = append(idx.named[exported], bind)
 						continue
@@ -326,7 +335,7 @@ func buildNamedExportIndex(file string, src []byte, kinds *tsutil.KindTable, roo
 	return idx, contextFree
 }
 
-func collectModuleBindings(kinds *tsutil.KindTable, root *sitter.Node, src []byte, fileDir string, aliases map[string]tsAlias, knownFiles map[string]bool, imported map[string][2]string, localBind map[string]bool) {
+func collectModuleBindings(kinds *tsutil.KindTable, root *sitter.Node, src []byte, fileDir string, aliases map[string]tsAlias, knownFiles map[string]bool, imported map[string][2]string, unresolved, localBind map[string]bool) {
 	if root == nil {
 		return
 	}
@@ -341,23 +350,31 @@ func collectModuleBindings(kinds *tsutil.KindTable, root *sitter.Node, src []byt
 			}
 			importPath := strings.Trim(nodeText(source, src), `"'`)
 			resolved, external := resolveImportPath(importPath, fileDir, aliases)
-			if external {
-				continue
-			}
-			mod, _, ok := resolveModuleFile(resolved, knownFiles)
-			if !ok {
-				continue
+			mod := ""
+			if !external {
+				mod, _, _ = resolveModuleFile(resolved, knownFiles)
 			}
 			clause := findChildByKind(kinds, child, "import_clause")
 			if clause == nil {
 				continue
+			}
+			bindLocal := func(local, orig string) {
+				if local == "" {
+					return
+				}
+				if mod == "" {
+					unresolved[local] = true
+					return
+				}
+				imported[local] = [2]string{mod, orig}
 			}
 			var walkClause func(*sitter.Node)
 			walkClause = func(n *sitter.Node) {
 				if n == nil {
 					return
 				}
-				if kindOf(kinds, n) == "import_specifier" {
+				switch kindOf(kinds, n) {
+				case "import_specifier":
 					nameNode := n.ChildByFieldName("name")
 					if nameNode == nil {
 						return
@@ -367,8 +384,14 @@ func collectModuleBindings(kinds *tsutil.KindTable, root *sitter.Node, src []byt
 					if a := n.ChildByFieldName("alias"); a != nil {
 						local = nodeText(a, src)
 					}
-					if local != "" {
-						imported[local] = [2]string{mod, orig}
+					bindLocal(local, orig)
+					return
+				case "identifier":
+					bindLocal(nodeText(n, src), "default")
+					return
+				case "namespace_import":
+					if id := findChildByKind(kinds, n, "identifier"); id != nil {
+						bindLocal(nodeText(id, src), "*")
 					}
 					return
 				}

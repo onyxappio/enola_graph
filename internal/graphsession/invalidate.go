@@ -142,6 +142,11 @@ func recordRebound(rec *tsextractor.FileRecord, priorKnown, known map[string]boo
 			return true
 		}
 	}
+	for _, spec := range rec.ResolutionSpecs {
+		if importRebound(spec, priorKnown, known) {
+			return true
+		}
+	}
 	return false
 }
 
@@ -217,6 +222,7 @@ func surfaceChanged(old, neu *tsextractor.FileRecord) bool {
 	}
 	return !eqStrings(old.Declared, neu.Declared) ||
 		!eqStrings(old.Reexports, neu.Reexports) ||
+		!eqStrings(old.ResolutionSpecs, neu.ResolutionSpecs) ||
 		!eqStrings(old.ResolvedFiles, neu.ResolvedFiles) ||
 		!eqStrings(old.UnresolvedSpecs, neu.UnresolvedSpecs) ||
 		!eqStrings(old.ImportSpecs, neu.ImportSpecs)

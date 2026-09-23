@@ -77,6 +77,7 @@ func nameOnlySurfaceShift(old, neu *tsextractor.FileRecord) bool {
 		return false
 	}
 	return eqStrings(old.ImportSpecs, neu.ImportSpecs) &&
+		eqStrings(old.ResolutionSpecs, neu.ResolutionSpecs) &&
 		eqStrings(old.ResolvedFiles, neu.ResolvedFiles) &&
 		eqStrings(old.UnresolvedSpecs, neu.UnresolvedSpecs) &&
 		eqStrings(old.Reexports, neu.Reexports) &&

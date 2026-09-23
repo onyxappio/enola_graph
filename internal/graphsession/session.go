@@ -1412,10 +1412,15 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				return nil, err
 			}
 			unreadable = append(unreadable, res.Unreadable...)
-			if s.frameworkSig == "" {
-				if sig, sigErr := tsextractor.CompositionSignature(s.abs, owned, res.Records, map[string]bool{}, s.capturedSources, s.eng.GraphScope()); sigErr == nil {
-					s.frameworkSig = sig
-				}
+			// Planning uses dirty source hashes as a conservative pre-Begin
+			// signal because newly parsed declarations are not available yet.
+			// Persist the canonical post-extraction signature from the complete
+			// records instead, so the next clean run compares the same form and
+			// does not mistake a settled dirty file for a new framework change.
+			if sig, sigErr := tsextractor.CompositionSignature(s.abs, owned, res.Records, map[string]bool{}, s.capturedSources, s.eng.GraphScope()); sigErr == nil {
+				s.frameworkSig = sig
+			} else {
+				return nil, classifyVanished(sigErr, "composition context input for", "typescript", "refusing to commit a partial composition signature")
 			}
 		default:
 			need := needByExt[ext.Name()]
@@ -2544,6 +2549,23 @@ func (s *session) frameworkDirtyRequiresFullScope(files []string, prevFiles map[
 		h, ok := lookupHash(hashes, f)
 		if !ok || st == nil || st.Hash != h || st.Unreadable {
 			dirty[filepath.ToSlash(f)] = true
+		}
+	}
+	// CompositionSignature observes the current file universe. Deleted TS
+	// sources are not in `owned`, but their removal can withdraw Nuxt auto-import
+	// names just as surely as an edit can change one. Include those prior owners
+	// in the pre-Begin dirty set so the planner sees the same framework-context
+	// change the later invalidation pass sees.
+	for path, st := range prevFiles {
+		if st == nil || st.TS == nil {
+			continue
+		}
+		rel := filepath.ToSlash(path)
+		if !tsextractor.IsSessionSource(rel, angular) {
+			continue
+		}
+		if _, present := lookupHash(hashes, rel); !present {
+			dirty[rel] = true
 		}
 	}
 	if !anyDirty(dirty) {

@@ -33,6 +33,7 @@ import (
 // test functions that assert the behavior that version introduced. v1 is the
 // implicit baseline (no changelog line), so coverage starts at v2.
 var versionCoverage = map[int][]string{
+	317: {"TestExtract_Wave12LoopHeaderBindingsShadowOnlyInsideLoop", "TestExtract_Wave12DefaultImportThenLocalBarrelExportKeepsVueOrigin", "TestExtract_Wave12DefaultImportReexportOriginLifecycle", "TestExtract_Wave12NuxtRoutesHandleOnlyUniqueDefaultTargets", "TestWave12ExtendPagesTargetMembershipMatchesCold", "TestWave12DeletedNuxtAutoimportIsPlannedBeforeFrozenBegin", "TestPublishedWave12CachedUpgradeFromV316"},
 	316: {"TestExtract_Wave11CommonJSRequireBindingSameFile", "TestExtract_Wave11AliasRequiresKitCreateResolver"},
 	315: {"TestExtract_Wave11ConstructorParameterProperties", "TestExtract_Wave11DefineEndpointFunctionURL", "TestExtract_Wave11FetchAliasClientRoute", "TestExtract_Wave11NuxtReexportAutoImport", "TestExtract_Wave11ExternalImportDoesNotBindSibling", "TestPublishedWave11CachedUpgradeFromV314"},
 	314: {"TestExtract_Wave10NuxtNestedConfigWithoutChildManifest", "TestPublishedWave10CachedUpgradeFromV313", "TestPublishedWave10NestedNuxtConfigDeltaEqualsCold"},

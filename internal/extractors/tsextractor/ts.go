@@ -330,7 +330,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 		var res tsFileResult
 		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, fileVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, fileOrms, aliases, knownFiles, func(rel string) []byte {
 			return sources[rel]
-		}, auto, grpcStubs, exportCache, nil)
+		}, auto, grpcStubs, exportCache, nil, nil)
 		// Routers, mounts and held-back routes for the repo-wide mount pass below.
 		// Collected here because resolving an import needs this file's path aliases,
 		// which are in scope only during the per-file walk. Same test-path gate as
@@ -565,7 +565,7 @@ type extractCtx struct {
 	sideReads     map[string]bool
 }
 
-func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, isNuxt, isSvelteKit, isEmber, isReactNav, isAngular bool, graphqlServer graphqlServerContext, orms ormFlags, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, nuxtAutoComponents map[string]string, grpcStubs *grpcStubIndex, exportCache *namedExportCache, sideReads map[string]bool) ([]facts.Fact, angularCounts, *angularRouterFile, map[string]*angularTemplate, *angularHTTPFile, clientCounts) {
+func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, isNuxt, isSvelteKit, isEmber, isReactNav, isAngular bool, graphqlServer graphqlServerContext, orms ormFlags, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, nuxtAutoComponents map[string]string, grpcStubs *grpcStubIndex, exportCache *namedExportCache, sideReads, resolutionSpecs map[string]bool) ([]facts.Fact, angularCounts, *angularRouterFile, map[string]*angularTemplate, *angularHTTPFile, clientCounts) {
 	// The grammar is chosen here, so the kind table is too: TypeScript and TSX assign
 	// different meanings to the same symbol ids, and everything below reads node kinds
 	// through this table. See kinds.go.
@@ -829,8 +829,8 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 		}
 	}
 	if !facts.IsTestPath(relFile) {
-		result = append(result, extractNitroFacts(kinds, root, src, relFile, isNuxt, aliases, knownFiles)...)
-		result = append(result, extractExtendPagesFacts(kinds, root, src, relFile, aliases, knownFiles)...)
+		result = append(result, extractNitroFacts(kinds, root, src, relFile, isNuxt, aliases, knownFiles, readSrc, sideReads, resolutionSpecs, result)...)
+		result = append(result, extractExtendPagesFacts(kinds, root, src, relFile, aliases, knownFiles, readSrc, sideReads, resolutionSpecs)...)
 	}
 
 	return ensureFileRef(result, relFile), angular, router, inlineTemplates, httpFile, clients
@@ -4009,6 +4009,29 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			frPop()
 			return
 		}
+		if kind == "for_statement" || kind == "for_in_statement" {
+			// The lexical head binding is already in scope (and in its TDZ) while a
+			// for..of/in RHS is evaluated. Walk the RHS once under that scope.
+			loopNames := tsLoopLexicalNames(kinds, n, src)
+			if len(loopNames) > 0 {
+				frPush(loopNames...)
+			}
+			var iterable *sitter.Node
+			if kind == "for_in_statement" {
+				iterable = n.ChildByFieldName("right")
+				walk(iterable)
+			}
+			for i := range n.ChildCount() {
+				child := n.Child(i)
+				if !tsSameNode(child, iterable) {
+					walk(child)
+				}
+			}
+			if len(loopNames) > 0 {
+				frPop()
+			}
+			return
+		}
 		if kind == "lexical_declaration" || kind == "variable_declaration" {
 			if len(frShadows) == 0 {
 				frPush()
@@ -5305,6 +5328,21 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 	// loop is bounded — it raises loop_depth but not scaling_loop_depth (the Big-O exponent).
 	switch kind {
 	case "for_statement", "for_in_statement", "while_statement", "do_statement":
+		// The lexical head binding is in scope (and in its TDZ) during for..of/in
+		// RHS evaluation. Walk that expression once under the binding, before loop
+		// metrics are raised because the RHS executes outside the repeated body.
+		// A lexical loop initializer belongs to the loop's environment and stops
+		// shadowing after the loop. A statement_block alone misses single-statement
+		// bodies and does not own the initializer.
+		loopBindings := tsLoopLexicalNames(w.kinds, n, w.src)
+		if len(loopBindings) > 0 {
+			w.pushShadowScope(loopBindings...)
+		}
+		var iterable *sitter.Node
+		if kind == "for_in_statement" {
+			iterable = n.ChildByFieldName("right")
+			w.walk(iterable)
+		}
 		bounded := tsLoopBounded(w.kinds, n, w.src)
 		repeats := tsLoopRepeats(w.kinds, n)
 		if w.metrics != nil {
@@ -5325,7 +5363,10 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 			w.repeatDepth++
 		}
 		for i := range n.ChildCount() {
-			w.walk(n.Child(i))
+			child := n.Child(i)
+			if !tsSameNode(child, iterable) {
+				w.walk(child)
+			}
 		}
 		w.loopDepth--
 		if !bounded {
@@ -5333,6 +5374,9 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 		}
 		if repeats {
 			w.repeatDepth--
+		}
+		if len(loopBindings) > 0 {
+			w.popShadowScope()
 		}
 		return
 	}
@@ -5668,6 +5712,41 @@ func tsLoopBounded(kinds *tsutil.KindTable, n *sitter.Node, src []byte) bool {
 // iteration even though its depth is discounted. Scaling and repeating differ.
 func tsLoopRepeats(kinds *tsutil.KindTable, n *sitter.Node) bool {
 	return !tsLoopConstant(kinds, n)
+}
+
+// tsSameNode compares stable Tree-sitter node identity across Go wrappers.
+func tsSameNode(a, b *sitter.Node) bool {
+	// Child and ChildByFieldName each allocate a Go wrapper. Compare the stable
+	// underlying Tree-sitter node IDs so a previously walked field child is skipped.
+	return a != nil && b != nil && a.Id() == b.Id()
+}
+
+// tsLoopLexicalNames returns only let/const bindings introduced by a loop
+// header. They shadow outer imports for the lifetime of that loop, including
+// destructured names, but are deliberately not added to the containing block.
+func tsLoopLexicalNames(kinds *tsutil.KindTable, n *sitter.Node, src []byte) []string {
+	if n == nil {
+		return nil
+	}
+	switch kindOf(kinds, n) {
+	case "for_in_statement":
+		// The grammar exposes `left` as the binding pattern and stores let/const
+		// separately in the `kind` field. An assignment-form `for (x of xs)`
+		// introduces no binding and must not shadow an outer import.
+		declKind := nodeText(n.ChildByFieldName("kind"), src)
+		if declKind != "let" && declKind != "const" {
+			return nil
+		}
+		return tsPatternBindingNames(kinds, n.ChildByFieldName("left"), src)
+	case "for_statement":
+		init := n.ChildByFieldName("initializer")
+		if init == nil || kindOf(kinds, init) != "lexical_declaration" {
+			return nil
+		}
+		return tsDeclLexicalNames(kinds, init, src)
+	default:
+		return nil
+	}
 }
 
 // tsLoopConstant reports whether a for..of / for..in iterates an array/object literal —

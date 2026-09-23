@@ -2597,7 +2597,11 @@ import (
 // v316: same-file CommonJS require bindings keep calls/file-refs/instantiates to
 // the owner file's variable nodes; Nuxt kit createResolver aliases require an
 // unshadowed factory applied to import.meta.url.
-const cacheVersion = "v316"
+// v317: TypeScript loop-header bindings shadow imported names only for the loop;
+// a default import re-exported through a local barrel follows its source SFC;
+// Nuxt route registrations retain proven default handlers and resolver candidate
+// membership, and canonical framework signatures settle after extracted records.
+const cacheVersion = "v317"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //
