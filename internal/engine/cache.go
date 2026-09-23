@@ -2519,7 +2519,11 @@ import (
 // parameter/block/catch bindings no longer fall back to sibling file_ref or
 // symbol-owned calls (destructured params, hoisted nested locals). Nested
 // function entities are not invented; shadowed names stay unbound.
-const cacheVersion = "v298"
+// v299: TypeScript type aliases and interfaces occupy type space only. A local
+// `type callback = string` or `interface callback {}` does not hide an imported
+// callable `callback` on symbol-owned or file_ref RelCalls; type-identifier
+// annotations still respect type-space shadowing.
+const cacheVersion = "v299"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

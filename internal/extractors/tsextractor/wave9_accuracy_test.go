@@ -225,3 +225,72 @@ export function Real() { return <Card />; }
 		t.Fatalf("file_ref must keep genuine JSX Card use: %+v", widgetFR.Relations)
 	}
 }
+
+func TestExtract_Wave9TypeAndInterfaceDoNotShadowValueImports(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/dep.ts": "export function callback() { return 1; }\nexport function keep() { return 2; }\nexport type Repo = { id: string };\n",
+		"src/type.ts": `
+import { callback, keep, Repo } from './dep';
+export function run() {
+  type callback = string;
+  callback();
+  keep();
+}
+export function typed(r: Repo) { return r; }
+`,
+		"src/iface.ts": `
+import { callback, keep } from './dep';
+export function run() {
+  interface callback { n: number }
+  callback();
+  keep();
+}
+`,
+	}, false)
+
+	for _, file := range []string{"src/type.ts", "src/iface.ts"} {
+		fr := fileRefFact(ff, file)
+		if !hasCallToFile(fr, "src.callback", "src/dep.ts") {
+			t.Fatalf("%s file_ref lost imported callback: %+v", file, fr.Relations)
+		}
+		if !hasCallToFile(fr, "src.keep", "src/dep.ts") {
+			t.Fatalf("%s file_ref lost keep: %+v", file, fr.Relations)
+		}
+	}
+	typedFR := fileRefFact(ff, "src/type.ts")
+	if !hasCallToFile(typedFR, "src.Repo", "src/dep.ts") {
+		t.Fatalf("imported type annotation Repo missing: %+v", typedFR.Relations)
+	}
+
+	typeRun, ok := findFact(ff, "src.run")
+	if !ok {
+		t.Fatal("src.run missing")
+	}
+	// extractAll may emit two src.run facts; check each owner file.
+	var typeOwned, ifaceOwned facts.Fact
+	for _, f := range ff {
+		if f.Name != "src.run" {
+			continue
+		}
+		if f.File == "src/type.ts" {
+			typeOwned = f
+		}
+		if f.File == "src/iface.ts" {
+			ifaceOwned = f
+		}
+	}
+	if typeOwned.Name == "" {
+		typeOwned = typeRun
+	}
+	for _, owned := range []facts.Fact{typeOwned, ifaceOwned} {
+		if owned.Name == "" {
+			t.Fatal("symbol-owned run missing")
+		}
+		if !hasCallToFile(owned, "src.callback", "src/dep.ts") && !hasCallTarget(owned, "src.callback") {
+			t.Fatalf("%s run must call imported callback: %+v", owned.File, owned.Relations)
+		}
+		if !hasCallToFile(owned, "src.keep", "src/dep.ts") && !hasCallTarget(owned, "src.keep") {
+			t.Fatalf("%s run must call keep: %+v", owned.File, owned.Relations)
+		}
+	}
+}

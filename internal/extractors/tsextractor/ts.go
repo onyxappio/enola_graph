@@ -2013,8 +2013,7 @@ func tsDeclLexicalNames(kinds *tsutil.KindTable, n *sitter.Node, src []byte) []s
 	}
 	switch kind {
 	case "function_declaration", "generator_function_declaration", "class_declaration",
-		"abstract_class_declaration", "interface_declaration", "type_alias_declaration",
-		"enum_declaration":
+		"abstract_class_declaration", "enum_declaration":
 		if id := n.ChildByFieldName("name"); id != nil {
 			if name := nodeText(id, src); name != "" {
 				return []string{name}
@@ -2030,6 +2029,33 @@ func tsDeclLexicalNames(kinds *tsutil.KindTable, n *sitter.Node, src []byte) []s
 	return nil
 }
 
+// tsDeclTypeNames collects TypeScript type-space names. Interfaces and type aliases
+// occupy the type namespace only; classes and enums occupy both namespaces.
+func tsDeclTypeNames(kinds *tsutil.KindTable, n *sitter.Node, src []byte) []string {
+	if n == nil {
+		return nil
+	}
+	kind := kindOf(kinds, n)
+	if kind == "export_statement" {
+		if inner := firstDeclChild(kinds, n); inner != nil {
+			n = inner
+			kind = kindOf(kinds, n)
+		} else {
+			return nil
+		}
+	}
+	switch kind {
+	case "interface_declaration", "type_alias_declaration",
+		"class_declaration", "abstract_class_declaration", "enum_declaration":
+		if id := n.ChildByFieldName("name"); id != nil {
+			if name := nodeText(id, src); name != "" {
+				return []string{name}
+			}
+		}
+	}
+	return nil
+}
+
 func tsBlockLexicalNames(kinds *tsutil.KindTable, n *sitter.Node, src []byte) []string {
 	if n == nil {
 		return nil
@@ -2037,6 +2063,17 @@ func tsBlockLexicalNames(kinds *tsutil.KindTable, n *sitter.Node, src []byte) []
 	var names []string
 	for i := range n.NamedChildCount() {
 		names = append(names, tsDeclLexicalNames(kinds, n.NamedChild(i), src)...)
+	}
+	return names
+}
+
+func tsBlockTypeNames(kinds *tsutil.KindTable, n *sitter.Node, src []byte) []string {
+	if n == nil {
+		return nil
+	}
+	var names []string
+	for i := range n.NamedChildCount() {
+		names = append(names, tsDeclTypeNames(kinds, n.NamedChild(i), src)...)
 	}
 	return names
 }
@@ -3211,6 +3248,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 		return ""
 	}
 	var frShadows []map[string]bool
+	var frTypeShadows []map[string]bool
 	var frImp []map[string]string
 	var frImpF []map[string]string
 	frPush := func(names ...string) {
@@ -3221,6 +3259,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			}
 		}
 		frShadows = append(frShadows, s)
+		frTypeShadows = append(frTypeShadows, map[string]bool{})
 		frImp = append(frImp, map[string]string{})
 		frImpF = append(frImpF, map[string]string{})
 	}
@@ -3229,15 +3268,20 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			return
 		}
 		frShadows = frShadows[:len(frShadows)-1]
+		frTypeShadows = frTypeShadows[:len(frTypeShadows)-1]
 		frImp = frImp[:len(frImp)-1]
 		frImpF = frImpF[:len(frImpF)-1]
 	}
-	frLookup := func(name string) (target, file string, ok, shadowed bool) {
+	frLookupNS := func(name string, typeSpace bool) (target, file string, ok, shadowed bool) {
 		for i := len(frImp) - 1; i >= 0; i-- {
 			if t, found := frImp[i][name]; found {
 				return t, frImpF[i][name], true, false
 			}
-			if frShadows[i][name] {
+			if typeSpace {
+				if frTypeShadows[i][name] {
+					return "", "", false, true
+				}
+			} else if frShadows[i][name] {
 				return "", "", false, true
 			}
 		}
@@ -3245,6 +3289,9 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			return t, internalFiles[name], true, false
 		}
 		return "", "", false, false
+	}
+	frLookup := func(name string) (target, file string, ok, shadowed bool) {
+		return frLookupNS(name, false)
 	}
 	frBindAwait := func(n *sitter.Node) {
 		if n == nil || len(frImp) == 0 {
@@ -3320,6 +3367,13 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 		}
 		if kind == "statement_block" {
 			frPush(tsBlockLexicalNames(kinds, n, src)...)
+			if len(frTypeShadows) > 0 {
+				for _, name := range tsBlockTypeNames(kinds, n, src) {
+					if name != "" {
+						frTypeShadows[len(frTypeShadows)-1][name] = true
+					}
+				}
+			}
 			for i := range n.ChildCount() {
 				walk(n.Child(i))
 			}
@@ -3338,8 +3392,11 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 		case "identifier", "type_identifier":
 			// type_identifier covers an imported type/interface used only as an
 			// annotation (`repo: Repo`), which is otherwise never an edge.
+			// Type aliases/interfaces occupy type space; they must not hide value
+			// identifiers such as an imported callable of the same name.
 			name := nodeText(n, src)
-			if t, file, ok, shadowed := frLookup(name); shadowed {
+			typeSpace := kind == "type_identifier"
+			if t, file, ok, shadowed := frLookupNS(name, typeSpace); shadowed {
 				return
 			} else if ok {
 				add(t, file)
