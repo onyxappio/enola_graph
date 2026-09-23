@@ -1,0 +1,1408 @@
+{
+  "provenance": {
+    "note": "first-parent history; persistent delta state; cold oracle per commit; file-sink --events JSONL timings, not NATS JetStream",
+    "sink": "file",
+    "source_tree": "/tmp/enola-product-history-source",
+    "source_dirty_untracked": "?? .enola/\n?? mcp-arch.yaml",
+    "fetch_clone": "/tmp/enola-stage5-exploratory-history10/product-fetch",
+    "ref": "a609c19f3861971930fae7b33dcb2950598953c5",
+    "ref_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+    "first_parent_shas": [
+      "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+      "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+      "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+      "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+      "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+      "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+      "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "a6f1f3a91a36ea3dead786560412a4944a009694",
+      "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "a609c19f3861971930fae7b33dcb2950598953c5"
+    ],
+    "selected_transitions": [
+      "4d104e600f89..07fb4a41ddaf",
+      "07fb4a41ddaf..fec1eac346c4",
+      "fec1eac346c4..9fc7ae5b4c3f",
+      "9fc7ae5b4c3f..1c2607479b6d",
+      "1c2607479b6d..599575d0aa39",
+      "599575d0aa39..ae233c5f5695",
+      "ae233c5f5695..4168360e2e7f",
+      "4168360e2e7f..a6f1f3a91a36",
+      "a6f1f3a91a36..5dfb2c8f276d",
+      "5dfb2c8f276d..a609c19f3861"
+    ],
+    "enola": {
+      "revision": "3957b50cf721a04262395589b97d4ac4d1587d03",
+      "dirty": true,
+      "status_porcelain": "?? docs/benchmarks/product-efficiency-2026-09-23/V304_PACKAGE_GATE_HISTORY.md\n?? docs/benchmarks/product-efficiency-2026-09-23/v304-package-gate-history-baseline.json\n?? docs/benchmarks/product-efficiency-2026-09-23/v304-package-gate-history-exploratory.json",
+      "diff_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+      "untracked_names_sha256": "143e06ebfa3d68c7962a13bf3edce7f57f8f4a36278fc857c6f0de337006663d"
+    },
+    "binary": {
+      "path": "/tmp/enola-stage5-exploratory/enola",
+      "sha256": "8a30aa9ca3a5285cce0972912356c587f8e18ddd500c909d6d77c11350ec9778",
+      "go_version_m": "/tmp/enola-stage5-exploratory/enola: go1.27.1\n\tpath\tgithub.com/enola-labs/enola/cmd/enola\n\tmod\tgithub.com/enola-labs/enola\tv0.0.0-20260923154444-3957b50cf721+dirty\t\n\tdep\tgithub.com/ebitengine/purego\tv0.10.2\th1:W809HbnvzAxgdm+aOvlSekrM16wGCdT/e76+9tS7gzE=\n\tdep\tgithub.com/fsnotify/fsnotify\tv1.9.0\th1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=\n\tdep\tgithub.com/google/jsonschema-go\tv0.4.3\th1:/DBOLZTfDow7pe2GmaJNhltueGTtDKICi8V8p+DQPd0=\n\tdep\tgithub.com/klauspost/compress\tv1.18.0\th1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=\n\tdep\tgithub.com/mattn/go-pointer\tv0.0.1\th1:n+XhsuGeVO6MEAp7xyEukFINEa+Quek5psIR/ylA6o0=\n\tdep\tgithub.com/modelcontextprotocol/go-sdk\tv1.8.0\th1:KIvahhYqwtbeniWVPs3TcXEA7b8jEtwfBpOTAI+Urx4=\n\tdep\tgithub.com/nats-io/nats.go\tv1.47.0\th1:YQdADw6J/UfGUd2Oy6tn4Hq6YHxCaJrVKayxxFqYrgM=\n\tdep\tgithub.com/nats-io/nkeys\tv0.4.11\th1:q44qGV008kYd9W1b1nEBkNzvnWxtRSQ7A8BoqRrcfa0=\n\tdep\tgithub.com/nats-io/nuid\tv1.0.1\th1:5iA8DT8V7q8WK2EScv2padNa/rTESc1KdnPw4TC2paw=\n\tdep\tgithub.com/pbnjay/memory\tv0.0.0-20210728143218-7b4eea64cf58\th1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=\n\tdep\tgithub.com/segmentio/asm\tv1.1.3\th1:WM03sfUOENvvKexOLp+pCqgb/WDjsi7EK8gIsICtzhc=\n\tdep\tgithub.com/segmentio/encoding\tv0.5.4\th1:OW1VRern8Nw6ITAtwSZ7Idrl3MXCFwXHPgqESYfvNt0=\n\tdep\tgithub.com/tree-sitter-grammars/tree-sitter-kotlin\tv1.1.0\th1:SWIUDASa+WPhDDem1U5IJpYwQEezkqXrUI61OcnORzM=\n\tdep\tgithub.com/tree-sitter/go-tree-sitter\tv0.24.0\th1:kRZb6aBNfcI/u0Qh8XEt3zjNVnmxTisDBN+kXK0xRYQ=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c\tv0.23.6\th1:aHcghKEBgyUDUcCKFT5fELp26UBU7RBltj5MkRYxyy8=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c-sharp\tv0.23.1\th1:ddG6osP34sMieVNN6lu5ZG/3N8Wn+67+43BmipqidyM=\n\tdep\tgithub.com/tree-sitter/tree-sitter-cpp\tv0.23.4\th1:LaWZsiqQKvR65yHgKmnaqA+uz6tlDJTJFCyFIeZU/8w=\n\tdep\tgithub.com/tree-sitter/tree-sitter-java\tv0.23.5\th1:J9YeMGMwXYlKSP3K4Us8CitC6hjtMjqpeOf2GGo6tig=\n\tdep\tgithub.com/tree-sitter/tree-sitter-php\tv0.23.12\th1:zgnxrV5RUEbK9d3jm9R8CjR3uSA1pBPbvq7Tbjg8j0k=\n\tdep\tgithub.com/tree-sitter/tree-sitter-python\tv0.23.6\th1:qHnWFR5WhtMQpxBZRwiaU5Hk/29vGju6CVtmvu5Haas=\n\tdep\tgithub.com/tree-sitter/tree-sitter-ruby\tv0.23.1\th1:T/NKHUA+iVbHM440hFx+lzVOzS4dV6z8Qw8ai+72bYo=\n\tdep\tgithub.com/tree-sitter/tree-sitter-rust\tv0.23.3\th1:v41N2Dx5ZEzouqeQJ0IIH2cUwVw/iepwrUoE9D56IL4=\n\tdep\tgithub.com/tree-sitter/tree-sitter-scala\tv0.24.1\th1:jO4zDfb3vQWmqCDpLfhENVtP3RvOSLYNR69m0R/T6wY=\n\tdep\tgithub.com/tree-sitter/tree-sitter-typescript\tv0.23.2\th1:/Odvphn18PniVixb9e97X0DbNVsU6Qocv9mfkyzdXwU=\n\tdep\tgithub.com/yosida95/uritemplate/v3\tv3.0.2\th1:Ed3Oyj9yrmi9087+NczuL5BwkIc4wvTb5zIM+UJPGz4=\n\tdep\tgolang.org/x/crypto\tv0.37.0\th1:kJNSjF/Xp7kU0iB2Z+9viTPMW4EqqsrywMXLJOOsXSE=\n\tdep\tgolang.org/x/oauth2\tv0.35.0\th1:Mv2mzuHuZuY2+bkyWXIHMfhNdJAdwW3FuWeCPYN5GVQ=\n\tdep\tgolang.org/x/sync\tv0.20.0\th1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=\n\tdep\tgolang.org/x/sys\tv0.48.0\th1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=\n\tdep\tgolang.org/x/time\tv0.15.0\th1:bbrp8t3bGUeFOx08pvsMYRTCVSMk89u4tKbNOZbp88U=\n\tdep\tgopkg.in/yaml.v3\tv3.0.1\th1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tDefaultGODEBUG=tracebacklabels=0,x509sslcertoverrideplatform=0\n\tbuild\tCGO_ENABLED=1\n\tbuild\tGOARCH=arm64\n\tbuild\tGOOS=darwin\n\tbuild\tGOARM64=v8.0\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=3957b50cf721a04262395589b97d4ac4d1587d03\n\tbuild\tvcs.time=2026-09-23T15:44:44Z\n\tbuild\tvcs.modified=true\n",
+      "go_version_m_sha256": "b4d03d5d11a4d0a64fb673c485f40cd314faba2d6baac73c239f60a1622788c5",
+      "go_version": "/tmp/enola-stage5-exploratory/enola: go1.27.1",
+      "vcs_revision": "3957b50cf721a04262395589b97d4ac4d1587d03",
+      "vcs_modified": "true"
+    },
+    "input_policy": {
+      "pinned_source": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/product-mcp-arch.yaml",
+      "pinned_sha256": "4fd513e2cddf987e9f0f9afbc51a6d39e388fae2111b24489cb418cadc786db6",
+      "source_mcp_arch": "/tmp/enola-product-history-source/mcp-arch.yaml",
+      "source_mcp_arch_sha256": "4fd513e2cddf987e9f0f9afbc51a6d39e388fae2111b24489cb418cadc786db6",
+      "source_matches_pin": true,
+      "note": "pinned overlay applied only when the SHA has no tracked mcp-arch.yaml; historical tracked config is left in place",
+      "lockfiles_excluded_from_required_owners": true
+    },
+    "baseline": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/invalidation-history-2026-09-22/results.baseline-invalid-chronology.json"
+  },
+  "initial_sha": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+  "transitions": [
+    {
+      "id": "00-4d104e600f89..07fb4a41ddaf",
+      "index": 0,
+      "parent": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+      "child": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+      "changed_file_count": 6,
+      "required_owner_count": 2,
+      "required_owners_sample": [
+        "file:packages/tracking-client/src/core/tracker.ts",
+        "file:packages/tracking-client/src/web/beacon.ts"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 3.791,
+        "sink": "file",
+        "parsed": 6,
+        "cached": 4058,
+        "files_read": 6,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 6,
+        "events": 7,
+        "run_id": "product-scope-scope-bench-2-1790179754184698000",
+        "manifest": {
+          "begin_count": 7,
+          "begin_digest": "762dd9ea582633cc481ba0c3f2cad0a15dca08fb9b2c8f71b488b7d4ae3a0c35",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            1,
+            2
+          ],
+          "end_batch_count": 5,
+          "end_batch_digest": "b3c7d05744276572ce422163ab3f7f4a9cab9f67685f2e8926e200e50d61c0d1",
+          "end_owner_scope_len": 7,
+          "end_owner_scope_digest": "762dd9ea582633cc481ba0c3f2cad0a15dca08fb9b2c8f71b488b7d4ae3a0c35",
+          "batch_seq_count": 5,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 30.929,
+        "sink": "file",
+        "parsed": 4012,
+        "cached": 0,
+        "files_read": 4064,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4942,
+        "events": 2306,
+        "run_id": "product-scope-scope-bench-1-1790179859597925000",
+        "manifest": {
+          "begin_count": 8451,
+          "begin_digest": "c60faa6ff0d05e11f8db6f5a92d2435ed00056eba1a86385622507ab8999dcb8",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2304,
+          "end_batch_digest": "00ef445a4d7c3c407f60ae39524f2c8e72fe0729a1ef14862b08cdd768f8c04c",
+          "end_owner_scope_len": 8451,
+          "end_owner_scope_digest": "c60faa6ff0d05e11f8db6f5a92d2435ed00056eba1a86385622507ab8999dcb8",
+          "batch_seq_count": 2304,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 7,
+      "necessary_owner_count": 2,
+      "necessary_owners_sample": [
+        "file:packages/tracking-client/src/core/tracker.ts",
+        "file:packages/tracking-client/src/web/beacon.ts"
+      ],
+      "extra_begin_owner_count": 5,
+      "extra_begin_owners_sample": [
+        "file:apps/mobile/src/analytics/trackerRuntimeDeps.ts",
+        "file:apps/mobile/src/analytics/trackerRuntimeDeps.web.ts",
+        "file:packages/tracking-client/package.json",
+        "file:packages/tracking-client/src/index.ts",
+        "file:packages/tracking-client/src/web/index.ts"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 2,
+      "sink": "file",
+      "blocker": null
+    },
+    {
+      "id": "01-07fb4a41ddaf..fec1eac346c4",
+      "index": 1,
+      "parent": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+      "child": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+      "changed_file_count": 9345,
+      "required_owner_count": 96,
+      "required_owners_sample": [
+        "file:apps/mobile/scripts/gate-shard-ci.ts",
+        "file:apps/mobile/src/appSurfaces/protect/protectSteadyStateAppSurface.tsx",
+        "file:apps/mobile/src/appSurfaces/visualCaptureAppSurface.tsx",
+        "file:apps/mobile/src/components/figma/FigmaIcon.tsx",
+        "file:apps/mobile/src/components/figma/bottomSheet/BottomSheet.tsx",
+        "file:apps/mobile/src/components/figma/buttons/Button.tsx",
+        "file:apps/mobile/src/components/figma/cards/CourseCardCertificatePreview.tsx",
+        "file:apps/mobile/src/components/figma/cards/CourseCardPreview.tsx",
+        "file:apps/mobile/src/components/figma/cards/FeatureCard.tsx",
+        "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingBrowsing.tsx",
+        "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingWelcome.tsx",
+        "file:apps/mobile/src/components/figma/cards/SettingsListCard.tsx",
+        "file:apps/mobile/src/components/figma/cards/SubscriptionInfoCard.tsx",
+        "file:apps/mobile/src/components/figma/cards/featureCardBorderInset.ts",
+        "file:apps/mobile/src/components/figma/coursePath/CoursePathCertificateSkiaCanvas.tsx",
+        "file:apps/mobile/src/components/figma/coursePath/CoursePathNodeSkiaCanvas.tsx",
+        "file:apps/mobile/src/components/figma/device/PointRowAction.tsx",
+        "file:apps/mobile/src/components/figma/device/PointsCard.tsx",
+        "file:apps/mobile/src/components/figma/device/pointsCardRowSeparator.ts",
+        "file:apps/mobile/src/components/figma/icons/GlassIconLock.tsx",
+        "file:apps/mobile/src/components/figma/icons/GlassIconPhone.tsx",
+        "file:apps/mobile/src/components/figma/icons/GlassIconShield.tsx",
+        "file:apps/mobile/src/components/figma/icons/GlassIconUser.tsx",
+        "file:apps/mobile/src/components/figma/icons/glass/GlassIcon.tsx",
+        "file:apps/mobile/src/components/figma/navigation/FilterGroup.tsx"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 15.084,
+        "sink": "file",
+        "parsed": 624,
+        "cached": 3444,
+        "files_read": 624,
+        "generation": [
+          2,
+          3
+        ],
+        "owners_published": 1811,
+        "events": 1045,
+        "run_id": "product-scope-scope-bench-3-1790180044308372000",
+        "manifest": {
+          "begin_count": 1811,
+          "begin_digest": "7d839466c5ba437adf1514b976444a12eaa7ba06a27cbd2e98af60332615008a",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            2,
+            3
+          ],
+          "end_batch_count": 1043,
+          "end_batch_digest": "d4e2f99cde013f2c81cd4d88885bde0a69d2a17b0847e04df9b2b49512af9fb5",
+          "end_owner_scope_len": 1811,
+          "end_owner_scope_digest": "7d839466c5ba437adf1514b976444a12eaa7ba06a27cbd2e98af60332615008a",
+          "batch_seq_count": 1043,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 25.381,
+        "sink": "file",
+        "parsed": 4016,
+        "cached": 0,
+        "files_read": 4068,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4946,
+        "events": 2311,
+        "run_id": "product-scope-scope-bench-1-1790180258028607000",
+        "manifest": {
+          "begin_count": 8455,
+          "begin_digest": "5e5d1628462771234f5a777025a89f55b47c89cc123579d9e0dd0e096d92a12e",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2309,
+          "end_batch_digest": "8049b86ab4455c3d2213a9e3427752b8be33b68da1d5bd00181682502124bcfb",
+          "end_owner_scope_len": 8455,
+          "end_owner_scope_digest": "5e5d1628462771234f5a777025a89f55b47c89cc123579d9e0dd0e096d92a12e",
+          "batch_seq_count": 2309,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 1811,
+      "necessary_owner_count": 83,
+      "necessary_owners_sample": [
+        "file:apps/mobile/scripts/gate-shard-ci.ts",
+        "file:apps/mobile/src/appSurfaces/protect/protectSteadyStateAppSurface.tsx",
+        "file:apps/mobile/src/appSurfaces/visualCaptureAppSurface.tsx",
+        "file:apps/mobile/src/components/figma/FigmaIcon.tsx",
+        "file:apps/mobile/src/components/figma/buttons/Button.tsx",
+        "file:apps/mobile/src/components/figma/cards/CourseCardCertificatePreview.tsx",
+        "file:apps/mobile/src/components/figma/cards/CourseCardPreview.tsx",
+        "file:apps/mobile/src/components/figma/cards/FeatureCard.tsx",
+        "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingBrowsing.tsx",
+        "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingWelcome.tsx",
+        "file:apps/mobile/src/components/figma/cards/SettingsListCard.tsx",
+        "file:apps/mobile/src/components/figma/cards/SubscriptionInfoCard.tsx",
+        "file:apps/mobile/src/components/figma/cards/featureCardBorderInset.ts",
+        "file:apps/mobile/src/components/figma/coursePath/CoursePathCertificateSkiaCanvas.tsx",
+        "file:apps/mobile/src/components/figma/coursePath/CoursePathNodeSkiaCanvas.tsx",
+        "file:apps/mobile/src/components/figma/device/PointRowAction.tsx",
+        "file:apps/mobile/src/components/figma/device/PointsCard.tsx",
+        "file:apps/mobile/src/components/figma/device/pointsCardRowSeparator.ts",
+        "file:apps/mobile/src/components/figma/icons/GlassIconLock.tsx",
+        "file:apps/mobile/src/components/figma/icons/GlassIconPhone.tsx",
+        "file:apps/mobile/src/components/figma/icons/GlassIconShield.tsx",
+        "file:apps/mobile/src/components/figma/icons/GlassIconUser.tsx",
+        "file:apps/mobile/src/components/figma/icons/glass/GlassIcon.tsx",
+        "file:apps/mobile/src/components/figma/navigation/FilterGroup.tsx",
+        "file:apps/mobile/src/components/figma/navigation/IconButton.tsx"
+      ],
+      "extra_begin_owner_count": 1728,
+      "extra_begin_owners_sample": [
+        "file:.deepsec/AGENTS.md",
+        "file:.deepsec/README.md",
+        "file:.deepsec/data/product/INFO.md",
+        "file:.deepsec/data/product/SETUP.md",
+        "file:.t191-coder-brief.md",
+        "file:.t191-coder-done.md",
+        "file:.t191-orchestrator-brief.md",
+        "file:.t191-review-1.md",
+        "file:.t191-reviewer-brief.md",
+        "file:.t198-orchestrator-brief.md",
+        "file:.t227-coder-status.md",
+        "file:.t284-badge-banner-3699-24547-assignment7-report.md",
+        "file:.t284-bottom-sheet-content-assignment1-report.md",
+        "file:.t284-clock-correction-pass-report.md",
+        "file:.t284-illustration-on-3578-31962-approve-with-residual-floor.md",
+        "file:.t284-illustration-on-3578-31962-css-frost-residual-floor.md",
+        "file:.t284-illustration-on-3578-31962-exact-gate-resume-report.md",
+        "file:.t284-illustration-on-3578-31962-frost-css-correction-report.md",
+        "file:.t284-illustration-on-3578-31962-live-inset-gate-report.md",
+        "file:.t284-illustration-on-3578-31962-rim-inset-correction-report.md",
+        "file:.t284-indicator-default-medium-assignment-report.md",
+        "file:.t284-indicator-default-medium-correction-report.md",
+        "file:.t284-journey-blockers-report.md",
+        "file:.t284-navigation-progress-bar-group-counter-assignment5-report.md",
+        "file:.t284-phase1-gates-journeys-independence.md"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 3,
+      "sink": "file",
+      "blocker": null
+    },
+    {
+      "id": "02-fec1eac346c4..9fc7ae5b4c3f",
+      "index": 2,
+      "parent": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+      "child": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+      "changed_file_count": 8125,
+      "required_owner_count": 17,
+      "required_owners_sample": [
+        "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingWelcome.tsx",
+        "file:apps/mobile/src/components/figma/cards/ListCardHeader.tsx",
+        "file:apps/mobile/src/components/figma/device/PointRowAction.tsx",
+        "file:apps/mobile/src/screens/train/TrainRuntimeScreen.tsx",
+        "file:apps/mobile/src/visual-diff/collapsedComponentVisibleText.ts",
+        "file:apps/mobile/src/visual-diff/componentActualBoundsDiff.ts",
+        "file:apps/mobile/src/visual-diff/componentLayoutMaskDiff.ts",
+        "file:apps/mobile/src/visual-diff/componentSlotOwnership.ts",
+        "file:apps/mobile/src/visual-diff/figmaMarkerManifest.ts",
+        "file:apps/mobile/src/visual-diff/figmaMarkerOwnership.ts",
+        "file:apps/mobile/src/visual-diff/gateEvaluatorOwnership.ts",
+        "file:apps/mobile/src/visual-diff/gateInputsHash.ts",
+        "file:apps/mobile/src/visual-diff/gateSourceClosure.ts",
+        "file:apps/mobile/src/visual-diff/gateStructureEval.ts",
+        "file:apps/mobile/src/visual-diff/screenComponentGateClosure.ts",
+        "file:apps/mobile/src/visual-diff/screenGateWaivers.ts",
+        "file:docs/engineering/sot-conflicts/2026-09-19-train-intentional-runtime-divergences.md"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 15.029,
+        "sink": "file",
+        "parsed": 69,
+        "cached": 4001,
+        "files_read": 69,
+        "generation": [
+          3,
+          4
+        ],
+        "owners_published": 2266,
+        "events": 1179,
+        "run_id": "product-scope-scope-bench-4-1790180349766916000",
+        "manifest": {
+          "begin_count": 2266,
+          "begin_digest": "6479174881b35b37059b3cddb75cb4fd4321c47e569db34c0a0e231c04b3c7ee",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            3,
+            4
+          ],
+          "end_batch_count": 1177,
+          "end_batch_digest": "fafdf173e2a1a5becda26165259a60cd93e2ce9abcdaf5a8dcff7008b135cd89",
+          "end_owner_scope_len": 2266,
+          "end_owner_scope_digest": "6479174881b35b37059b3cddb75cb4fd4321c47e569db34c0a0e231c04b3c7ee",
+          "batch_seq_count": 1177,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 22.201,
+        "sink": "file",
+        "parsed": 4018,
+        "cached": 0,
+        "files_read": 4070,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4949,
+        "events": 2312,
+        "run_id": "product-scope-scope-bench-1-1790180396128552000",
+        "manifest": {
+          "begin_count": 8458,
+          "begin_digest": "8edc48d5e5a73e35b2f43046b511bd0fa07fde0afb3dbcd05bb2cc550788273d",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2310,
+          "end_batch_digest": "3a5b4bd5227c5502d1798de48090ce2c55b88b19846cfbdb99b6823d61ed5099",
+          "end_owner_scope_len": 8458,
+          "end_owner_scope_digest": "8edc48d5e5a73e35b2f43046b511bd0fa07fde0afb3dbcd05bb2cc550788273d",
+          "batch_seq_count": 2310,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 2266,
+      "necessary_owner_count": 17,
+      "necessary_owners_sample": [
+        "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingWelcome.tsx",
+        "file:apps/mobile/src/components/figma/cards/ListCardHeader.tsx",
+        "file:apps/mobile/src/components/figma/device/PointRowAction.tsx",
+        "file:apps/mobile/src/screens/train/TrainRuntimeScreen.tsx",
+        "file:apps/mobile/src/visual-diff/collapsedComponentVisibleText.ts",
+        "file:apps/mobile/src/visual-diff/componentActualBoundsDiff.ts",
+        "file:apps/mobile/src/visual-diff/componentLayoutMaskDiff.ts",
+        "file:apps/mobile/src/visual-diff/componentSlotOwnership.ts",
+        "file:apps/mobile/src/visual-diff/figmaMarkerManifest.ts",
+        "file:apps/mobile/src/visual-diff/figmaMarkerOwnership.ts",
+        "file:apps/mobile/src/visual-diff/gateEvaluatorOwnership.ts",
+        "file:apps/mobile/src/visual-diff/gateInputsHash.ts",
+        "file:apps/mobile/src/visual-diff/gateSourceClosure.ts",
+        "file:apps/mobile/src/visual-diff/gateStructureEval.ts",
+        "file:apps/mobile/src/visual-diff/screenComponentGateClosure.ts",
+        "file:apps/mobile/src/visual-diff/screenGateWaivers.ts",
+        "file:docs/engineering/sot-conflicts/2026-09-19-train-intentional-runtime-divergences.md"
+      ],
+      "extra_begin_owner_count": 2249,
+      "extra_begin_owners_sample": [
+        "file:.deepsec/AGENTS.md",
+        "file:.deepsec/README.md",
+        "file:.deepsec/data/product/INFO.md",
+        "file:.deepsec/data/product/SETUP.md",
+        "file:.t191-coder-brief.md",
+        "file:.t191-coder-done.md",
+        "file:.t191-orchestrator-brief.md",
+        "file:.t191-review-1.md",
+        "file:.t191-reviewer-brief.md",
+        "file:.t198-orchestrator-brief.md",
+        "file:.t227-coder-status.md",
+        "file:.t284-badge-banner-3699-24547-assignment7-report.md",
+        "file:.t284-bottom-sheet-content-assignment1-report.md",
+        "file:.t284-clock-correction-pass-report.md",
+        "file:.t284-illustration-on-3578-31962-approve-with-residual-floor.md",
+        "file:.t284-illustration-on-3578-31962-css-frost-residual-floor.md",
+        "file:.t284-illustration-on-3578-31962-exact-gate-resume-report.md",
+        "file:.t284-illustration-on-3578-31962-frost-css-correction-report.md",
+        "file:.t284-illustration-on-3578-31962-live-inset-gate-report.md",
+        "file:.t284-illustration-on-3578-31962-rim-inset-correction-report.md",
+        "file:.t284-indicator-default-medium-assignment-report.md",
+        "file:.t284-indicator-default-medium-correction-report.md",
+        "file:.t284-journey-blockers-report.md",
+        "file:.t284-navigation-progress-bar-group-counter-assignment5-report.md",
+        "file:.t284-phase1-gates-journeys-independence.md"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 4,
+      "sink": "file",
+      "blocker": null
+    },
+    {
+      "id": "03-9fc7ae5b4c3f..1c2607479b6d",
+      "index": 3,
+      "parent": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+      "child": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+      "changed_file_count": 70,
+      "required_owner_count": 35,
+      "required_owners_sample": [
+        "file:docs/reports/T-578-managed-hosted-checkout-implementation.md",
+        "file:docs/reports/T-578-prod-stripe-managed-offers-unavailable.md",
+        "file:infra/pulumi/README.md",
+        "file:infra/pulumi/config/payment-seed-offers/README.md",
+        "file:infra/pulumi/src/environmentProfile.ts",
+        "file:infra/pulumi/src/gcp/cloudRun.ts",
+        "file:infra/pulumi/src/onyxEnvironment.ts",
+        "file:packages/checkout-vue/src/api.ts",
+        "file:packages/checkout-vue/src/paymentForm.ts",
+        "file:packages/checkout-vue/src/types.ts",
+        "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+        "file:packages/clickhouse/src/productCoreClickPipes.ts",
+        "file:packages/contracts/src/payment/checkoutAuthorization.ts",
+        "file:packages/contracts/src/payment/funnel.ts",
+        "file:packages/contracts/src/payment/paymentMode.ts",
+        "file:packages/database/src/productCoreCdcColumns.ts",
+        "file:packages/database/src/schema.ts",
+        "file:scripts/deploy/configure-pulumi-stack.mjs",
+        "file:scripts/deploy/pr-demo-fingerprint.mjs",
+        "file:scripts/deploy/product-core-clickpipes-test-image-provenance.mjs",
+        "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+        "file:services/payment-api/src/checkoutAuthorization.ts",
+        "file:services/payment-api/src/checkoutReturn.ts",
+        "file:services/payment-api/src/config.ts",
+        "file:services/payment-api/src/domain.ts"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 9.458,
+        "sink": "file",
+        "parsed": 433,
+        "cached": 3639,
+        "files_read": 433,
+        "generation": [
+          4,
+          5
+        ],
+        "owners_published": 1119,
+        "events": 686,
+        "run_id": "product-scope-scope-bench-5-1790180432196776000",
+        "manifest": {
+          "begin_count": 1119,
+          "begin_digest": "48067aa52e602dfd857801825feb7f428f5020565a0aac799bdc1937e40e2eed",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            4,
+            5
+          ],
+          "end_batch_count": 684,
+          "end_batch_digest": "3fb183cb5fc63da2b3871e03444734d43c53b194824bd4a8a183f9ebf302b80b",
+          "end_owner_scope_len": 1119,
+          "end_owner_scope_digest": "48067aa52e602dfd857801825feb7f428f5020565a0aac799bdc1937e40e2eed",
+          "batch_seq_count": 684,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 22.841,
+        "sink": "file",
+        "parsed": 4020,
+        "cached": 0,
+        "files_read": 4072,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4953,
+        "events": 2315,
+        "run_id": "product-scope-scope-bench-1-1790180473256302000",
+        "manifest": {
+          "begin_count": 8464,
+          "begin_digest": "784389653d8093cc8e12badaae84b3a8dfd197040baa020e3d912a5322ecc198",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2313,
+          "end_batch_digest": "c9fcde4e24483b74dcc1e82397f7aef61885f4c5efbe3cfd8fe27cf09d1ff038",
+          "end_owner_scope_len": 8464,
+          "end_owner_scope_digest": "784389653d8093cc8e12badaae84b3a8dfd197040baa020e3d912a5322ecc198",
+          "batch_seq_count": 2313,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 1119,
+      "necessary_owner_count": 32,
+      "necessary_owners_sample": [
+        "file:docs/reports/T-578-managed-hosted-checkout-implementation.md",
+        "file:docs/reports/T-578-prod-stripe-managed-offers-unavailable.md",
+        "file:infra/pulumi/README.md",
+        "file:infra/pulumi/src/environmentProfile.ts",
+        "file:infra/pulumi/src/gcp/cloudRun.ts",
+        "file:packages/checkout-vue/src/api.ts",
+        "file:packages/checkout-vue/src/paymentForm.ts",
+        "file:packages/checkout-vue/src/types.ts",
+        "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+        "file:packages/clickhouse/src/productCoreClickPipes.ts",
+        "file:packages/contracts/src/payment/checkoutAuthorization.ts",
+        "file:packages/contracts/src/payment/funnel.ts",
+        "file:packages/database/src/productCoreCdcColumns.ts",
+        "file:packages/database/src/schema.ts",
+        "file:scripts/deploy/configure-pulumi-stack.mjs",
+        "file:scripts/deploy/pr-demo-fingerprint.mjs",
+        "file:scripts/deploy/product-core-clickpipes-test-image-provenance.mjs",
+        "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+        "file:services/payment-api/src/checkoutAuthorization.ts",
+        "file:services/payment-api/src/checkoutReturn.ts",
+        "file:services/payment-api/src/config.ts",
+        "file:services/payment-api/src/domain.ts",
+        "file:services/payment-api/src/paymentOperationTelemetry.ts",
+        "file:services/payment-api/src/providers/stripe.ts",
+        "file:services/payment-api/src/providers/stripeEvents.ts"
+      ],
+      "extra_begin_owner_count": 1087,
+      "extra_begin_owners_sample": [
+        "file:.deepsec/AGENTS.md",
+        "file:.deepsec/README.md",
+        "file:.deepsec/data/product/INFO.md",
+        "file:.deepsec/data/product/SETUP.md",
+        "file:.t191-coder-brief.md",
+        "file:.t191-coder-done.md",
+        "file:.t191-orchestrator-brief.md",
+        "file:.t191-review-1.md",
+        "file:.t191-reviewer-brief.md",
+        "file:.t198-orchestrator-brief.md",
+        "file:.t227-coder-status.md",
+        "file:.t284-badge-banner-3699-24547-assignment7-report.md",
+        "file:.t284-bottom-sheet-content-assignment1-report.md",
+        "file:.t284-clock-correction-pass-report.md",
+        "file:.t284-illustration-on-3578-31962-approve-with-residual-floor.md",
+        "file:.t284-illustration-on-3578-31962-css-frost-residual-floor.md",
+        "file:.t284-illustration-on-3578-31962-exact-gate-resume-report.md",
+        "file:.t284-illustration-on-3578-31962-frost-css-correction-report.md",
+        "file:.t284-illustration-on-3578-31962-live-inset-gate-report.md",
+        "file:.t284-illustration-on-3578-31962-rim-inset-correction-report.md",
+        "file:.t284-indicator-default-medium-assignment-report.md",
+        "file:.t284-indicator-default-medium-correction-report.md",
+        "file:.t284-journey-blockers-report.md",
+        "file:.t284-navigation-progress-bar-group-counter-assignment5-report.md",
+        "file:.t284-phase1-gates-journeys-independence.md"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 5,
+      "sink": "file",
+      "blocker": null
+    },
+    {
+      "id": "04-1c2607479b6d..599575d0aa39",
+      "index": 4,
+      "parent": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+      "child": "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+      "changed_file_count": 15,
+      "required_owner_count": 9,
+      "required_owners_sample": [
+        "file:docs/reports/T-578-managed-hosted-checkout-implementation.md",
+        "file:infra/pulumi/README.md",
+        "file:infra/pulumi/src/environmentProfile.ts",
+        "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+        "file:services/payment-api/src/checkoutReturn.ts",
+        "file:services/payment-api/src/config.ts",
+        "file:services/payment-api/src/providers/stripe.ts",
+        "file:services/payment-api/src/providers/types.ts",
+        "file:services/payment-api/src/routes/funnel.ts"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 3.8,
+        "sink": "file",
+        "parsed": 7,
+        "cached": 4065,
+        "files_read": 7,
+        "generation": [
+          5,
+          6
+        ],
+        "owners_published": 9,
+        "events": 17,
+        "run_id": "product-scope-scope-bench-6-1790180508724873000",
+        "manifest": {
+          "begin_count": 9,
+          "begin_digest": "9533493254545da4d6b299f59f289adeae9dc6922cf3f02e9d9663e65cc8a4ef",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            5,
+            6
+          ],
+          "end_batch_count": 15,
+          "end_batch_digest": "f0e3953e2a850383f16e116774445f080a4fe035509cd3fb52cac304f49749fe",
+          "end_owner_scope_len": 9,
+          "end_owner_scope_digest": "9533493254545da4d6b299f59f289adeae9dc6922cf3f02e9d9663e65cc8a4ef",
+          "batch_seq_count": 15,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 21.582,
+        "sink": "file",
+        "parsed": 4020,
+        "cached": 0,
+        "files_read": 4072,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4953,
+        "events": 2315,
+        "run_id": "product-scope-scope-bench-1-1790180544903567000",
+        "manifest": {
+          "begin_count": 8464,
+          "begin_digest": "784389653d8093cc8e12badaae84b3a8dfd197040baa020e3d912a5322ecc198",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2313,
+          "end_batch_digest": "0205c776e2b1e3490ee53426472988a4c441285bf3a27731bd85202fe9f319e5",
+          "end_owner_scope_len": 8464,
+          "end_owner_scope_digest": "784389653d8093cc8e12badaae84b3a8dfd197040baa020e3d912a5322ecc198",
+          "batch_seq_count": 2313,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 9,
+      "necessary_owner_count": 6,
+      "necessary_owners_sample": [
+        "file:infra/pulumi/src/environmentProfile.ts",
+        "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+        "file:services/payment-api/src/checkoutReturn.ts",
+        "file:services/payment-api/src/config.ts",
+        "file:services/payment-api/src/providers/stripe.ts",
+        "file:services/payment-api/src/routes/funnel.ts"
+      ],
+      "extra_begin_owner_count": 3,
+      "extra_begin_owners_sample": [
+        "file:docs/reports/T-578-managed-hosted-checkout-implementation.md",
+        "file:infra/pulumi/README.md",
+        "file:services/payment-api/src/providers/types.ts"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 6,
+      "sink": "file",
+      "blocker": null
+    },
+    {
+      "id": "05-599575d0aa39..ae233c5f5695",
+      "index": 5,
+      "parent": "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+      "child": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "changed_file_count": 60,
+      "required_owner_count": 28,
+      "required_owners_sample": [
+        "file:docs/plans/2026-09-19-t578-payment-offer-catalog-sync.md",
+        "file:docs/qa/mb-2-payment-api-test-offers.md",
+        "file:docs/reports/T-578-prod-stripe-managed-offers-unavailable.md",
+        "file:docs/specs/2026-09-19-t578-payment-offer-catalog-sync.md",
+        "file:infra/pulumi/README.md",
+        "file:infra/pulumi/config/payment-seed-offers/README.md",
+        "file:infra/pulumi/src/environmentProfile.ts",
+        "file:infra/pulumi/src/gcp/cloudRun.ts",
+        "file:infra/pulumi/src/onyxEnvironment.ts",
+        "file:packages/database/catalogs/payment-offers/README.md",
+        "file:packages/database/package.json",
+        "file:packages/database/src/index.ts",
+        "file:packages/database/src/paymentDemoRuntime.d.mts",
+        "file:packages/database/src/paymentDemoRuntime.mjs",
+        "file:packages/database/src/paymentOfferCatalog.ts",
+        "file:packages/database/src/paymentOfferSeed.ts",
+        "file:packages/database/src/paymentOfferSync.ts",
+        "file:packages/database/src/paymentOfferSyncCli.ts",
+        "file:packages/database/src/schema.ts",
+        "file:scripts/deploy/configure-pulumi-stack.mjs",
+        "file:scripts/deploy/pr-demo-fingerprint.mjs",
+        "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+        "file:scripts/ops/create-stripe-gbp-catalog.mjs",
+        "file:services/payment-api/src/config.ts",
+        "file:services/payment-api/src/databaseBootstrap.ts"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 21.917,
+        "sink": "file",
+        "parsed": 101,
+        "cached": 3998,
+        "files_read": 101,
+        "generation": [
+          6,
+          7
+        ],
+        "owners_published": 4962,
+        "events": 2317,
+        "run_id": "product-scope-scope-bench-7-1790180578772289000",
+        "manifest": {
+          "begin_count": 8477,
+          "begin_digest": "35f327c3ac65e9ebead74d94f65072804e7a42c86b4d4f8325499e36e40fad7b",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            6,
+            7
+          ],
+          "end_batch_count": 2315,
+          "end_batch_digest": "d5ce7e11892a35ae8527b838df31ffb1053a7840fdf319a8f6d260819a38d9a9",
+          "end_owner_scope_len": 8477,
+          "end_owner_scope_digest": "35f327c3ac65e9ebead74d94f65072804e7a42c86b4d4f8325499e36e40fad7b",
+          "batch_seq_count": 2315,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 21.579,
+        "sink": "file",
+        "parsed": 4027,
+        "cached": 0,
+        "files_read": 4079,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4962,
+        "events": 2317,
+        "run_id": "product-scope-scope-bench-1-1790180634783035000",
+        "manifest": {
+          "begin_count": 8476,
+          "begin_digest": "26ac7c37e49b1805d27eb1117a0c64e1df163ea5026fd057c1428dbb6b97405e",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2315,
+          "end_batch_digest": "90d1158d512a76edd723a2196320ca2da74754240d0cb37d07ac2dd5c67d76a9",
+          "end_owner_scope_len": 8476,
+          "end_owner_scope_digest": "26ac7c37e49b1805d27eb1117a0c64e1df163ea5026fd057c1428dbb6b97405e",
+          "batch_seq_count": 2315,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 8477,
+      "necessary_owner_count": 25,
+      "necessary_owners_sample": [
+        "file:docs/plans/2026-09-19-t578-payment-offer-catalog-sync.md",
+        "file:docs/qa/mb-2-payment-api-test-offers.md",
+        "file:docs/reports/T-578-prod-stripe-managed-offers-unavailable.md",
+        "file:docs/specs/2026-09-19-t578-payment-offer-catalog-sync.md",
+        "file:infra/pulumi/README.md",
+        "file:infra/pulumi/config/payment-seed-offers/README.md",
+        "file:infra/pulumi/src/environmentProfile.ts",
+        "file:infra/pulumi/src/gcp/cloudRun.ts",
+        "file:packages/database/catalogs/payment-offers/README.md",
+        "file:packages/database/src/index.ts",
+        "file:packages/database/src/paymentDemoRuntime.d.mts",
+        "file:packages/database/src/paymentDemoRuntime.mjs",
+        "file:packages/database/src/paymentOfferCatalog.ts",
+        "file:packages/database/src/paymentOfferSeed.ts",
+        "file:packages/database/src/paymentOfferSync.ts",
+        "file:packages/database/src/paymentOfferSyncCli.ts",
+        "file:packages/database/src/schema.ts",
+        "file:scripts/deploy/configure-pulumi-stack.mjs",
+        "file:scripts/deploy/pr-demo-fingerprint.mjs",
+        "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+        "file:services/payment-api/src/config.ts",
+        "file:services/payment-api/src/databaseBootstrap.ts",
+        "file:services/payment-api/src/demoFixtures.ts",
+        "file:services/payment-api/src/repository.ts",
+        "file:services/payment-api/src/server.ts"
+      ],
+      "extra_begin_owner_count": 8452,
+      "extra_begin_owners_sample": [
+        "file:.claude/agents/codex-implementer.md",
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/AGENTS.md",
+        "file:.deepsec/README.md",
+        "file:.deepsec/data/product/INFO.md",
+        "file:.deepsec/data/product/SETUP.md",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/deepsec.config.ts",
+        "file:.deepsec/package.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 7,
+      "sink": "file",
+      "blocker": null
+    },
+    {
+      "id": "06-ae233c5f5695..4168360e2e7f",
+      "index": 6,
+      "parent": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "child": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "changed_file_count": 15,
+      "required_owner_count": 10,
+      "required_owners_sample": [
+        "file:docs/analytics/product-core-bronze.md",
+        "file:packages/clickhouse/package.json",
+        "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+        "file:packages/clickhouse/src/productCoreBronze/schemaVerifier.ts",
+        "file:packages/clickhouse/src/productCoreClickPipes.ts",
+        "file:packages/database/src/productCoreCdcCli.ts",
+        "file:packages/database/src/productCoreCdcExpansion.ts",
+        "file:packages/database/src/productCoreCdcPostgres.ts",
+        "file:packages/database/src/productCoreCdcProjection.ts",
+        "file:packages/database/src/productCoreCdcTypes.ts"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 6.799,
+        "sink": "file",
+        "parsed": 111,
+        "cached": 3969,
+        "files_read": 111,
+        "generation": [
+          7,
+          8
+        ],
+        "owners_published": 767,
+        "events": 256,
+        "run_id": "product-scope-scope-bench-8-1790180673590004000",
+        "manifest": {
+          "begin_count": 778,
+          "begin_digest": "dfccb7c9a94eeab6033eff4e3dbfd52f9508bbc8125b77a7a5311108ff5f2f48",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            7,
+            8
+          ],
+          "end_batch_count": 254,
+          "end_batch_digest": "0ba26769ca2cfb02cecd91be2aa32419bfe87a0b23a8a87802721ff472d560fc",
+          "end_owner_scope_len": 778,
+          "end_owner_scope_digest": "dfccb7c9a94eeab6033eff4e3dbfd52f9508bbc8125b77a7a5311108ff5f2f48",
+          "batch_seq_count": 254,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 24.548,
+        "sink": "file",
+        "parsed": 4028,
+        "cached": 0,
+        "files_read": 4080,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4963,
+        "events": 2318,
+        "run_id": "product-scope-scope-bench-1-1790180719922428000",
+        "manifest": {
+          "begin_count": 8477,
+          "begin_digest": "136220bb0b70f2fc7e580b8bcfb44f2005c59068621a0f50e01b523774eeacb2",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2316,
+          "end_batch_digest": "013423c8c84c43e21f885a1432bede435831395ba1d3b01016bd323268a26186",
+          "end_owner_scope_len": 8477,
+          "end_owner_scope_digest": "136220bb0b70f2fc7e580b8bcfb44f2005c59068621a0f50e01b523774eeacb2",
+          "batch_seq_count": 2316,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 778,
+      "necessary_owner_count": 10,
+      "necessary_owners_sample": [
+        "file:docs/analytics/product-core-bronze.md",
+        "file:packages/clickhouse/package.json",
+        "file:packages/clickhouse/src/productCoreBronze/schemaVerifier.ts",
+        "file:packages/clickhouse/src/productCoreClickPipes.ts",
+        "file:packages/database/package.json",
+        "file:packages/database/src/productCoreCdcCli.ts",
+        "file:packages/database/src/productCoreCdcExpansion.ts",
+        "file:packages/database/src/productCoreCdcPostgres.ts",
+        "file:packages/database/src/productCoreCdcProjection.ts",
+        "file:packages/database/src/productCoreCdcTypes.ts"
+      ],
+      "extra_begin_owner_count": 768,
+      "extra_begin_owners_sample": [
+        "file:.deepsec/AGENTS.md",
+        "file:.deepsec/README.md",
+        "file:.deepsec/data/product/INFO.md",
+        "file:.deepsec/data/product/SETUP.md",
+        "file:.deepsec/package.json",
+        "file:.t191-coder-brief.md",
+        "file:.t191-coder-done.md",
+        "file:.t191-orchestrator-brief.md",
+        "file:.t191-review-1.md",
+        "file:.t191-reviewer-brief.md",
+        "file:.t198-orchestrator-brief.md",
+        "file:.t227-coder-status.md",
+        "file:.t284-badge-banner-3699-24547-assignment7-report.md",
+        "file:.t284-bottom-sheet-content-assignment1-report.md",
+        "file:.t284-clock-correction-pass-report.md",
+        "file:.t284-illustration-on-3578-31962-approve-with-residual-floor.md",
+        "file:.t284-illustration-on-3578-31962-css-frost-residual-floor.md",
+        "file:.t284-illustration-on-3578-31962-exact-gate-resume-report.md",
+        "file:.t284-illustration-on-3578-31962-frost-css-correction-report.md",
+        "file:.t284-illustration-on-3578-31962-live-inset-gate-report.md",
+        "file:.t284-illustration-on-3578-31962-rim-inset-correction-report.md",
+        "file:.t284-indicator-default-medium-assignment-report.md",
+        "file:.t284-indicator-default-medium-correction-report.md",
+        "file:.t284-journey-blockers-report.md",
+        "file:.t284-navigation-progress-bar-group-counter-assignment5-report.md"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 8,
+      "sink": "file",
+      "blocker": null
+    },
+    {
+      "id": "07-4168360e2e7f..a6f1f3a91a36",
+      "index": 7,
+      "parent": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "child": "a6f1f3a91a36ea3dead786560412a4944a009694",
+      "changed_file_count": 5,
+      "required_owner_count": 4,
+      "required_owners_sample": [
+        "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+        "file:packages/clickhouse/src/productCoreClickPipes.ts",
+        "file:packages/database/src/productCoreCdc.ts",
+        "file:packages/database/src/productCoreCdcColumns.ts"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 5.664,
+        "sink": "file",
+        "parsed": 80,
+        "cached": 4000,
+        "files_read": 80,
+        "generation": [
+          8,
+          9
+        ],
+        "owners_published": 80,
+        "events": 88,
+        "run_id": "product-scope-scope-bench-9-1790180764702662000",
+        "manifest": {
+          "begin_count": 80,
+          "begin_digest": "b06029dddbef10235d0873f67d79730506c67eb06655ea2e1a5e3731c86351bf",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            8,
+            9
+          ],
+          "end_batch_count": 86,
+          "end_batch_digest": "6fa435c36715affe4b9caaf41144a110805e634fd323939e3423a168a0eb32ca",
+          "end_owner_scope_len": 80,
+          "end_owner_scope_digest": "b06029dddbef10235d0873f67d79730506c67eb06655ea2e1a5e3731c86351bf",
+          "batch_seq_count": 86,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 25.333,
+        "sink": "file",
+        "parsed": 4028,
+        "cached": 0,
+        "files_read": 4080,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4963,
+        "events": 2318,
+        "run_id": "product-scope-scope-bench-1-1790180829985623000",
+        "manifest": {
+          "begin_count": 8477,
+          "begin_digest": "136220bb0b70f2fc7e580b8bcfb44f2005c59068621a0f50e01b523774eeacb2",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2316,
+          "end_batch_digest": "849e3204bd2399102740966bc01b61b9db55b3d75ed42e94301c0a63a6dadac6",
+          "end_owner_scope_len": 8477,
+          "end_owner_scope_digest": "136220bb0b70f2fc7e580b8bcfb44f2005c59068621a0f50e01b523774eeacb2",
+          "batch_seq_count": 2316,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 80,
+      "necessary_owner_count": 4,
+      "necessary_owners_sample": [
+        "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+        "file:packages/clickhouse/src/productCoreClickPipes.ts",
+        "file:packages/database/src/productCoreCdc.ts",
+        "file:packages/database/src/productCoreCdcColumns.ts"
+      ],
+      "extra_begin_owner_count": 76,
+      "extra_begin_owners_sample": [
+        "file:packages/scan-engine/src/providerJobRepository.ts",
+        "file:packages/scan-engine/src/repository.ts",
+        "file:scripts/clickhouse/bootstrap-tasks-sync.ts",
+        "file:scripts/clickhouse/bootstrap.ts",
+        "file:scripts/clickhouse/cleanup-ci-databases.ts",
+        "file:scripts/clickhouse/replay-quarantine.ts",
+        "file:scripts/clickhouse/verify-deploy.ts",
+        "file:scripts/clickhouse/verify-isolation.ts",
+        "file:scripts/clickhouse/verify-tasks-sync-isolation.ts",
+        "file:services/admin-api/src/operations/drizzleStore.ts",
+        "file:services/admin-api/src/repositories/adminScans.ts",
+        "file:services/admin-api/src/server.ts",
+        "file:services/marketing-api/src/repositories/scans.ts",
+        "file:services/marketing-api/src/repositories/waitlist.ts",
+        "file:services/marketing-api/src/server.ts",
+        "file:services/memory-provider/src/analytics.ts",
+        "file:services/memory-provider/src/app.ts",
+        "file:services/memory-provider/src/config.ts",
+        "file:services/memory-provider/src/server.ts",
+        "file:services/payment-api/src/billingJurisdiction.ts",
+        "file:services/payment-api/src/checkoutSelection.ts",
+        "file:services/payment-api/src/demoFixtures.ts",
+        "file:services/payment-api/src/providers/types.ts",
+        "file:services/payment-api/src/repository.ts",
+        "file:services/payment-api/src/routes/funnel.ts"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 9,
+      "sink": "file",
+      "blocker": null
+    },
+    {
+      "id": "08-a6f1f3a91a36..5dfb2c8f276d",
+      "index": 8,
+      "parent": "a6f1f3a91a36ea3dead786560412a4944a009694",
+      "child": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "changed_file_count": 15,
+      "required_owner_count": 6,
+      "required_owners_sample": [
+        "file:docs/analytics/product-core-bronze.md",
+        "file:packages/clickhouse/src/productCoreBronze/index.ts",
+        "file:packages/clickhouse/src/productCoreBronze/prepareDestination.ts",
+        "file:scripts/deploy/product-core-bronze-containment-decision.mjs",
+        "file:scripts/deploy/product-core-bronze-pending-only.mjs",
+        "file:scripts/deploy/product-core-clickpipes-evidence.mjs"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 6.625,
+        "sink": "file",
+        "parsed": 93,
+        "cached": 3990,
+        "files_read": 93,
+        "generation": [
+          9,
+          10
+        ],
+        "owners_published": 743,
+        "events": 298,
+        "run_id": "product-scope-scope-bench-10-1790180878969805000",
+        "manifest": {
+          "begin_count": 743,
+          "begin_digest": "df96b7aa527514d1e39367b36432dcb289024730c88a99a2dc73547f1699fa08",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            9,
+            10
+          ],
+          "end_batch_count": 296,
+          "end_batch_digest": "e616e3dc0e5376d1da28aa054fde9083c87a62abe035eeb8b5c0907fda796241",
+          "end_owner_scope_len": 743,
+          "end_owner_scope_digest": "df96b7aa527514d1e39367b36432dcb289024730c88a99a2dc73547f1699fa08",
+          "batch_seq_count": 296,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 24.587,
+        "sink": "file",
+        "parsed": 4031,
+        "cached": 0,
+        "files_read": 4083,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4966,
+        "events": 2319,
+        "run_id": "product-scope-scope-bench-1-1790180942075221000",
+        "manifest": {
+          "begin_count": 8480,
+          "begin_digest": "6c922e34724d1011324da30197f79aaa3563192db3f28ec9887ac0ef15184945",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2317,
+          "end_batch_digest": "14cdf7a74a69e36df9f0b994aa616ac1d152c6068edba434fc1ac5daeac6a744",
+          "end_owner_scope_len": 8480,
+          "end_owner_scope_digest": "6c922e34724d1011324da30197f79aaa3563192db3f28ec9887ac0ef15184945",
+          "batch_seq_count": 2317,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 743,
+      "necessary_owner_count": 5,
+      "necessary_owners_sample": [
+        "file:packages/clickhouse/src/productCoreBronze/index.ts",
+        "file:packages/clickhouse/src/productCoreBronze/prepareDestination.ts",
+        "file:scripts/deploy/product-core-bronze-containment-decision.mjs",
+        "file:scripts/deploy/product-core-bronze-pending-only.mjs",
+        "file:scripts/deploy/product-core-clickpipes-evidence.mjs"
+      ],
+      "extra_begin_owner_count": 738,
+      "extra_begin_owners_sample": [
+        "file:.deepsec/AGENTS.md",
+        "file:.deepsec/README.md",
+        "file:.deepsec/data/product/INFO.md",
+        "file:.deepsec/data/product/SETUP.md",
+        "file:.t191-coder-brief.md",
+        "file:.t191-coder-done.md",
+        "file:.t191-orchestrator-brief.md",
+        "file:.t191-review-1.md",
+        "file:.t191-reviewer-brief.md",
+        "file:.t198-orchestrator-brief.md",
+        "file:.t227-coder-status.md",
+        "file:.t284-badge-banner-3699-24547-assignment7-report.md",
+        "file:.t284-bottom-sheet-content-assignment1-report.md",
+        "file:.t284-clock-correction-pass-report.md",
+        "file:.t284-illustration-on-3578-31962-approve-with-residual-floor.md",
+        "file:.t284-illustration-on-3578-31962-css-frost-residual-floor.md",
+        "file:.t284-illustration-on-3578-31962-exact-gate-resume-report.md",
+        "file:.t284-illustration-on-3578-31962-frost-css-correction-report.md",
+        "file:.t284-illustration-on-3578-31962-live-inset-gate-report.md",
+        "file:.t284-illustration-on-3578-31962-rim-inset-correction-report.md",
+        "file:.t284-indicator-default-medium-assignment-report.md",
+        "file:.t284-indicator-default-medium-correction-report.md",
+        "file:.t284-journey-blockers-report.md",
+        "file:.t284-navigation-progress-bar-group-counter-assignment5-report.md",
+        "file:.t284-phase1-gates-journeys-independence.md"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 10,
+      "sink": "file",
+      "blocker": null
+    },
+    {
+      "id": "09-5dfb2c8f276d..a609c19f3861",
+      "index": 9,
+      "parent": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "child": "a609c19f3861971930fae7b33dcb2950598953c5",
+      "changed_file_count": 19,
+      "required_owner_count": 8,
+      "required_owners_sample": [
+        "file:docs/analytics/product-core-bronze.md",
+        "file:infra/pulumi/src/gcp/productCoreClickPipes.ts",
+        "file:infra/pulumi/src/index.ts",
+        "file:infra/pulumi/src/onyxEnvironment.ts",
+        "file:packages/clickhouse/scripts/clickhouse/print-product-core-contract-digest.ts",
+        "file:packages/clickhouse/src/productCoreBronze/contractDigest.ts",
+        "file:packages/clickhouse/src/productCoreBronze/index.ts",
+        "file:scripts/clickhouse/print-product-core-contract-digest.ts"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 6.097,
+        "sink": "file",
+        "parsed": 37,
+        "cached": 4049,
+        "files_read": 37,
+        "generation": [
+          10,
+          11
+        ],
+        "owners_published": 663,
+        "events": 170,
+        "run_id": "product-scope-scope-bench-11-1790180988083155000",
+        "manifest": {
+          "begin_count": 663,
+          "begin_digest": "026569f9cedeb93d3fe7a605203b67711deae6f813a8a65925bf4d3b7d9df62f",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            10,
+            11
+          ],
+          "end_batch_count": 168,
+          "end_batch_digest": "0665b1130c7b9f110d49585333b0ba239132846481c65ef9faa022514fe9a922",
+          "end_owner_scope_len": 663,
+          "end_owner_scope_digest": "026569f9cedeb93d3fe7a605203b67711deae6f813a8a65925bf4d3b7d9df62f",
+          "batch_seq_count": 168,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 27.471,
+        "sink": "file",
+        "parsed": 4034,
+        "cached": 0,
+        "files_read": 4086,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4969,
+        "events": 2320,
+        "run_id": "product-scope-scope-bench-1-1790181049961340000",
+        "manifest": {
+          "begin_count": 8484,
+          "begin_digest": "f3f2bddd292ce978c50c38282a8d5a84635cc48100996abe983d2d4e29aba358",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2318,
+          "end_batch_digest": "175a45a33b431a2e0a21a95ed6db24e9f0767e9f9d8f56cd95519c2c5cd5b32d",
+          "end_owner_scope_len": 8484,
+          "end_owner_scope_digest": "f3f2bddd292ce978c50c38282a8d5a84635cc48100996abe983d2d4e29aba358",
+          "batch_seq_count": 2318,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 663,
+      "necessary_owner_count": 7,
+      "necessary_owners_sample": [
+        "file:docs/analytics/product-core-bronze.md",
+        "file:infra/pulumi/src/gcp/productCoreClickPipes.ts",
+        "file:infra/pulumi/src/index.ts",
+        "file:packages/clickhouse/scripts/clickhouse/print-product-core-contract-digest.ts",
+        "file:packages/clickhouse/src/productCoreBronze/contractDigest.ts",
+        "file:packages/clickhouse/src/productCoreBronze/index.ts",
+        "file:scripts/clickhouse/print-product-core-contract-digest.ts"
+      ],
+      "extra_begin_owner_count": 656,
+      "extra_begin_owners_sample": [
+        "file:.deepsec/AGENTS.md",
+        "file:.deepsec/README.md",
+        "file:.deepsec/data/product/INFO.md",
+        "file:.deepsec/data/product/SETUP.md",
+        "file:.t191-coder-brief.md",
+        "file:.t191-coder-done.md",
+        "file:.t191-orchestrator-brief.md",
+        "file:.t191-review-1.md",
+        "file:.t191-reviewer-brief.md",
+        "file:.t198-orchestrator-brief.md",
+        "file:.t227-coder-status.md",
+        "file:.t284-badge-banner-3699-24547-assignment7-report.md",
+        "file:.t284-bottom-sheet-content-assignment1-report.md",
+        "file:.t284-clock-correction-pass-report.md",
+        "file:.t284-illustration-on-3578-31962-approve-with-residual-floor.md",
+        "file:.t284-illustration-on-3578-31962-css-frost-residual-floor.md",
+        "file:.t284-illustration-on-3578-31962-exact-gate-resume-report.md",
+        "file:.t284-illustration-on-3578-31962-frost-css-correction-report.md",
+        "file:.t284-illustration-on-3578-31962-live-inset-gate-report.md",
+        "file:.t284-illustration-on-3578-31962-rim-inset-correction-report.md",
+        "file:.t284-indicator-default-medium-assignment-report.md",
+        "file:.t284-indicator-default-medium-correction-report.md",
+        "file:.t284-journey-blockers-report.md",
+        "file:.t284-navigation-progress-bar-group-counter-assignment5-report.md",
+        "file:.t284-phase1-gates-journeys-independence.md"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 11,
+      "sink": "file",
+      "blocker": null
+    }
+  ],
+  "work": "/tmp/enola-stage5-exploratory-history10",
+  "output": "/tmp/enola-stage5-exploratory/history10.json",
+  "sink": "file",
+  "repeat_limitation": "file-sink diagnostic; not a NATS JetStream or performance-acceptance run; launch the 10-case only when agreed",
+  "validation": {
+    "process_exit": 0,
+    "integrated_commit": "f0101f1",
+    "source_manifest": {
+      "base": "3957b50",
+      "status": "exploratory independent snapshot, not release candidate",
+      "files": {
+        "internal/extractors/tsextractor/context.go": "cdd65c6b372fb68cab1c13c076a5c47a8fecab0194f26dc5a06833702082c5bb",
+        "internal/extractors/tsextractor/packagegates.go": "9692e39679e8eddcc59093c92c792e74581939ecaa61fac0a78ab26563ef9152",
+        "internal/graphsession/config_scope.go": "87a3b308f6dd8fc45432a7370198e4d51b0d1f4eaba58c66180b16afc4d31bca"
+      }
+    },
+    "qualification": "exploratory-labelled frozen binary; all production source hashes match integrated and pushed f0101f1"
+  }
+}

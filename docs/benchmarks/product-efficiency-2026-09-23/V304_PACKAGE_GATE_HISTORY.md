@@ -79,3 +79,7 @@ The first harness attempt changed the file sink path after initialization and wa
 Engine extraction semantics and cached local facts are unchanged: the package selection function is refactored without changing its selection rule. The changed durable session projection migrates through context version v4. The first upgraded run rebuilds once and advances generation even if the graph is identical; subsequent unchanged runs settle to zero parses/events, as the real-binary migration probe established.
 
 [Full integration-test receipt and source hashes](v304-package-gate-integration.json).
+
+## Completed ten-transition follow-up
+
+All ten Product history transitions subsequently passed cold equivalence and frozen manifest/batch validation (process exit 0). See [the full history table](V304_PACKAGE_GATE_HISTORY10.md).
