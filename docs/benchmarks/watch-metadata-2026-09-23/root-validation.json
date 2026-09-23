@@ -1,0 +1,53 @@
+[
+  {
+    "probe": "head-gitconfig",
+    "generations": 2,
+    "graph_hashes": [
+      "bd675d287bef24f10f5aee1254053d7e34a15245973c6386ccff1a907c41a535",
+      "bd675d287bef24f10f5aee1254053d7e34a15245973c6386ccff1a907c41a535"
+    ],
+    "all_generations_same_graph": true
+  },
+  {
+    "probe": "patched-gitconfig",
+    "generations": 2,
+    "graph_hashes": [
+      "b2ab2ab519865564606cd3eabb00306d60fe2985e5bac951dbf2d4463988c6a3",
+      "b2ab2ab519865564606cd3eabb00306d60fe2985e5bac951dbf2d4463988c6a3"
+    ],
+    "all_generations_same_graph": true
+  },
+  {
+    "probe": "head-pure-stage",
+    "generations": 2,
+    "graph_hashes": [
+      "bc4b1b8d9f5cf054b1c38bb71301ea58f0d4d721906fcf527ad8214c7fcebd1f",
+      "bc4b1b8d9f5cf054b1c38bb71301ea58f0d4d721906fcf527ad8214c7fcebd1f"
+    ],
+    "all_generations_same_graph": true
+  },
+  {
+    "probe": "patched-pure-stage",
+    "generations": 1,
+    "graph_hashes": [
+      "5cfaee97e6f6bc4ef15eef81e03f42d1ee7feb59b45c10ffb375b245fedfbf15"
+    ],
+    "all_generations_same_graph": true
+  },
+  {
+    "probe": "head-quiet",
+    "generations": 1,
+    "graph_hashes": [
+      "86301d96ef1b989ea9b463774e33396b794d860c5a704cfca079d016398e4b6c"
+    ],
+    "all_generations_same_graph": true
+  },
+  {
+    "probe": "patched-quiet",
+    "generations": 1,
+    "graph_hashes": [
+      "a44b7a4014b5a83a2e611835f48eac1ee63e285da326054e1c885eafce70d020"
+    ],
+    "all_generations_same_graph": true
+  }
+]
