@@ -203,6 +203,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	pkgAliases := disc.packageAliasesFor(knownFiles)
 	graphprofile.Since("ts_disc_package_aliases", tAliases, fmt.Sprintf("aliases=%d", len(pkgAliases)))
 
+	aliasDirtyPkgs := map[string]bool{}
 	need := func(rel string) bool {
 		if allDirty {
 			return true
@@ -231,6 +232,9 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		}
 		pkg, inNuxt := nuxtPackageForFile(nuxtPkgs, rel, pkgDirSet)
 		if rec.NuxtScope == "" || rec.NuxtScope != nuxtScopeKey(pkg, inNuxt) {
+			return true
+		}
+		if inNuxt && aliasDirtyPkgs[pkg] {
 			return true
 		}
 		return false
@@ -271,6 +275,66 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			continue
 		}
 		sources[toRead[i]] = read.src
+	}
+	if isNuxt && !allDirty {
+		readAlias := func(rel string) []byte {
+			if b, ok := sources[rel]; ok {
+				return b
+			}
+			if hooks.Sources != nil {
+				if src, ok := hooks.Sources[rel]; ok {
+					return src
+				}
+			}
+			raw, err := overlayReadFile(ctx, filepath.Join(repoPath, rel), inputScope)
+			if err != nil {
+				return nil
+			}
+			return raw
+		}
+		aliasDirtyPkgs = nuxtAliasVisibilityChangedPkgs(sources, knownFiles, readAlias, prev, dirty, nuxtPkgs, invertPackageNames(pkgNamesEarly), pkgDirSet)
+		if len(aliasDirtyPkgs) > 0 {
+			var extra []string
+			for _, rel := range tsFiles {
+				if sources[rel] != nil {
+					continue
+				}
+				if !need(rel) {
+					continue
+				}
+				extra = append(extra, rel)
+			}
+			if len(extra) > 0 {
+				more := parallel.MapFiles(ctx, extra, func(relFile string) struct {
+					src []byte
+					err error
+				} {
+					if hooks.Sources != nil {
+						if src, ok := hooks.Sources[relFile]; ok {
+							return struct {
+								src []byte
+								err error
+							}{src, nil}
+						}
+					}
+					src, err := overlayReadFile(ctx, filepath.Join(repoPath, relFile), inputScope)
+					return struct {
+						src []byte
+						err error
+					}{src, err}
+				})
+				for i, read := range more {
+					stats.FilesRead++
+					stats.CachedFiles--
+					if read.err != nil {
+						log.Printf("[ts-extractor] error reading %s: %v", extra[i], read.err)
+						continue
+					}
+					sources[extra[i]] = read.src
+				}
+				toRead = append(toRead, extra...)
+			}
+		}
 	}
 	tr.Mark("ts_read_dirty", fmt.Sprintf("to_read=%d cached=%d", len(toRead), stats.CachedFiles))
 
@@ -1161,6 +1225,14 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 		cp := append([]string{}, mods...)
 		sort.Strings(cp)
 		vis = append(vis, "mod:"+consumer+"="+strings.Join(cp, ","))
+	}
+	if len(nuxtPkgs) > 0 {
+		aliasVis := nuxtRuntimeAliasVisibility(sources, known, readAuto, prev, dirty, nuxtPkgs, invertPackageNames(collectPackageNames(ctx, repoPath, inputScope)), pkgDirSet)
+		for pkg, pairs := range aliasVis {
+			cp := append([]string{}, pairs...)
+			sort.Strings(cp)
+			vis = append(vis, "alias:"+pkg+"="+strings.Join(cp, ","))
+		}
 	}
 	sort.Strings(vis)
 	h := sha256.New()

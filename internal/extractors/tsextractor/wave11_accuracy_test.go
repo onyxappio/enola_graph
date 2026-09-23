@@ -534,6 +534,14 @@ export function getIdVisitor() { return 'id' }
 import { getFingerprint, getIdVisitor } from '#landings-runtime/utils/getTrackingParams'
 export function getMarketingParams() { return getFingerprint() + getIdVisitor() }
 `,
+		"packages/landings-module/src/runtime/alt/utils/getTrackingParams.ts": `
+export function getFingerprint() { return 'alt' }
+export function getIdVisitor() { return 'id' }
+`,
+		"apps/landings/utils/useFp.ts": `
+import { getFingerprint } from '#landings-runtime/utils/getTrackingParams'
+export function useFp() { return getFingerprint() }
+`,
 		"packages/landings-module/src/runtime/components/GoogleAuth/GoogleAuth.vue": `<script setup lang="ts">
 import { useApi, useHead } from '#imports'
 useApi()
@@ -555,7 +563,9 @@ ghost()
 	}
 }
 
-const wave11LandingsRuntimeAlias = `export default function setup() {
+const wave11LandingsRuntimeAlias = `import { createResolver } from '@nuxt/kit'
+export default function setup() {
+  const resolver = createResolver(import.meta.url)
   addImportsDir(resolver.resolve('./runtime/composables/'))
   const runtimeDir = resolver.resolve('./runtime')
   nuxt.options.alias['#landings-runtime'] = runtimeDir
@@ -635,7 +645,9 @@ func TestExtract_Wave11AliasConfigRemovalAndRetarget(t *testing.T) {
 		t.Fatal("configured alias missing")
 	}
 
-	removed := wave11HashAliasFiles(`export default function setup() {
+	removed := wave11HashAliasFiles(`import { createResolver } from '@nuxt/kit'
+export default function setup() {
+  const resolver = createResolver(import.meta.url)
   addImportsDir(resolver.resolve('./runtime/composables/'))
 }
 `)
@@ -644,15 +656,14 @@ func TestExtract_Wave11AliasConfigRemovalAndRetarget(t *testing.T) {
 		t.Fatal("removed alias still bound")
 	}
 
-	retarget := wave11HashAliasFiles(`export default function setup() {
+	retarget := wave11HashAliasFiles(`import { createResolver } from '@nuxt/kit'
+export default function setup() {
+  const resolver = createResolver(import.meta.url)
   addImportsDir(resolver.resolve('./runtime/composables/'))
   const runtimeDir = resolver.resolve('./runtime/alt')
   nuxt.options.alias['#landings-runtime'] = runtimeDir
 }
 `)
-	retarget[alt] = `export function getFingerprint() { return 'alt' }
-export function getIdVisitor() { return 'id' }
-`
 	ff = extractAll(t, retarget, false)
 	if bound(ff, tracking) {
 		t.Fatal("retarget kept old runtime file")
@@ -669,5 +680,66 @@ func TestExtract_Wave11HashImportsAmbiguousStaysUnresolved(t *testing.T) {
 	auth := fileRefFact(ff, "packages/landings-module/src/runtime/components/GoogleAuth/GoogleAuth.vue")
 	if hasCallToFile(auth, "packages/landings-module/src/runtime/composables.useApi", "packages/landings-module/src/runtime/composables/useApi.ts") {
 		t.Fatal("ambiguous #imports useApi was guessed")
+	}
+}
+
+func TestExtract_Wave11AliasRequiresKitCreateResolver(t *testing.T) {
+	consumer := "packages/landings-module/src/runtime/utils/getMarketingParams.ts"
+	tracking := "packages/landings-module/src/runtime/utils/getTrackingParams.ts"
+	bound := func(setup string) bool {
+		ff := extractAll(t, wave11HashAliasFiles(setup), false)
+		return hasCallToFile(fileRefFact(ff, consumer), "packages/landings-module/src/runtime/utils.getFingerprint", tracking)
+	}
+	if !bound(wave11LandingsRuntimeAlias) {
+		t.Fatal("kit createResolver form must bind")
+	}
+	if bound(`export default function setup() {
+  const resolver = { resolve: (_value: string) => '/not-the-runtime' }
+  const runtimeDir = resolver.resolve('./runtime')
+  nuxt.options.alias['#landings-runtime'] = runtimeDir
+}
+`) {
+		t.Fatal("object resolve helper must not bind runtime alias")
+	}
+	if bound(`import { createResolver } from 'other-kit'
+export default function setup() {
+  const resolver = createResolver(import.meta.url)
+  const runtimeDir = resolver.resolve('./runtime')
+  nuxt.options.alias['#landings-runtime'] = runtimeDir
+}
+`) {
+		t.Fatal("non-kit createResolver must not bind")
+	}
+	if bound(`import { createResolver } from '@nuxt/kit'
+export default function setup() {
+  const resolver = createResolver(import.meta.url)
+  const resolver = { resolve: (_value: string) => './runtime' }
+  const runtimeDir = resolver.resolve('./runtime')
+  nuxt.options.alias['#landings-runtime'] = runtimeDir
+}
+`) {
+		t.Fatal("shadowed resolver must not bind")
+	}
+	if bound(`import { createResolver } from '@nuxt/kit'
+export default function setup() {
+  let resolver = createResolver(import.meta.url)
+  resolver = { resolve: (_value: string) => './runtime' }
+  const runtimeDir = resolver.resolve('./runtime')
+  nuxt.options.alias['#landings-runtime'] = runtimeDir
+}
+`) {
+		t.Fatal("reassigned resolver must not bind")
+	}
+	if bound(`import { createResolver } from '@nuxt/kit'
+export default function setup() {
+  const resolver = createResolver(import.meta.url)
+  const runtimeDir = resolver.resolve('./runtime')
+  // nuxt.options.alias['#landings-runtime'] = runtimeDir
+}
+`) {
+		t.Fatal("commented alias assignment must not bind")
+	}
+	if bound("import { createResolver } from '@nuxt/kit'\nexport default function setup() {\n  const resolver = createResolver(import.meta.url)\n  const runtimeDir = resolver.resolve('./runtime')\n  const s = \"nuxt.options.alias['#landings-runtime'] = runtimeDir\"\n}\n") {
+		t.Fatal("string-literal alias assignment must not bind")
 	}
 }

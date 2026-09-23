@@ -199,19 +199,29 @@ export default defineNuxtConfig({ modules: [landingModule] })`)
 
 func TestExtractSession_Wave11ConfiguredAliasRetarget(t *testing.T) {
 	consumer := "packages/landings-module/src/runtime/utils/getMarketingParams.ts"
+	appConsumer := "apps/landings/utils/useFp.ts"
 	tracking := "packages/landings-module/src/runtime/utils/getTrackingParams.ts"
 	alt := "packages/landings-module/src/runtime/alt/utils/getTrackingParams.ts"
 	moduleRel := "packages/landings-module/src/module.ts"
+	cfgRel := "apps/landings/nuxt.config.ts"
 	files := wave11HashAliasFiles(wave11LandingsRuntimeAlias)
 	dir, names := wave11SessionFiles(t, files)
 	ext := New()
 	ctx := context.Background()
+	bound := func(ff []facts.Fact, cons, file string) bool {
+		sym := "packages/landings-module/src/runtime/utils.getFingerprint"
+		if strings.Contains(file, "/alt/") {
+			sym = "packages/landings-module/src/runtime/alt/utils.getFingerprint"
+		}
+		return hasCallToFile(fileRefFact(ff, cons), sym, file)
+	}
+
 	cold, err := ext.ExtractSession(ctx, dir, names, nil, nil, SessionHooks{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !hasCallToFile(fileRefFact(cold.Facts, consumer), "packages/landings-module/src/runtime/utils.getFingerprint", tracking) {
-		t.Fatalf("cold alias missing: %+v", fileRefFact(cold.Facts, consumer).Relations)
+	if !bound(cold.Facts, consumer, tracking) || !bound(cold.Facts, appConsumer, tracking) {
+		t.Fatalf("cold alias missing: %+v %+v", fileRefFact(cold.Facts, consumer).Relations, fileRefFact(cold.Facts, appConsumer).Relations)
 	}
 	if rec := cold.Records[moduleRel]; rec == nil || len(rec.NuxtAliases) == 0 {
 		t.Fatalf("module record missing NuxtAliases: %+v", rec)
@@ -225,16 +235,9 @@ func TestExtractSession_Wave11ConfiguredAliasRetarget(t *testing.T) {
 		t.Fatalf("no-change parsed %d", warm.Stats.FilesParsed)
 	}
 
-	altSrc := `export function getFingerprint() { return 'alt' }
-export function getIdVisitor() { return 'id' }
-`
-	if err := os.MkdirAll(filepath.Join(dir, filepath.FromSlash(filepath.Dir(alt))), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(dir, filepath.FromSlash(alt)), []byte(altSrc), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	retarget := []byte(`export default function setup() {
+	retarget := []byte(`import { createResolver } from '@nuxt/kit'
+export default function setup() {
+  const resolver = createResolver(import.meta.url)
   addImportsDir(resolver.resolve('./runtime/composables/'))
   const runtimeDir = resolver.resolve('./runtime/alt')
   nuxt.options.alias['#landings-runtime'] = runtimeDir
@@ -243,17 +246,67 @@ export function getIdVisitor() { return 'id' }
 	if err := os.WriteFile(filepath.Join(dir, filepath.FromSlash(moduleRel)), retarget, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	names = append(names, alt)
-	dirty := map[string]bool{moduleRel: true, alt: true, consumer: true}
-	next, err := ext.ExtractSession(ctx, dir, names, cold.Records, dirty, SessionHooks{})
+	next, err := ext.ExtractSession(ctx, dir, names, warm.Records, map[string]bool{moduleRel: true}, SessionHooks{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	got := fileRefFact(next.Facts, consumer)
-	if hasCallToFile(got, "packages/landings-module/src/runtime/utils.getFingerprint", tracking) {
-		t.Fatalf("retarget kept old file: %+v", got.Relations)
+	if bound(next.Facts, consumer, tracking) {
+		t.Fatalf("module-only retarget kept old file: %+v", fileRefFact(next.Facts, consumer).Relations)
 	}
-	if !hasCallToFile(got, "packages/landings-module/src/runtime/alt/utils.getFingerprint", alt) {
-		t.Fatalf("retarget missing: %+v", got.Relations)
+	if !bound(next.Facts, consumer, alt) {
+		t.Fatalf("module-only retarget missing alt: %+v", fileRefFact(next.Facts, consumer).Relations)
+	}
+
+	removed := []byte(`import { createResolver } from '@nuxt/kit'
+export default function setup() {
+  const resolver = createResolver(import.meta.url)
+  addImportsDir(resolver.resolve('./runtime/composables/'))
+}
+`)
+	if err := os.WriteFile(filepath.Join(dir, filepath.FromSlash(moduleRel)), removed, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	gone, err := ext.ExtractSession(ctx, dir, names, next.Records, map[string]bool{moduleRel: true}, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if bound(gone.Facts, consumer, tracking) || bound(gone.Facts, consumer, alt) {
+		t.Fatalf("module-only removal left alias: %+v", fileRefFact(gone.Facts, consumer).Relations)
+	}
+
+	if err := os.WriteFile(filepath.Join(dir, filepath.FromSlash(moduleRel)), []byte(wave11LandingsRuntimeAlias), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	restored, err := ext.ExtractSession(ctx, dir, names, gone.Records, map[string]bool{moduleRel: true}, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bound(restored.Facts, consumer, tracking) || !bound(restored.Facts, appConsumer, tracking) {
+		t.Fatal("restore lost configured alias")
+	}
+
+	if err := os.WriteFile(filepath.Join(dir, cfgRel), []byte("export default defineNuxtConfig({ modules: [] })\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	dropped, err := ext.ExtractSession(ctx, dir, names, restored.Records, map[string]bool{cfgRel: true}, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if bound(dropped.Facts, appConsumer, tracking) {
+		t.Fatalf("app module-list removal left app alias: %+v", fileRefFact(dropped.Facts, appConsumer).Relations)
+	}
+
+	if err := os.WriteFile(filepath.Join(dir, cfgRel), []byte(`
+import landingModule from 'landings-module'
+export default defineNuxtConfig({ modules: [landingModule] })
+`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	cfgRestored, err := ext.ExtractSession(ctx, dir, names, dropped.Records, map[string]bool{cfgRel: true}, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bound(cfgRestored.Facts, appConsumer, tracking) {
+		t.Fatalf("app module-list restore missing alias: %+v", fileRefFact(cfgRestored.Facts, appConsumer).Relations)
 	}
 }
