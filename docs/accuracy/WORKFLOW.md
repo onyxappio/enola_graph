@@ -43,3 +43,18 @@ push without force. Keep unfinished wave changes out of main. Do not merge into
 a checkout while its coder is writing; use a separate integration checkout and
 synchronize the accuracy checkout at a clean worker boundary. Workers still do
 not push or merge themselves.
+
+## Annotated code examples — 2026-09-23
+
+In the next and subsequent HTML report updates, add concise explanatory comments
+inside code examples, adjacent to the relevant source lines. Identify the code
+entity, its actual graph node kind (and symbol_kind where useful), and the direct
+relationship with its direction: source node → relation → target node. Use the
+analyzer's real names; distinguish expected relationships from currently emitted
+ones. Do not invent edges for candidates concerning only properties or scope.
+
+Label inserted comments as report annotations (for example `// Report: …`) and
+state that they are explanations, not original repository comments. Keep source
+code otherwise faithful, mark omissions, use syntax-appropriate comments, and
+include annotations in the embedded Shiki highlighting. Keep each explanation
+short enough to read on a phone.
