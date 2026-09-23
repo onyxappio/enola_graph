@@ -26,3 +26,9 @@ bash ~/.claude/skills/user-send/send.sh -t enola-2 \
 Each concise card: candidate ID/title, repository-relative source path, actual short code excerpt (mark omissions), why the relationship exists, observed behavior before fix, required behavior, verified result/status. Include wave/commit and explicit limitations. Never label implementation in progress as verified. No more candidate approval buttons unless the user changes the policy.
 
 Current state at policy adoption: waves 1–2 implemented; wave2 reviewed at `b38d16a` (v278), 5/5 acceptance, 6/6 GraphQL controls, old-state migration and full Go suite passed. Wave3 #11–15 already individually approved and dispatched. Its original brief may still mention manual approval; this instruction governs subsequent waves.
+
+## Code highlighting — 2026-09-23
+
+The user requests Shiki syntax highlighting in the next and subsequent HTML reports.
+Generate highlighting at report build time and embed the resulting markup/styles in
+`docs/accuracy/report.html`; preserve standalone offline viewing with no CDN dependency.
