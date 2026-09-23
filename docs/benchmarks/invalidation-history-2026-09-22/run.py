@@ -335,6 +335,15 @@ def validate_publishing_or_noop(records, pairs, info, previous_generation: int, 
     return validated
 
 
+def validate_cold_transition(applied, expected, required, begin_scope, published):
+    """A publisher covers changed owners; a silent run still must equal cold."""
+    if published and not set(required).issubset(begin_scope):
+        missing = sorted(set(required) - begin_scope)
+        raise RuntimeError(f"required owners outside Begin: {missing[:20]}")
+    if applied.graph_hash() != expected.graph_hash():
+        raise RuntimeError("initial+deltas graph hash does not match cold")
+
+
 def case_id(parent: str, child: str) -> str:
     return f"{parent[:12]}..{child[:12]}"
 
@@ -513,15 +522,14 @@ def run_history(args) -> dict:
             expected.apply(cold_records)
             required = semantic_required_owners(changed, prior_owners, expected.owner_set_nonempty())
             begin_scope = set(validated.get("scope") or [])
-            if not set(required).issubset(begin_scope):
-                missing = sorted(set(required) - begin_scope)
-                raise RuntimeError(f"required owners outside Begin: {missing[:20]}")
             if delta_records:
                 applied.apply(delta_records)
                 completed = validated["target_generation"]
-            graph_equal = applied.graph_hash() == expected.graph_hash()
-            if not graph_equal:
-                raise RuntimeError("initial+deltas graph hash does not match cold")
+            # Changed paths with nonempty contributions need coverage when a
+            # replacement is published. They do not prove that facts changed:
+            # graph-neutral edits may correctly publish nothing at all.
+            validate_cold_transition(applied, expected, required, begin_scope, bool(delta_records))
+            graph_equal = True
             nec = scope.necessary_from_consumers(prior, expected)
             extra_begin = sorted(begin_scope - set(nec))
             row = {
@@ -742,6 +750,24 @@ def self_test() -> int:
         except RuntimeError:
             raised = True
         check("noop with required owners", raised)
+
+        # A changed owner may retain exactly the same contribution. Exercise
+        # the cold-oracle check used by the history loop, not only its no-op
+        # summary validator. Suppressing a real change must still fail.
+        for label, expected_graph, published, owner_scope, should_pass in [
+            ("neutral edit needs no Begin", old_graph.snapshot(), False, set(), True),
+            ("silent fact change fails cold", new_graph, False, set(), False),
+            ("publisher cannot omit required owner", old_graph.snapshot(), True, set(), False),
+            ("publisher with required owner and cold match", old_graph.snapshot(), True,
+             {"file:retired.ts"}, True),
+        ]:
+            accepted = True
+            try:
+                validate_cold_transition(old_graph, expected_graph, ["file:retired.ts"],
+                                         owner_scope, published)
+            except RuntimeError:
+                accepted = False
+            check(label, accepted == should_pass)
 
         walked = walk_until_failure(
             [

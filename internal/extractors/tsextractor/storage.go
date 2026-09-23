@@ -330,7 +330,7 @@ func extractPrismaStorage(ctx context.Context, repoPath string, inputScopes ...*
 	for _, root := range roots {
 		for _, rel := range prismaSchemaFiles {
 			abs := filepath.Join(root, rel)
-			st, err := inputScope.Stat(abs)
+			st, err := overlayStat(ctx, abs, inputScope)
 			if err != nil {
 				continue
 			}

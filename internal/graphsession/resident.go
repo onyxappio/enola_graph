@@ -44,6 +44,16 @@ type WorkCounters struct {
 	// was not taken under and had to read the tree again, and the run reports
 	// that rather than hiding it.
 	TSDiscoveries int
+	// TSDiscoveriesReused counts the runs that answered with a snapshot an
+	// earlier run built, after proving it again. It is the other half of
+	// TSDiscoveries: together they say how many runs needed a discovery and how
+	// many of those had to read the tree for it.
+	TSDiscoveriesReused int
+	// TSDiscoveryRechecks is what proving a retained snapshot cost: the
+	// presences re-observed, the side reads re-read, the directories
+	// re-enumerated. This is work this change introduces, not work it avoids,
+	// and it is counted separately so it cannot hide inside a win.
+	TSDiscoveryRechecks tsextractor.DiscoveryRecheck
 }
 
 type runtimeInputs struct {
@@ -67,7 +77,16 @@ type runtimeInputs struct {
 	angular           bool
 }
 
-func readRuntimeInputs(eng *engine.Engine, abs string, st *State, work *WorkCounters) (*runtimeInputs, error) {
+// retainedDiscoveryIdentity is what a snapshot was proven under, as opposed to
+// what it observed. A snapshot only gets as far as being re-proven when the
+// policy and admission rules deciding which paths are readable at all are the
+// same ones; otherwise the reads behind it answered a different question.
+type retainedDiscoveryIdentity struct {
+	policy    string
+	admission string
+}
+
+func readRuntimeInputs(eng *engine.Engine, abs string, st *State, work *WorkCounters, retained *tsextractor.Discovery, retainedFor retainedDiscoveryIdentity) (*runtimeInputs, error) {
 	tr := graphprofile.StartNamed("inputs")
 	work.InventoryScans++
 	inv, err := eng.Inventory(abs)
@@ -131,9 +150,19 @@ func readRuntimeInputs(eng *engine.Engine, abs string, st *State, work *WorkCoun
 				// away: the previews then ran against a snapshot the projected
 				// context keys were never computed from, and the counter never
 				// saw the second build.
-				built := ts.NewDiscovery(context.Background(), abs, cfg)
-				work.TSDiscoveries++
-				tr.Mark("ts_discovery", "")
+				offer := retained
+				if retainedFor != (retainedDiscoveryIdentity{policy: result.policyIdentity, admission: result.admissionIdentity}) {
+					offer = nil
+				}
+				built, reused, cost := ts.DiscoveryFor(context.Background(), abs, cfg, offer)
+				work.TSDiscoveryRechecks = work.TSDiscoveryRechecks.Add(cost)
+				if reused {
+					work.TSDiscoveriesReused++
+					tr.Mark("ts_discovery_retained", cost.String())
+				} else {
+					work.TSDiscoveries++
+					tr.Mark("ts_discovery", cost.String())
+				}
 				var used *tsextractor.Discovery
 				result.tsContext, result.tsFileContext, used = ts.SessionContext(abs, cfg, tsConfigPaths, inv.Files, built)
 				if used != built {
@@ -170,10 +199,16 @@ type Resident struct {
 	lock            *filelock.Lock
 	state           *State
 	inputs          *runtimeInputs
-	snapshot        []facts.Fact
-	epoch           string
-	watermark       uint64
-	failed, closed  bool
+	// tsDiscovery is the snapshot the last committed run proved, kept for the
+	// next one to try to prove again, together with the policy identity it was
+	// taken under. It is dropped on any failure: a run that did not commit
+	// leaves no observation worth carrying.
+	tsDiscovery    *tsextractor.Discovery
+	tsDiscoveryFor retainedDiscoveryIdentity
+	snapshot       []facts.Fact
+	epoch          string
+	watermark      uint64
+	failed, closed bool
 }
 
 type OnlineResult struct {
@@ -300,6 +335,7 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 	}
 	rtr.Mark("reconcile_complete", fmt.Sprintf("reloaded=%v", reloaded))
 	s := &session{eng: r.eng, abs: r.abs, opts: r.opts, sink: r.sink, state: r.state, journal: r.journal, prof: graphprofile.StartNamed("session"), inputs: input, fast: fast}
+	s.retained, s.retainedFor = r.tsDiscovery, r.tsDiscoveryFor
 	if !fast && r.eng.GraphScope() != nil {
 		s.work.PolicyBuilds = 1
 	}
@@ -330,6 +366,10 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 	}
 	if err != nil {
 		r.failed = true
+		// A run that did not commit proved nothing that outlives it. Its
+		// snapshot may have been built against a tree that moved underneath it,
+		// which is often why it failed, so the next run starts from no offer.
+		r.tsDiscovery, r.tsDiscoveryFor = nil, retainedDiscoveryIdentity{}
 		return nil, s.work, err
 	}
 	promoteEngine = true
@@ -344,6 +384,11 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 		s.inputs.generation = s.state.Generation
 	}
 	r.inputs = s.inputs
+	// Retain what this run proved, not what it was offered: on a run that had
+	// to rebuild, this is the new snapshot, and on one that reused, it is the
+	// same value carried one run further.
+	r.tsDiscovery = s.inputs.tsDiscovery
+	r.tsDiscoveryFor = retainedDiscoveryIdentity{policy: s.inputs.policyIdentity, admission: s.inputs.admissionIdentity}
 	r.snapshot = res.Facts
 	r.opts.ForceInitial = false
 	return res, s.work, nil
@@ -411,6 +456,8 @@ func (r *Resident) ApplyChanges(ctx context.Context, batch ChangeBatch) (*Online
 	// reported counters, so a run that built one snapshot and a run that built
 	// one and then rebuilt it reported the same number.
 	txWork.TSDiscoveries += work.TSDiscoveries
+	txWork.TSDiscoveriesReused += work.TSDiscoveriesReused
+	txWork.TSDiscoveryRechecks = txWork.TSDiscoveryRechecks.Add(work.TSDiscoveryRechecks)
 	r.epoch, r.watermark = batch.Epoch, batch.Through
 	res.Facts = nil
 	out := &OnlineResult{Result: *res, Work: txWork, Epoch: r.epoch, Watermark: r.watermark, Reconciled: reason != "", FallbackReason: reason}

@@ -54,7 +54,7 @@ func withNuxtAliasFallbacks(ctx context.Context, repoPath string, roots []tsAlia
 			}
 			addNuxtAliasIfAbsent(roots[idx].aliases, prefix, target)
 		}
-		srcDir, srcKnown := nuxtSourceDir(repoPath, pkg, cfg, inputScope)
+		srcDir, srcKnown := nuxtSourceDir(ctx, repoPath, pkg, cfg, inputScope)
 		if srcDir != "" && !strings.HasSuffix(srcDir, "/") {
 			srcDir += "/"
 		}
@@ -102,7 +102,7 @@ func readNuxtConfig(ctx context.Context, repoPath, pkg string, inputScopes ...*i
 	}
 	out := nuxtConfigFacts{aliases: map[string]string{}}
 	for _, name := range []string{"nuxt.config.ts", "nuxt.config.js", "nuxt.config.mjs"} {
-		data, err := inputScope.ReadFile(filepath.Join(pkgAbs, name))
+		data, err := overlayReadFile(ctx, filepath.Join(pkgAbs, name), inputScope)
 		if err != nil {
 			continue
 		}
@@ -132,7 +132,7 @@ func readNuxtConfig(ctx context.Context, repoPath, pkg string, inputScopes ...*i
 	return out
 }
 
-func nuxtSourceDir(repoPath, pkg string, cfg nuxtConfigFacts, inputScopes ...*inputscope.Scope) (string, bool) {
+func nuxtSourceDir(ctx context.Context, repoPath, pkg string, cfg nuxtConfigFacts, inputScopes ...*inputscope.Scope) (string, bool) {
 	inputScope := inputscope.First(inputScopes)
 	if cfg.srcDirUnknown {
 		return "", false
@@ -148,7 +148,7 @@ func nuxtSourceDir(repoPath, pkg string, cfg nuxtConfigFacts, inputScopes ...*in
 		pkgAbs = filepath.Join(repoPath, filepath.FromSlash(pkg))
 	}
 	appDir := filepath.Join(pkgAbs, "app")
-	if info, err := inputScope.Stat(appDir); err == nil && info.IsDir() {
+	if info, err := overlayStat(ctx, appDir, inputScope); err == nil && info.IsDir() {
 		if pkg == "" {
 			return "app", true
 		}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"io/fs"
 	"sync"
 
 	"github.com/enola-labs/enola/internal/extractors/inputscope"
@@ -24,17 +25,69 @@ const (
 	observedMissing     = "m:"
 )
 
-// overlayProbe records every configuration read a discovery pass makes, with
-// the digest of the bytes the reader was actually handed. Reuse is then checked
-// against those observations rather than against an assumption that two callers
-// were handed the same capture.
+// Bytes are not the whole of what a discovery snapshot rests on. findTSRoot and
+// every framework detector decide on a Stat, and the package, gate and alias
+// collectors decide on what a directory listing contained. A configuration file
+// that was absent when the snapshot ran, or a package that did not yet exist in
+// a directory it walked, is exactly the input a later caller's capture can
+// contradict - and neither leaves a byte observation behind.
+const (
+	observedStatFile    = "sf:"
+	observedStatDir     = "sd:"
+	observedStatMissing = "sm:"
+)
+
+// The kinds a directory entry is recorded as. Symlinks are their own kind
+// rather than being resolved, because that is what the readers see: WalkDir
+// does not follow them and a DirEntry reports the link itself, so a link that
+// becomes a real directory changes what every walk does with it.
+const (
+	observedEntryFile = "f"
+	observedEntryDir  = "d"
+	observedEntryLink = "l"
+)
+
+func entryKind(d fs.DirEntry) string {
+	switch {
+	case d == nil:
+		return ""
+	case d.Type()&fs.ModeSymlink != 0:
+		return observedEntryLink
+	case d.IsDir():
+		return observedEntryDir
+	default:
+		return observedEntryFile
+	}
+}
+
+// overlayProbe records every discovery observation a pass makes: the digest of
+// the bytes a reader was handed, the presence a reader stat'd, and the names a
+// reader's directory listing reported. Reuse is then checked against those
+// observations rather than against an assumption that two callers were handed
+// the same capture.
 type overlayProbe struct {
 	mu   sync.Mutex
 	seen map[string]string
+	stat map[string]string
+	// dirs is what each enumerated directory reported, after the same policy
+	// filtering the reader itself was subject to: every entry name, and the
+	// kind the reader saw it as. It is kept entry by entry rather than as a
+	// digest because the question asked of it later is whether one particular
+	// path was there and what it was, and a digest cannot answer that.
+	//
+	// The kind is not decoration. A plain file replaced by a directory of the
+	// same name leaves the parent listing identical while the walks that skipped
+	// a file now descend into a package tree, so a name set alone answers yes to
+	// a directory it never enumerated.
+	dirs map[string]map[string]string
 }
 
 func newOverlayProbe() *overlayProbe {
-	return &overlayProbe{seen: map[string]string{}}
+	return &overlayProbe{
+		seen: map[string]string{},
+		stat: map[string]string{},
+		dirs: map[string]map[string]string{},
+	}
 }
 
 func withOverlayProbe(ctx context.Context, p *overlayProbe) context.Context {
@@ -66,6 +119,35 @@ func (p *overlayProbe) record(key, digest string) {
 	p.mu.Unlock()
 }
 
+// recordStat keeps the first presence observation of a path, for the same
+// reason record does. The two are kept apart rather than sharing a key space:
+// a path that is both stat'd and read carries two independent observations, and
+// letting one overwrite the other would silently drop a fence.
+func (p *overlayProbe) recordStat(key, kind string) {
+	if p == nil {
+		return
+	}
+	p.mu.Lock()
+	if _, ok := p.stat[key]; !ok {
+		p.stat[key] = kind
+	}
+	p.mu.Unlock()
+}
+
+// recordDir keeps the first complete enumeration of a directory. Callers must
+// only offer an enumeration the reader actually completed; a listing cut short
+// by SkipDir or by a failed read describes no directory and is not recorded.
+func (p *overlayProbe) recordDir(key string, names map[string]string) {
+	if p == nil {
+		return
+	}
+	p.mu.Lock()
+	if _, ok := p.dirs[key]; !ok {
+		p.dirs[key] = names
+	}
+	p.mu.Unlock()
+}
+
 func (p *overlayProbe) snapshot() map[string]string {
 	if p == nil {
 		return nil
@@ -74,6 +156,35 @@ func (p *overlayProbe) snapshot() map[string]string {
 	defer p.mu.Unlock()
 	out := make(map[string]string, len(p.seen))
 	for k, v := range p.seen {
+		out[k] = v
+	}
+	return out
+}
+
+func (p *overlayProbe) statSnapshot() map[string]string {
+	if p == nil {
+		return nil
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	out := make(map[string]string, len(p.stat))
+	for k, v := range p.stat {
+		out[k] = v
+	}
+	return out
+}
+
+// dirSnapshot hands over the recorded enumerations. The name sets are not
+// copied: recordDir takes ownership of each one from a caller that has already
+// finished building it, and nothing mutates them afterwards.
+func (p *overlayProbe) dirSnapshot() map[string]map[string]string {
+	if p == nil {
+		return nil
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	out := make(map[string]map[string]string, len(p.dirs))
+	for k, v := range p.dirs {
 		out[k] = v
 	}
 	return out

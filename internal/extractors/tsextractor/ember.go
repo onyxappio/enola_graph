@@ -97,7 +97,7 @@ func nestedPkgDeclares(ctx context.Context, root, dependency string, depth int, 
 	if depth <= 0 {
 		return false
 	}
-	entries, err := inputScope.ReadDir(root)
+	entries, err := overlayReadDir(ctx, root, inputScope)
 	if err != nil {
 		return false
 	}

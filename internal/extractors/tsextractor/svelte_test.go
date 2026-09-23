@@ -185,7 +185,7 @@ func TestStaticSvelteKitAliases_LiteralsOnly(t *testing.T) {
 	if err := os.WriteFile(path, []byte(config), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	got := staticSvelteKitAliases(path)
+	got := staticSvelteKitAliases(context.Background(), path)
 	if got["src"] != "./src" || got["@ui"] != "./packages/ui/src" {
 		t.Fatalf("literal aliases = %v", got)
 	}

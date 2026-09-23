@@ -56,6 +56,11 @@ binary path. Do not treat those numbers as the history contract.
    covers affected owners outside the changed paths.
    Lock-only transitions must no-op with generation equal to the previous
    completed generation.
+   Graph-neutral edits may also no-op even when a changed file has nonempty
+   contributions. For those silent transitions the harness requires zero
+   parses/events, unchanged generation and exact whole-graph cold equality;
+   it does not demand a Begin solely because the path changed. Required-owner
+   scope coverage remains mandatory whenever a replacement is published.
 7. `necessary_owner_count` is the prior-versus-cold owner canonical
    contribution diff (overinvalidation = Begin owners minus that set).
    Changed-path counts are not a minimal invalidation proof.

@@ -111,7 +111,7 @@ func detectNuxt(ctx context.Context, repoPath string, inputScopes ...*inputscope
 func detectNuxtAt(ctx context.Context, dir string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
 	for _, name := range []string{"nuxt.config.js", "nuxt.config.ts", "nuxt.config.mjs"} {
-		if _, err := inputScope.Stat(filepath.Join(dir, name)); err == nil {
+		if _, err := overlayStat(ctx, filepath.Join(dir, name), inputScope); err == nil {
 			return true
 		}
 	}
@@ -124,7 +124,7 @@ func detectNuxtAt(ctx context.Context, dir string, inputScopes ...*inputscope.Sc
 func collectNuxtPackages(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) []string {
 	inputScope := inputscope.First(inputScopes)
 	var out []string
-	_ = inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+	_ = overlayWalkDir(ctx, repoPath, inputScope, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return nil
 		}

@@ -43,7 +43,7 @@ func detectReactNavigation(ctx context.Context, repoPath string, inputScopes ...
 	// A monorepo's example/demo app declares the dependency in its own
 	// package.json one level down (the framework's own repository is the
 	// extreme case: the root IS the dependency and depends on nothing).
-	entries, err := inputScope.ReadDir(repoPath)
+	entries, err := overlayReadDir(ctx, repoPath, inputScope)
 	if err != nil {
 		return false
 	}

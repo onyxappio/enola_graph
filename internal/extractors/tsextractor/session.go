@@ -107,6 +107,12 @@ type SessionResult struct {
 	ConfigPaths []string
 	Angular     bool
 	Unreadable  []string
+	// Discovery is the snapshot this session actually extracted under, whether
+	// it was handed one it could prove or built its own. A caller that retains
+	// discovery across runs needs the proven one rather than the one it
+	// offered: on a run whose offer was refused, this is the observation the
+	// run itself made, and it is the only one worth carrying forward.
+	Discovery *Discovery
 }
 
 // SessionHooks observe per-file local results before repo-wide composition.
@@ -552,7 +558,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	pkgNames := pkgNamesEarly
 	var projects map[string]string
 	if isAngular {
-		projects = angularProjectNames(repoPath, inputScope)
+		projects = angularProjectNames(ctx, repoPath, inputScope)
 	}
 	allFacts = appendTSDirectoryModules(allFacts, modules, pkgNames, projects)
 
@@ -564,7 +570,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	tr.Mark("ts_compose_modules", fmt.Sprintf("facts=%d records=%d unread=%d", len(allFacts), len(records), len(unreadable)))
 	var configPaths []string
 	if !hooks.SkipConfigPaths {
-		configPaths = tsConfigInputs(repoPath, inputScope)
+		configPaths = tsConfigInputs(ctx, repoPath, inputScope)
 	}
 	stats.DiscoveryPasses += discoveryPasses
 	return &SessionResult{
@@ -574,6 +580,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		ConfigPaths: configPaths,
 		Angular:     isAngular,
 		Unreadable:  unreadable,
+		Discovery:   disc,
 	}, nil
 }
 
@@ -734,9 +741,15 @@ func cloneFact(f facts.Fact) facts.Fact {
 }
 
 // ConfigInputPaths lists off-glob files that change TS extraction semantics.
+//
+// These two entry points are called from outside any extraction, so there is no
+// capture to read under and no snapshot to record into. They pass a bare
+// context deliberately: that is exactly the live-tree traversal they have
+// always done, and giving them a captured one would change which tree the
+// engine's own inventory is computed from.
 func ConfigInputPaths(repoPath string, inputScopes ...*inputscope.Scope) []string {
 	inputScope := inputscope.First(inputScopes)
-	return tsConfigInputs(repoPath, inputScope)
+	return tsConfigInputs(context.Background(), repoPath, inputScope)
 }
 
 // ConfigInputPathsFromNames keeps the original ConfigInputPaths traversal.
@@ -744,7 +757,7 @@ func ConfigInputPaths(repoPath string, inputScopes ...*inputscope.Scope) []strin
 func ConfigInputPathsFromNames(repoPath string, names []string, inputScopes ...*inputscope.Scope) []string {
 	inputScope := inputscope.First(inputScopes)
 	_ = names
-	return tsConfigInputs(repoPath, inputScope)
+	return tsConfigInputs(context.Background(), repoPath, inputScope)
 }
 
 // RepoUsesAngular reports whether Angular project markers are present.
@@ -775,7 +788,7 @@ func IsSessionSource(rel string, angular bool) bool {
 	return angular && isAngularTemplateFile(rel)
 }
 
-func tsConfigInputs(repoPath string, inputScopes ...*inputscope.Scope) []string {
+func tsConfigInputs(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) []string {
 	inputScope := inputscope.First(inputScopes)
 	tCfg := time.Now()
 	names := []string{
@@ -797,7 +810,7 @@ func tsConfigInputs(repoPath string, inputScopes ...*inputscope.Scope) []string 
 	}
 	for _, n := range names {
 		p := filepath.Join(repoPath, n)
-		if _, err := inputScope.Stat(p); err == nil {
+		if _, err := overlayStat(ctx, p, inputScope); err == nil {
 			add(n)
 			if n == "tsconfig.json" || n == "tsconfig.base.json" || n == "jsconfig.json" {
 				followTSConfigExtends(repoPath, p, add, inputScope)
@@ -809,7 +822,7 @@ func tsConfigInputs(repoPath string, inputScopes ...*inputscope.Scope) []string 
 	}
 	// Framework detectors also inspect the selected TS root. Retain missing
 	// candidates so config additions enter the resident reconciliation path.
-	if tsRoot, found := findTSRoot(context.Background(), repoPath, inputScope); found {
+	if tsRoot, found := findTSRoot(ctx, repoPath, inputScope); found {
 		rel, err := filepath.Rel(repoPath, tsRoot)
 		rel = factpath.Slash(rel)
 		if err == nil {
@@ -822,12 +835,12 @@ func tsConfigInputs(repoPath string, inputScopes ...*inputscope.Scope) []string 
 	}
 	// Match the actual alias reader's roots, including inherited tsconfig paths.
 	// The repository-root fallback is already represented by names above.
-	for _, root := range collectTSAliasRoots(context.Background(), repoPath, inputScope) {
+	for _, root := range collectTSAliasRoots(ctx, repoPath, inputScope) {
 		for _, name := range []string{"svelte.config.js", "svelte.config.ts", "svelte.config.mjs"} {
 			add(factpath.Join(root.dir, name))
 		}
 	}
-	_ = inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+	_ = overlayWalkDir(ctx, repoPath, inputScope, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return nil
 		}
