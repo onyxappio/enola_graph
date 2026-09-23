@@ -10,7 +10,7 @@ The user authorized **auto approval for all future candidates**. This supersedes
 - First state the expected entities/direct relationship, run the analyzer, and prove the discrepancy with source and controls. Auto approval does not waive evidence or independent review.
 - Research: Fable 5.1 through Claude Code. Coding: Grok 4.6 through the configured local CLIProxy launcher. Primary orchestrates and independently verifies.
 - Workers must not send Telegram messages. Primary alone sends important updates with `bash ~/.claude/skills/user-send/send.sh -t enola-2 -T term_b4d33c66-3033-42d6-8870-0852aa948bfd`.
-- Start workers in the authorized unattended/always-approve mode. Keep all work in this isolated branch. Local commits only; do not push/merge or disturb other sessions.
+- Start workers in the authorized unattended/always-approve mode. Keep all work in this isolated branch. Workers make local commits only and must not push/merge or disturb other sessions. The primary integrates completed waves under the synchronization policy below.
 - Preserve exact cold/delta equality, silent no-change runs, cache migration, source evidence, and negative controls.
 
 ## One cumulative report
@@ -32,3 +32,14 @@ Current state at policy adoption: waves 1–2 implemented; wave2 reviewed at `b3
 The user requests Shiki syntax highlighting in the next and subsequent HTML reports.
 Generate highlighting at report build time and embed the resulting markup/styles in
 `docs/accuracy/report.html`; preserve standalone offline viewing with no CDN dependency.
+
+## Main synchronization — 2026-09-23
+
+The user now authorizes integrating and pushing each verified completed wave to
+`origin/main`, then bringing current main back into the accuracy branch. This
+supersedes the earlier local-only policy for the primary orchestrator. Fetch main
+first, preserve concurrent upstream changes, resolve and validate integration, and
+push without force. Keep unfinished wave changes out of main. Do not merge into
+a checkout while its coder is writing; use a separate integration checkout and
+synchronize the accuracy checkout at a clean worker boundary. Workers still do
+not push or merge themselves.
