@@ -531,9 +531,18 @@ var vueCompilerMacroNames = map[string]bool{
 // buildVueImportBindings maps a template's local import spelling to the symbol
 // the imported file actually declares. Default imports may be freely renamed,
 // while a named import may have a different local alias.
-func buildVueImportBindings(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias) emberImportBindings {
+func buildVueImportBindings(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, cache *namedExportCache, sideReads map[string]bool) emberImportBindings {
 	b := emberImportBindings{internal: map[string]string{}, external: map[string]string{}, modules: map[string]string{}}
 	fileDir := factpath.Dir(relFile)
+	note := func(f string) {
+		if sideReads == nil {
+			return
+		}
+		f = filepath.ToSlash(f)
+		if f != "" && f != filepath.ToSlash(relFile) {
+			sideReads[f] = true
+		}
+	}
 	for i := range root.ChildCount() {
 		stmt := root.Child(i)
 		if kindOf(kinds, stmt) != "import_statement" {
@@ -547,11 +556,22 @@ func buildVueImportBindings(kinds *tsutil.KindTable, root *sitter.Node, src []by
 		importPath := strings.Trim(nodeText(source, src), `"'`)
 		resolved, external := resolveImportPath(importPath, fileDir, aliases)
 		moduleDir := factpath.Dir(resolved)
-		bind := func(local, target string) {
+		indexPath := ""
+		foundFile := false
+		if !external {
+			if idx, dir, ok := resolveModuleFile(resolved, knownFiles); ok {
+				indexPath, moduleDir, foundFile = idx, dir, true
+			}
+		}
+		bind := func(local, target, file string) {
 			if local == "" {
 				return
 			}
-			b.modules[local] = resolved
+			if file != "" {
+				b.modules[local] = file
+			} else {
+				b.modules[local] = resolved
+			}
 			if external {
 				b.external[local] = importPath
 			} else {
@@ -562,7 +582,11 @@ func buildVueImportBindings(kinds *tsutil.KindTable, root *sitter.Node, src []by
 			child := clause.Child(j)
 			switch kindOf(kinds, child) {
 			case "identifier":
-				bind(nodeText(child, src), moduleDir+"."+fileSymbolName(resolved))
+				name := fileSymbolName(resolved)
+				if foundFile && indexPath != "" {
+					name = fileSymbolName(indexPath)
+				}
+				bind(nodeText(child, src), moduleDir+"."+name, indexPath)
 			case "named_imports":
 				for k := range child.ChildCount() {
 					spec := child.Child(k)
@@ -578,7 +602,8 @@ func buildVueImportBindings(kinds *tsutil.KindTable, root *sitter.Node, src []by
 					if alias := spec.ChildByFieldName("alias"); alias != nil {
 						local = nodeText(alias, src)
 					}
-					bind(local, moduleDir+"."+exported)
+					target, leaf := bindImportedSymbol(moduleDir, indexPath, exported, resolved, foundFile, readSrc, aliases, knownFiles, cache, note)
+					bind(local, target, leaf)
 				}
 			}
 		}
@@ -779,6 +804,8 @@ func vueTemplateRefs(rawSrc []byte, relFile string, extracted []facts.Fact, bind
 		file := ""
 		if ownFile[name] {
 			file = relFile
+		} else if m := bindings.modules[name]; m != "" && strings.Contains(filepath.Base(m), ".") {
+			file = filepath.ToSlash(m)
 		}
 		seen[target] = vueTemplateRef{target: target, file: file}
 	}
@@ -878,6 +905,9 @@ func (e *TSExtractor) extractVueSFC(kinds *tsutil.KindTable, rawSrc []byte, relF
 		result = append(result, blockFacts...)
 		for name, target := range bindings.internal {
 			allBindings.internal[name] = target
+		}
+		for name, mod := range bindings.modules {
+			allBindings.modules[name] = mod
 		}
 		if block.IsSetup {
 			for _, macro := range macros {
@@ -1025,7 +1055,7 @@ func (e *TSExtractor) extractVueScriptBlock(kinds *tsutil.KindTable, block *vueS
 	defer tree.Close()
 
 	root := tree.RootNode()
-	bindings := buildVueImportBindings(kinds, root, block.Content, relFile, aliases)
+	bindings := buildVueImportBindings(kinds, root, block.Content, relFile, aliases, knownFiles, readSrc, exportCache, sideReads)
 	// All three passes below look for the same thing — the compiler-macro call sites
 	// — so the tree is matched ONCE and the results shared. Each used to walk the
 	// whole script block in Go, which costs a heap allocation per node visited

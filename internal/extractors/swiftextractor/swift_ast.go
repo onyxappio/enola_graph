@@ -969,6 +969,22 @@ func (w *astWalker) handleProperty(node *sitter.Node) {
 		symbolKind = facts.SymbolConstant
 	}
 
+	rels := []facts.Relation{{Kind: facts.RelDeclares, Target: w.dir}}
+	// A stored/computed field of a same-file type keeps a resolved declares
+	// target in v2: the directory module is excluded there, so the class
+	// (or nested type) must be named explicitly. Top-level and extension
+	// properties have no enclosing declaration in this file.
+	if idx := w.currentOwner(); idx >= 0 {
+		owner := w.out[idx]
+		if owner.Kind == facts.KindSymbol && owner.Name != "" {
+			rels = append(rels, facts.Relation{
+				Kind:       facts.RelDeclares,
+				Target:     owner.Name,
+				TargetFile: w.relFile,
+			})
+		}
+	}
+
 	w.out = append(w.out, facts.Fact{
 		Kind: facts.KindSymbol,
 		Name: w.dir + "." + w.qualify(name),
@@ -979,9 +995,7 @@ func (w *astWalker) handleProperty(node *sitter.Node) {
 			"exported":    !isPrivateAccess(modifierText),
 			"language":    "swift",
 		},
-		Relations: []facts.Relation{
-			{Kind: facts.RelDeclares, Target: w.dir},
-		},
+		Relations: rels,
 	})
 	propIdx := len(w.out) - 1
 

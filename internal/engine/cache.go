@@ -2498,7 +2498,13 @@ import (
 // v293: nested statement blocks restore outer JSX import bindings; import/export
 // alias bridges bind the leaf original name; markdown emits file-owned modules
 // alongside directory-shaped v1 identities.
-const cacheVersion = "v293"
+// v294: Vue default-as barrel reexports bind the leaf component; top-level
+// destructured bindings emit symbols; every parsed TS/JS/Vue file has a file_ref;
+// JS emit specifiers prefer implementation over sibling declarations; class
+// fields declare their owning class so v2 constants keep a resolved target.
+// v295: Swift stored/computed properties of a same-file type declare that type
+// so v2 constants keep a resolved structural target (directory modules excluded).
+const cacheVersion = "v295"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

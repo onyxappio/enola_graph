@@ -233,6 +233,87 @@ final class HomeBuilder {
 	}
 }
 
+func TestPropertyDeclaresEnclosingType(t *testing.T) {
+	ff := extractAST(t, `
+final class OnyxGlassView {
+    private let effectView: UIVisualEffectView
+    var mutable: Int = 0
+}
+let topLevel = 1
+extension OnyxGlassView {
+    let fromExtension = 2
+}
+class Outer {
+    class Inner {
+        let nested = 3
+    }
+}
+`, false)
+
+	field, ok := findFact(ff, "pkg.OnyxGlassView.effectView")
+	if !ok {
+		t.Fatal("expected pkg.OnyxGlassView.effectView")
+	}
+	if field.Props["symbol_kind"] != facts.SymbolConstant {
+		t.Errorf("effectView kind=%v want constant", field.Props["symbol_kind"])
+	}
+	if !hasRelation(field, facts.RelDeclares, "pkg") {
+		t.Errorf("expected module declares; relations=%v", field.Relations)
+	}
+	if !hasRelation(field, facts.RelDeclares, "pkg.OnyxGlassView") {
+		t.Errorf("expected class declares; relations=%v", field.Relations)
+	}
+	var classEdge facts.Relation
+	for _, r := range field.Relations {
+		if r.Kind == facts.RelDeclares && r.Target == "pkg.OnyxGlassView" {
+			classEdge = r
+		}
+	}
+	if classEdge.TargetFile != "pkg/test.swift" {
+		t.Errorf("class declares target_file=%q", classEdge.TargetFile)
+	}
+	for _, r := range field.Relations {
+		if r.Kind == facts.RelCalls {
+			t.Errorf("invented usage %v", r)
+		}
+	}
+
+	mutable, ok := findFact(ff, "pkg.OnyxGlassView.mutable")
+	if !ok {
+		t.Fatal("expected mutable field")
+	}
+	if !hasRelation(mutable, facts.RelDeclares, "pkg.OnyxGlassView") {
+		t.Errorf("var field should declare class; relations=%v", mutable.Relations)
+	}
+
+	top, ok := findFact(ff, "pkg.topLevel")
+	if !ok {
+		t.Fatal("expected top-level constant")
+	}
+	if hasRelation(top, facts.RelDeclares, "pkg.OnyxGlassView") {
+		t.Errorf("top-level constant must not declare a class; relations=%v", top.Relations)
+	}
+
+	ext, ok := findFact(ff, "pkg.OnyxGlassView.fromExtension")
+	if !ok {
+		t.Fatal("expected extension property")
+	}
+	if hasRelation(ext, facts.RelDeclares, "pkg.OnyxGlassView") {
+		t.Errorf("extension property must not fabricate a class declares; relations=%v", ext.Relations)
+	}
+
+	nested, ok := findFact(ff, "pkg.Outer.Inner.nested")
+	if !ok {
+		t.Fatal("expected nested field")
+	}
+	if !hasRelation(nested, facts.RelDeclares, "pkg.Outer.Inner") {
+		t.Errorf("nested field should declare Inner; relations=%v", nested.Relations)
+	}
+	if hasRelation(nested, facts.RelDeclares, "pkg.Outer") {
+		t.Errorf("nested field must not declare Outer; relations=%v", nested.Relations)
+	}
+}
+
 func factNames(ff []facts.Fact) []string {
 	var out []string
 	for _, f := range ff {

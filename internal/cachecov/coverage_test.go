@@ -33,6 +33,8 @@ import (
 // test functions that assert the behavior that version introduced. v1 is the
 // implicit baseline (no changelog line), so coverage starts at v2.
 var versionCoverage = map[int][]string{
+	295: {"TestPropertyDeclaresEnclosingType", "TestPublishedSwiftConstantDeclaresClassV2"},
+	294: {"TestExtract_DefaultAsSFCBarrelBridge", "TestExtract_TopLevelDestructuredBindings", "TestExtract_EmptyParsedFileEmitsFileRef", "TestExtract_DeclarationSiblingDoesNotShadowImplementation", "TestPublishedConstantDeclaresFileOwnedModuleV2"},
 	293: {"TestExtract_JSXBlockRecoveryAndImportExportAlias", "TestPublishedMarkdownDirectoryModuleV1AndV2"},
 	292: {"TestExtract_LongCommentDoesNotSkipHandWrittenModule", "TestExtract_JSXSymbolOwnedCallsAndControls", "TestExtract_ImportThenExportBridge", "TestExtract_NuxtModuleRuntimePagesAreRegistrations", "TestPublishedMarkdownDirectoryModuleV1AndV2", "TestPublishedConstantDeclaresFileOwnedModule"},
 	291: {"TestExtract_NitroFileAndAddServerHandlerRoutes", "TestFrozenSFCSiblingDeleteStaysInBeginAndEqualsCold"},

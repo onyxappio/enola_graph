@@ -486,21 +486,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	if isAngular {
 		projects = angularProjectNames(repoPath, inputScope)
 	}
-	for dir := range modules {
-		props := map[string]any{"language": "typescript"}
-		if name := nearestPackageName(pkgNames, dir); name != "" {
-			props["package_name"] = name
-		}
-		if name := nearestProjectName(projects, dir); name != "" {
-			props["workspace_project"] = name
-		}
-		allFacts = append(allFacts, facts.Fact{
-			Kind:  facts.KindModule,
-			Name:  dir,
-			File:  dir,
-			Props: props,
-		})
-	}
+	allFacts = appendTSDirectoryModules(allFacts, modules, pkgNames, projects)
 
 	for _, rec := range records {
 		if rec != nil && rec.Unreadable {
