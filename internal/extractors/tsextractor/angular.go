@@ -24,6 +24,7 @@
 package tsextractor
 
 import (
+	"context"
 	"path"
 	"sort"
 	"strings"
@@ -64,14 +65,14 @@ const angularSearchDepth = 2
 // and an Nx workspace's `apps/<app>/`). Checking only the root would leave the flag
 // false and every gate below silently producing nothing — the failure detectEmber
 // records having made once already.
-func detectAngular(repoPath string, inputScopes ...*inputscope.Scope) bool {
+func detectAngular(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
-	tsRoot, _ := findTSRoot(repoPath, inputScope)
-	if hasPkgDependency(tsRoot, "@angular/core", inputScope) ||
-		(tsRoot != repoPath && hasPkgDependency(repoPath, "@angular/core", inputScope)) {
+	tsRoot, _ := findTSRoot(ctx, repoPath, inputScope)
+	if hasPkgDependency(ctx, tsRoot, "@angular/core", inputScope) ||
+		(tsRoot != repoPath && hasPkgDependency(ctx, repoPath, "@angular/core", inputScope)) {
 		return true
 	}
-	return nestedPkgDeclares(repoPath, "@angular/core", angularSearchDepth, inputScope)
+	return nestedPkgDeclares(ctx, repoPath, "@angular/core", angularSearchDepth, inputScope)
 }
 
 // angularCounts accounts for the injection sites one file declared: those whose

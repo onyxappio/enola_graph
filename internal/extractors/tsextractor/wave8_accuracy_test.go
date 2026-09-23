@@ -348,7 +348,7 @@ export function run(s: TsLibGeneratorSchema) { return s }
 		"src/both.ts": `import type { Dual } from './dual'
 export function useDual(s: Dual) { return s }
 `,
-		"src/dual.ts":   `export interface Dual { n: number }
+		"src/dual.ts": `export interface Dual { n: number }
 `,
 		"src/dual.d.ts": `export interface Dual { n: number }
 `,

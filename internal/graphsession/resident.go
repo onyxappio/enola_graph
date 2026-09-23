@@ -37,10 +37,18 @@ type WorkCounters struct {
 	// one per needed extractor is what says the second question reused the
 	// first answer rather than reading the tree again.
 	NonTSCaptures int
+	// TSDiscoveries counts the repository-wide TypeScript discovery snapshots a
+	// run actually built. One run needs one: the context fingerprint and every
+	// planner preview ask the same framework, gate, name and alias questions of
+	// the same tree. A rise means some caller observed a capture the snapshot
+	// was not taken under and had to read the tree again, and the run reports
+	// that rather than hiding it.
+	TSDiscoveries int
 }
 
 type runtimeInputs struct {
 	engineContextHash string
+	tsDiscovery       *tsextractor.Discovery
 	tsContext         map[string]string
 	tsFileContext     map[string]string
 	policyIdentity    string
@@ -115,7 +123,26 @@ func readRuntimeInputs(eng *engine.Engine, abs string, st *State, work *WorkCoun
 		tr.Mark("engine_context_fingerprint", "")
 		for _, ext := range eng.Extractors() {
 			if ts, ok := ext.(*tsextractor.TSExtractor); ok {
-				result.tsContext, result.tsFileContext = ts.SessionContext(abs, cfg, tsConfigPaths, inv.Files)
+				// Built over cfg, the configuration this run has already
+				// captured and fenced, because that is what every later reader
+				// of this snapshot will observe. Building it over the live tree
+				// instead left SessionContext to rebuild locally whenever the
+				// capture and the tree disagreed, and that rebuild was thrown
+				// away: the previews then ran against a snapshot the projected
+				// context keys were never computed from, and the counter never
+				// saw the second build.
+				built := ts.NewDiscovery(context.Background(), abs, cfg)
+				work.TSDiscoveries++
+				tr.Mark("ts_discovery", "")
+				var used *tsextractor.Discovery
+				result.tsContext, result.tsFileContext, used = ts.SessionContext(abs, cfg, tsConfigPaths, inv.Files, built)
+				if used != built {
+					// SessionContext refused the snapshot and built its own.
+					// Keep that one - it is the proven one - and count it.
+					work.TSDiscoveries++
+					tr.Mark("ts_discovery_rebuilt", "")
+				}
+				result.tsDiscovery = used
 			}
 		}
 		tr.Mark("ts_session_context", fmt.Sprintf("files=%d", len(result.tsFileContext)))
@@ -379,6 +406,11 @@ func (r *Resident) ApplyChanges(ctx context.Context, batch ChangeBatch) (*Online
 	txWork.BoundedContextChecks += work.BoundedContextChecks
 	txWork.HashedFiles += work.HashedFiles
 	txWork.DirtyHashBytes += work.DirtyHashBytes
+	// The snapshot readRuntimeInputs built is work this run did, and it was
+	// being dropped here: only the extractions' own rebuilds survived into the
+	// reported counters, so a run that built one snapshot and a run that built
+	// one and then rebuilt it reported the same number.
+	txWork.TSDiscoveries += work.TSDiscoveries
 	r.epoch, r.watermark = batch.Epoch, batch.Through
 	res.Facts = nil
 	out := &OnlineResult{Result: *res, Work: txWork, Epoch: r.epoch, Watermark: r.watermark, Reconciled: reason != "", FallbackReason: reason}

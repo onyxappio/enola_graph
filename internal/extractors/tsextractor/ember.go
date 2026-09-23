@@ -1,6 +1,7 @@
 package tsextractor
 
 import (
+	"context"
 	"github.com/enola-labs/enola/internal/extractors/tsutil"
 
 	"path/filepath"
@@ -74,14 +75,14 @@ func isHbsFile(path string) bool {
 // The nested search is bounded and stops at the directories a JavaScript
 // project never keeps source in. A repository is Ember if any package.json it
 // contains says so.
-func detectEmber(repoPath string, inputScopes ...*inputscope.Scope) bool {
+func detectEmber(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
-	tsRoot, _ := findTSRoot(repoPath, inputScope)
-	if hasPkgDependency(tsRoot, "ember-source", inputScope) ||
-		(tsRoot != repoPath && hasPkgDependency(repoPath, "ember-source", inputScope)) {
+	tsRoot, _ := findTSRoot(ctx, repoPath, inputScope)
+	if hasPkgDependency(ctx, tsRoot, "ember-source", inputScope) ||
+		(tsRoot != repoPath && hasPkgDependency(ctx, repoPath, "ember-source", inputScope)) {
 		return true
 	}
-	return nestedPkgDeclares(repoPath, "ember-source", emberSearchDepth, inputScope)
+	return nestedPkgDeclares(ctx, repoPath, "ember-source", emberSearchDepth, inputScope)
 }
 
 // emberSearchDepth is how deep a nested application may sit. Two levels covers
@@ -91,7 +92,7 @@ const emberSearchDepth = 2
 
 // nestedPkgDeclares reports whether any package.json within depth levels of root
 // declares the dependency.
-func nestedPkgDeclares(root, dependency string, depth int, inputScopes ...*inputscope.Scope) bool {
+func nestedPkgDeclares(ctx context.Context, root, dependency string, depth int, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
 	if depth <= 0 {
 		return false
@@ -105,10 +106,10 @@ func nestedPkgDeclares(root, dependency string, depth int, inputScopes ...*input
 			continue
 		}
 		child := filepath.Join(root, entry.Name())
-		if hasPkgDependency(child, dependency, inputScope) {
+		if hasPkgDependency(ctx, child, dependency, inputScope) {
 			return true
 		}
-		if nestedPkgDeclares(child, dependency, depth-1, inputScope) {
+		if nestedPkgDeclares(ctx, child, dependency, depth-1, inputScope) {
 			return true
 		}
 	}

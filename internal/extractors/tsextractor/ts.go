@@ -77,7 +77,7 @@ var unambiguousTSExts = map[string]bool{
 // added, and every consumer of it pairs tsRoot with a repoPath fallback.
 func (e *TSExtractor) DetectFiles(repoPath string, files []string) (bool, error) {
 	inputScope := e.inputScope
-	if _, found := findTSRoot(repoPath, inputScope); found {
+	if _, found := findTSRoot(context.Background(), repoPath, inputScope); found {
 		return true, nil
 	}
 	if hasGraphQLDocs(files) {
@@ -98,19 +98,19 @@ func (e *TSExtractor) DetectFiles(repoPath string, files []string) (bool, error)
 // with a boolean indicating whether one was found. Search depth adapts to
 // repo structure: Java/Gradle projects nest UI code deep (src/main/resources/ui)
 // so we search up to 8 levels; plain repos need at most 2.
-func findTSRoot(repoPath string, inputScopes ...*inputscope.Scope) (string, bool) {
+func findTSRoot(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) (string, bool) {
 	inputScope := inputscope.First(inputScopes)
-	if hasTSMarkers(repoPath, inputScope) {
+	if hasTSMarkers(ctx, repoPath, inputScope) {
 		return repoPath, true
 	}
 	maxDepth := 2
-	if isDeepNestedProject(repoPath, inputScope) {
+	if isDeepNestedProject(ctx, repoPath, inputScope) {
 		maxDepth = 8
 	}
-	return searchTSRoot(repoPath, 0, maxDepth, inputScope)
+	return searchTSRoot(ctx, repoPath, 0, maxDepth, inputScope)
 }
 
-func isDeepNestedProject(repoPath string, inputScopes ...*inputscope.Scope) bool {
+func isDeepNestedProject(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
 	markers := []string{
 		"pom.xml", "build.gradle", "build.gradle.kts",
@@ -129,7 +129,7 @@ var tsSkipDirs = map[string]bool{
 	"build": true, "out": true, "target": true, "vendor": true,
 }
 
-func searchTSRoot(dir string, depth, maxDepth int, inputScopes ...*inputscope.Scope) (string, bool) {
+func searchTSRoot(ctx context.Context, dir string, depth, maxDepth int, inputScopes ...*inputscope.Scope) (string, bool) {
 	inputScope := inputscope.First(inputScopes)
 	if depth >= maxDepth {
 		return "", false
@@ -143,10 +143,10 @@ func searchTSRoot(dir string, depth, maxDepth int, inputScopes ...*inputscope.Sc
 			continue
 		}
 		sub := filepath.Join(dir, entry.Name())
-		if hasTSMarkers(sub, inputScope) {
+		if hasTSMarkers(ctx, sub, inputScope) {
 			return sub, true
 		}
-		if found, ok := searchTSRoot(sub, depth+1, maxDepth, inputScope); ok {
+		if found, ok := searchTSRoot(ctx, sub, depth+1, maxDepth, inputScope); ok {
 			return found, true
 		}
 	}
@@ -155,7 +155,7 @@ func searchTSRoot(dir string, depth, maxDepth int, inputScopes ...*inputscope.Sc
 
 // hasTSMarkers returns true if the directory looks like a project root this
 // extractor should handle (TypeScript, or a JS framework it also parses).
-func hasTSMarkers(dir string, inputScopes ...
+func hasTSMarkers(ctx context.Context, dir string, inputScopes ...
 // tsconfig.json (standard), tsconfig.base.json (Nx monorepo), or a Deno
 // project's config — Deno ships TypeScript with no package.json at all
 // (deno.json/deno.jsonc, import_map.json), so a Deno Slack app or service
@@ -176,7 +176,7 @@ func hasTSMarkers(dir string, inputScopes ...
 	// Rails 8 app, 350+ files were invisible until this marker.
 	for _, pkg := range []string{"typescript", "vue", "react", "svelte", "next", "nuxt", "ember-source",
 		"@hotwired/stimulus", "@hotwired/turbo-rails"} {
-		if hasPkgDependency(dir, pkg, inputScope) {
+		if hasPkgDependency(ctx, dir, pkg, inputScope) {
 			return true
 		}
 	}
@@ -193,12 +193,12 @@ func hasTSMarkers(dir string, inputScopes ...
 	// a Node CLI with zero deps declares itself structurally (bin, main,
 	// exports, type, workspaces, or any dependency map). Only a bare
 	// name-holding stub — a marker file, not a package — stays undetected.
-	return packageJSONDeclaresPackage(dir, inputScope)
+	return packageJSONDeclaresPackage(ctx, dir, inputScope)
 }
 
-func packageJSONDeclaresPackage(dir string, inputScopes ...*inputscope.Scope) bool {
+func packageJSONDeclaresPackage(ctx context.Context, dir string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
-	data, err := overlayReadFile(context.Background(), filepath.Join(dir, "package.json"), inputScope)
+	data, err := overlayReadFile(ctx, filepath.Join(dir, "package.json"), inputScope)
 	if err != nil {
 		return false
 	}
@@ -225,15 +225,15 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	var allFacts []facts.Fact
 
 	// Detect frameworks
-	isNextJS := detectNextJS(repoPath, inputScope)
+	isNextJS := detectNextJS(ctx, repoPath, inputScope)
 	nuxtPkgs := collectNuxtPackages(ctx, repoPath, inputScope)
 	isNuxt := len(nuxtPkgs) > 0
-	isSvelteKit := detectSvelteKit(repoPath, inputScope)
-	isEmber := detectEmber(repoPath, inputScope)
-	isReactNav := detectReactNavigation(repoPath, inputScope)
-	isAngular := detectAngular(repoPath, inputScope)
+	isSvelteKit := detectSvelteKit(ctx, repoPath, inputScope)
+	isEmber := detectEmber(ctx, repoPath, inputScope)
+	isReactNav := detectReactNavigation(ctx, repoPath, inputScope)
+	isAngular := detectAngular(ctx, repoPath, inputScope)
 	pkgGates := collectPackageGates(ctx, repoPath, inputScope)
-	pkgNames := collectPackageNames(repoPath, inputScope)
+	pkgNames := collectPackageNames(ctx, repoPath, inputScope)
 	isPrisma := pkgGates.anyPrisma
 
 	// Parse tsconfig.json path aliases, one root per package for monorepos.
@@ -242,10 +242,10 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	// SvelteKit maps $lib by convention and may declare literal aliases in its
 	// config even before `svelte-kit sync` has generated a tsconfig.
 	if isSvelteKit {
-		aliasRoots = withSvelteKitAliasFallbacks(repoPath, aliasRoots, inputScope)
+		aliasRoots = withSvelteKitAliasFallbacks(ctx, repoPath, aliasRoots, inputScope)
 	}
 	if isNuxt {
-		aliasRoots = withNuxtAliasFallbacks(repoPath, aliasRoots, nuxtPkgs, inputScope)
+		aliasRoots = withNuxtAliasFallbacks(ctx, repoPath, aliasRoots, nuxtPkgs, inputScope)
 	}
 
 	// Restrict to TypeScript files once, then parse them in parallel. The
@@ -1748,10 +1748,10 @@ func detectRoute(relFile string) *facts.Fact {
 // detectNextJS checks if the repository is a Next.js project.
 // It searches the TypeScript root directory (which may be a subdirectory in a
 // monorepo) for next.config.* files or a package.json with a "next" dependency.
-func detectNextJS(repoPath string, inputScopes ...*inputscope.Scope) bool {
+func detectNextJS(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
-	tsRoot, _ := findTSRoot(repoPath, inputScope)
-	return detectNextJSAt(tsRoot, inputScope) || (tsRoot != repoPath && detectNextJSAt(repoPath, inputScope))
+	tsRoot, _ := findTSRoot(ctx, repoPath, inputScope)
+	return detectNextJSAt(ctx, tsRoot, inputScope) || (tsRoot != repoPath && detectNextJSAt(ctx, repoPath, inputScope))
 }
 
 // collectPackageNames maps each directory holding a package.json to the package
@@ -1779,7 +1779,7 @@ func detectNextJS(repoPath string, inputScopes ...*inputscope.Scope) bool {
 // named here instead — tsSkipDirs (shared with the alias-root walk) plus dot-directories
 // and testdata. node_modules is the critical one: a dependency's package.json would
 // otherwise be read as if the repo published it.
-func collectPackageNames(repoPath string, inputScopes ...*inputscope.Scope) map[string]string {
+func collectPackageNames(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) map[string]string {
 	inputScope := inputscope.First(inputScopes)
 	out := map[string]string{}
 	_ = inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
@@ -1796,7 +1796,7 @@ func collectPackageNames(repoPath string, inputScopes ...*inputscope.Scope) map[
 		if d.Name() != "package.json" {
 			return nil
 		}
-		data, err := overlayReadFile(context.Background(), path, inputScope)
+		data, err := overlayReadFile(ctx, path, inputScope)
 		if err != nil {
 			return nil
 		}
@@ -1827,14 +1827,27 @@ func invertPackageNames(dirToName map[string]string) map[string]string {
 	return out
 }
 
-// collectPackageAliases maps each published package name to the repo-relative
-// entry file its package.json names. Workspace specifiers such as
-// `import { x } from '@onyx/contracts'` have no tsconfig `paths` entry in some
-// packages (Expo/mobile, Bundler resolution); without this map they stay
-// external and the import edge never binds to the file that exists in-tree.
-func collectPackageAliases(ctx context.Context, repoPath string, knownFiles map[string]bool, inputScopes ...*inputscope.Scope) map[string]tsAlias {
+// packageExportSource is one decoded package.json the alias walk found, kept in
+// walk order because applyParsedExports lets the first declaration of a
+// specifier win. The walk and the parse are separated so one traversal can
+// serve several known-file sets: the aliases a caller gets still come from the
+// existing reader applied to that caller's own set, not from a reconciliation
+// of two sets that were each resolved somewhere else.
+type packageExportSource struct {
+	dir     string
+	name    string
+	main    string
+	types   string
+	typings string
+	module  string
+	exports json.RawMessage
+}
+
+// collectPackageExportSources performs the package.json traversal behind
+// collectPackageAliases without resolving any of it against a known-file set.
+func collectPackageExportSources(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) []packageExportSource {
 	inputScope := inputscope.First(inputScopes)
-	out := map[string]tsAlias{}
+	var out []packageExportSource
 	_ = inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return nil
@@ -1872,11 +1885,29 @@ func collectPackageAliases(ctx context.Context, repoPath string, knownFiles map[
 		if pkgDir == "." {
 			pkgDir = ""
 		}
-		parsed := parsePackageJSONExports(pkg.Name, pkgDir, pkg.Types, pkg.Typings, pkg.Module, pkg.Main, pkg.Exports, knownFiles)
-		applyParsedExports(out, parsed)
+		out = append(out, packageExportSource{dir: pkgDir, name: pkg.Name, main: pkg.Main, types: pkg.Types, typings: pkg.Typings, module: pkg.Module, exports: pkg.Exports})
 		return nil
 	})
 	return out
+}
+
+// aliasesFromExportSources resolves already-walked package.json declarations
+// against one known-file set, in the order the walk produced them.
+func aliasesFromExportSources(sources []packageExportSource, knownFiles map[string]bool) map[string]tsAlias {
+	out := map[string]tsAlias{}
+	for _, src := range sources {
+		applyParsedExports(out, parsePackageJSONExports(src.name, src.dir, src.types, src.typings, src.module, src.main, src.exports, knownFiles))
+	}
+	return out
+}
+
+// collectPackageAliases maps each published package name to the repo-relative
+// entry file its package.json names. Workspace specifiers such as
+// `import { x } from '@onyx/contracts'` have no tsconfig `paths` entry in some
+// packages (Expo/mobile, Bundler resolution); without this map they stay
+// external and the import edge never binds to the file that exists in-tree.
+func collectPackageAliases(ctx context.Context, repoPath string, knownFiles map[string]bool, inputScopes ...*inputscope.Scope) map[string]tsAlias {
+	return aliasesFromExportSources(collectPackageExportSources(ctx, repoPath, inputScopes...), knownFiles)
 }
 
 // mergePackageAliases copies package.json name aliases then overlays tsconfig
@@ -1915,7 +1946,7 @@ func nearestPackageName(pkgNames map[string]string, dir string) string {
 	}
 }
 
-func detectNextJSAt(dir string, inputScopes ...
+func detectNextJSAt(ctx context.Context, dir string, inputScopes ...
 // Check next.config.* at this directory level
 *inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
@@ -1927,7 +1958,7 @@ func detectNextJSAt(dir string, inputScopes ...
 	}
 
 	// Check package.json for next dependency
-	data, err := overlayReadFile(context.Background(), filepath.Join(dir, "package.json"), inputScope)
+	data, err := overlayReadFile(ctx, filepath.Join(dir, "package.json"), inputScope)
 	if err != nil {
 		return false
 	}
@@ -2698,7 +2729,7 @@ type tsAliasRoot struct {
 func collectTSAliasRoots(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) []tsAliasRoot {
 	inputScope := inputscope.First(inputScopes)
 	maxDepth := 2
-	if isDeepNestedProject(repoPath, inputScope) {
+	if isDeepNestedProject(ctx, repoPath, inputScope) {
 		maxDepth = 8
 	}
 	var roots []tsAliasRoot
@@ -4058,11 +4089,11 @@ func (e *TSExtractor) ExtractTestRefs(ctx context.Context, repoPath string, file
 	}
 
 	aliasRoots := collectTSAliasRoots(ctx, repoPath, inputScope)
-	if detectSvelteKit(repoPath, inputScope) {
-		aliasRoots = withSvelteKitAliasFallbacks(repoPath, aliasRoots, inputScope)
+	if detectSvelteKit(ctx, repoPath, inputScope) {
+		aliasRoots = withSvelteKitAliasFallbacks(ctx, repoPath, aliasRoots, inputScope)
 	}
-	if detectNuxt(repoPath, inputScope) {
-		aliasRoots = withNuxtAliasFallbacks(repoPath, aliasRoots, collectNuxtPackages(ctx, repoPath, inputScope), inputScope)
+	if detectNuxt(ctx, repoPath, inputScope) {
+		aliasRoots = withNuxtAliasFallbacks(ctx, repoPath, aliasRoots, collectNuxtPackages(ctx, repoPath, inputScope), inputScope)
 	}
 
 	perFile := parallel.MapFiles(ctx, testFiles, func(relFile string) []facts.Fact {

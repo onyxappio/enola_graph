@@ -44,11 +44,11 @@ var drizzleTableFns = map[string]bool{
 
 // detectORMs reports which ORMs the repo declares, reusing the same package.json
 // primitive (and the same tsRoot + repo-root fallback) that Vue/Nuxt detection uses.
-func detectORMs(repoPath string, inputScopes ...*inputscope.Scope) (typeorm, drizzle, prisma bool) {
+func detectORMs(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) (typeorm, drizzle, prisma bool) {
 	inputScope := inputscope.First(inputScopes)
-	tsRoot, _ := findTSRoot(repoPath, inputScope)
+	tsRoot, _ := findTSRoot(ctx, repoPath, inputScope)
 	has := func(pkg string) bool {
-		return hasPkgDependency(tsRoot, pkg, inputScope) || (tsRoot != repoPath && hasPkgDependency(repoPath, pkg, inputScope))
+		return hasPkgDependency(ctx, tsRoot, pkg, inputScope) || (tsRoot != repoPath && hasPkgDependency(ctx, repoPath, pkg, inputScope))
 	}
 	return has(depTypeORM), has(depDrizzle), has(depPrisma)
 }
@@ -319,7 +319,7 @@ var prismaSchemaFiles = []string{
 // models and are ignored by construction.)
 func extractPrismaStorage(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) (factsOut []facts.Fact, unread []string) {
 	inputScope := inputscope.First(inputScopes)
-	tsRoot, _ := findTSRoot(repoPath, inputScope)
+	tsRoot, _ := findTSRoot(ctx, repoPath, inputScope)
 	roots := []string{tsRoot}
 	if tsRoot != repoPath {
 		roots = append(roots, repoPath)

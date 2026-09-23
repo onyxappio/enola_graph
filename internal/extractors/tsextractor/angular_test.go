@@ -366,7 +366,7 @@ func TestAngularDetectionFindsANestedApplication(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "frontend", "package.json"), []byte(`{"dependencies":{"@angular/core":"^19.0.0"}}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if !detectAngular(dir) {
+	if !detectAngular(context.Background(), dir) {
 		t.Error("an Angular application one level down was not detected")
 	}
 }

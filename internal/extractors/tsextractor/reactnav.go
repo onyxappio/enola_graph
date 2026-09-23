@@ -1,6 +1,7 @@
 package tsextractor
 
 import (
+	"context"
 	"github.com/enola-labs/enola/internal/extractors/tsutil"
 
 	"path/filepath"
@@ -32,11 +33,11 @@ const (
 	NavRouteLinksProp = "nav_route_links"
 )
 
-func detectReactNavigation(repoPath string, inputScopes ...*inputscope.Scope) bool {
+func detectReactNavigation(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
-	tsRoot, _ := findTSRoot(repoPath, inputScope)
-	if hasPkgDependency(tsRoot, "@react-navigation/native", inputScope) ||
-		(tsRoot != repoPath && hasPkgDependency(repoPath, "@react-navigation/native", inputScope)) {
+	tsRoot, _ := findTSRoot(ctx, repoPath, inputScope)
+	if hasPkgDependency(ctx, tsRoot, "@react-navigation/native", inputScope) ||
+		(tsRoot != repoPath && hasPkgDependency(ctx, repoPath, "@react-navigation/native", inputScope)) {
 		return true
 	}
 	// A monorepo's example/demo app declares the dependency in its own
@@ -48,7 +49,7 @@ func detectReactNavigation(repoPath string, inputScopes ...*inputscope.Scope) bo
 	}
 	for _, ent := range entries {
 		if ent.IsDir() && !strings.HasPrefix(ent.Name(), ".") && !tsSkipDirs[ent.Name()] &&
-			hasPkgDependency(filepath.Join(repoPath, ent.Name()), "@react-navigation/native", inputScope) {
+			hasPkgDependency(ctx, filepath.Join(repoPath, ent.Name()), "@react-navigation/native", inputScope) {
 			return true
 		}
 	}

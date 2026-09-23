@@ -93,29 +93,29 @@ func indexCaseInsensitive(src, needle []byte) int {
 	return bytes.Index(bytes.ToLower(src), bytes.ToLower(needle))
 }
 
-func detectVue(repoPath string, inputScopes ...*inputscope.Scope) bool {
+func detectVue(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
-	tsRoot, _ := findTSRoot(repoPath, inputScope)
-	return detectVueAt(tsRoot, inputScope) || (tsRoot != repoPath && detectVueAt(repoPath, inputScope))
+	tsRoot, _ := findTSRoot(ctx, repoPath, inputScope)
+	return detectVueAt(ctx, tsRoot, inputScope) || (tsRoot != repoPath && detectVueAt(ctx, repoPath, inputScope))
 }
 
-func detectVueAt(dir string, inputScopes ...*inputscope.Scope) bool {
+func detectVueAt(ctx context.Context, dir string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
-	return hasPkgDependency(dir, "vue", inputScope)
+	return hasPkgDependency(ctx, dir, "vue", inputScope)
 }
 
-func detectNuxt(repoPath string, inputScopes ...*inputscope.Scope) bool {
-	return len(collectNuxtPackages(context.Background(), repoPath, inputScopes...)) > 0
+func detectNuxt(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) bool {
+	return len(collectNuxtPackages(ctx, repoPath, inputScopes...)) > 0
 }
 
-func detectNuxtAt(dir string, inputScopes ...*inputscope.Scope) bool {
+func detectNuxtAt(ctx context.Context, dir string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
 	for _, name := range []string{"nuxt.config.js", "nuxt.config.ts", "nuxt.config.mjs"} {
 		if _, err := inputScope.Stat(filepath.Join(dir, name)); err == nil {
 			return true
 		}
 	}
-	return hasPkgDependency(dir, "nuxt", inputScope)
+	return hasPkgDependency(ctx, dir, "nuxt", inputScope)
 }
 
 // collectNuxtPackages lists every directory that declares Nuxt (nuxt.config.* or
@@ -135,7 +135,7 @@ func collectNuxtPackages(ctx context.Context, repoPath string, inputScopes ...*i
 		if path != repoPath && (strings.HasPrefix(name, ".") || tsSkipDirs[name] || name == "testdata") {
 			return filepath.SkipDir
 		}
-		if !detectNuxtAt(path, inputScope) {
+		if !detectNuxtAt(ctx, path, inputScope) {
 			return nil
 		}
 		rel, err := filepath.Rel(repoPath, path)
@@ -166,9 +166,9 @@ func nuxtPackageForFile(pkgs []string, relFile string) (string, bool) {
 	return "", false
 }
 
-func hasPkgDependency(dir, pkg string, inputScopes ...*inputscope.Scope) bool {
+func hasPkgDependency(ctx context.Context, dir, pkg string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
-	data, err := overlayReadFile(context.Background(), filepath.Join(dir, "package.json"), inputScope)
+	data, err := overlayReadFile(ctx, filepath.Join(dir, "package.json"), inputScope)
 	if err != nil {
 		return false
 	}

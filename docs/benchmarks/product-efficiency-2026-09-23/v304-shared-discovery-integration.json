@@ -1,0 +1,176 @@
+{
+  "main": "3013ec971709f74c7bb9401fbeb2d27a92b2fcff",
+  "base": "365d150",
+  "files": [
+    {
+      "path": "internal/extractors/tsextractor/angular.go",
+      "status": "candidate",
+      "sha256": "8ba90d1171f0e9c8bfe34a8e93287219db0c1ee2490dee6efad96bd21b1bd39f"
+    },
+    {
+      "path": "internal/extractors/tsextractor/context.go",
+      "status": "candidate",
+      "sha256": "4e8b7d6a615e493bf193b40c6dfa723ad2d5bcefcacfe916280ca1d799e98e42"
+    },
+    {
+      "path": "internal/extractors/tsextractor/discovery.go",
+      "status": "candidate",
+      "sha256": "fad8721b0ee8a11c48dd9ad12aca2d753b2d6a3204ee86803ab8b1663d638e95"
+    },
+    {
+      "path": "internal/extractors/tsextractor/ember.go",
+      "status": "candidate",
+      "sha256": "587cca67f4ef49da36bc47701bc717bcdbf255ea8be031655a80af9b523606ef"
+    },
+    {
+      "path": "internal/extractors/tsextractor/nuxt_alias.go",
+      "status": "candidate",
+      "sha256": "73a1b43d15beb5ee09cc9960a6d59dca870c304ceb3721770596863246465a5d"
+    },
+    {
+      "path": "internal/extractors/tsextractor/overlay.go",
+      "status": "candidate",
+      "sha256": "be11330cdd645b955a52945346f7517fa6590c3a28bc22858028a5901507c1f4"
+    },
+    {
+      "path": "internal/extractors/tsextractor/reactnav.go",
+      "status": "candidate",
+      "sha256": "4ebdf1372bcefd80018ac9f96fbf541934eb548440bc9654267adad84a9ab0f3"
+    },
+    {
+      "path": "internal/extractors/tsextractor/session.go",
+      "status": "candidate",
+      "sha256": "0560d6527326fa5a29de67b1f64fad5d8254bc8570969fae422ca9f029778efd"
+    },
+    {
+      "path": "internal/extractors/tsextractor/storage.go",
+      "status": "candidate",
+      "sha256": "b5817184e7dbd2109c53765914604ecb56c6b5ae17cf9006a1cf9570676b0743"
+    },
+    {
+      "path": "internal/extractors/tsextractor/svelte.go",
+      "status": "candidate",
+      "sha256": "9159bfa7435a0bc4cd58d007bdb8f91e725b695df46fd8fcc9efd888163f4f3c"
+    },
+    {
+      "path": "internal/extractors/tsextractor/ts.go",
+      "status": "merged-preserving-main",
+      "sha256": "25fedfa797d85458a0eb8fe156cc53a29e7332c7c61cd8843a1ea9e1a9c4ce24"
+    },
+    {
+      "path": "internal/extractors/tsextractor/vue.go",
+      "status": "candidate",
+      "sha256": "35b775bd9219d9f53166ccccfc82ea12891c945c6730cc654a00e94e6facf068"
+    },
+    {
+      "path": "internal/graphsession/resident.go",
+      "status": "candidate",
+      "sha256": "a3eb507300a63f9870451080c4a7e5b563eb0d716a614f8b2748a4744c3d7c4b"
+    },
+    {
+      "path": "internal/graphsession/session.go",
+      "status": "candidate",
+      "sha256": "08f1d45c68c8006256f49449e4f7cef3282e3f332977f80e99ebaeffc9038eff"
+    },
+    {
+      "path": "internal/extractors/tsextractor/angular_test.go",
+      "status": "candidate",
+      "sha256": "4ab4558efdbf8c2cbb5814ddc6abe8ff5d0f6c52b46654e0282f69b5215fe4c3"
+    },
+    {
+      "path": "internal/extractors/tsextractor/discovery_capture_test.go",
+      "status": "candidate",
+      "sha256": "5b178b800cff5d442b46b4599e517bb8702ee45d2ae78f74b9c908bf7ce1d760"
+    },
+    {
+      "path": "internal/extractors/tsextractor/discovery_test.go",
+      "status": "candidate",
+      "sha256": "6bb449bf0ed6d18988405aedd69a0d67a5e168e3b1cb0498977ea497f97bac91"
+    },
+    {
+      "path": "internal/extractors/tsextractor/graphql_test.go",
+      "status": "candidate",
+      "sha256": "d8aced19f486ad787fc7b6d3e5af39e71342fe072555da16765cb6ffab32bb29"
+    },
+    {
+      "path": "internal/extractors/tsextractor/svelte_test.go",
+      "status": "candidate",
+      "sha256": "fcd7555d91d8bdd713376de7d284beff7a958f815791aa42ac8ce5add830ac18"
+    },
+    {
+      "path": "internal/extractors/tsextractor/ts_test.go",
+      "status": "candidate",
+      "sha256": "848034e0eccb5efc6617ad665f411c1984a59072bb181a14606b23d1c0b1d091"
+    },
+    {
+      "path": "internal/extractors/tsextractor/vue_test.go",
+      "status": "candidate",
+      "sha256": "b910dfa79a24f0faebfbb2e61f250d1a5c3d99134f48db820b1b9d993af21653"
+    },
+    {
+      "path": "internal/extractors/tsextractor/wave5_accuracy_test.go",
+      "status": "candidate",
+      "sha256": "038c7d156c1db28e496cdf559b4d7eabe5891a90aeca0704e63af0c5981fc4e4"
+    },
+    {
+      "path": "internal/extractors/tsextractor/wave6_accuracy_test.go",
+      "status": "candidate",
+      "sha256": "2965b31ebb14a05a5f8c4e8b3b5b174529009445014efcd0fe12ab450571ea16"
+    },
+    {
+      "path": "internal/extractors/tsextractor/wave8_accuracy_test.go",
+      "status": "candidate",
+      "sha256": "518382e8bb9f36b75b8186f8f5b6957e96577e8252c1552d364d857893076532"
+    },
+    {
+      "path": "internal/graphsession/discovery_snapshot_regression_test.go",
+      "status": "candidate",
+      "sha256": "29729575b8be21a57d9f6310bc3fdf4a4bc21de120b51af4420bf47bef2802fe"
+    },
+    {
+      "path": "internal/graphsession/lexical_call_test.go",
+      "status": "merged-preserving-main",
+      "sha256": "11c5be6516a823680d93b87b8605c7574a3ed2834cc18e6065669b02dd884880"
+    }
+  ],
+  "targeted_verification": {
+    "command": "go test -overlay /tmp/enola-stage2-wave9-review/overlay.json ./internal/extractors/tsextractor ./internal/graphsession -run Test.*(Wave9|Independent|Discovery) -count=1",
+    "exit_code": 0,
+    "log": "/tmp/enola-stage2-wave9-review/targeted.log",
+    "log_sha256": "26b2420276398b98be304cb1f464fade18b7a36dc4ef5645d5b0b9fd2c147fd3",
+    "package_seconds": {
+      "tsextractor": 0.554,
+      "graphsession": 48.714
+    }
+  },
+  "integration_status": "validated integration",
+  "affected_verification": {
+    "command": [
+      "go",
+      "test",
+      "-overlay",
+      "/tmp/enola-stage2-wave9-review/overlay.json",
+      "./internal/extractors/tsextractor",
+      "./internal/graphsession",
+      "./internal/engine",
+      "./cmd/enola",
+      "-count=1"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 230.634074667,
+    "root_revision": "3013ec971709f74c7bb9401fbeb2d27a92b2fcff"
+  },
+  "affected_log": "ok  \tgithub.com/enola-labs/enola/internal/extractors/tsextractor\t34.802s\nok  \tgithub.com/enola-labs/enola/internal/graphsession\t229.377s\nok  \tgithub.com/enola-labs/enola/internal/engine\t43.413s\nok  \tgithub.com/enola-labs/enola/cmd/enola\t11.125s\n",
+  "command_log": "ok  \tgithub.com/enola-labs/enola/pkg/command\t5.384s\n",
+  "full_repository_verification": {
+    "command": [
+      "go",
+      "test",
+      "./..."
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 298.615451125,
+    "log_sha256": "393eec2fb9e3c7b5340e07cbcd35b3b0decdd796cb923d327eca5359b983d59a"
+  },
+  "full_repository_log": "ok  \tgithub.com/enola-labs/enola/cmd/enola\t7.671s\nok  \tgithub.com/enola-labs/enola/internal/cachecov\t0.960s\nok  \tgithub.com/enola-labs/enola/internal/clientspec\t1.134s\nok  \tgithub.com/enola-labs/enola/internal/config\t1.478s\nok  \tgithub.com/enola-labs/enola/internal/conformance\t1.720s\nok  \tgithub.com/enola-labs/enola/internal/diff\t2.118s\nok  \tgithub.com/enola-labs/enola/internal/docslint\t2.763s\n?   \tgithub.com/enola-labs/enola/internal/drift\t[no test files]\nok  \tgithub.com/enola-labs/enola/internal/engine\t60.443s\nok  \tgithub.com/enola-labs/enola/internal/eslintscaffold\t3.045s\nok  \tgithub.com/enola-labs/enola/internal/estateref\t3.259s\nok  \tgithub.com/enola-labs/enola/internal/explainers\t2.706s\nok  \tgithub.com/enola-labs/enola/internal/explainers/common\t2.832s\nok  \tgithub.com/enola-labs/enola/internal/explainers/complexity\t2.762s\nok  \tgithub.com/enola-labs/enola/internal/explainers/constraints\t2.461s\nok  \tgithub.com/enola-labs/enola/internal/explainers/coverage\t2.585s\nok  \tgithub.com/enola-labs/enola/internal/explainers/crossrepo\t2.269s\nok  \tgithub.com/enola-labs/enola/internal/explainers/cycles\t2.373s\nok  \tgithub.com/enola-labs/enola/internal/explainers/deadmethods\t2.369s\nok  \tgithub.com/enola-labs/enola/internal/explainers/depth\t2.417s\nok  \tgithub.com/enola-labs/enola/internal/explainers/domain\t3.190s\nok  \tgithub.com/enola-labs/enola/internal/explainers/entrypoints\t3.184s\nok  \tgithub.com/enola-labs/enola/internal/explainers/godclass\t3.055s\nok  \tgithub.com/enola-labs/enola/internal/explainers/hotspots\t3.133s\nok  \tgithub.com/enola-labs/enola/internal/explainers/importclosure\t3.007s\nok  \tgithub.com/enola-labs/enola/internal/explainers/intentcheck\t2.999s\nok  \tgithub.com/enola-labs/enola/internal/explainers/layers\t2.991s\nok  \tgithub.com/enola-labs/enola/internal/explainers/messagingcoverage\t2.650s\nok  \tgithub.com/enola-labs/enola/internal/explainers/queryloops\t2.435s\nok  \tgithub.com/enola-labs/enola/internal/explainers/surface\t2.382s\nok  \tgithub.com/enola-labs/enola/internal/explainers/unusedroutes\t2.442s\nok  \tgithub.com/enola-labs/enola/internal/explainers/vendoredcandidates\t2.704s\nok  \tgithub.com/enola-labs/enola/internal/extractors\t2.776s\nok  \tgithub.com/enola-labs/enola/internal/extractors/ansibleextractor\t2.744s\nok  \tgithub.com/enola-labs/enola/internal/extractors/asyncapiextractor\t2.758s\nok  \tgithub.com/enola-labs/enola/internal/extractors/cppextractor\t2.513s\nok  \tgithub.com/enola-labs/enola/internal/extractors/dartextractor\t2.148s\n?   \tgithub.com/enola-labs/enola/internal/extractors/dartextractor/grammar\t[no test files]\nok  \tgithub.com/enola-labs/enola/internal/extractors/detectnames\t2.433s\nok  \tgithub.com/enola-labs/enola/internal/extractors/dotnetextractor\t2.063s\n?   \tgithub.com/enola-labs/enola/internal/extractors/extcoverage\t[no test files]\nok  \tgithub.com/enola-labs/enola/internal/extractors/goextractor\t2.306s\nok  \tgithub.com/enola-labs/enola/internal/extractors/grpcextractor\t2.412s\nok  \tgithub.com/enola-labs/enola/internal/extractors/hclextractor\t2.465s\n?   \tgithub.com/enola-labs/enola/internal/extractors/inputscope\t[no test files]\nok  \tgithub.com/enola-labs/enola/internal/extractors/javaextractor\t2.440s\nok  \tgithub.com/enola-labs/enola/internal/extractors/jvmsrc\t2.552s\nok  \tgithub.com/enola-labs/enola/internal/extractors/kotlinextractor\t2.349s\nok  \tgithub.com/enola-labs/enola/internal/extractors/manifestextractor\t2.660s\nok  \tgithub.com/enola-labs/enola/internal/extractors/mdintent\t2.737s\nok  \tgithub.com/enola-labs/enola/internal/extractors/openapiextractor\t2.581s\nok  \tgithub.com/enola-labs/enola/internal/extractors/phpextractor\t2.445s\nok  \tgithub.com/enola-labs/enola/internal/extractors/pythonextractor\t2.581s\nok  \tgithub.com/enola-labs/enola/internal/extractors/rubyextractor\t2.362s\nok  \tgithub.com/enola-labs/enola/internal/extractors/rustextractor\t2.380s\nok  \tgithub.com/enola-labs/enola/internal/extractors/scalaextractor\t2.501s\nok  \tgithub.com/enola-labs/enola/internal/extractors/swiftextractor\t1.788s\n?   \tgithub.com/enola-labs/enola/internal/extractors/swiftextractor/grammar\t[no test files]\nok  \tgithub.com/enola-labs/enola/internal/extractors/tsextractor\t43.220s\n?   \tgithub.com/enola-labs/enola/internal/extractors/tsutil\t[no test files]\nok  \tgithub.com/enola-labs/enola/internal/factpath\t2.253s\nok  \tgithub.com/enola-labs/enola/internal/facts\t5.023s\nok  \tgithub.com/enola-labs/enola/internal/filelock\t2.716s\nok  \tgithub.com/enola-labs/enola/internal/gqlscan\t2.587s\nok  \tgithub.com/enola-labs/enola/internal/graphinput\t6.134s\n?   \tgithub.com/enola-labs/enola/internal/graphprofile\t[no test files]\nok  \tgithub.com/enola-labs/enola/internal/graphsession\t274.838s\nok  \tgithub.com/enola-labs/enola/internal/graphstream\t41.271s\nok  \tgithub.com/enola-labs/enola/internal/history\t7.342s\nok  \tgithub.com/enola-labs/enola/internal/hookstate\t2.554s\nok  \tgithub.com/enola-labs/enola/internal/intent\t2.923s\nok  \tgithub.com/enola-labs/enola/internal/linkers/binders\t1.917s\nok  \tgithub.com/enola-labs/enola/internal/linkers/binders/clientseam\t0.879s\nok  \tgithub.com/enola-labs/enola/internal/linkers/binders/emberresolver\t0.659s\nok  \tgithub.com/enola-labs/enola/internal/linkers/binders/frameworkroots\t0.633s\nok  \tgithub.com/enola-labs/enola/internal/linkers/binders/grpcclientfqn\t0.622s\nok  \tgithub.com/enola-labs/enola/internal/linkers/binders/grpcimpl\t0.761s\nok  \tgithub.com/enola-labs/enola/internal/linkers/binders/httphandler\t0.791s\nok  \tgithub.com/enola-labs/enola/internal/linkers/binders/messagingcontract\t0.685s\nok  \tgithub.com/enola-labs/enola/internal/linkers/binders/mixinowner\t0.866s\nok  \tgithub.com/enola-labs/enola/internal/linkers/binders/moduleedges\t0.936s\nok  \tgithub.com/enola-labs/enola/internal/linkers/binders/stimulusresolver\t0.968s\nok  \tgithub.com/enola-labs/enola/internal/linkers/binders/unmatchedroutes\t0.965s\nok  \tgithub.com/enola-labs/enola/internal/linkers/binders/vendoredspecs\t1.043s\nok  \tgithub.com/enola-labs/enola/internal/linkers/crossrepo\t0.403s\nok  \tgithub.com/enola-labs/enola/internal/linkers/crossrepo/routeindex\t0.613s\n?   \tgithub.com/enola-labs/enola/internal/linkers/crossrepo/signals\t[no test files]\nok  \tgithub.com/enola-labs/enola/internal/linkers/crossrepo/signals/graphqlsig\t0.826s\nok  \tgithub.com/enola-labs/enola/internal/linkers/crossrepo/signals/http\t0.968s\n?   \tgithub.com/enola-labs/enola/internal/linkers/crossrepo/signals/imports\t[no test files]\nok  \tgithub.com/enola-labs/enola/internal/linkers/crossrepo/signals/kafka\t1.165s\nok  \tgithub.com/enola-labs/enola/internal/linkers/crossrepo/signals/sharedcode\t1.348s\nok  \tgithub.com/enola-labs/enola/internal/linkers/vocab\t1.169s\nok  \tgithub.com/enola-labs/enola/internal/litfold\t1.289s\nok  \tgithub.com/enola-labs/enola/internal/metrics\t0.455s\nok  \tgithub.com/enola-labs/enola/internal/mining\t0.466s\nok  \tgithub.com/enola-labs/enola/internal/orphans\t0.433s\nok  \tgithub.com/enola-labs/enola/internal/parallel\t0.664s\nok  \tgithub.com/enola-labs/enola/internal/perf\t0.771s\nok  \tgithub.com/enola-labs/enola/internal/providers\t22.716s\nok  \tgithub.com/enola-labs/enola/internal/providers/rubydex\t1.174s\nok  \tgithub.com/enola-labs/enola/internal/renderers\t1.430s\nok  \tgithub.com/enola-labs/enola/internal/renderers/llmcontext\t1.270s\nok  \tgithub.com/enola-labs/enola/internal/server\t18.299s\nok  \tgithub.com/enola-labs/enola/internal/updatecheck\t1.310s\nok  \tgithub.com/enola-labs/enola/internal/upgrade\t1.185s\n?   \tgithub.com/enola-labs/enola/internal/version\t[no test files]\nok  \tgithub.com/enola-labs/enola/internal/workspace\t0.682s\nok  \tgithub.com/enola-labs/enola/pkg/bootstrap\t128.020s\nok  \tgithub.com/enola-labs/enola/pkg/check\t11.305s\nok  \tgithub.com/enola-labs/enola/pkg/cli\t2.371s\nok  \tgithub.com/enola-labs/enola/pkg/command\t15.801s\nok  \tgithub.com/enola-labs/enola/pkg/coverage\t1.235s\nok  \tgithub.com/enola-labs/enola/pkg/dashboard\t1.842s\n?   \tgithub.com/enola-labs/enola/pkg/diff\t[no test files]\nok  \tgithub.com/enola-labs/enola/pkg/explain\t0.712s\n?   \tgithub.com/enola-labs/enola/pkg/facts\t[no test files]\nok  \tgithub.com/enola-labs/enola/pkg/history\t0.951s\nok  \tgithub.com/enola-labs/enola/pkg/install\t5.561s\nok  \tgithub.com/enola-labs/enola/pkg/mcputil\t0.553s\nok  \tgithub.com/enola-labs/enola/pkg/plan\t1.984s\n?   \tgithub.com/enola-labs/enola/pkg/plugin\t[no test files]\nok  \tgithub.com/enola-labs/enola/pkg/status\t3.183s\n"
+}

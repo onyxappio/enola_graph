@@ -149,11 +149,11 @@ export function read() { return CONFETTI_STATIC_PROGRESS }
 
 func TestExtract_JSXBlockRecoveryAndImportExportAlias(t *testing.T) {
 	ff := extractAll(t, map[string]string{
-		"src/leaf.tsx": "export function Widget(){return null}",
-		"src/use.tsx":  "import {Widget} from './leaf';export function Render(){ {const Widget=()=>null;const ignored=<Widget/>;}return <Widget/>}",
-		"src/orig.ts":  "export function original(){return 1}",
+		"src/leaf.tsx":  "export function Widget(){return null}",
+		"src/use.tsx":   "import {Widget} from './leaf';export function Render(){ {const Widget=()=>null;const ignored=<Widget/>;}return <Widget/>}",
+		"src/orig.ts":   "export function original(){return 1}",
 		"src/bridge.ts": "import {original as local} from './orig'; export {local as publicName};",
-		"src/call.ts":  "import {publicName as selected} from './bridge';export function run(){return selected()}",
+		"src/call.ts":   "import {publicName as selected} from './bridge';export function run(){return selected()}",
 	}, false)
 	render, _ := findFact(ff, "src.Render")
 	if !hasRelation(render, facts.RelCalls, "src.Widget") {

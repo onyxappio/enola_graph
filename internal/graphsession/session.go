@@ -93,6 +93,18 @@ type InvalidationStats struct {
 // first run under this code over such a state always has graph work to do. The
 // fallback is therefore taken once per old state rather than conditionally, and
 // no run adopts the field without having reconciled under it.
+// tsRunDiscovery is the snapshot this run's input read already took. It is
+// offered, not imposed: the extractor keeps it only when the repository, the
+// policy scope and every configuration byte it read still match what this
+// extraction will observe, so a run whose capture disagrees simply reads the
+// tree as it did before.
+func (s *session) tsRunDiscovery() *tsextractor.Discovery {
+	if s.inputs == nil {
+		return nil
+	}
+	return s.inputs.tsDiscovery
+}
+
 func policyReconciles(st *State, input *runtimeInputs) bool {
 	if st == nil {
 		return true
@@ -368,6 +380,14 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	s.neutralScan = false
 	s.neutralConfig = false
 	s.previewFences = nil
+	if s.inputs != nil {
+		// A discovery snapshot is one run's observation of the tree. A fast run
+		// reuses the previous run's inputs without looking at the tree again,
+		// so the snapshot hanging off them is not an observation this run made;
+		// retaining one across runs needs its own membership and configuration
+		// proof and does not get one by inheritance.
+		s.inputs.tsDiscovery = nil
+	}
 	var err error
 	input := s.inputs
 	if !s.fast {
@@ -1057,6 +1077,11 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			hooks := tsextractor.SessionHooks{
 				SkipConfigPaths: true,
 				Sources:         s.capturedSources,
+				// The run's snapshot, kept only if this capture agrees with
+				// what it read; the extractor checks that itself and reports a
+				// rebuild in Stats.DiscoveryPasses rather than silently
+				// answering from a tree nobody here observed.
+				Discovery: s.tsRunDiscovery(),
 				OnBeforeParse: func(path string) {
 					reason := "resolution"
 					prev := s.stateFile(path)
@@ -1127,6 +1152,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				if xerr != nil {
 					return nil, fmt.Errorf("typescript extract: %w", xerr)
 				}
+				s.work.TSDiscoveries += res.Stats.DiscoveryPasses
 			}
 			tr.Mark("ts_extract_session", fmt.Sprintf("parsed=%d cached=%d facts=%d records=%d", res.Stats.FilesParsed, res.Stats.CachedFiles, len(res.Facts), len(res.Records)))
 			if err := s.fileLocalErr(); err != nil {
@@ -1243,6 +1269,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 					if xerr != nil {
 						return nil, fmt.Errorf("typescript extract: %w", xerr)
 					}
+					s.work.TSDiscoveries += more.Stats.DiscoveryPasses
 					if err := s.fileLocalErr(); err != nil {
 						return nil, err
 					}
@@ -2545,6 +2572,7 @@ func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*Fil
 	hooks := tsextractor.SessionHooks{
 		SkipConfigPaths: true,
 		Sources:         s.capturedSources,
+		Discovery:       s.tsRunDiscovery(),
 		OnBeforeParse: func(path string) {
 			parseMu.Lock()
 			parses = append(parses, preparedParse{path: path, reason: parseReason(path)})
@@ -2572,6 +2600,7 @@ func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*Fil
 		if err != nil {
 			return nil, nil, err
 		}
+		s.work.TSDiscoveries += r.Stats.DiscoveryPasses
 		stats.FilesRead += r.Stats.FilesRead
 		stats.FilesParsed += r.Stats.FilesParsed
 		stats.GraphQLParsed += r.Stats.GraphQLParsed

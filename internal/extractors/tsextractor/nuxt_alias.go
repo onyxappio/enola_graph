@@ -1,6 +1,7 @@
 package tsextractor
 
 import (
+	"context"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -22,7 +23,7 @@ var (
 // Explicit tsconfig paths win. Static nuxt.config alias literals are applied
 // next. A static srcDir literal sets the default source root; an explicit
 // srcDir expression is not treated as "use the package root".
-func withNuxtAliasFallbacks(repoPath string, roots []tsAliasRoot, pkgs []string, inputScopes ...*inputscope.Scope) []tsAliasRoot {
+func withNuxtAliasFallbacks(ctx context.Context, repoPath string, roots []tsAliasRoot, pkgs []string, inputScopes ...*inputscope.Scope) []tsAliasRoot {
 	inputScope := inputscope.First(inputScopes)
 	if len(pkgs) == 0 {
 		return roots
@@ -41,7 +42,7 @@ func withNuxtAliasFallbacks(repoPath string, roots []tsAliasRoot, pkgs []string,
 			idx = len(roots) - 1
 			byDir[pkg] = idx
 		}
-		cfg := readNuxtConfig(repoPath, pkg, inputScope)
+		cfg := readNuxtConfig(ctx, repoPath, pkg, inputScope)
 		rootDir := pkg
 		if rootDir != "" && !strings.HasSuffix(rootDir, "/") {
 			rootDir += "/"
@@ -93,7 +94,7 @@ type nuxtConfigFacts struct {
 	hasSrcDirLiteral bool
 }
 
-func readNuxtConfig(repoPath, pkg string, inputScopes ...*inputscope.Scope) nuxtConfigFacts {
+func readNuxtConfig(ctx context.Context, repoPath, pkg string, inputScopes ...*inputscope.Scope) nuxtConfigFacts {
 	inputScope := inputscope.First(inputScopes)
 	pkgAbs := repoPath
 	if pkg != "" {
