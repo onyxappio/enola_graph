@@ -1952,6 +1952,95 @@ func bindingNamesFromPattern(kinds *tsutil.KindTable, n *sitter.Node, src []byte
 	return nil
 }
 
+// tsPatternBindingNames collects lexical names from parameters, catch bindings,
+// and destructuring patterns (shorthand, rename, default, rest, nested).
+func tsPatternBindingNames(kinds *tsutil.KindTable, n *sitter.Node, src []byte) []string {
+	if n == nil {
+		return nil
+	}
+	switch kindOf(kinds, n) {
+	case "required_parameter", "optional_parameter", "rest_parameter", "variable_declarator":
+		if p := n.ChildByFieldName("pattern"); p != nil {
+			return tsPatternBindingNames(kinds, p, src)
+		}
+		if p := n.ChildByFieldName("name"); p != nil {
+			return tsPatternBindingNames(kinds, p, src)
+		}
+		var names []string
+		for i := range n.NamedChildCount() {
+			ch := n.NamedChild(i)
+			switch kindOf(kinds, ch) {
+			case "identifier", "object_pattern", "array_pattern", "rest_pattern",
+				"assignment_pattern", "object_assignment_pattern",
+				"shorthand_property_identifier_pattern":
+				names = append(names, tsPatternBindingNames(kinds, ch, src)...)
+			}
+		}
+		return names
+	case "catch_clause":
+		if p := n.ChildByFieldName("parameter"); p != nil {
+			return tsPatternBindingNames(kinds, p, src)
+		}
+		if p := n.ChildByFieldName("name"); p != nil {
+			return tsPatternBindingNames(kinds, p, src)
+		}
+		for i := range n.NamedChildCount() {
+			ch := n.NamedChild(i)
+			if kindOf(kinds, ch) == "statement_block" {
+				continue
+			}
+			if names := tsPatternBindingNames(kinds, ch, src); len(names) > 0 {
+				return names
+			}
+		}
+		return nil
+	}
+	return bindingNamesFromPattern(kinds, n, src)
+}
+
+func tsDeclLexicalNames(kinds *tsutil.KindTable, n *sitter.Node, src []byte) []string {
+	if n == nil {
+		return nil
+	}
+	kind := kindOf(kinds, n)
+	if kind == "export_statement" {
+		if inner := firstDeclChild(kinds, n); inner != nil {
+			n = inner
+			kind = kindOf(kinds, n)
+		} else {
+			return nil
+		}
+	}
+	switch kind {
+	case "function_declaration", "generator_function_declaration", "class_declaration",
+		"abstract_class_declaration", "interface_declaration", "type_alias_declaration",
+		"enum_declaration":
+		if id := n.ChildByFieldName("name"); id != nil {
+			if name := nodeText(id, src); name != "" {
+				return []string{name}
+			}
+		}
+	case "lexical_declaration", "variable_declaration":
+		var names []string
+		for i := range n.NamedChildCount() {
+			names = append(names, tsPatternBindingNames(kinds, n.NamedChild(i), src)...)
+		}
+		return names
+	}
+	return nil
+}
+
+func tsBlockLexicalNames(kinds *tsutil.KindTable, n *sitter.Node, src []byte) []string {
+	if n == nil {
+		return nil
+	}
+	var names []string
+	for i := range n.NamedChildCount() {
+		names = append(names, tsDeclLexicalNames(kinds, n.NamedChild(i), src)...)
+	}
+	return names
+}
+
 type objectImportBinding struct {
 	export string
 	local  string
@@ -2907,7 +2996,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 	internalFiles := make(map[string]string)
 	namespaces := make(map[string]string)     // `import * as ns` local -> module dir
 	namespaceFiles := make(map[string]string) // `import * as ns` local -> module file
-	var reexports []string                    // canonical targets re-exported via `export { x } from './y'`
+	var reexports []facts.Relation            // proven source-export targets of `export { x } from './y'`
 	var defaultRefs []string                  // default-export targets of default-imported modules
 
 	bind := func(local, moduleDir, exportName, indexPath, resolved string, foundFile bool) {
@@ -3021,28 +3110,42 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 				continue
 			}
 			if clause := findChildByKind(kinds, child, "export_clause"); clause != nil {
+				resolved := ""
+				if srcNode := child.ChildByFieldName("source"); srcNode != nil {
+					importPath := strings.Trim(nodeText(srcNode, src), `"'`)
+					if r, ext := resolveImportPath(importPath, fileDir, aliases); !ext {
+						resolved = r
+					}
+				}
 				for k := range clause.ChildCount() {
 					spec := clause.Child(k)
 					if kindOf(kinds, spec) != "export_specifier" {
 						continue
 					}
-					nameNode := spec.ChildByFieldName("name")
-					if nameNode == nil {
+					orig, _, ok := exportSpecifierNames(kinds, spec, src)
+					if !ok {
 						continue
 					}
-					// `export { default as X } from './y'` re-exports y's default; the
-					// literal name "default" matches no symbol, so resolve it to y's
-					// default-export name (fileSymbolName) instead.
-					name := nodeText(nameNode, src)
-					if name == "default" && indexPath != "" {
-						reexports = append(reexports, moduleDir+"."+fileSymbolName(indexPath))
-					} else {
-						exported := name
-						if a := spec.ChildByFieldName("alias"); a != nil {
-							exported = nodeText(a, src)
-						}
-						reexports = append(reexports, moduleDir+"."+exported)
+					// Target the SOURCE export (orig), never the public alias.
+					// `export { default as X }` still uses the module default name.
+					if orig == "default" && indexPath != "" {
+						reexports = append(reexports, facts.Relation{
+							Kind:       facts.RelCalls,
+							Target:     moduleDir + "." + fileSymbolName(indexPath),
+							TargetFile: indexPath,
+						})
+						continue
 					}
+					target, file := bindImportedSymbol(moduleDir, indexPath, orig, resolved, indexPath != "", ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, func(f string) {
+						if ctx.sideReads == nil {
+							return
+						}
+						f = filepath.ToSlash(f)
+						if f != "" && f != filepath.ToSlash(ctx.relFile) {
+							ctx.sideReads[f] = true
+						}
+					})
+					reexports = append(reexports, facts.Relation{Kind: facts.RelCalls, Target: target, TargetFile: file})
 				}
 			}
 		case "lexical_declaration", "variable_declaration":
@@ -3129,19 +3232,19 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 		frImp = frImp[:len(frImp)-1]
 		frImpF = frImpF[:len(frImpF)-1]
 	}
-	frLookup := func(name string) (string, string, bool) {
+	frLookup := func(name string) (target, file string, ok, shadowed bool) {
 		for i := len(frImp) - 1; i >= 0; i-- {
-			if t, ok := frImp[i][name]; ok {
-				return t, frImpF[i][name], true
+			if t, found := frImp[i][name]; found {
+				return t, frImpF[i][name], true, false
 			}
 			if frShadows[i][name] {
-				return "", "", false
+				return "", "", false, true
 			}
 		}
-		if t, ok := internal[name]; ok {
-			return t, internalFiles[name], true
+		if t, found := internal[name]; found {
+			return t, internalFiles[name], true, false
 		}
-		return "", "", false
+		return "", "", false, false
 	}
 	frBindAwait := func(n *sitter.Node) {
 		if n == nil || len(frImp) == 0 {
@@ -3207,8 +3310,16 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			frPop()
 			return
 		}
+		if kind == "catch_clause" {
+			frPush(tsPatternBindingNames(kinds, n, src)...)
+			for i := range n.ChildCount() {
+				walk(n.Child(i))
+			}
+			frPop()
+			return
+		}
 		if kind == "statement_block" {
-			frPush()
+			frPush(tsBlockLexicalNames(kinds, n, src)...)
 			for i := range n.ChildCount() {
 				walk(n.Child(i))
 			}
@@ -3228,10 +3339,10 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			// type_identifier covers an imported type/interface used only as an
 			// annotation (`repo: Repo`), which is otherwise never an edge.
 			name := nodeText(n, src)
-			if t, file, ok := frLookup(name); ok {
+			if t, file, ok, shadowed := frLookup(name); shadowed {
+				return
+			} else if ok {
 				add(t, file)
-			} else if t, ok := internal[name]; ok {
-				add(t, internalFiles[name])
 			}
 			return
 		case "member_expression":
@@ -3263,7 +3374,22 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			return
 		case "jsx_opening_element", "jsx_self_closing_element":
 			if nameNode := n.ChildByFieldName("name"); nameNode != nil {
-				add(resolveJSXTag(kinds, nameNode, src, ctx.dir, internal, namespaces), jsxTagFile(kinds, nameNode, src, internalFiles, namespaceFiles, ctx.localNames, ctx.relFile))
+				tag := ""
+				if kindOf(kinds, nameNode) == "identifier" {
+					tag = nodeText(nameNode, src)
+				}
+				bound := false
+				if tag != "" {
+					if t, file, ok, shadowed := frLookup(tag); shadowed {
+						bound = true
+					} else if ok {
+						add(t, file)
+						bound = true
+					}
+				}
+				if !bound {
+					add(resolveJSXTag(kinds, nameNode, src, ctx.dir, internal, namespaces), jsxTagFile(kinds, nameNode, src, internalFiles, namespaceFiles, ctx.localNames, ctx.relFile))
+				}
 			}
 			for i := range n.ChildCount() {
 				walk(n.Child(i))
@@ -3278,7 +3404,9 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			// symbol used only that way is falsely reported dead.
 			if fn := n.ChildByFieldName("function"); fn != nil && kindOf(kinds, fn) == "identifier" {
 				name := nodeText(fn, src)
-				if t, file, ok := frLookup(name); ok {
+				if t, file, ok, shadowed := frLookup(name); shadowed {
+					// lexical binding: never fall back to sibling-file symbols
+				} else if ok {
 					add(t, file)
 				} else {
 					add(resolveLocalOrImport(name, ctx.dir, internal), callFile(name))
@@ -3288,7 +3416,9 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 				for i := range args.ChildCount() {
 					if a := args.Child(i); kindOf(kinds, a) == "identifier" {
 						name := nodeText(a, src)
-						if t, file, ok := frLookup(name); ok {
+						if t, file, ok, shadowed := frLookup(name); shadowed {
+							// lexical binding: never fall back to sibling-file symbols
+						} else if ok {
 							add(t, file)
 						} else {
 							add(resolveLocalOrImport(name, ctx.dir, internal), callFile(name))
@@ -3308,7 +3438,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 	walk(root)
 
 	for _, t := range reexports {
-		add(t, "")
+		add(t.Target, t.TargetFile)
 	}
 	for _, t := range defaultRefs {
 		add(t, "")
@@ -3911,7 +4041,7 @@ type tsBodyWalker struct {
 	// repeatDepth counts the enclosing loops that run a non-constant number of times. It
 	// differs from scalingDepth for `while (true)`, which adds no factor of n but whose
 	// body still runs many times — so a query inside it is still an N+1 candidate.
-	repeatDepth int
+	repeatDepth      int
 	rels             []facts.Relation
 	seen             map[string]bool
 	shadows          []map[string]bool
@@ -4033,16 +4163,16 @@ func (w *tsBodyWalker) noteShadowBindings(n *sitter.Node) {
 	if len(w.shadows) == 0 || n == nil {
 		return
 	}
+	for _, name := range tsPatternBindingNames(w.kinds, n, w.src) {
+		if name != "" {
+			w.shadows[len(w.shadows)-1][name] = true
+		}
+	}
 	kind := kindOf(w.kinds, n)
-	if kind == "identifier" {
-		w.shadows[len(w.shadows)-1][nodeText(n, w.src)] = true
-		return
-	}
-	if kind != "lexical_declaration" && kind != "variable_declaration" && kind != "variable_declarator" {
-		return
-	}
-	for i := range n.ChildCount() {
-		w.noteShadowBindings(n.Child(i))
+	if kind == "lexical_declaration" || kind == "variable_declaration" || kind == "variable_declarator" {
+		for i := range n.ChildCount() {
+			w.noteShadowBindings(n.Child(i))
+		}
 	}
 }
 
@@ -4064,35 +4194,26 @@ func tsFunctionParamNames(kinds *tsutil.KindTable, n *sitter.Node, src []byte) [
 		return nil
 	}
 	var names []string
-	addIdent := func(node *sitter.Node) {
-		if node == nil {
-			return
-		}
-		if kindOf(kinds, node) == "identifier" {
-			names = append(names, nodeText(node, src))
-			return
-		}
-		if id := findChildByKind(kinds, node, "identifier"); id != nil {
-			names = append(names, nodeText(id, src))
-		}
+	addParam := func(node *sitter.Node) {
+		names = append(names, tsPatternBindingNames(kinds, node, src)...)
 	}
 	if params := n.ChildByFieldName("parameters"); params != nil {
 		for i := range params.ChildCount() {
-			addIdent(params.Child(i))
+			addParam(params.Child(i))
 		}
 		return names
 	}
 	if params := findChildByKind(kinds, n, "formal_parameters"); params != nil {
 		for i := range params.ChildCount() {
-			addIdent(params.Child(i))
+			addParam(params.Child(i))
 		}
 		return names
 	}
 	if kindOf(kinds, n) == "arrow_function" {
 		if id := n.ChildByFieldName("parameter"); id != nil {
-			addIdent(id)
+			addParam(id)
 		} else if id := findChildByKind(kinds, n, "identifier"); id != nil {
-			addIdent(id)
+			addParam(id)
 		}
 	}
 	return names
@@ -4139,8 +4260,16 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 		return
 	}
 	kind := kindOf(w.kinds, n)
+	if kind == "catch_clause" {
+		w.pushShadowScope(tsPatternBindingNames(w.kinds, n, w.src)...)
+		for i := range n.ChildCount() {
+			w.walk(n.Child(i))
+		}
+		w.popShadowScope()
+		return
+	}
 	if kind == "statement_block" {
-		w.pushShadowScope()
+		w.pushShadowScope(tsBlockLexicalNames(w.kinds, n, w.src)...)
 		for i := range n.ChildCount() {
 			w.walk(n.Child(i))
 		}

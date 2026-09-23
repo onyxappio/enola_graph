@@ -2514,7 +2514,12 @@ import (
 // v297: awaited dynamic-import object patterns bind only proven export aliases
 // (shorthand and identifier rename). Nested object patterns stay unbound instead
 // of mapping the inner local to the outer container export.
-const cacheVersion = "v297"
+// v298: TypeScript re-export file_ref records the source-declaration file and
+// original export name (aliased and chained re-exports, cycle-safe); lexical
+// parameter/block/catch bindings no longer fall back to sibling file_ref or
+// symbol-owned calls (destructured params, hoisted nested locals). Nested
+// function entities are not invented; shadowed names stay unbound.
+const cacheVersion = "v298"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //
