@@ -844,6 +844,26 @@ func TestBodyScopeDefaultOriginSwitchRebindsConsumers(t *testing.T) {
 			}
 			assertAppliedEqualsCold(t, cons, applyGraph(t, cold))
 			assertCallResolvedToFile(t, cons, "src/a.ts", "src.ceil", "src/origin.ts")
+			assertCallResolvedToFile(t, cons, "src/barrel.ts", "src.ceil", "src/origin.ts")
+
+			writeFile(t, root, "src/origin.ts", body+"export default round;\n")
+			rev := &graphstream.MemorySink{}
+			if _, err := Run(context.Background(), eng, root, rev, opts); err != nil {
+				t.Fatal(err)
+			}
+			if err := cons.ApplyRecords(rev.CloneRecords()); err != nil {
+				t.Fatal(err)
+			}
+			coldRev := &graphstream.MemorySink{}
+			coldRevOpts := opts
+			coldRevOpts.StateDir = t.TempDir()
+			coldRevOpts.ForceInitial = true
+			if _, err := Run(context.Background(), eng, root, coldRev, coldRevOpts); err != nil {
+				t.Fatal(err)
+			}
+			assertAppliedEqualsCold(t, cons, applyGraph(t, coldRev))
+			assertCallResolvedToFile(t, cons, "src/a.ts", "src.round", "src/origin.ts")
+			assertCallResolvedToFile(t, cons, "src/barrel.ts", "src.round", "src/origin.ts")
 		})
 	}
 }

@@ -3542,12 +3542,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 					}
 					// Target the SOURCE export (orig), never the public alias.
 					// `export { default as X }` still uses the module default name.
-					if orig == "default" && indexPath != "" {
-						target, file := bindImportedSymbol(moduleDir, indexPath, "default", resolved, true, ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, note)
-						reexports = append(reexports, facts.Relation{Kind: facts.RelCalls, Target: target, TargetFile: file})
-						continue
-					}
-					target, file := bindImportedSymbol(moduleDir, indexPath, orig, resolved, indexPath != "", ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, func(f string) {
+					sideNote := func(f string) {
 						if ctx.sideReads == nil {
 							return
 						}
@@ -3555,7 +3550,14 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 						if f != "" && f != filepath.ToSlash(ctx.relFile) {
 							ctx.sideReads[f] = true
 						}
-					})
+					}
+					if orig == "default" && indexPath != "" {
+						sideNote(indexPath)
+						target, file := bindImportedSymbol(moduleDir, indexPath, "default", resolved, true, ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, sideNote)
+						reexports = append(reexports, facts.Relation{Kind: facts.RelCalls, Target: target, TargetFile: file})
+						continue
+					}
+					target, file := bindImportedSymbol(moduleDir, indexPath, orig, resolved, indexPath != "", ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, sideNote)
 					reexports = append(reexports, facts.Relation{Kind: facts.RelCalls, Target: target, TargetFile: file})
 				}
 			}
