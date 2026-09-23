@@ -1138,6 +1138,7 @@ func (e *TSExtractor) extractVueScriptBlock(kinds *tsutil.KindTable, block *vueS
 	ctx.exportCache = exportCache
 	ctx.sideReads = sideReads
 	ctx.importMap, ctx.importFiles, ctx.nsDirs, ctx.nsIndex = buildImportSymbols(kinds, root, block.Content, relFile, aliases, knownFiles, readSrc, exportCache, sideReads)
+	ctx.namedImports, ctx.nsImports = collectImportOrigins(kinds, root, block.Content)
 	ctx.localNames = collectFileScopeCallNames(kinds, root, block.Content)
 	decls := e.extractDeclarations(kinds, root, ctx)
 

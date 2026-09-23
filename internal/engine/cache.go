@@ -2555,7 +2555,11 @@ import (
 // imported Tree (or a direct schema field of that Tree). Unions, intersections,
 // generics, local type shadows, and nearest const/let schema-source shadows keep
 // HTTP client routes; identifier prefixes are not proof.
-const cacheVersion = "v307"
+// v308: Default-exported Nuxt plugin factories keep function identity when the
+// callee is a named, aliased, or namespace import of defineNuxtPlugin /
+// definePayloadPlugin from #app (same runtime contract). Local same-spelling
+// functions or object members that return a plain value stay variables.
+const cacheVersion = "v308"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

@@ -540,10 +540,12 @@ type extractCtx struct {
 	isNuxt      bool
 	isSvelteKit bool
 	orms        ormFlags
-	importMap   map[string]string
-	importFiles map[string]string   // local import name → known source file of that specifier
-	nsDirs      map[string]string   // `import * as ns` local → module directory
-	nsIndex     map[string]string   // `import * as ns` local → resolved module file
+	importMap    map[string]string
+	importFiles  map[string]string // local import name → known source file of that specifier
+	nsDirs       map[string]string // `import * as ns` local → module directory
+	nsIndex      map[string]string // `import * as ns` local → resolved module file
+	namedImports map[string]namedImportOrigin
+	nsImports    map[string]string // `import * as ns` local → original specifier
 	localNames  map[string]bool     // file-scope function/const names that may own a local call
 	imports     emberImportBindings // the file's import table, read for the module a superclass identifier came from
 	ioBindings  map[string]bool     // local names bound to imports from a network module (I/O sinks)
@@ -705,6 +707,7 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 		sideReads:   sideReads,
 	}
 	ctx.importMap, ctx.importFiles, ctx.nsDirs, ctx.nsIndex = buildImportSymbols(kinds, root, src, relFile, aliases, knownFiles, readSrc, exportCache, sideReads)
+	ctx.namedImports, ctx.nsImports = collectImportOrigins(kinds, root, src)
 	ctx.localNames = collectFileScopeCallNames(kinds, root, src)
 	decls := e.extractDeclarations(kinds, root, ctx)
 
@@ -1009,7 +1012,7 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 	case "call_expression":
 		// Reached for `export default memo(...)` / `forwardRef(...)` / ordinary values.
 		if fallbackName != "" {
-			if isKnownFunctionValueCall(kinds, node, src) {
+			if isKnownFunctionValueCall(kinds, node, src, ctx) {
 				result = append(result, e.funcSymbol(kinds, node, node, ctx, fallbackName, isExported))
 			} else {
 				result = append(result, e.valueSymbol(kinds, node, node, ctx, fallbackName, isExported))
@@ -1304,7 +1307,7 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 			if v := findChildByKind(kinds, decl, "arrow_function"); v != nil {
 				symbolKind = facts.SymbolFunc
 				body = v
-			} else if call := findChildByKind(kinds, decl, "call_expression"); call != nil && isComponentWrapper(kinds, call, src) {
+			} else if call := findChildByKind(kinds, decl, "call_expression"); call != nil && isKnownFunctionValueCall(kinds, call, src, ctx) {
 				symbolKind = facts.SymbolFunc
 				body = call
 			}
@@ -1442,7 +1445,109 @@ func (e *TSExtractor) valueSymbol(kinds *tsutil.KindTable, declNode, body *sitte
 	return f
 }
 
-func isKnownFunctionValueCall(kinds *tsutil.KindTable, call *sitter.Node, src []byte) bool {
+type namedImportOrigin struct {
+	specifier string
+	export    string
+}
+
+func collectImportOrigins(kinds *tsutil.KindTable, root *sitter.Node, src []byte) (map[string]namedImportOrigin, map[string]string) {
+	named := make(map[string]namedImportOrigin)
+	ns := make(map[string]string)
+	if root == nil {
+		return named, ns
+	}
+	for i := range root.ChildCount() {
+		child := root.Child(i)
+		if kindOf(kinds, child) != "import_statement" {
+			continue
+		}
+		if importStatementIsTypeOnly(kinds, child, src) {
+			continue
+		}
+		source := findChildByKind(kinds, child, "string")
+		if source == nil {
+			continue
+		}
+		specifier := strings.Trim(nodeText(source, src), `"'`)
+		clause := findChildByKind(kinds, child, "import_clause")
+		if clause == nil {
+			continue
+		}
+		if nsimp := findChildByKind(kinds, clause, "namespace_import"); nsimp != nil {
+			if id := findChildByKind(kinds, nsimp, "identifier"); id != nil {
+				ns[nodeText(id, src)] = specifier
+			}
+		}
+		namedClause := findChildByKind(kinds, clause, "named_imports")
+		if namedClause == nil {
+			continue
+		}
+		for j := range namedClause.ChildCount() {
+			spec := namedClause.Child(j)
+			if kindOf(kinds, spec) != "import_specifier" {
+				continue
+			}
+			if importSpecifierIsTypeOnly(kinds, spec, src) {
+				continue
+			}
+			nameNode := spec.ChildByFieldName("name")
+			if nameNode == nil {
+				continue
+			}
+			exportName := nodeText(nameNode, src)
+			local := exportName
+			if alias := spec.ChildByFieldName("alias"); alias != nil {
+				local = nodeText(alias, src)
+			}
+			if local != "" {
+				named[local] = namedImportOrigin{specifier: specifier, export: exportName}
+			}
+		}
+	}
+	return named, ns
+}
+
+func importStatementIsTypeOnly(kinds *tsutil.KindTable, stmt *sitter.Node, src []byte) bool {
+	if stmt == nil {
+		return false
+	}
+	for i := range stmt.ChildCount() {
+		ch := stmt.Child(i)
+		if kindOf(kinds, ch) == "import_clause" {
+			break
+		}
+		if nodeText(ch, src) == "type" {
+			return true
+		}
+	}
+	return false
+}
+
+func importSpecifierIsTypeOnly(kinds *tsutil.KindTable, spec *sitter.Node, src []byte) bool {
+	if spec == nil {
+		return false
+	}
+	for i := range spec.ChildCount() {
+		ch := spec.Child(i)
+		if kindOf(kinds, ch) == "identifier" {
+			break
+		}
+		if nodeText(ch, src) == "type" {
+			return true
+		}
+	}
+	return false
+}
+
+func isNuxtAppSpecifier(spec string) bool {
+	return spec == "#app" || spec == "nuxt/app" || strings.HasPrefix(spec, "#app/")
+}
+
+func isNuxtAppPluginExport(export string) bool {
+	return export == "defineNuxtPlugin" || export == "definePayloadPlugin"
+}
+
+func isKnownFunctionValueCall(kinds *tsutil.KindTable, call *sitter.Node, src []byte, ctx *extractCtx) bool {
 	if isComponentWrapper(kinds, call, src) {
 		return true
 	}
@@ -1454,9 +1559,23 @@ func isKnownFunctionValueCall(kinds *tsutil.KindTable, call *sitter.Node, src []
 	switch kindOf(kinds, fn) {
 	case "identifier":
 		name = nodeText(fn, src)
+		if ctx != nil {
+			if origin, ok := ctx.namedImports[name]; ok && isNuxtAppSpecifier(origin.specifier) && isNuxtAppPluginExport(origin.export) {
+				return true
+			}
+		}
 	case "member_expression":
 		if prop := fn.ChildByFieldName("property"); prop != nil {
 			name = nodeText(prop, src)
+		}
+		if ctx != nil {
+			obj := fn.ChildByFieldName("object")
+			if obj != nil && kindOf(kinds, obj) == "identifier" {
+				nsName := nodeText(obj, src)
+				if spec, ok := ctx.nsImports[nsName]; ok && isNuxtAppSpecifier(spec) && isNuxtAppPluginExport(name) {
+					return true
+				}
+			}
 		}
 	}
 	switch name {

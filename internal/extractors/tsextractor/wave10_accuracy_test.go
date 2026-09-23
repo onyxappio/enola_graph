@@ -484,6 +484,78 @@ export default defineEndpoint({ path: '/x' })
 	}
 }
 
+func TestExtract_Wave10NuxtPluginFactoryKind(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"runtime/named.ts": `import { defineNuxtPlugin } from '#app'
+export default defineNuxtPlugin({
+  setup() {
+    fetch('/x')
+    return {}
+  },
+})
+`,
+		"runtime/alias.ts": `import { defineNuxtPlugin as register } from '#app'
+export default register(() => ({}))
+`,
+		"runtime/namespace.ts": `import * as nuxt from '#app'
+export default nuxt.defineNuxtPlugin(() => ({}))
+`,
+		"runtime/payload.ts": `import { definePayloadPlugin as register } from '#app'
+export default register(() => ({}))
+`,
+		"runtime/nuxtapp.ts": `import { defineNuxtPlugin } from 'nuxt/app'
+export default defineNuxtPlugin(() => ({}))
+`,
+		"runtime/local.ts": `function defineNuxtPlugin(value: any) { return value }
+export default defineNuxtPlugin({ name: 'plain-value' })
+`,
+		"runtime/member.ts": `const local = { defineNuxtPlugin: (value: any) => value }
+export default local.defineNuxtPlugin({ name: 'plain-value' })
+`,
+		"runtime/constplug.ts": `import { defineNuxtPlugin } from '#app'
+export const plugin = defineNuxtPlugin(() => ({}))
+`,
+		"runtime/typeonly.ts": `import type { defineNuxtPlugin } from '#app'
+function defineNuxtPlugin(value: any) { return value }
+export default defineNuxtPlugin({ name: 'plain-value' })
+`,
+		"runtime/ordinary.ts": "export default Object.fromEntries([['a', 1]])\n",
+	}, false)
+
+	wantFunc := []string{"runtime.Named", "runtime.Alias", "runtime.Namespace", "runtime.Payload", "runtime.Nuxtapp", "runtime.plugin"}
+	for _, name := range wantFunc {
+		f, ok := findFact(ff, name)
+		if !ok {
+			t.Fatalf("missing %s", name)
+		}
+		if f.Props["symbol_kind"] != facts.SymbolFunc {
+			t.Fatalf("%s kind=%v want function", name, f.Props["symbol_kind"])
+		}
+		if _, ok := f.Props["cyclomatic"]; !ok {
+			t.Fatalf("%s missing function metrics", name)
+		}
+	}
+	named, _ := findFact(ff, "runtime.Named")
+	foundFetch := false
+	for _, r := range named.Relations {
+		if r.Kind == facts.RelCalls && strings.Contains(strings.ToLower(r.Target), "fetch") {
+			foundFetch = true
+		}
+	}
+	if !foundFetch {
+		t.Fatalf("named plugin missing direct fetch call: %+v", named.Relations)
+	}
+	for _, name := range []string{"runtime.Local", "runtime.Member", "runtime.Typeonly", "runtime.Ordinary"} {
+		f, ok := findFact(ff, name)
+		if !ok {
+			t.Fatalf("missing %s", name)
+		}
+		if f.Props["symbol_kind"] != facts.SymbolVariable {
+			t.Fatalf("%s kind=%v want variable", name, f.Props["symbol_kind"])
+		}
+	}
+}
+
 func TestExtract_Wave10DefaultObjectValue(t *testing.T) {
 	ff := extractAll(t, map[string]string{
 		"packages/web-push/src/utils/base64.ts": `export function urlBase64ToUint8Array(s: string) { return s; }
