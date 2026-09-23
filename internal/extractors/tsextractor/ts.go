@@ -4009,6 +4009,29 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			frPop()
 			return
 		}
+		if kind == "for_statement" || kind == "for_in_statement" {
+			// for..of/in evaluates its iterable before introducing the loop binding.
+			// Walk it in the outer scope so a same-named imported value remains visible.
+			var iterable *sitter.Node
+			if kind == "for_in_statement" {
+				iterable = n.ChildByFieldName("right")
+				walk(iterable)
+			}
+			loopNames := tsLoopLexicalNames(kinds, n, src)
+			if len(loopNames) > 0 {
+				frPush(loopNames...)
+			}
+			for i := range n.ChildCount() {
+				child := n.Child(i)
+				if child != iterable {
+					walk(child)
+				}
+			}
+			if len(loopNames) > 0 {
+				frPop()
+			}
+			return
+		}
 		if kind == "lexical_declaration" || kind == "variable_declaration" {
 			if len(frShadows) == 0 {
 				frPush()
@@ -5305,8 +5328,16 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 	// loop is bounded — it raises loop_depth but not scaling_loop_depth (the Big-O exponent).
 	switch kind {
 	case "for_statement", "for_in_statement", "while_statement", "do_statement":
-		// A lexical loop initializer belongs to the loop's environment, including
-		// its iterable / condition and body, and stops shadowing after the loop.
+		// A for..of/in iterable is evaluated once before its lexical head binding
+		// takes effect and outside the repeated body. Resolve it in the outer scope.
+		var iterable *sitter.Node
+		if kind == "for_in_statement" {
+			iterable = n.ChildByFieldName("right")
+			w.walk(iterable)
+		}
+		// A lexical loop initializer belongs to the loop's environment and stops
+		// shadowing after the loop. for..of/in iterables were resolved above before
+		// introducing that environment.
 		// statement_block scopes alone miss `for (const token of values) token()`
 		// when the body is a single statement (and do not own the initializer).
 		loopBindings := tsLoopLexicalNames(w.kinds, n, w.src)
@@ -5333,7 +5364,10 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 			w.repeatDepth++
 		}
 		for i := range n.ChildCount() {
-			w.walk(n.Child(i))
+			child := n.Child(i)
+			if child != iterable {
+				w.walk(child)
+			}
 		}
 		w.loopDepth--
 		if !bounded {

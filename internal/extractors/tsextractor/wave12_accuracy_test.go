@@ -1,6 +1,8 @@
 package tsextractor
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/enola-labs/enola/internal/facts"
@@ -18,6 +20,9 @@ export function afterForOf(raw: string[]) {
   for (let [token] of splitTokenList(raw)) { token() }
   token()
 }
+export function forOfRhs() {
+  for (const token of token()) {}
+}
 export function forIn(source: Record<string, unknown>) {
   for (const { token } in source) token()
 }
@@ -27,7 +32,7 @@ export function cStyle() {
 `,
 	}, false)
 
-	for _, name := range []string{"src.forOf", "src.afterForOf", "src.forIn", "src.cStyle"} {
+	for _, name := range []string{"src.forOf", "src.afterForOf", "src.forOfRhs", "src.forIn", "src.cStyle"} {
 		if _, ok := findFact(ff, name); !ok {
 			t.Fatalf("missing %s; facts=%v", name, factNames(ff))
 		}
@@ -42,11 +47,52 @@ export function cStyle() {
 	if !hasRelation(after, facts.RelCalls, "src.token") {
 		t.Fatalf("loop binding leaked past its scope and hid imported token: %+v", after.Relations)
 	}
+	rhs, _ := findFact(ff, "src.forOfRhs")
+	if !hasRelation(rhs, facts.RelCalls, "src.token") {
+		t.Fatalf("for-of iterable must resolve in the outer scope before the loop binding: %+v", rhs.Relations)
+	}
 	for _, name := range []string{"src.forOf", "src.afterForOf"} {
 		f, _ := findFact(ff, name)
 		if !hasRelation(f, facts.RelCalls, "src.splitTokenList") {
 			t.Errorf("genuine splitTokenList call was suppressed in %s: %+v", name, f.Relations)
 		}
+	}
+}
+
+func TestExtract_Wave12ProductLoopBindingDoesNotCrossBindFileRef(t *testing.T) {
+	const fixtureRoot = "testdata/wave12/candidate56"
+	const owner = "apps/mobile/scripts/require-figma-api-token.mjs"
+	const sibling = "apps/mobile/scripts/refresh-figma-train-copy.mjs"
+	read := func(rel string) string {
+		t.Helper()
+		b, err := os.ReadFile(filepath.Join(fixtureRoot, filepath.FromSlash(rel)))
+		if err != nil {
+			t.Fatalf("read exact Product fixture %s: %v", rel, err)
+		}
+		return string(b)
+	}
+	ff := extractAll(t, map[string]string{
+		owner:   read(owner),
+		sibling: read(sibling),
+	}, false)
+
+	var fileRef *facts.Fact
+	for i := range ff {
+		if ff[i].Kind == facts.KindFileRef && ff[i].File == owner {
+			fileRef = &ff[i]
+			break
+		}
+	}
+	if fileRef == nil {
+		t.Fatalf("missing Product file_ref for %s; facts=%v", owner, factNames(ff))
+	}
+	for _, rel := range fileRef.Relations {
+		if rel.Kind == facts.RelCalls && rel.Target == "apps/mobile/scripts.token" {
+			t.Errorf("loop-local token was cross-bound from the file_ref pass to the private sibling: %+v; all refs: %+v", rel, fileRef.Relations)
+		}
+	}
+	if !hasTargetFileRelation(*fileRef, facts.RelCalls, "apps/mobile/scripts.splitTokenList", owner) {
+		t.Errorf("genuine Product splitTokenList call was lost from file_ref: %+v", fileRef.Relations)
 	}
 }
 
