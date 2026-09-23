@@ -572,31 +572,28 @@ func TestMDScopeNarrowingLeavesOtherOwnerDeclaringExtractorsWhole(t *testing.T) 
 		"notes/two.txt": "two\n",
 	})
 	md := mdintent.New()
-	notes := stubExtractor{
-		name:   "txtnotes",
-		detect: true,
-		suffix: ".txt",
+	notes := capturingStub{stubExtractor: stubExtractor{name: "txtnotes", detect: true, suffix: ".txt",
 		fact: func(rel string) []facts.Fact {
 			return []facts.Fact{{Kind: facts.KindSymbol, Name: "note:" + rel, File: rel}}
-		},
-	}
+		}}}
 	eng := multiEngine(t, root, md, notes)
 	opts := mdScopeOpts(t)
 	cons := mdScopeInitial(t, eng, root, opts)
-
 	writeFile(t, root, "src/added.ts", "export const added = 1;\n")
+	// The note edit is what makes txtnotes rerun now that it declares its
+	// content inputs. Only one of its two files changes, and both still have to
+	// be seeded: the narrowing belongs to mdintent, not to this extractor.
+	writeFile(t, root, "notes/one.txt", "one edited\n")
 	sink := &graphstream.MemorySink{}
 	delta, err := Run(context.Background(), eng, root, sink, opts)
 	if err != nil {
 		t.Fatal(err)
 	}
 	applyRun(t, cons, sink)
-
 	owners, ids := beginScope(t, sink)
 	requireOwners(t, owners, ids, "src/added.ts", "notes/one.txt", "notes/two.txt")
 	forbidOwners(t, owners, ids, "docs/guide.md")
 	requireNoWholeDomainFallback(t, delta, ids)
-
 	assertAppliedEqualsCold(t, cons, coldConsumer(t, eng, root))
 }
 

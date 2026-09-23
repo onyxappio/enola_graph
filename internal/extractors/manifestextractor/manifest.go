@@ -157,6 +157,29 @@ func (e *Extractor) Extract(ctx context.Context, repoPath string, _ []string) ([
 	rc := &readCtx{repoPath: repoPath, inputScope: e.inputScope, withoutLockfiles: e.withoutLockfiles, locks: map[string]map[string]string{}}
 	names := detectnames.Walk(repoPath, e.inputScope)
 	sort.Strings(names)
+	return e.compile(ctx, rc, names, &deps)
+}
+
+// ExtractCaptured is Extract over a CaptureContext snapshot. Every read is
+// served from src, including the lockfiles a manifest resolves against, so the
+// facts provably describe the captured bytes and not whatever the tree holds by
+// the time this runs. The manifests are the snapshot's own paths rather than a
+// fresh walk, because re-walking would reintroduce the discovery this snapshot
+// exists to pin down; a path that was unreadable when it was captured is absent
+// from src and contributes nothing, which is what reading it would have done.
+func (e *Extractor) ExtractCaptured(ctx context.Context, repoPath string, _ []string, src map[string][]byte) ([]facts.Fact, error) {
+	var deps []pkgDep
+	rc := &readCtx{repoPath: repoPath, inputScope: e.inputScope, withoutLockfiles: e.withoutLockfiles, locks: map[string]map[string]string{}, src: src}
+	names := make([]string, 0, len(src))
+	for rel := range src {
+		names = append(names, rel)
+	}
+	sort.Strings(names)
+	return e.compile(ctx, rc, names, &deps)
+}
+
+// compile parses every name that has a reader, in the order given.
+func (e *Extractor) compile(ctx context.Context, rc *readCtx, names []string, deps *[]pkgDep) ([]facts.Fact, error) {
 	for _, rel := range names {
 		select {
 		case <-ctx.Done():
@@ -167,9 +190,9 @@ func (e *Extractor) Extract(ctx context.Context, repoPath string, _ []string) ([
 		if read == nil {
 			continue
 		}
-		deps = append(deps, read(rc, rel)...)
+		*deps = append(*deps, read(rc, rel)...)
 	}
-	return factsFor(deps), nil
+	return factsFor(*deps), nil
 }
 
 // factsFor turns parsed dependencies into facts, one per package.
@@ -321,6 +344,9 @@ type readCtx struct {
 	// cached miss, which matters as much as a hit: it is what stops an absent
 	// lockfile from being stat'd once per manifest.
 	locks map[string]map[string]string
+	// src, when non-nil, is the captured snapshot every read is served from, so
+	// an extraction planned from a capture never touches the live tree.
+	src map[string][]byte
 }
 
 // read returns a repository file's contents, or "" — a manifest that cannot be
@@ -329,6 +355,11 @@ type readCtx struct {
 func (rc *readCtx) read(relFile string) string {
 	if rc.withoutLockfiles && lockNames[detectnames.Base(relFile)] {
 		return ""
+	}
+	if rc.src != nil {
+		// A path absent from the snapshot was unreadable when it was captured,
+		// which is the same answer this function gives for an unreadable file.
+		return string(rc.src[filepath.ToSlash(relFile)])
 	}
 	data, err := rc.inputScope.ReadFile(filepath.Join(rc.repoPath, filepath.FromSlash(relFile)))
 	if err != nil {
