@@ -958,6 +958,7 @@ def run_soak(args) -> int:
             "abandoned_begins": settled["abandoned_begins"],
             "generations_begun_after_last_save":
                 settled["generations_begun_after_last_save"],
+            "post_save_generation_observed": settled["post_save_generation_observed"],
             "begin_after_save_is_not_capture_proof": True,
             "quiescence_limitations": settled["limitations"],
             "input_hash_scope": "whole-isolated-checkout",

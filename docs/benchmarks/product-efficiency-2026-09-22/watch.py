@@ -252,6 +252,8 @@ CLOCK_ASSUMPTION = (
 # What heuristic quiescence does NOT establish. Carried into every report so a
 # reader cannot mistake it for an internal drain proof.
 QUIESCENCE_LIMITS = [
+    "a final no-op save may publish no generation; selecting an older completed "
+    "graph for cold comparison does not prove the watcher processed that save",
     "no watcher watermark exists, so the harness cannot read the watcher's own "
     "queue; quiescence is inferred from observed traffic, never proved",
     "an analysis longer than the quiet margin with its Begin not yet published "
@@ -706,6 +708,7 @@ def evaluate_quiescence(
         # run captured the saved bytes.
         "generations_begun_after_last_save": [f.get("target_generation") for f in after_save],
         "begin_after_save_is_not_capture_proof": True,
+        "post_save_generation_observed": bool(after_save),
     }
     if inputs_now != inputs_expected:
         state["reason"] = "input-unstable"
@@ -716,16 +719,17 @@ def evaluate_quiescence(
     if not in_ctx:
         state["reason"] = "no-completed-generation"
         return state
-    if not after_save:
-        state["reason"] = "no-generation-after-last-save"
-        return state
     if not quiet_elapsed:
         state["reason"] = "activity-within-quiet-margin"
         return state
-    # The FINAL completed generation for this context, reached after the inputs
-    # were frozen. Its correctness is established by cold equality, not here.
+    # A final save may write identical bytes or be graph-neutral, so a correct
+    # watcher need not publish a generation after it. Select the final completed
+    # graph only as a candidate for the caller's mandatory cold equality check.
+    # No post-save frame means we have NO evidence the watcher processed that
+    # save; a missed semantic edit must fail the cold oracle, never pass here.
     state["ready"] = True
-    state["reason"] = "quiescent"
+    state["reason"] = ("quiescent" if after_save else
+                       "quiescent-without-post-save-generation")
     state["selected"] = in_ctx[-1]
     return state
 
@@ -805,6 +809,7 @@ def wait_quiescent(
                 "incomplete_begin_end_pairs_at_selection": state["incomplete_begin_end_pairs"],
                 "abandoned_begins": state["abandoned_begins"],
                 "generations_begun_after_last_save": state["generations_begun_after_last_save"],
+                "post_save_generation_observed": state["post_save_generation_observed"],
                 "selected_generation": selected.get("target_generation"),
                 "last_seq": activity[1],
                 "stable_inputs": inputs_expected,
@@ -1218,6 +1223,7 @@ def run_watch(args) -> int:
             "abandoned_begins": settled["abandoned_begins"],
             "generations_begun_after_last_save":
                 settled["generations_begun_after_last_save"],
+            "post_save_generation_observed": settled["post_save_generation_observed"],
             "begin_after_save_is_not_capture_proof": True,
             "selected_generation": final.get("target_generation"),
             "quiescence_limitations": settled["limitations"],
@@ -1522,8 +1528,17 @@ def self_test() -> int:
     check("begin-after-save is liveness not proof", st["begin_after_save_is_not_capture_proof"])
     check("generations after save listed", st["generations_begun_after_last_save"] == [2], str(st))
     st = ev([_frame(2, save - 500)], [_begin("run-2"), _end("run-2")])
-    check("no generation after save blocks selection",
-          not st["ready"] and st["reason"] == "no-generation-after-last-save", st["reason"])
+    check("no-op tail permits a candidate for mandatory cold comparison",
+          st["ready"] and st["reason"] == "quiescent-without-post-save-generation", st["reason"])
+    check("no-op tail does not invent processing evidence",
+          not st["post_save_generation_observed"] and
+          st["generations_begun_after_last_save"] == [], str(st))
+    st = ev([_frame(2, save - 500)], [_begin("run-3", gen=3)])
+    check("no-op tail still refuses an active Begin", not st["ready"], str(st))
+    st = ev([_frame(2, save - 500)], [_begin("run-2"), _end("run-2")], now=moved)
+    check("no-op tail still refuses unstable inputs", not st["ready"], str(st))
+    st = ev([_frame(2, save - 500)], [_begin("run-2"), _end("run-2")], quiet=False)
+    check("no-op tail still waits for quiet margin", not st["ready"], str(st))
 
     # Quiet margin not yet elapsed.
     st = ev([gen2], [_begin("run-2"), _end("run-2")], quiet=False)
