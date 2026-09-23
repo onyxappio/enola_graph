@@ -2568,7 +2568,18 @@ import (
 // v310: `export { default as X } from` records a side-read of the origin whose
 // default identity was bound, so switching `export default round` to `ceil`
 // invalidates the barrel's file_ref call without a universal reparse.
-const cacheVersion = "v310"
+// v311: Nuxt plugin factories stay functions when proven via #imports (named,
+// aliased, or namespace value imports of defineNuxtPlugin / definePayloadPlugin)
+// or as an implicit auto-import inside a detected Nuxt package. #app and
+// nuxt/app provenance is unchanged. Local declarations, parameters, type-only
+// imports, and unrelated specifiers remain variables; defineNuxtConfig stays a
+// value object.
+// v312: h3 lazyEventHandler / defineLazyEventHandler keep function identity when
+// proven via a value import from h3 (named, aliased, namespace, or default
+// assignment of those exports). Local same-name functions, object members,
+// type-only imports, unrelated specifiers, and bare names stay variables.
+// defineEventHandler is unchanged.
+const cacheVersion = "v312"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

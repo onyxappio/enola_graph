@@ -487,6 +487,10 @@ export default defineEndpoint({ path: '/x' })
 
 func TestExtract_Wave10NuxtPluginFactoryKind(t *testing.T) {
 	ff := extractAll(t, map[string]string{
+		"apps/landings/nuxt.config.ts": `export default defineNuxtConfig({ name: 'landings' })
+`,
+		"apps/landings/package.json": `{"name":"landings","dependencies":{"nuxt":"3.14.0"}}
+`,
 		"runtime/named.ts": `import { defineNuxtPlugin } from '#app'
 export default defineNuxtPlugin({
   setup() {
@@ -507,6 +511,29 @@ export default register(() => ({}))
 		"runtime/nuxtapp.ts": `import { defineNuxtPlugin } from 'nuxt/app'
 export default defineNuxtPlugin(() => ({}))
 `,
+		"runtime/imports.ts": `import { defineNuxtPlugin } from '#imports'
+export default defineNuxtPlugin({
+  name: 'meta-pixel',
+  setup() { return {} },
+})
+`,
+		"runtime/importsAlias.ts": `import { defineNuxtPlugin as register } from '#imports'
+export default register(() => ({}))
+`,
+		"runtime/importsNs.ts": `import * as nuxt from '#imports'
+export default nuxt.defineNuxtPlugin(() => ({}))
+`,
+		"runtime/importsPayload.ts": `import { definePayloadPlugin as register } from '#imports'
+export default register(() => ({}))
+`,
+		"apps/landings/plugins/auto.ts": `export default defineNuxtPlugin((nuxtApp) => {
+  return {}
+})
+`,
+		"apps/landings/plugins/autoPayload.ts": `export default definePayloadPlugin(() => ({}))
+`,
+		"runtime/config.ts": `export default defineNuxtConfig({ srcDir: 'src' })
+`,
 		"runtime/local.ts": `function defineNuxtPlugin(value: any) { return value }
 export default defineNuxtPlugin({ name: 'plain-value' })
 `,
@@ -520,10 +547,28 @@ export const plugin = defineNuxtPlugin(() => ({}))
 function defineNuxtPlugin(value: any) { return value }
 export default defineNuxtPlugin({ name: 'plain-value' })
 `,
+		"runtime/typeonlyImports.ts": `import type { defineNuxtPlugin } from '#imports'
+function defineNuxtPlugin(value: any) { return value }
+export default defineNuxtPlugin({ name: 'plain-value' })
+`,
+		"runtime/foreign.ts": `import { defineNuxtPlugin } from 'not-nuxt'
+export default defineNuxtPlugin({ name: 'plain-value' })
+`,
+		"runtime/localmod.ts": `import { defineNuxtPlugin } from './helpers'
+export default defineNuxtPlugin({ name: 'plain-value' })
+`,
+		"runtime/helpers.ts": `export function defineNuxtPlugin(value: any) { return value }
+`,
 		"runtime/ordinary.ts": "export default Object.fromEntries([['a', 1]])\n",
+		"packages/plain/src/plugin.ts": `export default defineNuxtPlugin({ name: 'plain-value' })
+`,
 	}, false)
 
-	wantFunc := []string{"runtime.Named", "runtime.Alias", "runtime.Namespace", "runtime.Payload", "runtime.Nuxtapp", "runtime.plugin"}
+	wantFunc := []string{
+		"runtime.Named", "runtime.Alias", "runtime.Namespace", "runtime.Payload", "runtime.Nuxtapp",
+		"runtime.Imports", "runtime.ImportsAlias", "runtime.ImportsNs", "runtime.ImportsPayload",
+		"apps/landings/plugins.Auto", "apps/landings/plugins.AutoPayload", "runtime.plugin",
+	}
 	for _, name := range wantFunc {
 		f, ok := findFact(ff, name)
 		if !ok {
@@ -546,7 +591,114 @@ export default defineNuxtPlugin({ name: 'plain-value' })
 	if !foundFetch {
 		t.Fatalf("named plugin missing direct fetch call: %+v", named.Relations)
 	}
-	for _, name := range []string{"runtime.Local", "runtime.Member", "runtime.Typeonly", "runtime.Ordinary"} {
+	for _, name := range []string{
+		"runtime.Local", "runtime.Member", "runtime.Typeonly", "runtime.TypeonlyImports",
+		"runtime.Ordinary", "runtime.Config", "runtime.Foreign", "runtime.Localmod",
+		"packages/plain/src.Plugin", "apps/landings.NuxtConfig",
+	} {
+		f, ok := findFact(ff, name)
+		if !ok {
+			t.Fatalf("missing %s", name)
+		}
+		if f.Props["symbol_kind"] != facts.SymbolVariable {
+			t.Fatalf("%s kind=%v want variable", name, f.Props["symbol_kind"])
+		}
+	}
+}
+
+func TestExtract_Wave10H3LazyEventHandlerKind(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"packages/landings-module-image/src/runtime/images/ipxHandler.ts": `import { lazyEventHandler } from 'h3'
+import { createIPX, ipxFSStorage, ipxHttpStorage, createIPXH3Handler } from 'ipx'
+export default lazyEventHandler(() => {
+  const ipxOptions = { maxAge: 3600 }
+  const ipx = createIPX({
+    storage: ipxFSStorage({ dir: ipxOptions.dir ?? './public' }),
+    httpStorage: ipxHttpStorage({ domains: ipxOptions.domains }),
+    ...ipxOptions,
+  })
+  const handler = createIPXH3Handler(ipx)
+  return handler
+})
+`,
+		"runtime/named.ts": `import { defineLazyEventHandler } from 'h3'
+export default defineLazyEventHandler(() => {
+  return () => ({})
+})
+`,
+		"runtime/alias.ts": `import { lazyEventHandler as lazy } from 'h3'
+export default lazy(() => () => ({}))
+`,
+		"runtime/namespace.ts": `import * as h3 from 'h3'
+export default h3.lazyEventHandler(() => () => ({}))
+`,
+		"runtime/nsDefine.ts": `import * as h3 from 'h3'
+export default h3.defineLazyEventHandler(() => () => ({}))
+`,
+		"runtime/defaultLazy.ts": `import lazyEventHandler from 'h3'
+export default lazyEventHandler(() => () => ({}))
+`,
+		"runtime/defaultDefine.ts": `import defineLazyEventHandler from 'h3'
+export default defineLazyEventHandler(() => () => ({}))
+`,
+		"runtime/subpath.ts": `import { lazyEventHandler } from 'h3/utils'
+export default lazyEventHandler(() => () => ({}))
+`,
+		"runtime/event.ts": `import { defineEventHandler } from 'h3'
+export default defineEventHandler(() => ({}))
+`,
+		"runtime/bareEvent.ts": "export default defineEventHandler(() => ({}))\n",
+		"runtime/constlazy.ts": `import { lazyEventHandler } from 'h3'
+export const handler = lazyEventHandler(() => () => ({}))
+`,
+		"runtime/local.ts": `function lazyEventHandler(value: any) { return value }
+export default lazyEventHandler({ name: 'plain-value' })
+`,
+		"runtime/member.ts": `const local = { lazyEventHandler: (value: any) => value }
+export default local.lazyEventHandler({ name: 'plain-value' })
+`,
+		"runtime/typeonly.ts": `import type { lazyEventHandler } from 'h3'
+function lazyEventHandler(value: any) { return value }
+export default lazyEventHandler({ name: 'plain-value' })
+`,
+		"runtime/typeonlyDefine.ts": `import type { defineLazyEventHandler } from 'h3'
+function defineLazyEventHandler(value: any) { return value }
+export default defineLazyEventHandler({ name: 'plain-value' })
+`,
+		"runtime/foreign.ts": `import { lazyEventHandler } from 'not-h3'
+export default lazyEventHandler({ name: 'plain-value' })
+`,
+		"runtime/localmod.ts": `import { lazyEventHandler } from './helpers'
+export default lazyEventHandler({ name: 'plain-value' })
+`,
+		"runtime/helpers.ts": `export function lazyEventHandler(value: any) { return value }
+`,
+		"runtime/ordinary.ts": "export default Object.fromEntries([['a', 1]])\n",
+		"runtime/bareLazy.ts": "export default lazyEventHandler(() => ({}))\n",
+	}, false)
+
+	wantFunc := []string{
+		"packages/landings-module-image/src/runtime/images.IpxHandler",
+		"runtime.Named", "runtime.Alias", "runtime.Namespace", "runtime.NsDefine",
+		"runtime.DefaultLazy", "runtime.DefaultDefine", "runtime.Subpath",
+		"runtime.Event", "runtime.BareEvent", "runtime.handler",
+	}
+	for _, name := range wantFunc {
+		f, ok := findFact(ff, name)
+		if !ok {
+			t.Fatalf("missing %s", name)
+		}
+		if f.Props["symbol_kind"] != facts.SymbolFunc {
+			t.Fatalf("%s kind=%v want function", name, f.Props["symbol_kind"])
+		}
+		if _, ok := f.Props["cyclomatic"]; !ok {
+			t.Fatalf("%s missing function metrics", name)
+		}
+	}
+	for _, name := range []string{
+		"runtime.Local", "runtime.Member", "runtime.Typeonly", "runtime.TypeonlyDefine",
+		"runtime.Ordinary", "runtime.Foreign", "runtime.Localmod", "runtime.BareLazy",
+	} {
 		f, ok := findFact(ff, name)
 		if !ok {
 			t.Fatalf("missing %s", name)

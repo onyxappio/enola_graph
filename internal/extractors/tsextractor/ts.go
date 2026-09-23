@@ -531,29 +531,29 @@ func appendTSDirectoryModules(allFacts []facts.Fact, dirs map[string]bool, pkgNa
 // extractCtx bundles the per-file state threaded through declaration extraction
 // so symbols can be enriched with React/Next.js semantic classification.
 type extractCtx struct {
-	src         []byte
-	relFile     string
-	dir         string
-	isTSX       bool
-	isNextJS    bool
-	isVue       bool
-	isNuxt      bool
-	isSvelteKit bool
-	orms        ormFlags
+	src          []byte
+	relFile      string
+	dir          string
+	isTSX        bool
+	isNextJS     bool
+	isVue        bool
+	isNuxt       bool
+	isSvelteKit  bool
+	orms         ormFlags
 	importMap    map[string]string
 	importFiles  map[string]string // local import name → known source file of that specifier
 	nsDirs       map[string]string // `import * as ns` local → module directory
 	nsIndex      map[string]string // `import * as ns` local → resolved module file
 	namedImports map[string]namedImportOrigin
-	nsImports    map[string]string // `import * as ns` local → original specifier
-	localNames  map[string]bool     // file-scope function/const names that may own a local call
-	imports     emberImportBindings // the file's import table, read for the module a superclass identifier came from
-	ioBindings  map[string]bool     // local names bound to imports from a network module (I/O sinks)
-	knownFiles  map[string]bool     // repo-relative (slash) paths of all indexed TS/JS files
-	aliases     map[string]tsAlias  // this directory's tsconfig path aliases, for resolving an import written as a bare specifier
-	readSrc     func(string) []byte // known file bytes for following named re-exports
-	exportCache *namedExportCache
-	sideReads   map[string]bool
+	nsImports    map[string]string   // `import * as ns` local → original specifier
+	localNames   map[string]bool     // file-scope function/const names that may own a local call
+	imports      emberImportBindings // the file's import table, read for the module a superclass identifier came from
+	ioBindings   map[string]bool     // local names bound to imports from a network module (I/O sinks)
+	knownFiles   map[string]bool     // repo-relative (slash) paths of all indexed TS/JS files
+	aliases      map[string]tsAlias  // this directory's tsconfig path aliases, for resolving an import written as a bare specifier
+	readSrc      func(string) []byte // known file bytes for following named re-exports
+	exportCache  *namedExportCache
+	sideReads    map[string]bool
 }
 
 func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, isNuxt, isSvelteKit, isEmber, isReactNav, isAngular bool, graphqlServer graphqlServerContext, orms ormFlags, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, nuxtAutoComponents map[string]string, grpcStubs *grpcStubIndex, exportCache *namedExportCache, sideReads map[string]bool) ([]facts.Fact, angularCounts, *angularRouterFile, map[string]*angularTemplate, *angularHTTPFile, clientCounts) {
@@ -1550,11 +1550,43 @@ func importSpecifierIsTypeOnly(kinds *tsutil.KindTable, spec *sitter.Node, src [
 }
 
 func isNuxtAppSpecifier(spec string) bool {
-	return spec == "#app" || spec == "nuxt/app" || strings.HasPrefix(spec, "#app/")
+	switch spec {
+	case "#app", "#imports", "nuxt/app":
+		return true
+	}
+	return strings.HasPrefix(spec, "#app/") || strings.HasPrefix(spec, "#imports/")
 }
 
 func isNuxtAppPluginExport(export string) bool {
 	return export == "defineNuxtPlugin" || export == "definePayloadPlugin"
+}
+
+func isH3Specifier(spec string) bool {
+	return spec == "h3" || strings.HasPrefix(spec, "h3/")
+}
+
+func isH3LazyEventHandlerExport(export string) bool {
+	return export == "lazyEventHandler" || export == "defineLazyEventHandler"
+}
+
+func isH3LazyEventHandlerOrigin(origin namedImportOrigin, local string) bool {
+	if !isH3Specifier(origin.specifier) {
+		return false
+	}
+	if isH3LazyEventHandlerExport(origin.export) {
+		return true
+	}
+	return origin.export == "default" && isH3LazyEventHandlerExport(local)
+}
+
+func isNuxtAutoImportedPluginFactory(name string, ctx *extractCtx) bool {
+	if ctx == nil || !ctx.isNuxt || !isNuxtAppPluginExport(name) {
+		return false
+	}
+	if ctx.localNames[name] {
+		return false
+	}
+	return true
 }
 
 func isEmberEngineRoutesSpecifier(spec string) bool {
@@ -1589,6 +1621,11 @@ func isKnownFunctionValueCall(kinds *tsutil.KindTable, call *sitter.Node, src []
 				if isEmberEngineBuildRoutesOrigin(origin) {
 					return true
 				}
+				if isH3LazyEventHandlerOrigin(origin, name) {
+					return true
+				}
+			} else if isNuxtAutoImportedPluginFactory(name, ctx) {
+				return true
 			}
 		}
 	case "member_expression":
@@ -1604,6 +1641,9 @@ func isKnownFunctionValueCall(kinds *tsutil.KindTable, call *sitter.Node, src []
 						return true
 					}
 					if isEmberEngineRoutesSpecifier(spec) && (name == "default" || name == "buildRoutes") {
+						return true
+					}
+					if isH3Specifier(spec) && isH3LazyEventHandlerExport(name) {
 						return true
 					}
 				}
