@@ -20,10 +20,11 @@ type namedExportCache struct {
 }
 
 type namedExportIndex struct {
-	local map[string]bool
-	named map[string][][2]string // exported name → (module file, original name)
-	stars []string
-	empty bool
+	local       map[string]bool
+	named       map[string][][2]string // exported name → (module file, original name)
+	stars       []string
+	defaultName string // proven default export symbol; empty if the file has none
+	empty       bool
 }
 
 func newNamedExportCache() *namedExportCache {
@@ -69,6 +70,49 @@ func parseNamedExportIndex(file string, readSrc func(string) []byte, aliases map
 		return idx
 	}
 	src := readSrc(file)
+	if isVueFile(file) {
+		idx.defaultName = fileSymbolName(file)
+		blocks := extractVueScriptBlocks(src)
+		if len(blocks) == 0 {
+			if len(src) == 0 {
+				idx.empty = true
+			}
+			return idx
+		}
+		for _, b := range blocks {
+			if len(b.Content) == 0 {
+				continue
+			}
+			sub := parseNamedExportIndexBytes(file, b.Content, aliases, knownFiles)
+			mergeNamedExportIndex(idx, sub)
+		}
+		return idx
+	}
+	if len(src) == 0 {
+		idx.empty = true
+		return idx
+	}
+	return parseNamedExportIndexBytes(file, src, aliases, knownFiles)
+}
+
+func mergeNamedExportIndex(dst, src *namedExportIndex) {
+	if src == nil || src.empty {
+		return
+	}
+	for k, v := range src.local {
+		dst.local[k] = v
+	}
+	for k, v := range src.named {
+		dst.named[k] = append(dst.named[k], v...)
+	}
+	dst.stars = append(dst.stars, src.stars...)
+	if dst.defaultName == "" {
+		dst.defaultName = src.defaultName
+	}
+}
+
+func parseNamedExportIndexBytes(file string, src []byte, aliases map[string]tsAlias, knownFiles map[string]bool) *namedExportIndex {
+	idx := &namedExportIndex{local: map[string]bool{}, named: map[string][][2]string{}}
 	if len(src) == 0 {
 		idx.empty = true
 		return idx
@@ -99,6 +143,20 @@ func parseNamedExportIndex(file string, readSrc func(string) []byte, aliases map
 			continue
 		}
 		if hasChildKind(kinds, child, "default") {
+			if idx.defaultName == "" {
+				if decl := firstDeclChild(kinds, child); decl != nil {
+					if names := declExportedNames(kinds, decl, src); len(names) > 0 {
+						idx.defaultName = names[0]
+					}
+				}
+				if idx.defaultName == "" {
+					if id := findChildByKind(kinds, child, "identifier"); id != nil {
+						idx.defaultName = nodeText(id, src)
+					} else {
+						idx.defaultName = fileSymbolName(file)
+					}
+				}
+			}
 			continue
 		}
 		source := child.ChildByFieldName("source")
@@ -118,14 +176,9 @@ func parseNamedExportIndex(file string, readSrc func(string) []byte, aliases map
 					if kindOf(kinds, spec) != "export_specifier" {
 						continue
 					}
-					nameNode := spec.ChildByFieldName("name")
-					if nameNode == nil {
+					orig, exported, ok := exportSpecifierNames(kinds, spec, src)
+					if !ok {
 						continue
-					}
-					orig := nodeText(nameNode, src)
-					exported := orig
-					if a := spec.ChildByFieldName("alias"); a != nil {
-						exported = nodeText(a, src)
 					}
 					idx.named[exported] = append(idx.named[exported], [2]string{mod, orig})
 				}
@@ -149,14 +202,9 @@ func parseNamedExportIndex(file string, readSrc func(string) []byte, aliases map
 				if kindOf(kinds, spec) != "export_specifier" {
 					continue
 				}
-				nameNode := spec.ChildByFieldName("name")
-				if nameNode == nil {
+				local, exported, ok := exportSpecifierNames(kinds, spec, src)
+				if !ok {
 					continue
-				}
-				local := nodeText(nameNode, src)
-				exported := local
-				if a := spec.ChildByFieldName("alias"); a != nil {
-					exported = nodeText(a, src)
 				}
 				if !localBind[local] {
 					if bind, ok := imported[local]; ok {
@@ -277,6 +325,9 @@ func followNamedExportFileSeen(file, exportName string, readSrc func(string) []b
 	if idx.local[exportName] {
 		return file, exportName, followOne
 	}
+	if exportName == "default" && idx.defaultName != "" {
+		return file, idx.defaultName, followOne
+	}
 	type owner struct {
 		file, orig string
 	}
@@ -355,12 +406,38 @@ func declExportedNames(kinds *tsutil.KindTable, decl *sitter.Node, src []byte) [
 			if kindOf(kinds, d) != "variable_declarator" {
 				continue
 			}
-			if id := findChildByKind(kinds, d, "identifier"); id != nil {
-				names = append(names, nodeText(id, src))
+			nameNode := d.ChildByFieldName("name")
+			if nameNode == nil {
+				nameNode = findChildByKind(kinds, d, "identifier")
 			}
+			if nameNode == nil {
+				continue
+			}
+			if kindOf(kinds, nameNode) == "identifier" {
+				names = append(names, nodeText(nameNode, src))
+				continue
+			}
+			names = append(names, bindingNamesFromPattern(kinds, nameNode, src)...)
 		}
 	}
 	return names
+}
+
+func exportSpecifierNames(kinds *tsutil.KindTable, spec *sitter.Node, src []byte) (orig, exported string, ok bool) {
+	nameNode := spec.ChildByFieldName("name")
+	if nameNode != nil {
+		orig = nodeText(nameNode, src)
+	} else if hasChildKind(kinds, spec, "default") {
+		orig = "default"
+	}
+	if orig == "" {
+		return "", "", false
+	}
+	exported = orig
+	if a := spec.ChildByFieldName("alias"); a != nil {
+		exported = nodeText(a, src)
+	}
+	return orig, exported, true
 }
 
 func declExportsName(kinds *tsutil.KindTable, decl *sitter.Node, src []byte, exportName string) bool {

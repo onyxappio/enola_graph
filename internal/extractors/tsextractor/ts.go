@@ -368,6 +368,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	// module, so a directory containing only skipped bundles (e.g. a vendored
 	// scripts dir) stays out of the graph rather than surfacing as an empty module.
 	modules := make(map[string]bool)
+	var moduleFiles []string
 	routerFiles := make([]*routerFile, 0, len(perFile))
 	var angular angularCounts
 	var angularRouters []*angularRouterFile
@@ -395,6 +396,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 		}
 		allFacts = append(allFacts, res.facts...)
 		modules[factpath.Dir(tsFiles[i])] = true
+		moduleFiles = append(moduleFiles, tsFiles[i])
 	}
 
 	// Express sub-routers mounted from another file. The per-file pass holds their
@@ -504,14 +506,15 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	if isAngular {
 		projects = angularProjectNames(repoPath, inputScope)
 	}
-	for dir := range modules {
-		props := map[string]any{
-			"language": "typescript",
-		}
-		// The npm package this directory belongs to. The cross-repo linker reads it
-		// to recognize a repo's own @scope, so an import of a sibling package the
-		// repo itself publishes is not mistaken for a dependency on another repo
-		// that happens to be labeled like the scope.
+	allFacts = appendTSDirectoryModules(allFacts, modules, moduleFiles, pkgNames, projects)
+
+	return allFacts, nil
+}
+
+func appendTSDirectoryModules(allFacts []facts.Fact, dirs map[string]bool, files []string, pkgNames, projects map[string]string) []facts.Fact {
+	_ = files
+	for dir := range dirs {
+		props := map[string]any{"language": "typescript"}
 		if name := nearestPackageName(pkgNames, dir); name != "" {
 			props["package_name"] = name
 		}
@@ -525,8 +528,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 			Props: props,
 		})
 	}
-
-	return allFacts, nil
+	return allFacts
 }
 
 // extractCtx bundles the per-file state threaded through declaration extraction
@@ -563,10 +565,12 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 	kinds := tsKindsFor(isTSX)
 
 	if isVueFile(relFile) {
-		return e.extractVueSFC(kinds, src, relFile, isNuxt, aliases, nuxtAutoComponents, knownFiles, readSrc, exportCache, sideReads), angularCounts{}, nil, nil, nil, nil
+		ff := e.extractVueSFC(kinds, src, relFile, isNuxt, aliases, nuxtAutoComponents, knownFiles, readSrc, exportCache, sideReads)
+		return ensureFileRef(ff, relFile), angularCounts{}, nil, nil, nil, nil
 	}
 	if isSvelteFile(relFile) {
-		return e.extractSvelteSFC(kinds, src, relFile, isSvelteKit, aliases, knownFiles, readSrc, exportCache, sideReads), angularCounts{}, nil, nil, nil, nil
+		ff := e.extractSvelteSFC(kinds, src, relFile, isSvelteKit, aliases, knownFiles, readSrc, exportCache, sideReads)
+		return ensureFileRef(ff, relFile), angularCounts{}, nil, nil, nil, nil
 	}
 	if isGraphQLDocFile(relFile) {
 		if facts.IsTestPath(relFile) {
@@ -799,7 +803,7 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 		result = append(result, extractExtendPagesFacts(kinds, root, src, relFile, aliases, knownFiles)...)
 	}
 
-	return result, angular, router, inlineTemplates, httpFile, clients
+	return ensureFileRef(result, relFile), angular, router, inlineTemplates, httpFile, clients
 }
 
 func (e *TSExtractor) extractImports(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool, isSvelteKit bool) []facts.Fact {
@@ -1123,6 +1127,9 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 				}
 				dataField := kindOf(kinds, member) == "public_field_definition" && !classFieldIsFunctionValued(kinds, member)
 				mRels := []facts.Relation{{Kind: facts.RelDeclares, Target: dir}}
+				if dataField {
+					mRels = append(mRels, facts.Relation{Kind: facts.RelDeclares, Target: dir + "." + symbolName, TargetFile: relFile})
+				}
 				callRels, m := collectCallsWithMetrics(kinds, member, src, dir, symbolName, ctx, dir+"."+symbolName+"."+mName, mName)
 				mRels = append(mRels, callRels...)
 				kind := facts.SymbolMethod
@@ -1228,10 +1235,34 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 			if kindOf(kinds, decl) != "variable_declarator" {
 				continue
 			}
-			name := findChildByKind(kinds, decl, "identifier")
-			if name == nil {
+			nameNode := decl.ChildByFieldName("name")
+			if nameNode == nil {
+				nameNode = findChildByKind(kinds, decl, "identifier")
+			}
+			if nameNode == nil {
 				continue
 			}
+			if kindOf(kinds, nameNode) != "identifier" {
+				for _, symbolName := range bindingNamesFromPattern(kinds, nameNode, src) {
+					if symbolName == "" {
+						continue
+					}
+					result = append(result, facts.Fact{
+						Kind: facts.KindSymbol,
+						Name: dir + "." + symbolName,
+						File: relFile,
+						Line: int(node.StartPosition().Row) + 1,
+						Props: map[string]any{
+							"symbol_kind": facts.SymbolVariable,
+							"exported":    isExported,
+							"language":    "typescript",
+						},
+						Relations: []facts.Relation{{Kind: facts.RelDeclares, Target: dir}},
+					})
+				}
+				continue
+			}
+			name := nameNode
 			symbolName := nodeText(name, src)
 
 			// Determine the value node and the symbol kind. Arrow functions and
@@ -1893,6 +1924,37 @@ func firstDeclChild(kinds *tsutil.KindTable, node *sitter.Node) *sitter.Node {
 	return nil
 }
 
+func bindingNamesFromPattern(kinds *tsutil.KindTable, n *sitter.Node, src []byte) []string {
+	if n == nil {
+		return nil
+	}
+	switch kindOf(kinds, n) {
+	case "identifier", "shorthand_property_identifier_pattern", "shorthand_property_identifier":
+		if t := strings.TrimSpace(nodeText(n, src)); t != "" {
+			return []string{t}
+		}
+	case "array_pattern", "object_pattern", "rest_pattern":
+		var names []string
+		for i := range n.NamedChildCount() {
+			names = append(names, bindingNamesFromPattern(kinds, n.NamedChild(i), src)...)
+		}
+		return names
+	case "assignment_pattern", "object_assignment_pattern":
+		left := n.ChildByFieldName("left")
+		if left == nil && n.NamedChildCount() > 0 {
+			left = n.NamedChild(0)
+		}
+		return bindingNamesFromPattern(kinds, left, src)
+	case "pair_pattern", "pair":
+		val := n.ChildByFieldName("value")
+		if val == nil && n.NamedChildCount() > 1 {
+			val = n.NamedChild(1)
+		}
+		return bindingNamesFromPattern(kinds, val, src)
+	}
+	return nil
+}
+
 // fileSymbolName derives a symbol name from a file path for anonymous default
 // exports. Generic Next.js filenames (page, route, layout, …) are disambiguated
 // with their parent directory segment, e.g. app/dashboard/page.tsx → "DashboardPage".
@@ -2523,10 +2585,21 @@ func resolveModuleFile(resolved string, knownFiles map[string]bool) (indexPath, 
 	// tried before the literal .js/.mjs/.cjs/.jsx path so a .ts sibling wins
 	// when both exist; a genuine JS file is the last candidate.
 	if cands := tsExtensionSubstitutionCandidates(resolved); len(cands) > 0 {
+		var declFallback string
 		for _, cand := range cands {
-			if knownFiles[cand] {
-				return cand, factpath.Dir(cand), true
+			if !knownFiles[cand] {
+				continue
 			}
+			if isTSDeclarationPath(cand) {
+				if declFallback == "" {
+					declFallback = cand
+				}
+				continue
+			}
+			return cand, factpath.Dir(cand), true
+		}
+		if declFallback != "" {
+			return declFallback, factpath.Dir(declFallback), true
 		}
 		return "", "", false
 	}
@@ -2554,19 +2627,24 @@ func tsExtensionSubstitutionCandidates(resolved string) []string {
 	switch {
 	case strings.HasSuffix(resolved, ".mjs"):
 		stem := strings.TrimSuffix(resolved, ".mjs")
-		return []string{stem + ".mts", stem + ".d.mts", stem + ".mjs"}
+		return []string{stem + ".mts", stem + ".mjs", stem + ".d.mts"}
 	case strings.HasSuffix(resolved, ".cjs"):
 		stem := strings.TrimSuffix(resolved, ".cjs")
-		return []string{stem + ".cts", stem + ".d.cts", stem + ".cjs"}
+		return []string{stem + ".cts", stem + ".cjs", stem + ".d.cts"}
 	case strings.HasSuffix(resolved, ".jsx"):
 		stem := strings.TrimSuffix(resolved, ".jsx")
-		return []string{stem + ".tsx", stem + ".d.ts", stem + ".jsx"}
+		return []string{stem + ".tsx", stem + ".jsx", stem + ".d.ts"}
 	case strings.HasSuffix(resolved, ".js"):
 		stem := strings.TrimSuffix(resolved, ".js")
-		return []string{stem + ".ts", stem + ".tsx", stem + ".d.ts", stem + ".js"}
+		return []string{stem + ".ts", stem + ".tsx", stem + ".js", stem + ".d.ts"}
 	default:
 		return nil
 	}
+}
+
+func isTSDeclarationPath(path string) bool {
+	base := filepath.Base(path)
+	return strings.Contains(base, ".d.")
 }
 
 // buildImportSymbols returns locally-bound import name → canonical symbol name
@@ -2669,6 +2747,9 @@ func bindImportedSymbol(moduleDir, indexPath, exportName, resolved string, found
 			name := exportName
 			if kind == followOne && orig != "" {
 				name = orig
+			}
+			if name == "default" {
+				name = fileSymbolName(leaf)
 			}
 			target = factpath.Dir(leaf) + "." + name
 		}
@@ -3052,6 +3133,22 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 		Props:     map[string]any{"language": "typescript"},
 		Relations: targets,
 	}}
+}
+
+func ensureFileRef(ff []facts.Fact, relFile string) []facts.Fact {
+	relFile = filepath.ToSlash(relFile)
+	for _, f := range ff {
+		if (f.Kind == facts.KindFileRef || f.Kind == facts.KindTestRef) && filepath.ToSlash(f.Name) == relFile {
+			return ff
+		}
+	}
+	return append(ff, facts.Fact{
+		Kind:  facts.KindFileRef,
+		Name:  relFile,
+		File:  relFile,
+		Line:  1,
+		Props: map[string]any{"language": "typescript"},
+	})
 }
 
 // tsTestSuffixes are the co-located TypeScript test/spec suffixes that
