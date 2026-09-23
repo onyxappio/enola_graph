@@ -1,0 +1,241 @@
+{
+  "label": "single sequential shared-host comparison; baseline initialized at same parent; candidate cold oracle",
+  "binary_sha256": "906e4d3c6d1bbb47703c33134072456d9382eff20d511d58303f7dd8223ad45d",
+  "initial": {
+    "exit": 0,
+    "wall_s": 27.517,
+    "sink": "file",
+    "parsed": 4016,
+    "cached": 0,
+    "files_read": 4068,
+    "generation": [
+      0,
+      1
+    ],
+    "owners_published": 4934,
+    "events": 2645,
+    "run_id": "product-scope-scope-bench-1-1790153743687894000"
+  },
+  "delta": {
+    "exit": 0,
+    "wall_s": 16.83,
+    "sink": "file",
+    "parsed": 1601,
+    "cached": 2486,
+    "files_read": 1601,
+    "generation": [
+      1,
+      2
+    ],
+    "owners_published": 2295,
+    "events": 1372,
+    "run_id": "product-scope-scope-bench-2-1790153775227181000",
+    "manifest": {
+      "begin_count": 2295,
+      "begin_digest": "df3e080d574c601a9433b26f3b0cc3e0a68214b6f0545ee2f228eb86555acc7f",
+      "begin_schema": "enola.graph.v2",
+      "begin_generation": [
+        1,
+        2
+      ],
+      "end_batch_count": 1370,
+      "end_batch_digest": "d688a5273d2cf81c8322eda37515133aaa35dfcc58e68c0a5ea0a0e68a535c91",
+      "end_owner_scope_len": 2295,
+      "end_owner_scope_digest": "df3e080d574c601a9433b26f3b0cc3e0a68214b6f0545ee2f228eb86555acc7f",
+      "batch_seq_count": 1370,
+      "batch_phase_set": [
+        "resolved"
+      ]
+    }
+  },
+  "begin_count": 2295,
+  "graph_hash_equal": true,
+  "candidate_result": {
+    "id": "00-fec1eac346c4..9fc7ae5b4c3f",
+    "index": 0,
+    "parent": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+    "child": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+    "changed_file_count": 8125,
+    "required_owner_count": 17,
+    "required_owners_sample": [
+      "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingWelcome.tsx",
+      "file:apps/mobile/src/components/figma/cards/ListCardHeader.tsx",
+      "file:apps/mobile/src/components/figma/device/PointRowAction.tsx",
+      "file:apps/mobile/src/screens/train/TrainRuntimeScreen.tsx",
+      "file:apps/mobile/src/visual-diff/collapsedComponentVisibleText.ts",
+      "file:apps/mobile/src/visual-diff/componentActualBoundsDiff.ts",
+      "file:apps/mobile/src/visual-diff/componentLayoutMaskDiff.ts",
+      "file:apps/mobile/src/visual-diff/componentSlotOwnership.ts",
+      "file:apps/mobile/src/visual-diff/figmaMarkerManifest.ts",
+      "file:apps/mobile/src/visual-diff/figmaMarkerOwnership.ts",
+      "file:apps/mobile/src/visual-diff/gateEvaluatorOwnership.ts",
+      "file:apps/mobile/src/visual-diff/gateInputsHash.ts",
+      "file:apps/mobile/src/visual-diff/gateSourceClosure.ts",
+      "file:apps/mobile/src/visual-diff/gateStructureEval.ts",
+      "file:apps/mobile/src/visual-diff/screenComponentGateClosure.ts",
+      "file:apps/mobile/src/visual-diff/screenGateWaivers.ts",
+      "file:docs/engineering/sot-conflicts/2026-09-19-train-intentional-runtime-divergences.md"
+    ],
+    "delta": {
+      "exit": 0,
+      "wall_s": 16.387,
+      "sink": "file",
+      "parsed": 69,
+      "cached": 4001,
+      "files_read": 69,
+      "generation": [
+        1,
+        2
+      ],
+      "owners_published": 2266,
+      "events": 1330,
+      "run_id": "product-scope-scope-bench-2-1790153643180007000",
+      "manifest": {
+        "begin_count": 2266,
+        "begin_digest": "6479174881b35b37059b3cddb75cb4fd4321c47e569db34c0a0e231c04b3c7ee",
+        "begin_schema": "enola.graph.v2",
+        "begin_generation": [
+          1,
+          2
+        ],
+        "end_batch_count": 1328,
+        "end_batch_digest": "af2a9c83cdb57572aa85f0aa0c6a1ecb0d4b14072aea4ad95a96cfdf15ba9232",
+        "end_owner_scope_len": 2266,
+        "end_owner_scope_digest": "6479174881b35b37059b3cddb75cb4fd4321c47e569db34c0a0e231c04b3c7ee",
+        "batch_seq_count": 1328,
+        "batch_phase_set": [
+          "resolved"
+        ]
+      }
+    },
+    "cold": {
+      "exit": 0,
+      "wall_s": 28.155,
+      "sink": "file",
+      "parsed": 4018,
+      "cached": 0,
+      "files_read": 4070,
+      "generation": [
+        0,
+        1
+      ],
+      "owners_published": 4937,
+      "events": 2646,
+      "run_id": "product-scope-scope-bench-1-1790153694406298000",
+      "manifest": {
+        "begin_count": 8458,
+        "begin_digest": "8edc48d5e5a73e35b2f43046b511bd0fa07fde0afb3dbcd05bb2cc550788273d",
+        "begin_schema": "enola.graph.v2",
+        "begin_generation": [
+          0,
+          1
+        ],
+        "end_batch_count": 2644,
+        "end_batch_digest": "ec7bf097ba5fb66e4da1957a9c665a5aecf5e32a644ee75360be55a4b2831e27",
+        "end_owner_scope_len": 8458,
+        "end_owner_scope_digest": "8edc48d5e5a73e35b2f43046b511bd0fa07fde0afb3dbcd05bb2cc550788273d",
+        "batch_seq_count": 2644,
+        "batch_phase_set": [
+          "resolved"
+        ]
+      }
+    },
+    "begin_scope_count": 2266,
+    "necessary_owner_count": 17,
+    "necessary_owners_sample": [
+      "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingWelcome.tsx",
+      "file:apps/mobile/src/components/figma/cards/ListCardHeader.tsx",
+      "file:apps/mobile/src/components/figma/device/PointRowAction.tsx",
+      "file:apps/mobile/src/screens/train/TrainRuntimeScreen.tsx",
+      "file:apps/mobile/src/visual-diff/collapsedComponentVisibleText.ts",
+      "file:apps/mobile/src/visual-diff/componentActualBoundsDiff.ts",
+      "file:apps/mobile/src/visual-diff/componentLayoutMaskDiff.ts",
+      "file:apps/mobile/src/visual-diff/componentSlotOwnership.ts",
+      "file:apps/mobile/src/visual-diff/figmaMarkerManifest.ts",
+      "file:apps/mobile/src/visual-diff/figmaMarkerOwnership.ts",
+      "file:apps/mobile/src/visual-diff/gateEvaluatorOwnership.ts",
+      "file:apps/mobile/src/visual-diff/gateInputsHash.ts",
+      "file:apps/mobile/src/visual-diff/gateSourceClosure.ts",
+      "file:apps/mobile/src/visual-diff/gateStructureEval.ts",
+      "file:apps/mobile/src/visual-diff/screenComponentGateClosure.ts",
+      "file:apps/mobile/src/visual-diff/screenGateWaivers.ts",
+      "file:docs/engineering/sot-conflicts/2026-09-19-train-intentional-runtime-divergences.md"
+    ],
+    "extra_begin_owner_count": 2249,
+    "extra_begin_owners_sample": [
+      "file:.deepsec/AGENTS.md",
+      "file:.deepsec/README.md",
+      "file:.deepsec/data/product/INFO.md",
+      "file:.deepsec/data/product/SETUP.md",
+      "file:.t191-coder-brief.md",
+      "file:.t191-coder-done.md",
+      "file:.t191-orchestrator-brief.md",
+      "file:.t191-review-1.md",
+      "file:.t191-reviewer-brief.md",
+      "file:.t198-orchestrator-brief.md",
+      "file:.t227-coder-status.md",
+      "file:.t284-badge-banner-3699-24547-assignment7-report.md",
+      "file:.t284-bottom-sheet-content-assignment1-report.md",
+      "file:.t284-clock-correction-pass-report.md",
+      "file:.t284-illustration-on-3578-31962-approve-with-residual-floor.md",
+      "file:.t284-illustration-on-3578-31962-css-frost-residual-floor.md",
+      "file:.t284-illustration-on-3578-31962-exact-gate-resume-report.md",
+      "file:.t284-illustration-on-3578-31962-frost-css-correction-report.md",
+      "file:.t284-illustration-on-3578-31962-live-inset-gate-report.md",
+      "file:.t284-illustration-on-3578-31962-rim-inset-correction-report.md",
+      "file:.t284-indicator-default-medium-assignment-report.md",
+      "file:.t284-indicator-default-medium-correction-report.md",
+      "file:.t284-journey-blockers-report.md",
+      "file:.t284-navigation-progress-bar-group-counter-assignment5-report.md",
+      "file:.t284-phase1-gates-journeys-independence.md"
+    ],
+    "graph_hash_equal": true,
+    "kind": "delta",
+    "completed_generation": 2,
+    "sink": "file",
+    "blocker": null
+  },
+  "events_correction": "delta event count selected by run_id; original helper counted initial+delta together",
+  "candidate_build": {
+    "experimental": true,
+    "source_manifest": "/tmp/enola-scope-review-snapshot-2/sources.json",
+    "overlay": "/tmp/enola-scope-review-snapshot-2/overlay.json",
+    "root_head": "a1319d4a35a7bf7a265bf5bdc96e1df445463ac4",
+    "binary_sha256": "69c72b84ce18853b73b037a86fd17c5ba88a4599c862f155aca44181ddf221c9",
+    "build_exit": 0,
+    "note": "Overlay build of captured worker WIP; embedded root VCS revision alone does not identify this binary. Preliminary, not accepted."
+  },
+  "candidate_sources": {
+    "captured_at": 1790153372.84477,
+    "worker_head": "c17be11dea7856d7fe2027b2a5c6f02dae6345b8",
+    "sha256": {
+      "internal/graphsession/invalidate.go": "d7b30b242e3fce9bdd99c5fbf5b5b70fca5ca226c3fc3d20eda393e17cbe4515",
+      "internal/graphsession/invalidation_plan.go": "04f61d5b8bee4023e5c10d72ed889eb895c47df085fdfd4e345d40336b6e5fda",
+      "internal/graphsession/invalidation_plan_test.go": "0e3c7cf52ea9e8306ea0ebbb92485675c7b15970cf797bbba8dc5337ebeb3f23",
+      "internal/graphsession/raw_config_scope_regression_test.go": "aab4f3fae252be2e2e88eef2dafca3ab5b971a195ffe51b4724ec34098f462d7",
+      "internal/graphsession/session.go": "e2a85544c512e8305c8f8ab0de78a23523fbc93de294baa10ba064923e65b10c",
+      "internal/graphsession/body_scope_regression_test.go": "f5e67772854a01060ceeef4437653bbca54cf77ac0d086c9ec39e08dc63fa508"
+    }
+  },
+  "candidate_targeted_tests": {
+    "command": [
+      "/tmp/enola-toolchain/go/bin/go",
+      "test",
+      "-overlay",
+      "/tmp/enola-scope-review-snapshot-2/overlay.json",
+      "./internal/graphsession",
+      "-run",
+      "TestBodyScope|TestRawConfigVersionBumpWithSourceEditKeepsBeginBounded",
+      "-count=1"
+    ],
+    "exit": 0,
+    "elapsed_s": 20.988746042000002
+  },
+  "acceptance": "NOT ACCEPTED: existing reexport-rename cold-equivalence regression remains; performance gain unproven",
+  "candidate_begin_by_extension": {
+    ".md": 633,
+    ".ts": 876,
+    ".tsx": 756,
+    ".js": 1
+  }
+}
