@@ -33,6 +33,7 @@ import (
 // test functions that assert the behavior that version introduced. v1 is the
 // implicit baseline (no changelog line), so coverage starts at v2.
 var versionCoverage = map[int][]string{
+	286: {"TestServerRoutes_UnknownAliasLocalDoesNotInheritFactory"},
 	285: {"TestExtract_NuxtRegisteredModuleAutoImportsWhenModulePackageIsNuxt", "TestExtract_NuxtRegisteredModuleAutoImportsDoNotLeakToUnrelatedApp", "TestServerRoutes_LocalVarShadowDoesNotInheritFactory"},
 	284: {"TestServerRoutes_ParameterShadowDoesNotInheritFactory", "TestExtract_NuxtAutoImportDoesNotBindSiblingVuePackage", "TestExtract_TwoNuxtAppsBindOwnComposables", "TestExtract_NuxtExplicitMissingImportNotOverriddenByAutoImport", "TestPublishedPackageExportsTargetChangeDeltaEqualsCold", "TestPublishedNuxtAutoImportRenameDeltaEqualsCold"},
 	283: {"TestExtract_PackageJSONExportsSubpathAndExistingTypes", "TestExtract_PackageJSONExportsSkipsMissingDistTypes", "TestStorage_OwningPackageDrizzleDoesNotLeakToSiblings", "TestExtract_NuxtAutoImportsNonUseUtilsAndAddImportsDir", "TestServerRoutes_FastifyRouteObjectLiteral", "TestExtract_NewImportedClassInstantiates"},

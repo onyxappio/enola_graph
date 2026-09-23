@@ -648,48 +648,291 @@ func serverLexicalScopes(src []byte) []fastifyParamScope {
 	)
 }
 
-var localVarBinding = regexp.MustCompile(`(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*(?::[^=;]*)?=\s*`)
-
 var localFactoryRHS = regexp.MustCompile(`^(?:new\s+)?(express|fastify|Fastify|Hono|Koa)\s*\(`)
 var localRouterRHS = regexp.MustCompile(`^(?:new\s+)?(?:express\s*\.\s*Router|Router)\s*\(`)
 
+// collectLocalBindingScopes records const/let/var (including destructuring)
+// identifiers as lexical shadows of same-named outer receivers. A local name is
+// a proven server receiver only when its initializer is a recognized app
+// factory. Unknown, alias, object, and router RHS still occupy the scope so
+// they cannot inherit an unrelated outer factory of the same name.
 func collectLocalBindingScopes(src []byte) []fastifyParamScope {
 	mask := tsCommentStringMask(src)
 	var out []fastifyParamScope
-	for _, m := range localVarBinding.FindAllSubmatchIndex(src, -1) {
-		if mask[m[0]] {
+	i := 0
+	for i < len(src) {
+		if mask[i] {
+			i++
 			continue
 		}
-		name := string(src[m[2]:m[3]])
-		rhs := m[1]
-		end := enclosingBlockEnd(src, mask, m[0])
-		if end < rhs {
+		kw, ok := localDeclKeywordAt(src, i)
+		if !ok {
+			i++
 			continue
 		}
-		rest := src[rhs:]
-		if localRouterRHS.Match(rest) {
-			continue
-		}
-		b := serverBinding{}
-		if fm := localFactoryRHS.FindSubmatch(rest); fm != nil {
-			b = serverBinding{framework: frameworkOf[string(fm[1])], mounted: true}
-		} else {
-			i := 0
-			for i < len(rest) && (rest[i] == ' ' || rest[i] == '\t' || rest[i] == '\n' || rest[i] == '\r') {
-				i++
+		declStart := i
+		i += len(kw)
+		blockEnd := enclosingBlockEnd(src, mask, declStart)
+		for i < len(src) && i < blockEnd {
+			i = skipTSSpace(src, mask, i)
+			if i >= len(src) || i >= blockEnd {
+				break
 			}
-			if i >= len(rest) || rest[i] != '{' {
+			if src[i] == ';' {
+				i++
+				break
+			}
+			names, next, ok := parseBindingPattern(src, mask, i)
+			if !ok {
+				break
+			}
+			i = skipTSSpace(src, mask, next)
+			if i < len(src) && src[i] == ':' {
+				i = skipTSTypeAnnot(src, mask, i)
+				i = skipTSSpace(src, mask, i)
+			}
+			rhs := i
+			b := serverBinding{}
+			if i < len(src) && src[i] == '=' {
+				i++
+				i = skipTSSpace(src, mask, i)
+				rhs = i
+				rest := src[i:]
+				if fm := localFactoryRHS.FindSubmatch(rest); fm != nil && !localRouterRHS.Match(rest) {
+					b = serverBinding{framework: frameworkOf[string(fm[1])], mounted: true}
+				}
+				i = skipTSInitializer(src, mask, i, blockEnd)
+			}
+			if rhs > blockEnd {
+				break
+			}
+			// File-scope unmounted bindings (routers, unknown aliases) must not
+			// occupy the whole file: same-file app.use mounts live in
+			// serverBindings, and a file-wide empty shadow would hide them.
+			if !b.mounted && blockEnd >= len(src) {
+				i = skipTSSpace(src, mask, i)
+				if i < len(src) && src[i] == ',' {
+					i++
+					continue
+				}
+				break
+			}
+			for _, name := range names {
+				out = append(out, fastifyParamScope{
+					name:    name,
+					start:   rhs,
+					end:     blockEnd,
+					binding: b,
+				})
+			}
+			i = skipTSSpace(src, mask, i)
+			if i < len(src) && src[i] == ',' {
+				i++
 				continue
 			}
+			break
 		}
-		out = append(out, fastifyParamScope{
-			name:    name,
-			start:   rhs,
-			end:     end,
-			binding: b,
-		})
 	}
 	return out
+}
+
+func localDeclKeywordAt(src []byte, i int) (string, bool) {
+	for _, kw := range []string{"const", "let", "var"} {
+		if i+len(kw) > len(src) {
+			continue
+		}
+		if string(src[i:i+len(kw)]) != kw {
+			continue
+		}
+		if i > 0 && isJSIdentPart(src[i-1]) {
+			continue
+		}
+		if i+len(kw) < len(src) && isJSIdentPart(src[i+len(kw)]) {
+			continue
+		}
+		return kw, true
+	}
+	return "", false
+}
+
+func skipTSSpace(src []byte, mask []bool, i int) int {
+	for i < len(src) {
+		if mask[i] || src[i] == ' ' || src[i] == '\t' || src[i] == '\n' || src[i] == '\r' {
+			i++
+			continue
+		}
+		break
+	}
+	return i
+}
+
+func parseBindingPattern(src []byte, mask []bool, i int) ([]string, int, bool) {
+	i = skipTSSpace(src, mask, i)
+	if i >= len(src) {
+		return nil, i, false
+	}
+	if isJSIdentStart(src[i]) {
+		start := i
+		i++
+		for i < len(src) && isJSIdentPart(src[i]) {
+			i++
+		}
+		return []string{string(src[start:i])}, i, true
+	}
+	if src[i] != '{' && src[i] != '[' {
+		return nil, i, false
+	}
+	open := src[i]
+	close := byte('}')
+	if open == '[' {
+		close = ']'
+	}
+	depth := 0
+	var names []string
+	i++
+	for i < len(src) {
+		if mask[i] {
+			i++
+			continue
+		}
+		c := src[i]
+		if c == open {
+			depth++
+			i++
+			continue
+		}
+		if c == close {
+			if depth == 0 {
+				return names, i + 1, true
+			}
+			depth--
+			i++
+			continue
+		}
+		if depth == 0 && isJSIdentStart(c) {
+			start := i
+			i++
+			for i < len(src) && isJSIdentPart(src[i]) {
+				i++
+			}
+			j := skipTSSpace(src, mask, i)
+			if j < len(src) && src[j] == ':' {
+				i = j
+				continue
+			}
+			names = append(names, string(src[start:i]))
+			continue
+		}
+		i++
+	}
+	return nil, i, false
+}
+
+func skipTSTypeAnnot(src []byte, mask []bool, i int) int {
+	if i >= len(src) || src[i] != ':' {
+		return i
+	}
+	i++
+	depthParen, depthBrace, depthBrack, depthAngle := 0, 0, 0, 0
+	for i < len(src) {
+		if mask[i] {
+			i++
+			continue
+		}
+		switch src[i] {
+		case '(':
+			depthParen++
+		case ')':
+			if depthParen > 0 {
+				depthParen--
+			}
+		case '{':
+			depthBrace++
+		case '}':
+			if depthBrace > 0 {
+				depthBrace--
+			}
+		case '[':
+			depthBrack++
+		case ']':
+			if depthBrack > 0 {
+				depthBrack--
+			}
+		case '<':
+			depthAngle++
+		case '>':
+			if depthAngle > 0 {
+				depthAngle--
+			}
+		case '=', ',', ';':
+			if depthParen+depthBrace+depthBrack+depthAngle == 0 {
+				return i
+			}
+		}
+		i++
+	}
+	return i
+}
+
+func skipTSInitializer(src []byte, mask []bool, i, limit int) int {
+	depthParen, depthBrace, depthBrack := 0, 0, 0
+	for i < len(src) && i < limit {
+		if mask[i] {
+			i++
+			continue
+		}
+		c := src[i]
+		depth := depthParen + depthBrace + depthBrack
+		if depth == 0 {
+			if c == ',' || c == ';' {
+				return i
+			}
+			if c == '}' {
+				return i
+			}
+			if c == '\n' {
+				j := skipTSSpace(src, mask, i+1)
+				if j >= len(src) || j >= limit {
+					return i
+				}
+				if !exprContinues(src[j]) {
+					return i
+				}
+			}
+		}
+		switch c {
+		case '(':
+			depthParen++
+		case ')':
+			if depthParen > 0 {
+				depthParen--
+			}
+		case '{':
+			depthBrace++
+		case '}':
+			if depthBrace > 0 {
+				depthBrace--
+			} else {
+				return i
+			}
+		case '[':
+			depthBrack++
+		case ']':
+			if depthBrack > 0 {
+				depthBrack--
+			}
+		}
+		i++
+	}
+	return i
+}
+
+func exprContinues(c byte) bool {
+	switch c {
+	case '.', '(', '[', '+', '-', '*', '/', '%', '&', '|', '?', ':', '`', '<', '>', '=', '!':
+		return true
+	}
+	return false
 }
 
 func enclosingBlockEnd(src []byte, mask []bool, pos int) int {

@@ -2470,7 +2470,10 @@ import (
 // auto-import declaration names participate in incremental invalidation.
 // v285: Nuxt registered-module addImportsDir visible to consuming apps when the
 // module package is itself Nuxt; Fastify local-variable lexical shadows.
-const cacheVersion = "v285"
+// v286: Fastify local const/let/var/destructuring bindings always lexically
+// shadow outer same-name factories; only a proven local app-factory RHS is a
+// server receiver (unknown/alias RHS does not inherit outer bindings).
+const cacheVersion = "v286"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //
