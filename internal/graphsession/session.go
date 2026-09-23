@@ -233,6 +233,16 @@ type session struct {
 	// preparedMD is the mdintent extraction this run made before Begin to plan
 	// the manifest with; see prepareMDScope.
 	preparedMD *preparedMD
+	// preparedNonTS holds one pre-Begin extraction per non-TypeScript extractor
+	// previewed to close its candidate names; see prepareNonTSCandidateScope.
+	// The extraction site consumes it instead of reading the tree again.
+	preparedNonTS map[string][]facts.Fact
+	// previewFences re-prove, before a successful End, that each previewed
+	// extractor's declared context is still the one this run planned from.
+	// capturedSources compares bytes it managed to read; these compare the
+	// context digest, so a lockfile that appeared, vanished or became
+	// unreadable mid-run is caught too.
+	previewFences []func() error
 }
 
 func (s *session) analyze(ctx context.Context) (*Result, error) {
@@ -248,6 +258,8 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	// A run that failed between preview and consumption must not hand its
 	// extraction to the next one: the tree has moved on since.
 	s.preparedMD = nil
+	s.preparedNonTS = nil
+	s.previewFences = nil
 	var err error
 	input := s.inputs
 	if !s.fast {
@@ -469,7 +481,18 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			// Initial/global-context changes still require the complete domain.
 			// For an ordinary content delta, derive the manifest from changed
 			// files plus reverse file-to-file dependents in the prior state.
-			wholeDomain := initial || forceAll || s.state == nil || configChanged || s.state.ConfigHash != cfgHash || s.state.PolicyIdentity != input.policyIdentity || incompleteDependencyRecords(prevFiles)
+			wholeDomain := initial || forceAll || s.state == nil || configChanged || s.state.PolicyIdentity != input.policyIdentity || incompleteDependencyRecords(prevFiles)
+			// A raw configuration byte change is not by itself a reason to
+			// replace every owner. It is a reason to do so when no active
+			// consumer can prove a smaller boundary for it; rawConfigScopeBounded
+			// states that proof. The fingerprint, its stored value and the
+			// post-Begin rechecks against it are untouched either way.
+			if !wholeDomain && s.state.ConfigHash != cfgHash {
+				if bounded, reason := s.rawConfigScopeBounded(haveCache, input, detectedExt, prevFiles); !bounded {
+					wholeDomain = true
+					fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "configuration inputs changed; " + reason})
+				}
+			}
 			if !wholeDomain && s.state != nil && s.state.FrameworkSig != "" {
 				need, ferr := s.frameworkDirtyRequiresFullScope(inv.Files, prevFiles, hashes, angular)
 				if ferr != nil {
@@ -532,6 +555,22 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 								extraOwners = append(extraOwners, filepath.ToSlash(owner.ID))
 							}
 						}
+						// The seed says which files this extractor writes. It does
+						// not say which owners its output moves: Fact.Name resolves
+						// globally, so a new, removed or newly ambiguous candidate
+						// retargets references in files that are otherwise untouched
+						// and that no import edge connects to the change. Close over
+						// them here or the frozen plan cannot carry them.
+						closure, closed, cerr := s.prepareNonTSCandidateScope(ctx, ext, inv.Files, prevFiles, hashes, repoID)
+						if cerr != nil {
+							return nil, cerr
+						}
+						if !closed {
+							wholeDomain = true
+							fallbacks = append(fallbacks, graphstream.Fallback{Extractor: name, Scope: "all prior/current file owners", Reason: "extractor contribution cannot be previewed before Begin; its candidate names cannot be bounded"})
+							break
+						}
+						extraOwners = append(extraOwners, closure...)
 						break
 					}
 				}
@@ -553,6 +592,24 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 						h, ok := lookupHash(hashes, f)
 						if tsextractor.IsSessionSource(f, false) && (st == nil || !ok || st.Hash != h || st.Unreadable || recMissing(st)) {
 							dirty[filepath.ToSlash(f)] = true
+						}
+					}
+					// A configuration edit can move a byte-unchanged source's own
+					// semantic context: the package it belongs to, the alias roots
+					// its specifiers resolve against. The extraction site already
+					// reparses on exactly this comparison, but it runs after Begin,
+					// so the same files have to be in the frozen plan or the run
+					// fails closed on a reparse it decided on itself. They are
+					// seeded as owners too: their facts are replaced, and
+					// planFileInvalidation reverse-closes their dependents.
+					if s.eng.GraphScope() != nil && s.state != nil {
+						for _, f := range current {
+							st := lookupState(prevFiles, f)
+							if st == nil || st.TS == nil || s.state.TSFileContext[f] == input.tsFileContext[f] {
+								continue
+							}
+							dirty[filepath.ToSlash(f)] = true
+							extraOwners = append(extraOwners, filepath.ToSlash(f))
 						}
 					}
 					for _, f := range membership.rebound {
@@ -1091,8 +1148,15 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			// could contradict the manifest already frozen from it.
 			prepared := s.takePreparedMD(ext.Name())
 			var extracted []facts.Fact
+			reused, wasPreviewed := s.takePreparedNonTS(ext.Name())
 			if prepared != nil {
 				extracted = prepared.facts
+			} else if wasPreviewed {
+				// Planned from this output; re-running would read a tree that may
+				// have moved and could contradict the frozen manifest. Its owners
+				// were seeded conservatively, so unlike a narrowed preview it still
+				// derives replacement owners the ordinary way below.
+				extracted = reused
 			} else {
 				out, err := ext.Extract(ctx, s.abs, inv.Files)
 				graphprofile.Since("non_ts_extract", tExt, fmt.Sprintf("%s facts=%d", ext.Name(), len(out)))
@@ -1458,6 +1522,11 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		disk, rerr := os.ReadFile(filepath.Join(s.abs, rel))
 		if rerr != nil || !bytes.Equal(disk, src) {
 			return nil, fmt.Errorf("%w: source/config bytes changed during the run (%s); refusing successful EndReplace", ErrInputsChanged, rel)
+		}
+	}
+	for _, fence := range s.previewFences {
+		if err := fence(); err != nil {
+			return nil, err
 		}
 	}
 	if s.validateEffective != nil {

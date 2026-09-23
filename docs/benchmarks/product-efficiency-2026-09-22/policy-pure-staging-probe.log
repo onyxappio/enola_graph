@@ -1,0 +1,8 @@
+=== RUN   TestRootProbePureStagingAlreadyAnalyzedSource
+    root_policy_membership_probe_test.go:27: pure staging owners=[package.json src/alone.ts src/leaf.ts src/new-independent.ts src/use.ts tsconfig.json] policy=true parsed=0 generation=1->2 fallback="frozen scope: global name-resolution domain"
+--- PASS: TestRootProbePureStagingAlreadyAnalyzedSource (1.63s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	2.127s
+real 3.46
+user 2.76
+sys 1.33

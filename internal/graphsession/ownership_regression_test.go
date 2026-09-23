@@ -2,6 +2,7 @@ package graphsession
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -422,3 +423,52 @@ func TestSharedPathKeepsBothExtractorFacts(t *testing.T) {
 var _ plugin.Extractor = stubExtractor{}
 var _ plugin.Extractor = fileOwnerStub{}
 var _ plugin.Extractor = noOwnerExtractor{}
+
+// capturingStub is a file-owning extractor that declares its content inputs and
+// can compile from a snapshot of them, which is what the pre-Begin candidate
+// closure requires before it will preview an extractor at all. Real extractors
+// that cannot do this keep the conservative whole domain, so a fixture standing
+// in for one that can has to declare the same thing.
+type capturingStub struct {
+	stubExtractor
+	extracted *int
+}
+
+func (c capturingStub) OwnsFile(rel string) bool     { return strings.HasSuffix(rel, c.suffix) }
+func (c capturingStub) ContentInput(rel string) bool { return c.OwnsFile(rel) }
+func (c capturingStub) NameSetInput() bool           { return false }
+
+func (c capturingStub) CaptureInputs(repoPath string, files []string) (map[string][]byte, error) {
+	src := map[string][]byte{}
+	for _, f := range files {
+		if !c.ContentInput(f) {
+			continue
+		}
+		b, err := os.ReadFile(filepath.Join(repoPath, f))
+		if err != nil {
+			return nil, err
+		}
+		src[filepath.ToSlash(f)] = b
+	}
+	return src, nil
+}
+
+func (c capturingStub) ExtractCaptured(ctx context.Context, repoPath string, files []string, src map[string][]byte) ([]facts.Fact, error) {
+	if c.extracted != nil {
+		*c.extracted++
+	}
+	var out []facts.Fact
+	for _, f := range files {
+		rel := filepath.ToSlash(f)
+		if !c.ContentInput(rel) {
+			continue
+		}
+		if _, ok := src[rel]; !ok {
+			return nil, fmt.Errorf("%s is not in the capture", rel)
+		}
+		if c.fact != nil {
+			out = append(out, c.fact(rel)...)
+		}
+	}
+	return out, nil
+}

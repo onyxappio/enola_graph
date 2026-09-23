@@ -1,0 +1,1997 @@
+{
+  "status": "experimental snapshot; not final production acceptance",
+  "provenance": {
+    "kind": "experimental-patch",
+    "main_parent": "665f3c959248910e955b14c705a62ff64659f362",
+    "private_unpushed_commit": "6cbad2d9c7526f543db653447c84eedc11b84de4",
+    "files_sha256": {
+      "internal/engine/engine.go": "1950239b8059f8f6763c539ac40e0c3a883d89a1cbb7b2be136f640f911597fc",
+      "internal/graphsession/session.go": "d6f8df3b6817e9fb3ea01e3173e98a2896bbb4090c24fc655c542fc5d906d497",
+      "internal/graphsession/config_scope.go": "02066807176e5710c5a29e1ce0d37aa11b5dc3ac33bcf07be6ddc9e66b4fa49b",
+      "internal/graphsession/nonts_candidate_scope.go": "5d44264dcbc1b7f2e266b0f997d0070b14d391ca368ec699bb33da5810eaad48",
+      "internal/extractors/manifestextractor/manifest.go": "5d3eecc177d5e2953ab9db419b5707c0189704a109527a9cb6986c979175a76f",
+      "internal/extractors/manifestextractor/delta.go": "9e3cb372cf2a4e17bb907aef7adc5a0dfdf770dcb0fa673a01e8ab01d248bbc1"
+    },
+    "snapshot": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/config-exploratory-1-snapshot",
+    "exit_code": 0,
+    "build_wall_seconds": 11.855
+  },
+  "summary": {
+    "label": "config-exploratory-watch-1",
+    "correctness": "exact cold equality PASS",
+    "timing_requires_repeated_comparison": true,
+    "host_sampling_available": true,
+    "sampled_go_test_contention": true,
+    "contention_samples": 47,
+    "contention_samples_before_delta_applied": 23,
+    "contention_note": "Whole-run contention includes idle observation and final cold verification after the measured initial/delta.",
+    "initial_launch_to_consumer_ms": 16544.145,
+    "fsync_to_consumer_ms": 7744.806,
+    "begin_to_end_ms": 933.06,
+    "owners": 33,
+    "batches": 3,
+    "payload_bytes": 73238,
+    "parsed_ts_files": 1,
+    "graph_nodes_delta": 1,
+    "graph_edges_delta": 1,
+    "stable_input_files": 45106,
+    "timestamp_basis": "script fsync completion to observer consumer-applied timestamp",
+    "sampling_limitation": "5-second Go/test process samples; absence does not prove no other host load"
+  },
+  "writes": [
+    {
+      "path": "packages/tracking-client/package.json",
+      "write_start_ns": 1790140967718303000,
+      "fsync_end_ns": 1790140967739305000,
+      "before_sha256": "83dff407d6199086f058b1ffff3c1b0f48203a8a31ea713439bbb0f95d0ab902",
+      "after_sha256": "6d9408ee6391aa4c7a3f61009a7790df4d906ff9c3ba7a09969dbea6d576ecac"
+    },
+    {
+      "path": "packages/tracking-client/src/index.ts",
+      "write_start_ns": 1790140967739409000,
+      "fsync_end_ns": 1790140967759279000,
+      "before_sha256": "8547259aef2af2e7d65b1b245a7a32f75f9fb1c4f618dc0d18ea1e8b176e273d",
+      "after_sha256": "7c5b02ba58dcd7da710ba65f9396923f69c4c7baa7dc08234c17a191cb675b2f"
+    }
+  ],
+  "generations": [
+    {
+      "generation": 1,
+      "base_generation": 0,
+      "run_id": "watch-bench-soak-watch-1-1790140945977427000",
+      "context": "soak-watch",
+      "owner_scope_count": 8645,
+      "scope_mode": "complete",
+      "latest_observed_save_ns": null,
+      "latest_observed_save_start_ns": null,
+      "latest_observed_save_path": null,
+      "observation_basis": null,
+      "pairing_is_causal": false,
+      "begin_ns": 1790140946051461000,
+      "first_batch_ns": 1790140949701561000,
+      "broker_end_ns": 1790140959255626000,
+      "consumer_end_ns": 1790140959339089000,
+      "write_to_durable_ms": null,
+      "time_since_latest_observed_save_at_begin_ms": null,
+      "begin_to_first_batch_ms": 3650.1,
+      "begin_to_end_ms": 13204.165,
+      "end_to_consumer_ms": 83.463,
+      "time_since_latest_observed_save_at_consumer_ms": null,
+      "telemetry_available": true,
+      "generation_kind": "initial",
+      "messages_observed": 2691,
+      "batches_observed": 2689,
+      "batch_count_end": 2689,
+      "batch_count_matches_end": true,
+      "node_records_sent": 69311,
+      "edge_records_sent": 171954,
+      "node_records_sent_resolved": 69311,
+      "edge_records_sent_resolved": 171954,
+      "payload_bytes_begin": 831690,
+      "payload_bytes_batches": 77389904,
+      "payload_bytes_end": 1201,
+      "payload_bytes_total": 78222795,
+      "payload_bytes_basis": "json_payload_bytes_including_begin_and_end_excluding_broker_framing",
+      "graph_nodes_total": 69311,
+      "graph_edges_total": 171954,
+      "graph_nodes_delta": 69311,
+      "graph_edges_delta": 171954,
+      "completeness_status": "success",
+      "completeness_files_analyzed": 11127,
+      "completeness_parsed_files": 4144,
+      "completeness_cached_files": 0,
+      "completeness_summary_scans": 0,
+      "completeness_early_local": false,
+      "completeness_files_unreadable": 0,
+      "completeness_fallbacks": 6
+    },
+    {
+      "generation": 2,
+      "base_generation": 1,
+      "run_id": "watch-bench-soak-watch-2-1790140974195585000",
+      "context": "soak-watch",
+      "owner_scope_count": 33,
+      "scope_mode": "complete",
+      "latest_observed_save_ns": 1790140967749045490,
+      "latest_observed_save_start_ns": null,
+      "latest_observed_save_path": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/config-exploratory-watch-1/product-live/packages/tracking-client/src/index.ts",
+      "observation_basis": "filesystem-mtime",
+      "pairing_is_causal": false,
+      "begin_ns": 1790140974570599000,
+      "first_batch_ns": 1790140974934638000,
+      "broker_end_ns": 1790140975503659000,
+      "consumer_end_ns": 1790140975504085000,
+      "write_to_durable_ms": null,
+      "time_since_latest_observed_save_at_begin_ms": 6821.554,
+      "begin_to_first_batch_ms": 364.039,
+      "begin_to_end_ms": 933.06,
+      "end_to_consumer_ms": 0.426,
+      "time_since_latest_observed_save_at_consumer_ms": 7755.04,
+      "telemetry_available": true,
+      "generation_kind": "delta",
+      "messages_observed": 5,
+      "batches_observed": 3,
+      "batch_count_end": 3,
+      "batch_count_matches_end": true,
+      "node_records_sent": 139,
+      "edge_records_sent": 42,
+      "node_records_sent_resolved": 139,
+      "edge_records_sent_resolved": 42,
+      "payload_bytes_begin": 2291,
+      "payload_bytes_batches": 70214,
+      "payload_bytes_end": 733,
+      "payload_bytes_total": 73238,
+      "payload_bytes_basis": "json_payload_bytes_including_begin_and_end_excluding_broker_framing",
+      "graph_nodes_total": 69312,
+      "graph_edges_total": 171955,
+      "graph_nodes_delta": 1,
+      "graph_edges_delta": 1,
+      "completeness_status": "success",
+      "completeness_files_analyzed": 11127,
+      "completeness_parsed_files": 1,
+      "completeness_cached_files": 4243,
+      "completeness_summary_scans": 0,
+      "completeness_early_local": false,
+      "completeness_files_unreadable": 0,
+      "completeness_fallbacks": 2
+    }
+  ],
+  "input_stability": {
+    "stable": true,
+    "files_before_cold": 45106,
+    "files_after_cold": 45106,
+    "diff": {
+      "added": [],
+      "modified": [],
+      "deleted": [],
+      "changed_count": 0,
+      "outside_allowlist": []
+    },
+    "scope": "whole-isolated-checkout",
+    "note": "if unstable, the watch and cold graphs read different inputs and the equality result is inconclusive, not a verdict"
+  },
+  "scenario": {
+    "scenario": "version-source",
+    "source_tip": "a609c19f3861971930fae7b33dcb2950598953c5",
+    "timestamp_basis": "fsync-completion",
+    "note": "Scripted two-file edit, not an AI-editor run"
+  },
+  "host_load_samples": [
+    {
+      "ns": 1790140860799819000,
+      "load_average": [
+        10.93896484375,
+        7.0087890625,
+        5.92822265625
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1280,
+          "cpu_percent": 95.8,
+          "executable": "tsextractor.test"
+        },
+        {
+          "pid": 1405,
+          "cpu_percent": 5.2,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 1412,
+          "cpu_percent": 4.4,
+          "executable": "graphstream.test"
+        },
+        {
+          "pid": 2025,
+          "cpu_percent": 1.1,
+          "executable": "providers.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 4.8,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 2433,
+          "cpu_percent": 6.9,
+          "executable": "command.test"
+        },
+        {
+          "pid": 3613,
+          "cpu_percent": 7.3,
+          "executable": "install.test"
+        },
+        {
+          "pid": 3873,
+          "cpu_percent": 7.7,
+          "executable": "go"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 1.9,
+          "executable": "go"
+        },
+        {
+          "pid": 99379,
+          "cpu_percent": 14.1,
+          "executable": "engine.test"
+        }
+      ]
+    },
+    {
+      "ns": 1790140865969055000,
+      "load_average": [
+        11.02392578125,
+        7.09130859375,
+        5.96337890625
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1280,
+          "cpu_percent": 18.2,
+          "executable": "tsextractor.test"
+        },
+        {
+          "pid": 1405,
+          "cpu_percent": 6.9,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2025,
+          "cpu_percent": 3.5,
+          "executable": "providers.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 10.5,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 3873,
+          "cpu_percent": 0.3,
+          "executable": "go"
+        },
+        {
+          "pid": 4370,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.1,
+          "executable": "go"
+        },
+        {
+          "pid": 99379,
+          "cpu_percent": 6.1,
+          "executable": "engine.test"
+        }
+      ]
+    },
+    {
+      "ns": 1790140871146757000,
+      "load_average": [
+        11.26220703125,
+        7.20556640625,
+        6.01025390625
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 6.4,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 6.6,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140876315803000,
+      "load_average": [
+        10.35986328125,
+        7.0859375,
+        5.974609375
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 5.5,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 6.9,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140881514660000,
+      "load_average": [
+        9.60986328125,
+        6.98486328125,
+        5.9453125
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 8.7,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 14.0,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140886695345000,
+      "load_average": [
+        9.640625,
+        7.03466796875,
+        5.96875
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 5.9,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 8.5,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140891870287000,
+      "load_average": [
+        9.7490234375,
+        7.10009765625,
+        5.998046875
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 5.7,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 8.0,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140897055412000,
+      "load_average": [
+        8.87109375,
+        6.99755859375,
+        5.974609375
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 11.0,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 9.3,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140902215908000,
+      "load_average": [
+        8.24072265625,
+        6.89794921875,
+        5.9453125
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 6.6,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 5.2,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140907384786000,
+      "load_average": [
+        7.58056640625,
+        6.783203125,
+        5.91015625
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 5.9,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 8.0,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140912564627000,
+      "load_average": [
+        7.37353515625,
+        6.75341796875,
+        5.90478515625
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 6.1,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 7.4,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140917744172000,
+      "load_average": [
+        7.26318359375,
+        6.74072265625,
+        5.9052734375
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 5.0,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 7.1,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140922947427000,
+      "load_average": [
+        6.84130859375,
+        6.66162109375,
+        5.88232421875
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 4.8,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 5.6,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140928126070000,
+      "load_average": [
+        6.85400390625,
+        6.6669921875,
+        5.888671875
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 1.0,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 10.1,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140933312251000,
+      "load_average": [
+        6.625,
+        6.62255859375,
+        5.87744140625
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 7.0,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 8.2,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140938496422000,
+      "load_average": [
+        6.09423828125,
+        6.51220703125,
+        5.8427734375
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 9.2,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 10.7,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140943665873000,
+      "load_average": [
+        6.00634765625,
+        6.48681640625,
+        5.83740234375
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 5.3,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 5.6,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140948854623000,
+      "load_average": [
+        6.80615234375,
+        6.64453125,
+        5.896484375
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 9.4,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 9.3,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140954023509000,
+      "load_average": [
+        6.5009765625,
+        6.583984375,
+        5.87939453125
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 6.5,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 5.3,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140959206660000,
+      "load_average": [
+        6.14013671875,
+        6.5078125,
+        5.8564453125
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 7.4,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 5.3,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140964396232000,
+      "load_average": [
+        6.76953125,
+        6.6318359375,
+        5.90380859375
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 5.5,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 5.2,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 9425,
+          "cpu_percent": 9.6,
+          "executable": "go"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140969844356000,
+      "load_average": [
+        6.94775390625,
+        6.6708984375,
+        5.921875
+      ],
+      "go_or_tests": [
+        {
+          "pid": 1405,
+          "cpu_percent": 0.0,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 2377,
+          "cpu_percent": 7.8,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 9425,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 9511,
+          "cpu_percent": 8.4,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 9604,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140974928997000,
+      "load_average": [
+        6.79150390625,
+        6.64306640625,
+        5.916015625
+      ],
+      "go_or_tests": [
+        {
+          "pid": 2377,
+          "cpu_percent": 9.2,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140980026529000,
+      "load_average": [
+        6.56787109375,
+        6.59912109375,
+        5.90478515625
+      ],
+      "go_or_tests": [
+        {
+          "pid": 2377,
+          "cpu_percent": 10.3,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 98641,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140985106617000,
+      "load_average": [
+        6.12158203125,
+        6.505859375,
+        5.8759765625
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 7.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790140990182439000,
+      "load_average": [
+        5.87158203125,
+        6.447265625,
+        5.85888671875
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11040,
+          "cpu_percent": 100.0,
+          "executable": "tsextractor.test"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 7.1,
+          "executable": "graphsession.test"
+        }
+      ]
+    },
+    {
+      "ns": 1790140995267790000,
+      "load_average": [
+        6.0419921875,
+        6.47265625,
+        5.87109375
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11040,
+          "cpu_percent": 99.1,
+          "executable": "tsextractor.test"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 4.6,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 11343,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790141000369635000,
+      "load_average": [
+        5.95849609375,
+        6.44775390625,
+        5.86572265625
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 0.0,
+          "executable": "graphsession.test"
+        }
+      ]
+    },
+    {
+      "ns": 1790141005474178000,
+      "load_average": [
+        5.48095703125,
+        6.34033203125,
+        5.8310546875
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 15.7,
+          "executable": "graphsession.test"
+        }
+      ]
+    },
+    {
+      "ns": 1790141010570081000,
+      "load_average": [
+        5.5224609375,
+        6.33447265625,
+        5.83203125
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 0.0,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 11803,
+          "cpu_percent": 2.7,
+          "executable": "go"
+        },
+        {
+          "pid": 11838,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11917,
+          "cpu_percent": 41.5,
+          "executable": "go"
+        },
+        {
+          "pid": 11924,
+          "cpu_percent": 0.0,
+          "executable": "engine.test"
+        }
+      ]
+    },
+    {
+      "ns": 1790141015644621000,
+      "load_average": [
+        5.400390625,
+        6.29541015625,
+        5.8212890625
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 15.9,
+          "executable": "graphsession.test"
+        }
+      ]
+    },
+    {
+      "ns": 1790141020743944000,
+      "load_average": [
+        5.1279296875,
+        6.2236328125,
+        5.798828125
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 8.6,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 12633,
+          "cpu_percent": 32.9,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790141025833429000,
+      "load_average": [
+        7.60009765625,
+        6.7177734375,
+        5.9755859375
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 5.3,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 12633,
+          "cpu_percent": 0.2,
+          "executable": "go"
+        },
+        {
+          "pid": 13070,
+          "cpu_percent": 0.0,
+          "executable": "enola.test"
+        },
+        {
+          "pid": 13100,
+          "cpu_percent": 6.6,
+          "executable": "engine.test"
+        },
+        {
+          "pid": 13104,
+          "cpu_percent": 0.0,
+          "executable": "estateref.test"
+        },
+        {
+          "pid": 13107,
+          "cpu_percent": 0.0,
+          "executable": "explainers.test"
+        },
+        {
+          "pid": 13112,
+          "cpu_percent": 0.8,
+          "executable": "go"
+        },
+        {
+          "pid": 13117,
+          "cpu_percent": 0.0,
+          "executable": "common.test"
+        },
+        {
+          "pid": 13146,
+          "cpu_percent": 0.0,
+          "executable": "complexity.test"
+        },
+        {
+          "pid": 13147,
+          "cpu_percent": 0.0,
+          "executable": "constraints.test"
+        },
+        {
+          "pid": 13154,
+          "cpu_percent": 0.0,
+          "executable": "coverage.test"
+        },
+        {
+          "pid": 13170,
+          "cpu_percent": 0.0,
+          "executable": "crossrepo.test"
+        },
+        {
+          "pid": 13204,
+          "cpu_percent": 2.2,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790141030922186000,
+      "load_average": [
+        7.7919921875,
+        6.77197265625,
+        5.9990234375
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 7.5,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 12633,
+          "cpu_percent": 1.0,
+          "executable": "go"
+        },
+        {
+          "pid": 13070,
+          "cpu_percent": 5.4,
+          "executable": "enola.test"
+        },
+        {
+          "pid": 13100,
+          "cpu_percent": 33.6,
+          "executable": "engine.test"
+        },
+        {
+          "pid": 13204,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 13313,
+          "cpu_percent": 0.0,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 13324,
+          "cpu_percent": 0.0,
+          "executable": "unusedroutes.test"
+        },
+        {
+          "pid": 13334,
+          "cpu_percent": 0.0,
+          "executable": "vendoredcandidates.test"
+        },
+        {
+          "pid": 13340,
+          "cpu_percent": 0.0,
+          "executable": "extractors.test"
+        },
+        {
+          "pid": 13362,
+          "cpu_percent": 0.0,
+          "executable": "ansibleextractor.test"
+        },
+        {
+          "pid": 13369,
+          "cpu_percent": 0.0,
+          "executable": "asyncapiextractor.test"
+        },
+        {
+          "pid": 13391,
+          "cpu_percent": 0.0,
+          "executable": "cppextractor.test"
+        },
+        {
+          "pid": 13435,
+          "cpu_percent": 0.0,
+          "executable": "dartextractor.test"
+        },
+        {
+          "pid": 13456,
+          "cpu_percent": 0.0,
+          "executable": "detectnames.test"
+        }
+      ]
+    },
+    {
+      "ns": 1790141036003048000,
+      "load_average": [
+        7.568359375,
+        6.7421875,
+        5.9931640625
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 8.9,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 12633,
+          "cpu_percent": 2.1,
+          "executable": "go"
+        },
+        {
+          "pid": 13100,
+          "cpu_percent": 35.5,
+          "executable": "engine.test"
+        },
+        {
+          "pid": 13754,
+          "cpu_percent": 33.9,
+          "executable": "tsextractor.test"
+        },
+        {
+          "pid": 13758,
+          "cpu_percent": 75.0,
+          "executable": "facts.test"
+        },
+        {
+          "pid": 13763,
+          "cpu_percent": 0.0,
+          "executable": "gqlscan.test"
+        },
+        {
+          "pid": 13769,
+          "cpu_percent": 0.0,
+          "executable": "graphinput.test"
+        },
+        {
+          "pid": 13771,
+          "cpu_percent": 0.0,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 13775,
+          "cpu_percent": 0.0,
+          "executable": "graphstream.test"
+        },
+        {
+          "pid": 13794,
+          "cpu_percent": 0.0,
+          "executable": "history.test"
+        },
+        {
+          "pid": 13797,
+          "cpu_percent": 0.0,
+          "executable": "hookstate.test"
+        },
+        {
+          "pid": 13806,
+          "cpu_percent": 0.0,
+          "executable": "intent.test"
+        }
+      ]
+    },
+    {
+      "ns": 1790141041085021000,
+      "load_average": [
+        7.2822265625,
+        6.6962890625,
+        5.9814453125
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 6.0,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 12633,
+          "cpu_percent": 2.4,
+          "executable": "go"
+        },
+        {
+          "pid": 13100,
+          "cpu_percent": 376.1,
+          "executable": "engine.test"
+        },
+        {
+          "pid": 13754,
+          "cpu_percent": 51.9,
+          "executable": "tsextractor.test"
+        },
+        {
+          "pid": 13769,
+          "cpu_percent": 4.8,
+          "executable": "graphinput.test"
+        },
+        {
+          "pid": 13771,
+          "cpu_percent": 5.2,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 13775,
+          "cpu_percent": 3.8,
+          "executable": "graphstream.test"
+        },
+        {
+          "pid": 13794,
+          "cpu_percent": 13.7,
+          "executable": "history.test"
+        },
+        {
+          "pid": 14032,
+          "cpu_percent": 0.0,
+          "executable": "litfold.test"
+        },
+        {
+          "pid": 14060,
+          "cpu_percent": 0.0,
+          "executable": "metrics.test"
+        },
+        {
+          "pid": 14069,
+          "cpu_percent": 0.0,
+          "executable": "mining.test"
+        },
+        {
+          "pid": 14079,
+          "cpu_percent": 0.0,
+          "executable": "orphans.test"
+        }
+      ]
+    },
+    {
+      "ns": 1790141046159337000,
+      "load_average": [
+        7.01904296875,
+        6.6513671875,
+        5.9697265625
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 5.7,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 12633,
+          "cpu_percent": 15.5,
+          "executable": "go"
+        },
+        {
+          "pid": 13100,
+          "cpu_percent": 14.5,
+          "executable": "engine.test"
+        },
+        {
+          "pid": 13754,
+          "cpu_percent": 99.9,
+          "executable": "tsextractor.test"
+        },
+        {
+          "pid": 13771,
+          "cpu_percent": 4.5,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 13775,
+          "cpu_percent": 3.7,
+          "executable": "graphstream.test"
+        },
+        {
+          "pid": 14110,
+          "cpu_percent": 1.2,
+          "executable": "providers.test"
+        },
+        {
+          "pid": 14541,
+          "cpu_percent": 0.0,
+          "executable": "server.test"
+        },
+        {
+          "pid": 14545,
+          "cpu_percent": 0.0,
+          "executable": "updatecheck.test"
+        },
+        {
+          "pid": 14547,
+          "cpu_percent": 0.0,
+          "executable": "upgrade.test"
+        }
+      ]
+    },
+    {
+      "ns": 1790141051246508000,
+      "load_average": [
+        7.09716796875,
+        6.67333984375,
+        5.9814453125
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 4.6,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 12633,
+          "cpu_percent": 1.8,
+          "executable": "go"
+        },
+        {
+          "pid": 13100,
+          "cpu_percent": 15.6,
+          "executable": "engine.test"
+        },
+        {
+          "pid": 13754,
+          "cpu_percent": 94.9,
+          "executable": "tsextractor.test"
+        },
+        {
+          "pid": 13771,
+          "cpu_percent": 6.8,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 13775,
+          "cpu_percent": 3.9,
+          "executable": "graphstream.test"
+        },
+        {
+          "pid": 14110,
+          "cpu_percent": 1.6,
+          "executable": "providers.test"
+        },
+        {
+          "pid": 14541,
+          "cpu_percent": 15.1,
+          "executable": "server.test"
+        },
+        {
+          "pid": 14568,
+          "cpu_percent": 4.6,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 14612,
+          "cpu_percent": 0.7,
+          "executable": "check.test"
+        },
+        {
+          "pid": 14681,
+          "cpu_percent": 0.1,
+          "executable": "command.test"
+        },
+        {
+          "pid": 14846,
+          "cpu_percent": 14.1,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790141056325449000,
+      "load_average": [
+        6.92919921875,
+        6.6455078125,
+        5.9755859375
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 4.3,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 12633,
+          "cpu_percent": 1.9,
+          "executable": "go"
+        },
+        {
+          "pid": 13100,
+          "cpu_percent": 10.3,
+          "executable": "engine.test"
+        },
+        {
+          "pid": 13754,
+          "cpu_percent": 96.1,
+          "executable": "tsextractor.test"
+        },
+        {
+          "pid": 13771,
+          "cpu_percent": 4.9,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 13775,
+          "cpu_percent": 3.8,
+          "executable": "graphstream.test"
+        },
+        {
+          "pid": 14110,
+          "cpu_percent": 3.1,
+          "executable": "providers.test"
+        },
+        {
+          "pid": 14541,
+          "cpu_percent": 11.2,
+          "executable": "server.test"
+        },
+        {
+          "pid": 14568,
+          "cpu_percent": 5.2,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 14612,
+          "cpu_percent": 2.0,
+          "executable": "check.test"
+        },
+        {
+          "pid": 14681,
+          "cpu_percent": 0.1,
+          "executable": "command.test"
+        }
+      ]
+    },
+    {
+      "ns": 1790141061422566000,
+      "load_average": [
+        7.0146484375,
+        6.66796875,
+        5.9873046875
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 3.9,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 12633,
+          "cpu_percent": 0.8,
+          "executable": "go"
+        },
+        {
+          "pid": 13100,
+          "cpu_percent": 9.4,
+          "executable": "engine.test"
+        },
+        {
+          "pid": 13754,
+          "cpu_percent": 89.9,
+          "executable": "tsextractor.test"
+        },
+        {
+          "pid": 13771,
+          "cpu_percent": 5.5,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 13775,
+          "cpu_percent": 3.6,
+          "executable": "graphstream.test"
+        },
+        {
+          "pid": 14541,
+          "cpu_percent": 362.7,
+          "executable": "server.test"
+        },
+        {
+          "pid": 14568,
+          "cpu_percent": 5.1,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 15698,
+          "cpu_percent": 7.1,
+          "executable": "install.test"
+        },
+        {
+          "pid": 15952,
+          "cpu_percent": 23.9,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790141066501955000,
+      "load_average": [
+        8.69482421875,
+        7.02197265625,
+        6.1162109375
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 4.1,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 12633,
+          "cpu_percent": 0.1,
+          "executable": "go"
+        },
+        {
+          "pid": 13100,
+          "cpu_percent": 12.6,
+          "executable": "engine.test"
+        },
+        {
+          "pid": 13754,
+          "cpu_percent": 99.1,
+          "executable": "tsextractor.test"
+        },
+        {
+          "pid": 13771,
+          "cpu_percent": 1.7,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 13775,
+          "cpu_percent": 3.4,
+          "executable": "graphstream.test"
+        },
+        {
+          "pid": 14568,
+          "cpu_percent": 5.5,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 16260,
+          "cpu_percent": 65.3,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790141071575075000,
+      "load_average": [
+        9.84033203125,
+        7.287109375,
+        6.21484375
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 4.0,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 12633,
+          "cpu_percent": 0.1,
+          "executable": "go"
+        },
+        {
+          "pid": 13100,
+          "cpu_percent": 9.8,
+          "executable": "engine.test"
+        },
+        {
+          "pid": 13754,
+          "cpu_percent": 8.2,
+          "executable": "tsextractor.test"
+        },
+        {
+          "pid": 13771,
+          "cpu_percent": 3.5,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 13775,
+          "cpu_percent": 4.5,
+          "executable": "graphstream.test"
+        },
+        {
+          "pid": 14568,
+          "cpu_percent": 3.2,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 16260,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790141076657809000,
+      "load_average": [
+        9.29248046875,
+        7.2158203125,
+        6.19580078125
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 2.8,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 12633,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 13100,
+          "cpu_percent": 9.4,
+          "executable": "engine.test"
+        },
+        {
+          "pid": 13754,
+          "cpu_percent": 5.1,
+          "executable": "tsextractor.test"
+        },
+        {
+          "pid": 13771,
+          "cpu_percent": 3.0,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 13775,
+          "cpu_percent": 2.6,
+          "executable": "graphstream.test"
+        },
+        {
+          "pid": 14568,
+          "cpu_percent": 5.6,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 16260,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 16588,
+          "cpu_percent": 2.9,
+          "executable": "graphsession.test"
+        }
+      ]
+    },
+    {
+      "ns": 1790141081739114000,
+      "load_average": [
+        9.42919921875,
+        7.2783203125,
+        6.2236328125
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 5.1,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 12633,
+          "cpu_percent": 0.1,
+          "executable": "go"
+        },
+        {
+          "pid": 13100,
+          "cpu_percent": 10.8,
+          "executable": "engine.test"
+        },
+        {
+          "pid": 13754,
+          "cpu_percent": 8.5,
+          "executable": "tsextractor.test"
+        },
+        {
+          "pid": 13771,
+          "cpu_percent": 0.4,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 14568,
+          "cpu_percent": 3.7,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 16260,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 16588,
+          "cpu_percent": 5.1,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 16859,
+          "cpu_percent": 75.3,
+          "executable": "go"
+        }
+      ]
+    },
+    {
+      "ns": 1790141086830333000,
+      "load_average": [
+        8.673828125,
+        7.1572265625,
+        6.18701171875
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 4.2,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 12633,
+          "cpu_percent": 0.2,
+          "executable": "go"
+        },
+        {
+          "pid": 13100,
+          "cpu_percent": 12.1,
+          "executable": "engine.test"
+        },
+        {
+          "pid": 13771,
+          "cpu_percent": 0.6,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 14568,
+          "cpu_percent": 4.2,
+          "executable": "bootstrap.test"
+        },
+        {
+          "pid": 16260,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 16588,
+          "cpu_percent": 2.8,
+          "executable": "graphsession.test"
+        }
+      ]
+    },
+    {
+      "ns": 1790141091921844000,
+      "load_average": [
+        8.21923828125,
+        7.087890625,
+        6.16796875
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 2.5,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 12633,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 13100,
+          "cpu_percent": 7.0,
+          "executable": "engine.test"
+        },
+        {
+          "pid": 13771,
+          "cpu_percent": 3.2,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 14568,
+          "cpu_percent": 3.2,
+          "executable": "bootstrap.test"
+        }
+      ]
+    },
+    {
+      "ns": 1790141096996399000,
+      "load_average": [
+        8.20166015625,
+        7.10302734375,
+        6.17822265625
+      ],
+      "go_or_tests": [
+        {
+          "pid": 10861,
+          "cpu_percent": 0.0,
+          "executable": "go"
+        },
+        {
+          "pid": 11041,
+          "cpu_percent": 2.9,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 12633,
+          "cpu_percent": 0.3,
+          "executable": "go"
+        },
+        {
+          "pid": 13100,
+          "cpu_percent": 14.6,
+          "executable": "engine.test"
+        },
+        {
+          "pid": 13771,
+          "cpu_percent": 3.6,
+          "executable": "graphsession.test"
+        },
+        {
+          "pid": 14568,
+          "cpu_percent": 3.5,
+          "executable": "bootstrap.test"
+        }
+      ]
+    }
+  ],
+  "timing_note": "Concurrent Go/tests overlap measured initial and delta; exclude from performance acceptance. Scope/payload and exact cold equality remain diagnostic evidence."
+}

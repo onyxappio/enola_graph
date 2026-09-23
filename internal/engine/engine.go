@@ -1791,11 +1791,29 @@ func (e *Engine) ValidateGraphConsumers(detected map[string]bool) error {
 		if !detected[ext.Name()] {
 			continue
 		}
-		switch ext.(type) {
-		case *tsextractor.TSExtractor, *manifestextractor.Extractor, *mdintent.Extractor, *hclextractor.Extractor, *pythonextractor.PythonExtractor, *swiftextractor.SwiftExtractor:
+		if AuditedGraphConsumer(ext) {
 			continue
 		}
 		return fmt.Errorf("graph input policy: active extractor %s has unaudited side inputs; use the legacy profile or disable it explicitly", ext.Name())
 	}
 	return nil
+}
+
+// AuditedGraphConsumer reports whether an extractor's inputs have been audited:
+// everything it reads is either declared through plugin.DeltaInputs and
+// plugin.DeltaContext, or is a path the session already fingerprints. It is the
+// single admission table for graph mode - ValidateGraphConsumers rejects an
+// active extractor that is not on it, and callers that want to narrow a
+// conservative scope must re-check it rather than assume the run got that far.
+//
+// An extractor absent from this list is not assumed benign. Narrowing decisions
+// that depend on knowing every input an extractor consumes have to fall back to
+// their conservative scope for it, which is why this returns a value instead of
+// only failing a run.
+func AuditedGraphConsumer(ext plugin.Extractor) bool {
+	switch ext.(type) {
+	case *tsextractor.TSExtractor, *manifestextractor.Extractor, *mdintent.Extractor, *hclextractor.Extractor, *pythonextractor.PythonExtractor, *swiftextractor.SwiftExtractor:
+		return true
+	}
+	return false
 }

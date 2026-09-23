@@ -1,0 +1,63 @@
+package graphsession
+import (
+ "encoding/json"
+ "os"
+ "testing"
+ "sort"
+ "reflect"
+ "github.com/enola-labs/enola/internal/extractors/tsextractor"
+)
+func TestRootRetainedHistoryReboundAttribution(t *testing.T) {
+ load:=func(path string)*State { b,e:=os.ReadFile(path);if e!=nil{t.Fatal(e)};var s State;if e=json.Unmarshal(b,&s);e!=nil{t.Fatal(e)};return &s }
+ root:="/tmp/enola-history-config-exploratory-2/cases/"
+ before:=load(root+"00-4d104e600f89..07fb4a41ddaf/state-cold/state.json")
+ after:=load(root+"01-07fb4a41ddaf..fec1eac346c4/state-cold/state.json")
+ prev:=map[string]*tsextractor.FileRecord{};next:=map[string]*tsextractor.FileRecord{}
+ for p,f:=range before.Files {if f!=nil&&f.TS!=nil{prev[p]=f.TS}}
+ for p,f:=range after.Files {if f!=nil&&f.TS!=nil{next[p]=f.TS}}
+ pk,nk:=priorKnownFiles(prev),priorKnownFiles(next)
+ added,deleted:=[]string{},[]string{}
+ for p:=range nk {if !pk[p]{added=append(added,p)}};for p:=range pk{if !nk[p]{deleted=append(deleted,p)}}
+ sort.Strings(added);sort.Strings(deleted)
+ rebound,stableRebound,content,sem:=[]string{},[]string{},0,0
+ targets:=map[string]int{}
+ for p,r:=range prev {
+  n:=after.Files[p];if n==nil {continue};if before.Files[p].Hash!=n.Hash{content++};if before.TSFileContext[p]!=after.TSFileContext[p]{sem++}
+  if !recordRebound(r,pk,nk){continue};rebound=append(rebound,p)
+  if before.Files[p].Hash==n.Hash && before.TSFileContext[p]==after.TSFileContext[p]{stableRebound=append(stableRebound,p)}
+  seen:=map[string]bool{}
+  for _,sp:=range append(append([]string{},r.ImportSpecs...),r.UnresolvedSpecs...) {if importRebound(sp,pk,nk){target,_:=tsextractor.NormalizeImportTarget(sp,nk);if !seen[target]{targets[target]++;seen[target]=true}}}
+ }
+ sort.Strings(rebound);sort.Strings(stableRebound)
+ out:=map[string]any{"basis":"offline cached-record projection using cold target record keys as current universe; not instrumented live branch attribution","prior_records":len(prev),"next_records":len(next),"added_universe":added,"deleted_universe":deleted,"content_changed_prior_records":content,"semantic_context_changes":sem,"m2_rebound_all":len(rebound),"m2_rebound_byte_and_context_stable":len(stableRebound),"rebound_owners":rebound,"changed_target_importer_counts":targets}
+
+ first:=map[string]bool{};work:=map[string]*tsextractor.FileRecord{}
+ for p,r:=range prev{work[p]=r}
+ for p,r:=range next{old:=before.Files[p];if old==nil||old.Hash!=after.Files[p].Hash{first[p]=true;work[p]=r}}
+ for _,p:=range rebound{first[p]=true;work[p]=next[p]}
+ changed:=map[string]bool{};newNames,removedNames:=map[string]bool{},map[string]bool{}
+ for p:=range first {
+  old,rec:=prev[p],next[p];if surfaceChanged(old,rec){changed[p]=true};if rec==nil{continue}
+  have,now:=map[string]bool{},map[string]bool{}
+  if old!=nil{for _,n:=range old.Declared{have[n]=true}}
+  for _,n:=range rec.Declared{now[n]=true;if !have[n]{newNames[n]=true}}
+  for n:=range have{if !now[n]{removedNames[n]=true}}
+ }
+ closure:=reverseClose(changed,work);closureNeed:=0
+ for p:=range closure{if !first[p]{closureNeed++}}
+ extra:=map[string]bool{};for p,v:=range closure{extra[p]=v}
+ waveOnly:=0;waveNeeds:=0;waveNames:=map[string]int{}
+ for p,r:=range prev{if r==nil||extra[p]{continue};for _,n:=range r.Referenced{if newNames[n]||removedNames[n]{extra[p]=true;waveOnly++;if !first[p]{waveNeeds++;waveNames[n]++};break}}}
+ need:=0;for p:=range extra{if !first[p]{need++}}
+
+ equalFacts,equalRecords:=0,0;differentFacts:=[]string{}
+ for p:=range extra{if first[p]{continue};old,neu:=prev[p],next[p];if old==nil||neu==nil{continue};if reflect.DeepEqual(old.Facts,neu.Facts){equalFacts++}else{differentFacts=append(differentFacts,p)};if reflect.DeepEqual(old,neu){equalRecords++}}
+ sort.Strings(differentFacts)
+ out["projected_need_identical_fact_slices"]=equalFacts;out["projected_need_identical_full_records"]=equalRecords;out["projected_need_changed_fact_owners"]=differentFacts
+ out["projected_first_pass_sources"]=len(first);out["surface_changed_seeds"]=len(changed)
+ out["m3_reverse_closure_total"]=len(closure);out["m3_reverse_closure_need"]=closureNeed
+ out["m3_name_wave_additions"]=waveOnly;out["m3_name_wave_need"]=waveNeeds
+ out["m3_combined_need"]=need;out["first_matching_name_counts"]=waveNames
+ out["new_declared_names"]=len(newNames);out["removed_declared_names"]=len(removedNames)
+ b,e:=json.MarshalIndent(out,"","  ");if e!=nil{t.Fatal(e)};if e=os.WriteFile("/tmp/enola-root-rebound-attribution.json",b,0644);e!=nil{t.Fatal(e)};t.Log(string(b))
+}
