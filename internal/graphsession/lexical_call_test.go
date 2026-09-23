@@ -810,6 +810,73 @@ export function missingNs() {
 	}
 }
 
+func TestPublishedWave9CachedUpgradeFromV303(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"src/fn.ts":    "export function ping() { return 1; }\n",
+		"src/local.ts": "export function work() { return 1; }\nexport function keep() { return 2; }\n",
+		"src/sib.ts":   "export function ping() { return 9; }\nexport function work() { return 9; }\n",
+		"src/app.ts": `
+export function callRequiredFn() {
+  const ping = require('./fn');
+  return ping();
+}
+export function namespaceRequire() {
+  const sdk = require('./local');
+  return sdk.work();
+}
+export function missingValue() {
+  const gone = require('./gone');
+  return gone();
+}
+`,
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("load state: %v %#v", err, st)
+	}
+	st.ExtractorVersion = "v303"
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	up := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, dir, up, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.ParsedFiles == 0 {
+		t.Fatal("v303 migration parsed no files")
+	}
+	c := applyGraph(t, first)
+	if err := c.ApplyRecords(up.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, coldSink))
+	assertCallResolvedToFile(t, c, "src/app.ts", "src.ping", "src/fn.ts")
+	assertCallResolvedToFile(t, c, "src/app.ts", "src.work", "src/local.ts")
+	quiet := &graphstream.MemorySink{}
+	again, err := Run(context.Background(), eng, dir, quiet, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if again.ParsedFiles != 0 {
+		t.Fatalf("silent nochange parsed=%d", again.ParsedFiles)
+	}
+	if engine.ExtractorVersion() == "v303" {
+		t.Fatal("cached upgrade test requires cacheVersion newer than v303")
+	}
+}
+
 func TestPublishedBridgeTargetChangeResolvesToC(t *testing.T) {
 	dir := setupTSRepo(t, map[string]string{
 		"src/a.ts":      "import { round } from './bridge';\nexport function caller() { return round(1); }\n",

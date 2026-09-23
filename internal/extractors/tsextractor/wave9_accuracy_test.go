@@ -299,7 +299,7 @@ func TestExtract_Wave9ScopedLiteralRequireCalls(t *testing.T) {
 	ff := extractAll(t, map[string]string{
 		"src/figma.ts": "export function readScreenStructureFileKey() { return 'k'; }\nexport function otherFigma() { return 1; }\n",
 		"src/crop.ts":  "export function shouldRunInstanceCropCompare() { return true; }\n",
-		"src/sib.ts": "export function readScreenStructureFileKey() { return 'sib'; }\nexport function shouldRunInstanceCropCompare() { return false; }\nexport function helper() { return 9; }\nexport function aliased() { return 8; }\nexport function nsFn() { return 7; }\nexport function load() { return 6; }\nexport function keep() { return 5; }\n",
+		"src/sib.ts":   "export function readScreenStructureFileKey() { return 'sib'; }\nexport function shouldRunInstanceCropCompare() { return false; }\nexport function helper() { return 9; }\nexport function aliased() { return 8; }\nexport function nsFn() { return 7; }\nexport function load() { return 6; }\nexport function keep() { return 5; }\n",
 		"src/gate.ts": `
 export function runSuitePipeline() {
   const { readScreenStructureFileKey, otherFigma } = require('./figma') as typeof import('./figma');
@@ -580,6 +580,113 @@ export function run() {
 	}
 	if !hasCallToFile(miss, "src.keep", "src/local.ts") && !hasCallToFile(missFR, "src.keep", "src/local.ts") {
 		t.Fatalf("missing namespace require lost keep: %+v %+v", miss.Relations, missFR.Relations)
+	}
+}
+
+func TestExtract_Wave9CommonJSRequireValueAndNamespace(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/fn.ts":     "module.exports = function ping() { return 1; }\n",
+		"src/routes.ts": "const express = require('express');\nconst router = express.Router();\nrouter.get('/x', () => {});\nmodule.exports = router;\n",
+		"src/local.ts":  "export function work() { return 1; }\nexport function keep() { return 2; }\nexport function helper() { return 3; }\n",
+		"src/sib.ts":    "export function ping() { return 9; }\nexport function work() { return 9; }\nexport function helper() { return 9; }\nexport function mount() { return 9; }\nexport function gone() { return 9; }\n",
+		"src/app.ts": `
+export function callRequiredFn() {
+  const ping = require('./fn');
+  return ping();
+}
+export function mountRequiredRoutes() {
+  const routes = require('./routes');
+  function mount(r) { return r; }
+  return mount(routes);
+}
+export function namespaceStill() {
+  const sdk = require('./local');
+  return sdk.work();
+}
+export function shadowedRequireIdent() {
+  const require = (p) => ({ work: () => 0 });
+  const ping = require('./fn');
+  return ping();
+}
+export function shadowedResultName() {
+  const ping = require('./fn');
+  {
+    const ping = () => 0;
+    return ping();
+  }
+}
+export function missingValueRequire() {
+  const gone = require('./gone');
+  return gone();
+}
+export function keepLocal() {
+  const { keep } = require('./local');
+  return keep();
+}
+`,
+	}, false)
+
+	appFR := fileRefFact(ff, "src/app.ts")
+	if appFR.Name == "" {
+		t.Fatal("app file_ref missing")
+	}
+	if !hasCallToFile(appFR, "src.ping", "src/fn.ts") {
+		t.Fatalf("file_ref lost value require ping: %+v", appFR.Relations)
+	}
+	if hasCallToFile(appFR, "src.ping", "src/sib.ts") {
+		t.Fatalf("file_ref bound sibling ping: %+v", appFR.Relations)
+	}
+	if !hasCallToFile(appFR, "src.routes", "src/routes.ts") {
+		t.Fatalf("file_ref lost mounted require routes: %+v", appFR.Relations)
+	}
+	if !hasCallToFile(appFR, "src.work", "src/local.ts") {
+		t.Fatalf("file_ref lost namespace sdk.work: %+v", appFR.Relations)
+	}
+	if hasCallToFile(appFR, "src.work", "src/sib.ts") {
+		t.Fatalf("file_ref bound sibling work: %+v", appFR.Relations)
+	}
+	if hasCallToFile(appFR, "src.gone", "src/sib.ts") || hasCallToFile(appFR, "src.gone", "src/local.ts") {
+		t.Fatalf("missing require must not bind sibling gone: %+v", appFR.Relations)
+	}
+	goneOK := false
+	for _, r := range appFR.Relations {
+		if r.Kind == facts.RelCalls && r.Target == "src.gone" && r.TargetFile != "" && r.TargetFile != "src/sib.ts" && r.TargetFile != "src/local.ts" {
+			goneOK = true
+		}
+	}
+	if !goneOK {
+		t.Fatalf("missing value require must keep unresolved specifier: %+v", appFR.Relations)
+	}
+
+	callFn, _ := findFact(ff, "src.callRequiredFn")
+	if !hasCallToFile(callFn, "src.ping", "src/fn.ts") {
+		t.Fatalf("symbol-owned ping() lost: %+v", callFn.Relations)
+	}
+	if hasCallToFile(callFn, "src.ping", "src/sib.ts") {
+		t.Fatalf("symbol-owned ping bound sibling: %+v", callFn.Relations)
+	}
+	mountF, _ := findFact(ff, "src.mountRequiredRoutes")
+	if !hasCallToFile(mountF, "src.routes", "src/routes.ts") {
+		t.Fatalf("symbol-owned mount(routes) lost: %+v", mountF.Relations)
+	}
+	nsF, _ := findFact(ff, "src.namespaceStill")
+	if !hasCallToFile(nsF, "src.work", "src/local.ts") {
+		t.Fatalf("symbol-owned sdk.work lost: %+v", nsF.Relations)
+	}
+	if hasCallTarget(nsF, "src.sdk") {
+		t.Fatalf("namespace use must not also emit phantom sdk value: %+v", nsF.Relations)
+	}
+	shReq, _ := findFact(ff, "src.shadowedRequireIdent")
+	if hasCallToFile(shReq, "src.ping", "src/fn.ts") || hasCallToFile(shReq, "src.ping", "src/sib.ts") {
+		t.Fatalf("shadowed require identifier must not be CommonJS: %+v", shReq.Relations)
+	}
+	shRes, _ := findFact(ff, "src.shadowedResultName")
+	if hasCallToFile(shRes, "src.ping", "src/fn.ts") || hasCallToFile(shRes, "src.ping", "src/sib.ts") {
+		t.Fatalf("shadowed result name must not bind required ping: %+v", shRes.Relations)
+	}
+	miss, _ := findFact(ff, "src.missingValueRequire")
+	if hasCallToFile(miss, "src.gone", "src/sib.ts") || hasCallToFile(miss, "src.gone", "src/local.ts") {
+		t.Fatalf("symbol-owned missing require bound sibling: %+v", miss.Relations)
 	}
 }
 

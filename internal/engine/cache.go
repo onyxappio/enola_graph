@@ -2537,7 +2537,11 @@ import (
 // v303: Module-level lexical/import names of require are not CommonJS;
 // namespace require/import * missing modules keep unresolved specifier
 // provenance instead of binding a sibling export of the same name.
-const cacheVersion = "v303"
+// v304: Identifier `const x = require('./m')` is both a namespace (`x.work()`)
+// and a value/callable (`x()`, `mount(x)`). Namespace-only classification had
+// dropped existing CommonJS value uses; dual-bind keeps v302/v303 shadows and
+// missing-module specifier provenance.
+const cacheVersion = "v304"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

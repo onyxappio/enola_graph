@@ -3030,6 +3030,27 @@ func namespaceFileProvenance(indexPath, resolved string, foundFile bool) string 
 	return indexPath
 }
 
+// bindCJSRequireIdentifier records `const x = require('./m')` as both a
+// namespace (`x.work()`) and a value/callable (`x()`, `mount(x)`). The value
+// target uses the local name as the export spelling (existing CommonJS
+// file_ref contract). Missing modules keep specifier provenance via bindValue.
+func bindCJSRequireIdentifier(local, moduleDir, indexPath, resolved string, foundFile bool, named, namedF, ns, nsF map[string]string, bindValue func(local, moduleDir, exportName, indexPath, resolved string, foundFile bool)) {
+	if local == "" {
+		return
+	}
+	if ns != nil {
+		ns[local] = moduleDir
+		if key := namespaceFileProvenance(indexPath, resolved, foundFile); key != "" && nsF != nil {
+			nsF[local] = key
+		}
+	}
+	if bindValue != nil {
+		bindValue(local, moduleDir, local, indexPath, resolved, foundFile)
+	}
+	_ = named
+	_ = namedF
+}
+
 func bindNamespaceExport(moduleDir, nsFile, exportName string, ctx *extractCtx, note func(string)) (target, file string) {
 	if ctx == nil || exportName == "" {
 		return "", ""
@@ -3318,7 +3339,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 		case "lexical_declaration", "variable_declaration":
 			// CommonJS: `const x = require('./y')` / `const { a } = require('./y')`,
 			// including `require('./y') as typeof import('./y')`. Identifier
-			// bindings are namespaces (`sdk.work()`), not an export named `sdk`.
+			// bindings are namespaces (`sdk.work()`) and values (`x()`, `mount(x)`).
 			for j := range child.ChildCount() {
 				d := child.Child(j)
 				if kindOf(kinds, d) != "variable_declarator" {
@@ -3349,10 +3370,9 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 					if local == "" {
 						continue
 					}
-					namespaces[local] = moduleDir
-					if key := namespaceFileProvenance(indexPath, resolved, foundFile); key != "" {
-						namespaceFiles[local] = key
-					}
+					bindCJSRequireIdentifier(local, moduleDir, indexPath, resolved, foundFile, internal, internalFiles, namespaces, namespaceFiles, func(local, moduleDir, exportName, indexPath, resolved string, foundFile bool) {
+						bind(local, moduleDir, exportName, indexPath, resolved, foundFile)
+					})
 				case "object_pattern":
 					for _, b := range objectPatternImportBindings(kinds, nameNode, src) {
 						bind(b.local, moduleDir, b.export, indexPath, resolved, foundFile)
@@ -3514,10 +3534,16 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 				if local == "" {
 					continue
 				}
-				ns[local] = dir
-				if key := namespaceFileProvenance(idx, resolved, found); key != "" {
-					nsF[local] = key
-				}
+				bindCJSRequireIdentifier(local, dir, idx, resolved, found, named, namedF, ns, nsF, func(local, moduleDir, exportName, indexPath, resolved string, foundFile bool) {
+					target, file := bindImportedSymbol(moduleDir, indexPath, exportName, resolved, foundFile, ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, note)
+					if target == "" {
+						return
+					}
+					named[local] = target
+					if file != "" {
+						namedF[local] = file
+					}
+				})
 			case "object_pattern":
 				for _, b := range objectPatternImportBindings(kinds, nameNode, src) {
 					if b.local == "" {
@@ -3609,6 +3635,13 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			// annotation (`repo: Repo`), which is otherwise never an edge.
 			// Type aliases/interfaces occupy type space; they must not hide value
 			// identifiers such as an imported callable of the same name.
+			if kind == "identifier" {
+				if p := n.Parent(); p != nil && kindOf(kinds, p) == "variable_declarator" {
+					if nameNode := p.ChildByFieldName("name"); nameNode != nil && nameNode.StartByte() == n.StartByte() && nameNode.EndByte() == n.EndByte() {
+						return
+					}
+				}
+			}
 			name := nodeText(n, src)
 			typeSpace := kind == "type_identifier"
 			if t, file, ok, shadowed := frLookupNS(name, typeSpace); shadowed {
@@ -4495,6 +4528,27 @@ func (w *tsBodyWalker) lookupNamespace(name string) (dir, index string, ok bool)
 	return "", "", false
 }
 
+func (w *tsBodyWalker) lookupRequireValue(name string) (string, string, bool) {
+	nested := w.fnNesting > w.fnBase
+	for i := len(w.importScopes) - 1; i >= 0; i-- {
+		if t, ok := w.importScopes[i][name]; ok {
+			return t, w.importFileScopes[i][name], true
+		}
+		if nested {
+			if t, ok := w.preImportScopes[i][name]; ok {
+				return t, w.preImportFiles[i][name], true
+			}
+		}
+		if w.nsScopes[i][name] != "" || (nested && w.preNSScopes[i][name] != "") {
+			return "", "", false
+		}
+		if w.shadows[i][name] {
+			return "", "", false
+		}
+	}
+	return "", "", false
+}
+
 func (w *tsBodyWalker) bindScopedImport(local, exportName, importPath string) {
 	if local == "" || importPath == "" || w.ctx == nil || len(w.importScopes) == 0 {
 		return
@@ -4595,10 +4649,24 @@ func (w *tsBodyWalker) harvestLiteralImports(n *sitter.Node, named, namedF, ns, 
 			if local == "" {
 				continue
 			}
-			ns[local] = dir
-			if key := namespaceFileProvenance(idx, resolved, found); key != "" {
-				nsF[local] = key
-			}
+			bindCJSRequireIdentifier(local, dir, idx, resolved, found, named, namedF, ns, nsF, func(local, moduleDir, exportName, indexPath, resolved string, foundFile bool) {
+				target, file := bindImportedSymbol(moduleDir, indexPath, exportName, resolved, foundFile, w.ctx.readSrc, w.ctx.aliases, w.ctx.knownFiles, w.ctx.exportCache, func(f string) {
+					if w.ctx.sideReads == nil {
+						return
+					}
+					f = filepath.ToSlash(f)
+					if f != "" && f != filepath.ToSlash(w.relFile) {
+						w.ctx.sideReads[f] = true
+					}
+				})
+				if target == "" {
+					return
+				}
+				named[local] = target
+				if file != "" {
+					namedF[local] = file
+				}
+			})
 		case "object_pattern":
 			note := func(f string) {
 				if w.ctx.sideReads == nil {
@@ -4885,6 +4953,25 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 					tgt = recv + "." + prop
 				}
 				w.recordInLoop(tgt)
+			}
+		}
+		if args := n.ChildByFieldName("arguments"); args != nil {
+			for i := range args.ChildCount() {
+				a := args.Child(i)
+				if kindOf(w.kinds, a) != "identifier" {
+					continue
+				}
+				name := nodeText(a, w.src)
+				target, targetFile, ok := w.lookupRequireValue(name)
+				if !ok || target == "" {
+					continue
+				}
+				key := target + "\x00" + targetFile
+				if !w.seen[key] {
+					w.seen[key] = true
+					w.rels = append(w.rels, facts.Relation{Kind: facts.RelCalls, Target: target, TargetFile: targetFile})
+				}
+				w.recordCall(target)
 			}
 		}
 		// An array-iterator method with a callback (items.map(cb)) is a loop: its
