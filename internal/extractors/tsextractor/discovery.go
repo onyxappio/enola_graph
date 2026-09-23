@@ -80,7 +80,7 @@ func (e *TSExtractor) NewDiscovery(ctx context.Context, root string, sources map
 func (e *TSExtractor) newDiscovery(ctx context.Context, root string, ov *fileOverlay, captured int) *Discovery {
 	scope := e.inputScope
 	probe := newOverlayProbe()
-	ctx = withOverlayProbe(withFileOverlay(ctx, ov), probe)
+	ctx = withDiscoveryWalkCache(withOverlayProbe(withFileOverlay(ctx, ov), probe))
 	d := &Discovery{root: root, scope: scope}
 	t := time.Now()
 

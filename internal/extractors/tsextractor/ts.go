@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/enola-labs/enola/internal/extractors/extcoverage"
 	"github.com/enola-labs/enola/internal/extractors/tsutil"
-	"io/fs"
 	"log"
 
 	"path/filepath"
@@ -1963,37 +1962,26 @@ func detectNextJS(ctx context.Context, repoPath string, inputScopes ...*inputsco
 func collectPackageNames(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) map[string]string {
 	inputScope := inputscope.First(inputScopes)
 	out := map[string]string{}
-	_ = overlayWalkDir(ctx, repoPath, inputScope, func(path string, d fs.DirEntry, err error) error {
+	for _, e := range sharedDiscoveryEntries(ctx, repoPath, inputScope) {
+		if e.isDir || e.name != "package.json" {
+			continue
+		}
+		data, err := overlayReadFile(ctx, e.path, inputScope)
 		if err != nil {
-			return nil // unreadable subtree: skip it rather than fail extraction
-		}
-		if d.IsDir() {
-			name := d.Name()
-			if path != repoPath && (strings.HasPrefix(name, ".") || tsSkipDirs[name] || name == "testdata") {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-		if d.Name() != "package.json" {
-			return nil
-		}
-		data, err := overlayReadFile(ctx, path, inputScope)
-		if err != nil {
-			return nil
+			continue
 		}
 		var pkg struct {
 			Name string `json:"name"`
 		}
 		if err := json.Unmarshal(data, &pkg); err != nil || pkg.Name == "" {
-			return nil
+			continue
 		}
-		rel, err := filepath.Rel(repoPath, filepath.Dir(path)) //factpath:host
+		rel, err := filepath.Rel(repoPath, filepath.Dir(e.path)) //factpath:host
 		if err != nil {
-			return nil
+			continue
 		}
 		out[factpath.Slash(rel)] = pkg.Name
-		return nil
-	})
+	}
 	return out
 }
 
@@ -2029,23 +2017,13 @@ type packageExportSource struct {
 func collectPackageExportSources(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) []packageExportSource {
 	inputScope := inputscope.First(inputScopes)
 	var out []packageExportSource
-	_ = overlayWalkDir(ctx, repoPath, inputScope, func(path string, d fs.DirEntry, err error) error {
+	for _, e := range sharedDiscoveryEntries(ctx, repoPath, inputScope) {
+		if e.isDir || e.name != "package.json" {
+			continue
+		}
+		data, err := overlayReadFile(ctx, e.path, inputScope)
 		if err != nil {
-			return nil
-		}
-		if d.IsDir() {
-			name := d.Name()
-			if path != repoPath && (strings.HasPrefix(name, ".") || tsSkipDirs[name] || name == "testdata") {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-		if d.Name() != "package.json" {
-			return nil
-		}
-		data, err := overlayReadFile(ctx, path, inputScope)
-		if err != nil {
-			return nil
+			continue
 		}
 		var pkg struct {
 			Name    string          `json:"name"`
@@ -2056,19 +2034,18 @@ func collectPackageExportSources(ctx context.Context, repoPath string, inputScop
 			Exports json.RawMessage `json:"exports"`
 		}
 		if err := json.Unmarshal(data, &pkg); err != nil || pkg.Name == "" {
-			return nil
+			continue
 		}
-		rel, err := filepath.Rel(repoPath, filepath.Dir(path)) //factpath:host
+		rel, err := filepath.Rel(repoPath, filepath.Dir(e.path)) //factpath:host
 		if err != nil {
-			return nil
+			continue
 		}
 		pkgDir := factpath.Slash(rel)
 		if pkgDir == "." {
 			pkgDir = ""
 		}
 		out = append(out, packageExportSource{dir: pkgDir, name: pkg.Name, main: pkg.Main, types: pkg.Types, typings: pkg.Typings, module: pkg.Module, exports: pkg.Exports})
-		return nil
-	})
+	}
 	return out
 }
 
