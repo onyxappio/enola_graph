@@ -140,6 +140,27 @@ func parseNamedExportIndex(file string, readSrc func(string) []byte, aliases map
 		}
 		return idx
 	}
+	if isSvelteFile(file) {
+		idx.defaultName = fileSymbolName(file)
+		blocks := extractSvelteScriptBlocks(src)
+		if len(blocks) == 0 {
+			if len(src) == 0 {
+				idx.empty = true
+			}
+			return idx
+		}
+		for _, b := range blocks {
+			if len(b.Content) == 0 {
+				continue
+			}
+			sub := parseNamedExportIndexBytes(file, b.Content, aliases, knownFiles)
+			mergeNamedExportIndex(idx, sub)
+		}
+		return idx
+	}
+	if isEmberTemplateTagFile(file) {
+		src, _ = blankEmberTemplates(src)
+	}
 	if len(src) == 0 {
 		idx.empty = true
 		return idx

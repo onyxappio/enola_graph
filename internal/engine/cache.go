@@ -2559,7 +2559,13 @@ import (
 // callee is a named, aliased, or namespace import of defineNuxtPlugin /
 // definePayloadPlugin from #app (same runtime contract). Local same-spelling
 // functions or object members that return a plain value stay variables.
-const cacheVersion = "v308"
+// v309: Default imports of .gts/.gjs (and Svelte SFCs) bind the proven default
+// export from blanked/script-extracted source rather than a filename guess or
+// unresolved ".default". Test-ref extraction uses the production file set for
+// the same bind. ember-engines/routes buildRoutes returns its callback, so a
+// proven default/aliased/namespace import of that module keeps function kind;
+// local, member, type-only, and other-module shadows stay variables.
+const cacheVersion = "v309"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

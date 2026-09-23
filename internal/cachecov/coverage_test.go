@@ -33,6 +33,7 @@ import (
 // test functions that assert the behavior that version introduced. v1 is the
 // implicit baseline (no changelog line), so coverage starts at v2.
 var versionCoverage = map[int][]string{
+	309: {"TestExtract_Wave10GtsDefaultImportNamedUnlikeFile", "TestExtract_Wave10GjsDefaultImportNamedUnlikeFile", "TestExtractTestRefs_Wave10GtsDefaultClassUnlikeFilename", "TestExtract_Wave10BuildRoutesReturnIsFunction", "TestPublishedWave10CachedUpgradeFromV308"},
 	308: {"TestExtract_Wave10NuxtPluginFactoryKind", "TestPublishedWave10CachedUpgradeFromV307"},
 	307: {"TestExtract_Wave10NxUnionTreeKeepsHTTP", "TestExtract_Wave10NxUnionSchemaKeepsHTTP", "TestExtract_Wave10NxSchemaValueShadowKeepsInnerHTTP", "TestExtract_Wave10NxLocalTypeShadowKeepsHTTP", "TestExtract_Wave10NxIntersectionAndGenericStayClient", "TestPublishedWave10CachedUpgradeFromV306"},
 	306: {"TestExtract_Wave10NxLexicalShadowKeepsInnerHTTP", "TestExtract_Wave10NxNearestOptionsBindingKeepsInnerHTTP", "TestExtract_Wave10NxCommentedSchemaFieldKeepsHTTP", "TestExtract_Wave10NxNestedSchemaFieldDoesNotProveDirect", "TestExtract_Wave10NxBlockConstShadowsParam", "TestPublishedWave10CachedUpgradeFromV305"},
