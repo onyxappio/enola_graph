@@ -12,6 +12,7 @@ package tsextractor
 import (
 	"bytes"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -46,6 +47,8 @@ var mountCall = regexp.MustCompile("([A-Za-z_$][\\w$]*)\\s*\\.\\s*use\\s*\\(\\s*
 // serverVerbCall matches a route registration on a named receiver, capturing the
 // receiver so the binding table can rule on it.
 var serverVerbCall = regexp.MustCompile("([A-Za-z_$][\\w$]*)\\s*\\.\\s*(get|post|put|patch|delete|all|options|head)\\s*(?:<[^()]*>)?\\s*\\(\\s*(?:\"([^\"]*)\"|'([^']*)'|`([^`]*)`)")
+
+var serverRouteObjectCall = regexp.MustCompile(`([A-Za-z_$][\w$]*)\s*\.\s*route\s*\(\s*\{`)
 
 // frameworkOf normalises a factory token to the framework label emitted on facts.
 var frameworkOf = map[string]string{
@@ -196,7 +199,167 @@ func extractServerRouteFacts(src []byte, relFile string) []facts.Fact {
 			Relations: []facts.Relation{{Kind: facts.RelDeclares, Target: dir}},
 		})
 	}
+	out = append(out, extractServerRouteObjects(src, relFile, dir, bindings, scopes, seen)...)
 	return out
+}
+
+func extractServerRouteObjects(src []byte, relFile, dir string, bindings map[string]serverBinding, scopes []fastifyParamScope, seen map[string]bool) []facts.Fact {
+	if !bytes.Contains(src, []byte(".route")) {
+		return nil
+	}
+	var out []facts.Fact
+	for _, m := range serverRouteObjectCall.FindAllSubmatchIndex(src, -1) {
+		recv := string(src[m[2]:m[3]])
+		b, ok := bindings[recv]
+		if !ok {
+			b, ok = fastifyScopeBinding(scopes, recv, m[0])
+		}
+		if !ok || !b.mounted {
+			continue
+		}
+		brace := m[1] - 1
+		if brace < 0 || brace >= len(src) || src[brace] != '{' {
+			continue
+		}
+		end, ok := matchObjectLiteral(src, brace)
+		if !ok {
+			continue
+		}
+		obj := src[brace : end+1]
+		raw := objectLiteralStringField(obj, "url")
+		if raw == "" {
+			raw = objectLiteralStringField(obj, "path")
+		}
+		path, ok := cleanServerPath(raw)
+		if !ok {
+			continue
+		}
+		methods := objectLiteralMethods(obj)
+		verb := joinRouteMethods(methods)
+		full := facts.JoinRoutePath(b.prefix, path)
+		line := 1 + bytes.Count(src[:m[0]], []byte("\n"))
+		key := verb + "\x00" + full + "\x00" + strconv.Itoa(line)
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		out = append(out, facts.Fact{
+			Kind: facts.KindRoute,
+			Name: full,
+			File: relFile,
+			Line: line,
+			Props: map[string]any{
+				facts.PropRole: facts.RoleServer,
+				"method":       verb,
+				"framework":    b.framework,
+				"language":     "typescript",
+			},
+			Relations: []facts.Relation{{Kind: facts.RelDeclares, Target: dir}},
+		})
+	}
+	return out
+}
+
+func matchObjectLiteral(src []byte, open int) (int, bool) {
+	if open < 0 || open >= len(src) || src[open] != '{' {
+		return 0, false
+	}
+	depth := 0
+	var quote byte
+	esc := false
+	for i := open; i < len(src); i++ {
+		c := src[i]
+		if quote != 0 {
+			if esc {
+				esc = false
+				continue
+			}
+			if c == '\\' {
+				esc = true
+				continue
+			}
+			if c == quote {
+				quote = 0
+			}
+			continue
+		}
+		switch c {
+		case '\'', '"', '`':
+			quote = c
+		case '{':
+			depth++
+		case '}':
+			depth--
+			if depth == 0 {
+				return i, true
+			}
+		}
+	}
+	return 0, false
+}
+
+func objectLiteralStringField(obj []byte, key string) string {
+	re := regexp.MustCompile(`(?m)(?:^|[,{])\s*` + regexp.QuoteMeta(key) + `\s*:\s*(?:["']([^"']+)["']|` + "`" + `([^` + "`" + `]+)` + "`" + `)`)
+	m := re.FindSubmatch(obj)
+	if m == nil {
+		return ""
+	}
+	return firstNonEmpty(m[1], m[2])
+}
+
+func objectLiteralMethods(obj []byte) []string {
+	re := regexp.MustCompile(`(?m)(?:^|[,{])\s*method\s*:\s*`)
+	loc := re.FindIndex(obj)
+	if loc == nil {
+		return nil
+	}
+	rest := obj[loc[1]:]
+	rest = bytes.TrimSpace(rest)
+	if len(rest) == 0 {
+		return nil
+	}
+	if rest[0] == '[' {
+		end := bytes.IndexByte(rest, ']')
+		if end < 0 {
+			return nil
+		}
+		var methods []string
+		for _, m := range regexp.MustCompile(`["']([A-Za-z]+)["']`).FindAllSubmatch(rest[:end], -1) {
+			methods = append(methods, strings.ToUpper(string(m[1])))
+		}
+		return methods
+	}
+	if rest[0] == '"' || rest[0] == '\'' || rest[0] == '`' {
+		q := rest[0]
+		j := 1
+		for j < len(rest) && rest[j] != q {
+			j++
+		}
+		if j < len(rest) {
+			return []string{strings.ToUpper(string(rest[1:j]))}
+		}
+	}
+	return nil
+}
+
+func joinRouteMethods(methods []string) string {
+	if len(methods) == 0 {
+		return "GET"
+	}
+	seen := map[string]bool{}
+	var out []string
+	for _, m := range methods {
+		if m == "" || seen[m] {
+			continue
+		}
+		seen[m] = true
+		out = append(out, m)
+	}
+	if len(out) == 1 {
+		return out[0]
+	}
+	sort.Strings(out)
+	return strings.Join(out, "|")
 }
 
 // cleanServerPath accepts a declared route path, rejecting the ones that carry no

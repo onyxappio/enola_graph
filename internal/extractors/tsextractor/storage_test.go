@@ -237,6 +237,52 @@ model Comment {
 // TestStorage_NoORMDependencyEmitsNothing is the guard against over-firing. Detection is
 // gated on the package.json dependency, so a class decorated @Entity in a repo that does
 // not use TypeORM — or a helper coincidentally named pgTable — models no storage.
+func TestStorage_OwningPackageDrizzleDoesNotLeakToSiblings(t *testing.T) {
+	dir := t.TempDir()
+	files := map[string]string{
+		"package.json":                          `{"name":"root","private":true}`,
+		"packages/database/package.json":        `{"name":"db","dependencies":{"drizzle-orm":"0.30.0"}}`,
+		"packages/database/src/schema.ts":       `import { pgTable, text } from "drizzle-orm/pg-core"; export const scanRuns = pgTable("scan_runs", { id: text("id") });`,
+		"packages/other/package.json":           `{"name":"other","dependencies":{"react":"18"}}`,
+		"packages/other/src/helper.ts":          `export const decoy = pgTable("decoy", {});`,
+		"packages/checkout-vue/package.json":    `{"name":"checkout-vue","peerDependencies":{"vue":"3"},"devDependencies":{"vue":"3"}}`,
+		"packages/checkout-vue/src/checkout.ts": `export function useOnyxCheckout() { return null }`,
+	}
+	var relFiles []string
+	for rel, content := range files {
+		abs := filepath.Join(dir, rel)
+		if err := os.MkdirAll(filepath.Dir(abs), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(abs, []byte(content), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		if filepath.Ext(rel) == ".ts" {
+			relFiles = append(relFiles, rel)
+		}
+	}
+	if err := os.WriteFile(filepath.Join(dir, "tsconfig.json"), []byte(`{}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	got, err := New().Extract(context.Background(), dir, relFiles)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := findStorage(got, "packages/database/src.scanRuns"); !ok {
+		t.Fatal("owning-package drizzle table missing")
+	}
+	if _, ok := findStorage(got, "packages/other/src.decoy"); ok {
+		t.Fatal("unrelated package inherited drizzle")
+	}
+	f, ok := findFact(got, "packages/checkout-vue/src.useOnyxCheckout")
+	if !ok {
+		t.Fatal("missing useOnyxCheckout")
+	}
+	if f.Props["web_component"] != "composable" || f.Props["framework"] != "vue" {
+		t.Fatalf("vue owning package: %+v", f.Props)
+	}
+}
+
 func TestStorage_NoORMDependencyEmitsNothing(t *testing.T) {
 	ff := extractWithPkg(t, `{"dependencies":{"react":"^18.0.0"}}`, map[string]string{
 		"src/entity.ts": `@Entity("users")

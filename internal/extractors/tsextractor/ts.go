@@ -226,21 +226,18 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 
 	// Detect frameworks
 	isNextJS := detectNextJS(repoPath, inputScope)
-	isVue := detectVue(repoPath, inputScope)
 	nuxtPkgs := collectNuxtPackages(ctx, repoPath, inputScope)
 	isNuxt := len(nuxtPkgs) > 0
 	isSvelteKit := detectSvelteKit(repoPath, inputScope)
 	isEmber := detectEmber(repoPath, inputScope)
 	isReactNav := detectReactNavigation(repoPath, inputScope)
 	isAngular := detectAngular(repoPath, inputScope)
-	// ORM detection is gated on the package.json dependency, exactly as Vue/Nuxt are, so
-	// a class coincidentally decorated @Entity models nothing in a repo without TypeORM.
-	isTypeORM, isDrizzle, isPrisma := detectORMs(repoPath, inputScope)
-	orms := ormFlags{typeORM: isTypeORM, drizzle: isDrizzle}
+	pkgGates := collectPackageGates(ctx, repoPath, inputScope)
+	pkgNames := collectPackageNames(repoPath, inputScope)
+	isPrisma := pkgGates.anyPrisma
 
 	// Parse tsconfig.json path aliases, one root per package for monorepos.
 	aliasRoots := collectTSAliasRoots(ctx, repoPath, inputScope)
-	pkgAliases := collectPackageAliases(ctx, repoPath, inputScope)
 
 	// SvelteKit maps $lib by convention and may declare literal aliases in its
 	// config even before `svelte-kit sync` has generated a tsconfig.
@@ -271,6 +268,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 			htmlFiles = append(htmlFiles, relFile)
 		}
 	}
+	pkgAliases := collectPackageAliases(ctx, repoPath, knownFiles, inputScope)
 	nuxtAutoByPkg := map[string]map[string]string{}
 	for _, p := range nuxtPkgs {
 		nuxtAutoByPkg[p] = nuxtAutoComponentIndex(knownFiles, p, nuxtPkgs)
@@ -322,8 +320,9 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 		if inNuxt {
 			auto = nuxtAutoByPkg[fileNuxt]
 		}
+		fileOrms, fileVue := pkgGates.forFile(pkgNames, relFile)
 		var res tsFileResult
-		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, isVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, orms, aliases, knownFiles, func(rel string) []byte {
+		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, fileVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, fileOrms, aliases, knownFiles, func(rel string) []byte {
 			return sources[rel]
 		}, auto, grpcStubs, exportCache, nil)
 		// Routers, mounts and held-back routes for the repo-wide mount pass below.
@@ -336,6 +335,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 		}
 		return res
 	})
+	nuxtExtraDirs := collectAddImportsDirs(sources)
 	sources = nil
 
 	// Templates are scanned in parallel with no parser: an Angular template is not
@@ -406,7 +406,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	// symbol. Transitive caller tagging is intentionally not applied; reachability
 	// belongs in graph queries. See applyDirectIOContract.
 	if isNuxt {
-		resolveNuxtAutoComposableCalls(allFacts)
+		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, nuxtExtraDirs)
 	}
 	applyDirectIOContract(allFacts)
 
@@ -492,7 +492,6 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	}
 
 	// Emit module facts for each directory
-	pkgNames := collectPackageNames(repoPath, inputScope)
 	// The workspace project each directory belongs to, where the repository states
 	// one. A monorepo's unit of ownership is its project, not its directory, and
 	// every reading that groups by unit was inferring the boundary from the path.
@@ -1553,7 +1552,7 @@ func collectPackageNames(repoPath string, inputScopes ...*inputscope.Scope) map[
 // `import { x } from '@onyx/contracts'` have no tsconfig `paths` entry in some
 // packages (Expo/mobile, Bundler resolution); without this map they stay
 // external and the import edge never binds to the file that exists in-tree.
-func collectPackageAliases(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) map[string]tsAlias {
+func collectPackageAliases(ctx context.Context, repoPath string, knownFiles map[string]bool, inputScopes ...*inputscope.Scope) map[string]tsAlias {
 	inputScope := inputscope.First(inputScopes)
 	out := map[string]tsAlias{}
 	_ = inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
@@ -1585,9 +1584,6 @@ func collectPackageAliases(ctx context.Context, repoPath string, inputScopes ...
 		if err := json.Unmarshal(data, &pkg); err != nil || pkg.Name == "" {
 			return nil
 		}
-		if _, exists := out[pkg.Name]; exists {
-			return nil
-		}
 		rel, err := filepath.Rel(repoPath, filepath.Dir(path)) //factpath:host
 		if err != nil {
 			return nil
@@ -1596,31 +1592,11 @@ func collectPackageAliases(ctx context.Context, repoPath string, inputScopes ...
 		if pkgDir == "." {
 			pkgDir = ""
 		}
-		entry := packageJSONEntry(pkg.Types, pkg.Typings, pkg.Module, pkg.Main, pkg.Exports)
-		if entry == "" {
-			entry = "src/index"
-		}
-		replacement := factpath.Clean(factpath.Join(pkgDir, entry))
-		out[pkg.Name] = tsAlias{replacement: replacement, exact: true}
+		parsed := parsePackageJSONExports(pkg.Name, pkgDir, pkg.Types, pkg.Typings, pkg.Module, pkg.Main, pkg.Exports, knownFiles)
+		applyParsedExports(out, parsed)
 		return nil
 	})
 	return out
-}
-
-func packageJSONEntry(types, typings, module, main string, exports json.RawMessage) string {
-	for _, s := range []string{types, typings, module, main} {
-		if strings.TrimSpace(s) != "" {
-			return strings.TrimSpace(s)
-		}
-	}
-	if len(exports) == 0 || exports[0] != '"' {
-		return ""
-	}
-	var s string
-	if err := json.Unmarshal(exports, &s); err != nil {
-		return ""
-	}
-	return strings.TrimSpace(s)
 }
 
 // mergePackageAliases copies package.json name aliases then overlays tsconfig
@@ -3487,6 +3463,11 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 	if kind == "lexical_declaration" || kind == "variable_declaration" {
 		w.noteShadowBindings(n)
 	}
+	if (kind == "class_declaration" || kind == "class") && len(w.shadows) > 0 {
+		if id := n.ChildByFieldName("name"); id != nil {
+			w.shadows[len(w.shadows)-1][nodeText(id, w.src)] = true
+		}
+	}
 
 	// A nested function/arrow definition is a deferred scope: its body runs when the
 	// function is called, NOT per-iteration of the enclosing loops — so reset the
@@ -3618,9 +3599,18 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 
 	// `new WebSocket(...)` / `new XMLHttpRequest()` opens a network/stream resource —
 	// tag the enclosing body io_direct (constructors are new_expression, not call_expression).
-	if kind == "new_expression" && w.metrics != nil && !w.metrics.ioDirect {
-		if ctor := n.ChildByFieldName("constructor"); ctor != nil && tsIOConstructors[nodeText(ctor, w.src)] {
-			w.metrics.ioDirect = true
+	if kind == "new_expression" {
+		if ctor := n.ChildByFieldName("constructor"); ctor != nil {
+			if w.metrics != nil && !w.metrics.ioDirect && tsIOConstructors[nodeText(ctor, w.src)] {
+				w.metrics.ioDirect = true
+			}
+			if target, targetFile := resolveTSConstructor(w.kinds, ctor, w.src, w.dir, w.importMap, w.importFiles, w.localNames, w.relFile, w.shadowed); target != "" {
+				key := facts.RelInstantiates + "\x00" + target + "\x00" + targetFile
+				if !w.seen[key] {
+					w.seen[key] = true
+					w.rels = append(w.rels, facts.Relation{Kind: facts.RelInstantiates, Target: target, TargetFile: targetFile})
+				}
+			}
 		}
 	}
 
@@ -3967,6 +3957,23 @@ func resolveTSCall(kinds *tsutil.KindTable, call *sitter.Node, src []byte, dir, 
 		if kindOf(kinds, object) == "this" && className != "" {
 			return dir + "." + className + "." + nodeText(property, src), relFile
 		}
+	}
+	return "", ""
+}
+
+func resolveTSConstructor(kinds *tsutil.KindTable, ctor *sitter.Node, src []byte, dir string, importMap, importFiles map[string]string, localNames map[string]bool, relFile string, shadowed func(string) bool) (string, string) {
+	if ctor == nil || kindOf(kinds, ctor) != "identifier" {
+		return "", ""
+	}
+	name := nodeText(ctor, src)
+	if shadowed != nil && shadowed(name) {
+		return "", ""
+	}
+	if target, ok := importMap[name]; ok {
+		return target, importFiles[name]
+	}
+	if localNames[name] {
+		return dir + "." + name, relFile
 	}
 	return "", ""
 }

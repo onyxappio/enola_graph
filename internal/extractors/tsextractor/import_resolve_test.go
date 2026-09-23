@@ -158,6 +158,71 @@ func TestExtract_PackageJSONNameAliasWithoutTSConfigPaths(t *testing.T) {
 	}
 }
 
+func TestExtract_PackageJSONExportsSubpathAndExistingTypes(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"packages/shared-lands-types/package.json": `{
+  "name":"shared-lands-types",
+  "exports":{
+    ".":{"types":"./src/index.ts","import":"./dist/index.mjs"},
+    "./enums":{"types":"./src/enums.ts","import":"./dist/enums.mjs"}
+  }
+}`,
+		"packages/shared-lands-types/src/index.ts": `export const X = 1;`,
+		"packages/shared-lands-types/src/enums.ts": `export enum GenderEnum { Male = 'm' }`,
+		"apps/land/Welcome.ts":                     `import { GenderEnum } from 'shared-lands-types/enums'; export const g = GenderEnum.Male;`,
+	}, false)
+	if !importEdgeResolves(t, ff, "apps/land/Welcome.ts", "packages/shared-lands-types/src", "packages/shared-lands-types/src/enums.ts") {
+		t.Fatalf("exports ./enums did not bind:\n%s", importDump(ff, "apps/land/Welcome.ts"))
+	}
+	var found bool
+	for _, f := range ff {
+		if hasRelation(f, facts.RelCalls, "packages/shared-lands-types/src.GenderEnum") {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("GenderEnum reference missing after exports bind")
+	}
+}
+
+func TestExtract_PackageJSONExportsSkipsMissingDistTypes(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"packages/tracking-client/package.json": `{
+  "name":"@onyxappio/tracking-client",
+  "types":"./dist/index.d.ts",
+  "exports":{
+    ".":{"types":"./dist/index.d.ts","react-native":"./src/index.ts","import":"./dist/index.js"},
+    "./native":{"types":"./dist/native/index.d.ts","react-native":"./src/native/index.ts"}
+  }
+}`,
+		"packages/tracking-client/src/index.ts":        `export function createEventId() {}`,
+		"packages/tracking-client/src/native/index.ts": `export function createNativeTracker() {}`,
+		"apps/mobile/src/tracker.ts": `import { createEventId } from '@onyxappio/tracking-client';
+import { createNativeTracker } from '@onyxappio/tracking-client/native';
+export const a = createEventId;
+export const b = createNativeTracker;`,
+	}, false)
+	if !importEdgeResolves(t, ff, "apps/mobile/src/tracker.ts", "packages/tracking-client/src", "packages/tracking-client/src/index.ts") {
+		t.Fatalf("root export should skip missing dist types:\n%s", importDump(ff, "apps/mobile/src/tracker.ts"))
+	}
+	if !importEdgeResolves(t, ff, "apps/mobile/src/tracker.ts", "packages/tracking-client/src/native", "packages/tracking-client/src/native/index.ts") {
+		t.Fatalf("native subpath unresolved:\n%s", importDump(ff, "apps/mobile/src/tracker.ts"))
+	}
+}
+
+func TestExtract_PackageJSONExportsMissingSubpathStaysExternal(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"packages/lib/package.json": `{"name":"lib","exports":{".":"./src/index.ts"}}`,
+		"packages/lib/src/index.ts": `export const X = 1;`,
+		"apps/app.ts":               `import { X } from 'lib/missing'; export const y = X;`,
+	}, false)
+	for _, f := range ff {
+		if f.Kind == facts.KindDependency && f.File == "apps/app.ts" && f.PropString("source") == "internal" {
+			t.Fatalf("missing export subpath must stay external: %+v", f)
+		}
+	}
+}
+
 func TestExtract_TSConfigPathsBeatPackageJSONName(t *testing.T) {
 	ff := extractAll(t, map[string]string{
 		"packages/contracts/package.json":    `{"name":"@onyx/contracts","main":"./src/index.ts"}`,

@@ -99,6 +99,40 @@ app.get('/healthcheck', handler);
 // former as a client call. Only a receiver BOUND to an app/router in this file may
 // become a server route, and an unknown receiver must keep its v141 behaviour
 // exactly — reclassifying one would move existing facts.
+func TestServerRoutes_FastifyRouteObjectLiteral(t *testing.T) {
+	src := `
+import Fastify from 'fastify'
+const app = Fastify()
+app.route({
+  url: '/graphql',
+  method: ['GET', 'POST', 'OPTIONS'],
+  handler: async (req, reply) => {}
+})
+app.get('/health', async () => {})
+`
+	ff := extractTS(t, src, "services/memory-provider/src/app.ts")
+	got := serverRoutes(ff)
+	if got["/graphql"] == "" {
+		t.Fatalf("expected /graphql from app.route: %+v", got)
+	}
+	if got["/health"] != "GET" {
+		t.Errorf("sibling verb route lost: %+v", got)
+	}
+}
+
+func TestServerRoutes_RouteObjectDoesNotStealClient(t *testing.T) {
+	src := `
+import axios from "axios";
+export async function load() {
+  await axios.route({ url: '/graphql', method: 'POST' });
+}
+`
+	ff := extractTS(t, src, "src/client.ts")
+	if got := serverRoutes(ff); len(got) != 0 {
+		t.Errorf("axios.route must not become a server route: %+v", got)
+	}
+}
+
 func TestServerRoutes_DoNotStealClientCalls(t *testing.T) {
 	src := `
 import axios from "axios";

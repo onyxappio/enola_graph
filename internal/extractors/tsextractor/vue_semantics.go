@@ -1,6 +1,7 @@
 package tsextractor
 
 import (
+	"bytes"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -387,9 +388,64 @@ func vueRouterComponentTarget(kinds *tsutil.KindTable, value *sitter.Node, src [
 	return factpath.Dir(resolved) + "." + fileSymbolName(resolved)
 }
 
-// resolveNuxtAutoComposableCalls rewrites only dangling useXxx targets to one
-// unambiguous exported declaration under a composables directory.
-func resolveNuxtAutoComposableCalls(all []facts.Fact) {
+var addImportsDirCall = regexp.MustCompile(`addImportsDir\s*\(\s*(?:[A-Za-z_$][\w$]*\s*\.\s*resolve\s*\(\s*)?(?:["'](\.[^"']+)["'])`)
+
+func addImportsDirsFromFile(file string, src []byte) []string {
+	if !bytes.Contains(src, []byte("addImportsDir")) {
+		return nil
+	}
+	base := factpath.Dir(file)
+	seen := map[string]bool{}
+	var out []string
+	for _, m := range addImportsDirCall.FindAllSubmatch(src, -1) {
+		rel := strings.TrimSuffix(strings.TrimPrefix(string(m[1]), "./"), "/")
+		dir := factpath.Clean(factpath.Join(base, rel))
+		if dir == "" || seen[dir] {
+			continue
+		}
+		seen[dir] = true
+		out = append(out, dir)
+	}
+	return out
+}
+
+// collectAddImportsDirs records statically literal addImportsDir('./…') registrations
+// once per source file. Paths are relative to the registering module file.
+func collectAddImportsDirs(sources map[string][]byte) []string {
+	seen := map[string]bool{}
+	var out []string
+	for file, src := range sources {
+		for _, dir := range addImportsDirsFromFile(file, src) {
+			if seen[dir] {
+				continue
+			}
+			seen[dir] = true
+			out = append(out, dir)
+		}
+	}
+	return out
+}
+
+func nuxtAutoImportDir(file string, nuxtPkgs, extraDirs []string) bool {
+	file = filepath.ToSlash(file)
+	parent := factpath.Dir(file)
+	base := filepath.Base(parent)
+	if base != "composables" && base != "utils" {
+		return false
+	}
+	for _, d := range extraDirs {
+		if parent == d || strings.HasPrefix(parent, d+"/") {
+			return true
+		}
+	}
+	_, inNuxt := nuxtPackageForFile(nuxtPkgs, file)
+	return inNuxt
+}
+
+// resolveNuxtAutoComposableCalls rewrites dangling calls to one unique exported
+// declaration under a Nuxt-scoped composables/ or utils/ directory (including
+// statically registered addImportsDir trees). Ambiguous names stay unresolved.
+func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []string) {
 	exists := make(map[string]bool)
 	candidates := make(map[string]map[string]bool)
 	for _, f := range all {
@@ -397,16 +453,14 @@ func resolveNuxtAutoComposableCalls(all []facts.Fact) {
 			continue
 		}
 		exists[f.Name] = true
-		parts := strings.Split(filepath.ToSlash(f.File), "/")
-		underComposables := false
-		for _, part := range parts[:max(0, len(parts)-1)] {
-			if part == "composables" {
-				underComposables = true
-				break
-			}
+		if v, ok := f.Props["exported"].(bool); ok && !v {
+			continue
+		}
+		if !nuxtAutoImportDir(f.File, nuxtPkgs, extraDirs) {
+			continue
 		}
 		name := f.Name[strings.LastIndexByte(f.Name, '.')+1:]
-		if !underComposables || !isHookName(name) {
+		if name == "" {
 			continue
 		}
 		if candidates[name] == nil {

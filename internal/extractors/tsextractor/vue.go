@@ -176,7 +176,7 @@ func hasPkgDependency(dir, pkg string, inputScopes ...*inputscope.Scope) bool {
 	if err := json.Unmarshal(data, &p); err != nil {
 		return false
 	}
-	for _, key := range []string{"dependencies", "devDependencies"} {
+	for _, key := range []string{"dependencies", "devDependencies", "peerDependencies"} {
 		if deps, ok := p[key].(map[string]any); ok {
 			if _, ok := deps[pkg]; ok {
 				return true

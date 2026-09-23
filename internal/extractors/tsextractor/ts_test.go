@@ -1268,6 +1268,41 @@ func TestDetect_HotwireStimulusApp(t *testing.T) {
 	}
 }
 
+func TestExtract_NewImportedClassInstantiates(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"packages/crypto/src/envelope.ts": `export class CryptoEnvelopeError extends Error {}`,
+		"packages/crypto/src/keys.ts": `import { CryptoEnvelopeError } from './envelope';
+export function parseEncryptionKeyring(raw: string) {
+  throw new CryptoEnvelopeError('empty');
+}`,
+	}, false)
+	f, ok := findFact(ff, "packages/crypto/src.parseEncryptionKeyring")
+	if !ok {
+		t.Fatal("missing parseEncryptionKeyring")
+	}
+	if !hasRelation(f, facts.RelInstantiates, "packages/crypto/src.CryptoEnvelopeError") {
+		t.Fatalf("expected instantiates CryptoEnvelopeError, got %+v", f.Relations)
+	}
+}
+
+func TestExtract_NewExpressionRespectsShadow(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/envelope.ts": `export class CryptoEnvelopeError extends Error {}`,
+		"src/keys.ts": `import { CryptoEnvelopeError } from './envelope';
+export function parseEncryptionKeyring() {
+  class CryptoEnvelopeError {}
+  throw new CryptoEnvelopeError();
+}`,
+	}, false)
+	f, ok := findFact(ff, "src.parseEncryptionKeyring")
+	if !ok {
+		t.Fatal("missing function")
+	}
+	if hasRelation(f, facts.RelInstantiates, "src.CryptoEnvelopeError") {
+		t.Fatalf("shadowed constructor must not instantiate imported class: %+v", f.Relations)
+	}
+}
+
 // TestCommonJSExportAssignments: `exports.name = function` and
 // `module.exports.name = function` declare that name as an exported function
 // symbol — the whole public surface of a classic Node module. Everything short

@@ -47,18 +47,19 @@ type FileRecord struct {
 	UnresolvedSpecs []string     `json:"unresolved_specs,omitempty"`
 	// ImportComplete is set after summarizeFacts runs. Empty resolved and
 	// unresolved lists are a valid graph when every import is external.
-	ImportComplete bool        `json:"import_complete,omitempty"`
+	ImportComplete bool `json:"import_complete,omitempty"`
 	// SideReads are other source files whose bytes were consulted to derive
 	// this file's facts (named re-export chains). Hash changes there invalidate
 	// this contribution even when this file is untouched.
 	SideReads      []string          `json:"side_reads,omitempty"`
 	SideReadHashes map[string]string `json:"side_read_hashes,omitempty"`
-	GraphQLServer  bool        `json:"graphql_server,omitempty"`
-	GraphQLSDL     []string    `json:"graphql_sdl,omitempty"`
-	GraphQLParsed  bool        `json:"graphql_parsed,omitempty"`
-	GRPC           *GRPCRecord `json:"grpc,omitempty"`
-	Router         *RouterDTO  `json:"router,omitempty"`
-	ParseKind      string      `json:"parse_kind,omitempty"`
+	GraphQLServer  bool              `json:"graphql_server,omitempty"`
+	GraphQLSDL     []string          `json:"graphql_sdl,omitempty"`
+	GraphQLParsed  bool              `json:"graphql_parsed,omitempty"`
+	GRPC           *GRPCRecord       `json:"grpc,omitempty"`
+	Router         *RouterDTO        `json:"router,omitempty"`
+	ParseKind      string            `json:"parse_kind,omitempty"`
+	AutoImportDirs []string          `json:"auto_import_dirs,omitempty"`
 }
 
 // SessionResult is one TS analysis pass under the local-fact contract.
@@ -99,17 +100,16 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	tr := graphprofile.Start()
 
 	isNextJS := detectNextJS(repoPath, inputScope)
-	isVue := detectVue(repoPath, inputScope)
 	nuxtPkgs := collectNuxtPackages(ctx, repoPath, inputScope)
 	isNuxt := len(nuxtPkgs) > 0
 	isSvelteKit := detectSvelteKit(repoPath, inputScope)
 	isEmber := detectEmber(repoPath, inputScope)
 	isReactNav := detectReactNavigation(repoPath, inputScope)
 	isAngular := detectAngular(repoPath, inputScope)
-	isTypeORM, isDrizzle, isPrisma := detectORMs(repoPath, inputScope)
-	orms := ormFlags{typeORM: isTypeORM, drizzle: isDrizzle}
+	pkgGates := collectPackageGates(ctx, repoPath, inputScope)
+	pkgNamesEarly := collectPackageNames(repoPath, inputScope)
+	isPrisma := pkgGates.anyPrisma
 	aliasRoots := collectTSAliasRoots(ctx, repoPath, inputScope)
-	pkgAliases := collectPackageAliases(ctx, repoPath, inputScope)
 	if isSvelteKit {
 		aliasRoots = withSvelteKitAliasFallbacks(repoPath, aliasRoots, inputScope)
 	}
@@ -130,6 +130,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			htmlFiles = append(htmlFiles, relFile)
 		}
 	}
+	pkgAliases := collectPackageAliases(ctx, repoPath, knownFiles, inputScope)
 
 	need := func(rel string) bool {
 		if allDirty {
@@ -285,7 +286,9 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			}
 			return raw
 		}
-		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, isVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, orms, aliases, knownFiles, readSrc, auto, grpcIdx, exportCache, sideReads)
+		fileOrms, fileVue := pkgGates.forFile(pkgNamesEarly, relFile)
+		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, fileVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, fileOrms, aliases, knownFiles, readSrc, auto, grpcIdx, exportCache, sideReads)
+		rec.AutoImportDirs = addImportsDirsFromFile(relFile, src)
 		if len(sideReads) > 0 {
 			rec.SideReads = make([]string, 0, len(sideReads))
 			rec.SideReadHashes = make(map[string]string, len(sideReads))
@@ -372,7 +375,21 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	}
 
 	if isNuxt {
-		resolveNuxtAutoComposableCalls(allFacts)
+		var extra []string
+		seenDir := map[string]bool{}
+		for _, rec := range records {
+			if rec == nil {
+				continue
+			}
+			for _, d := range rec.AutoImportDirs {
+				if seenDir[d] {
+					continue
+				}
+				seenDir[d] = true
+				extra = append(extra, d)
+			}
+		}
+		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, extra)
 	}
 	applyDirectIOContract(allFacts)
 
@@ -461,7 +478,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		allFacts = append(allFacts, ff...)
 		unreadable = append(unreadable, unread...)
 	}
-	pkgNames := collectPackageNames(repoPath, inputScope)
+	pkgNames := pkgNamesEarly
 	var projects map[string]string
 	if isAngular {
 		projects = angularProjectNames(repoPath, inputScope)

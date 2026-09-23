@@ -63,24 +63,31 @@ func scopedFixture(t *testing.T) (string, *graphsession.Resident, *graphstream.M
 func TestScopedPackageReadersStableContext(t *testing.T) {
 	root, _, sink, apply := scopedFixture(t)
 	for _, step := range []struct {
-		path, body  string
-		graphChange bool
+		path, body             string
+		graphChange, tsContext bool
 	}{
-		{"package.json", `{"name":"app","dependencies":{"react":"18"},"scripts":{"test":"echo changed"}}`, false},
-		{"package.json", "{\n \"scripts\": {\"test\": \"echo changed\"},\n \"dependencies\": {\"react\":\"18\"}, \"name\":\"app\"\n}\n", false},
-		{"packages/clickhouse/package.json", `{"name":"clickhouse","devDependencies":{"helper":"1","drizzle-orm":"catalog:"}}`, true},
-		{"packages/database/package.json", `{"name":"database","dependencies":{"helper":"1","@onyx/contracts":"workspace:*"},"scripts":{"db:sync-payment-offers":"tsx src/paymentOfferSyncCli.ts"}}`, true},
+		{"package.json", `{"name":"app","dependencies":{"react":"18"},"scripts":{"test":"echo changed"}}`, false, false},
+		{"package.json", "{\n \"scripts\": {\"test\": \"echo changed\"},\n \"dependencies\": {\"react\":\"18\"}, \"name\":\"app\"\n}\n", false, false},
+		{"packages/clickhouse/package.json", `{"name":"clickhouse","devDependencies":{"helper":"1","drizzle-orm":"catalog:"}}`, true, true},
+		{"packages/database/package.json", `{"name":"database","dependencies":{"helper":"1","@onyx/contracts":"workspace:*"},"scripts":{"db:sync-payment-offers":"tsx src/paymentOfferSyncCli.ts"}}`, true, false},
 	} {
 		graphWrite(t, root, step.path, step.body)
 		before := len(sink.CloneRecords())
 		res := apply(step.path)
-		if res.ParsedFiles != 0 || len(res.Invalidation.ContextReasons) != 0 {
+		if !step.tsContext && (res.ParsedFiles != 0 || len(res.Invalidation.ContextReasons) != 0) {
 			t.Fatalf("stable readers reparsed TS: %+v", res)
 		}
+		if step.tsContext && res.ParsedFiles == 0 {
+			t.Fatalf("owning-package ORM change must reparse: %+v", res)
+		}
 		for _, f := range res.Fallbacks {
-			if f.Extractor != "manifests" {
-				t.Fatalf("unrelated fallback %+v", f)
+			if f.Extractor == "manifests" {
+				continue
 			}
+			if step.tsContext && f.Extractor == "typescript" {
+				continue
+			}
+			t.Fatalf("unrelated fallback %+v", f)
 		}
 		if step.graphChange != (res.TargetGeneration > res.BaseGeneration) {
 			t.Fatalf("manifest graph change=%v result=%+v", step.graphChange, res)

@@ -477,9 +477,9 @@ func TestExtract_NuxtLazyAliasDoesNotOverrideRealLazyComponent(t *testing.T) {
 
 func TestExtract_RootNuxtDoesNotBindNestedPackageComponents(t *testing.T) {
 	ff := extractAll(t, map[string]string{
-		"package.json":    `{"dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
-		"nuxt.config.ts":  `export default defineNuxtConfig({})`,
-		"pages/index.vue": `<template><LazyStepIndexElement /></template>`,
+		"package.json":                 `{"dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"nuxt.config.ts":               `export default defineNuxtConfig({})`,
+		"pages/index.vue":              `<template><LazyStepIndexElement /></template>`,
 		"apps/landings/package.json":   `{"dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
 		"apps/landings/nuxt.config.ts": `export default defineNuxtConfig({})`,
 		"apps/landings/components/step/index/StepIndexElement.vue": `<template><h1>nested</h1></template>`,
@@ -892,6 +892,46 @@ const auth = useAuth()
 	}
 	if hasTarget(targets, "app/pages.useAuth") {
 		t.Errorf("dangling same-directory composable target survived: %v", targets)
+	}
+}
+
+func TestExtract_NuxtAutoImportsNonUseUtilsAndAddImportsDir(t *testing.T) {
+	ff := extractVue(t, map[string]string{
+		"app/composables/useAuth.ts": `export function useAuth() { return 1 }`,
+		"packages/mod/src/module.ts": `
+export default function setup() {
+  addImportsDir(resolver.resolve('./runtime/composables/'))
+  addImportsDir(resolver.resolve('./runtime/utils/'))
+}
+`,
+		"packages/mod/src/runtime/composables/setLandPageMetadata.ts": `export function setLandPageMetadata(meta: Record<string, string>) {}`,
+		"packages/mod/src/runtime/utils/loadGeoFlags.ts":              `export function loadGeoFlags() {}`,
+		"app/pages/index.vue": `<script setup lang="ts">
+setLandPageMetadata({ page: 'x' })
+loadGeoFlags()
+useAuth()
+</script><template><p /></template>`,
+	}, true)
+	targets := fileRefTargets(ff, "app/pages/index.vue")
+	if !hasTarget(targets, "packages/mod/src/runtime/composables.setLandPageMetadata") {
+		t.Errorf("addImportsDir composable unresolved: %v", targets)
+	}
+	if !hasTarget(targets, "packages/mod/src/runtime/utils.loadGeoFlags") {
+		t.Errorf("addImportsDir utils unresolved: %v", targets)
+	}
+	if !hasTarget(targets, "app/composables.useAuth") {
+		t.Errorf("use* auto-import lost: %v", targets)
+	}
+}
+
+func TestExtract_NuxtAutoImportIgnoresUnrelatedPackageBasename(t *testing.T) {
+	ff := extractVue(t, map[string]string{
+		"other/src/helper.ts": `export function setLandPageMetadata() {}`,
+		"app/pages/index.vue": `<script setup lang="ts">setLandPageMetadata()</script><template><p /></template>`,
+	}, true)
+	targets := fileRefTargets(ff, "app/pages/index.vue")
+	if hasTarget(targets, "other/src.setLandPageMetadata") {
+		t.Errorf("unrelated package export was guessed: %v", targets)
 	}
 }
 

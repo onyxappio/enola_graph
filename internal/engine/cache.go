@@ -2462,7 +2462,10 @@ import (
 // v282: Failed/ambiguous named-import follow stays constrained to the import
 // file instead of unique-name fallback; importer fingerprints include reexport
 // chain side-reads so rename/remove invalidates derived target_file.
-const cacheVersion = "v282"
+// v283: package.json exports subpaths; owning-package ORM/Vue gates; Nuxt
+// composables/utils auto-imports including addImportsDir; Fastify app.route
+// object form; symbol-level RelInstantiates for `new ImportedClass()`.
+const cacheVersion = "v283"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //
