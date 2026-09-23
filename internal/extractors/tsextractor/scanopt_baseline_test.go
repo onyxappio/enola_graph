@@ -213,8 +213,9 @@ func baselineExtractHTTPClientFacts(src []byte, relFile string) []facts.Fact {
 		add(raw, method, "openapi-fetch", m[0], "")
 	}
 	serverRecv := baselineServerBindings(src)
+	fastifyScopes := serverLexicalScopes(src)
 	for _, m := range lowerVerbCall.FindAllSubmatchIndex(src, -1) {
-		if isServerReceiver(serverRecv, identifierEndingAt(src, m[0])) {
+		if isServerReceiverAt(serverRecv, fastifyScopes, identifierEndingAt(src, m[0]), m[0]) {
 			continue
 		}
 		method := strings.ToUpper(string(src[m[2]:m[3]]))
@@ -222,7 +223,7 @@ func baselineExtractHTTPClientFacts(src []byte, relFile string) []facts.Fact {
 		add(raw, method, "axios", m[0], "")
 	}
 	for _, m := range lowerVerbTemplateCall.FindAllSubmatchIndex(src, -1) {
-		if isServerReceiver(serverRecv, identifierEndingAt(src, m[0])) {
+		if isServerReceiverAt(serverRecv, fastifyScopes, identifierEndingAt(src, m[0]), m[0]) {
 			continue
 		}
 		raw := string(src[m[4]:m[5]])

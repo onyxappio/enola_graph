@@ -89,6 +89,8 @@ var testFileSuffixes = []string{
 	"_spec.rb",
 	".test.ts", ".test.tsx", ".spec.ts", ".spec.tsx",
 	".test.js", ".test.jsx", ".spec.js", ".spec.jsx",
+	".test.mjs", ".spec.mjs", ".test.cjs", ".spec.cjs",
+	".test.mts", ".spec.mts", ".test.cts", ".spec.cts",
 	// End-to-end suites. `.e2e-spec.ts` is what the Nest CLI generates and what its
 	// jest-e2e config matches (testRegex ".e2e-spec.ts$"); `.e2e.ts` is the
 	// Playwright/Cypress convention. Both are tool-enforced, which is this list's

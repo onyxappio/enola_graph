@@ -219,14 +219,15 @@ func TestScanOpt_ProductHelpersMatchBaseline(t *testing.T) {
 
 func baselineExtractServerRouteFacts(src []byte, relFile string) []facts.Fact {
 	bindings := baselineServerBindings(src)
-	if len(bindings) == 0 {
+	scopes := serverLexicalScopes(src)
+	if len(bindings) == 0 && len(scopes) == 0 {
 		return nil
 	}
 	dir := factpath.Dir(relFile)
 	var out []facts.Fact
 	seen := map[string]bool{}
 	for _, m := range serverVerbCall.FindAllSubmatchIndex(src, -1) {
-		b, ok := bindings[string(src[m[2]:m[3]])]
+		b, ok := serverReceiverAt(bindings, scopes, string(src[m[2]:m[3]]), m[0])
 		if !ok || !b.mounted {
 			continue
 		}

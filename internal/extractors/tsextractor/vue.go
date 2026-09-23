@@ -462,23 +462,32 @@ func isVueTagNameChar(c byte) bool {
 // vueTemplateRefs resolves names used by a Vue template against declarations and
 // imports visible to that SFC. Filtering through those two exact scopes avoids
 // turning HTML text, property names, v-for locals, and native tags into graph edges.
-func vueTemplateRefs(rawSrc []byte, relFile string, extracted []facts.Fact, bindings emberImportBindings, autoComponents map[string]string) []string {
+type vueTemplateRef struct {
+	target, file string
+}
+
+func vueTemplateRefs(rawSrc []byte, relFile string, extracted []facts.Fact, bindings emberImportBindings, autoComponents map[string]string) []vueTemplateRef {
 	template := vueTemplateContent(rawSrc)
 	if len(template) == 0 {
 		return nil
 	}
 	dir := factpath.Dir(relFile)
 	visible := make(map[string]string)
+	ownFile := make(map[string]bool)
 	for _, f := range extracted {
 		if f.Kind != facts.KindSymbol || f.File != relFile {
 			continue
 		}
 		if dot := strings.LastIndexByte(f.Name, '.'); dot >= 0 {
-			visible[f.Name[dot+1:]] = f.Name
+			short := f.Name[dot+1:]
+			visible[short] = f.Name
+			ownFile[short] = true
 		}
 	}
 	for local, target := range bindings.internal {
-		visible[local] = target
+		if visible[local] == "" {
+			visible[local] = target
+		}
 	}
 	for local, target := range autoComponents {
 		if visible[local] == "" {
@@ -486,12 +495,21 @@ func vueTemplateRefs(rawSrc []byte, relFile string, extracted []facts.Fact, bind
 		}
 	}
 
-	seen := make(map[string]bool)
+	seen := make(map[string]vueTemplateRef)
+	addName := func(name string) {
+		target := visible[name]
+		if target == "" || target == dir+"."+fileSymbolName(relFile) {
+			return
+		}
+		file := ""
+		if ownFile[name] {
+			file = relFile
+		}
+		seen[target] = vueTemplateRef{target: target, file: file}
+	}
 	addExpr := func(expr []byte) {
 		for _, name := range identTokens(string(expr)) {
-			if target := visible[name]; target != "" && target != dir+"."+fileSymbolName(relFile) {
-				seen[target] = true
-			}
+			addName(name)
 		}
 	}
 	for _, m := range vueInterpolationRe.FindAllSubmatch(template, -1) {
@@ -509,19 +527,19 @@ func vueTemplateRefs(rawSrc []byte, relFile string, extracted []facts.Fact, bind
 		if dot := strings.IndexByte(name, '.'); dot >= 0 {
 			name = name[:dot]
 		}
-		if target := visible[name]; target != "" {
-			seen[target] = true
+		if visible[name] != "" {
+			addName(name)
 			continue
 		}
-		if target := visible[toPascal(name)]; target != "" {
-			seen[target] = true
+		if visible[toPascal(name)] != "" {
+			addName(toPascal(name))
 		}
 	}
-	targets := make([]string, 0, len(seen))
-	for target := range seen {
-		targets = append(targets, target)
+	targets := make([]vueTemplateRef, 0, len(seen))
+	for _, ref := range seen {
+		targets = append(targets, ref)
 	}
-	sort.Strings(targets)
+	sort.Slice(targets, func(i, j int) bool { return targets[i].target < targets[j].target })
 	return targets
 }
 
@@ -693,10 +711,11 @@ func (e *TSExtractor) extractVueSFC(kinds *tsutil.KindTable, rawSrc []byte, relF
 			if result[i].Kind != facts.KindSymbol || result[i].Name != factName {
 				continue
 			}
-			for _, target := range templateTargets {
-				if target != factName && !result[i].HasRelation(facts.RelCalls, target) {
-					result[i].Relations = append(result[i].Relations, facts.Relation{Kind: facts.RelCalls, Target: target})
+			for _, ref := range templateTargets {
+				if ref.target == factName || result[i].HasRelation(facts.RelCalls, ref.target) {
+					continue
 				}
+				result[i].Relations = append(result[i].Relations, facts.Relation{Kind: facts.RelCalls, Target: ref.target, TargetFile: ref.file})
 			}
 			break
 		}
@@ -764,7 +783,7 @@ func (e *TSExtractor) extractVueScriptBlock(kinds *tsutil.KindTable, block *vueS
 	ctx.aliases = aliases
 	ctx.exportCache = exportCache
 	ctx.sideReads = sideReads
-	ctx.importMap, ctx.importFiles = buildImportSymbols(kinds, root, block.Content, relFile, aliases, knownFiles, readSrc, exportCache, sideReads)
+	ctx.importMap, ctx.importFiles, ctx.nsDirs, ctx.nsIndex = buildImportSymbols(kinds, root, block.Content, relFile, aliases, knownFiles, readSrc, exportCache, sideReads)
 	ctx.localNames = collectFileScopeCallNames(kinds, root, block.Content)
 	decls := e.extractDeclarations(kinds, root, ctx)
 

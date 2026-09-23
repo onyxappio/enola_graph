@@ -642,10 +642,89 @@ func mergeFastifyScopes(typed, params []fastifyParamScope) []fastifyParamScope {
 }
 
 func serverLexicalScopes(src []byte) []fastifyParamScope {
-	return mergeFastifyScopes(
+	base := mergeFastifyScopes(
 		mergeFastifyScopes(typedFastifyParamScopes(src), collectParamNameScopes(src)),
 		collectLocalBindingScopes(src),
 	)
+	return mergeFastifyScopes(base, collectRegisterCallbackScopes(src, serverBindings(src), base))
+}
+
+var registerOrPluginCall = regexp.MustCompile(`([A-Za-z_$][\w$]*)\s*\.\s*(?:register|plugin)\s*\(`)
+
+// collectRegisterCallbackScopes binds the first parameter of a plugin callback
+// passed to a proven server receiver's `.register(` / `.plugin(`. Unknown
+// receivers do not propagate; nested same-name parameters still shadow via
+// the smallest enclosing scope.
+func collectRegisterCallbackScopes(src []byte, bindings map[string]serverBinding, existing []fastifyParamScope) []fastifyParamScope {
+	if !hasDotKeyword(src, []byte("register")) && !hasDotKeyword(src, []byte("plugin")) {
+		return nil
+	}
+	mask := tsCommentStringMask(src)
+	scopes := existing
+	var extra []fastifyParamScope
+	for _, m := range registerOrPluginCall.FindAllSubmatchIndex(src, -1) {
+		if mask[m[0]] {
+			continue
+		}
+		recv := string(src[m[2]:m[3]])
+		live := scopes
+		if len(extra) > 0 {
+			live = append(append([]fastifyParamScope{}, scopes...), extra...)
+		}
+		b, ok := serverReceiverAt(bindings, live, recv, m[0])
+		if !ok || !b.mounted {
+			continue
+		}
+		paramPos, name, ok := registerCallbackFirstParam(src, mask, m[1]-1)
+		if !ok {
+			continue
+		}
+		bodyStart, bodyEnd, ok := functionBodyAroundParam(src, mask, paramPos)
+		if !ok {
+			continue
+		}
+		extra = append(extra, fastifyParamScope{
+			name:    name,
+			start:   bodyStart,
+			end:     bodyEnd,
+			binding: b,
+		})
+	}
+	return extra
+}
+
+func registerCallbackFirstParam(src []byte, mask []bool, openParen int) (pos int, name string, ok bool) {
+	if openParen < 0 || openParen >= len(src) || src[openParen] != '(' {
+		return 0, "", false
+	}
+	i := skipTSSpace(src, mask, openParen+1)
+	if i < len(src) && i+5 <= len(src) && string(src[i:i+5]) == "async" && (i+5 == len(src) || !isJSIdentPart(src[i+5])) {
+		i = skipTSSpace(src, mask, i+5)
+	}
+	if i < len(src) && i+8 <= len(src) && string(src[i:i+8]) == "function" && (i+8 == len(src) || !isJSIdentPart(src[i+8])) {
+		i = skipTSSpace(src, mask, i+8)
+		if i < len(src) && isJSIdentStart(src[i]) {
+			j := i + 1
+			for j < len(src) && isJSIdentPart(src[j]) {
+				j++
+			}
+			i = skipTSSpace(src, mask, j)
+		}
+	}
+	if i >= len(src) {
+		return 0, "", false
+	}
+	if src[i] == '(' {
+		i = skipTSSpace(src, mask, i+1)
+	}
+	if i >= len(src) || !isJSIdentStart(src[i]) {
+		return 0, "", false
+	}
+	j := i + 1
+	for j < len(src) && isJSIdentPart(src[j]) {
+		j++
+	}
+	return i, string(src[i:j]), true
 }
 
 var localFactoryRHS = regexp.MustCompile(`^(?:new\s+)?(express|fastify|Fastify|Hono|Koa)\s*\(`)

@@ -542,8 +542,10 @@ type extractCtx struct {
 	isSvelteKit bool
 	orms        ormFlags
 	importMap   map[string]string
-	importFiles map[string]string   // local import name → known source file of that specifier
-	localNames  map[string]bool     // file-scope function/const names that may own a local call
+	importFiles map[string]string // local import name → known source file of that specifier
+	nsDirs      map[string]string // `import * as ns` local → module directory
+	nsIndex     map[string]string // `import * as ns` local → resolved module file
+	localNames  map[string]bool   // file-scope function/const names that may own a local call
 	imports     emberImportBindings // the file's import table, read for the module a superclass identifier came from
 	ioBindings  map[string]bool     // local names bound to imports from a network module (I/O sinks)
 	knownFiles  map[string]bool     // repo-relative (slash) paths of all indexed TS/JS files
@@ -682,7 +684,7 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 		exportCache: exportCache,
 		sideReads:   sideReads,
 	}
-	ctx.importMap, ctx.importFiles = buildImportSymbols(kinds, root, src, relFile, aliases, knownFiles, readSrc, exportCache, sideReads)
+	ctx.importMap, ctx.importFiles, ctx.nsDirs, ctx.nsIndex = buildImportSymbols(kinds, root, src, relFile, aliases, knownFiles, readSrc, exportCache, sideReads)
 	ctx.localNames = collectFileScopeCallNames(kinds, root, src)
 	decls := e.extractDeclarations(kinds, root, ctx)
 
@@ -791,6 +793,9 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 		if route := detectNuxtRoute(relFile); route != nil {
 			result = append(result, *route)
 		}
+	}
+	if !facts.IsTestPath(relFile) {
+		result = append(result, extractNitroFacts(src, relFile, isNuxt, aliases, knownFiles)...)
 	}
 
 	return result, angular, router, inlineTemplates, httpFile, clients
@@ -1103,18 +1108,31 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 					continue
 				}
 				isPrivate := false
+				isReadonly := false
 				for k := range member.ChildCount() {
 					c := member.Child(k)
-					if kindOf(kinds, c) == "accessibility_modifier" && nodeText(c, src) == "private" {
+					ck := kindOf(kinds, c)
+					if ck == "accessibility_modifier" && nodeText(c, src) == "private" {
 						isPrivate = true
-						break
+					}
+					if ck == "readonly" || nodeText(c, src) == "readonly" {
+						isReadonly = true
 					}
 				}
+				dataField := kindOf(kinds, member) == "public_field_definition" && !classFieldIsFunctionValued(kinds, member)
 				mRels := []facts.Relation{{Kind: facts.RelDeclares, Target: dir}}
 				callRels, m := collectCallsWithMetrics(kinds, member, src, dir, symbolName, ctx, dir+"."+symbolName+"."+mName, mName)
 				mRels = append(mRels, callRels...)
+				kind := facts.SymbolMethod
+				if dataField {
+					if isReadonly {
+						kind = facts.SymbolConstant
+					} else {
+						kind = facts.SymbolVariable
+					}
+				}
 				mProps := map[string]any{
-					"symbol_kind": facts.SymbolMethod,
+					"symbol_kind": kind,
 					"exported":    isExported && !isPrivate,
 					"language":    "typescript",
 					"receiver":    symbolName,
@@ -1122,8 +1140,10 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 				if names := decoratorSetProp(memberDecorators); names != "" {
 					mProps["decorators"] = names
 				}
-				if takes, ok := declaresParameters(kinds, member); ok {
-					mProps["takes_parameters"] = takes
+				if !dataField {
+					if takes, ok := declaresParameters(kinds, member); ok {
+						mProps["takes_parameters"] = takes
+					}
 				}
 				if isGetterDefinition(kinds, member) {
 					mProps["symbol_kind"] = facts.SymbolGetter
@@ -1133,7 +1153,9 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 					mProps["framework"] = "stimulus"
 					mProps["stimulus_static"] = mName
 				}
-				applyTSMetrics(mProps, m)
+				if !dataField {
+					applyTSMetrics(mProps, m)
+				}
 				result = append(result, facts.Fact{
 					Kind:      facts.KindSymbol,
 					Name:      dir + "." + symbolName + "." + mName,
@@ -1358,6 +1380,21 @@ func (e *TSExtractor) funcSymbol(kinds *tsutil.KindTable, declNode, body *sitter
 	applyTSMetrics(f.Props, m)
 	classifySymbol(kinds, &f, name, body, ctx, facts.SymbolFunc)
 	return f
+}
+
+func classFieldIsFunctionValued(kinds *tsutil.KindTable, member *sitter.Node) bool {
+	if member == nil {
+		return false
+	}
+	val := member.ChildByFieldName("value")
+	if val == nil {
+		return false
+	}
+	switch kindOf(kinds, val) {
+	case "arrow_function", "function", "function_expression", "generator_function":
+		return true
+	}
+	return false
 }
 
 // simpleSymbol builds a declaration-only symbol fact (interface, type, enum, namespace).
@@ -2445,10 +2482,21 @@ func tsExtensionSubstitutionCandidates(resolved string) []string {
 // fact. Symbols declared in an imported module are named "<moduleDir>.<exportName>",
 // where moduleDir is the directory of the resolved module file — this matches the
 // common file-module case (e.g. import "./utils" → utils.ts → "<dir>.foo").
-func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, cache *namedExportCache, sideReads map[string]bool) (map[string]string, map[string]string) {
+func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, cache *namedExportCache, sideReads map[string]bool) (map[string]string, map[string]string, map[string]string, map[string]string) {
 	fileDir := factpath.Dir(relFile)
 	m := make(map[string]string)
 	files := make(map[string]string)
+	nsDirs := make(map[string]string)
+	nsIndex := make(map[string]string)
+	note := func(f string) {
+		if sideReads == nil {
+			return
+		}
+		f = filepath.ToSlash(f)
+		if f != "" && f != filepath.ToSlash(relFile) {
+			sideReads[f] = true
+		}
+	}
 	for i := range root.ChildCount() {
 		child := root.Child(i)
 		if kindOf(kinds, child) != "import_statement" {
@@ -2476,9 +2524,18 @@ func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, 
 		if clause == nil {
 			continue
 		}
+		if ns := findChildByKind(kinds, clause, "namespace_import"); ns != nil {
+			if id := findChildByKind(kinds, ns, "identifier"); id != nil {
+				local := nodeText(id, src)
+				nsDirs[local] = moduleDir
+				if foundFile && indexPath != "" {
+					nsIndex[local] = indexPath
+				}
+			}
+		}
 		named := findChildByKind(kinds, clause, "named_imports")
 		if named == nil {
-			continue // default/namespace imports are not resolved
+			continue
 		}
 		for j := range named.ChildCount() {
 			spec := named.Child(j)
@@ -2494,26 +2551,37 @@ func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, 
 			if aliasNode := spec.ChildByFieldName("alias"); aliasNode != nil {
 				local = nodeText(aliasNode, src)
 			}
-			m[local] = moduleDir + "." + exportName
-			if foundFile && indexPath != "" {
-				note := func(f string) {
-					if sideReads == nil {
-						return
-					}
-					f = filepath.ToSlash(f)
-					if f != "" && f != filepath.ToSlash(relFile) {
-						sideReads[f] = true
-					}
-				}
-				if leaf := bindNamedImportFile(indexPath, exportName, readSrc, aliases, knownFiles, cache, note); leaf != "" {
-					files[local] = leaf
-				}
-			} else if resolved != "" {
-				files[local] = filepath.ToSlash(resolved)
+			target, leaf := bindImportedSymbol(moduleDir, indexPath, exportName, resolved, foundFile, readSrc, aliases, knownFiles, cache, note)
+			m[local] = target
+			if leaf != "" {
+				files[local] = leaf
 			}
 		}
 	}
-	return m, files
+	return m, files, nsDirs, nsIndex
+}
+
+func bindImportedSymbol(moduleDir, indexPath, exportName, resolved string, foundFile bool, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool, cache *namedExportCache, note func(string)) (target, file string) {
+	target = moduleDir + "." + exportName
+	if foundFile && indexPath != "" {
+		leaf := bindNamedImportFile(indexPath, exportName, readSrc, aliases, knownFiles, cache, note)
+		if leaf != "" {
+			file = leaf
+			if filepath.ToSlash(leaf) != filepath.ToSlash(indexPath) {
+				target = factpath.Dir(leaf) + "." + exportName
+			}
+		}
+		return target, file
+	}
+	if resolved != "" {
+		if file, _, ok := resolveModuleFile(resolved, knownFiles); ok {
+			return target, file
+		}
+		// Keep explicit unresolved specifier provenance so later auto-import
+		// passes cannot replace a named import that failed to bind.
+		return target, filepath.ToSlash(resolved)
+	}
+	return target, ""
 }
 
 // collectFileScopeCallNames records module-scope function bindings that a bare
@@ -2583,16 +2651,28 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 	fileDir := factpath.Dir(ctx.relFile)
 	internal := make(map[string]string) // local name -> canonical target (internal modules only)
 	internalFiles := make(map[string]string)
-	namespaces := make(map[string]string) // `import * as ns` local -> module dir
+	namespaces := make(map[string]string)     // `import * as ns` local -> module dir
+	namespaceFiles := make(map[string]string) // `import * as ns` local -> module file
 	var reexports []string                // canonical targets re-exported via `export { x } from './y'`
 	var defaultRefs []string              // default-export targets of default-imported modules
 
-	bind := func(local, moduleDir, exportName, file string) {
-		if local != "" {
-			internal[local] = moduleDir + "." + exportName
-			if file != "" {
-				internalFiles[local] = file
+	bind := func(local, moduleDir, exportName, indexPath, resolved string, foundFile bool) {
+		if local == "" {
+			return
+		}
+		note := func(f string) {
+			if ctx.sideReads == nil {
+				return
 			}
+			f = filepath.ToSlash(f)
+			if f != "" && f != filepath.ToSlash(ctx.relFile) {
+				ctx.sideReads[f] = true
+			}
+		}
+		target, file := bindImportedSymbol(moduleDir, indexPath, exportName, resolved, foundFile, ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, note)
+		internal[local] = target
+		if file != "" {
+			internalFiles[local] = file
 		}
 	}
 	// resolveModule resolves an import specifier to its owning module directory and,
@@ -2635,7 +2715,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 				switch kindOf(kinds, c) {
 				case "identifier": // default import: `import Foo from './x'`
 					local := nodeText(c, src)
-					bind(local, moduleDir, local, indexPath)
+					bind(local, moduleDir, local, indexPath, "", indexPath != "")
 					// A default import IS a use of the module's default export, whose
 					// symbol is named by fileSymbolName (an anonymous
 					// `export default connect(...)(X)` in a folder index becomes
@@ -2646,7 +2726,11 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 					}
 				case "namespace_import": // `import * as ns from './x'`
 					if id := findChildByKind(kinds, c, "identifier"); id != nil {
-						namespaces[nodeText(id, src)] = moduleDir
+						local := nodeText(id, src)
+						namespaces[local] = moduleDir
+						if indexPath != "" {
+							namespaceFiles[local] = indexPath
+						}
 					}
 				case "named_imports":
 					for k := range c.ChildCount() {
@@ -2663,29 +2747,14 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 						if a := spec.ChildByFieldName("alias"); a != nil {
 							local = nodeText(a, src)
 						}
-						file := ""
-						if indexPath != "" {
-							note := func(f string) {
-								if ctx.sideReads == nil {
-									return
-								}
-								f = filepath.ToSlash(f)
-								if f != "" && f != filepath.ToSlash(ctx.relFile) {
-									ctx.sideReads[f] = true
-								}
-							}
-							file = bindNamedImportFile(indexPath, exportName, ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, note)
-						} else if ctx.knownFiles != nil {
-							if srcNode := findChildByKind(kinds, child, "string"); srcNode != nil {
-								importPath := strings.Trim(nodeText(srcNode, src), `"'`)
-								if resolved, ext := resolveImportPath(importPath, fileDir, aliases); !ext && resolved != "" {
-									if _, _, found := resolveModuleFile(resolved, ctx.knownFiles); !found {
-										file = filepath.ToSlash(resolved)
-									}
-								}
+						resolved := ""
+						if srcNode := findChildByKind(kinds, child, "string"); srcNode != nil {
+							importPath := strings.Trim(nodeText(srcNode, src), `"'`)
+							if r, ext := resolveImportPath(importPath, fileDir, aliases); !ext {
+								resolved = r
 							}
 						}
-						bind(local, moduleDir, exportName, file)
+						bind(local, moduleDir, exportName, indexPath, resolved, indexPath != "")
 					}
 				}
 			}
@@ -2748,12 +2817,12 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 				switch kindOf(kinds, nameNode) {
 				case "identifier":
 					local := nodeText(nameNode, src)
-					bind(local, moduleDir, local, indexPath)
+					bind(local, moduleDir, local, indexPath, "", indexPath != "")
 				case "object_pattern":
 					for k := range nameNode.ChildCount() {
 						if p := nameNode.Child(k); kindOf(kinds, p) == "shorthand_property_identifier_pattern" {
 							nm := nodeText(p, src)
-							bind(nm, moduleDir, nm, indexPath)
+							bind(nm, moduleDir, nm, indexPath, "", indexPath != "")
 						}
 					}
 				}
@@ -2805,8 +2874,18 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			prop := n.ChildByFieldName("property")
 			if obj != nil && kindOf(kinds, obj) == "identifier" {
 				name := nodeText(obj, src)
-				if dir, ok := namespaces[name]; ok && prop != nil {
-					add(dir+"."+nodeText(prop, src), internalFiles[name]) // ns.foo -> <dir>.foo
+				if dir, ok := namespaces[name]; ok && prop != nil && kindOf(kinds, prop) == "property_identifier" {
+					exportName := nodeText(prop, src)
+					target, file := bindImportedSymbol(dir, namespaceFiles[name], exportName, "", namespaceFiles[name] != "", ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, func(f string) {
+						if ctx.sideReads == nil {
+							return
+						}
+						f = filepath.ToSlash(f)
+						if f != "" && f != filepath.ToSlash(ctx.relFile) {
+							ctx.sideReads[f] = true
+						}
+					})
+					add(target, file)
 					return
 				}
 				if t, ok := internal[name]; ok {
@@ -2877,7 +2956,12 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 // tsTestSuffixes are the co-located TypeScript test/spec suffixes that
 // config.Default().TestGlobs matches. Kept in one place so isTSTestFile and any
 // future glob check agree.
-var tsTestSuffixes = []string{".test.ts", ".test.tsx", ".spec.ts", ".spec.tsx"}
+var tsTestSuffixes = []string{
+	".test.ts", ".test.tsx", ".spec.ts", ".spec.tsx",
+	".test.js", ".test.jsx", ".spec.js", ".spec.jsx",
+	".test.mjs", ".spec.mjs", ".test.cjs", ".spec.cjs",
+	".test.mts", ".spec.mts", ".test.cts", ".spec.cts",
+}
 
 // emberTestSuffixes are Ember's hyphenated test suffixes, valid ONLY under a
 // tests/ directory segment — ember-cli generates and qunit discovers
@@ -3339,6 +3423,7 @@ type tsBodyWalker struct {
 	importFiles         map[string]string
 	localNames          map[string]bool
 	relFile             string
+	ctx                 *extractCtx
 	ioBindings          map[string]bool
 	selfName, selfShort string
 	metrics             *tsBodyMetrics
@@ -3578,7 +3663,7 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 		if w.metrics != nil && !w.metrics.ioDirect && tsIsIOCall(w.kinds, n, w.src, w.ioBindings) {
 			w.metrics.ioDirect = true
 		}
-		if target, targetFile := resolveTSCall(w.kinds, n, w.src, w.dir, w.className, w.importMap, w.importFiles, w.localNames, w.relFile, w.shadowed); target != "" {
+		if target, targetFile := resolveTSCall(w.kinds, n, w.src, w.dir, w.className, w.importMap, w.importFiles, w.localNames, w.relFile, w.shadowed, w.ctx); target != "" {
 			key := target + "\x00" + targetFile
 			if !w.seen[key] {
 				w.seen[key] = true
@@ -3766,7 +3851,7 @@ func collectCallsWithMetrics(kinds *tsutil.KindTable, node *sitter.Node, src []b
 	w := &tsBodyWalker{
 		src: src, kinds: kinds, dir: dir, className: className,
 		importMap: ctx.importMap, importFiles: ctx.importFiles, localNames: ctx.localNames,
-		relFile: ctx.relFile, ioBindings: ctx.ioBindings,
+		relFile: ctx.relFile, ctx: ctx, ioBindings: ctx.ioBindings,
 		selfName: selfName, selfShort: selfShort, metrics: m, seen: make(map[string]bool),
 	}
 	w.walk(node)
@@ -3957,7 +4042,7 @@ func applyDirectIOContract(allFacts []facts.Fact) {
 // type). It resolves:
 //   - bare calls `foo()` → imported symbol via importMap, else same-module "<dir>.foo"
 //   - `this.method()` inside a class → "<dir>.<className>.method"
-func resolveTSCall(kinds *tsutil.KindTable, call *sitter.Node, src []byte, dir, className string, importMap, importFiles map[string]string, localNames map[string]bool, relFile string, shadowed func(string) bool) (string, string) {
+func resolveTSCall(kinds *tsutil.KindTable, call *sitter.Node, src []byte, dir, className string, importMap, importFiles map[string]string, localNames map[string]bool, relFile string, shadowed func(string) bool, ctx *extractCtx) (string, string) {
 	fn := call.ChildByFieldName("function")
 	if fn == nil {
 		return "", ""
@@ -3985,6 +4070,26 @@ func resolveTSCall(kinds *tsutil.KindTable, call *sitter.Node, src []byte, dir, 
 		// have an unknown type and are left unresolved to avoid dangling edges.
 		if kindOf(kinds, object) == "this" && className != "" {
 			return dir + "." + className + "." + nodeText(property, src), relFile
+		}
+		if kindOf(kinds, object) == "identifier" && kindOf(kinds, property) == "property_identifier" {
+			recv := nodeText(object, src)
+			if shadowed != nil && shadowed(recv) {
+				return "", ""
+			}
+			if ctx != nil {
+				if nsDir, ok := ctx.nsDirs[recv]; ok {
+					exportName := nodeText(property, src)
+					return bindImportedSymbol(nsDir, ctx.nsIndex[recv], exportName, "", ctx.nsIndex[recv] != "", ctx.readSrc, ctx.aliases, ctx.knownFiles, ctx.exportCache, func(f string) {
+						if ctx.sideReads == nil {
+							return
+						}
+						f = filepath.ToSlash(f)
+						if f != "" && f != filepath.ToSlash(ctx.relFile) {
+							ctx.sideReads[f] = true
+						}
+					})
+				}
+			}
 		}
 	}
 	return "", ""

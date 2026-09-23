@@ -2475,7 +2475,11 @@ import (
 // server receiver (unknown/alias RHS does not inherit outer bindings).
 // v287: lexical local-binding discovery walks nested function/arrow
 // initializer bodies instead of skipping them with skipTSInitializer.
-const cacheVersion = "v287"
+// v288: Fastify register/plugin callback receivers; JS module test/spec
+// suffixes; namespace-import member calls; Nitro file and addServerHandler
+// routes; class data fields as variable/constant; named-reexport leaf
+// directory names; Vue own-file template call provenance.
+const cacheVersion = "v288"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

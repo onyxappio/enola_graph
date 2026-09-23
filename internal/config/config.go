@@ -262,6 +262,18 @@ func Default() *Config {
 			"**/*.test.tsx",
 			"**/*.spec.ts",
 			"**/*.spec.tsx",
+			"**/*.test.js",
+			"**/*.test.jsx",
+			"**/*.spec.js",
+			"**/*.spec.jsx",
+			"**/*.test.mjs",
+			"**/*.spec.mjs",
+			"**/*.test.cjs",
+			"**/*.spec.cjs",
+			"**/*.test.mts",
+			"**/*.spec.mts",
+			"**/*.test.cts",
+			"**/*.spec.cts",
 			// Ember's test convention is a HYPHENATED suffix under tests/ —
 			// ember-cli generates and qunit discovers tests/**/*-test.{js,ts,gjs,gts}.
 			// The directory is demanded for the same reason Ruby's is below: a bare
@@ -500,6 +512,9 @@ func Default() *Config {
 		TestGlobs: []string{
 			"**/*_test.go",
 			"**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx",
+			"**/*.test.js", "**/*.test.jsx", "**/*.spec.js", "**/*.spec.jsx",
+			"**/*.test.mjs", "**/*.spec.mjs", "**/*.test.cjs", "**/*.spec.cjs",
+			"**/*.test.mts", "**/*.spec.mts", "**/*.test.cts", "**/*.spec.cts",
 			"**/tests/**/*-test.js", "**/tests/**/*-test.ts",
 			"**/tests/**/*-test.gjs", "**/tests/**/*-test.gts",
 			"**/spec/**/*_spec.rb", "**/test/**/*_test.rb",

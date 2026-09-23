@@ -33,6 +33,9 @@ func TestIsTestPath(t *testing.T) {
 		// Genuinely outside any test segment on python/superset — the one case the
 		// dotted rule uniquely earns.
 		{"cypress e2e outside a test tree", "superset-frontend/cypress-base/cypress/e2e/explore/chart.test.js", true},
+		{"node test mjs", "scripts/deploy/pr-demo-writer-probe.test.mjs", true},
+		{"production mjs probe", "scripts/deploy/pr-demo-writer-probe.mjs", false},
+		{"hyphen test token mjs", "scripts/rule-test.mjs", false},
 
 		// Colocated conventions that are safe on their own.
 		{"rspec suffix", "app/models/user_spec.rb", true},
