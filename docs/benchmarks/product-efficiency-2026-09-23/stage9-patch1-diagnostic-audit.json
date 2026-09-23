@@ -1,0 +1,75 @@
+{
+  "exact_product_initial_equal": true,
+  "graph_hashes": {
+    "control": "25554c32e09d508f663a5b4a5dc51d74a85af73e007c7bace31440323e249ae1",
+    "candidate": "25554c32e09d508f663a5b4a5dc51d74a85af73e007c7bace31440323e249ae1"
+  },
+  "noop_rows": [
+    {
+      "build": "baseline",
+      "log": "/tmp/enola-stage9-logs3/noop-control-first-20260923T184841Z.log",
+      "wall_s": 2.001,
+      "parsed_files": 0,
+      "asserted_state_events_generation": true
+    },
+    {
+      "build": "baseline",
+      "log": "/tmp/enola-stage9-logs3/noop-control-s1-20260923T184841Z.log",
+      "wall_s": 2.01,
+      "parsed_files": 0,
+      "asserted_state_events_generation": true
+    },
+    {
+      "build": "baseline",
+      "log": "/tmp/enola-stage9-logs3/noop-control-s2-20260923T184841Z.log",
+      "wall_s": 2.038,
+      "parsed_files": 0,
+      "asserted_state_events_generation": true
+    },
+    {
+      "build": "baseline",
+      "log": "/tmp/enola-stage9-logs3/noop-control-s3-20260923T184841Z.log",
+      "wall_s": 1.997,
+      "parsed_files": 0,
+      "asserted_state_events_generation": true
+    },
+    {
+      "build": "candidate",
+      "log": "/tmp/enola-stage9-logs3/noop-instrumented-first-20260923T184841Z.log",
+      "wall_s": 1.839,
+      "parsed_files": 0,
+      "asserted_state_events_generation": true
+    },
+    {
+      "build": "candidate",
+      "log": "/tmp/enola-stage9-logs3/noop-instrumented-s1-20260923T184841Z.log",
+      "wall_s": 1.813,
+      "parsed_files": 0,
+      "asserted_state_events_generation": true
+    },
+    {
+      "build": "candidate",
+      "log": "/tmp/enola-stage9-logs3/noop-instrumented-s2-20260923T184841Z.log",
+      "wall_s": 1.843,
+      "parsed_files": 0,
+      "asserted_state_events_generation": true
+    },
+    {
+      "build": "candidate",
+      "log": "/tmp/enola-stage9-logs3/noop-instrumented-s3-20260923T184841Z.log",
+      "wall_s": 1.827,
+      "parsed_files": 0,
+      "asserted_state_events_generation": true
+    }
+  ],
+  "limitations": [
+    "shared host, diagnostic timing only",
+    "file sink, not NATS",
+    "patch1 only, not full stage9"
+  ],
+  "label_correction": "Raw instrumented filenames refer to clean patch1 candidate, not profiling instrumentation.",
+  "candidate_sha256": "c8cf6000d9be2eaea6852ccead6c8bf56b5f34a9facb7413ba1f7064b303c3f3",
+  "baseline_revision": "8c30274",
+  "product_revision": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+  "toolchain": "go1.27.1 darwin/arm64"
+}

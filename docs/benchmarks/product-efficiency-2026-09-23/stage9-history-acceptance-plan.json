@@ -1,0 +1,123 @@
+{
+  "purpose": "Final stage9 matched historical correctness cohort; no performance results yet",
+  "source": "/tmp/enola-product-history-source",
+  "pinned_ref": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "freshness": "local pinned main, not remotely refreshed",
+  "cases": [
+    {
+      "case": 0,
+      "parent": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+      "target": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+      "changed_paths": 6,
+      "manifests": [
+        "packages/tracking-client/package.json"
+      ],
+      "configs": []
+    },
+    {
+      "case": 1,
+      "parent": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+      "target": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+      "changed_paths": 9345,
+      "manifests": [],
+      "configs": []
+    },
+    {
+      "case": 2,
+      "parent": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+      "target": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+      "changed_paths": 8125,
+      "manifests": [],
+      "configs": []
+    },
+    {
+      "case": 3,
+      "parent": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+      "target": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+      "changed_paths": 70,
+      "manifests": [],
+      "configs": []
+    },
+    {
+      "case": 4,
+      "parent": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+      "target": "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+      "changed_paths": 15,
+      "manifests": [],
+      "configs": []
+    },
+    {
+      "case": 5,
+      "parent": "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+      "target": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "changed_paths": 60,
+      "manifests": [
+        "packages/database/package.json"
+      ],
+      "configs": []
+    },
+    {
+      "case": 6,
+      "parent": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "target": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "changed_paths": 15,
+      "manifests": [
+        "packages/clickhouse/package.json"
+      ],
+      "configs": []
+    },
+    {
+      "case": 7,
+      "parent": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "target": "a6f1f3a91a36ea3dead786560412a4944a009694",
+      "changed_paths": 5,
+      "manifests": [],
+      "configs": []
+    },
+    {
+      "case": 8,
+      "parent": "a6f1f3a91a36ea3dead786560412a4944a009694",
+      "target": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "changed_paths": 15,
+      "manifests": [],
+      "configs": []
+    },
+    {
+      "case": 9,
+      "parent": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "target": "a609c19f3861971930fae7b33dcb2950598953c5",
+      "changed_paths": 19,
+      "manifests": [],
+      "configs": []
+    }
+  ],
+  "required_checks": [
+    "exact cold versus applied delta graph",
+    "frozen Begin manifest count/digest matches End",
+    "all contributions inside Begin",
+    "post-delta no-op zero parses/events/generation and unchanged state",
+    "parsed files and scope size reported separately",
+    "matched Go toolchain/build flags and input policy",
+    "fresh CLI/file-sink history timings labelled separately from resident and NATS"
+  ],
+  "remaining_acceptance": [
+    "quiet paired initial/delta/noop measurements",
+    "NATS initial completion through acknowledgments",
+    "completed AI watch final cold equivalence"
+  ],
+  "supplemental_config_case": {
+    "parent": "d0fbbf855af5f4a33c364885f85805d71f9fac7c",
+    "target": "a2ac71af8a22471c27059a9b318ef4880caa50cb",
+    "reason": "The pinned ten first-parent transitions contain manifest changes but no tsconfig changes; this real parent-to-child transition adds package tsconfig and manifest with source files.",
+    "config": "packages/state-machine-telemetry/tsconfig.json",
+    "changed_paths": 14,
+    "lockfile_policy": "pnpm-lock.yaml remains ignored, manifest changes remain semantic",
+    "status": "selected, not executed",
+    "runner_args": [
+      "--count",
+      "1",
+      "--ref",
+      "a2ac71af8a22471c27059a9b318ef4880caa50cb"
+    ]
+  }
+}
