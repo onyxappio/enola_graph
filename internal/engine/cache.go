@@ -2526,7 +2526,11 @@ import (
 // v300: TypeScript catch_clause is a cyclomatic decision again. Body-walk lexical
 // catch shadowing still walks children, then returns; the catch itself must be
 // counted before that return so try/catch complexity matches prior metrics.
-const cacheVersion = "v300"
+// v301: Scoped literal CommonJS require() bindings (typed as/satisfies/parenthesized,
+// destructured alias, identifier) resolve imported call targets on symbol-owned
+// and file_ref walks. Ordinary locals, params, and catch still shadow; unawaited
+// import() and computed require stay unbound.
+const cacheVersion = "v301"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

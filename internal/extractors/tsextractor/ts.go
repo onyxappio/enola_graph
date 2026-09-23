@@ -2154,6 +2154,80 @@ func unwrapAwaitExpr(kinds *tsutil.KindTable, n *sitter.Node) *sitter.Node {
 	return n
 }
 
+func tsTypeLikeKind(kind string) bool {
+	switch kind {
+	case "type_annotation", "type_arguments", "type_identifier", "type_query", "generic_type",
+		"typeof_type", "predefined_type", "union_type", "intersection_type", "nested_type_identifier",
+		"literal_type", "object_type", "array_type", "tuple_type", "function_type", "constructor_type",
+		"parenthesized_type", "conditional_type", "template_literal_type", "lookup_type",
+		"index_type_query", "readonly_type", "infer_type", "rest_type", "optional_type",
+		"flow_maybe_type", "existential_type", "type_predicate":
+		return true
+	}
+	return false
+}
+
+// unwrapTSSyntaxExpr peels TypeScript `as`/`satisfies`, parentheses, and non-null
+// assertions so a typed `require('./x') as typeof import('./x')` is still a require.
+func unwrapTSSyntaxExpr(kinds *tsutil.KindTable, n *sitter.Node) *sitter.Node {
+	for n != nil {
+		switch kindOf(kinds, n) {
+		case "as_expression", "satisfies_expression", "parenthesized_expression", "non_null_expression":
+			if inner := n.ChildByFieldName("expression"); inner != nil && inner != n {
+				n = inner
+				continue
+			}
+			var next *sitter.Node
+			for i := range n.NamedChildCount() {
+				c := n.NamedChild(i)
+				if c == nil || tsTypeLikeKind(kindOf(kinds, c)) {
+					continue
+				}
+				next = c
+				break
+			}
+			if next == nil || next == n {
+				return n
+			}
+			n = next
+		default:
+			return n
+		}
+	}
+	return n
+}
+
+// literalRequireSpecifier is a string-literal require(...) after syntax unwrap.
+func literalRequireSpecifier(kinds *tsutil.KindTable, n *sitter.Node, src []byte) (string, bool) {
+	n = unwrapTSSyntaxExpr(kinds, n)
+	if n == nil || kindOf(kinds, n) != "call_expression" {
+		return "", false
+	}
+	fn := n.ChildByFieldName("function")
+	if fn == nil {
+		return "", false
+	}
+	if kindOf(kinds, fn) != "identifier" || nodeText(fn, src) != "require" {
+		return "", false
+	}
+	return dynamicImportSpecifier(kinds, n, src)
+}
+
+// awaitedOrRequireImportSpecifier binds awaited literal import() (existing) and
+// literal require(), including typed/parenthesized wrappers. Unawaited import()
+// stays unbound.
+func awaitedOrRequireImportSpecifier(kinds *tsutil.KindTable, n *sitter.Node, src []byte) (string, bool) {
+	n = unwrapTSSyntaxExpr(kinds, n)
+	if n == nil {
+		return "", false
+	}
+	if kindOf(kinds, n) == "await_expression" {
+		inner := unwrapTSSyntaxExpr(kinds, unwrapAwaitExpr(kinds, n))
+		return dynamicImportSpecifier(kinds, inner, src)
+	}
+	return literalRequireSpecifier(kinds, n, src)
+}
+
 // fileSymbolName derives a symbol name from a file path for anonymous default
 // exports. Generic Next.js filenames (page, route, layout, …) are disambiguated
 // with their parent directory segment, e.g. app/dashboard/page.tsx → "DashboardPage".
@@ -3201,23 +3275,27 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 				}
 			}
 		case "lexical_declaration", "variable_declaration":
-			// CommonJS: `const x = require('./y')` / `const { a } = require('./y')`.
+			// CommonJS: `const x = require('./y')` / `const { a } = require('./y')`,
+			// including `require('./y') as typeof import('./y')`.
 			for j := range child.ChildCount() {
 				d := child.Child(j)
 				if kindOf(kinds, d) != "variable_declarator" {
 					continue
 				}
-				val := d.ChildByFieldName("value")
-				if val == nil || kindOf(kinds, val) != "call_expression" {
-					continue
-				}
-				fn := val.ChildByFieldName("function")
-				if fn == nil || nodeText(fn, src) != "require" {
-					continue
-				}
-				moduleDir, indexPath, ok := resolveModule(findChildByKind(kinds, val.ChildByFieldName("arguments"), "string"))
+				spec, ok := literalRequireSpecifier(kinds, d.ChildByFieldName("value"), src)
 				if !ok {
 					continue
+				}
+				resolved, isExternal := resolveImportPath(spec, fileDir, aliases)
+				if isExternal {
+					continue
+				}
+				var moduleDir, indexPath string
+				foundFile := false
+				if idx, dir, found := resolveModuleFile(resolved, ctx.knownFiles); found {
+					moduleDir, indexPath, foundFile = dir, idx, true
+				} else {
+					moduleDir = factpath.Dir(resolved)
 				}
 				nameNode := d.ChildByFieldName("name")
 				if nameNode == nil {
@@ -3226,13 +3304,10 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 				switch kindOf(kinds, nameNode) {
 				case "identifier":
 					local := nodeText(nameNode, src)
-					bind(local, moduleDir, local, indexPath, "", indexPath != "")
+					bind(local, moduleDir, local, indexPath, resolved, foundFile)
 				case "object_pattern":
-					for k := range nameNode.ChildCount() {
-						if p := nameNode.Child(k); kindOf(kinds, p) == "shorthand_property_identifier_pattern" {
-							nm := nodeText(p, src)
-							bind(nm, moduleDir, nm, indexPath, "", indexPath != "")
-						}
+					for _, b := range objectPatternImportBindings(kinds, nameNode, src) {
+						bind(b.local, moduleDir, b.export, indexPath, resolved, foundFile)
 					}
 				}
 			}
@@ -3308,7 +3383,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 	frLookup := func(name string) (target, file string, ok, shadowed bool) {
 		return frLookupNS(name, false)
 	}
-	frBindAwait := func(n *sitter.Node) {
+	frBindLiteralImport := func(n *sitter.Node) {
 		if n == nil || len(frImp) == 0 {
 			return
 		}
@@ -3317,16 +3392,12 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			if kindOf(kinds, decl) != "variable_declarator" {
 				continue
 			}
-			val := decl.ChildByFieldName("value")
-			if kindOf(kinds, val) != "await_expression" {
-				continue
-			}
-			spec, ok := dynamicImportSpecifier(kinds, unwrapAwaitExpr(kinds, val), src)
+			spec, ok := awaitedOrRequireImportSpecifier(kinds, decl.ChildByFieldName("value"), src)
 			if !ok {
 				continue
 			}
 			nameNode := decl.ChildByFieldName("name")
-			if nameNode == nil || kindOf(kinds, nameNode) != "object_pattern" {
+			if nameNode == nil {
 				continue
 			}
 			resolved, isExternal := resolveImportPath(spec, fileDir, aliases)
@@ -3346,14 +3417,23 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 					ctx.sideReads[f] = true
 				}
 			}
-			for _, b := range objectPatternImportBindings(kinds, nameNode, src) {
-				target, file := bindImportedSymbol(dir, idx, b.export, resolved, found, ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, note)
+			bindOne := func(local, exportName string) {
+				target, file := bindImportedSymbol(dir, idx, exportName, resolved, found, ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, note)
 				if target == "" {
-					continue
+					return
 				}
-				frImp[len(frImp)-1][b.local] = target
+				frImp[len(frImp)-1][local] = target
 				if file != "" {
-					frImpF[len(frImpF)-1][b.local] = file
+					frImpF[len(frImpF)-1][local] = file
+				}
+			}
+			switch kindOf(kinds, nameNode) {
+			case "identifier":
+				local := nodeText(nameNode, src)
+				bindOne(local, local)
+			case "object_pattern":
+				for _, b := range objectPatternImportBindings(kinds, nameNode, src) {
+					bindOne(b.local, b.export)
 				}
 			}
 		}
@@ -3399,7 +3479,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			if len(frShadows) == 0 {
 				frPush()
 			}
-			frBindAwait(n)
+			frBindLiteralImport(n)
 		}
 		switch kind {
 		case "import_statement":
@@ -4200,7 +4280,7 @@ func (w *tsBodyWalker) bindScopedImport(local, exportName, importPath string) {
 	}
 }
 
-func (w *tsBodyWalker) bindAwaitImportDecl(n *sitter.Node) {
+func (w *tsBodyWalker) bindLiteralImportDecl(n *sitter.Node) {
 	if n == nil {
 		return
 	}
@@ -4209,24 +4289,26 @@ func (w *tsBodyWalker) bindAwaitImportDecl(n *sitter.Node) {
 		if kindOf(w.kinds, decl) != "variable_declarator" {
 			continue
 		}
-		val := decl.ChildByFieldName("value")
-		if kindOf(w.kinds, val) != "await_expression" {
-			w.noteShadowBindings(decl)
-			continue
-		}
-		val = unwrapAwaitExpr(w.kinds, val)
-		spec, ok := dynamicImportSpecifier(w.kinds, val, w.src)
+		spec, ok := awaitedOrRequireImportSpecifier(w.kinds, decl.ChildByFieldName("value"), w.src)
 		if !ok {
 			w.noteShadowBindings(decl)
 			continue
 		}
 		nameNode := decl.ChildByFieldName("name")
-		if nameNode == nil || kindOf(w.kinds, nameNode) != "object_pattern" {
+		if nameNode == nil {
 			w.noteShadowBindings(decl)
 			continue
 		}
-		for _, b := range objectPatternImportBindings(w.kinds, nameNode, w.src) {
-			w.bindScopedImport(b.local, b.export, spec)
+		switch kindOf(w.kinds, nameNode) {
+		case "identifier":
+			local := nodeText(nameNode, w.src)
+			w.bindScopedImport(local, local, spec)
+		case "object_pattern":
+			for _, b := range objectPatternImportBindings(w.kinds, nameNode, w.src) {
+				w.bindScopedImport(b.local, b.export, spec)
+			}
+		default:
+			w.noteShadowBindings(decl)
 		}
 	}
 }
@@ -4238,6 +4320,10 @@ func (w *tsBodyWalker) noteShadowBindings(n *sitter.Node) {
 	for _, name := range tsPatternBindingNames(w.kinds, n, w.src) {
 		if name != "" {
 			w.shadows[len(w.shadows)-1][name] = true
+			if len(w.importScopes) > 0 {
+				delete(w.importScopes[len(w.importScopes)-1], name)
+				delete(w.importFileScopes[len(w.importFileScopes)-1], name)
+			}
 		}
 	}
 	kind := kindOf(w.kinds, n)
@@ -4357,7 +4443,7 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 		if len(w.shadows) == 0 {
 			w.pushShadowScope()
 		}
-		w.bindAwaitImportDecl(n)
+		w.bindLiteralImportDecl(n)
 	}
 	if (kind == "class_declaration" || kind == "class") && len(w.shadows) > 0 {
 		if id := n.ChildByFieldName("name"); id != nil {
