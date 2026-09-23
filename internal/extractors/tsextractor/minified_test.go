@@ -12,20 +12,28 @@ func TestIsMinifiedSource(t *testing.T) {
 	if !isMinifiedSource([]byte(longLine)) {
 		t.Errorf("isMinifiedSource(one very long line) = false, want true")
 	}
-	// A build banner on line 1 followed by a huge minified chunk (the common shape).
-	bundle := "/* Build */\n" + longLine + "\nfunction f(){}\n"
+	codeChunk := strings.Repeat("a();", minifiedLineThreshold/2)
+	bundle := "/* Build */\n" + codeChunk + "\nfunction f(){}\n"
 	if !isMinifiedSource([]byte(bundle)) {
-		t.Errorf("isMinifiedSource(banner + long line) = false, want true")
+		t.Errorf("isMinifiedSource(banner + long code line) = false, want true")
 	}
 
 	ordinary := "export function add(a, b) {\n  return a + b;\n}\n"
 	if isMinifiedSource([]byte(ordinary)) {
 		t.Errorf("isMinifiedSource(ordinary source) = true, want false")
 	}
-	// Many short lines, none over the threshold, even if the file is large overall.
 	manyLines := strings.Repeat("const x = compute();\n", 500)
 	if isMinifiedSource([]byte(manyLines)) {
 		t.Errorf("isMinifiedSource(many short lines) = true, want false")
+	}
+
+	commentPad := "export function Icon() {\n  return 1;\n  /* hist\n" + strings.Repeat("M", minifiedLineThreshold+50) + "\n  */\n}\n"
+	if isMinifiedSource([]byte(commentPad)) {
+		t.Errorf("long comment in a multi-line module must not skip the file")
+	}
+	stringPad := "export const PATH = \"" + strings.Repeat("M", minifiedLineThreshold+50) + "\";\nexport function draw() { return PATH; }\n"
+	if isMinifiedSource([]byte(stringPad)) {
+		t.Errorf("long string literal in a multi-line module must not skip the file")
 	}
 }
 

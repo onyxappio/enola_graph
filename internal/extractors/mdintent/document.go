@@ -63,9 +63,11 @@ func documentFacts(scope *inScope, relFile string, src []byte, count *linkCount)
 			"exported":    true,
 		},
 	}, links: map[string]bool{}}
-	if dir := factpath.Dir(slashed); dir != "." && dir != "" {
-		doc.fact.Relations = append(doc.fact.Relations, facts.Relation{Kind: facts.RelDeclares, Target: dir})
+	dir := factpath.Dir(slashed)
+	if dir == "" {
+		dir = "."
 	}
+	doc.fact.Relations = append(doc.fact.Relations, facts.Relation{Kind: facts.RelDeclares, Target: dir})
 
 	sections := []*section{}
 	slugs := map[string]int{}
@@ -138,6 +140,14 @@ func documentFacts(scope *inScope, relFile string, src []byte, count *linkCount)
 	for _, sec := range sections {
 		out = append(out, *sec.fact)
 	}
+	out = append(out, facts.Fact{
+		Kind: facts.KindModule,
+		Name: dir,
+		File: dir,
+		Props: map[string]any{
+			"language": "markdown",
+		},
+	})
 	return out
 }
 

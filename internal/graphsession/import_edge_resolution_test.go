@@ -40,14 +40,22 @@ func ownerKey(file string) string {
 }
 
 func moduleNode(c *Consumer, name string) (graphstream.Node, bool) {
+	var fileOwned graphstream.Node
+	var fileOK bool
 	for _, nodes := range c.Owners {
 		for _, n := range nodes {
-			if n.Kind == facts.KindModule && n.Name == name {
+			if n.Kind != facts.KindModule || n.Name != name {
+				continue
+			}
+			if n.File == n.Name || n.File == "" {
 				return n, true
+			}
+			if !fileOK || n.File < fileOwned.File {
+				fileOwned, fileOK = n, true
 			}
 		}
 	}
-	return graphstream.Node{}, false
+	return fileOwned, fileOK
 }
 
 // assertModuleImportResolved checks the authoritative import edge from importer
@@ -386,10 +394,10 @@ func TestPublishedPackageExportsTargetChangeDeltaEqualsCold(t *testing.T) {
 
 func TestPublishedNuxtAutoImportRenameDeltaEqualsCold(t *testing.T) {
 	dir := setupTSRepo(t, map[string]string{
-		"package.json":                          `{"name":"app","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
-		"nuxt.config.ts":                        `export default defineNuxtConfig({})`,
-		"composables/setLandPageMetadata.ts":    `export function setLandPageMetadata() {}`,
-		"app.vue":                               `<script setup lang="ts">setLandPageMetadata()</script><template><p /></template>`,
+		"package.json":                       `{"name":"app","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"nuxt.config.ts":                     `export default defineNuxtConfig({})`,
+		"composables/setLandPageMetadata.ts": `export function setLandPageMetadata() {}`,
+		"app.vue":                            `<script setup lang="ts">setLandPageMetadata()</script><template><p /></template>`,
 	})
 	eng := testEngine(t, dir)
 	state := filepath.Join(dir, ".enola", "live")
