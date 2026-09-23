@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/tmp/enola-toolchain/go/bin/go",
+    "test",
+    "-count=1",
+    "-run",
+    "TestCacheVersionCoverage|TestGolden|TestDeterminism",
+    "./internal/cachecov/",
+    "./internal/engine/..."
+  ],
+  "exit_code": 0,
+  "wall_seconds": 6.561
+}

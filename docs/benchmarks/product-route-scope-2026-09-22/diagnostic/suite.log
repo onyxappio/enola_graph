@@ -1,0 +1,18 @@
+DONE r1-resident-initial 10.116992 parsed 4144
+DONE r1-resident-noop0 0.000162 parsed 0
+DONE r1-resident-noop1 0.000151 parsed 0
+DONE r1-resident-noop2 0.000142 parsed 0
+DONE r1-resident-noop3 0.000144 parsed 0
+DONE r1-resident-noop4 0.000137 parsed 0
+DONE r1-resident-noop5 0.000136 parsed 0
+DONE r1-resident-noop6 0.000126 parsed 0
+DONE r1-resident-noop7 0.000147 parsed 0
+DONE r1-resident-noop8 0.000138 parsed 0
+DONE r1-resident-noop9 0.000138 parsed 0
+DONE r1-resident-duplicate 0.000468 parsed 0
+DONE r1-resident-body 0.71127 parsed 1
+START cold-body
+DONE cold-body 7.938
+START cold-original
+DONE cold-original 7.27
+CHECKS [{'check': 'r1-resident-noop0 zero work/no events', 'pass': True}, {'check': 'r1-resident-noop1 zero work/no events', 'pass': True}, {'check': 'r1-resident-noop2 zero work/no events', 'pass': True}, {'check': 'r1-resident-noop3 zero work/no events', 'pass': True}, {'check': 'r1-resident-noop4 zero work/no events', 'pass': True}, {'check': 'r1-resident-noop5 zero work/no events', 'pass': True}, {'check': 'r1-resident-noop6 zero work/no events', 'pass': True}, {'check': 'r1-resident-noop7 zero work/no events', 'pass': True}, {'check': 'r1-resident-noop8 zero work/no events', 'pass': True}, {'check': 'r1-resident-noop9 zero work/no events', 'pass': True}, {'check': 'r1-resident-duplicate same-content duplicate: no parse/publish/checkpoint/fact assembly, generation unchanged (verification hash of at most one file allowed)', 'pass': True}, {'check': 'r1-resident-body real observed input and fast path', 'pass': True}, {'check': 'r1-resident-initial cold equality', 'pass': True}, {'check': 'r1-resident-body cold equality', 'pass': True}]

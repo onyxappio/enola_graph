@@ -230,6 +230,9 @@ type session struct {
 	// so name-delta planning uses composed facts. The later TS path reuses it.
 	preparedTS    *tsextractor.SessionResult
 	preparedDirty map[string]bool
+	// preparedMD is the mdintent extraction this run made before Begin to plan
+	// the manifest with; see prepareMDScope.
+	preparedMD *preparedMD
 }
 
 func (s *session) analyze(ctx context.Context) (*Result, error) {
@@ -242,6 +245,9 @@ func (s *session) delta(ctx context.Context) (*Result, error) {
 
 func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	tr := s.prof
+	// A run that failed between preview and consumption must not hand its
+	// extraction to the next one: the tree has moved on since.
+	s.preparedMD = nil
 	var err error
 	input := s.inputs
 	if !s.fast {
@@ -476,6 +482,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				}
 			}
 			var extraOwners []string
+			var membership membershipDelta
 			if !wholeDomain && s.state != nil {
 				// Non-TypeScript extractors without per-file incremental support
 				// still have a bounded owner domain. Seed the frozen plan with
@@ -489,6 +496,34 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 						if ext.Name() != name {
 							continue
 						}
+						if !declaresFileOwnership(ext) {
+							// The extractor is about to rerun but declares no owner
+							// domain, so the files it will emit cannot be enumerated
+							// before Begin. Announce the full domain rather than
+							// freeze a manifest its output can escape.
+							wholeDomain = true
+							fallbacks = append(fallbacks, graphstream.Fallback{Extractor: name, Scope: "all prior/current file owners", Reason: "extractor declares no file-owner domain; its owners cannot be planned before Begin"})
+							break
+						}
+						// One extractor can say more than which files it owns:
+						// mdintent's whole output is reproducible from captured
+						// bytes, so its unchanged pages stay out of the frozen
+						// manifest instead of being seeded with it. Every other
+						// owner-declaring extractor keeps the conservative seed.
+						// Whether THIS extractor was previewed, not whether some
+						// earlier pass through this loop previewed mdintent:
+						// s.preparedMD stays set until the extraction site
+						// consumes it, so reading it here would let mdintent's
+						// narrowing silently swallow the next extractor's seed
+						// and leave its owners outside the frozen manifest.
+						narrowed, previewed, perr := s.prepareMDScope(ctx, ext, inv.Files, prevFiles, hashes, repoID, nonTSForceAll || nonTSConfigChanged)
+						if perr != nil {
+							return nil, perr
+						}
+						if previewed {
+							extraOwners = append(extraOwners, narrowed...)
+							break
+						}
 						for _, file := range ownedFiles(ext, inv.Files) {
 							extraOwners = append(extraOwners, filepath.ToSlash(file))
 						}
@@ -500,37 +535,66 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 						break
 					}
 				}
-				dirty := map[string]bool{}
-				for _, f := range current {
-					st := lookupState(prevFiles, f)
-					h, ok := lookupHash(hashes, f)
-					if tsextractor.IsSessionSource(f, false) && (st == nil || !ok || st.Hash != h || st.Unreadable) {
-						dirty[filepath.ToSlash(f)] = true
-					}
-				}
-				preview, perr := s.prepareFrozenTS(ctx, prevFiles, inv.Files, dirty, angular)
-				if perr != nil {
+				// Membership is settled before the preview, never after it. An
+				// importer the new file set rebinds is a reparse like any other:
+				// its declared names and route mounts can move, so it has to be
+				// previewed before the name and composed route deltas run.
+				// inv.Files, not the policy-filtered current list, is the
+				// resolution universe the extractor itself will use.
+				membership = membershipScope(previous, current, inv.Files, prevFiles)
+				if membership.changed && !membership.proven {
 					wholeDomain = true
-					fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "planning extract of dirty files failed; using whole domain"})
-				} else {
-					extraOwners = append(extraOwners, ownersForNameDelta(prevFiles, dirty, preview)...)
-					if len(prevFiles) > 100 && resolutionCandidatesChanged(prevFiles, dirty, preview) {
-						wholeDomain = true
-						forceAll = true
-						fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "frozen scope: resolver candidate identity changed"})
+					fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: membership.reason})
+				}
+				if !wholeDomain {
+					dirty := map[string]bool{}
+					for _, f := range current {
+						st := lookupState(prevFiles, f)
+						h, ok := lookupHash(hashes, f)
+						if tsextractor.IsSessionSource(f, false) && (st == nil || !ok || st.Hash != h || st.Unreadable || recMissing(st)) {
+							dirty[filepath.ToSlash(f)] = true
+						}
 					}
-					if !wholeDomain && s.state.FrameworkSig != "" && len(prevFiles) > 100 && len(dirty) > 1 {
-						// Framework composition can synthesize resolver candidates from
-						// files outside the dirty set. Until that domain is indexed
-						// before Begin, use the conservative immutable fallback.
+					for _, f := range membership.rebound {
+						dirty[f] = true
+					}
+					// Retired identities carry an old contribution and no new one.
+					// They are absent from the owned set, so the planning extract
+					// never reads them, but they must reach the deltas below as
+					// old->empty so a global consumer of a deleted candidate - a
+					// markdown link, a route mount - is inside Begin. Reverse
+					// import edges alone cannot reach those.
+					retired := make(map[string]bool, len(membership.retired))
+					for _, f := range membership.retired {
+						retired[f] = true
+						dirty[f] = true
+					}
+					// Deleting a file changes what its importers see, and that reaches
+					// further than one edge: invalidateTS reverse-closes the same seeds
+					// at extraction time. Closing here too keeps the previewed parse set
+					// equal to the one extraction will ask for, so the planning extract
+					// stays reusable instead of being recomputed on every delete.
+					for p, d := range reverseClose(retired, tsRecordsFromState(prevFiles)) {
+						if d {
+							dirty[p] = true
+						}
+					}
+					preview, perr := s.prepareFrozenTS(ctx, prevFiles, inv.Files, dirty, angular)
+					if perr != nil {
 						wholeDomain = true
-						forceAll = true
-						fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "frozen scope: framework composition resolver domain"})
+						fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "planning extract of dirty files failed; using whole domain"})
+					} else {
+						extraOwners = append(extraOwners, ownersForNameDelta(prevFiles, dirty, preview)...)
+						var previewRecs map[string]*tsextractor.FileRecord
+						if s.preparedTS != nil {
+							previewRecs = s.preparedTS.Records
+						}
+						extraOwners = append(extraOwners, composedRouteOwnerDelta(prevFiles, dirty, previewRecs, retired)...)
 					}
 				}
 			}
 			var planReason string
-			s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, wholeDomain, extraOwners)
+			s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, wholeDomain, extraOwners, membership)
 			if err != nil {
 				return nil, err
 			}
@@ -542,7 +606,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				// the frozen contract safe by replacing the complete prior/current
 				// domain rather than publishing an empty manifest.
 				wholeDomain = true
-				s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, true, nil)
+				s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, true, nil, membership)
 				if err != nil {
 					return nil, err
 				}
@@ -550,6 +614,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			s.replaceScope = s.plan.manifest()
 			s.scopeLimited = true
 			scopeLabel := "changed files and reverse file dependents"
+			if planReason == frozenScopeMembershipRe {
+				scopeLabel = "changed files, resolution-rebound importers and reverse file dependents"
+			}
 			if wholeDomain || planReason == frozenScopeMembership || planReason == frozenScopeWholeDomain {
 				scopeLabel = "all prior/current file owners"
 			}
@@ -803,11 +870,18 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				},
 			}
 			var res *tsextractor.SessionResult
-			if s.preparedTS != nil {
+			// The planning extract is reusable only when it already parsed everything
+			// this extraction asks for. dirtyArg is recomputed from the extraction
+			// context and can be wider - a context-dirty source, an owned file the
+			// graph policy keeps out of the plan - and the preview carries a cached
+			// record for anything it did not parse, so reusing it there would freeze
+			// a stale surface into the graph.
+			if s.preparedTS != nil && coversDirty(s.preparedDirty, dirtyArg) {
 				res = s.preparedTS
-				s.preparedTS = nil
-				s.preparedDirty = nil
-			} else {
+			}
+			s.preparedTS = nil
+			s.preparedDirty = nil
+			if res == nil {
 				var xerr error
 				res, xerr = ts.ExtractSession(ctx, s.abs, owned, prevRecs, dirtyArg, hooks)
 				if xerr != nil {
@@ -963,18 +1037,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			tagRepo(res.Facts, repoID)
 			allFacts = append(allFacts, res.Facts...)
 			appendExtractorSynthetic(synByExt, "typescript", res.Facts)
-			var oldFacts []facts.Fact
-			if s.state != nil {
-				for _, st := range s.state.Files {
-					oldFacts = append(oldFacts, fileFacts(st)...)
-					if st != nil && st.Contrib != nil {
-						for _, ff := range st.Contrib {
-							oldFacts = append(oldFacts, ff...)
-						}
-					}
-				}
-			}
-			addChangedRouteFiles(scopeFiles, oldFacts, res.Facts)
+			addChangedRouteFiles(scopeFiles, composedRouteFacts(tsRecordsFromState(prevFiles)), composedRouteFacts(res.Records))
 			for f, d := range dirty {
 				if d {
 					scopeFiles[filepath.ToSlash(f)] = true
@@ -1023,23 +1086,38 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				Reason:    "no per-file incremental session; whole-extractor re-run",
 			})
 			tExt := time.Now()
-			extracted, err := ext.Extract(ctx, s.abs, inv.Files)
-			graphprofile.Since("non_ts_extract", tExt, fmt.Sprintf("%s facts=%d", ext.Name(), len(extracted)))
-			if err != nil {
-				var fatal *plugin.FatalError
-				if asFatal(err, &fatal) {
-					return nil, err
+			// A preview made before Begin is the extraction, not a rehearsal of
+			// one: re-running it here would read a tree that may have moved and
+			// could contradict the manifest already frozen from it.
+			prepared := s.takePreparedMD(ext.Name())
+			var extracted []facts.Fact
+			if prepared != nil {
+				extracted = prepared.facts
+			} else {
+				out, err := ext.Extract(ctx, s.abs, inv.Files)
+				graphprofile.Since("non_ts_extract", tExt, fmt.Sprintf("%s facts=%d", ext.Name(), len(out)))
+				if err != nil {
+					var fatal *plugin.FatalError
+					if asFatal(err, &fatal) {
+						return nil, err
+					}
+					log.Printf("[graphsession] extractor %s: %v", ext.Name(), err)
+					continue
 				}
-				log.Printf("[graphsession] extractor %s: %v", ext.Name(), err)
-				continue
+				applyLocalIO(out)
+				tagRepo(out, repoID)
+				extracted = out
 			}
-			applyLocalIO(extracted)
-			tagRepo(extracted, repoID)
 			extractorInput[ext.Name()] = extractorInputDigest(ext, owned, inv.Files, inv.AllNames, hashes, fileSetHash, scanHash)
 			tFP := time.Now()
 			fp := factsFingerprint(extracted)
 			graphprofile.Since("non_ts_fingerprint", tFP, ext.Name())
-			if !nonTSForceAll && !nonTSConfigChanged && extractorDigest[ext.Name()] != "" && extractorDigest[ext.Name()] == fp {
+			// The whole-output short-circuit returns before the contributions are
+			// stored, so the per-file hash it consumed stays stale and the next
+			// run re-extracts for the same reason. A previewed extractor has a
+			// scope narrowed to what changed - nothing, in this case - so it can
+			// afford to fall through and refresh those keys instead.
+			if prepared == nil && !nonTSForceAll && !nonTSConfigChanged && extractorDigest[ext.Name()] != "" && extractorDigest[ext.Name()] == fp {
 				cached := cachedFactsFor(ext.Name(), owned, prevFiles)
 				allFacts = append(allFacts, cached...)
 				syn := cloneTagged(syntheticFactsFor(s.state, ext.Name()), repoID)
@@ -1049,25 +1127,37 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				continue
 			}
 			// Replacement must retire prior synthetic owners too (for example a
-			// Swift target whose include changes its module identity).
-			nonTSFileOwners = append(nonTSFileOwners, retireExtractorOwners(s.state, prevFiles, ext.Name())...)
+			// Swift target whose include changes its module identity). A
+			// previewed extractor announced the owners it changes before Begin;
+			// re-deriving the whole domain here would announce owners the frozen
+			// plan does not carry, which is the failure the narrowing exists to
+			// avoid. Its facts are still published and stored in full below.
+			if prepared != nil {
+				nonTSFileOwners = append(nonTSFileOwners, prepared.owners...)
+			} else {
+				nonTSFileOwners = append(nonTSFileOwners, retireExtractorOwners(s.state, prevFiles, ext.Name())...)
+			}
 			extractorDigest[ext.Name()] = fp
 			allFacts = append(allFacts, extracted...)
 			appendExtractorSynthetic(synByExt, ext.Name(), extracted)
 			byFile := map[string][]facts.Fact{}
 			for _, f := range extracted {
 				byFile[filepath.ToSlash(f.File)] = append(byFile[filepath.ToSlash(f.File)], f)
-				nonTSFileOwners = append(nonTSFileOwners, ownerOf(f))
-			}
-			for _, fpath := range owned {
-				nonTSFileOwners = append(nonTSFileOwners, graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: filepath.ToSlash(fpath)})
-			}
-			for path, prev := range prevFiles {
-				if !extractorOwnsState(prev, ext.Name()) {
-					continue
+				if prepared == nil {
+					nonTSFileOwners = append(nonTSFileOwners, ownerOf(f))
 				}
-				if _, still := lookupHash(hashes, path); !still {
-					nonTSFileOwners = append(nonTSFileOwners, graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: filepath.ToSlash(path)})
+			}
+			if prepared == nil {
+				for _, fpath := range owned {
+					nonTSFileOwners = append(nonTSFileOwners, graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: filepath.ToSlash(fpath)})
+				}
+				for path, prev := range prevFiles {
+					if !extractorOwnsState(prev, ext.Name()) {
+						continue
+					}
+					if _, still := lookupHash(hashes, path); !still {
+						nonTSFileOwners = append(nonTSFileOwners, graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: filepath.ToSlash(path)})
+					}
 				}
 			}
 			if len(owned) == 0 {
@@ -2009,6 +2099,24 @@ func (s *session) frameworkDirtyRequiresFullScope(files []string, prevFiles map[
 	}
 	s.frameworkSig = sig
 	return s.state.FrameworkSig != sig, nil
+}
+
+// coversDirty reports whether a planning extract that parsed prepared satisfies
+// a later request for want. A nil want means every owned file, which no
+// dirty-file preview covers.
+func coversDirty(prepared, want map[string]bool) bool {
+	if want == nil {
+		return false
+	}
+	for f, d := range want {
+		if !d {
+			continue
+		}
+		if !prepared[f] && !prepared[filepath.ToSlash(f)] {
+			return false
+		}
+	}
+	return true
 }
 
 func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*FileState, files []string, dirty map[string]bool, angular bool) (map[string][]facts.Fact, error) {

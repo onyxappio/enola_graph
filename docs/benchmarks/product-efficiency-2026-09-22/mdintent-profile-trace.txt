@@ -1,0 +1,143 @@
+[graph-profile] lock                               0.000s  total= 0.000s
+[graph-profile] bind_identity                      0.000s  total= 0.001s
+[graph-profile] open_journal                       0.000s  total= 0.001s
+[graph-profile] replay_unacked                     0.029s  total= 0.029s
+[graph-profile] load_state                         0.000s  total= 0.029s  files=0
+[graph-profile] engine_walk_repo                   0.140s  files=11127 tests=0 all_names=11127
+[graph-profile] inventory                          0.140s  total= 0.140s  files=11127 all_names=11127
+[graph-profile] detect_go                          0.000s
+[graph-profile] detect_manifests                   0.000s
+[graph-profile] detect_mdintent                    0.001s
+[graph-profile] detect_dotnet                      0.006s
+[graph-profile] detect_cpp                         0.007s
+[graph-profile] detect_hcl                         0.002s
+[graph-profile] detect_ansible                     0.002s
+[graph-profile] detect_java                        0.004s
+[graph-profile] detect_kotlin                      0.004s
+[graph-profile] detect_php                         0.001s
+[graph-profile] detect_python                      0.000s
+[graph-profile] detect_typescript                  0.002s
+[graph-profile] detect_swift                       0.001s
+[graph-profile] detect_ruby                        0.006s
+[graph-profile] detect_rust                        0.002s
+[graph-profile] detect_scala                       0.005s
+[graph-profile] detect_dart                        0.001s
+[graph-profile] detect_grpc                        0.084s
+[graph-profile] detect_openapi                     0.082s
+[graph-profile] detect_asyncapi                    0.183s
+[graph-profile] detect_extractors                  0.185s  total= 0.325s  detected=6
+[graph-profile] engine_hash_files                  0.527s  n=5209 hashed=5209 bytes=58935712
+[graph-profile] hash_content_inputs                0.630s  total= 0.955s  targets=5209
+[graph-profile] ts_config_inputs                   0.083s  n=83
+[graph-profile] analysis_fingerprint               0.095s  total= 1.050s  cfg_files=59
+[graph-profile] clone_file_state_copy              0.000s  n=0
+[graph-profile] extractor_need                     1.183s  total= 1.183s  non_ts_need=true detected=6
+[graph-profile] non_ts_extract                     0.080s  manifests facts=132
+[graph-profile] non_ts_fingerprint                 0.000s  manifests
+[graph-profile] non_ts_extract                     0.138s  mdintent facts=9749
+[graph-profile] non_ts_fingerprint                 0.016s  mdintent
+[graph-profile] non_ts_extract                     0.000s  hcl facts=10
+[graph-profile] non_ts_fingerprint                 0.000s  hcl
+[graph-profile] non_ts_extract                     0.010s  python facts=91
+[graph-profile] non_ts_fingerprint                 0.000s  python
+[graph-profile] ts_dirty_scope                     0.368s  total= 1.551s  dirty=0 scope=4244 force=true
+[graph-profile] ts_detect_frameworks               0.019s  total= 0.019s  files=4244
+[graph-profile] ts_read_dirty                      0.204s  total= 0.223s  to_read=4244 cached=0
+[graph-profile] ts_graphql_grpc_index              0.416s  total= 0.639s  ts_files=4244
+[graph-profile] ts_mapfiles_aggregate              2.143s  total= 2.782s  parsed=4144 facts=59318 routers=0
+[graph-profile] ts_compose_modules                 0.084s  total= 2.866s  facts=59753 records=4244 unread=0
+[graph-profile] ts_extract_session                 2.871s  total= 4.422s  parsed=4144 cached=0 facts=59753 records=4244
+[graph-profile] non_ts_extract                     0.015s  swift facts=19
+[graph-profile] non_ts_fingerprint                 0.000s  swift
+[graph-profile] assemble_new_files                 0.486s  total= 4.909s  new=5190 ts_noop=false non_ts_need=true skip=false facts=69754
+[graph-profile] index_group_owners                 0.020s  total= 4.928s  facts=69311 owners=5068
+[graph-profile] publish_resolved                   2.412s  total= 7.340s  owners=5068
+[graph-profile] revalidate_ts_records              0.150s  total= 7.490s  n=4244
+[graph-profile] ts_config_inputs                   0.074s  n=83
+[graph-profile] state_json_marshal                 0.129s  bytes=50955169 files=5190
+[graph-profile] write_pending_state                0.325s  total= 7.816s
+[graph-profile] end_flush_promote                  0.145s  total= 7.961s  parsed=4144 published=5068
+[graph-profile] engine_walk_repo                   0.149s  files=11127 tests=0 all_names=11127
+[graph-profile] inventory                          0.149s  total= 0.149s  files=11127 all_names=11127
+[graph-profile] detect_go                          0.000s
+[graph-profile] detect_manifests                   0.000s
+[graph-profile] detect_mdintent                    0.000s
+[graph-profile] detect_dotnet                      0.005s
+[graph-profile] detect_cpp                         0.006s
+[graph-profile] detect_hcl                         0.001s
+[graph-profile] detect_ansible                     0.002s
+[graph-profile] detect_java                        0.004s
+[graph-profile] detect_kotlin                      0.004s
+[graph-profile] detect_php                         0.001s
+[graph-profile] detect_python                      0.000s
+[graph-profile] detect_typescript                  0.002s
+[graph-profile] detect_swift                       0.001s
+[graph-profile] detect_ruby                        0.003s
+[graph-profile] detect_rust                        0.002s
+[graph-profile] detect_scala                       0.006s
+[graph-profile] detect_dart                        0.002s
+[graph-profile] detect_grpc                        0.090s
+[graph-profile] detect_openapi                     0.091s
+[graph-profile] detect_asyncapi                    0.153s
+[graph-profile] detect_extractors                  0.153s  total= 0.303s  detected=6
+[graph-profile] engine_hash_files                  0.237s  n=5209 hashed=5209 bytes=58935712
+[graph-profile] hash_content_inputs                0.346s  total= 0.649s  targets=5209
+[graph-profile] ts_config_inputs                   0.089s  n=83
+[graph-profile] analysis_fingerprint               0.101s  total= 0.750s  cfg_files=59
+[graph-profile] clone_file_state_copy              0.000s  n=5190
+[graph-profile] extractor_need                     0.922s  total= 0.922s  non_ts_need=false detected=6
+[graph-profile] ts_reuse_cache                     0.061s  total= 0.982s  owned=4244 facts=69735
+[graph-profile] assemble_new_files                 0.009s  total= 0.992s  new=5190 ts_noop=true non_ts_need=false skip=true facts=69754
+[graph-profile] ts_config_inputs                   0.079s  n=83
+[graph-profile] skip_publish_return                0.081s  total= 1.073s
+[graph-profile] engine_walk_repo                   0.140s  files=11129 tests=0 all_names=11129
+[graph-profile] inventory                          0.140s  total= 0.140s  files=11129 all_names=11129
+[graph-profile] detect_go                          0.000s
+[graph-profile] detect_manifests                   0.000s
+[graph-profile] detect_mdintent                    0.000s
+[graph-profile] detect_dotnet                      0.005s
+[graph-profile] detect_hcl                         0.001s
+[graph-profile] detect_cpp                         0.006s
+[graph-profile] detect_ansible                     0.001s
+[graph-profile] detect_java                        0.004s
+[graph-profile] detect_kotlin                      0.004s
+[graph-profile] detect_php                         0.001s
+[graph-profile] detect_python                      0.000s
+[graph-profile] detect_typescript                  0.002s
+[graph-profile] detect_swift                       0.001s
+[graph-profile] detect_ruby                        0.003s
+[graph-profile] detect_rust                        0.002s
+[graph-profile] detect_scala                       0.005s
+[graph-profile] detect_dart                        0.002s
+[graph-profile] detect_grpc                        0.083s
+[graph-profile] detect_openapi                     0.085s
+[graph-profile] detect_asyncapi                    0.147s
+[graph-profile] detect_extractors                  0.147s  total= 0.288s  detected=6
+[graph-profile] engine_hash_files                  0.225s  n=5211 hashed=5211 bytes=58941657
+[graph-profile] hash_content_inputs                0.326s  total= 0.614s  targets=5211
+[graph-profile] ts_config_inputs                   0.072s  n=83
+[graph-profile] analysis_fingerprint               0.079s  total= 0.693s  cfg_files=59
+[graph-profile] clone_file_state_copy              0.000s  n=5190
+[graph-profile] extractor_need                     0.830s  total= 0.830s  non_ts_need=true detected=6
+[graph-profile] md_scope_preview                   0.168s  pages=893 facts=9749 owners=0
+[graph-profile] ts_detect_frameworks               0.018s  total= 0.018s  files=4246
+[graph-profile] ts_read_dirty                      0.001s  total= 0.018s  to_read=3 cached=4243
+[graph-profile] ts_graphql_grpc_index              0.000s  total= 0.019s  ts_files=4246
+[graph-profile] ts_mapfiles_aggregate              0.028s  total= 0.047s  parsed=3 facts=59333 routers=0
+[graph-profile] ts_compose_modules                 0.072s  total= 0.119s  facts=59768 records=4246 unread=0
+[graph-profile] non_ts_fingerprint                 0.022s  mdintent
+[graph-profile] ts_dirty_scope                     0.540s  total= 1.370s  dirty=3 scope=3 force=false
+[graph-profile] ts_extract_session                 0.000s  total= 1.370s  parsed=3 cached=4243 facts=59768 records=4246
+[graph-profile] ts_detect_frameworks               0.017s  total= 0.017s  files=4246
+[graph-profile] ts_read_dirty                      0.001s  total= 0.018s  to_read=15 cached=4231
+[graph-profile] ts_graphql_grpc_index              0.004s  total= 0.022s  ts_files=4246
+[graph-profile] ts_mapfiles_aggregate              0.056s  total= 0.078s  parsed=15 facts=59333 routers=0
+[graph-profile] ts_compose_modules                 0.072s  total= 0.150s  facts=59768 records=4246 unread=0
+[graph-profile] assemble_new_files                 0.233s  total= 1.603s  new=5192 ts_noop=false non_ts_need=true skip=false facts=69769
+[graph-profile] index_group_owners                 0.210s  total= 1.813s  facts=69326 owners=5070
+[graph-profile] publish_resolved                   0.056s  total= 1.869s  owners=18
+[graph-profile] revalidate_ts_records              0.135s  total= 2.005s  n=4246
+[graph-profile] ts_config_inputs                   0.071s  n=83
+[graph-profile] state_json_marshal                 0.130s  bytes=50965544 files=5192
+[graph-profile] write_pending_state                0.339s  total= 2.344s
+[graph-profile] end_flush_promote                  0.104s  total= 2.448s  parsed=18 published=18

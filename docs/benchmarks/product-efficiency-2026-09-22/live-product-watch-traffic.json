@@ -1,0 +1,314 @@
+{
+  "audit_wall_s": 5.230722374999999,
+  "stream_messages": 13533,
+  "errors": [],
+  "runs": [
+    {
+      "run_id": "watch-bench-soak-watch-1-1790102455950586000",
+      "messages": 2691,
+      "batches": 2689,
+      "node_records": 69311,
+      "edge_records": 171954,
+      "payload_bytes": 78222795,
+      "phase_counts": {
+        "resolved": 2689
+      },
+      "complete": true,
+      "context": "soak-watch",
+      "generation": 1,
+      "scope_owners": 8645,
+      "begin_time": "2026-09-22T18:40:56.00592Z",
+      "end_time": "2026-09-22T18:41:02.10893Z",
+      "declared_batch_count": 2689,
+      "completeness": {
+        "status": "success",
+        "files_analyzed": 11127,
+        "parsed_files": 4144,
+        "cached_files": 0,
+        "summary_scans": 0,
+        "early_local": false,
+        "fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "all prior/current file owners",
+            "reason": "frozen scope: global name-resolution domain"
+          },
+          {
+            "extractor": "manifests",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "hcl",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "python",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "swift",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ]
+      }
+    },
+    {
+      "run_id": "watch-bench-soak-watch-2-1790102661041420000",
+      "messages": 2691,
+      "batches": 2690,
+      "node_records": 69319,
+      "edge_records": 171969,
+      "payload_bytes": 78228665,
+      "phase_counts": {
+        "resolved": 2690
+      },
+      "complete": false,
+      "context": "soak-watch",
+      "generation": 2,
+      "scope_owners": 8646,
+      "begin_time": "2026-09-22T18:44:21.383893Z"
+    },
+    {
+      "run_id": "watch-bench-soak-watch-2-1790102671281234000",
+      "messages": 2692,
+      "batches": 2690,
+      "node_records": 69317,
+      "edge_records": 171967,
+      "payload_bytes": 78228053,
+      "phase_counts": {
+        "resolved": 2690
+      },
+      "complete": true,
+      "context": "soak-watch",
+      "generation": 2,
+      "scope_owners": 8646,
+      "begin_time": "2026-09-22T18:44:31.56042Z",
+      "end_time": "2026-09-22T18:44:35.060732Z",
+      "declared_batch_count": 2690,
+      "completeness": {
+        "status": "success",
+        "files_analyzed": 11128,
+        "parsed_files": 14,
+        "cached_files": 4233,
+        "summary_scans": 0,
+        "early_local": false,
+        "fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "all prior/current file owners",
+            "reason": "add/delete/rename: prior file graph cannot prove a safe subset"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ]
+      }
+    },
+    {
+      "run_id": "watch-bench-soak-watch-3-1790102695498743000",
+      "messages": 2692,
+      "batches": 2690,
+      "node_records": 69327,
+      "edge_records": 171992,
+      "payload_bytes": 78238492,
+      "phase_counts": {
+        "resolved": 2690
+      },
+      "complete": true,
+      "context": "soak-watch",
+      "generation": 3,
+      "scope_owners": 8647,
+      "begin_time": "2026-09-22T18:44:55.804708Z",
+      "end_time": "2026-09-22T18:44:59.429052Z",
+      "declared_batch_count": 2690,
+      "completeness": {
+        "status": "success",
+        "files_analyzed": 11129,
+        "parsed_files": 1,
+        "cached_files": 4245,
+        "summary_scans": 0,
+        "early_local": false,
+        "fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "all prior/current file owners",
+            "reason": "add/delete/rename: prior file graph cannot prove a safe subset"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ]
+      }
+    },
+    {
+      "run_id": "watch-bench-soak-watch-4-1790102833753928000",
+      "messages": 36,
+      "batches": 34,
+      "node_records": 517,
+      "edge_records": 2160,
+      "payload_bytes": 798735,
+      "phase_counts": {
+        "resolved": 34
+      },
+      "complete": true,
+      "context": "soak-watch",
+      "generation": 4,
+      "scope_owners": 18,
+      "begin_time": "2026-09-22T18:47:14.015363Z",
+      "end_time": "2026-09-22T18:47:15.031265Z",
+      "declared_batch_count": 34,
+      "completeness": {
+        "status": "success",
+        "files_analyzed": 11129,
+        "parsed_files": 18,
+        "cached_files": 4230,
+        "summary_scans": 0,
+        "early_local": false,
+        "fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: reverse-close plus owners that reference added or removed fact names"
+          }
+        ]
+      }
+    },
+    {
+      "run_id": "watch-bench-soak-watch-5-1790102841431175000",
+      "messages": 3,
+      "batches": 1,
+      "node_records": 10,
+      "edge_records": 24,
+      "payload_bytes": 11160,
+      "phase_counts": {
+        "resolved": 1
+      },
+      "complete": true,
+      "context": "soak-watch",
+      "generation": 5,
+      "scope_owners": 1,
+      "begin_time": "2026-09-22T18:47:21.680788Z",
+      "end_time": "2026-09-22T18:47:22.540233Z",
+      "declared_batch_count": 1,
+      "completeness": {
+        "status": "success",
+        "files_analyzed": 11129,
+        "parsed_files": 1,
+        "cached_files": 4245,
+        "summary_scans": 0,
+        "early_local": false,
+        "fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ]
+      }
+    },
+    {
+      "run_id": "watch-bench-soak-watch-6-1790102888071684000",
+      "messages": 36,
+      "batches": 34,
+      "node_records": 517,
+      "edge_records": 2159,
+      "payload_bytes": 798410,
+      "phase_counts": {
+        "resolved": 34
+      },
+      "complete": true,
+      "context": "soak-watch",
+      "generation": 6,
+      "scope_owners": 18,
+      "begin_time": "2026-09-22T18:48:08.305604Z",
+      "end_time": "2026-09-22T18:48:09.147796Z",
+      "declared_batch_count": 34,
+      "completeness": {
+        "status": "success",
+        "files_analyzed": 11129,
+        "parsed_files": 1,
+        "cached_files": 4245,
+        "summary_scans": 0,
+        "early_local": false,
+        "fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ]
+      }
+    },
+    {
+      "run_id": "watch-bench-soak-cold-1-1790104267630993000",
+      "messages": 2692,
+      "batches": 2690,
+      "node_records": 69326,
+      "edge_records": 171990,
+      "payload_bytes": 78235338,
+      "phase_counts": {
+        "resolved": 2690
+      },
+      "complete": true,
+      "context": "soak-cold",
+      "generation": 1,
+      "scope_owners": 8647,
+      "begin_time": "2026-09-22T19:11:07.699612Z",
+      "end_time": "2026-09-22T19:11:18.135082Z",
+      "declared_batch_count": 2690,
+      "completeness": {
+        "status": "success",
+        "files_analyzed": 11129,
+        "parsed_files": 4146,
+        "cached_files": 0,
+        "summary_scans": 0,
+        "early_local": false,
+        "fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "all prior/current file owners",
+            "reason": "frozen scope: global name-resolution domain"
+          },
+          {
+            "extractor": "manifests",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "hcl",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "python",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "swift",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ]
+      }
+    }
+  ]
+}

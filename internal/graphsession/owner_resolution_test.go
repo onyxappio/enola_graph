@@ -334,6 +334,78 @@ func TestChangedResolutionOwnersDetectsFileRecordCollision(t *testing.T) {
 	}
 }
 
+func TestRouteDigestByFileHashesPayloadAndNormalizesRepo(t *testing.T) {
+	app := "apps/architect-console/src/server/app.ts"
+	base := facts.Fact{
+		Kind: facts.KindRoute, Name: "/health", File: app, Line: 4, Column: 2,
+		Props:     map[string]any{"method": "GET", "framework": "express"},
+		Relations: []facts.Relation{{Kind: "handler", Target: "listen"}},
+	}
+	tagged := base
+	tagged.Repo = "product-scope"
+	scope := map[string]bool{}
+	addChangedRouteFiles(scope, []facts.Fact{base}, []facts.Fact{tagged})
+	if len(scope) != 0 {
+		t.Fatalf("blank vs tagged full payload grew scope %v", scope)
+	}
+	post := base
+	post.Props = map[string]any{"method": "POST", "framework": "express"}
+	addChangedRouteFiles(scope, []facts.Fact{base}, []facts.Fact{post})
+	if !scope[app] {
+		t.Fatal("method change was not a route digest change")
+	}
+	scope = map[string]bool{}
+	moved := base
+	moved.Line = 12
+	addChangedRouteFiles(scope, []facts.Fact{base}, []facts.Fact{moved})
+	if !scope[app] {
+		t.Fatal("line change was not a route digest change")
+	}
+}
+
+func TestAddChangedRouteFilesIgnoresBlankVersusTaggedRepo(t *testing.T) {
+	app := "apps/architect-console/src/server/app.ts"
+	blank := []facts.Fact{{Kind: facts.KindRoute, Name: "/health", File: app, Relations: []facts.Relation{{Kind: "handler", Target: "listen"}}}}
+	tagged := []facts.Fact{{Repo: "product-scope", Kind: facts.KindRoute, Name: "/health", File: app, Relations: []facts.Relation{{Kind: "handler", Target: "listen"}}}}
+	scope := map[string]bool{}
+	addChangedRouteFiles(scope, blank, tagged)
+	if len(scope) != 0 {
+		t.Fatalf("blank vs tagged repo grew scope %v", scope)
+	}
+}
+
+func TestAddChangedRouteFilesEquivalentComposedDomainsDoNotGrow(t *testing.T) {
+	orders := "src/api/orders.ts"
+	prev := map[string]*tsextractor.FileRecord{
+		"src/server.ts": {
+			File: "src/server.ts",
+			Router: &tsextractor.RouterDTO{
+				RelFile: "src/server.ts",
+				Roots:   map[string]bool{"app": true},
+				Mounts:  []tsextractor.MountDTO{{File: "src/server.ts", Parent: "app", Prefix: "/api", Child: "ordersRouter"}},
+				Imports: map[string]tsextractor.ImportRefDTO{"ordersRouter": {File: orders, Export: "default"}},
+			},
+		},
+		orders: {
+			File:  orders,
+			Facts: []facts.Fact{{Kind: facts.KindSymbol, Name: "listOrders", File: orders}},
+			Router: &tsextractor.RouterDTO{
+				RelFile: orders,
+				Routers: map[string]bool{"router": true},
+				Exports: map[string]string{"default": "router"},
+				Pending: map[string][]tsextractor.PendingRouteDTO{
+					"router": {{Verb: "GET", Path: "/orders", Line: 4, Framework: "express"}},
+				},
+			},
+		},
+	}
+	scope := map[string]bool{}
+	addChangedRouteFiles(scope, composedRouteFacts(prev), composedRouteFacts(prev))
+	if len(scope) != 0 {
+		t.Fatalf("equivalent composed domains grew scope %v", scope)
+	}
+}
+
 func TestAddChangedRouteFilesComparesRecordRoutes(t *testing.T) {
 	app := "apps/architect-console/src/server/app.ts"
 	records := []facts.Fact{{Kind: facts.KindSymbol, Name: "listen", File: app}}

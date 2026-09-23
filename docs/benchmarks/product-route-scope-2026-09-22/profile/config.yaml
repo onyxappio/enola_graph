@@ -1,0 +1,9 @@
+repo: /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-route-product-diagnostic-mzh5dtso/product-live
+extractors: [typescript]
+explainers: []
+renderers: []
+# Overlay without repo. Paths are relative to the Product checkout.
+graph_inputs:
+  exclude:
+    - "apps/mobile/e2e/artifacts/**"
+    - "worker-reports/**"

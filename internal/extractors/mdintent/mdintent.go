@@ -8,11 +8,14 @@ package mdintent
 
 import (
 	"context"
-	"github.com/enola-labs/enola/internal/extractors/inputscope"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync/atomic"
+
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
 
 	"github.com/enola-labs/enola/internal/extractors/extcoverage"
 	"github.com/enola-labs/enola/internal/factpath"
@@ -22,7 +25,10 @@ import (
 )
 
 // Extractor extracts enola_intent frontmatter from markdown pages.
-type Extractor struct{ inputScope *inputscope.Scope }
+type Extractor struct {
+	inputScope *inputscope.Scope
+	calls      atomic.Int64
+}
 
 // New creates the extractor.
 func New() *Extractor { return &Extractor{} }
@@ -101,6 +107,57 @@ var mdSkipDirs = map[string]bool{
 // that do not counted on the extraction fact.
 func (e *Extractor) Extract(ctx context.Context, repoPath string, files []string) ([]facts.Fact, error) {
 	inputScope := e.inputScope
+	return e.extract(ctx, repoPath, files, func(relFile string) ([]byte, error) {
+		return inputScope.ReadFile(filepath.Join(repoPath, relFile))
+	}, false)
+}
+
+// CaptureInputs reads every content input once, so a caller that must prove its
+// facts came from particular bytes can extract from exactly those bytes instead
+// of a second read of a tree that may have moved underneath it.
+//
+// A page the walker listed but that cannot be read is an error here, where
+// Extract skips it. To a caller comparing contributions, a silently dropped
+// page is indistinguishable from one that legitimately emits nothing, and that
+// difference decides whether its owner is replaced.
+func (e *Extractor) CaptureInputs(repoPath string, files []string) (map[string][]byte, error) {
+	inputScope := e.inputScope
+	out := make(map[string][]byte)
+	for _, relFile := range files {
+		if !e.ContentInput(relFile) {
+			continue
+		}
+		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
+		if err != nil {
+			return nil, fmt.Errorf("mdintent capture %s: %w", relFile, err)
+		}
+		out[filepath.ToSlash(relFile)] = src
+	}
+	return out, nil
+}
+
+// ExtractCaptured is Extract over captured bytes. Every content input must be
+// present in src: a missing one fails rather than yielding an empty page.
+func (e *Extractor) ExtractCaptured(ctx context.Context, repoPath string, files []string, src map[string][]byte) ([]facts.Fact, error) {
+	return e.extract(ctx, repoPath, files, func(relFile string) ([]byte, error) {
+		b, ok := src[filepath.ToSlash(relFile)]
+		if !ok {
+			return nil, fmt.Errorf("mdintent: %s is not in the captured inputs", relFile)
+		}
+		return b, nil
+	}, true)
+}
+
+// ExtractCalls counts attempted extractions, captured or not, whether or not
+// they returned facts. A caller that previews an extraction to plan with and
+// then consumes it has to be able to show the page was compiled once, not twice
+// - and a second attempt that failed is still a second read of the tree.
+func (e *Extractor) ExtractCalls() int { return int(e.calls.Load()) }
+
+// extract compiles the pages read supplies. strict fails the extraction on an
+// unreadable input instead of skipping it; see CaptureInputs.
+func (e *Extractor) extract(_ context.Context, repoPath string, files []string, read func(relFile string) ([]byte, error), strict bool) ([]facts.Fact, error) {
+	e.calls.Add(1)
 	var out []facts.Fact
 	var links linkCount
 	documents, sections := 0, 0
@@ -113,8 +170,11 @@ func (e *Extractor) Extract(ctx context.Context, repoPath string, files []string
 		if !e.ContentInput(relFile) {
 			continue
 		}
-		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
+		src, err := read(relFile)
 		if err != nil {
+			if strict {
+				return nil, err
+			}
 			continue
 		}
 		page, err := intent.ParsePage(src)

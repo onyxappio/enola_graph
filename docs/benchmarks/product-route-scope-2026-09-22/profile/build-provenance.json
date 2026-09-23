@@ -1,0 +1,19 @@
+{
+  "base": "120285570ea6593caa25f9f753fed4dd80c929e9",
+  "patch_sha256": "eae759aefd0f6ab8d6f92fa1e0996350b724df052ed812a6310b4f16792a0e90",
+  "experimental": true,
+  "known_review_blockers": [
+    "Ember composition",
+    "same-name candidate identities",
+    "full route payload"
+  ],
+  "build_seconds": 10.973894042,
+  "bins": {
+    "enola": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-route-experiment-49509dq8/bin/enola",
+    "resident": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-route-experiment-49509dq8/bin/benchresident",
+    "observer": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-route-experiment-49509dq8/bin/benchobserver",
+    "enola_sha256": "52cbbad84c68f9cb69d8c2cc6a81ea6b634380fd13bcca32461b1dedd5a1016b",
+    "resident_sha256": "e85eb6bbfd5b2c6df105a204ca0c348bc53c7c5bee8ece21d39939d54b5f1afe",
+    "observer_sha256": "8786066ab76f0d621a9649b1e86a91bb2a87a27a59fa38aa2c9ef74df342d623"
+  }
+}

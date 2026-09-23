@@ -805,7 +805,7 @@ func (e *TSExtractor) extractImports(kinds *tsutil.KindTable, root *sitter.Node,
 	var result []facts.Fact
 	dir := factpath.Dir(relFile)
 	emit := func(importPath string, line int, isReexport, dynamic bool) {
-		file, moduleDir, isExternal := bindImportTarget(importPath, dir, aliases, knownFiles)
+		file, moduleDir, replaySpec, isExternal := bindImportTarget(importPath, dir, aliases, knownFiles)
 		importSource := "internal"
 		if isExternal {
 			importSource = "external"
@@ -814,8 +814,9 @@ func (e *TSExtractor) extractImports(kinds *tsutil.KindTable, root *sitter.Node,
 			importSource = facts.DepSourceFramework
 		}
 		props := map[string]any{
-			"language": "typescript",
-			"source":   importSource,
+			"language":           "typescript",
+			"source":             importSource,
+			facts.PropImportSpec: replaySpec,
 		}
 		if isReexport {
 			props["reexport"] = true
@@ -874,7 +875,7 @@ func (e *TSExtractor) extractImports(kinds *tsutil.KindTable, root *sitter.Node,
 			return
 		}
 		if importPath, ok := dynamicImportSpecifier(kinds, n, src); ok {
-			file, _, _ := bindImportTarget(importPath, dir, aliases, knownFiles)
+			file, _, _, _ := bindImportTarget(importPath, dir, aliases, knownFiles)
 			name := dir + " -> " + file
 			if !seenDep[name] {
 				seenDep[name] = true
@@ -2340,15 +2341,15 @@ func parseTSConfigAliases(config tsConfigAliasFile, declaringPath, originDir str
 // (the directory) so graphsession idIndex can resolve the edge. The exact file
 // is returned separately and stored as target_file so ResolvedFiles / invalidation
 // keep file granularity. Missing internals stay on the unresolved path.
-func bindImportTarget(importPath, fileDir string, aliases map[string]tsAlias, knownFiles map[string]bool) (file, moduleDir string, external bool) {
+func bindImportTarget(importPath, fileDir string, aliases map[string]tsAlias, knownFiles map[string]bool) (file, moduleDir, replaySpec string, external bool) {
 	resolved, external := resolveImportPath(importPath, fileDir, aliases)
 	if external {
-		return resolved, "", true
+		return resolved, "", resolved, true
 	}
 	if file, dir, ok := resolveModuleFile(resolved, knownFiles); ok {
-		return file, dir, false
+		return file, dir, resolved, false
 	}
-	return resolved, "", false
+	return resolved, "", resolved, false
 }
 
 // resolveImportPath normalizes a TypeScript import path to a filesystem-relative path.

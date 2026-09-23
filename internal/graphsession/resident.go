@@ -374,10 +374,11 @@ func (r *Resident) contentInputs(paths []string, work *WorkCounters) (*runtimeIn
 	}
 	next := *r.inputs
 	next.sources = map[string][]byte{}
-	next.hashes = make(map[string]string, len(r.inputs.hashes))
-	for k, v := range r.inputs.hashes {
-		next.hashes[k] = v
-	}
+	// Keep the committed hash map shared until a captured path proves that its
+	// content changed. Most watcher notifications are duplicate or stale
+	// same-content events; copying every captured hash for those events adds a
+	// repository-sized allocation before the idle shortcut can return.
+	next.hashes = r.inputs.hashes
 	changed := false
 	seen := map[string]bool{}
 	for _, p := range paths {
@@ -414,6 +415,12 @@ func (r *Resident) contentInputs(paths []string, work *WorkCounters) (*runtimeIn
 		sum := sha256.Sum256(b)
 		h := hex.EncodeToString(sum[:])
 		if next.hashes[p] != h {
+			if !changed {
+				next.hashes = make(map[string]string, len(r.inputs.hashes))
+				for k, v := range r.inputs.hashes {
+					next.hashes[k] = v
+				}
+			}
 			changed = true
 		}
 		next.hashes[p] = h

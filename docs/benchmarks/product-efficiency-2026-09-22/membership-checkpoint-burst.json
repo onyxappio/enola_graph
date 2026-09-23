@@ -1,0 +1,102 @@
+{
+  "comparison_kind": "one_sample_each_not_speedup_acceptance",
+  "baseline_source": "b611e22e446c57a419339c401ec767d7cdedeca0",
+  "candidate_production_source": "fffc0b74efbf7ea5f4c31aa30ee1c34dc4ff9099",
+  "candidate_note": "Production patch frozen before commit; candidate snapshot omitted the subsequently completed independent test file, which does not affect the binary.",
+  "product_revision": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "workload": "Final five-file live-editor patch replayed as one burst, not original editor chronology.",
+  "samples": [
+    {
+      "label": "baseline",
+      "equal": true,
+      "elapsed_s": 99.183,
+      "generations": [
+        {
+          "generation": 1,
+          "owners": 8645,
+          "begin_to_end_ms": 6393.448
+        },
+        {
+          "generation": 2,
+          "owners": 8647,
+          "begin_to_end_ms": 3853.693
+        }
+      ],
+      "stable_inputs": {
+        "stable": true,
+        "files_before_cold": 45110,
+        "files_after_cold": 45110,
+        "diff": {
+          "added": [],
+          "modified": [],
+          "deleted": [],
+          "changed_count": 0,
+          "outside_allowlist": []
+        },
+        "scope": "whole-isolated-checkout",
+        "note": "if unstable, the watch and cold graphs read different inputs and the equality result is inconclusive, not a verdict"
+      },
+      "work": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/burst-baseline-1"
+    },
+    {
+      "label": "candidate",
+      "equal": true,
+      "elapsed_s": 97.897,
+      "generations": [
+        {
+          "generation": 1,
+          "owners": 8645,
+          "begin_to_end_ms": 6070.138
+        },
+        {
+          "generation": 2,
+          "owners": 8647,
+          "begin_to_end_ms": 3646.305
+        }
+      ],
+      "stable_inputs": {
+        "stable": true,
+        "files_before_cold": 45110,
+        "files_after_cold": 45110,
+        "diff": {
+          "added": [],
+          "modified": [],
+          "deleted": [],
+          "changed_count": 0,
+          "outside_allowlist": []
+        },
+        "scope": "whole-isolated-checkout",
+        "note": "if unstable, the watch and cold graphs read different inputs and the equality result is inconclusive, not a verdict"
+      },
+      "work": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/burst-candidate-1"
+    }
+  ],
+  "candidate_end_audit": {
+    "type": "end_replace",
+    "run_id": "watch-bench-soak-watch-2-1790105827220274000",
+    "batch_count": 2690,
+    "batch_digest": "aa46ce96885bfe881f4608d21e159fa3c2d5dce0bc3c95947773b44486c242a0",
+    "completeness": {
+      "status": "success",
+      "files_analyzed": 11129,
+      "parsed_files": 293,
+      "cached_files": 4234,
+      "summary_scans": 0,
+      "early_local": false,
+      "fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "all prior/current file owners",
+          "reason": "frozen scope: global name-resolution domain"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ]
+    },
+    "owner_scope_len": 8647,
+    "owner_scope_digest": "e260bbb6afb6dc9658914b2833f33098bcf54ae78f22aadc98a945f608b0ae15"
+  }
+}

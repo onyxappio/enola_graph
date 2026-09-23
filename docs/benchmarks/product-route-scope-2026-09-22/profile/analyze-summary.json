@@ -1,0 +1,38 @@
+[
+  {
+    "Invalidation": {
+      "RawConfigChanged": false,
+      "PolicyReconciled": false,
+      "AddedSources": 0,
+      "RemovedSources": 0,
+      "ContextAffectedSources": 0,
+      "ContextReasons": null,
+      "ParsedByReason": {
+        "initial": 4144
+      }
+    },
+    "RunID": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-route-product-diagnostic-mzh5dtso/product-live-profile-1-1790084862321157000",
+    "BaseGeneration": 0,
+    "TargetGeneration": 1,
+    "Stats": {
+      "files_read": 4244,
+      "files_parsed": 4144,
+      "cached_files": 0,
+      "graphql_parsed": 2,
+      "sfc_parsed": 17,
+      "summary_scans": 0
+    },
+    "Fallbacks": [
+      {
+        "extractor": "graph",
+        "scope": "all prior/current file owners",
+        "reason": "frozen scope: global name-resolution domain"
+      }
+    ],
+    "Unreadable": null,
+    "OwnersPublished": 4133,
+    "ParsedFiles": 4144,
+    "EarlyLocal": 0,
+    "Facts": null
+  }
+]

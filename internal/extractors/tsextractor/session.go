@@ -34,17 +34,20 @@ type ExtractStats struct {
 
 // FileRecord is the immutable per-file contribution persisted between generations.
 type FileRecord struct {
-	File            string       `json:"file"`
-	Hash            string       `json:"hash,omitempty"`
-	Unreadable      bool         `json:"unreadable,omitempty"`
-	Minified        bool         `json:"minified,omitempty"`
-	Facts           []facts.Fact `json:"facts,omitempty"`
-	ImportSpecs     []string     `json:"import_specs,omitempty"`
-	ResolvedFiles   []string     `json:"resolved_files,omitempty"`
-	Declared        []string     `json:"declared,omitempty"`
-	Referenced      []string     `json:"referenced,omitempty"`
-	Reexports       []string     `json:"reexports,omitempty"`
-	UnresolvedSpecs []string     `json:"unresolved_specs,omitempty"`
+	File       string       `json:"file"`
+	Hash       string       `json:"hash,omitempty"`
+	Unreadable bool         `json:"unreadable,omitempty"`
+	Minified   bool         `json:"minified,omitempty"`
+	Facts      []facts.Fact `json:"facts,omitempty"`
+	// ImportSpecs are alias/relative-normalized replay paths (resolveImportPath
+	// output), not the exact bound file. Membership replay compares these
+	// against old/new filename universes; ResolvedFiles hold exact provenance.
+	ImportSpecs     []string `json:"import_specs,omitempty"`
+	ResolvedFiles   []string `json:"resolved_files,omitempty"`
+	Declared        []string `json:"declared,omitempty"`
+	Referenced      []string `json:"referenced,omitempty"`
+	Reexports       []string `json:"reexports,omitempty"`
+	UnresolvedSpecs []string `json:"unresolved_specs,omitempty"`
 	// ImportComplete is set after summarizeFacts runs. Empty resolved and
 	// unresolved lists are a valid graph when every import is external.
 	ImportComplete bool `json:"import_complete,omitempty"`
@@ -587,15 +590,22 @@ func summarizeFacts(ff []facts.Fact, knownFiles map[string]bool) (specs, resolve
 				continue
 			}
 			spec := r.Target
-			if tf := f.PropString(facts.PropTargetFile); tf != "" {
-				spec = tf
+			if replay := f.PropString(facts.PropImportSpec); replay != "" {
+				spec = replay
 			}
-			if seenSpec[spec] {
+			if !seenSpec[spec] {
+				seenSpec[spec] = true
+				specs = append(specs, spec)
+			}
+			slash := filepath.ToSlash(spec)
+			if tf := f.PropString(facts.PropTargetFile); tf != "" {
+				tf = filepath.ToSlash(tf)
+				if !seenRes[tf] {
+					seenRes[tf] = true
+					resolved = append(resolved, tf)
+				}
 				continue
 			}
-			seenSpec[spec] = true
-			specs = append(specs, spec)
-			slash := filepath.ToSlash(spec)
 			if file, ok := NormalizeImportTarget(slash, knownFiles); ok {
 				if !seenRes[file] {
 					seenRes[file] = true

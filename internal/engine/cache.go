@@ -2479,11 +2479,16 @@ import (
 // suffixes; namespace-import member calls; Nitro file and addServerHandler
 // routes; class data fields as variable/constant; named-reexport leaf
 // directory names; Vue own-file template call provenance.
+// Main v288 also added alias/relative-normalized ImportSpecs separately from
+// exact ResolvedFiles and target_file provenance.
 // v289: Fastify register/plugin unparenthesized single-param arrow callbacks
 // (`async child=>{...}`) bind the callback body without treating `.register(`
 // as the function; nested same-name parameters and unknown/local shadows stay
 // non-server.
-const cacheVersion = "v289"
+// v290: reconcile parallel accuracy and main branches: retain import replay
+// specifiers with exact file provenance alongside all wave5 extraction fixes.
+// Both branches used v288 independently; no old cache may cross this merge.
+const cacheVersion = "v290"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

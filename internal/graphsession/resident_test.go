@@ -85,6 +85,28 @@ func TestResidentCoveredIdleDoesNoWork(t *testing.T) {
 	}
 }
 
+func TestResidentDuplicateSameContentNotificationReusesInputs(t *testing.T) {
+	_, r, _, sink := residentFixture(t, map[string]string{"src/a.ts": "export const a=1"}, Options{})
+	committed := r.inputs
+	beforeEvents := len(sink.CloneRecords())
+	res, err := r.ApplyChanges(context.Background(), ChangeBatch{
+		Epoch: r.epoch, From: r.watermark, Through: r.watermark + 1, Covered: true,
+		Paths: []string{"src/a.ts", "src/a.ts"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.Work.HashedFiles != 1 || res.ParsedFiles != 0 || res.TargetGeneration != committed.generation {
+		t.Fatalf("duplicate same-content notification did work: %+v", res)
+	}
+	if r.inputs != committed {
+		t.Fatal("same-content notification replaced committed runtime inputs")
+	}
+	if got := len(sink.CloneRecords()); got != beforeEvents {
+		t.Fatalf("same-content notification published %d events", got-beforeEvents)
+	}
+}
+
 func TestResidentContentEditsAndFallbacksEqualCold(t *testing.T) {
 	root, r, q, sink := residentFixture(t, map[string]string{"src/a.ts": "export function a(){return 1}", "src/b.ts": "import {a} from './a'; export function b(){return a()}", "src/c.ts": "export const c=1"}, Options{})
 	for _, body := range []string{"export function a(){return 2}", "export function a(){return fetch('/a')}", "export function renamed(){return 3}", "export function a(){return 1}"} {
@@ -214,6 +236,7 @@ func TestResidentFailurePreservesCommittedCachesAndRecovers(t *testing.T) {
 		}
 	}})
 	before, _ := json.Marshal(r.state)
+	beforeHash := r.inputs.hashes["a.ts"]
 	independentWrite(t, root, "a.ts", "export const a=2")
 	q.Add("a.ts")
 	mutate = func() { os.WriteFile(filepath.Join(root, "a.ts"), []byte("export const a=3"), 0644); q.Add("a.ts") }
@@ -223,6 +246,9 @@ func TestResidentFailurePreservesCommittedCachesAndRecovers(t *testing.T) {
 	after, _ := json.Marshal(r.state)
 	if string(before) != string(after) {
 		t.Fatal("failed transaction mutated committed cache")
+	}
+	if got := r.inputs.hashes["a.ts"]; got != beforeHash {
+		t.Fatalf("failed transaction mutated committed input hash: got %q want %q", got, beforeHash)
 	}
 	mutate = nil
 	res := residentApply(t, r, q)

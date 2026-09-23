@@ -23,6 +23,20 @@ type factFileOwner interface {
 	OwnsFactFile(relFile string) bool
 }
 
+// declaresFileOwnership reports whether an extractor names the files it owns.
+// ownedFiles returns nil both for an extractor that owns nothing in this
+// inventory and for one that cannot answer the question at all; only the latter
+// makes a frozen manifest unprovable, so the two are distinguished here rather
+// than by the emptiness of the result.
+func declaresFileOwnership(ext plugin.Extractor) bool {
+	switch ext.(type) {
+	case plugin.FileOwner, factFileOwner:
+		return true
+	default:
+		return false
+	}
+}
+
 func ownedFiles(ext plugin.Extractor, files []string) []string {
 	if ext == nil {
 		return nil
@@ -481,24 +495,24 @@ func fileFacts(st *FileState) []facts.Fact {
 	return st.Facts
 }
 
+func canonicalizeRouteFact(f facts.Fact) facts.Fact {
+	f.Repo = ""
+	f.File = canonicalFactFile(f.File)
+	return f
+}
+
 func routeDigestByFile(ff []facts.Fact) map[string]string {
-	grouped := map[string][]string{}
+	grouped := map[string][]facts.Fact{}
 	for _, f := range ff {
 		if f.Kind != facts.KindRoute {
 			continue
 		}
-		file := filepath.ToSlash(f.File)
-		parts := []string{f.Identity(), f.Name}
-		for _, r := range f.Relations {
-			parts = append(parts, r.Kind+"->"+r.Target)
-		}
-		grouped[file] = append(grouped[file], strings.Join(parts, "|"))
+		f = canonicalizeRouteFact(f)
+		grouped[f.File] = append(grouped[f.File], f)
 	}
 	out := map[string]string{}
-	for file, parts := range grouped {
-		sort.Strings(parts)
-		sum := sha256.Sum256([]byte(strings.Join(parts, "\n")))
-		out[file] = hex.EncodeToString(sum[:])
+	for file, rows := range grouped {
+		out[file] = factsFingerprint(rows)
 	}
 	return out
 }

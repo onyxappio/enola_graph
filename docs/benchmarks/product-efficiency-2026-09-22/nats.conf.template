@@ -1,0 +1,6 @@
+# Frozen v2 Product Begin is ~831KiB. Keep JetStream payload at 1MiB.
+listen: 127.0.0.1:PORT
+max_payload: 1048576
+jetstream {
+  store_dir: STORE_DIR
+}

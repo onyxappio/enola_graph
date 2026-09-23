@@ -26,6 +26,7 @@ import (
 	"encoding/json"
 	"flag"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -315,6 +316,32 @@ func TestGolden(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestGolden_CustomClientConfiguredUnderHookGitDir pins sdk -> gateway while
+// GIT_DIR/GIT_WORK_TREE point at this clone, which is how pre-push runs tests.
+func TestGolden_CustomClientConfiguredUnderHookGitDir(t *testing.T) {
+	gitDir, err := exec.Command("git", "rev-parse", "--absolute-git-dir").Output()
+	if err != nil {
+		t.Fatalf("absolute-git-dir: %v", err)
+	}
+	workTree, err := exec.Command("git", "rev-parse", "--show-toplevel").Output()
+	if err != nil {
+		t.Fatalf("show-toplevel: %v", err)
+	}
+	t.Setenv("GIT_DIR", strings.TrimSpace(string(gitDir)))
+	t.Setenv("GIT_WORK_TREE", strings.TrimSpace(string(workTree)))
+
+	f := fixture{
+		name:           "ts_custom_client_configured",
+		dir:            "ts_custom_client_cluster",
+		config:         "ts_custom_client_configured.yaml",
+		subRepos:       []string{"gateway", "replica", "sdk", "backend"},
+		goldenInsights: true,
+	}
+	got, insights := snapshotFixture(t, f)
+	assertGolden(t, f.name, got)
+	assertInsightsGolden(t, f.name, insights)
 }
 
 // snapshotFixture copies the fixture repo into a temp dir, runs the full
