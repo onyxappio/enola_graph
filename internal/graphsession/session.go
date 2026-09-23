@@ -328,6 +328,14 @@ type session struct {
 	// previewed to close its candidate names; see prepareNonTSCandidateScope.
 	// The extraction site consumes it instead of reading the tree again.
 	preparedNonTS map[string][]facts.Fact
+	// nonTSPreviews is that same extraction kept by name for the rest of the
+	// run, together with what it proved; see proveNonTSNeutrality.
+	nonTSPreviews map[string]*nonTSPreview
+	// neutralScan and neutralConfig record that the scan digest and the raw
+	// configuration fingerprint moved for reasons this run proved inert, so a
+	// no-publication return can still record the values it observed.
+	neutralScan   bool
+	neutralConfig bool
 	// previewFences re-prove, before a successful End, that each previewed
 	// extractor's declared context is still the one this run planned from.
 	// capturedSources compares bytes it managed to read; these compare the
@@ -356,6 +364,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	// extraction to the next one: the tree has moved on since.
 	s.preparedMD = nil
 	s.preparedNonTS = nil
+	s.nonTSPreviews = nil
+	s.neutralScan = false
+	s.neutralConfig = false
 	s.previewFences = nil
 	var err error
 	input := s.inputs
@@ -552,14 +563,53 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		delete(extractorDigest, name)
 		delete(extractorInput, name)
 	}
-	tr.Mark("extractor_need", fmt.Sprintf("non_ts_need=%v detected=%d", nonTSNeed, len(detectedExt)))
+	// A need is raised from input hashes, which say an extractor has to run,
+	// not that its output moves. Answer the second question here, while the run
+	// can still decline to publish at all; see proveNonTSNeutrality.
+	if err := s.proveNonTSNeutrality(ctx, needByExt, detectedExt, extractorDigest, inv.Files, inv.AllNames, hashes, fileSetHash, scanHash, repoID, nonTSForceAll || nonTSConfigChanged); err != nil {
+		return nil, err
+	}
+	neutralNonTS := s.neutralNonTSPreviews()
+	nonTSNeed = false
+	for _, need := range needByExt {
+		if need {
+			nonTSNeed = true
+			break
+		}
+	}
+	tr.Mark("extractor_need", fmt.Sprintf("non_ts_need=%v detected=%d neutral=%d", nonTSNeed, len(detectedExt), len(neutralNonTS)))
 	if s.opts.AuthoritativeFiles {
 		// The name-based graph resolver has no proven isolated domain. Announce
 		// the full prior/current file union, while retaining incremental parsing.
 		// Empty initial and last-file deletion still Begin before extraction so
 		// the frozen manifest is immutable for the run.
-		scanChanged := s.state != nil && !scanHashEquivalent(s.state, inv.AllNames, graphSemanticNames(s.eng, inv.AllNames), hashes, scanHash)
-		changed := initial || forceAll || nonTSNeed || s.state == nil || scanChanged || s.state.ConfigHash != cfgHash || policyReconciles(s.state, input)
+		semantic := graphSemanticNames(s.eng, inv.AllNames)
+		scanChanged := s.state != nil && !scanHashEquivalent(s.state, inv.AllNames, semantic, hashes, scanHash)
+		rawConfigChanged := s.state != nil && s.state.ConfigHash != cfgHash
+		policyChanged := policyReconciles(s.state, input)
+		// Two coarse digests would otherwise force a publication on their own.
+		// The scan digest is one number over every semantic name and its bytes
+		// and the configuration fingerprint one number over every analysis
+		// input, so neither can say which byte moved; both are discharged only
+		// by showing what did. A proven-neutral extractor does that for the
+		// files it owns, and rawConfigScopeBounded states the projection
+		// argument for the rest of the configuration. Neither discharge is
+		// reached while any other reason to publish stands.
+		if !initial && !forceAll && !nonTSNeed && s.state != nil && len(neutralNonTS) > 0 &&
+			!s.tsFileContextMoved(graphSemanticNames(s.eng, inv.Files), prevFiles, input.tsFileContext) {
+			if scanChanged && scanChangeNeutral(s.state, semantic, hashes, prevFiles, neutralNonTS) {
+				scanChanged = false
+				s.neutralScan = true
+			}
+			if rawConfigChanged && !scanChanged && !policyChanged {
+				if bounded, _ := s.rawConfigScopeBounded(haveCache, input, detectedExt, prevFiles); bounded {
+					rawConfigChanged = false
+					s.neutralConfig = true
+				}
+			}
+		}
+		changed := initial || forceAll || nonTSNeed || s.state == nil || scanChanged || rawConfigChanged || policyChanged
+		tr.Mark("changed_terms", fmt.Sprintf("initial=%v force=%v non_ts=%v scan=%v raw_cfg=%v policy=%v neutral_scan=%v neutral_cfg=%v", initial, forceAll, nonTSNeed, scanChanged, rawConfigChanged, policyChanged, s.neutralScan, s.neutralConfig))
 		if changed {
 			previous := []string{}
 			if s.state != nil {
@@ -1247,7 +1297,22 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			}
 		default:
 			need := needByExt[ext.Name()]
-			if !need && !s.fast {
+			// A need discharged before Begin was discharged by proof, and this
+			// site must not ask the weaker question again. The comparison below
+			// is the one that raised the need in the first place - inputs whose
+			// hashes moved - and it will raise it again, because the bytes on
+			// disk really are not the bytes the stored state records. Re-running
+			// the extractor on that answer reads the live tree after the plan is
+			// frozen: an input edited since the capture then reaches the graph
+			// as an owner the frozen manifest does not carry, and the run fails
+			// on the scope audit instead of on the fence that owns this
+			// refusal. The proven answer stands, and the captured sources are
+			// read back before EndReplace exactly as for any other preview.
+			proven := false
+			if pv := s.nonTSPreviews[ext.Name()]; pv != nil && pv.neutral {
+				proven = true
+			}
+			if !need && !s.fast && !proven {
 				need = nonTSExtractorNeed(owned, prevFiles, hashes, ext.Name(), prevScan, scanHash, nonTSForceAll, nonTSConfigChanged)
 				if !need {
 					need = ownedExtractorContextNeed(owned, s.state, ext, inv.Files, inv.AllNames, hashes, fileSetHash, prevScan, scanHash)
@@ -1262,6 +1327,13 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				appendExtractorSynthetic(synByExt, ext.Name(), syn)
 				if !s.fast {
 					extractorInput[ext.Name()] = extractorInputDigest(ext, owned, inv.Files, inv.AllNames, hashes, fileSetHash, scanHash)
+				}
+				if pv := s.nonTSPreviews[ext.Name()]; pv != nil && pv.neutral {
+					// This need was discharged by proof, not by matching
+					// hashes: the inputs on disk differ from the ones the
+					// stored state records, and no later site will write down
+					// what this run read.
+					refreshExtractorObservedInputs(prevFiles, owned, hashes, ext.Name())
 				}
 				continue
 			}
@@ -1465,21 +1537,34 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			}
 		}
 		// A run that publishes nothing can still be holding bookkeeping the
-		// stored state has not caught up with. Both refreshes below rewrite a
-		// digest and nothing else - the generation, the file records and every
+		// stored state has not caught up with. Every refresh below rewrites
+		// what this run observed and nothing else - the generation and every
 		// published fact are carried over untouched - so they are collapsed
 		// into one clone and one save rather than racing each other's write,
 		// and the result is adopted as this session's state so that a resident
 		// holding it in memory sees the same metadata the file now carries
 		// without rereading it, and without a second run repeating the work.
+		//
+		// The proven-neutral refresh is the one that also touches file records.
+		// Its extractor read inputs that differ from the ones the stored state
+		// describes and proved they produce the same output; if that
+		// observation is not written down here, the next run raises the same
+		// need for the same reason and proves the same thing again, forever.
+		neutralNonTS := s.neutralNonTSPreviews()
+		if len(neutralNonTS) > 0 || s.neutralScan || s.neutralConfig {
+			// An observation commits under the same fence a publication does.
+			if err := s.revalidateCapturedInputs("refusing to record the run's observations"); err != nil {
+				return nil, err
+			}
+		}
 		refreshScan := s.opts.AuthoritativeFiles && s.state != nil &&
 			(s.state.ScanHashVersion != scanHashVersion || s.state.ScanHash != scanHash) &&
-			scanHashEquivalent(s.state, inv.AllNames, graphSemanticNames(s.eng, inv.AllNames), hashes, scanHash)
+			(s.neutralScan || scanHashEquivalent(s.state, inv.AllNames, graphSemanticNames(s.eng, inv.AllNames), hashes, scanHash))
 		refreshPolicy, perr := s.policyBookkeepingFenced(input)
 		if perr != nil {
 			return nil, perr
 		}
-		if refreshScan || refreshPolicy {
+		if refreshScan || refreshPolicy || s.neutralConfig || len(neutralNonTS) > 0 {
 			st, err := cloneState(s.state)
 			if err != nil {
 				return nil, err
@@ -1491,6 +1576,18 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			if refreshPolicy {
 				st.PolicyIdentity = input.policyIdentity
 				st.PolicyAdmissionIdentity = input.admissionIdentity
+			}
+			if s.neutralConfig {
+				st.ConfigHash = cfgHash
+			}
+			for name, pv := range neutralNonTS {
+				refreshExtractorObservedInputs(st.Files, pv.owned, hashes, name)
+				if pv.input != "" {
+					if st.ExtractorInputHash == nil {
+						st.ExtractorInputHash = map[string]string{}
+					}
+					st.ExtractorInputHash[name] = pv.input
+				}
 			}
 			if err := saveState(s.opts.StateDir, st); err != nil {
 				return nil, err
@@ -1679,17 +1776,8 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			}
 		}
 	}
-	for rel, src := range s.capturedSources {
-		s.work.CapturedReads++
-		disk, rerr := os.ReadFile(filepath.Join(s.abs, rel))
-		if rerr != nil || !bytes.Equal(disk, src) {
-			return nil, fmt.Errorf("%w: source/config bytes changed during the run (%s); refusing successful EndReplace", ErrInputsChanged, rel)
-		}
-	}
-	for _, fence := range s.previewFences {
-		if err := fence(); err != nil {
-			return nil, err
-		}
+	if err := s.revalidateCapturedInputs("refusing successful EndReplace"); err != nil {
+		return nil, err
 	}
 	if s.validateEffective != nil {
 		if err := s.validateEffective(); err != nil {
@@ -1906,6 +1994,28 @@ func (s *session) noteAnnounced(owners []graphstream.OwnerRef) {
 	for _, o := range owners {
 		s.announced[o.String()] = true
 	}
+}
+
+// revalidateCapturedInputs re-proves that every snapshot this run compiled from
+// is still the tree. The captured bytes are compared directly; the previewed
+// context digests are re-derived rather than kept, so an input that appeared,
+// vanished or became unreadable mid-run is caught along with one that was
+// edited. Both a publication and a run that records observations without
+// publishing have to clear it before committing anything.
+func (s *session) revalidateCapturedInputs(refusing string) error {
+	for rel, src := range s.capturedSources {
+		s.work.CapturedReads++
+		disk, rerr := os.ReadFile(filepath.Join(s.abs, rel))
+		if rerr != nil || !bytes.Equal(disk, src) {
+			return fmt.Errorf("%w: source/config bytes changed during the run (%s); %s", ErrInputsChanged, rel, refusing)
+		}
+	}
+	for _, fence := range s.previewFences {
+		if err := fence(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (s *session) mergeCaptured(extra map[string][]byte) {

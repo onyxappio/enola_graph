@@ -79,30 +79,29 @@ func (s *session) prepareNonTSCandidateScope(ctx context.Context, ext plugin.Ext
 		return nil, false, nil
 	}
 	tPrev := time.Now()
-	src, extracted, reusable, err := s.captureAndExtract(ctx, ext, invFiles, hashes)
-	if err != nil {
-		return nil, false, err
+	// The neutrality proof this run already made is that same capture and that
+	// same extraction, so the candidate delta is derived from it rather than
+	// read again. A run that skipped the proof - or an extractor it could not
+	// reach - still previews here.
+	pv := s.nonTSPreviews[ext.Name()]
+	if pv == nil {
+		src, extracted, reusable, err := s.captureAndExtract(ctx, ext, invFiles, hashes)
+		if err != nil {
+			return nil, false, err
+		}
+		if extracted == nil {
+			return nil, false, nil
+		}
+		applyLocalIO(extracted)
+		tagRepo(extracted, repoID)
+		pv = &nonTSPreview{facts: extracted, reusable: reusable, owned: ownedFiles(ext, invFiles)}
+		s.rememberNonTSPreview(ext.Name(), src, pv)
 	}
-	if extracted == nil {
-		return nil, false, nil
-	}
-	applyLocalIO(extracted)
-	tagRepo(extracted, repoID)
 
 	prior := append(cachedFactsFor(ext.Name(), priorContributingFiles(ext, invFiles, prevFiles), prevFiles),
 		cloneTagged(syntheticFactsFor(s.state, ext.Name()), repoID)...)
-	owners := ownersForCandidateNameDelta(prevFiles, prior, extracted)
-	graphprofile.Since("non_ts_scope_preview", tPrev, fmt.Sprintf("%s inputs=%d facts=%d owners=%d", ext.Name(), len(src), len(extracted), len(owners)))
-	// The snapshot joins the sources the run reads back and compares before
-	// EndReplace, so a file edited after the fence still fails the run rather
-	// than leaving a committed state describing bytes that are gone.
-	if reusable {
-		s.mergeCaptured(src)
-		if s.preparedNonTS == nil {
-			s.preparedNonTS = map[string][]facts.Fact{}
-		}
-		s.preparedNonTS[ext.Name()] = extracted
-	}
+	owners := ownersForCandidateNameDelta(prevFiles, prior, pv.facts)
+	graphprofile.Since("non_ts_scope_preview", tPrev, fmt.Sprintf("%s facts=%d owners=%d", ext.Name(), len(pv.facts), len(owners)))
 	return owners, true, nil
 }
 
@@ -138,6 +137,7 @@ func (s *session) captureAndExtract(ctx context.Context, ext plugin.Extractor, i
 				}
 				return nil
 			})
+			s.work.NonTSCaptures++
 			return src, nonNilFacts(out), true, nil
 		}
 	}
@@ -174,6 +174,7 @@ func (s *session) captureAndExtract(ctx context.Context, ext plugin.Extractor, i
 	if err != nil {
 		return nil, nil, false, previewExtractError(err)
 	}
+	s.work.NonTSCaptures++
 	return src, nonNilFacts(out), true, nil
 }
 

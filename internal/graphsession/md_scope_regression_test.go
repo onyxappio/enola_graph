@@ -582,10 +582,14 @@ func TestMDScopeNarrowingLeavesOtherOwnerDeclaringExtractorsWhole(t *testing.T) 
 	opts := mdScopeOpts(t)
 	cons := mdScopeInitial(t, eng, root, opts)
 	writeFile(t, root, "src/added.ts", "export const added = 1;\n")
-	// The note edit is what makes txtnotes rerun now that it declares its
-	// content inputs. Only one of its two files changes, and both still have to
-	// be seeded: the narrowing belongs to mdintent, not to this extractor.
-	writeFile(t, root, "notes/one.txt", "one edited\n")
+	// The added note is what makes txtnotes rerun, and it has to be a change
+	// this extractor's output can actually show: its facts are named from the
+	// file, so editing a note's bytes moves no fact, and a run that proves the
+	// output unchanged is right to leave the whole domain alone. A third note
+	// emits a third fact. Two of the three files are untouched and all three
+	// still have to be seeded: the narrowing belongs to mdintent, not to this
+	// extractor.
+	writeFile(t, root, "notes/three.txt", "three\n")
 	sink := &graphstream.MemorySink{}
 	delta, err := Run(context.Background(), eng, root, sink, opts)
 	if err != nil {
@@ -593,7 +597,7 @@ func TestMDScopeNarrowingLeavesOtherOwnerDeclaringExtractorsWhole(t *testing.T) 
 	}
 	applyRun(t, cons, sink)
 	owners, ids := beginScope(t, sink)
-	requireOwners(t, owners, ids, "src/added.ts", "notes/one.txt", "notes/two.txt")
+	requireOwners(t, owners, ids, "src/added.ts", "notes/one.txt", "notes/two.txt", "notes/three.txt")
 	forbidOwners(t, owners, ids, "docs/guide.md")
 	requireNoWholeDomainFallback(t, delta, ids)
 	assertAppliedEqualsCold(t, cons, coldConsumer(t, eng, root))

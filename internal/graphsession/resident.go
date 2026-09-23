@@ -30,6 +30,13 @@ type WorkCounters struct {
 	CheckpointBytes                                           int64
 	InventoryScans, DetectionScans, ContextScans, ConfigScans int
 	HashedFiles, DirtyHashBytes, VerifiedFiles, Checkpoints   int
+	// NonTSCaptures counts the fenced snapshot-and-extract passes a run makes
+	// over non-TypeScript extractors. A run asks two questions about such an
+	// extractor - whether its output moved, and which owners its candidate
+	// names retarget - and both are answered from one pass, so this staying at
+	// one per needed extractor is what says the second question reused the
+	// first answer rather than reading the tree again.
+	NonTSCaptures int
 }
 
 type runtimeInputs struct {

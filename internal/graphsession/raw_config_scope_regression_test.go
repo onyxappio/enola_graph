@@ -144,25 +144,46 @@ func configScopeRepo(t *testing.T) string {
 }
 
 // A version bump is the case the blunt raw-config term punished: no source
-// file, no package name, no framework gate and no alias root moves, so the
-// manifest owner that actually republishes is the only owner Begin needs.
-func TestRawConfigVersionBumpKeepsBeginBounded(t *testing.T) {
+// file, no package name, no framework gate and no alias root moves. Bounding
+// Begin to the manifest owner was the first answer; proving before Begin that
+// the manifest extractor's whole output is unchanged is the complete one, and
+// an owner whose facts are identical does not need announcing at all. The cold
+// comparison is what keeps that honest - the applied graph is the one the
+// previous run published, and it must still be the graph a fresh session
+// produces from the edited tree.
+func TestRawConfigVersionBumpPublishesNothing(t *testing.T) {
 	root := configScopeRepo(t)
 	eng := configScopeEngine(t, root)
 	opts := Options{StateDir: t.TempDir(), AuthoritativeFiles: true}
 	cons := NewConsumer()
 	configScopeRun(t, eng, root, opts, cons)
+	before, _ := committedGeneration(t, opts.StateDir)
 
 	writeRepoFile(t, root, "package.json", `{"name":"app","type":"module","version":"0.7.2"}`)
-	res, owners, ids := configScopeRun(t, eng, root, opts, cons)
-
-	if reason := wholeDomainFallback(res); reason != "" {
-		t.Fatalf("version-only bump fell back to the whole domain (%s); scope was %v", reason, ids)
+	sink := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, root, sink, opts)
+	if err != nil {
+		t.Fatal(err)
 	}
-	requireOwners(t, owners, ids, "package.json")
-	forbidOwners(t, owners, ids, "src/leaf.ts", "src/use.ts", "src/alone.ts", "tsconfig.json")
+	if n := len(sink.CloneRecords()); n != 0 {
+		_, ids := beginScope(t, sink)
+		t.Fatalf("version-only bump published %d record(s) over %v; a graph-neutral edit must publish nothing", n, ids)
+	}
 	if res.ParsedFiles != 0 {
 		t.Fatalf("parsed=%d, want no TypeScript reparse for a version bump", res.ParsedFiles)
+	}
+	after, _ := committedGeneration(t, opts.StateDir)
+	if after.Generation != before.Generation {
+		t.Fatalf("version-only bump advanced the committed generation %d -> %d", before.Generation, after.Generation)
+	}
+	// Publishing nothing is only half of it: the run read bytes the stored
+	// state did not describe, and if it does not write down what it read the
+	// next run raises the same need and proves the same thing again.
+	if after.Files["package.json"] == nil || after.Files["package.json"].Hash == before.Files["package.json"].Hash {
+		t.Fatalf("no-publication run did not record the manifest bytes it was proved against")
+	}
+	if after.ConfigHash == before.ConfigHash || after.ScanHash == before.ScanHash {
+		t.Fatalf("no-publication run left the configuration or scan digest behind its own observation")
 	}
 	assertAppliedEqualsCold(t, cons, coldConsumer(t, configScopeEngine(t, root), root))
 }

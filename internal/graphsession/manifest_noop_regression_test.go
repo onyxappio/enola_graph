@@ -20,13 +20,13 @@ import (
 // runs, 21 owners and ~60KB of events each) and with a two-file CLI fixture.
 //
 // The assertion is deliberately over repeated runs: one unchanged run looking
-// quiet proves nothing here. The first run after the edit still republishes,
-// and that is a separate, still-open defect rather than accepted behaviour -
-// the plan freezes and a Begin is published before extraction can prove the
-// output unchanged, so neutrality is detected too late to suppress it. This
-// test pins only the perpetual retrigger: the second and third runs must be
-// silent. A graph-neutral edit publishing nothing at all needs neutral-output
-// detection before Begin, which this change does not provide.
+// quiet proves nothing here. The first run after the edit is now included -
+// proveNonTSNeutrality makes the whole-output comparison from a fenced capture
+// before the plan freezes, so the run that first sees the edit declines to
+// publish rather than publishing a replacement of what is already there. What
+// this test still pins beyond that is the perpetual retrigger: a run that
+// proves neutrality has to record the input it was proved against, or every
+// later run raises the same need for the same reason.
 func TestManifestVersionOnlyEditSettlesToATrueNoOp(t *testing.T) {
 	root := configScopeRepo(t)
 	eng := configScopeEngine(t, root)
@@ -38,8 +38,13 @@ func TestManifestVersionOnlyEditSettlesToATrueNoOp(t *testing.T) {
 	// The edit, left in place - the existing coverage restored the original
 	// bytes, which is exactly why the stale hash never showed.
 	writeRepoFile(t, root, "package.json", `{"name":"app","type":"module","version":"0.7.2"}`)
-	if _, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, opts); err != nil {
+	first := &graphstream.MemorySink{}
+	firstRes, err := Run(context.Background(), eng, root, first, opts)
+	if err != nil {
 		t.Fatal(err)
+	}
+	if n := len(first.CloneRecords()); n != 0 || firstRes.ParsedFiles != 0 {
+		t.Fatalf("the run that first saw the version bump published %d record(s) and parsed %d file(s); a graph-neutral edit must publish nothing", n, firstRes.ParsedFiles)
 	}
 
 	_, settled := committedGeneration(t, opts.StateDir)
@@ -71,6 +76,13 @@ func TestManifestVersionOnlyEditSettlesToATrueNoOp(t *testing.T) {
 // entry for a file that is no longer there keeps reporting a changed input
 // forever. Retiring that entry is the other half of recording what was
 // observed.
+//
+// A deletion is deliberately left to publish once. Showing that the stored scan
+// digest is the digest of this tree means putting back what moved, and a name
+// that is gone cannot be put back from the current inventory - nothing left in
+// it says which extractor used to own that path. So the run after a deletion
+// takes the conservative branch and the test starts counting from the one after
+// it.
 func TestDeletedFactlessManifestSettlesToATrueNoOp(t *testing.T) {
 	root := configScopeRepo(t)
 	if err := os.MkdirAll(filepath.Join(root, "packages/side"), 0o755); err != nil {
@@ -111,7 +123,10 @@ func TestDeletedFactlessManifestSettlesToATrueNoOp(t *testing.T) {
 // fingerprint unchanged, so the short-circuit is taken on the very run that
 // first sees the file - and if the refresh only covered files already in the
 // state, the newcomer would keep an empty seen hash and report a changed input
-// on every run after that.
+// on every run after that. Putting the tree back to what the stored scan digest
+// described means dropping the newcomer's name rather than restoring a content
+// hash it never had, so this addition, unlike the deletion above, publishes
+// nothing at all.
 func TestAddedFactlessManifestSettlesToATrueNoOp(t *testing.T) {
 	root := configScopeRepo(t)
 	eng := configScopeEngine(t, root)
@@ -124,8 +139,13 @@ func TestAddedFactlessManifestSettlesToATrueNoOp(t *testing.T) {
 		t.Fatal(err)
 	}
 	writeRepoFile(t, root, "packages/late/package.json", `{"name":"late","version":"1.0.0"}`)
-	if _, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, opts); err != nil {
+	first := &graphstream.MemorySink{}
+	firstRes, err := Run(context.Background(), eng, root, first, opts)
+	if err != nil {
 		t.Fatal(err)
+	}
+	if n := len(first.CloneRecords()); n != 0 || firstRes.ParsedFiles != 0 {
+		t.Fatalf("the run that first saw the added factless manifest published %d record(s) and parsed %d file(s)", n, firstRes.ParsedFiles)
 	}
 
 	_, settled := committedGeneration(t, opts.StateDir)
