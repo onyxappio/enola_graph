@@ -935,6 +935,73 @@ func TestExtract_NuxtAutoImportIgnoresUnrelatedPackageBasename(t *testing.T) {
 	}
 }
 
+func TestExtract_NuxtAutoImportDoesNotBindSiblingVuePackage(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"packages/a/package.json":                `{"name":"a","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"packages/a/nuxt.config.ts":              `export default defineNuxtConfig({})`,
+		"packages/a/composables/setMetadata.ts":  `export function setMetadata() {}`,
+		"packages/a/app.vue":                     `<script setup lang="ts">setMetadata()</script><template><p /></template>`,
+		"packages/b/package.json":                `{"name":"b","dependencies":{"vue":"^3.0.0"}}`,
+		"packages/b/composables/setMetadata.ts":  `export function setMetadata() {}`,
+		"packages/b/app.vue":                     `<script setup lang="ts">setMetadata()</script><template><p /></template>`,
+	}, false)
+	a := fileRefTargets(ff, "packages/a/app.vue")
+	if !hasTarget(a, "packages/a/composables.setMetadata") {
+		t.Errorf("Nuxt package A must bind its composable: %v", a)
+	}
+	b := fileRefTargets(ff, "packages/b/app.vue")
+	if hasTarget(b, "packages/a/composables.setMetadata") || hasTarget(b, "packages/b/composables.setMetadata") {
+		t.Errorf("plain Vue package B must not receive Nuxt auto-import: %v", b)
+	}
+}
+
+func TestExtract_TwoNuxtAppsBindOwnComposables(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"packages/a/package.json":               `{"name":"a","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"packages/a/nuxt.config.ts":             `export default defineNuxtConfig({})`,
+		"packages/a/composables/setMetadata.ts": `export function setMetadata() {}`,
+		"packages/a/app.vue":                    `<script setup lang="ts">setMetadata()</script><template><p /></template>`,
+		"packages/b/package.json":               `{"name":"b","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"packages/b/nuxt.config.ts":             `export default defineNuxtConfig({})`,
+		"packages/b/composables/setMetadata.ts": `export function setMetadata() {}`,
+		"packages/b/app.vue":                    `<script setup lang="ts">setMetadata()</script><template><p /></template>`,
+	}, false)
+	a := fileRefTargets(ff, "packages/a/app.vue")
+	b := fileRefTargets(ff, "packages/b/app.vue")
+	if !hasTarget(a, "packages/a/composables.setMetadata") {
+		t.Errorf("app A must bind its own composable: %v", a)
+	}
+	if hasTarget(a, "packages/b/composables.setMetadata") {
+		t.Errorf("app A bound the other app: %v", a)
+	}
+	if !hasTarget(b, "packages/b/composables.setMetadata") {
+		t.Errorf("app B must bind its own composable: %v", b)
+	}
+	if hasTarget(b, "packages/a/composables.setMetadata") {
+		t.Errorf("app B bound the other app: %v", b)
+	}
+}
+
+func TestExtract_NuxtExplicitMissingImportNotOverriddenByAutoImport(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"packages/a/package.json":               `{"name":"a","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"packages/a/nuxt.config.ts":             `export default defineNuxtConfig({})`,
+		"packages/a/composables/setMetadata.ts": `export function setMetadata() {}`,
+		"packages/a/app.vue":                    `<script setup lang="ts">import { setMetadata } from './missing'; setMetadata()</script><template><p /></template>`,
+		"packages/b/package.json":               `{"name":"b","dependencies":{"vue":"^3.0.0"}}`,
+		"packages/b/composables/setMetadata.ts": `export function setMetadata() {}`,
+		"packages/b/app.vue":                    `<script setup lang="ts">setMetadata()</script><template><p /></template>`,
+	}, false)
+	a := fileRefTargets(ff, "packages/a/app.vue")
+	if hasTarget(a, "packages/a/composables.setMetadata") {
+		t.Errorf("explicit missing import must not be rewritten to auto-import: %v", a)
+	}
+	b := fileRefTargets(ff, "packages/b/app.vue")
+	if hasTarget(b, "packages/a/composables.setMetadata") || hasTarget(b, "packages/b/composables.setMetadata") {
+		t.Errorf("plain Vue B must stay unbound: %v", b)
+	}
+}
+
 func TestExtract_NuxtAmbiguousAutoImportedComposableIsNotGuessed(t *testing.T) {
 	ff := extractVue(t, map[string]string{
 		"layers/a/composables/useAuth.ts": `export function useAuth() {}`,

@@ -82,7 +82,21 @@ func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, 
 	}
 	out["package validity errors"] = digest(packageStatus)
 	out["alias config validity errors"] = digest(configStatus)
+	type aliasValue struct {
+		Replacement, Suffix string
+		Exact               bool
+	}
 	packages := collectPackageNames(root, scope)
+	known := map[string]bool{}
+	for _, file := range files {
+		known[filepath.ToSlash(file)] = true
+	}
+	pkgAliases := collectPackageAliases(context.Background(), root, known, scope)
+	exportedAliases := map[string]aliasValue{}
+	for key, value := range pkgAliases {
+		exportedAliases[key] = aliasValue{value.replacement, value.suffix, value.exact}
+	}
+	out["package export aliases"] = digest(exportedAliases)
 	aliases := collectTSAliasRoots(context.Background(), root, scope)
 	if detectSvelteKit(root, scope) {
 		aliases = withSvelteKitAliasFallbacks(root, aliases, scope)
@@ -91,10 +105,6 @@ func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, 
 		aliases = withNuxtAliasFallbacks(root, aliases, collectNuxtPackages(context.Background(), root, scope), scope)
 	}
 	perFile := map[string]string{}
-	type aliasValue struct {
-		Replacement, Suffix string
-		Exact               bool
-	}
 	angular := detectAngular(root, scope)
 	for _, file := range files {
 		if !IsSessionSource(file, angular) {
@@ -102,7 +112,7 @@ func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, 
 		}
 		dir := factpath.Dir(file)
 		normalized := map[string]aliasValue{}
-		for key, value := range aliasesForDir(aliases, dir) {
+		for key, value := range mergePackageAliases(aliasesForDir(aliases, dir), pkgAliases) {
 			normalized[key] = aliasValue{value.replacement, value.suffix, value.exact}
 		}
 		perFile[file] = digest([]any{nearestPackageName(packages, dir), normalized})

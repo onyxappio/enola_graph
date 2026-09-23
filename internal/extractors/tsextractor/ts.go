@@ -2449,9 +2449,11 @@ func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, 
 		}
 		moduleDir := factpath.Dir(resolved)
 		indexPath := ""
+		foundFile := false
 		if idx, dir, found := resolveModuleFile(resolved, knownFiles); found {
 			moduleDir = dir
 			indexPath = idx
+			foundFile = true
 		}
 
 		clause := findChildByKind(kinds, child, "import_clause")
@@ -2477,7 +2479,7 @@ func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, 
 				local = nodeText(aliasNode, src)
 			}
 			m[local] = moduleDir + "." + exportName
-			if indexPath != "" {
+			if foundFile && indexPath != "" {
 				note := func(f string) {
 					if sideReads == nil {
 						return
@@ -2490,6 +2492,8 @@ func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, 
 				if leaf := bindNamedImportFile(indexPath, exportName, readSrc, aliases, knownFiles, cache, note); leaf != "" {
 					files[local] = leaf
 				}
+			} else if resolved != "" {
+				files[local] = filepath.ToSlash(resolved)
 			}
 		}
 	}
@@ -2655,6 +2659,15 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 								}
 							}
 							file = bindNamedImportFile(indexPath, exportName, ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, note)
+						} else if ctx.knownFiles != nil {
+							if srcNode := findChildByKind(kinds, child, "string"); srcNode != nil {
+								importPath := strings.Trim(nodeText(srcNode, src), `"'`)
+								if resolved, ext := resolveImportPath(importPath, fileDir, aliases); !ext && resolved != "" {
+									if _, _, found := resolveModuleFile(resolved, ctx.knownFiles); !found {
+										file = filepath.ToSlash(resolved)
+									}
+								}
+							}
 						}
 						bind(local, moduleDir, exportName, file)
 					}

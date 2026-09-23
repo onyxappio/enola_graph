@@ -155,7 +155,7 @@ func serverBindings(src []byte) map[string]serverBinding {
 // (the shape of goextractor/routeprefix.go); it is deliberately not attempted here.
 func extractServerRouteFacts(src []byte, relFile string) []facts.Fact {
 	bindings := serverBindings(src)
-	scopes := typedFastifyParamScopes(src)
+	scopes := mergeFastifyScopes(typedFastifyParamScopes(src), collectParamNameScopes(src))
 	if len(bindings) == 0 && len(scopes) == 0 {
 		return nil
 	}
@@ -165,10 +165,7 @@ func extractServerRouteFacts(src []byte, relFile string) []facts.Fact {
 	seen := map[string]bool{}
 	for _, m := range serverVerbCall.FindAllSubmatchIndex(src, -1) {
 		recv := string(src[m[2]:m[3]])
-		b, ok := bindings[recv]
-		if !ok {
-			b, ok = fastifyScopeBinding(scopes, recv, m[0])
-		}
+		b, ok := serverReceiverAt(bindings, scopes, recv, m[0])
 		if !ok || !b.mounted {
 			continue
 		}
@@ -210,10 +207,7 @@ func extractServerRouteObjects(src []byte, relFile, dir string, bindings map[str
 	var out []facts.Fact
 	for _, m := range serverRouteObjectCall.FindAllSubmatchIndex(src, -1) {
 		recv := string(src[m[2]:m[3]])
-		b, ok := bindings[recv]
-		if !ok {
-			b, ok = fastifyScopeBinding(scopes, recv, m[0])
-		}
+		b, ok := serverReceiverAt(bindings, scopes, recv, m[0])
 		if !ok || !b.mounted {
 			continue
 		}
@@ -387,11 +381,24 @@ func isServerReceiver(bindings map[string]serverBinding, name string) bool {
 }
 
 func isServerReceiverAt(bindings map[string]serverBinding, scopes []fastifyParamScope, name string, pos int) bool {
-	if isServerReceiver(bindings, name) {
-		return true
+	if _, ok := fastifyScopeBinding(scopes, name, pos); ok {
+		b, bound := serverReceiverAt(bindings, scopes, name, pos)
+		return bound && b.mounted
 	}
-	_, ok := fastifyScopeBinding(scopes, name, pos)
-	return ok
+	return isServerReceiver(bindings, name)
+}
+
+func serverReceiverAt(bindings map[string]serverBinding, scopes []fastifyParamScope, name string, pos int) (serverBinding, bool) {
+	if b, ok := fastifyScopeBinding(scopes, name, pos); ok {
+		if !b.mounted {
+			return serverBinding{}, false
+		}
+		return b, true
+	}
+	if b, ok := bindings[name]; ok {
+		return b, true
+	}
+	return serverBinding{}, false
 }
 
 var (
@@ -471,6 +478,63 @@ func importedFastifyInstanceNames(src []byte) map[string]bool {
 		}
 	}
 	return local
+}
+
+func isFunctionParameter(src []byte, mask []bool, paramPos int) bool {
+	i := paramPos
+	for i > 0 && src[i] != '(' {
+		if src[i] == ')' || src[i] == '{' || src[i] == '}' {
+			return false
+		}
+		i--
+	}
+	if i < 0 || src[i] != '(' || mask[i] {
+		return false
+	}
+	j := i - 1
+	for j >= 0 && (src[j] == ' ' || src[j] == '\t' || src[j] == '\n' || src[j] == '\r') {
+		j--
+	}
+	if j >= 0 && isJSIdentPart(src[j]) {
+		end := j + 1
+		for j >= 0 && isJSIdentPart(src[j]) {
+			j--
+		}
+		name := string(src[j+1 : end])
+		if name == "function" {
+			return true
+		}
+		k := j
+		for k >= 0 && (src[k] == ' ' || src[k] == '\t' || src[k] == '\n' || src[k] == '\r') {
+			k--
+		}
+		if k >= 7 && string(src[k-7:k+1]) == "function" {
+			return true
+		}
+	}
+	depth := 0
+	for k := i; k < len(src); k++ {
+		if mask[k] {
+			continue
+		}
+		switch src[k] {
+		case '(':
+			depth++
+		case ')':
+			depth--
+			if depth == 0 {
+				p := k + 1
+				for p < len(src) && (src[p] == ' ' || src[p] == '\t' || src[p] == '\n' || src[p] == '\r') {
+					p++
+				}
+				if p+1 < len(src) && src[p] == '=' && src[p+1] == '>' {
+					return true
+				}
+				return false
+			}
+		}
+	}
+	return false
 }
 
 func functionBodyAroundParam(src []byte, mask []bool, paramPos int) (start, end int, ok bool) {
@@ -553,7 +617,7 @@ func fastifyScopeBinding(scopes []fastifyParamScope, name string, pos int) (serv
 			continue
 		}
 		span := s.end - s.start
-		if span < bestSpan {
+		if span < bestSpan || (span == bestSpan && best >= 0 && s.binding.mounted && !scopes[best].binding.mounted) {
 			bestSpan = span
 			best = i
 		}
@@ -562,6 +626,68 @@ func fastifyScopeBinding(scopes []fastifyParamScope, name string, pos int) (serv
 		return serverBinding{}, false
 	}
 	return scopes[best].binding, true
+}
+
+func mergeFastifyScopes(typed, params []fastifyParamScope) []fastifyParamScope {
+	if len(typed) == 0 {
+		return params
+	}
+	if len(params) == 0 {
+		return typed
+	}
+	out := make([]fastifyParamScope, 0, len(typed)+len(params))
+	out = append(out, typed...)
+	out = append(out, params...)
+	return out
+}
+
+func collectParamNameScopes(src []byte) []fastifyParamScope {
+	mask := tsCommentStringMask(src)
+	var out []fastifyParamScope
+	i := 0
+	for i < len(src) {
+		if mask[i] {
+			i++
+			continue
+		}
+		if !isJSIdentStart(src[i]) {
+			i++
+			continue
+		}
+		start := i
+		i++
+		for i < len(src) && isJSIdentPart(src[i]) {
+			i++
+		}
+		j := start - 1
+		for j >= 0 && (src[j] == ' ' || src[j] == '\t' || src[j] == '\n' || src[j] == '\r') {
+			j--
+		}
+		if j < 0 || (src[j] != '(' && src[j] != ',') {
+			continue
+		}
+		if !isFunctionParameter(src, mask, start) {
+			continue
+		}
+		bodyStart, bodyEnd, ok := functionBodyAroundParam(src, mask, start)
+		if !ok {
+			continue
+		}
+		out = append(out, fastifyParamScope{
+			name:  string(src[start:i]),
+			start: bodyStart,
+			end:   bodyEnd,
+		})
+	}
+	return out
+}
+
+func isJSIdentStart(b byte) bool {
+	return b == '_' || b == '$' || (b >= 'A' && b <= 'Z') || (b >= 'a' && b <= 'z')
+}
+
+func isJSIdentPart(b byte) bool {
+	return isJSIdentStart(b) || (b >= '0' && b <= '9')
 }
 
 // tsCommentStringMask is true at bytes inside comments or string/template literals.

@@ -937,6 +937,61 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 		}
 	}
 	sort.Strings(nuxt)
+	extraSeen := map[string]bool{}
+	var extraDirs []string
+	addExtra := func(d string) {
+		if d == "" || extraSeen[d] {
+			return
+		}
+		extraSeen[d] = true
+		extraDirs = append(extraDirs, d)
+	}
+	for _, rec := range prev {
+		if rec == nil {
+			continue
+		}
+		for _, d := range rec.AutoImportDirs {
+			addExtra(d)
+		}
+	}
+	for rel, src := range sources {
+		if src == nil {
+			continue
+		}
+		if !allDirty && dirty != nil && !dirty[rel] {
+			continue
+		}
+		for _, d := range addImportsDirsFromFile(rel, src) {
+			addExtra(d)
+		}
+	}
+	var auto []string
+	for _, rel := range files {
+		if !nuxtAutoImportDir(rel, nuxtPkgs, extraDirs) {
+			continue
+		}
+		usePrev := !allDirty && dirty != nil && !dirty[rel] && prev[rel] != nil
+		if usePrev {
+			for _, n := range prev[rel].Declared {
+				auto = append(auto, rel+"="+n)
+			}
+			continue
+		}
+		src := []byte(nil)
+		if sources != nil {
+			src = sources[rel]
+		}
+		if src == nil {
+			raw, err := overlayReadFile(ctx, filepath.Join(repoPath, rel), inputScope)
+			if err != nil {
+				return "", err
+			}
+			src = raw
+		}
+		sum := sha256.Sum256(src)
+		auto = append(auto, rel+"="+hex.EncodeToString(sum[:]))
+	}
+	sort.Strings(auto)
 	h := sha256.New()
 	if gql.enabled {
 		h.Write([]byte("gql-on"))
@@ -949,5 +1004,7 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 	h.Write([]byte(strings.Join(grpcParts, ";")))
 	h.Write([]byte{0})
 	h.Write([]byte(strings.Join(nuxt, ";")))
+	h.Write([]byte{0})
+	h.Write([]byte(strings.Join(auto, ";")))
 	return hex.EncodeToString(h.Sum(nil)), nil
 }

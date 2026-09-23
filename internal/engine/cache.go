@@ -2465,7 +2465,10 @@ import (
 // v283: package.json exports subpaths; owning-package ORM/Vue gates; Nuxt
 // composables/utils auto-imports including addImportsDir; Fastify app.route
 // object form; symbol-level RelInstantiates for `new ImportedClass()`.
-const cacheVersion = "v283"
+// v284: Fastify lexical parameter shadows; Nuxt auto-import per owning package;
+// explicit import provenance not overridden; package export aliases and
+// auto-import declaration names participate in incremental invalidation.
+const cacheVersion = "v284"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

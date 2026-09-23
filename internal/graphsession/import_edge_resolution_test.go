@@ -330,3 +330,101 @@ func TestPublishedImportDeltaEqualsCold(t *testing.T) {
 	assertModuleImportResolved(t, cons, "src/index.ts", "src/publisher.ts")
 	assertModuleImportResolved(t, oracle, "src/index.ts", "src/publisher.ts")
 }
+
+func TestPublishedPackageExportsTargetChangeDeltaEqualsCold(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"packages/shared-lands-types/package.json": `{
+  "name":"shared-lands-types",
+  "exports":{
+    ".":{"types":"./src/index.ts","import":"./dist/index.mjs"},
+    "./enums":{"types":"./src/enums.ts","import":"./dist/enums.mjs"}
+  }
+}`,
+		"packages/shared-lands-types/src/index.ts": `export const X = 1;`,
+		"packages/shared-lands-types/src/enums.ts": `export enum GenderEnum { Male = 'm' }`,
+		"apps/land/Welcome.ts":                     `import { GenderEnum } from 'shared-lands-types/enums'; export const g = GenderEnum.Male;`,
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "live")
+	opts := Options{StateDir: state}
+	live := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, live, opts); err != nil {
+		t.Fatal(err)
+	}
+	cons := applyGraph(t, live)
+	assertModuleImportResolved(t, cons, "apps/land/Welcome.ts", "packages/shared-lands-types/src/enums.ts")
+
+	pkg := filepath.Join(dir, "packages/shared-lands-types/package.json")
+	if err := os.WriteFile(pkg, []byte(`{
+  "name":"shared-lands-types",
+  "exports":{
+    ".":{"types":"./src/index.ts","import":"./dist/index.mjs"},
+    "./enums":{"types":"./src/missing.ts","import":"./dist/enums.mjs"}
+  }
+}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	deltaSink := &graphstream.MemorySink{}
+	delta, err := Run(context.Background(), eng, dir, deltaSink, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if delta.ParsedFiles == 0 {
+		t.Fatal("exports target change parsed no files")
+	}
+	if err := cons.ApplyRecords(deltaSink.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	oracle := applyGraph(t, coldSink)
+	assertAppliedEqualsCold(t, cons, oracle)
+}
+
+func TestPublishedNuxtAutoImportRenameDeltaEqualsCold(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"package.json":                          `{"name":"app","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"nuxt.config.ts":                        `export default defineNuxtConfig({})`,
+		"composables/setLandPageMetadata.ts":    `export function setLandPageMetadata() {}`,
+		"app.vue":                               `<script setup lang="ts">setLandPageMetadata()</script><template><p /></template>`,
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "live")
+	opts := Options{StateDir: state}
+	live := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, live, opts); err != nil {
+		t.Fatal(err)
+	}
+	cons := applyGraph(t, live)
+	assertCallResolvedToFile(t, cons, "app.vue", "composables.setLandPageMetadata", "composables/setLandPageMetadata.ts")
+
+	if err := os.WriteFile(filepath.Join(dir, "composables/setLandPageMetadata.ts"), []byte(`export function renamedMetadata() {}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	deltaSink := &graphstream.MemorySink{}
+	delta, err := Run(context.Background(), eng, dir, deltaSink, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if delta.ParsedFiles == 0 {
+		t.Fatal("auto-import rename parsed no files")
+	}
+	if err := cons.ApplyRecords(deltaSink.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	oracle := applyGraph(t, coldSink)
+	assertAppliedEqualsCold(t, cons, oracle)
+	for _, e := range cons.Edges[ownerKey("app.vue")] {
+		if e.Kind == facts.RelCalls && e.TargetName == "composables.setLandPageMetadata" && e.Resolution == graphstream.ResResolved {
+			t.Fatalf("stale setLandPageMetadata relation survived rename: %+v", e)
+		}
+	}
+}

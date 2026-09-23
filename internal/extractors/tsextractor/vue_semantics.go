@@ -447,7 +447,8 @@ func nuxtAutoImportDir(file string, nuxtPkgs, extraDirs []string) bool {
 // statically registered addImportsDir trees). Ambiguous names stay unresolved.
 func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []string) {
 	exists := make(map[string]bool)
-	candidates := make(map[string]map[string]bool)
+	byPkg := make(map[string]map[string]map[string]bool)
+	extra := make(map[string]map[string]bool)
 	for _, f := range all {
 		if f.Kind != facts.KindSymbol {
 			continue
@@ -463,27 +464,52 @@ func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []stri
 		if name == "" {
 			continue
 		}
-		if candidates[name] == nil {
-			candidates[name] = make(map[string]bool)
+		pkg, inNuxt := nuxtPackageForFile(nuxtPkgs, f.File)
+		if inNuxt {
+			if byPkg[pkg] == nil {
+				byPkg[pkg] = make(map[string]map[string]bool)
+			}
+			if byPkg[pkg][name] == nil {
+				byPkg[pkg][name] = make(map[string]bool)
+			}
+			byPkg[pkg][name][f.Name] = true
+			continue
 		}
-		candidates[name][f.Name] = true
+		if extra[name] == nil {
+			extra[name] = make(map[string]bool)
+		}
+		extra[name][f.Name] = true
 	}
-	unique := make(map[string]string)
-	for name, targets := range candidates {
-		if len(targets) == 1 {
-			for target := range targets {
-				unique[name] = target
+	uniqueFor := func(pkg, name string) string {
+		set := make(map[string]bool)
+		if byPkg[pkg] != nil {
+			for t := range byPkg[pkg][name] {
+				set[t] = true
 			}
 		}
+		for t := range extra[name] {
+			set[t] = true
+		}
+		if len(set) != 1 {
+			return ""
+		}
+		for t := range set {
+			return t
+		}
+		return ""
 	}
 	for i := range all {
+		pkg, inNuxt := nuxtPackageForFile(nuxtPkgs, all[i].File)
+		if !inNuxt {
+			continue
+		}
 		for j := range all[i].Relations {
 			r := &all[i].Relations[j]
-			if r.Kind != facts.RelCalls || exists[r.Target] {
+			if r.Kind != facts.RelCalls || exists[r.Target] || r.TargetFile != "" {
 				continue
 			}
 			short := r.Target[strings.LastIndexByte(r.Target, '.')+1:]
-			if target := unique[short]; target != "" {
+			if target := uniqueFor(pkg, short); target != "" {
 				r.Target = target
 			}
 		}
