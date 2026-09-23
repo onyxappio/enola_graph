@@ -455,3 +455,5 @@ number of files read or parsed by every extractor.
 
 Repeated Product baseline and pending Markdown-scope comparison:
 [MDINTENT_COMPARISON.md](MDINTENT_COMPARISON.md).
+
+Phase attribution after Markdown scope narrowing: [MDINTENT_PROFILE.md](MDINTENT_PROFILE.md).
