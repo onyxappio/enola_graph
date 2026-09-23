@@ -10,18 +10,22 @@ import (
 
 func TestExtract_Wave12LoopHeaderBindingsShadowOnlyInsideLoop(t *testing.T) {
 	ff := extractAll(t, map[string]string{
-		"src/token.ts": `export default function token() { return 1 }`,
+		"src/token.ts": `export function token() { return 1 }`,
 		"src/loop.ts": `
-import token from './token'
+import { token } from './token'
 export function forOf(raw: string[]) {
-  for (const token of splitTokenList(raw)) token()
+  for (const token of splitTokenList(raw)) {
+    token()
+    consume(token)
+  }
 }
 export function afterForOf(raw: string[]) {
   for (let [token] of splitTokenList(raw)) { token() }
   token()
 }
-export function forOfRhs() {
-  for (const token of token()) {}
+export function afterForIn(source: Record<string, unknown>) {
+  for (let { token } in source) token()
+  token()
 }
 export function forIn(source: Record<string, unknown>) {
   for (const { token } in source) token()
@@ -29,33 +33,74 @@ export function forIn(source: Record<string, unknown>) {
 export function cStyle() {
   for (let { token } = { token: 0 }; token < 1; token++) token()
 }
+export function splitTokenList(raw: string[]) { return raw }
+export function consume(_token: unknown) {}
+`,
+		"src/tdz.ts": `
+import { token } from './token'
+export function forOfRhs() { for (const token of token()) {} }
+export function forInRhs() { for (const token in token) {} }
 `,
 	}, false)
 
-	for _, name := range []string{"src.forOf", "src.afterForOf", "src.forOfRhs", "src.forIn", "src.cStyle"} {
+	for _, name := range []string{"src.forOf", "src.afterForOf", "src.forOfRhs", "src.afterForIn", "src.forIn", "src.forInRhs", "src.cStyle"} {
 		if _, ok := findFact(ff, name); !ok {
 			t.Fatalf("missing %s; facts=%v", name, factNames(ff))
 		}
 	}
-	for _, name := range []string{"src.forOf", "src.forIn", "src.cStyle"} {
+	for _, name := range []string{"src.forOf", "src.forIn", "src.cStyle", "src.forOfRhs", "src.forInRhs"} {
 		f, _ := findFact(ff, name)
 		if hasRelation(f, facts.RelCalls, "src.token") {
-			t.Errorf("%s bound its loop-local token to the imported function: %+v", name, f.Relations)
+			t.Errorf("%s resolved a loop-local or TDZ token to the imported function: %+v", name, f.Relations)
 		}
 	}
-	after, _ := findFact(ff, "src.afterForOf")
-	if !hasRelation(after, facts.RelCalls, "src.token") {
-		t.Fatalf("loop binding leaked past its scope and hid imported token: %+v", after.Relations)
+	for _, name := range []string{"src.afterForOf", "src.afterForIn"} {
+		after, _ := findFact(ff, name)
+		if !hasRelation(after, facts.RelCalls, "src.token") {
+			t.Errorf("loop binding leaked past its scope and hid imported token in %s: %+v", name, after.Relations)
+		}
 	}
-	rhs, _ := findFact(ff, "src.forOfRhs")
-	if !hasRelation(rhs, facts.RelCalls, "src.token") {
-		t.Fatalf("for-of iterable must resolve in the outer scope before the loop binding: %+v", rhs.Relations)
+	for _, name := range []string{"src.forOfRhs", "src.forInRhs"} {
+		rhs, _ := findFact(ff, name)
+		if hasRelation(rhs, facts.RelCalls, "src.token") {
+			t.Errorf("same-name %s RHS is in the loop binding's TDZ, not the outer import scope: %+v", name, rhs.Relations)
+		}
 	}
 	for _, name := range []string{"src.forOf", "src.afterForOf"} {
 		f, _ := findFact(ff, name)
 		if !hasRelation(f, facts.RelCalls, "src.splitTokenList") {
 			t.Errorf("genuine splitTokenList call was suppressed in %s: %+v", name, f.Relations)
 		}
+	}
+	forOf, _ := findFact(ff, "src.forOf")
+	var splitCalls int
+	for _, rel := range forOf.Relations {
+		if rel.Kind == facts.RelCalls && rel.Target == "src.splitTokenList" {
+			splitCalls++
+		}
+	}
+	if splitCalls != 1 {
+		t.Errorf("for-of RHS call should produce one call relation, got %d: %+v", splitCalls, forOf.Relations)
+	}
+	if calls := tsStrSlice(forOf, "calls_in_loop"); !tsContains(calls, "src.consume") || tsContains(calls, "src.splitTokenList") {
+		t.Errorf("RHS executes once outside repeated-body metrics; calls_in_loop = %v, want consume only", calls)
+	}
+	if got := tsIntProp(t, forOf, "loop_count"); got != 1 {
+		t.Errorf("loop_count = %d, want one loop after visiting the RHS", got)
+	}
+	fileRef, ok := findFact(ff, "src/loop.ts")
+	if !ok || fileRef.Kind != facts.KindFileRef {
+		t.Fatalf("missing file_ref for src/loop.ts; facts=%v", factNames(ff))
+	}
+	if !hasTargetFileRelation(fileRef, facts.RelCalls, "src.splitTokenList", "src/loop.ts") {
+		t.Errorf("file_ref lost genuine unrelated splitTokenList RHS calls: %+v", fileRef.Relations)
+	}
+	tdzFileRef, ok := findFact(ff, "src/tdz.ts")
+	if !ok || tdzFileRef.Kind != facts.KindFileRef {
+		t.Fatalf("missing file_ref for src/tdz.ts; facts=%v", factNames(ff))
+	}
+	if hasRelation(tdzFileRef, facts.RelCalls, "src.token") {
+		t.Errorf("file_ref resolved same-name for-of/in TDZ references to the imported token: %+v", tdzFileRef.Relations)
 	}
 }
 

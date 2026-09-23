@@ -4010,20 +4010,20 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			return
 		}
 		if kind == "for_statement" || kind == "for_in_statement" {
-			// for..of/in evaluates its iterable before introducing the loop binding.
-			// Walk it in the outer scope so a same-named imported value remains visible.
+			// The lexical head binding is already in scope (and in its TDZ) while a
+			// for..of/in RHS is evaluated. Walk the RHS once under that scope.
+			loopNames := tsLoopLexicalNames(kinds, n, src)
+			if len(loopNames) > 0 {
+				frPush(loopNames...)
+			}
 			var iterable *sitter.Node
 			if kind == "for_in_statement" {
 				iterable = n.ChildByFieldName("right")
 				walk(iterable)
 			}
-			loopNames := tsLoopLexicalNames(kinds, n, src)
-			if len(loopNames) > 0 {
-				frPush(loopNames...)
-			}
 			for i := range n.ChildCount() {
 				child := n.Child(i)
-				if child != iterable {
+				if !tsSameNode(child, iterable) {
 					walk(child)
 				}
 			}
@@ -5328,21 +5328,20 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 	// loop is bounded — it raises loop_depth but not scaling_loop_depth (the Big-O exponent).
 	switch kind {
 	case "for_statement", "for_in_statement", "while_statement", "do_statement":
-		// A for..of/in iterable is evaluated once before its lexical head binding
-		// takes effect and outside the repeated body. Resolve it in the outer scope.
+		// The lexical head binding is in scope (and in its TDZ) during for..of/in
+		// RHS evaluation. Walk that expression once under the binding, before loop
+		// metrics are raised because the RHS executes outside the repeated body.
+		// A lexical loop initializer belongs to the loop's environment and stops
+		// shadowing after the loop. A statement_block alone misses single-statement
+		// bodies and does not own the initializer.
+		loopBindings := tsLoopLexicalNames(w.kinds, n, w.src)
+		if len(loopBindings) > 0 {
+			w.pushShadowScope(loopBindings...)
+		}
 		var iterable *sitter.Node
 		if kind == "for_in_statement" {
 			iterable = n.ChildByFieldName("right")
 			w.walk(iterable)
-		}
-		// A lexical loop initializer belongs to the loop's environment and stops
-		// shadowing after the loop. for..of/in iterables were resolved above before
-		// introducing that environment.
-		// statement_block scopes alone miss `for (const token of values) token()`
-		// when the body is a single statement (and do not own the initializer).
-		loopBindings := tsLoopLexicalNames(w.kinds, n, w.src)
-		if len(loopBindings) > 0 {
-			w.pushShadowScope(loopBindings...)
 		}
 		bounded := tsLoopBounded(w.kinds, n, w.src)
 		repeats := tsLoopRepeats(w.kinds, n)
@@ -5365,7 +5364,7 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 		}
 		for i := range n.ChildCount() {
 			child := n.Child(i)
-			if child != iterable {
+			if !tsSameNode(child, iterable) {
 				w.walk(child)
 			}
 		}
@@ -5713,6 +5712,13 @@ func tsLoopBounded(kinds *tsutil.KindTable, n *sitter.Node, src []byte) bool {
 // iteration even though its depth is discounted. Scaling and repeating differ.
 func tsLoopRepeats(kinds *tsutil.KindTable, n *sitter.Node) bool {
 	return !tsLoopConstant(kinds, n)
+}
+
+// tsSameNode compares stable Tree-sitter node identity across Go wrappers.
+func tsSameNode(a, b *sitter.Node) bool {
+	// Child and ChildByFieldName each allocate a Go wrapper. Compare the stable
+	// underlying Tree-sitter node IDs so a previously walked field child is skipped.
+	return a != nil && b != nil && a.Id() == b.Id()
 }
 
 // tsLoopLexicalNames returns only let/const bindings introduced by a loop
