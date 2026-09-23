@@ -368,6 +368,30 @@ export function ordinaryForward() {
   const load = () => 1;
   return value();
 }
+export function namespaceRequire() {
+  const sdk = require('./local');
+  return sdk.helper();
+}
+export function namespaceRequireAs() {
+  const sdk = require('./local') as typeof import('./local');
+  return sdk.keep();
+}
+export function shadowedRequireLocal() {
+  const require = (p: string) => ({ helper: () => 0 });
+  const { helper } = require('./local');
+  return helper();
+}
+export function shadowedRequireParameter(require: any) {
+  const { helper } = require('./local');
+  return helper();
+}
+export function nestedRequireNoLeak() {
+  {
+    const { keep } = require('./local');
+    keep();
+  }
+  helper();
+}
 `,
 		"src/local.ts": "export function helper() { return 1; }\nexport function keep() { return 2; }\nexport function load() { return 3; }\nexport function nsFn() { return 4; }\nexport function localMod() { return 0; }\n",
 	}, false)
@@ -441,6 +465,9 @@ export function ordinaryForward() {
 	if hasCallToFile(later, "src.load", "src/sib.ts") {
 		t.Fatalf("early closure must not fall back to sibling load: %+v", later.Relations)
 	}
+	if !hasCallToFile(later, "src.load", "src/local.ts") {
+		t.Fatalf("closure must capture later required load: %+v", later.Relations)
+	}
 	after, _ := findFact(ff, "src.afterRequire")
 	if !hasCallToFile(after, "src.load", "src/local.ts") {
 		t.Fatalf("call after require must bind load: %+v", after.Relations)
@@ -456,5 +483,31 @@ export function ordinaryForward() {
 	ord, _ := findFact(ff, "src.ordinaryForward")
 	if hasCallToFile(ord, "src.load", "src/local.ts") || hasCallToFile(ord, "src.load", "src/sib.ts") {
 		t.Fatalf("ordinary forward local must not bind sibling load: %+v", ord.Relations)
+	}
+	nsReq, _ := findFact(ff, "src.namespaceRequire")
+	if !hasCallToFile(nsReq, "src.helper", "src/local.ts") {
+		t.Fatalf("namespace require sdk.helper lost: %+v", nsReq.Relations)
+	}
+	if hasCallToFile(nsReq, "src.helper", "src/sib.ts") {
+		t.Fatalf("namespace require bound sibling helper: %+v", nsReq.Relations)
+	}
+	nsAs, _ := findFact(ff, "src.namespaceRequireAs")
+	if !hasCallToFile(nsAs, "src.keep", "src/local.ts") {
+		t.Fatalf("namespace require as keep lost: %+v", nsAs.Relations)
+	}
+	shLocal, _ := findFact(ff, "src.shadowedRequireLocal")
+	if hasCallToFile(shLocal, "src.helper", "src/local.ts") || hasCallToFile(shLocal, "src.helper", "src/sib.ts") {
+		t.Fatalf("local require binding must not be CommonJS: %+v", shLocal.Relations)
+	}
+	shParam, _ := findFact(ff, "src.shadowedRequireParameter")
+	if hasCallToFile(shParam, "src.helper", "src/local.ts") || hasCallToFile(shParam, "src.helper", "src/sib.ts") {
+		t.Fatalf("parameter require binding must not be CommonJS: %+v", shParam.Relations)
+	}
+	noLeak, _ := findFact(ff, "src.nestedRequireNoLeak")
+	if !hasCallToFile(noLeak, "src.keep", "src/local.ts") {
+		t.Fatalf("inner-block required keep lost: %+v", noLeak.Relations)
+	}
+	if hasCallToFile(noLeak, "src.helper", "src/local.ts") || hasCallToFile(noLeak, "src.helper", "src/sib.ts") {
+		t.Fatalf("inner-block require must not leak to outer helper(): %+v", noLeak.Relations)
 	}
 }

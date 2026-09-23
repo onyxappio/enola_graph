@@ -2530,7 +2530,11 @@ import (
 // destructured alias, identifier) resolve imported call targets on symbol-owned
 // and file_ref walks. Ordinary locals, params, and catch still shadow; unawaited
 // import() and computed require stay unbound.
-const cacheVersion = "v301"
+// v302: Lexical provenance for require(): identifier bindings are namespaces
+// (`sdk.work()`); a value binding named require is not CommonJS; closures may
+// capture a later const import in the same block without binding ordinary
+// forward locals or leaking nested-scope imports.
+const cacheVersion = "v302"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

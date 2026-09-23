@@ -3276,7 +3276,8 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			}
 		case "lexical_declaration", "variable_declaration":
 			// CommonJS: `const x = require('./y')` / `const { a } = require('./y')`,
-			// including `require('./y') as typeof import('./y')`.
+			// including `require('./y') as typeof import('./y')`. Identifier
+			// bindings are namespaces (`sdk.work()`), not an export named `sdk`.
 			for j := range child.ChildCount() {
 				d := child.Child(j)
 				if kindOf(kinds, d) != "variable_declarator" {
@@ -3304,7 +3305,13 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 				switch kindOf(kinds, nameNode) {
 				case "identifier":
 					local := nodeText(nameNode, src)
-					bind(local, moduleDir, local, indexPath, resolved, foundFile)
+					if local == "" {
+						continue
+					}
+					namespaces[local] = moduleDir
+					if foundFile && indexPath != "" {
+						namespaceFiles[local] = indexPath
+					}
 				case "object_pattern":
 					for _, b := range objectPatternImportBindings(kinds, nameNode, src) {
 						bind(b.local, moduleDir, b.export, indexPath, resolved, foundFile)
@@ -3341,6 +3348,13 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 	var frTypeShadows []map[string]bool
 	var frImp []map[string]string
 	var frImpF []map[string]string
+	var frNS []map[string]string
+	var frNSF []map[string]string
+	var frPreImp []map[string]string
+	var frPreImpF []map[string]string
+	var frPreNS []map[string]string
+	var frPreNSF []map[string]string
+	frFnNesting := 0
 	frPush := func(names ...string) {
 		s := map[string]bool{}
 		for _, name := range names {
@@ -3352,6 +3366,12 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 		frTypeShadows = append(frTypeShadows, map[string]bool{})
 		frImp = append(frImp, map[string]string{})
 		frImpF = append(frImpF, map[string]string{})
+		frNS = append(frNS, map[string]string{})
+		frNSF = append(frNSF, map[string]string{})
+		frPreImp = append(frPreImp, map[string]string{})
+		frPreImpF = append(frPreImpF, map[string]string{})
+		frPreNS = append(frPreNS, map[string]string{})
+		frPreNSF = append(frPreNSF, map[string]string{})
 	}
 	frPop := func() {
 		if len(frShadows) == 0 {
@@ -3361,11 +3381,37 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 		frTypeShadows = frTypeShadows[:len(frTypeShadows)-1]
 		frImp = frImp[:len(frImp)-1]
 		frImpF = frImpF[:len(frImpF)-1]
+		frNS = frNS[:len(frNS)-1]
+		frNSF = frNSF[:len(frNSF)-1]
+		frPreImp = frPreImp[:len(frPreImp)-1]
+		frPreImpF = frPreImpF[:len(frPreImpF)-1]
+		frPreNS = frPreNS[:len(frPreNS)-1]
+		frPreNSF = frPreNSF[:len(frPreNSF)-1]
+	}
+	frRequireFree := func() bool {
+		for i := len(frShadows) - 1; i >= 0; i-- {
+			if frImp[i]["require"] != "" || frNS[i]["require"] != "" {
+				return true
+			}
+			if frShadows[i]["require"] {
+				return false
+			}
+		}
+		return true
 	}
 	frLookupNS := func(name string, typeSpace bool) (target, file string, ok, shadowed bool) {
+		nested := frFnNesting > 0
 		for i := len(frImp) - 1; i >= 0; i-- {
 			if t, found := frImp[i][name]; found {
 				return t, frImpF[i][name], true, false
+			}
+			if nested {
+				if t, found := frPreImp[i][name]; found {
+					return t, frPreImpF[i][name], true, false
+				}
+			}
+			if frNS[i][name] != "" || (nested && frPreNS[i][name] != "") {
+				return "", "", false, true
 			}
 			if typeSpace {
 				if frTypeShadows[i][name] {
@@ -3383,8 +3429,8 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 	frLookup := func(name string) (target, file string, ok, shadowed bool) {
 		return frLookupNS(name, false)
 	}
-	frBindLiteralImport := func(n *sitter.Node) {
-		if n == nil || len(frImp) == 0 {
+	frHarvestLiteralImport := func(n *sitter.Node, named, namedF, ns, nsF map[string]string) {
+		if n == nil {
 			return
 		}
 		for i := range n.ChildCount() {
@@ -3392,7 +3438,11 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			if kindOf(kinds, decl) != "variable_declarator" {
 				continue
 			}
-			spec, ok := awaitedOrRequireImportSpecifier(kinds, decl.ChildByFieldName("value"), src)
+			value := decl.ChildByFieldName("value")
+			if _, ok := literalRequireSpecifier(kinds, value, src); ok && !frRequireFree() {
+				continue
+			}
+			spec, ok := awaitedOrRequireImportSpecifier(kinds, value, src)
 			if !ok {
 				continue
 			}
@@ -3417,24 +3467,50 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 					ctx.sideReads[f] = true
 				}
 			}
-			bindOne := func(local, exportName string) {
-				target, file := bindImportedSymbol(dir, idx, exportName, resolved, found, ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, note)
-				if target == "" {
-					return
-				}
-				frImp[len(frImp)-1][local] = target
-				if file != "" {
-					frImpF[len(frImpF)-1][local] = file
-				}
-			}
 			switch kindOf(kinds, nameNode) {
 			case "identifier":
 				local := nodeText(nameNode, src)
-				bindOne(local, local)
+				if local == "" {
+					continue
+				}
+				ns[local] = dir
+				if found && idx != "" {
+					nsF[local] = idx
+				}
 			case "object_pattern":
 				for _, b := range objectPatternImportBindings(kinds, nameNode, src) {
-					bindOne(b.local, b.export)
+					if b.local == "" {
+						continue
+					}
+					target, file := bindImportedSymbol(dir, idx, b.export, resolved, found, ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, note)
+					if target == "" {
+						continue
+					}
+					named[b.local] = target
+					if file != "" {
+						namedF[b.local] = file
+					}
 				}
+			}
+		}
+	}
+	frBindLiteralImport := func(n *sitter.Node) {
+		if n == nil || len(frImp) == 0 {
+			return
+		}
+		i := len(frImp) - 1
+		frHarvestLiteralImport(n, frImp[i], frImpF[i], frNS[i], frNSF[i])
+	}
+	frPrecollectBlock := func(block *sitter.Node) {
+		if block == nil || len(frImp) == 0 {
+			return
+		}
+		i := len(frImp) - 1
+		for j := range block.NamedChildCount() {
+			n := block.NamedChild(j)
+			switch kindOf(kinds, n) {
+			case "lexical_declaration", "variable_declaration":
+				frHarvestLiteralImport(n, frPreImp[i], frPreImpF[i], frPreNS[i], frPreNSF[i])
 			}
 		}
 	}
@@ -3445,11 +3521,13 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 		}
 		kind := kindOf(kinds, n)
 		if tsIsFunctionLike(kind) {
+			frFnNesting++
 			frPush(tsFunctionParamNames(kinds, n, src)...)
 			for i := range n.ChildCount() {
 				walk(n.Child(i))
 			}
 			frPop()
+			frFnNesting--
 			return
 		}
 		if kind == "catch_clause" {
@@ -3469,6 +3547,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 					}
 				}
 			}
+			frPrecollectBlock(n)
 			for i := range n.ChildCount() {
 				walk(n.Child(i))
 			}
@@ -3502,9 +3581,33 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			prop := n.ChildByFieldName("property")
 			if obj != nil && kindOf(kinds, obj) == "identifier" {
 				name := nodeText(obj, src)
-				if dir, ok := namespaces[name]; ok && prop != nil && kindOf(kinds, prop) == "property_identifier" {
+				nested := frFnNesting > 0
+				nsDir, nsFile, nsOK := "", "", false
+				nsHidden := false
+				for i := len(frNS) - 1; i >= 0; i-- {
+					if d, found := frNS[i][name]; found {
+						nsDir, nsFile, nsOK = d, frNSF[i][name], true
+						break
+					}
+					if nested {
+						if d, found := frPreNS[i][name]; found {
+							nsDir, nsFile, nsOK = d, frPreNSF[i][name], true
+							break
+						}
+					}
+					if frImp[i][name] != "" || (nested && frPreImp[i][name] != "") || frShadows[i][name] {
+						nsHidden = true
+						break
+					}
+				}
+				if !nsOK && !nsHidden {
+					if dir, ok := namespaces[name]; ok {
+						nsDir, nsFile, nsOK = dir, namespaceFiles[name], true
+					}
+				}
+				if nsOK && prop != nil && kindOf(kinds, prop) == "property_identifier" {
 					exportName := nodeText(prop, src)
-					target, file := bindImportedSymbol(dir, namespaceFiles[name], exportName, "", namespaceFiles[name] != "", ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, func(f string) {
+					target, file := bindImportedSymbol(nsDir, nsFile, exportName, "", nsFile != "", ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, func(f string) {
 						if ctx.sideReads == nil {
 							return
 						}
@@ -4199,6 +4302,14 @@ type tsBodyWalker struct {
 	shadows          []map[string]bool
 	importScopes     []map[string]string
 	importFileScopes []map[string]string
+	nsScopes         []map[string]string
+	nsFileScopes     []map[string]string
+	preImportScopes  []map[string]string
+	preImportFiles   []map[string]string
+	preNSScopes      []map[string]string
+	preNSFiles       []map[string]string
+	fnNesting        int
+	fnBase           int
 }
 
 func (w *tsBodyWalker) pushShadowScope(names ...string) {
@@ -4211,6 +4322,12 @@ func (w *tsBodyWalker) pushShadowScope(names ...string) {
 	w.shadows = append(w.shadows, scope)
 	w.importScopes = append(w.importScopes, map[string]string{})
 	w.importFileScopes = append(w.importFileScopes, map[string]string{})
+	w.nsScopes = append(w.nsScopes, map[string]string{})
+	w.nsFileScopes = append(w.nsFileScopes, map[string]string{})
+	w.preImportScopes = append(w.preImportScopes, map[string]string{})
+	w.preImportFiles = append(w.preImportFiles, map[string]string{})
+	w.preNSScopes = append(w.preNSScopes, map[string]string{})
+	w.preNSFiles = append(w.preNSFiles, map[string]string{})
 }
 
 func (w *tsBodyWalker) popShadowScope() {
@@ -4220,11 +4337,37 @@ func (w *tsBodyWalker) popShadowScope() {
 	w.shadows = w.shadows[:len(w.shadows)-1]
 	w.importScopes = w.importScopes[:len(w.importScopes)-1]
 	w.importFileScopes = w.importFileScopes[:len(w.importFileScopes)-1]
+	w.nsScopes = w.nsScopes[:len(w.nsScopes)-1]
+	w.nsFileScopes = w.nsFileScopes[:len(w.nsFileScopes)-1]
+	w.preImportScopes = w.preImportScopes[:len(w.preImportScopes)-1]
+	w.preImportFiles = w.preImportFiles[:len(w.preImportFiles)-1]
+	w.preNSScopes = w.preNSScopes[:len(w.preNSScopes)-1]
+	w.preNSFiles = w.preNSFiles[:len(w.preNSFiles)-1]
+}
+
+func (w *tsBodyWalker) requireFree() bool {
+	return w.nameIsFree("require")
+}
+
+func (w *tsBodyWalker) nameIsFree(name string) bool {
+	for i := len(w.shadows) - 1; i >= 0; i-- {
+		if w.importScopes[i][name] != "" || w.nsScopes[i][name] != "" {
+			return true
+		}
+		if w.shadows[i][name] {
+			return false
+		}
+	}
+	return true
 }
 
 func (w *tsBodyWalker) shadowed(name string) bool {
+	nested := w.fnNesting > w.fnBase
 	for i := len(w.shadows) - 1; i >= 0; i-- {
-		if w.importScopes[i][name] != "" {
+		if w.importScopes[i][name] != "" || w.nsScopes[i][name] != "" {
+			return false
+		}
+		if nested && (w.preImportScopes[i][name] != "" || w.preNSScopes[i][name] != "") {
 			return false
 		}
 		if w.shadows[i][name] {
@@ -4235,9 +4378,18 @@ func (w *tsBodyWalker) shadowed(name string) bool {
 }
 
 func (w *tsBodyWalker) lookupImport(name string) (string, string, bool) {
+	nested := w.fnNesting > w.fnBase
 	for i := len(w.importScopes) - 1; i >= 0; i-- {
 		if t, ok := w.importScopes[i][name]; ok {
 			return t, w.importFileScopes[i][name], true
+		}
+		if nested {
+			if t, ok := w.preImportScopes[i][name]; ok {
+				return t, w.preImportFiles[i][name], true
+			}
+		}
+		if w.nsScopes[i][name] != "" || (nested && w.preNSScopes[i][name] != "") {
+			return "", "", false
 		}
 		if w.shadows[i][name] {
 			return "", "", false
@@ -4245,6 +4397,53 @@ func (w *tsBodyWalker) lookupImport(name string) (string, string, bool) {
 	}
 	if t, ok := w.importMap[name]; ok {
 		return t, w.importFiles[name], true
+	}
+	return "", "", false
+}
+
+func (w *tsBodyWalker) resolveCall(call *sitter.Node) (string, string) {
+	if call == nil {
+		return "", ""
+	}
+	if fn := call.ChildByFieldName("function"); fn != nil && kindOf(w.kinds, fn) == "member_expression" {
+		obj := fn.ChildByFieldName("object")
+		prop := fn.ChildByFieldName("property")
+		if obj != nil && prop != nil && kindOf(w.kinds, obj) == "identifier" && kindOf(w.kinds, prop) == "property_identifier" {
+			recv := nodeText(obj, w.src)
+			if dir, idx, ok := w.lookupNamespace(recv); ok && w.ctx != nil {
+				exportName := nodeText(prop, w.src)
+				return bindImportedSymbol(dir, idx, exportName, "", idx != "", w.ctx.readSrc, w.ctx.aliases, w.ctx.knownFiles, w.ctx.exportCache, func(f string) {
+					if w.ctx.sideReads == nil {
+						return
+					}
+					f = filepath.ToSlash(f)
+					if f != "" && f != filepath.ToSlash(w.relFile) {
+						w.ctx.sideReads[f] = true
+					}
+				})
+			}
+		}
+	}
+	return resolveTSCall(w.kinds, call, w.src, w.dir, w.className, w.importMap, w.importFiles, w.localNames, w.relFile, w.shadowed, w.ctx, w.lookupImport)
+}
+
+func (w *tsBodyWalker) lookupNamespace(name string) (dir, index string, ok bool) {
+	nested := w.fnNesting > w.fnBase
+	for i := len(w.nsScopes) - 1; i >= 0; i-- {
+		if d, found := w.nsScopes[i][name]; found {
+			return d, w.nsFileScopes[i][name], true
+		}
+		if nested {
+			if d, found := w.preNSScopes[i][name]; found {
+				return d, w.preNSFiles[i][name], true
+			}
+		}
+		if w.importScopes[i][name] != "" || (nested && w.preImportScopes[i][name] != "") {
+			return "", "", false
+		}
+		if w.shadows[i][name] {
+			return "", "", false
+		}
 	}
 	return "", "", false
 }
@@ -4281,6 +4480,28 @@ func (w *tsBodyWalker) bindScopedImport(local, exportName, importPath string) {
 }
 
 func (w *tsBodyWalker) bindLiteralImportDecl(n *sitter.Node) {
+	if n == nil || len(w.importScopes) == 0 {
+		return
+	}
+	i := len(w.importScopes) - 1
+	w.harvestLiteralImports(n, w.importScopes[i], w.importFileScopes[i], w.nsScopes[i], w.nsFileScopes[i], true)
+}
+
+func (w *tsBodyWalker) precollectBlockImports(block *sitter.Node) {
+	if block == nil || len(w.importScopes) == 0 {
+		return
+	}
+	i := len(w.importScopes) - 1
+	for j := range block.NamedChildCount() {
+		n := block.NamedChild(j)
+		switch kindOf(w.kinds, n) {
+		case "lexical_declaration", "variable_declaration":
+			w.harvestLiteralImports(n, w.preImportScopes[i], w.preImportFiles[i], w.preNSScopes[i], w.preNSFiles[i], false)
+		}
+	}
+}
+
+func (w *tsBodyWalker) harvestLiteralImports(n *sitter.Node, named, namedF, ns, nsF map[string]string, noteUnknown bool) {
 	if n == nil {
 		return
 	}
@@ -4289,26 +4510,75 @@ func (w *tsBodyWalker) bindLiteralImportDecl(n *sitter.Node) {
 		if kindOf(w.kinds, decl) != "variable_declarator" {
 			continue
 		}
-		spec, ok := awaitedOrRequireImportSpecifier(w.kinds, decl.ChildByFieldName("value"), w.src)
-		if !ok {
-			w.noteShadowBindings(decl)
+		value := decl.ChildByFieldName("value")
+		if _, ok := literalRequireSpecifier(w.kinds, value, w.src); ok && !w.requireFree() {
+			if noteUnknown {
+				w.noteShadowBindings(decl)
+			}
+			continue
+		}
+		spec, ok := awaitedOrRequireImportSpecifier(w.kinds, value, w.src)
+		if !ok || w.ctx == nil {
+			if noteUnknown {
+				w.noteShadowBindings(decl)
+			}
 			continue
 		}
 		nameNode := decl.ChildByFieldName("name")
 		if nameNode == nil {
-			w.noteShadowBindings(decl)
+			if noteUnknown {
+				w.noteShadowBindings(decl)
+			}
 			continue
+		}
+		resolved, isExternal := resolveImportPath(spec, w.dir, w.ctx.aliases)
+		if isExternal {
+			if noteUnknown {
+				w.noteShadowBindings(decl)
+			}
+			continue
+		}
+		idx, dir, found := resolveModuleFile(resolved, w.ctx.knownFiles)
+		if !found {
+			dir = factpath.Dir(resolved)
 		}
 		switch kindOf(w.kinds, nameNode) {
 		case "identifier":
 			local := nodeText(nameNode, w.src)
-			w.bindScopedImport(local, local, spec)
+			if local == "" {
+				continue
+			}
+			ns[local] = dir
+			if found && idx != "" {
+				nsF[local] = idx
+			}
 		case "object_pattern":
+			note := func(f string) {
+				if w.ctx.sideReads == nil {
+					return
+				}
+				f = filepath.ToSlash(f)
+				if f != "" && f != filepath.ToSlash(w.relFile) {
+					w.ctx.sideReads[f] = true
+				}
+			}
 			for _, b := range objectPatternImportBindings(w.kinds, nameNode, w.src) {
-				w.bindScopedImport(b.local, b.export, spec)
+				if b.local == "" {
+					continue
+				}
+				target, file := bindImportedSymbol(dir, idx, b.export, resolved, found, w.ctx.readSrc, w.ctx.aliases, w.ctx.knownFiles, w.ctx.exportCache, note)
+				if target == "" {
+					continue
+				}
+				named[b.local] = target
+				if file != "" {
+					namedF[b.local] = file
+				}
 			}
 		default:
-			w.noteShadowBindings(decl)
+			if noteUnknown {
+				w.noteShadowBindings(decl)
+			}
 		}
 	}
 }
@@ -4433,6 +4703,7 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 	}
 	if kind == "statement_block" {
 		w.pushShadowScope(tsBlockLexicalNames(w.kinds, n, w.src)...)
+		w.precollectBlockImports(n)
 		for i := range n.ChildCount() {
 			w.walk(n.Child(i))
 		}
@@ -4457,18 +4728,24 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 	// inside a `.map(...)` render callback (`onClick={() => handleDelete(x)}`) from
 	// being mis-counted as a per-iteration call. The iterator's own callback is
 	// handled separately in the call_expression branch (its body walks at +1).
-	if w.metrics != nil && tsIsFunctionLike(kind) {
+	if tsIsFunctionLike(kind) {
 		saved, savedScaling, savedRepeat := w.loopDepth, w.scalingDepth, w.repeatDepth
-		w.loopDepth, w.scalingDepth, w.repeatDepth = 0, 0, 0
+		if w.metrics != nil {
+			w.loopDepth, w.scalingDepth, w.repeatDepth = 0, 0, 0
+		}
 		if name := tsFunctionBindingName(w.kinds, n, w.src); name != "" && len(w.shadows) > 0 {
 			w.shadows[len(w.shadows)-1][name] = true
 		}
+		w.fnNesting++
 		w.pushShadowScope(tsFunctionParamNames(w.kinds, n, w.src)...)
 		for i := range n.ChildCount() {
 			w.walk(n.Child(i))
 		}
 		w.popShadowScope()
-		w.loopDepth, w.scalingDepth, w.repeatDepth = saved, savedScaling, savedRepeat
+		w.fnNesting--
+		if w.metrics != nil {
+			w.loopDepth, w.scalingDepth, w.repeatDepth = saved, savedScaling, savedRepeat
+		}
 		return
 	}
 
@@ -4544,7 +4821,7 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 		if w.metrics != nil && !w.metrics.ioDirect && tsIsIOCall(w.kinds, n, w.src, w.ioBindings) {
 			w.metrics.ioDirect = true
 		}
-		if target, targetFile := resolveTSCall(w.kinds, n, w.src, w.dir, w.className, w.importMap, w.importFiles, w.localNames, w.relFile, w.shadowed, w.ctx, w.lookupImport); target != "" {
+		if target, targetFile := w.resolveCall(n); target != "" {
 			key := target + "\x00" + targetFile
 			if !w.seen[key] {
 				w.seen[key] = true
@@ -4734,6 +5011,9 @@ func collectCallsWithMetrics(kinds *tsutil.KindTable, node *sitter.Node, src []b
 		importMap: ctx.importMap, importFiles: ctx.importFiles, localNames: ctx.localNames,
 		relFile: ctx.relFile, ctx: ctx, ioBindings: ctx.ioBindings,
 		selfName: selfName, selfShort: selfShort, metrics: m, seen: make(map[string]bool),
+	}
+	if node != nil && tsIsFunctionLike(kindOf(kinds, node)) {
+		w.fnBase = 1
 	}
 	w.walk(node)
 	return w.rels, m
