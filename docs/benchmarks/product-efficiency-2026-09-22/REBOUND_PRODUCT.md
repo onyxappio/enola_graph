@@ -1,7 +1,7 @@
 # Product membership fix: frozen scope reduced to 911 owners
 
 The five-file invitation-link burst now replaces **911 owners instead of 8647**
-and reports **18 parsed files instead of 293**. The accepted run exactly matches
+and reports **18 TypeScript-session parses instead of 293**. The accepted run exactly matches
 cold analysis, with identical 45110-file inventory fences across cold verification.
 This is a measured scope reduction; timings below are one accepted sample per
 candidate, not repeated performance acceptance.
@@ -17,13 +17,13 @@ recorded in [rebound-product-result.json](rebound-product-result.json).
 | Metric | Previous checkpoint | Fixed candidate |
 |---|---:|---:|
 | Begin owners | 8647 | 911 |
-| Parsed files reported by End | 293 | 18 |
+| TypeScript-session parses reported by End | 293 | 18 |
 | Batches | 2690 | 237 |
 | Delta Begin → End | 3.646 s | 1.378 s |
 | Initial Begin → End | 6.070 s | 6.405 s |
 | Exact final cold equality | yes | yes |
 
-Scope is 9.49× smaller; the parsed-file counter is 16.28× smaller. The single-run
+Scope is 9.49× smaller; the TypeScript-session parsed-file counter is 16.28× smaller. The single-run
 Begin → End interval is 2.65× lower, but host contention and unequal harness
 observation windows preclude treating that as a stable speedup estimate. Initial
 completion was not optimized here; Begin → End is not complete initial wall time.
@@ -50,7 +50,10 @@ owners and new declarations retain their regression coverage.
 ## Remaining work
 
 Of the 911 owners, **893 are Markdown documents and 18 are TS/TSX files**.
-The mdintent extractor still reruns its entire owner domain. Its optimization is
+The mdintent extractor still rereads and parses its entire owner domain. The
+End parsed_files/cached_files fields come from TypeScript ExtractStats; they do
+not count Markdown or other non-TypeScript extractor reads/parses. Thus 18 does
+not mean only 18 files were processed by the full profile. Its optimization is
 separate follow-up work and must preserve file/link and global-name dependencies.
 
 The last observed filesystem mtime to consumer completion was 7.952 seconds,

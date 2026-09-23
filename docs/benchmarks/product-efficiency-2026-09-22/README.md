@@ -445,3 +445,13 @@ there would fail on the first partial analysis.
 
 Toolchain: `/tmp/enola-toolchain/go/bin/go`, `/tmp/enola-toolchain/go/bin/gofmt`,
 `/tmp/enola-toolchain/bin/nats-server`.
+
+### Parse-counter scope
+
+End `parsed_files` and `cached_files` currently come from the TypeScript
+session counters. Full-profile Markdown and other non-TypeScript extraction work
+is not counted there. A low parsed-files number must not be reported as the total
+number of files read or parsed by every extractor.
+
+Repeated Product baseline and pending Markdown-scope comparison:
+[MDINTENT_COMPARISON.md](MDINTENT_COMPARISON.md).

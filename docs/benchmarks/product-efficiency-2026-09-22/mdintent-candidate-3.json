@@ -1,0 +1,371 @@
+{
+  "measurement_kind": "production-graph-watch-soak",
+  "not_request_driven_resident": true,
+  "not_product_acceptance": true,
+  "fixture": "product",
+  "work": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-candidate-run-3",
+  "port": 49991,
+  "elapsed_s": 219.752,
+  "requested_duration_s": 180.0,
+  "watch_every": "5s",
+  "window_semantics": "fixed collection window, not debounce; edits during analysis queue and the next window opens after that analysis finishes",
+  "broker_error_policy_documented": "broker errors terminate graph watch; the harness restarts it",
+  "broker_outage_observation": {
+    "attempted": false
+  },
+  "broker_outage_verdict": "untested: no deliberate outage was requested",
+  "generations_completed_after_outage": 0,
+  "broker_recovery_acceptance": "untested until observed in a Product run",
+  "binary": {
+    "path": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-final-1-snapshot/bin/enola",
+    "sha256": "9a2712028e47093acec01cc6e6ee28afb0f3304d667523d5a2db5cb691bc4d71",
+    "go_version_m": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-final-1-snapshot/bin/enola: go1.26.8\n\tpath\tgithub.com/enola-labs/enola/cmd/enola\n\tmod\tgithub.com/enola-labs/enola\tv0.0.0-20260923035116-bb89663bf31d+dirty\t\n\tdep\tgithub.com/ebitengine/purego\tv0.10.2\th1:W809HbnvzAxgdm+aOvlSekrM16wGCdT/e76+9tS7gzE=\n\tdep\tgithub.com/fsnotify/fsnotify\tv1.9.0\th1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=\n\tdep\tgithub.com/google/jsonschema-go\tv0.4.3\th1:/DBOLZTfDow7pe2GmaJNhltueGTtDKICi8V8p+DQPd0=\n\tdep\tgithub.com/klauspost/compress\tv1.18.0\th1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=\n\tdep\tgithub.com/mattn/go-pointer\tv0.0.1\th1:n+XhsuGeVO6MEAp7xyEukFINEa+Quek5psIR/ylA6o0=\n\tdep\tgithub.com/modelcontextprotocol/go-sdk\tv1.8.0\th1:KIvahhYqwtbeniWVPs3TcXEA7b8jEtwfBpOTAI+Urx4=\n\tdep\tgithub.com/nats-io/nats.go\tv1.47.0\th1:YQdADw6J/UfGUd2Oy6tn4Hq6YHxCaJrVKayxxFqYrgM=\n\tdep\tgithub.com/nats-io/nkeys\tv0.4.11\th1:q44qGV008kYd9W1b1nEBkNzvnWxtRSQ7A8BoqRrcfa0=\n\tdep\tgithub.com/nats-io/nuid\tv1.0.1\th1:5iA8DT8V7q8WK2EScv2padNa/rTESc1KdnPw4TC2paw=\n\tdep\tgithub.com/pbnjay/memory\tv0.0.0-20210728143218-7b4eea64cf58\th1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=\n\tdep\tgithub.com/segmentio/asm\tv1.1.3\th1:WM03sfUOENvvKexOLp+pCqgb/WDjsi7EK8gIsICtzhc=\n\tdep\tgithub.com/segmentio/encoding\tv0.5.4\th1:OW1VRern8Nw6ITAtwSZ7Idrl3MXCFwXHPgqESYfvNt0=\n\tdep\tgithub.com/tree-sitter-grammars/tree-sitter-kotlin\tv1.1.0\th1:SWIUDASa+WPhDDem1U5IJpYwQEezkqXrUI61OcnORzM=\n\tdep\tgithub.com/tree-sitter/go-tree-sitter\tv0.24.0\th1:kRZb6aBNfcI/u0Qh8XEt3zjNVnmxTisDBN+kXK0xRYQ=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c\tv0.23.6\th1:aHcghKEBgyUDUcCKFT5fELp26UBU7RBltj5MkRYxyy8=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c-sharp\tv0.23.1\th1:ddG6osP34sMieVNN6lu5ZG/3N8Wn+67+43BmipqidyM=\n\tdep\tgithub.com/tree-sitter/tree-sitter-cpp\tv0.23.4\th1:LaWZsiqQKvR65yHgKmnaqA+uz6tlDJTJFCyFIeZU/8w=\n\tdep\tgithub.com/tree-sitter/tree-sitter-java\tv0.23.5\th1:J9YeMGMwXYlKSP3K4Us8CitC6hjtMjqpeOf2GGo6tig=\n\tdep\tgithub.com/tree-sitter/tree-sitter-php\tv0.23.12\th1:zgnxrV5RUEbK9d3jm9R8CjR3uSA1pBPbvq7Tbjg8j0k=\n\tdep\tgithub.com/tree-sitter/tree-sitter-python\tv0.23.6\th1:qHnWFR5WhtMQpxBZRwiaU5Hk/29vGju6CVtmvu5Haas=\n\tdep\tgithub.com/tree-sitter/tree-sitter-ruby\tv0.23.1\th1:T/NKHUA+iVbHM440hFx+lzVOzS4dV6z8Qw8ai+72bYo=\n\tdep\tgithub.com/tree-sitter/tree-sitter-rust\tv0.23.3\th1:v41N2Dx5ZEzouqeQJ0IIH2cUwVw/iepwrUoE9D56IL4=\n\tdep\tgithub.com/tree-sitter/tree-sitter-scala\tv0.24.1\th1:jO4zDfb3vQWmqCDpLfhENVtP3RvOSLYNR69m0R/T6wY=\n\tdep\tgithub.com/tree-sitter/tree-sitter-typescript\tv0.23.2\th1:/Odvphn18PniVixb9e97X0DbNVsU6Qocv9mfkyzdXwU=\n\tdep\tgithub.com/yosida95/uritemplate/v3\tv3.0.2\th1:Ed3Oyj9yrmi9087+NczuL5BwkIc4wvTb5zIM+UJPGz4=\n\tdep\tgolang.org/x/crypto\tv0.37.0\th1:kJNSjF/Xp7kU0iB2Z+9viTPMW4EqqsrywMXLJOOsXSE=\n\tdep\tgolang.org/x/oauth2\tv0.35.0\th1:Mv2mzuHuZuY2+bkyWXIHMfhNdJAdwW3FuWeCPYN5GVQ=\n\tdep\tgolang.org/x/sync\tv0.20.0\th1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=\n\tdep\tgolang.org/x/sys\tv0.48.0\th1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=\n\tdep\tgolang.org/x/time\tv0.15.0\th1:bbrp8t3bGUeFOx08pvsMYRTCVSMk89u4tKbNOZbp88U=\n\tdep\tgopkg.in/yaml.v3\tv3.0.1\th1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\tCGO_ENABLED=1\n\tbuild\tCGO_CFLAGS=\n\tbuild\tCGO_CPPFLAGS=\n\tbuild\tCGO_CXXFLAGS=\n\tbuild\tCGO_LDFLAGS=\n\tbuild\tGOARCH=arm64\n\tbuild\tGOOS=darwin\n\tbuild\tGOARM64=v8.0\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=bb89663bf31dc6f9b30ccc3610df9eed3a7b2881\n\tbuild\tvcs.time=2026-09-23T03:51:16Z\n\tbuild\tvcs.modified=true\n",
+    "go_version_m_sha256": "b5e243b48080672e64244182360d97d3cae26ce421927c222acb8177a44857c5",
+    "vcs_revision": "bb89663bf31dc6f9b30ccc3610df9eed3a7b2881",
+    "vcs_modified": true,
+    "vcs_modified_explained_by_harness_injection": true
+  },
+  "observer": {
+    "path": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-candidate-run-3/bin/benchobserver",
+    "sha256": "75ef1eb4250e0c731bb194a0a6309d92278a969d3d480c9b1510c52963a6d7fe",
+    "go_version_m": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-candidate-run-3/bin/benchobserver: go1.26.8\n\tpath\tgithub.com/enola-labs/enola/cmd/benchobserver\n\tmod\tgithub.com/enola-labs/enola\tv0.0.0-20260923035116-bb89663bf31d+dirty\t\n\tdep\tgithub.com/ebitengine/purego\tv0.10.2\th1:W809HbnvzAxgdm+aOvlSekrM16wGCdT/e76+9tS7gzE=\n\tdep\tgithub.com/fsnotify/fsnotify\tv1.9.0\th1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=\n\tdep\tgithub.com/klauspost/compress\tv1.18.0\th1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=\n\tdep\tgithub.com/mattn/go-pointer\tv0.0.1\th1:n+XhsuGeVO6MEAp7xyEukFINEa+Quek5psIR/ylA6o0=\n\tdep\tgithub.com/nats-io/nats.go\tv1.47.0\th1:YQdADw6J/UfGUd2Oy6tn4Hq6YHxCaJrVKayxxFqYrgM=\n\tdep\tgithub.com/nats-io/nkeys\tv0.4.11\th1:q44qGV008kYd9W1b1nEBkNzvnWxtRSQ7A8BoqRrcfa0=\n\tdep\tgithub.com/nats-io/nuid\tv1.0.1\th1:5iA8DT8V7q8WK2EScv2padNa/rTESc1KdnPw4TC2paw=\n\tdep\tgithub.com/tree-sitter/go-tree-sitter\tv0.24.0\th1:kRZb6aBNfcI/u0Qh8XEt3zjNVnmxTisDBN+kXK0xRYQ=\n\tdep\tgithub.com/tree-sitter/tree-sitter-python\tv0.23.6\th1:qHnWFR5WhtMQpxBZRwiaU5Hk/29vGju6CVtmvu5Haas=\n\tdep\tgithub.com/tree-sitter/tree-sitter-ruby\tv0.23.1\th1:T/NKHUA+iVbHM440hFx+lzVOzS4dV6z8Qw8ai+72bYo=\n\tdep\tgithub.com/tree-sitter/tree-sitter-typescript\tv0.23.2\th1:/Odvphn18PniVixb9e97X0DbNVsU6Qocv9mfkyzdXwU=\n\tdep\tgolang.org/x/crypto\tv0.37.0\th1:kJNSjF/Xp7kU0iB2Z+9viTPMW4EqqsrywMXLJOOsXSE=\n\tdep\tgolang.org/x/sys\tv0.48.0\th1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=\n\tdep\tgopkg.in/yaml.v3\tv3.0.1\th1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\tCGO_ENABLED=1\n\tbuild\tCGO_CFLAGS=\n\tbuild\tCGO_CPPFLAGS=\n\tbuild\tCGO_CXXFLAGS=\n\tbuild\tCGO_LDFLAGS=\n\tbuild\tGOARCH=arm64\n\tbuild\tGOOS=darwin\n\tbuild\tGOARM64=v8.0\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=bb89663bf31dc6f9b30ccc3610df9eed3a7b2881\n\tbuild\tvcs.time=2026-09-23T03:51:16Z\n\tbuild\tvcs.modified=true\n",
+    "go_version_m_sha256": "677ad5e2aeaa196dec10dce70665b4fc9ca01ab9e370e05888dd5260055a4c7a",
+    "vcs_revision": "bb89663bf31dc6f9b30ccc3610df9eed3a7b2881",
+    "vcs_modified": true,
+    "vcs_modified_explained_by_harness_injection": true
+  },
+  "snapshot": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-final-1-snapshot",
+  "snapshot_note": "experimental-patch",
+  "repo_id": "watch-bench",
+  "completion_selection": "heuristic-quiescence + observed cold equality",
+  "internal_drain_proved": false,
+  "requires_watcher_watermark_for_proof": true,
+  "quiet_margin_s": 10.0,
+  "open_begin_tracking": "observed",
+  "incomplete_begin_end_pairs_at_selection": [],
+  "abandoned_begins": [],
+  "generations_begun_after_last_save": [
+    2
+  ],
+  "begin_after_save_is_not_capture_proof": true,
+  "quiescence_limitations": [
+    "no watcher watermark exists, so the harness cannot read the watcher's own queue; quiescence is inferred from observed traffic, never proved",
+    "an analysis longer than the quiet margin with its Begin not yet published is indistinguishable from an idle watcher (unobservable pre-Begin work)",
+    "a Begin broker timestamp records when the Begin was published, not when the watcher captured the input, so a Begin after a save does not prove that run scanned the saved bytes",
+    "acceptance therefore rests on cold equality of the final completed generation after inputs are frozen, not on the quiescence signal",
+    "an open Begin that a later Begin supersedes, or that predates a watcher restart, is treated as abandoned and reported separately rather than waited on; if that classification were wrong the harness would stop blocking on a run that is genuinely still in flight"
+  ],
+  "input_hash_scope": "whole-isolated-checkout",
+  "input_scope_excluded_dirs": [
+    ".enola",
+    ".git",
+    ".next",
+    ".turbo",
+    ".venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "node_modules"
+  ],
+  "input_stability_across_cold": {
+    "stable": true,
+    "files_before_cold": 45110,
+    "files_after_cold": 45110,
+    "diff": {
+      "added": [],
+      "modified": [],
+      "deleted": [],
+      "changed_count": 0,
+      "outside_allowlist": []
+    },
+    "scope": "whole-isolated-checkout",
+    "note": "if unstable, the watch and cold graphs read different inputs and the equality result is inconclusive, not a verdict"
+  },
+  "equality_inconclusive_reason": null,
+  "input_files_hashed": 45110,
+  "inputs_isolated_under_work": true,
+  "save_ns_basis": "filesystem mtime observed by polling the checkout (external editor; no durability guarantee, no editor cooperation assumed)",
+  "harness_setup_before_watch_launch_s": 72.593,
+  "watch_launch_to_initial_frame_observed_ms": 9697.491,
+  "watch_launch_to_initial_consumer_applied_ms": 9417.774,
+  "frame_detection_poll_interval_s": 0.05,
+  "observed_startup_note": "Two startup numbers, both from spawning the `graph watch` process to the FIRST completed generation, and neither of them a total. watch_launch_to_initial_frame_observed_ms is the honest observable: a monotonic interval ending when THIS HARNESS read the frame, so it includes up to one poll interval of detection lag (frame_detection_poll_interval_s). watch_launch_to_initial_consumer_applied_ms ends at the apply timestamp the observer stamped into the frame instead, which drops the polling lag but compares a Python clock read with a Go clock read on this host. Both cover process start, config load, the first full repository scan, publication and consumer apply, so they are cold-start figures for THIS harness on THIS fixture. Neither is a user-save latency: harness setup before the spawn is reported separately as harness_setup_before_watch_launch_s, and begin_to_end_ms stays a broker-side interval of a single generation, never an initial total.",
+  "clock_basis": {
+    "time_since_latest_observed_save_at_begin_ms": "local_wall(latest observed save) -> broker(Begin) [CROSS]",
+    "begin_to_first_batch_ms": "broker -> broker [single]",
+    "begin_to_end_ms": "broker -> broker [single]",
+    "end_to_consumer_ms": "broker(End) -> local_wall(observer applied) [CROSS]",
+    "time_since_latest_observed_save_at_consumer_ms": "local_wall -> local_wall [single]",
+    "final_convergence_ms": "local_wall(last observed edit) -> local_wall(first final-cold-equal completion) [single]",
+    "watch_launch_to_initial_frame_observed_ms": "monotonic(watch process spawn) -> monotonic(harness READ the initial frame) [single; includes up to one FRAME_POLL_INTERVAL_S of detection lag]",
+    "watch_launch_to_initial_consumer_applied_ms": "local_wall(watch process spawn) -> local_wall(observer applied the initial End, as stamped in the frame) [single host, two processes]"
+  },
+  "clock_assumption": "single host; broker metadata timestamps and local wall clock are the same physical clock read through different paths; CROSS intervals include unquantified skew and are indicative, not precise",
+  "causality_note": "time_since_latest_observed_save_* pairs each generation with the NEAREST PRIOR observed save. That is correlation, not causation: the collection window is fixed, so a generation may have been triggered by an earlier save and merely happen to follow a later one, and a save landing inside an open window is folded into a run that started before it. Generation and run ids are recorded so a reader can re-pair them. The one causal end-to-end number here is final_convergence_ms: last observed edit to the first completed generation that equals the final cold graph.",
+  "fsync_visibility_note": "fsync completion is the chosen latency REFERENCE, not a visibility guarantee: a reader or filesystem watcher can observe written bytes before fsync returns. Intervals measured from it can therefore be legitimately NEGATIVE when the watcher sampled during the write; negative offsets are reported and labelled, never clamped away.",
+  "save_observation_bases": {
+    "fsync-completion": "harness-scripted write; time.time_ns() read after fsync(2) returned",
+    "filesystem-mtime": "external editor; st_mtime_ns found by polling the checkout, i.e. when the editor's write landed in the filesystem, with no durability guarantee and no editor cooperation assumed"
+  },
+  "extractor_profile": "full",
+  "extractors_key_omitted_for_production_default": true,
+  "effective_config": "repo: /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-candidate-run-3/product-live\nexplainers: []\nrenderers: []\n\n# Overlay without repo. Paths are relative to the Product checkout.\ngraph_inputs:\n  exclude:\n    - \"apps/mobile/e2e/artifacts/**\"\n    - \"worker-reports/**\"\n",
+  "editor_mode": "external-editor",
+  "editor_activity": {
+    "mode": "external-editor",
+    "save_observation_basis": "filesystem-mtime",
+    "observed_changes": 5,
+    "first_change_ns": 1790136072321630704,
+    "last_change_ns": 1790136072323564954,
+    "active_editing_s": 0.002,
+    "editor_finished_signal_ns": 1790136072503607000,
+    "run_continued_after_finish_s": 97.142,
+    "idle_s": 186.308,
+    "editor_allowlist": [
+      "apps/mobile/src/deeplinks"
+    ],
+    "live_poll_scope": [
+      "apps/mobile/src/deeplinks"
+    ],
+    "poll_interval_s": 1.0,
+    "integrity_scope": "whole isolated checkout, hashed once at start and once after editing",
+    "final_full_inventory_diff": {
+      "added": [
+        "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-candidate-run-3/product-live/apps/mobile/src/deeplinks/deepLinkUrl.test.ts",
+        "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-candidate-run-3/product-live/apps/mobile/src/deeplinks/deepLinkUrl.ts",
+        "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-candidate-run-3/product-live/apps/mobile/src/deeplinks/invitationLink.test.ts",
+        "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-candidate-run-3/product-live/apps/mobile/src/deeplinks/invitationLink.ts"
+      ],
+      "modified": [
+        "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-candidate-run-3/product-live/apps/mobile/src/deeplinks/passwordResetLink.ts"
+      ],
+      "deleted": [],
+      "changed_count": 5
+    },
+    "changes_outside_allowlist": [],
+    "observation_limits": [
+      "changes are seen no earlier than the next poll tick, so per-change detection lag is up to 1.0s and observed_ns - ns is harness lag, never watcher latency",
+      "a file changed and reverted between two ticks is invisible to the live poll; the final full inventory only shows net difference, not every intermediate state",
+      "out-of-allowlist changes are detected by the final full inventory, so they are reported without a timestamp",
+      "mtime comes from the editor's write landing and is not a durable-save time; no durable timestamp is inferred from polling",
+      "this is complete change detection for the DECLARED experiment scope, not generic coverage of every path a watcher might observe"
+    ]
+  },
+  "harness_mutated_source": false,
+  "edit_count": 5,
+  "edit_kinds": {
+    "add-export": 0,
+    "remove-export": 0,
+    "edit-body": 0,
+    "add-import": 0,
+    "remove-import": 0,
+    "create-file": 0,
+    "rename-file": 0,
+    "delete-file": 0
+  },
+  "observed_change_kinds": {
+    "added": 4,
+    "modified": 1,
+    "deleted": 0
+  },
+  "generation_count": 2,
+  "generations": [
+    {
+      "generation": 1,
+      "base_generation": 0,
+      "run_id": "watch-bench-soak-watch-1-1790136058832803000",
+      "context": "soak-watch",
+      "owner_scope_count": 8645,
+      "scope_mode": "complete",
+      "latest_observed_save_ns": null,
+      "latest_observed_save_start_ns": null,
+      "latest_observed_save_path": null,
+      "observation_basis": null,
+      "pairing_is_causal": false,
+      "begin_ns": 1790136058894600000,
+      "first_batch_ns": 1790136062472002000,
+      "broker_end_ns": 1790136065262291000,
+      "consumer_end_ns": 1790136065346459000,
+      "write_to_durable_ms": null,
+      "time_since_latest_observed_save_at_begin_ms": null,
+      "begin_to_first_batch_ms": 3577.402,
+      "begin_to_end_ms": 6367.691,
+      "end_to_consumer_ms": 84.168,
+      "time_since_latest_observed_save_at_consumer_ms": null,
+      "telemetry_available": true,
+      "generation_kind": "initial",
+      "messages_observed": 2691,
+      "batches_observed": 2689,
+      "batch_count_end": 2689,
+      "batch_count_matches_end": true,
+      "node_records_sent": 69311,
+      "edge_records_sent": 171954,
+      "node_records_sent_resolved": 69311,
+      "edge_records_sent_resolved": 171954,
+      "payload_bytes_begin": 831690,
+      "payload_bytes_batches": 77389904,
+      "payload_bytes_end": 1201,
+      "payload_bytes_total": 78222795,
+      "payload_bytes_basis": "json_payload_bytes_including_begin_and_end_excluding_broker_framing",
+      "graph_nodes_total": 69311,
+      "graph_edges_total": 171954,
+      "graph_nodes_delta": 69311,
+      "graph_edges_delta": 171954,
+      "completeness_status": "success",
+      "completeness_files_analyzed": 11127,
+      "completeness_parsed_files": 4144,
+      "completeness_cached_files": 0,
+      "completeness_summary_scans": 0,
+      "completeness_early_local": false,
+      "completeness_files_unreadable": 0,
+      "completeness_fallbacks": 6
+    },
+    {
+      "generation": 2,
+      "base_generation": 1,
+      "run_id": "watch-bench-soak-watch-2-1790136078649686000",
+      "context": "soak-watch",
+      "owner_scope_count": 18,
+      "scope_mode": "complete",
+      "latest_observed_save_ns": 1790136072323564954,
+      "latest_observed_save_start_ns": null,
+      "latest_observed_save_path": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-candidate-run-3/product-live/apps/mobile/src/deeplinks/deepLinkUrl.test.ts",
+      "observation_basis": "filesystem-mtime",
+      "pairing_is_causal": false,
+      "begin_ns": 1790136079133058000,
+      "first_batch_ns": 1790136079705576000,
+      "broker_end_ns": 1790136080248341000,
+      "consumer_end_ns": 1790136080249544000,
+      "write_to_durable_ms": null,
+      "time_since_latest_observed_save_at_begin_ms": 6809.493,
+      "begin_to_first_batch_ms": 572.518,
+      "begin_to_end_ms": 1115.283,
+      "end_to_consumer_ms": 1.203,
+      "time_since_latest_observed_save_at_consumer_ms": 7925.979,
+      "telemetry_available": true,
+      "generation_kind": "delta",
+      "messages_observed": 36,
+      "batches_observed": 34,
+      "batch_count_end": 34,
+      "batch_count_matches_end": true,
+      "node_records_sent": 517,
+      "edge_records_sent": 2159,
+      "node_records_sent_resolved": 517,
+      "edge_records_sent_resolved": 2159,
+      "payload_bytes_begin": 1686,
+      "payload_bytes_batches": 796153,
+      "payload_bytes_end": 765,
+      "payload_bytes_total": 798604,
+      "payload_bytes_basis": "json_payload_bytes_including_begin_and_end_excluding_broker_framing",
+      "graph_nodes_total": 69326,
+      "graph_edges_total": 171990,
+      "graph_nodes_delta": 15,
+      "graph_edges_delta": 36,
+      "completeness_status": "success",
+      "completeness_files_analyzed": 11129,
+      "completeness_parsed_files": 18,
+      "completeness_cached_files": 4231,
+      "completeness_summary_scans": 0,
+      "completeness_early_local": false,
+      "completeness_files_unreadable": 0,
+      "completeness_fallbacks": 2
+    }
+  ],
+  "telemetry_totals": {
+    "completed_generations_counted": 2,
+    "completed_generations_without_telemetry": 0,
+    "initial_generations": 1,
+    "delta_generations": 1,
+    "aborted_or_in_flight_included": false,
+    "messages_observed": 2727,
+    "batches_observed": 2723,
+    "node_records_sent": 69828,
+    "edge_records_sent": 174113,
+    "node_records_sent_resolved": 69828,
+    "edge_records_sent_resolved": 174113,
+    "payload_bytes_begin": 833376,
+    "payload_bytes_batches": 78186057,
+    "payload_bytes_end": 1966,
+    "payload_bytes_total": 79021399,
+    "completeness_files_analyzed": 22256,
+    "completeness_parsed_files": 4162,
+    "completeness_cached_files": 4231,
+    "batch_count_mismatches": 0,
+    "net_graph_nodes_after_last_generation": 69326,
+    "net_graph_edges_after_last_generation": 171990,
+    "records_vs_entities_note": "*_records_sent counts records the replacement PUT ON THE WIRE. A replacement resends every owner in its frozen scope, so most of those records REPLACE facts the consumer already held: they are traffic, not new entities. graph_*_total is the resulting net graph SIZE and graph_*_delta the change in that size since this context's previous completed generation. A zero delta therefore means the graph did not change size, NOT that the same facts came back: ids, edge targets and properties can all change at constant counts. normalized_hash is the only equality evidence here. graph_*_total sums per-owner record counts; it is not a count of distinct ids, so an id contributed by two owners counts twice.",
+    "completed_only_note": "All telemetry here comes from COMPLETED generations: the observer writes a frame at End, so an aborted or still-in-flight Begin contributes nothing to any count or byte total. Those attempts are visible only through the lifecycle records, reported separately as incomplete_begin_end_pairs_* and abandoned_begins."
+  },
+  "latency_summary": {
+    "write_to_durable_ms": {
+      "count": 0
+    },
+    "time_since_latest_observed_save_at_begin_ms": {
+      "count": 1,
+      "min": 6809.493,
+      "median": 6809.493,
+      "max": 6809.493
+    },
+    "begin_to_first_batch_ms": {
+      "count": 2,
+      "min": 572.518,
+      "median": 2074.96,
+      "max": 3577.402
+    },
+    "begin_to_end_ms": {
+      "count": 2,
+      "min": 1115.283,
+      "median": 3741.487,
+      "max": 6367.691
+    },
+    "end_to_consumer_ms": {
+      "count": 2,
+      "min": 1.203,
+      "median": 42.686,
+      "max": 84.168
+    },
+    "time_since_latest_observed_save_at_consumer_ms": {
+      "count": 1,
+      "min": 7925.979,
+      "median": 7925.979,
+      "max": 7925.979
+    }
+  },
+  "rss_samples": 10,
+  "rss_kb": {
+    "count": 10,
+    "min": 866560,
+    "median": 867072.0,
+    "max": 867072
+  },
+  "lifecycle_events": [
+    {
+      "kind": "editor-finished-signal",
+      "ns": 1790136072503607000
+    }
+  ],
+  "selected_generation": 2,
+  "watch_hash": "17d786c72a1db2b92893bae783c022125fe7e0d052014bd3d7143dafcd7dd3d8",
+  "cold_hash": "17d786c72a1db2b92893bae783c022125fe7e0d052014bd3d7143dafcd7dd3d8",
+  "cold_context": "soak-cold",
+  "cold_run_id": "watch-bench-soak-cold-1-1790136190086706000",
+  "equal": true,
+  "convergence": {
+    "converged": true,
+    "first_cold_equal_generation": 2,
+    "first_cold_equal_run_id": "watch-bench-soak-watch-2-1790136078649686000",
+    "first_cold_equal_consumer_ns": 1790136080249544000,
+    "last_observed_edit_ns": 1790136072323564954,
+    "final_convergence_ms": 7925.979,
+    "cold_equal_generations_at_tail": 1,
+    "basis": "last observed edit -> start of the observed final matching suffix: the first completed generation that equals the final cold graph and is never contradicted afterwards",
+    "is_causal_claim": false,
+    "basis_limitation": "observed matching suffix only; a graph-neutral edit can make an earlier generation match, which shortens this number without the work being faster"
+  },
+  "cold_summary": {
+    "BaseGeneration": 0,
+    "TargetGeneration": 1,
+    "ParsedFiles": 4146,
+    "OwnersPublished": 5070
+  }
+}

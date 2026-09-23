@@ -14,8 +14,8 @@ broker acknowledgments and consumer application.
   stable whole-checkout input, no *active* open Begin, and an unchanged frame
   count / `last_seq` / lifecycle count for `max(2*window, window+2s)`.
   Begin/End records come from the observer's new `OBSERVER_LIFECYCLE_FILE`
-  (additive: with the env var unset the output is byte-identical, so
-  `resident.py` is unaffected), because `consumer.jsonl` only gains a line when
+  (optional; completed-frame telemetry fields are additive and existing fields
+  remain compatible with `resident.py`), because `consumer.jsonl` only gains a line when
   a generation *completes*.
 
   This is **heuristic quiescence, not an internal drain proof**. Reports carry
@@ -114,10 +114,24 @@ The live AI editor Product experiment has now completed: see
 [LIVE_PRODUCT_WATCH.md](LIVE_PRODUCT_WATCH.md). Final cold equality passed after
 11 observed changes across 5 files, with roughly 3.85 minutes of active editing
 and a requested 30-minute observation window. No restart or deliberate outage
-was exercised. Source-addition scope still widened to 8646–8647 owners; its fix
-is under review, not measured or accepted yet.
+was exercised. The follow-up five-file burst now replaces 911 owners instead
+of 8647 and reports 18 TypeScript-session parses instead of 293; exact cold equality and stable input
+fences passed. See [REBOUND_PRODUCT.md](REBOUND_PRODUCT.md). Three subsequent
+baseline replays at the pushed checkpoint reproduce the 911-owner scope; their
+timing spread is in [MDINTENT_COMPARISON.md](MDINTENT_COMPARISON.md). Of those
+911 owners, 893 are Markdown documents. The final Markdown-scope candidate has
+now passed three Product cold-equality replays with 18 owners and 12.09× less JSON
+payload. Complete delta latency has not improved; Markdown still compiles once
+per required preview. The repeated timing comparison and fresh baseline control
+are recorded in the same report.
 
-Remaining checks: candidate-versus-baseline replay, sustained mixed edits,
+Automatic per-generation messages, batches, node/edge records, payload bytes and
+End completeness counters are available. Startup-to-frame observation,
+startup-to-consumer-apply and Begin-to-End are separate fields; zero change in
+graph cardinality does not imply graph equality. Tiny watch and external-editor
+smokes passed; Product use of this new telemetry is being measured separately.
+
+Remaining checks: repeated baseline/candidate measurements, sustained mixed edits,
 rename/delete scenarios, an interruption that actually kills the watcher during
 publication, raw-config scope and fresh-CLI state-loading costs.
 

@@ -1,0 +1,46 @@
+{
+  "source_manifest": {
+    "internal/graphsession/mdpreview.go": "cee5bcf5950b9a67049a3b655fcd1eeb217c97b07e22643d7358bfb940c1f2a1",
+    "internal/graphsession/session.go": "de80bdf3c61cfaa1dc3646aec847d01eec96c3cfbb80d1de0b7de6a0d7a96643",
+    "internal/graphsession/md_scope_regression_test.go": "802fff132e1b3372bc167a2b757560c26186330d41a024ee40aabd0082a7f9cd",
+    "internal/extractors/mdintent/mdintent.go": "8406dd3611d1052bcc09fd1dce9662e8e3d1ecd7f64b90dfbc5ec82fd0fdc3e7"
+  },
+  "worker_dispatch": "ctx_2f97efa26cba",
+  "worker_reported_checks": [
+    {
+      "suite": "graphsession TestMDScope",
+      "exit_code": 0,
+      "wall_seconds": 10.71
+    },
+    {
+      "suite": "graphsession",
+      "exit_code": 0,
+      "wall_seconds": 194.53
+    },
+    {
+      "suite": "pkg/command",
+      "exit_code": 0,
+      "wall_seconds": 5.87
+    },
+    {
+      "suite": "mdintent",
+      "exit_code": 0,
+      "wall_seconds": 1.08
+    },
+    {
+      "suite": "vet graphsession mdintent pkg/command",
+      "exit_code": 0
+    }
+  ],
+  "negative_controls": [
+    "omitting captured MD End validation fails regression",
+    "declining changed hashed inputs instead of failing closes fails regression",
+    "global preparedMD check instead of per-extractor result fails mixed extractor regression"
+  ],
+  "notes": [
+    "Worker tests were reported on the final frozen file hashes.",
+    "Root independently checked source hashes while preparing the private build.",
+    "Root cache coverage and golden/determinism gate results are in mdintent-final-gates.json.",
+    "Product benchmark acceptance is tracked separately."
+  ]
+}

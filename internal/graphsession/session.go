@@ -230,6 +230,9 @@ type session struct {
 	// so name-delta planning uses composed facts. The later TS path reuses it.
 	preparedTS    *tsextractor.SessionResult
 	preparedDirty map[string]bool
+	// preparedMD is the mdintent extraction this run made before Begin to plan
+	// the manifest with; see prepareMDScope.
+	preparedMD *preparedMD
 }
 
 func (s *session) analyze(ctx context.Context) (*Result, error) {
@@ -242,6 +245,9 @@ func (s *session) delta(ctx context.Context) (*Result, error) {
 
 func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	tr := s.prof
+	// A run that failed between preview and consumption must not hand its
+	// extraction to the next one: the tree has moved on since.
+	s.preparedMD = nil
 	var err error
 	input := s.inputs
 	if !s.fast {
@@ -497,6 +503,25 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 							// freeze a manifest its output can escape.
 							wholeDomain = true
 							fallbacks = append(fallbacks, graphstream.Fallback{Extractor: name, Scope: "all prior/current file owners", Reason: "extractor declares no file-owner domain; its owners cannot be planned before Begin"})
+							break
+						}
+						// One extractor can say more than which files it owns:
+						// mdintent's whole output is reproducible from captured
+						// bytes, so its unchanged pages stay out of the frozen
+						// manifest instead of being seeded with it. Every other
+						// owner-declaring extractor keeps the conservative seed.
+						// Whether THIS extractor was previewed, not whether some
+						// earlier pass through this loop previewed mdintent:
+						// s.preparedMD stays set until the extraction site
+						// consumes it, so reading it here would let mdintent's
+						// narrowing silently swallow the next extractor's seed
+						// and leave its owners outside the frozen manifest.
+						narrowed, previewed, perr := s.prepareMDScope(ctx, ext, inv.Files, prevFiles, hashes, repoID, nonTSForceAll || nonTSConfigChanged)
+						if perr != nil {
+							return nil, perr
+						}
+						if previewed {
+							extraOwners = append(extraOwners, narrowed...)
 							break
 						}
 						for _, file := range ownedFiles(ext, inv.Files) {
@@ -1049,23 +1074,38 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				Reason:    "no per-file incremental session; whole-extractor re-run",
 			})
 			tExt := time.Now()
-			extracted, err := ext.Extract(ctx, s.abs, inv.Files)
-			graphprofile.Since("non_ts_extract", tExt, fmt.Sprintf("%s facts=%d", ext.Name(), len(extracted)))
-			if err != nil {
-				var fatal *plugin.FatalError
-				if asFatal(err, &fatal) {
-					return nil, err
+			// A preview made before Begin is the extraction, not a rehearsal of
+			// one: re-running it here would read a tree that may have moved and
+			// could contradict the manifest already frozen from it.
+			prepared := s.takePreparedMD(ext.Name())
+			var extracted []facts.Fact
+			if prepared != nil {
+				extracted = prepared.facts
+			} else {
+				out, err := ext.Extract(ctx, s.abs, inv.Files)
+				graphprofile.Since("non_ts_extract", tExt, fmt.Sprintf("%s facts=%d", ext.Name(), len(out)))
+				if err != nil {
+					var fatal *plugin.FatalError
+					if asFatal(err, &fatal) {
+						return nil, err
+					}
+					log.Printf("[graphsession] extractor %s: %v", ext.Name(), err)
+					continue
 				}
-				log.Printf("[graphsession] extractor %s: %v", ext.Name(), err)
-				continue
+				applyLocalIO(out)
+				tagRepo(out, repoID)
+				extracted = out
 			}
-			applyLocalIO(extracted)
-			tagRepo(extracted, repoID)
 			extractorInput[ext.Name()] = extractorInputDigest(ext, owned, inv.Files, inv.AllNames, hashes, fileSetHash, scanHash)
 			tFP := time.Now()
 			fp := factsFingerprint(extracted)
 			graphprofile.Since("non_ts_fingerprint", tFP, ext.Name())
-			if !nonTSForceAll && !nonTSConfigChanged && extractorDigest[ext.Name()] != "" && extractorDigest[ext.Name()] == fp {
+			// The whole-output short-circuit returns before the contributions are
+			// stored, so the per-file hash it consumed stays stale and the next
+			// run re-extracts for the same reason. A previewed extractor has a
+			// scope narrowed to what changed - nothing, in this case - so it can
+			// afford to fall through and refresh those keys instead.
+			if prepared == nil && !nonTSForceAll && !nonTSConfigChanged && extractorDigest[ext.Name()] != "" && extractorDigest[ext.Name()] == fp {
 				cached := cachedFactsFor(ext.Name(), owned, prevFiles)
 				allFacts = append(allFacts, cached...)
 				syn := cloneTagged(syntheticFactsFor(s.state, ext.Name()), repoID)
@@ -1075,25 +1115,37 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				continue
 			}
 			// Replacement must retire prior synthetic owners too (for example a
-			// Swift target whose include changes its module identity).
-			nonTSFileOwners = append(nonTSFileOwners, retireExtractorOwners(s.state, prevFiles, ext.Name())...)
+			// Swift target whose include changes its module identity). A
+			// previewed extractor announced the owners it changes before Begin;
+			// re-deriving the whole domain here would announce owners the frozen
+			// plan does not carry, which is the failure the narrowing exists to
+			// avoid. Its facts are still published and stored in full below.
+			if prepared != nil {
+				nonTSFileOwners = append(nonTSFileOwners, prepared.owners...)
+			} else {
+				nonTSFileOwners = append(nonTSFileOwners, retireExtractorOwners(s.state, prevFiles, ext.Name())...)
+			}
 			extractorDigest[ext.Name()] = fp
 			allFacts = append(allFacts, extracted...)
 			appendExtractorSynthetic(synByExt, ext.Name(), extracted)
 			byFile := map[string][]facts.Fact{}
 			for _, f := range extracted {
 				byFile[filepath.ToSlash(f.File)] = append(byFile[filepath.ToSlash(f.File)], f)
-				nonTSFileOwners = append(nonTSFileOwners, ownerOf(f))
-			}
-			for _, fpath := range owned {
-				nonTSFileOwners = append(nonTSFileOwners, graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: filepath.ToSlash(fpath)})
-			}
-			for path, prev := range prevFiles {
-				if !extractorOwnsState(prev, ext.Name()) {
-					continue
+				if prepared == nil {
+					nonTSFileOwners = append(nonTSFileOwners, ownerOf(f))
 				}
-				if _, still := lookupHash(hashes, path); !still {
-					nonTSFileOwners = append(nonTSFileOwners, graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: filepath.ToSlash(path)})
+			}
+			if prepared == nil {
+				for _, fpath := range owned {
+					nonTSFileOwners = append(nonTSFileOwners, graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: filepath.ToSlash(fpath)})
+				}
+				for path, prev := range prevFiles {
+					if !extractorOwnsState(prev, ext.Name()) {
+						continue
+					}
+					if _, still := lookupHash(hashes, path); !still {
+						nonTSFileOwners = append(nonTSFileOwners, graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: filepath.ToSlash(path)})
+					}
 				}
 			}
 			if len(owned) == 0 {

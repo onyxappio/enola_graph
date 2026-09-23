@@ -1,0 +1,194 @@
+{
+  "series": {
+    "baseline": {
+      "accepted_samples": 3,
+      "rows": [
+        {
+          "work": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-baseline-run-1",
+          "initial_consumer_applied_ms": 9782.699,
+          "initial_frame_observed_ms": 10063.503,
+          "delta_begin_end_ms": 1350.763,
+          "burst_last_fsync_to_consumer_ms": 7962.828,
+          "owners": 911,
+          "ts_session_parsed": 18,
+          "batches": 237,
+          "json_payload_bytes": 9656176,
+          "node_records": 10265,
+          "edge_records": 15160,
+          "cold_equal": true,
+          "stable_inputs": true
+        },
+        {
+          "work": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-baseline-run-2",
+          "initial_consumer_applied_ms": 9645.975,
+          "initial_frame_observed_ms": 10004.751,
+          "delta_begin_end_ms": 1356.84,
+          "burst_last_fsync_to_consumer_ms": 7941.305,
+          "owners": 911,
+          "ts_session_parsed": 18,
+          "batches": 237,
+          "json_payload_bytes": 9656176,
+          "node_records": 10265,
+          "edge_records": 15160,
+          "cold_equal": true,
+          "stable_inputs": true
+        },
+        {
+          "work": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-baseline-run-3",
+          "initial_consumer_applied_ms": 9037.4,
+          "initial_frame_observed_ms": 9354.372,
+          "delta_begin_end_ms": 1348.015,
+          "burst_last_fsync_to_consumer_ms": 8095.903,
+          "owners": 911,
+          "ts_session_parsed": 18,
+          "batches": 237,
+          "json_payload_bytes": 9656176,
+          "node_records": 10265,
+          "edge_records": 15160,
+          "cold_equal": true,
+          "stable_inputs": true
+        }
+      ],
+      "summary": {
+        "initial_consumer_applied_ms": {
+          "min": 9037.4,
+          "median": 9645.975,
+          "max": 9782.699
+        },
+        "initial_frame_observed_ms": {
+          "min": 9354.372,
+          "median": 10004.751,
+          "max": 10063.503
+        },
+        "delta_begin_end_ms": {
+          "min": 1348.015,
+          "median": 1350.763,
+          "max": 1356.84
+        },
+        "burst_last_fsync_to_consumer_ms": {
+          "min": 7941.305,
+          "median": 7962.828,
+          "max": 8095.903
+        },
+        "owners": {
+          "min": 911,
+          "median": 911,
+          "max": 911
+        },
+        "ts_session_parsed": {
+          "min": 18,
+          "median": 18,
+          "max": 18
+        },
+        "batches": {
+          "min": 237,
+          "median": 237,
+          "max": 237
+        },
+        "json_payload_bytes": {
+          "min": 9656176,
+          "median": 9656176,
+          "max": 9656176
+        }
+      }
+    },
+    "candidate": {
+      "accepted_samples": 3,
+      "rows": [
+        {
+          "work": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-candidate-run-1",
+          "initial_consumer_applied_ms": 12674.141,
+          "initial_frame_observed_ms": 12978.43,
+          "delta_begin_end_ms": 1251.715,
+          "burst_last_fsync_to_consumer_ms": 8134.263,
+          "owners": 18,
+          "ts_session_parsed": 18,
+          "batches": 34,
+          "json_payload_bytes": 798604,
+          "node_records": 517,
+          "edge_records": 2159,
+          "cold_equal": true,
+          "stable_inputs": true
+        },
+        {
+          "work": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-candidate-run-2",
+          "initial_consumer_applied_ms": 10780.71,
+          "initial_frame_observed_ms": 11104.943,
+          "delta_begin_end_ms": 1174.853,
+          "burst_last_fsync_to_consumer_ms": 8047.542,
+          "owners": 18,
+          "ts_session_parsed": 18,
+          "batches": 34,
+          "json_payload_bytes": 798604,
+          "node_records": 517,
+          "edge_records": 2159,
+          "cold_equal": true,
+          "stable_inputs": true
+        },
+        {
+          "work": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/mdintent-candidate-run-3",
+          "initial_consumer_applied_ms": 9417.774,
+          "initial_frame_observed_ms": 9697.491,
+          "delta_begin_end_ms": 1115.283,
+          "burst_last_fsync_to_consumer_ms": 7925.918,
+          "owners": 18,
+          "ts_session_parsed": 18,
+          "batches": 34,
+          "json_payload_bytes": 798604,
+          "node_records": 517,
+          "edge_records": 2159,
+          "cold_equal": true,
+          "stable_inputs": true
+        }
+      ],
+      "summary": {
+        "initial_consumer_applied_ms": {
+          "min": 9417.774,
+          "median": 10780.71,
+          "max": 12674.141
+        },
+        "initial_frame_observed_ms": {
+          "min": 9697.491,
+          "median": 11104.943,
+          "max": 12978.43
+        },
+        "delta_begin_end_ms": {
+          "min": 1115.283,
+          "median": 1174.853,
+          "max": 1251.715
+        },
+        "burst_last_fsync_to_consumer_ms": {
+          "min": 7925.918,
+          "median": 8047.542,
+          "max": 8134.263
+        },
+        "owners": {
+          "min": 18,
+          "median": 18,
+          "max": 18
+        },
+        "ts_session_parsed": {
+          "min": 18,
+          "median": 18,
+          "max": 18
+        },
+        "batches": {
+          "min": 34,
+          "median": 34,
+          "max": 34
+        },
+        "json_payload_bytes": {
+          "min": 798604,
+          "median": 798604,
+          "max": 798604
+        }
+      }
+    }
+  },
+  "notes": [
+    "Identical final five-file burst, full production profile,5s window.",
+    "Burst fsync->consumer is observed wall interval, not instrumented watcher capture latency.",
+    "TS session parse counters exclude Markdown and other extractors.",
+    "Only stable-input cold-equal runs with exactly one delta included; discarded runs must be disclosed separately."
+  ]
+}
