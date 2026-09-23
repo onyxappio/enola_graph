@@ -4,6 +4,14 @@ First-parent Product commit chain, oldest to newest. Diagnostic correctness
 harness. One pass is not a performance-acceptance run. Wall times are
 file-sink `--events` JSONL, not NATS JetStream.
 
+The debug file sink calls `os.File.Sync()` after **every protocol message**
+(`pkg/command/graph.go`, `eventFileSink.Publish`). A full replacement in this
+history produces roughly 2,700 messages, each with that durability boundary.
+This differs from the NATS/watch benchmark path. It is a concrete reason not
+to compare their wall times directly; it does not quantify how much of a
+particular run was spent in fsync. Use matched sink, source revision, profile,
+and timing boundaries when claiming a speedup.
+
 The dedicated Product checkout `/tmp/enola-product-history-source` is never
 written. Analysis uses a pinned overlay from
 `docs/benchmarks/product-delta-2026-09-21/product-mcp-arch.yaml`
@@ -12,6 +20,12 @@ hash-recorded in provenance and applied only when a SHA has no git-tracked
 `mcp-arch.yaml`. Tracked historical config is left in place.
 
 ## What was wrong with the previous dump
+
+The corrected harness has now completed all ten first-parent transitions on
+Enola `2a124c2`: see [the current report](HISTORY_2A124C2.md) and
+[results with provenance](results.2a124c2.json). Every transition passed exact
+cold graph equality and frozen replacement validation. The older dumps below
+remain historical evidence only.
 
 [results.json](results.json) and
 [results.baseline-invalid-chronology.json](results.baseline-invalid-chronology.json)
@@ -104,14 +118,14 @@ closed before End rather than expanding scope after Begin.
 
 ## Limitations
 
-- The ten first-parent Product transitions at
-  `a609c19f3861971930fae7b33dcb2950598953c5` have not been re-run after these
-  harness fixes. Launch them with the invocation above into a fresh `--work`
-  directory after production graphsession edits settle.
+- The corrected ten-transition run at
+  `a609c19f3861971930fae7b33dcb2950598953c5` is a single diagnostic series on
+  Enola `2a124c2`. It does not validate subsequent production edits.
 - Timings are file-sink `--events` JSONL. They are not NATS JetStream broker
   ACK times and are not performance acceptance.
-- Whole-domain Begin (~8.6k owners) remains the observed Product history
-  fallback while the framework-composition resolver domain is active.
+- Eight transitions still use a whole-domain Begin (~8.6k owners); two use
+  narrowed scopes of 202 and 33 owners. Raw configuration changes remain a
+  demonstrated source of overinvalidation in this series.
 - `--only` is a contiguous prefix from the initial SHA. It does not jump into
   the middle of the chain.
 - Pinned overlay bytes are the tracked `product-mcp-arch.yaml`. A live dirty
