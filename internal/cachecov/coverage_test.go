@@ -33,6 +33,7 @@ import (
 // test functions that assert the behavior that version introduced. v1 is the
 // implicit baseline (no changelog line), so coverage starts at v2.
 var versionCoverage = map[int][]string{
+	289: {"TestServerRoutes_FastifyRegisterUnparenthesizedArrowCallback"},
 	288: {"TestServerRoutes_FastifyRegisterCallbackReceiver", "TestExtract_NamespaceImportMemberCalls", "TestExtract_NamedReexportSubdirLeafName", "TestExtract_ClassDataFieldsAreNotMethods", "TestExtract_NitroFileAndAddServerHandlerRoutes", "TestExtract_VueOwnFileTemplateCallHasTargetFile", "TestDefaultTestGlobsCoverTypeScriptAndStayIgnored"},
 	287: {"TestServerRoutes_FunctionInitializerLocalDoesNotInheritFactory"},
 	286: {"TestServerRoutes_UnknownAliasLocalDoesNotInheritFactory"},

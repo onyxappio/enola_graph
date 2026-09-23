@@ -538,6 +538,9 @@ func isFunctionParameter(src []byte, mask []bool, paramPos int) bool {
 }
 
 func functionBodyAroundParam(src []byte, mask []bool, paramPos int) (start, end int, ok bool) {
+	if start, end, ok := unparenthesizedArrowBody(src, mask, paramPos); ok {
+		return start, end, true
+	}
 	i := paramPos
 	for i > 0 && src[i] != '(' {
 		if src[i] == ')' || src[i] == '{' || src[i] == '}' {
@@ -588,6 +591,32 @@ func functionBodyAroundParam(src []byte, mask []bool, paramPos int) (start, end 
 		}
 	}
 	return 0, 0, false
+}
+
+// unparenthesizedArrowBody binds `async child=>{ ... }` / `child => { ... }`.
+// Those forms have no parameter list parentheses, so walking back to the
+// enclosing `.register(` paren would treat the whole call as the function.
+func unparenthesizedArrowBody(src []byte, mask []bool, paramPos int) (start, end int, ok bool) {
+	if paramPos < 0 || paramPos >= len(src) || mask[paramPos] || !isJSIdentStart(src[paramPos]) {
+		return 0, 0, false
+	}
+	j := paramPos + 1
+	for j < len(src) && isJSIdentPart(src[j]) {
+		j++
+	}
+	j = skipTSSpace(src, mask, j)
+	if j+1 >= len(src) || src[j] != '=' || src[j+1] != '>' || mask[j] {
+		return 0, 0, false
+	}
+	j = skipTSSpace(src, mask, j+2)
+	if j >= len(src) || src[j] != '{' || mask[j] {
+		return 0, 0, false
+	}
+	end = matchBrace(src, mask, j)
+	if end < 0 {
+		return 0, 0, false
+	}
+	return j, end, true
 }
 
 func matchBrace(src []byte, mask []bool, open int) int {

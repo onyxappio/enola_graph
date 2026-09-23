@@ -2479,7 +2479,11 @@ import (
 // suffixes; namespace-import member calls; Nitro file and addServerHandler
 // routes; class data fields as variable/constant; named-reexport leaf
 // directory names; Vue own-file template call provenance.
-const cacheVersion = "v288"
+// v289: Fastify register/plugin unparenthesized single-param arrow callbacks
+// (`async child=>{...}`) bind the callback body without treating `.register(`
+// as the function; nested same-name parameters and unknown/local shadows stay
+// non-server.
+const cacheVersion = "v289"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

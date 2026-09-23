@@ -41,6 +41,35 @@ export function wrap(obj: any) {
 	}
 }
 
+func TestServerRoutes_FastifyRegisterUnparenthesizedArrowCallback(t *testing.T) {
+	src := `
+import Fastify from 'fastify'
+const app = Fastify()
+app.get('/positive', () => 1)
+app.register(async child=>{child.post('/registered',()=>1); function other(child:any){child.post('/param-shadow',()=>1);} })
+const fake={register:(cb:any)=>cb({post:()=>1})}
+fake.register(async child=>{child.post('/fake-register',()=>1)})
+export const local=(candidate:any)=>{const app=candidate;app.register(async child=>{child.post('/local-shadow',()=>1)})}
+`
+	ff := extractTS(t, src, "src/routes.ts")
+	got := serverRoutes(ff)
+	if got["/positive"] != "GET" {
+		t.Fatalf("outer factory route lost: %+v", got)
+	}
+	if got["/registered"] != "POST" {
+		t.Fatalf("unparenthesized register callback lost: %+v", got)
+	}
+	if _, ok := got["/param-shadow"]; ok {
+		t.Fatalf("nested same-name param inherited callback receiver: %+v", got)
+	}
+	if _, ok := got["/fake-register"]; ok {
+		t.Fatalf("unknown register receiver inherited server role: %+v", got)
+	}
+	if _, ok := got["/local-shadow"]; ok {
+		t.Fatalf("local app alias inherited outer factory: %+v", got)
+	}
+}
+
 func TestServerRoutes_RegisterCallbackParamShadow(t *testing.T) {
 	src := `
 import { FastifyInstance } from 'fastify'
