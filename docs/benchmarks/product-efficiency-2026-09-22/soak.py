@@ -145,6 +145,23 @@ def _write(path: Path, text: str) -> dict:
     return {"start_ns": start_ns, "ns": time.time_ns()}
 
 
+
+def prepare_product_editor(repo: Path) -> Path:
+    """Seed scripted edits in a new module inside the isolated Product copy.
+
+    Product need not have the tiny fixture's src/core.ts, util.ts or index.ts.
+    Refuse collisions rather than modifying an existing application module.
+    """
+    root = repo / "enola-watch-fixture"
+    root.mkdir(exist_ok=False)
+    src = root / "src"
+    src.mkdir()
+    (src / "core.ts").write_text("export const seed = 1;\nexport function core() { return seed; }\n")
+    (src / "util.ts").write_text("export function util(n: number) { return n + 1; }\n")
+    (src / "index.ts").write_text("import { core } from './core';\nimport { util } from './util';\nexport function main() { return util(core()); }\n")
+    return root
+
+
 def editor_worker(args) -> int:
     """Separate process: mixed graph-changing edits on an isolated checkout.
 
@@ -535,6 +552,9 @@ def run_soak(args) -> int:
         else:
             repo = make_soak_repo(work)
             fixture = "tiny"
+        editor_repo = repo
+        if fixture == "product" and not args.external_editor:
+            editor_repo = prepare_product_editor(repo)
         cfg = work / "config.yaml"
         # Product acceptance must measure what production builds, so the tiny
         # fixture keeps its narrow set but a Product run does not.
@@ -644,7 +664,7 @@ def run_soak(args) -> int:
         else:
             editor_proc = subprocess.Popen(
                 [sys.executable, str(HERE / "soak.py"), "--editor-worker",
-                 "--repo", str(repo), "--edit-log", str(edit_log),
+                 "--repo", str(editor_repo), "--edit-log", str(edit_log),
                  "--duration", str(max(duration_s - every_s * 3, 5)) + "s",
                  "--edit-interval", args.edit_interval, "--seed", str(args.seed)],
                 stdout=(work / "editor.log").open("w"), stderr=subprocess.STDOUT,
@@ -783,6 +803,8 @@ def run_soak(args) -> int:
             if not edits:
                 raise RuntimeError("editor produced no edits")
             save_basis = "fsync-completion"
+        edit_errors = [e for e in edits if e.get("error")]
+        edits = [e for e in edits if not e.get("error")]
         edit_stamps = [e["ns"] for e in edits if isinstance(e.get("ns"), int)]
         if not edit_stamps and not args.external_editor:
             raise RuntimeError("no edit timestamps recorded")
@@ -948,6 +970,9 @@ def run_soak(args) -> int:
             "editor_mode": editor_activity["mode"],
             "editor_activity": editor_activity,
             "harness_mutated_source": not args.external_editor,
+            "scripted_editor_root": str(editor_repo) if not args.external_editor else None,
+            "synthetic_module_in_product": fixture == "product" and not args.external_editor,
+            "edit_errors": edit_errors,
             "edit_count": len(edits),
             "edit_kinds": {k: sum(1 for e in edits if e.get("kind") == k) for k in EDIT_KINDS},
             "observed_change_kinds": {
@@ -992,6 +1017,9 @@ def run_soak(args) -> int:
         (work / "rss.jsonl").write_text("".join(json.dumps(s) + "\n" for s in rss_samples))
         print(json.dumps({k: v for k, v in report.items() if k != "generations"}, indent=2))
         print("generations:", len(rows), "→", work / "soak.json")
+        if edit_errors:
+            print("SOAK FAIL: scripted editor operations failed", file=sys.stderr)
+            return 1
         if not equal:
             print("SOAK FAIL: cold equality mismatch", file=sys.stderr)
             return 1
@@ -1178,6 +1206,24 @@ def self_test() -> int:
               isinstance(rec.get("start_ns"), int) and isinstance(rec.get("ns"), int))
         big = _write(Path(tmp) / "big.ts", "y" * (4 << 20))
         check("durable write completion after start", big["ns"] > big["start_ns"], str(big))
+
+    with tempfile.TemporaryDirectory() as tmp:
+        product = Path(tmp) / "product"
+        product.mkdir()
+        sentinel = product / "application.ts"
+        sentinel.write_text("export const untouched = true;\n")
+        editor_root = prepare_product_editor(product)
+        rng = random.Random(7)
+        extra = []
+        for i, kind in enumerate(("create-file", "add-export", "remove-export", "edit-body", "add-import", "remove-import", "rename-file", "delete-file"), 1):
+            record = _apply_edit(kind, editor_root / "src", rng, i, extra)
+            check("Product editor " + kind, "error" not in record and "ns" in record)
+        check("Product application unchanged", sentinel.read_text() == "export const untouched = true;\n")
+        try:
+            prepare_product_editor(product)
+            check("Product fixture collision refused", False)
+        except FileExistsError:
+            pass
 
     # --- extractor profile: full must not pin the extractor set -------------
     ts_cfg = build_config_text(Path("/tmp/r"), "typescript")
