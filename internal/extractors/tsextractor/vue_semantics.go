@@ -759,6 +759,17 @@ func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []stri
 		}
 		return ""
 	}
+	fileOf := map[string]string{}
+	for _, f := range all {
+		if f.Kind != facts.KindSymbol || f.Name == "" {
+			continue
+		}
+		if prev, ok := fileOf[f.Name]; ok && prev != f.File {
+			fileOf[f.Name] = ""
+			continue
+		}
+		fileOf[f.Name] = f.File
+	}
 	for i := range all {
 		pkg, inNuxt := nuxtPackageForFile(nuxtPkgs, all[i].File, pkgDirs)
 		if !inNuxt {
@@ -772,6 +783,9 @@ func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []stri
 			short := r.Target[strings.LastIndexByte(r.Target, '.')+1:]
 			if target := uniqueFor(pkg, short); target != "" {
 				r.Target = target
+				if f := fileOf[target]; f != "" {
+					r.TargetFile = f
+				}
 			}
 		}
 	}

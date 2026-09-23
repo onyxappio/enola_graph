@@ -367,10 +367,10 @@ export default defineNuxtConfig({ modules: [landingModule] })
 const { nextDelayed } = useStep()
 setLandPageMetadata({ page: 'x' })
 </script><template><p /></template>`,
-		"apps/landings/composables/useLocalFlag.ts": `export function useLocalFlag() { return true }`,
-		"apps/landings/pages/Local.vue":             `<script setup lang="ts">useLocalFlag()</script><template><p /></template>`,
-		"packages/landings-module/package.json":     `{"name":"landings-module","dependencies":{"nuxt":"^3.0.0"}}`,
-		"packages/landings-module/src/module.ts":    moduleSetup,
+		"apps/landings/composables/useLocalFlag.ts":                               `export function useLocalFlag() { return true }`,
+		"apps/landings/pages/Local.vue":                                           `<script setup lang="ts">useLocalFlag()</script><template><p /></template>`,
+		"packages/landings-module/package.json":                                   `{"name":"landings-module","dependencies":{"nuxt":"^3.0.0"}}`,
+		"packages/landings-module/src/module.ts":                                  moduleSetup,
 		"packages/landings-module/src/runtime/composables/useStep.ts":             `export { useStep } from 'shared-lands-components'`,
 		"packages/landings-module/src/runtime/composables/setLandPageMetadata.ts": `export function setLandPageMetadata(meta: Record<string, string>) {}`,
 		"packages/shared-lands-components/package.json":                           `{"name":"shared-lands-components"}`,
@@ -513,5 +513,161 @@ export function run(pixelmatch: () => void) { pixelmatch() }
 	local := fileRefFact(ff, "tools/local.ts")
 	if !hasCallToFile(local, "tools.helper", "tools/util.ts") {
 		t.Fatalf("relative import lost: %+v", local.Relations)
+	}
+}
+
+func wave11HashAliasFiles(moduleSetup string) map[string]string {
+	return map[string]string{
+		"apps/landings/package.json": `{"name":"landings","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0","landings-module":"workspace:*"}}`,
+		"apps/landings/nuxt.config.ts": `
+import landingModule from 'landings-module'
+export default defineNuxtConfig({ modules: [landingModule] })
+`,
+		"packages/landings-module/package.json":                      `{"name":"landings-module","dependencies":{"nuxt":"^3.0.0"}}`,
+		"packages/landings-module/src/module.ts":                     moduleSetup,
+		"packages/landings-module/src/runtime/composables/useApi.ts": `export function useApi() { return fetch }`,
+		"packages/landings-module/src/runtime/utils/getTrackingParams.ts": `
+export function getFingerprint() { return 'fp' }
+export function getIdVisitor() { return 'id' }
+`,
+		"packages/landings-module/src/runtime/utils/getMarketingParams.ts": `
+import { getFingerprint, getIdVisitor } from '#landings-runtime/utils/getTrackingParams'
+export function getMarketingParams() { return getFingerprint() + getIdVisitor() }
+`,
+		"packages/landings-module/src/runtime/components/GoogleAuth/GoogleAuth.vue": `<script setup lang="ts">
+import { useApi, useHead } from '#imports'
+useApi()
+useHead({})
+</script><template><p /></template>`,
+		"packages/landings-module/src/runtime/utils/siblingCollision.ts": `export function getFingerprint() { return 'wrong' }`,
+		"tools/compare.mjs": `
+import pixelmatch from 'pixelmatch'
+pixelmatch(1, 2)
+`,
+		"tools/_t191.mjs": `export default function pixelmatch() {}
+export function getFingerprint() {}
+`,
+		"packages/landings-module/src/runtime/utils/unconfigured.ts": `
+import { ghost } from '#unknown-runtime/ghost'
+ghost()
+`,
+		"packages/landings-module/src/runtime/utils/ghost.ts": `export function ghost() {}`,
+	}
+}
+
+const wave11LandingsRuntimeAlias = `export default function setup() {
+  addImportsDir(resolver.resolve('./runtime/composables/'))
+  const runtimeDir = resolver.resolve('./runtime')
+  nuxt.options.alias['#landings-runtime'] = runtimeDir
+}
+`
+
+func TestExtract_Wave11NuxtVirtualImportsAndConfiguredAlias(t *testing.T) {
+	ff := extractAll(t, wave11HashAliasFiles(wave11LandingsRuntimeAlias), false)
+	auth := fileRefFact(ff, "packages/landings-module/src/runtime/components/GoogleAuth/GoogleAuth.vue")
+	if !hasCallToFile(auth, "packages/landings-module/src/runtime/composables.useApi", "packages/landings-module/src/runtime/composables/useApi.ts") {
+		t.Fatalf("#imports useApi lost: %+v", auth.Relations)
+	}
+	mkt := fileRefFact(ff, "packages/landings-module/src/runtime/utils/getMarketingParams.ts")
+	if !hasCallToFile(mkt, "packages/landings-module/src/runtime/utils.getFingerprint", "packages/landings-module/src/runtime/utils/getTrackingParams.ts") {
+		t.Fatalf("#landings-runtime getFingerprint lost: %+v", mkt.Relations)
+	}
+	if hasCallToFile(mkt, "packages/landings-module/src/runtime/utils.getFingerprint", "packages/landings-module/src/runtime/utils/siblingCollision.ts") {
+		t.Fatal("configured alias bound same-dir sibling")
+	}
+	unk := fileRefFact(ff, "packages/landings-module/src/runtime/utils/unconfigured.ts")
+	for _, r := range unk.Relations {
+		if r.Kind == facts.RelCalls && strings.Contains(r.TargetFile, "ghost.ts") {
+			t.Fatalf("unconfigured # alias bound sibling: %+v", r)
+		}
+	}
+	cmp := fileRefFact(ff, "tools/compare.mjs")
+	for _, r := range cmp.Relations {
+		if r.Kind == facts.RelCalls && strings.Contains(r.TargetFile, "_t191") {
+			t.Fatalf("external pixelmatch bound sibling: %+v", r)
+		}
+	}
+}
+
+func TestExtract_Wave11ConfiguredAliasRenameDeleteRestore(t *testing.T) {
+	tracking := "packages/landings-module/src/runtime/utils/getTrackingParams.ts"
+	other := "packages/landings-module/src/runtime/utils/otherTracking.ts"
+	consumer := "packages/landings-module/src/runtime/utils/getMarketingParams.ts"
+	want := func(ff []facts.Fact, file string) bool {
+		return hasCallToFile(fileRefFact(ff, consumer), "packages/landings-module/src/runtime/utils.getFingerprint", file)
+	}
+
+	base := wave11HashAliasFiles(wave11LandingsRuntimeAlias)
+	ff := extractAll(t, base, false)
+	if !want(ff, tracking) {
+		t.Fatal("initial alias target missing")
+	}
+
+	renamed := wave11HashAliasFiles(wave11LandingsRuntimeAlias)
+	renamed[other] = renamed[tracking]
+	delete(renamed, tracking)
+	renamed[consumer] = strings.ReplaceAll(renamed[consumer], "getTrackingParams", "otherTracking")
+	ff = extractAll(t, renamed, false)
+	if want(ff, tracking) {
+		t.Fatal("deleted tracking file still bound")
+	}
+	if !want(ff, other) {
+		t.Fatalf("renamed target missing: %+v", fileRefFact(ff, consumer).Relations)
+	}
+
+	ff = extractAll(t, base, false)
+	if !want(ff, tracking) {
+		t.Fatal("restore lost original target")
+	}
+}
+
+func TestExtract_Wave11AliasConfigRemovalAndRetarget(t *testing.T) {
+	consumer := "packages/landings-module/src/runtime/utils/getMarketingParams.ts"
+	tracking := "packages/landings-module/src/runtime/utils/getTrackingParams.ts"
+	alt := "packages/landings-module/src/runtime/alt/utils/getTrackingParams.ts"
+	bound := func(ff []facts.Fact, file string) bool {
+		return hasCallToFile(fileRefFact(ff, consumer), "packages/landings-module/src/runtime/utils.getFingerprint", file) ||
+			hasCallToFile(fileRefFact(ff, consumer), "packages/landings-module/src/runtime/alt/utils.getFingerprint", file)
+	}
+
+	ff := extractAll(t, wave11HashAliasFiles(wave11LandingsRuntimeAlias), false)
+	if !bound(ff, tracking) {
+		t.Fatal("configured alias missing")
+	}
+
+	removed := wave11HashAliasFiles(`export default function setup() {
+  addImportsDir(resolver.resolve('./runtime/composables/'))
+}
+`)
+	ff = extractAll(t, removed, false)
+	if bound(ff, tracking) {
+		t.Fatal("removed alias still bound")
+	}
+
+	retarget := wave11HashAliasFiles(`export default function setup() {
+  addImportsDir(resolver.resolve('./runtime/composables/'))
+  const runtimeDir = resolver.resolve('./runtime/alt')
+  nuxt.options.alias['#landings-runtime'] = runtimeDir
+}
+`)
+	retarget[alt] = `export function getFingerprint() { return 'alt' }
+export function getIdVisitor() { return 'id' }
+`
+	ff = extractAll(t, retarget, false)
+	if bound(ff, tracking) {
+		t.Fatal("retarget kept old runtime file")
+	}
+	if !bound(ff, alt) {
+		t.Fatalf("retarget missing: %+v", fileRefFact(ff, consumer).Relations)
+	}
+}
+
+func TestExtract_Wave11HashImportsAmbiguousStaysUnresolved(t *testing.T) {
+	files := wave11HashAliasFiles(wave11LandingsRuntimeAlias)
+	files["packages/landings-module/src/runtime/composables/useApiDup.ts"] = `export function useApi() { return 2 }`
+	ff := extractAll(t, files, false)
+	auth := fileRefFact(ff, "packages/landings-module/src/runtime/components/GoogleAuth/GoogleAuth.vue")
+	if hasCallToFile(auth, "packages/landings-module/src/runtime/composables.useApi", "packages/landings-module/src/runtime/composables/useApi.ts") {
+		t.Fatal("ambiguous #imports useApi was guessed")
 	}
 }

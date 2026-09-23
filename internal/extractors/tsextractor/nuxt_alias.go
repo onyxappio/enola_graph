@@ -1,9 +1,11 @@
 package tsextractor
 
 import (
+	"bytes"
 	"context"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/enola-labs/enola/internal/extractors/inputscope"
@@ -11,10 +13,14 @@ import (
 )
 
 var (
-	nuxtSrcDirLiteral = regexp.MustCompile(`\bsrcDir\s*:\s*['"]([^'"]+)['"]`)
-	nuxtSrcDirField   = regexp.MustCompile(`\bsrcDir\s*:`)
-	nuxtAliasBlock    = regexp.MustCompile(`\balias\s*:\s*\{([^}]*)\}`)
-	nuxtAliasPair     = regexp.MustCompile(`['"](~|@|~~|@@)['"]\s*:\s*['"]([^'"]+)['"]`)
+	nuxtSrcDirLiteral      = regexp.MustCompile(`\bsrcDir\s*:\s*['"]([^'"]+)['"]`)
+	nuxtSrcDirField        = regexp.MustCompile(`\bsrcDir\s*:`)
+	nuxtAliasBlock         = regexp.MustCompile(`\balias\s*:\s*\{([^}]*)\}`)
+	nuxtAliasPair          = regexp.MustCompile(`['"](~|@|~~|@@)['"]\s*:\s*['"]([^'"]+)['"]`)
+	nuxtRuntimeAliasAssign = regexp.MustCompile(`nuxt\.options\.alias\[\s*['"]([^'"]+)['"]\s*\]\s*=\s*([^\n;]+)`)
+	nuxtResolveDecl        = regexp.MustCompile(`(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*[A-Za-z_$][\w$]*\.resolve\(\s*['"](\.[^'"]+)['"]\s*\)`)
+	nuxtResolveCall        = regexp.MustCompile(`^[A-Za-z_$][\w$]*\.resolve\(\s*['"](\.[^'"]+)['"]\s*\)$`)
+	nuxtRelativeLiteral    = regexp.MustCompile(`^['"](\.[^'"]+)['"]$`)
 )
 
 // withNuxtAliasFallbacks adds Nuxt's documented default aliases (~/@ → srcDir,
@@ -130,6 +136,183 @@ func readNuxtConfig(ctx context.Context, repoPath, pkg string, inputScopes ...*i
 		return out
 	}
 	return out
+}
+
+func nuxtRelativeAliasTarget(file, rel string) string {
+	rel = strings.TrimSpace(rel)
+	if rel == "" || strings.Contains(rel, "..") || filepath.IsAbs(rel) {
+		return ""
+	}
+	if !strings.HasPrefix(rel, ".") {
+		return ""
+	}
+	return factpath.Clean(factpath.Join(factpath.Dir(file), rel))
+}
+
+// nuxtRuntimeAliasesFromFile reads statically assigned nuxt.options.alias
+// entries whose right-hand side is a same-file resolver.resolve('./…') binding
+// or a relative string literal. The replacement is the actual resolved
+// directory of that expression, not a guess from the alias name.
+func nuxtRuntimeAliasesFromFile(file string, src []byte) []string {
+	if src == nil || !bytes.Contains(src, []byte("nuxt.options.alias")) {
+		return nil
+	}
+	idents := map[string]string{}
+	for _, m := range nuxtResolveDecl.FindAllSubmatch(src, -1) {
+		if t := nuxtRelativeAliasTarget(file, string(m[2])); t != "" {
+			idents[string(m[1])] = t
+		}
+	}
+	seen := map[string]bool{}
+	var out []string
+	add := func(key, target string) {
+		key = strings.TrimSpace(key)
+		target = factpath.Clean(strings.TrimSpace(target))
+		if key == "" || target == "" {
+			return
+		}
+		pair := key + "=>" + target
+		if seen[pair] {
+			return
+		}
+		seen[pair] = true
+		out = append(out, pair)
+	}
+	for _, m := range nuxtRuntimeAliasAssign.FindAllSubmatch(src, -1) {
+		key := string(m[1])
+		rhs := strings.TrimSpace(string(m[2]))
+		if loc := nuxtResolveCall.FindStringSubmatch(rhs); loc != nil {
+			if t := nuxtRelativeAliasTarget(file, loc[1]); t != "" {
+				add(key, t)
+			}
+			continue
+		}
+		if loc := nuxtRelativeLiteral.FindStringSubmatch(rhs); loc != nil {
+			if t := nuxtRelativeAliasTarget(file, loc[1]); t != "" {
+				add(key, t)
+			}
+			continue
+		}
+		if t := idents[rhs]; t != "" {
+			add(key, t)
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+func applyNuxtRuntimeAliasPairs(aliases map[string]tsAlias, pairs []string) {
+	if aliases == nil {
+		return
+	}
+	for _, pair := range pairs {
+		key, target, ok := strings.Cut(pair, "=>")
+		if !ok || key == "" || target == "" {
+			continue
+		}
+		if _, exists := aliases[key]; !exists {
+			aliases[key] = tsAlias{replacement: target, exact: !strings.HasSuffix(key, "/")}
+		}
+		if strings.HasSuffix(key, "/") {
+			continue
+		}
+		prefix := key + "/"
+		repl := target
+		if !strings.HasSuffix(repl, "/") {
+			repl += "/"
+		}
+		addNuxtAliasIfAbsent(aliases, prefix, repl)
+	}
+}
+
+func withNuxtRuntimeAliases(roots []tsAliasRoot, sources map[string][]byte, knownFiles map[string]bool, readSrc func(string) []byte, records map[string]*FileRecord, dirty map[string]bool, nuxtPkgs []string, pkgDirs map[string]bool, pkgDirByName map[string]string) []tsAliasRoot {
+	if len(nuxtPkgs) == 0 {
+		return roots
+	}
+	byPkg := map[string][]string{}
+	seenPair := map[string]map[string]bool{}
+	add := func(file string, pairs []string) {
+		if len(pairs) == 0 {
+			return
+		}
+		pkg, ok := nuxtPackageForFile(nuxtPkgs, file, pkgDirs)
+		if !ok {
+			return
+		}
+		for _, pair := range pairs {
+			if seenPair[pkg][pair] {
+				continue
+			}
+			if seenPair[pkg] == nil {
+				seenPair[pkg] = map[string]bool{}
+			}
+			seenPair[pkg][pair] = true
+			byPkg[pkg] = append(byPkg[pkg], pair)
+		}
+	}
+	for file, rec := range records {
+		file = filepath.ToSlash(file)
+		if rec == nil || len(rec.NuxtAliases) == 0 {
+			continue
+		}
+		if dirty != nil && dirty[file] {
+			continue
+		}
+		if knownFiles != nil && !knownFiles[file] {
+			continue
+		}
+		if sources != nil {
+			if _, ok := sources[file]; ok {
+				continue
+			}
+		}
+		add(file, rec.NuxtAliases)
+	}
+	for file, src := range sources {
+		add(filepath.ToSlash(file), nuxtRuntimeAliasesFromFile(file, src))
+	}
+	consumes := nuxtModuleConsumersRead(sources, knownFiles, readSrc, nuxtPkgs, pkgDirByName, pkgDirs)
+	visible := map[string][]string{}
+	seenVis := map[string]map[string]bool{}
+	addVis := func(pkg string, pairs []string) {
+		for _, pair := range pairs {
+			if seenVis[pkg][pair] {
+				continue
+			}
+			if seenVis[pkg] == nil {
+				seenVis[pkg] = map[string]bool{}
+			}
+			seenVis[pkg][pair] = true
+			visible[pkg] = append(visible[pkg], pair)
+		}
+	}
+	for pkg, pairs := range byPkg {
+		addVis(pkg, pairs)
+	}
+	for consumer, mods := range consumes {
+		for _, mod := range mods {
+			addVis(consumer, byPkg[mod])
+		}
+	}
+	byDir := map[string]int{}
+	for i := range roots {
+		byDir[roots[i].dir] = i
+		cloned := make(map[string]tsAlias, len(roots[i].aliases))
+		for k, v := range roots[i].aliases {
+			cloned[k] = v
+		}
+		roots[i].aliases = cloned
+	}
+	for pkg, pairs := range visible {
+		idx, ok := byDir[pkg]
+		if !ok {
+			roots = append(roots, tsAliasRoot{dir: pkg, aliases: map[string]tsAlias{}})
+			idx = len(roots) - 1
+			byDir[pkg] = idx
+		}
+		applyNuxtRuntimeAliasPairs(roots[idx].aliases, pairs)
+	}
+	return roots
 }
 
 func nuxtSourceDir(ctx context.Context, repoPath, pkg string, cfg nuxtConfigFacts, inputScopes ...*inputscope.Scope) (string, bool) {

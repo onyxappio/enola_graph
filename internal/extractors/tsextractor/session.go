@@ -86,6 +86,10 @@ type FileRecord struct {
 	Router                *RouterDTO  `json:"router,omitempty"`
 	ParseKind             string      `json:"parse_kind,omitempty"`
 	AutoImportDirs        []string    `json:"auto_import_dirs,omitempty"`
+	// NuxtAliases are statically assigned nuxt.options.alias pairs from this
+	// file ("prefix=>target"), used to honor module runtime aliases on later
+	// incremental extracts without rereading clean sources.
+	NuxtAliases []string `json:"nuxt_aliases,omitempty"`
 	// NuxtScope is the owning Nuxt application for this file: "-" when none,
 	// "." for a repo-root Nuxt app, otherwise the application directory.
 	// Empty means a record written before this field existed.
@@ -307,6 +311,19 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		grpcIdx = nil
 	}
 
+	if isNuxt {
+		aliasRoots = withNuxtRuntimeAliases(aliasRoots, sources, knownFiles, func(rel string) []byte {
+			if b, ok := sources[rel]; ok {
+				return b
+			}
+			raw, err := overlayReadFile(ctx, filepath.Join(repoPath, rel), inputScope)
+			if err != nil {
+				return nil
+			}
+			return raw
+		}, prev, dirty, nuxtPkgs, pkgDirSet, invertPackageNames(pkgNamesEarly))
+	}
+
 	nuxtAutoByPkg := map[string]map[string]string{}
 	for _, p := range nuxtPkgs {
 		nuxtAutoByPkg[p] = nuxtAutoComponentIndex(knownFiles, p, nuxtPkgs, pkgDirSet)
@@ -361,6 +378,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		fileOrms, fileVue := pkgGates.forFile(pkgNamesEarly, relFile)
 		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, fileVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, fileOrms, aliases, knownFiles, readSrc, auto, grpcIdx, exportCache, sideReads)
 		rec.AutoImportDirs = addImportsDirsFromFile(relFile, src)
+		rec.NuxtAliases = nuxtRuntimeAliasesFromFile(relFile, src)
 		if len(sideReads) > 0 {
 			rec.SideReads = make([]string, 0, len(sideReads))
 			rec.SideReadHashes = make(map[string]string, len(sideReads))

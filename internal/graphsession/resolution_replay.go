@@ -80,7 +80,8 @@ func nameOnlySurfaceShift(old, neu *tsextractor.FileRecord) bool {
 		eqStrings(old.ResolvedFiles, neu.ResolvedFiles) &&
 		eqStrings(old.UnresolvedSpecs, neu.UnresolvedSpecs) &&
 		eqStrings(old.Reexports, neu.Reexports) &&
-		eqStrings(old.AutoImportDirs, neu.AutoImportDirs)
+		eqStrings(old.AutoImportDirs, neu.AutoImportDirs) &&
+		eqStrings(old.NuxtAliases, neu.NuxtAliases)
 }
 
 // rebindableConsumer reports whether an owner the name delta took can be
@@ -133,7 +134,7 @@ func rebindableConsumer(rec *tsextractor.FileRecord, moved map[string]bool) bool
 	if rec.NuxtScope != "-" {
 		return false
 	}
-	if rec.ParseKind != "ts" || len(rec.AutoImportDirs) > 0 || rec.Router != nil {
+	if rec.ParseKind != "ts" || len(rec.AutoImportDirs) > 0 || len(rec.NuxtAliases) > 0 || rec.Router != nil {
 		return false
 	}
 	for _, f := range rec.ResolvedFiles {

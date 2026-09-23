@@ -124,8 +124,8 @@ export default defineNuxtConfig({ modules: [landingModule] })`)
 	pkgDirs := map[string]bool{"apps/site": true, "packages/module": true, "packages/unrelated": true}
 	pkgDirByName := map[string]string{"landings-module": "packages/module", "module": "packages/module"}
 	known := map[string]bool{
-		"apps/site/nuxt.config.ts":           true,
-		"packages/module/src/register.ts":    true,
+		"apps/site/nuxt.config.ts":                           true,
+		"packages/module/src/register.ts":                    true,
 		"packages/module/src/runtime/composables/useStep.ts": true,
 	}
 	for i := 0; i < 2000; i++ {
@@ -195,4 +195,65 @@ export default defineNuxtConfig({ modules: [landingModule] })`)
 			t.Fatal("fresh dirty registration missing")
 		}
 	})
+}
+
+func TestExtractSession_Wave11ConfiguredAliasRetarget(t *testing.T) {
+	consumer := "packages/landings-module/src/runtime/utils/getMarketingParams.ts"
+	tracking := "packages/landings-module/src/runtime/utils/getTrackingParams.ts"
+	alt := "packages/landings-module/src/runtime/alt/utils/getTrackingParams.ts"
+	moduleRel := "packages/landings-module/src/module.ts"
+	files := wave11HashAliasFiles(wave11LandingsRuntimeAlias)
+	dir, names := wave11SessionFiles(t, files)
+	ext := New()
+	ctx := context.Background()
+	cold, err := ext.ExtractSession(ctx, dir, names, nil, nil, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !hasCallToFile(fileRefFact(cold.Facts, consumer), "packages/landings-module/src/runtime/utils.getFingerprint", tracking) {
+		t.Fatalf("cold alias missing: %+v", fileRefFact(cold.Facts, consumer).Relations)
+	}
+	if rec := cold.Records[moduleRel]; rec == nil || len(rec.NuxtAliases) == 0 {
+		t.Fatalf("module record missing NuxtAliases: %+v", rec)
+	}
+
+	warm, err := ext.ExtractSession(ctx, dir, names, cold.Records, map[string]bool{}, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if warm.Stats.FilesParsed != 0 {
+		t.Fatalf("no-change parsed %d", warm.Stats.FilesParsed)
+	}
+
+	altSrc := `export function getFingerprint() { return 'alt' }
+export function getIdVisitor() { return 'id' }
+`
+	if err := os.MkdirAll(filepath.Join(dir, filepath.FromSlash(filepath.Dir(alt))), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, filepath.FromSlash(alt)), []byte(altSrc), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	retarget := []byte(`export default function setup() {
+  addImportsDir(resolver.resolve('./runtime/composables/'))
+  const runtimeDir = resolver.resolve('./runtime/alt')
+  nuxt.options.alias['#landings-runtime'] = runtimeDir
+}
+`)
+	if err := os.WriteFile(filepath.Join(dir, filepath.FromSlash(moduleRel)), retarget, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	names = append(names, alt)
+	dirty := map[string]bool{moduleRel: true, alt: true, consumer: true}
+	next, err := ext.ExtractSession(ctx, dir, names, cold.Records, dirty, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := fileRefFact(next.Facts, consumer)
+	if hasCallToFile(got, "packages/landings-module/src/runtime/utils.getFingerprint", tracking) {
+		t.Fatalf("retarget kept old file: %+v", got.Relations)
+	}
+	if !hasCallToFile(got, "packages/landings-module/src/runtime/alt/utils.getFingerprint", alt) {
+		t.Fatalf("retarget missing: %+v", got.Relations)
+	}
 }

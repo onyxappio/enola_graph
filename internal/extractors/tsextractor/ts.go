@@ -270,6 +270,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 		}
 	}
 	pkgAliases := collectPackageAliases(ctx, repoPath, knownFiles, inputScope)
+	nuxtPkgDirByName := invertPackageNames(pkgNames)
 	nuxtAutoByPkg := map[string]map[string]string{}
 	for _, p := range nuxtPkgs {
 		nuxtAutoByPkg[p] = nuxtAutoComponentIndex(knownFiles, p, nuxtPkgs, pkgDirSet)
@@ -301,6 +302,11 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	}
 	grpcStubs := buildGRPCStubIndex(tsFiles, sources)
 	graphqlServer := detectGraphQLServerUsage(tsFiles, sources)
+	if isNuxt {
+		aliasRoots = withNuxtRuntimeAliases(aliasRoots, sources, knownFiles, func(rel string) []byte {
+			return sources[rel]
+		}, nil, nil, nuxtPkgs, pkgDirSet, nuxtPkgDirByName)
+	}
 
 	exportCache := newNamedExportCache()
 	perFile := parallel.MapFiles(ctx, tsFiles, func(relFile string) tsFileResult {
@@ -337,7 +343,6 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 		return res
 	})
 	nuxtExtraDirs := collectAddImportsDirs(sources)
-	nuxtPkgDirByName := invertPackageNames(pkgNames)
 	nuxtSources := sources
 	if !isNuxt {
 		nuxtSources = nil
@@ -550,6 +555,7 @@ type extractCtx struct {
 	namedImports  map[string]namedImportOrigin
 	nsImports     map[string]string   // `import * as ns` local → original specifier
 	externalNames map[string]bool     // locals bound to external (npm/node:) specifiers
+	virtualNames  map[string]bool     // locals bound to framework virtual modules (#imports/#app)
 	localNames    map[string]bool     // file-scope function/const names that may own a local call
 	imports       emberImportBindings // the file's import table, read for the module a superclass identifier came from
 	ioBindings    map[string]bool     // local names bound to imports from a network module (I/O sinks)
@@ -712,7 +718,7 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 	}
 	ctx.importMap, ctx.importFiles, ctx.nsDirs, ctx.nsIndex = buildImportSymbols(kinds, root, src, relFile, aliases, knownFiles, readSrc, exportCache, sideReads)
 	ctx.namedImports, ctx.nsImports = collectImportOrigins(kinds, root, src)
-	ctx.externalNames = collectExternalImportNames(kinds, root, src, relFile, aliases)
+	ctx.externalNames, ctx.virtualNames = collectImportNameClasses(kinds, root, src, relFile, aliases)
 	ctx.localNames = collectFileScopeCallNames(kinds, root, src)
 	decls := e.extractDeclarations(kinds, root, ctx)
 
@@ -4904,6 +4910,11 @@ func (w *tsBodyWalker) lookupImport(name string) (string, string, bool) {
 	if w.ctx != nil && w.ctx.externalNames[name] {
 		return "", "", true
 	}
+	if w.ctx != nil && w.ctx.virtualNames[name] {
+		// Framework virtual binding: suppress sibling fallback but keep a
+		// dangling same-owner name so Nuxt composition can bind a unique target.
+		return w.dir + "." + name, "", true
+	}
 	return "", "", false
 }
 
@@ -5850,20 +5861,38 @@ func resolveTSConstructor(kinds *tsutil.KindTable, ctor *sitter.Node, src []byte
 	return "", ""
 }
 
-func collectExternalImportNames(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias) map[string]bool {
-	out := map[string]bool{}
+func collectImportNameClasses(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias) (external, virtual map[string]bool) {
+	external = map[string]bool{}
+	virtual = map[string]bool{}
 	if root == nil {
-		return out
+		return external, virtual
 	}
 	fileDir := factpath.Dir(relFile)
-	addSpec := func(stmt *sitter.Node, specifier string) {
-		if specifier == "" {
+	addNames := func(dst map[string]bool, stmt *sitter.Node, specifier string, fromRequire bool) {
+		if specifier == "" || dst == nil {
 			return
 		}
-		if _, ext := resolveImportPath(specifier, fileDir, aliases); !ext {
+		if !fromRequire && importStatementIsTypeOnly(kinds, stmt, src) {
 			return
 		}
-		if importStatementIsTypeOnly(kinds, stmt, src) {
+		if fromRequire {
+			nameNode := stmt.ChildByFieldName("name")
+			if nameNode == nil {
+				return
+			}
+			if kindOf(kinds, nameNode) == "identifier" {
+				if n := nodeText(nameNode, src); n != "" {
+					dst[n] = true
+				}
+				return
+			}
+			if kindOf(kinds, nameNode) == "object_pattern" {
+				for _, b := range objectPatternImportBindings(kinds, nameNode, src) {
+					if b.local != "" {
+						dst[b.local] = true
+					}
+				}
+			}
 			return
 		}
 		clause := findChildByKind(kinds, stmt, "import_clause")
@@ -5873,7 +5902,7 @@ func collectExternalImportNames(kinds *tsutil.KindTable, root *sitter.Node, src 
 		if nsimp := findChildByKind(kinds, clause, "namespace_import"); nsimp != nil {
 			if id := findChildByKind(kinds, nsimp, "identifier"); id != nil {
 				if n := nodeText(id, src); n != "" {
-					out[n] = true
+					dst[n] = true
 				}
 			}
 		}
@@ -5881,7 +5910,7 @@ func collectExternalImportNames(kinds *tsutil.KindTable, root *sitter.Node, src 
 			c := clause.Child(j)
 			if kindOf(kinds, c) == "identifier" {
 				if n := nodeText(c, src); n != "" {
-					out[n] = true
+					dst[n] = true
 				}
 			}
 		}
@@ -5906,9 +5935,18 @@ func collectExternalImportNames(kinds *tsutil.KindTable, root *sitter.Node, src 
 				local = nodeText(a, src)
 			}
 			if local != "" {
-				out[local] = true
+				dst[local] = true
 			}
 		}
+	}
+	classOf := func(specifier string) map[string]bool {
+		if isNuxtAppSpecifier(specifier) {
+			return virtual
+		}
+		if _, ext := resolveImportPath(specifier, fileDir, aliases); ext {
+			return external
+		}
+		return nil
 	}
 	for i := range root.ChildCount() {
 		child := root.Child(i)
@@ -5918,7 +5956,8 @@ func collectExternalImportNames(kinds *tsutil.KindTable, root *sitter.Node, src 
 			if source == nil {
 				continue
 			}
-			addSpec(child, strings.Trim(nodeText(source, src), `"'`))
+			spec := strings.Trim(nodeText(source, src), `"'`)
+			addNames(classOf(spec), child, spec, false)
 		case "lexical_declaration", "variable_declaration":
 			for j := range child.ChildCount() {
 				d := child.Child(j)
@@ -5929,30 +5968,11 @@ func collectExternalImportNames(kinds *tsutil.KindTable, root *sitter.Node, src 
 				if !ok {
 					continue
 				}
-				if _, ext := resolveImportPath(spec, fileDir, aliases); !ext {
-					continue
-				}
-				nameNode := d.ChildByFieldName("name")
-				if nameNode == nil {
-					continue
-				}
-				if kindOf(kinds, nameNode) == "identifier" {
-					if n := nodeText(nameNode, src); n != "" {
-						out[n] = true
-					}
-					continue
-				}
-				if kindOf(kinds, nameNode) == "object_pattern" {
-					for _, b := range objectPatternImportBindings(kinds, nameNode, src) {
-						if b.local != "" {
-							out[b.local] = true
-						}
-					}
-				}
+				addNames(classOf(spec), d, spec, true)
 			}
 		}
 	}
-	return out
+	return external, virtual
 }
 
 // tsGrammarKey and tsGrammarLanguage name the grammar a tree was parsed with, so a
