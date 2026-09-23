@@ -138,15 +138,17 @@ def required_owners(name_status: list[list[str]]) -> list[str]:
     return out
 
 
-def semantic_required_owners(name_status: list[list[str]], prior_owners, cold_scope) -> list[str]:
-    """Keep changed-path owners that existed on the prior graph or the target cold scope.
+def semantic_required_owners(name_status: list[list[str]], prior_owners, cold_owners) -> list[str]:
+    """Keep changed paths with nonempty prior or target contributions.
 
     Deleted and old-rename owners live on the prior semantic set. New and
-    renamed-to owners live on the target cold scope. Paths that never entered
-    either set (ignored fixtures) are dropped. Target-only filtering would
-    omit deleted/old-rename owners.
+    renamed-to owners live on the target graph. Both arguments must be
+    nonempty contribution sets, not Begin manifests: a conservative initial
+    manifest can include inventory-only files that never contributed facts.
+    Prior nonempty owners remain required even when their target is empty.
+    Exact whole-graph equality separately catches unchanged-path dependents.
     """
-    allowed = set(prior_owners) | set(cold_scope)
+    allowed = set(prior_owners) | set(cold_owners)
     return [owner for owner in required_owners(name_status) if owner in allowed]
 
 
@@ -489,7 +491,7 @@ def run_history(args) -> dict:
         try:
             changed = changed_name_status(fetch, parent, child)
             prior = applied.snapshot()
-            prior_owners = prior.owner_set_all()
+            prior_owners = prior.owner_set_nonempty()
             write_json(case / "changed.json", {"name_status": changed, "changed_owners": required_owners(changed)})
             before = events.stat().st_size if events.exists() else 0
             checkout_sha(live, child, policy)
@@ -507,14 +509,13 @@ def run_history(args) -> dict:
             cold_pairs = scope.parse_event_records(cold_events)
             cold_records = [rec for rec, _ in cold_pairs]
             cold_validated = scope.validate_replacement(cold_records, cold_pairs)
-            cold_scope = set(cold_validated.get("scope") or [])
-            required = semantic_required_owners(changed, prior_owners, cold_scope)
+            expected = scope.Consumer()
+            expected.apply(cold_records)
+            required = semantic_required_owners(changed, prior_owners, expected.owner_set_nonempty())
             begin_scope = set(validated.get("scope") or [])
             if not set(required).issubset(begin_scope):
                 missing = sorted(set(required) - begin_scope)
                 raise RuntimeError(f"required owners outside Begin: {missing[:20]}")
-            expected = scope.Consumer()
-            expected.apply(cold_records)
             if delta_records:
                 applied.apply(delta_records)
                 completed = validated["target_generation"]
@@ -690,6 +691,38 @@ def self_test() -> int:
         ignored = semantic_required_owners([["M", "ignored.fixture.ts"], ["D", "old.ts"]], prior, cold)
         check("ignored path dropped", "file:ignored.fixture.ts" not in ignored, str(ignored))
         check("deleted owner kept from prior", "file:old.ts" in ignored, str(ignored))
+
+        # Begin membership alone is not a contribution. Exercise the same
+        # Consumer sets used by the history loop, including edge-only owners.
+        old_graph, new_graph = scope.Consumer(), scope.Consumer()
+        old_graph.owners = {
+            "file:inventory.json": [], "file:retired.ts": [{"id": "old"}],
+            "file:old.ts": [{"id": "renamed"}], "file:zero.ts": [{"id": "gone"}],
+        }
+        old_graph.edges = {"file:edge-only.ts": [{"id": "edge"}]}
+        new_graph.owners = {
+            "file:inventory.json": [], "file:new.ts": [{"id": "renamed"}],
+            "file:zero.ts": [], "file:added.ts": [{"id": "added"}],
+        }
+        contribution_rows = [
+            ["M", "inventory.json"], ["D", "retired.ts"],
+            ["R100", "old.ts", "new.ts"], ["M", "zero.ts"],
+            ["D", "edge-only.ts"], ["A", "added.ts"],
+        ]
+        semantic = set(semantic_required_owners(
+            contribution_rows, old_graph.owner_set_nonempty(), new_graph.owner_set_nonempty()))
+        check("inventory-only identity is not required", "file:inventory.json" not in semantic)
+        check("retired node and edge contributions required",
+              {"file:retired.ts", "file:edge-only.ts"} <= semantic)
+        check("owner becoming empty still required", "file:zero.ts" in semantic)
+        check("nonempty rename identities and addition required",
+              {"file:old.ts", "file:new.ts", "file:added.ts"} <= semantic)
+        check("inventory-set negative control catches false positive",
+              "file:inventory.json" in semantic_required_owners(
+                  contribution_rows, old_graph.owner_set_all(), new_graph.owner_set_all()))
+        omitted = old_graph.snapshot()
+        check("retaining deleted contributions fails cold equality",
+              omitted.graph_hash() != new_graph.graph_hash())
 
         info_ok = {"parsed": 0, "events": 0, "owners_published": 0, "generation": [3, 3]}
         try:

@@ -34,8 +34,12 @@ binary path. Do not treat those numbers as the history contract.
 5. Isolated cold snapshot at the same child SHA. Fresh frozen **analyze**.
    Incremental graph (initial + all deltas so far) must hash-equal cold.
 6. Required owners from `git diff --name-status -M` parent→child, minus
-   lockfiles, kept when the owner is in the **prior semantic owner set or the
-   target cold scope**. Deleted and old-rename owners stay required.
+   lockfiles, kept when the owner has **nonempty prior or target cold
+   contributions** (nodes or edges). Begin membership alone is insufficient:
+   conservative initial scopes also contain inventory-only identities with
+   nothing to delete or rebuild. Deleted, old-rename, and now-empty owners
+   with prior contributions stay required. Exact whole-graph equality also
+   covers affected owners outside the changed paths.
    Lock-only transitions must no-op with generation equal to the previous
    completed generation.
 7. `necessary_owner_count` is the prior-versus-cold owner canonical
@@ -112,4 +116,3 @@ closed before End rather than expanding scope after Begin.
   the middle of the chain.
 - Pinned overlay bytes are the tracked `product-mcp-arch.yaml`. A live dirty
   `mcp-arch.yaml` on the Product clone is hash-compared and is not copied.
-
