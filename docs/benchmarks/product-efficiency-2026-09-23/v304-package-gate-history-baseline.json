@@ -1,0 +1,188 @@
+{
+  "provenance": {
+    "note": "first-parent history; persistent delta state; cold oracle per commit; file-sink --events JSONL timings, not NATS JetStream",
+    "sink": "file",
+    "source_tree": "/tmp/enola-product-history-source",
+    "source_dirty_untracked": "?? .enola/\n?? mcp-arch.yaml",
+    "fetch_clone": "/tmp/enola-stage5-main-case06/product-fetch",
+    "ref": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+    "ref_sha": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+    "first_parent_shas": [
+      "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "4168360e2e7f5140115ea5af58db62afd4dc9f43"
+    ],
+    "selected_transitions": [
+      "ae233c5f5695..4168360e2e7f"
+    ],
+    "enola": {
+      "revision": "3957b50cf721a04262395589b97d4ac4d1587d03",
+      "dirty": false,
+      "status_porcelain": "",
+      "diff_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+      "untracked_names_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "binary": {
+      "path": "/tmp/enola-stage5-baseline-main/enola",
+      "sha256": "c7716144dd207d945f6fbac68ce7c3b176ec5c7a0bd29b8b96b1c59b15e57c2e",
+      "go_version_m": "/tmp/enola-stage5-baseline-main/enola: go1.27.1\n\tpath\tgithub.com/enola-labs/enola/cmd/enola\n\tmod\tgithub.com/enola-labs/enola\tv0.0.0-20260923154444-3957b50cf721\t\n\tdep\tgithub.com/ebitengine/purego\tv0.10.2\th1:W809HbnvzAxgdm+aOvlSekrM16wGCdT/e76+9tS7gzE=\n\tdep\tgithub.com/fsnotify/fsnotify\tv1.9.0\th1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=\n\tdep\tgithub.com/google/jsonschema-go\tv0.4.3\th1:/DBOLZTfDow7pe2GmaJNhltueGTtDKICi8V8p+DQPd0=\n\tdep\tgithub.com/klauspost/compress\tv1.18.0\th1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=\n\tdep\tgithub.com/mattn/go-pointer\tv0.0.1\th1:n+XhsuGeVO6MEAp7xyEukFINEa+Quek5psIR/ylA6o0=\n\tdep\tgithub.com/modelcontextprotocol/go-sdk\tv1.8.0\th1:KIvahhYqwtbeniWVPs3TcXEA7b8jEtwfBpOTAI+Urx4=\n\tdep\tgithub.com/nats-io/nats.go\tv1.47.0\th1:YQdADw6J/UfGUd2Oy6tn4Hq6YHxCaJrVKayxxFqYrgM=\n\tdep\tgithub.com/nats-io/nkeys\tv0.4.11\th1:q44qGV008kYd9W1b1nEBkNzvnWxtRSQ7A8BoqRrcfa0=\n\tdep\tgithub.com/nats-io/nuid\tv1.0.1\th1:5iA8DT8V7q8WK2EScv2padNa/rTESc1KdnPw4TC2paw=\n\tdep\tgithub.com/pbnjay/memory\tv0.0.0-20210728143218-7b4eea64cf58\th1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=\n\tdep\tgithub.com/segmentio/asm\tv1.1.3\th1:WM03sfUOENvvKexOLp+pCqgb/WDjsi7EK8gIsICtzhc=\n\tdep\tgithub.com/segmentio/encoding\tv0.5.4\th1:OW1VRern8Nw6ITAtwSZ7Idrl3MXCFwXHPgqESYfvNt0=\n\tdep\tgithub.com/tree-sitter-grammars/tree-sitter-kotlin\tv1.1.0\th1:SWIUDASa+WPhDDem1U5IJpYwQEezkqXrUI61OcnORzM=\n\tdep\tgithub.com/tree-sitter/go-tree-sitter\tv0.24.0\th1:kRZb6aBNfcI/u0Qh8XEt3zjNVnmxTisDBN+kXK0xRYQ=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c\tv0.23.6\th1:aHcghKEBgyUDUcCKFT5fELp26UBU7RBltj5MkRYxyy8=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c-sharp\tv0.23.1\th1:ddG6osP34sMieVNN6lu5ZG/3N8Wn+67+43BmipqidyM=\n\tdep\tgithub.com/tree-sitter/tree-sitter-cpp\tv0.23.4\th1:LaWZsiqQKvR65yHgKmnaqA+uz6tlDJTJFCyFIeZU/8w=\n\tdep\tgithub.com/tree-sitter/tree-sitter-java\tv0.23.5\th1:J9YeMGMwXYlKSP3K4Us8CitC6hjtMjqpeOf2GGo6tig=\n\tdep\tgithub.com/tree-sitter/tree-sitter-php\tv0.23.12\th1:zgnxrV5RUEbK9d3jm9R8CjR3uSA1pBPbvq7Tbjg8j0k=\n\tdep\tgithub.com/tree-sitter/tree-sitter-python\tv0.23.6\th1:qHnWFR5WhtMQpxBZRwiaU5Hk/29vGju6CVtmvu5Haas=\n\tdep\tgithub.com/tree-sitter/tree-sitter-ruby\tv0.23.1\th1:T/NKHUA+iVbHM440hFx+lzVOzS4dV6z8Qw8ai+72bYo=\n\tdep\tgithub.com/tree-sitter/tree-sitter-rust\tv0.23.3\th1:v41N2Dx5ZEzouqeQJ0IIH2cUwVw/iepwrUoE9D56IL4=\n\tdep\tgithub.com/tree-sitter/tree-sitter-scala\tv0.24.1\th1:jO4zDfb3vQWmqCDpLfhENVtP3RvOSLYNR69m0R/T6wY=\n\tdep\tgithub.com/tree-sitter/tree-sitter-typescript\tv0.23.2\th1:/Odvphn18PniVixb9e97X0DbNVsU6Qocv9mfkyzdXwU=\n\tdep\tgithub.com/yosida95/uritemplate/v3\tv3.0.2\th1:Ed3Oyj9yrmi9087+NczuL5BwkIc4wvTb5zIM+UJPGz4=\n\tdep\tgolang.org/x/crypto\tv0.37.0\th1:kJNSjF/Xp7kU0iB2Z+9viTPMW4EqqsrywMXLJOOsXSE=\n\tdep\tgolang.org/x/oauth2\tv0.35.0\th1:Mv2mzuHuZuY2+bkyWXIHMfhNdJAdwW3FuWeCPYN5GVQ=\n\tdep\tgolang.org/x/sync\tv0.20.0\th1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=\n\tdep\tgolang.org/x/sys\tv0.48.0\th1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=\n\tdep\tgolang.org/x/time\tv0.15.0\th1:bbrp8t3bGUeFOx08pvsMYRTCVSMk89u4tKbNOZbp88U=\n\tdep\tgopkg.in/yaml.v3\tv3.0.1\th1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tDefaultGODEBUG=tracebacklabels=0,x509sslcertoverrideplatform=0\n\tbuild\tCGO_ENABLED=1\n\tbuild\tGOARCH=arm64\n\tbuild\tGOOS=darwin\n\tbuild\tGOARM64=v8.0\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=3957b50cf721a04262395589b97d4ac4d1587d03\n\tbuild\tvcs.time=2026-09-23T15:44:44Z\n\tbuild\tvcs.modified=false\n",
+      "go_version_m_sha256": "dd83801ed076db7dc9c78c324cad93aaf6a75478daff65a5f66a44393865c27b",
+      "go_version": "/tmp/enola-stage5-baseline-main/enola: go1.27.1",
+      "vcs_revision": "3957b50cf721a04262395589b97d4ac4d1587d03",
+      "vcs_modified": "false"
+    },
+    "input_policy": {
+      "pinned_source": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/product-mcp-arch.yaml",
+      "pinned_sha256": "4fd513e2cddf987e9f0f9afbc51a6d39e388fae2111b24489cb418cadc786db6",
+      "source_mcp_arch": "/tmp/enola-product-history-source/mcp-arch.yaml",
+      "source_mcp_arch_sha256": "4fd513e2cddf987e9f0f9afbc51a6d39e388fae2111b24489cb418cadc786db6",
+      "source_matches_pin": true,
+      "note": "pinned overlay applied only when the SHA has no tracked mcp-arch.yaml; historical tracked config is left in place",
+      "lockfiles_excluded_from_required_owners": true
+    },
+    "baseline": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/invalidation-history-2026-09-22/results.baseline-invalid-chronology.json"
+  },
+  "initial_sha": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+  "transitions": [
+    {
+      "id": "00-ae233c5f5695..4168360e2e7f",
+      "index": 0,
+      "parent": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "child": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "changed_file_count": 15,
+      "required_owner_count": 10,
+      "required_owners_sample": [
+        "file:docs/analytics/product-core-bronze.md",
+        "file:packages/clickhouse/package.json",
+        "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+        "file:packages/clickhouse/src/productCoreBronze/schemaVerifier.ts",
+        "file:packages/clickhouse/src/productCoreClickPipes.ts",
+        "file:packages/database/src/productCoreCdcCli.ts",
+        "file:packages/database/src/productCoreCdcExpansion.ts",
+        "file:packages/database/src/productCoreCdcPostgres.ts",
+        "file:packages/database/src/productCoreCdcProjection.ts",
+        "file:packages/database/src/productCoreCdcTypes.ts"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 26.732,
+        "sink": "file",
+        "parsed": 4028,
+        "cached": 0,
+        "files_read": 4080,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 4963,
+        "events": 2318,
+        "run_id": "product-scope-scope-bench-2-1790178499881470000",
+        "manifest": {
+          "begin_count": 8477,
+          "begin_digest": "136220bb0b70f2fc7e580b8bcfb44f2005c59068621a0f50e01b523774eeacb2",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            1,
+            2
+          ],
+          "end_batch_count": 2316,
+          "end_batch_digest": "9fd924fa4117e91530c291dbbe36604e0c5f9023ebf23f5b72e81a59bb5bcee3",
+          "end_owner_scope_len": 8477,
+          "end_owner_scope_digest": "136220bb0b70f2fc7e580b8bcfb44f2005c59068621a0f50e01b523774eeacb2",
+          "batch_seq_count": 2316,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 25.521,
+        "sink": "file",
+        "parsed": 4028,
+        "cached": 0,
+        "files_read": 4080,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4963,
+        "events": 2318,
+        "run_id": "product-scope-scope-bench-1-1790178592066053000",
+        "manifest": {
+          "begin_count": 8477,
+          "begin_digest": "136220bb0b70f2fc7e580b8bcfb44f2005c59068621a0f50e01b523774eeacb2",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2316,
+          "end_batch_digest": "2b7aba33c2d7c85f0bd389421287b6a8560ae32a0438894fae9c7f15c499547f",
+          "end_owner_scope_len": 8477,
+          "end_owner_scope_digest": "136220bb0b70f2fc7e580b8bcfb44f2005c59068621a0f50e01b523774eeacb2",
+          "batch_seq_count": 2316,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 8477,
+      "necessary_owner_count": 10,
+      "necessary_owners_sample": [
+        "file:docs/analytics/product-core-bronze.md",
+        "file:packages/clickhouse/package.json",
+        "file:packages/clickhouse/src/productCoreBronze/schemaVerifier.ts",
+        "file:packages/clickhouse/src/productCoreClickPipes.ts",
+        "file:packages/database/package.json",
+        "file:packages/database/src/productCoreCdcCli.ts",
+        "file:packages/database/src/productCoreCdcExpansion.ts",
+        "file:packages/database/src/productCoreCdcPostgres.ts",
+        "file:packages/database/src/productCoreCdcProjection.ts",
+        "file:packages/database/src/productCoreCdcTypes.ts"
+      ],
+      "extra_begin_owner_count": 8467,
+      "extra_begin_owners_sample": [
+        "file:.claude/agents/codex-implementer.md",
+        "file:.deepsec/.gitignore",
+        "file:.deepsec/AGENTS.md",
+        "file:.deepsec/README.md",
+        "file:.deepsec/data/product/INFO.md",
+        "file:.deepsec/data/product/SETUP.md",
+        "file:.deepsec/data/product/tech.json",
+        "file:.deepsec/deepsec.config.ts",
+        "file:.deepsec/package.json",
+        "file:.deepsec/pnpm-workspace.yaml",
+        "file:.dockerignore",
+        "file:.easignore",
+        "file:.gitattributes",
+        "file:.githooks/post-checkout",
+        "file:.githooks/post-commit",
+        "file:.githooks/post-merge",
+        "file:.githooks/pre-commit",
+        "file:.githooks/pre-push",
+        "file:.github/actions/setup-node-pnpm/action.yml",
+        "file:.github/workflows/clickhouse-ci-cleanup.yml",
+        "file:.github/workflows/customerio-test-delivery-smoke.yml",
+        "file:.github/workflows/dbt-test-deploy.yml",
+        "file:.github/workflows/deploy-marketing-api.yml",
+        "file:.github/workflows/live-provider-smoke.yml",
+        "file:.github/workflows/mobile-qa-shards.yml"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 2,
+      "sink": "file",
+      "blocker": null
+    }
+  ],
+  "work": "/tmp/enola-stage5-main-case06",
+  "output": "/tmp/enola-stage5-baseline-main/case06.json",
+  "sink": "file",
+  "repeat_limitation": "file-sink diagnostic; not a NATS JetStream or performance-acceptance run; launch the 10-case only when agreed",
+  "clean_build": {
+    "revision": "3957b50cf721a04262395589b97d4ac4d1587d03",
+    "binary_sha256": "c7716144dd207d945f6fbac68ce7c3b176ec5c7a0bd29b8b96b1c59b15e57c2e",
+    "go": "/tmp/enola-stage5-baseline-main/enola: go1.27.1\n\tpath\tgithub.com/enola-labs/enola/cmd/enola\n\tmod\tgithub.com/enola-labs/enola\tv0.0.0-20260923154444-3957b50cf721\t\n\tdep\tgithub.com/ebitengine/purego\tv0.10.2\th1:W809HbnvzAxgdm+aOvlSekrM16wGCdT/e76+9tS7gzE=\n\tdep\tgithub.com/fsnotify/fsnotify\tv1.9.0\th1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=\n\tdep\tgithub.com/google/jsonschema-go\tv0.4.3\th1:/DBOLZTfDow7pe2GmaJNhltueGTtDKICi8V8p+DQPd0=\n\tdep\tgithub.com/klauspost/compress\tv1.18.0\th1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=\n\tdep\tgithub.com/mattn/go-pointer\tv0.0.1\th1:n+XhsuGeVO6MEAp7xyEukFINEa+Quek5psIR/ylA6o0=\n\tdep\tgithub.com/modelcontextprotocol/go-sdk\tv1.8.0\th1:KIvahhYqwtbeniWVPs3TcXEA7b8jEtwfBpOTAI+Urx4=\n\tdep\tgithub.com/nats-io/nats.go\tv1.47.0\th1:YQdADw6J/UfGUd2Oy6tn4Hq6YHxCaJrVKayxxFqYrgM=\n\tdep\tgithub.com/nats-io/nkeys\tv0.4.11\th1:q44qGV008kYd9W1b1nEBkNzvnWxtRSQ7A8BoqRrcfa0=\n\tdep\tgithub.com/nats-io/nuid\tv1.0.1\th1:5iA8DT8V7q8WK2EScv2padNa/rTESc1KdnPw4TC2paw=\n\tdep\tgithub.com/pbnjay/memory\tv0.0.0-20210728143218-7b4eea64cf58\th1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=\n\tdep\tgithub.com/segmentio/asm\tv1.1.3\th1:WM03sfUOENvvKexOLp+pCqgb/WDjsi7EK8gIsICtzhc=\n\tdep\tgithub.com/segmentio/encoding\tv0.5.4\th1:OW1VRern8Nw6ITAtwSZ7Idrl3MXCFwXHPgqESYfvNt0=\n\tdep\tgithub.com/tree-sitter-grammars/tree-sitter-kotlin\tv1.1.0\th1:SWIUDASa+WPhDDem1U5IJpYwQEezkqXrUI61OcnORzM=\n\tdep\tgithub.com/tree-sitter/go-tree-sitter\tv0.24.0\th1:kRZb6aBNfcI/u0Qh8XEt3zjNVnmxTisDBN+kXK0xRYQ=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c\tv0.23.6\th1:aHcghKEBgyUDUcCKFT5fELp26UBU7RBltj5MkRYxyy8=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c-sharp\tv0.23.1\th1:ddG6osP34sMieVNN6lu5ZG/3N8Wn+67+43BmipqidyM=\n\tdep\tgithub.com/tree-sitter/tree-sitter-cpp\tv0.23.4\th1:LaWZsiqQKvR65yHgKmnaqA+uz6tlDJTJFCyFIeZU/8w=\n\tdep\tgithub.com/tree-sitter/tree-sitter-java\tv0.23.5\th1:J9YeMGMwXYlKSP3K4Us8CitC6hjtMjqpeOf2GGo6tig=\n\tdep\tgithub.com/tree-sitter/tree-sitter-php\tv0.23.12\th1:zgnxrV5RUEbK9d3jm9R8CjR3uSA1pBPbvq7Tbjg8j0k=\n\tdep\tgithub.com/tree-sitter/tree-sitter-python\tv0.23.6\th1:qHnWFR5WhtMQpxBZRwiaU5Hk/29vGju6CVtmvu5Haas=\n\tdep\tgithub.com/tree-sitter/tree-sitter-ruby\tv0.23.1\th1:T/NKHUA+iVbHM440hFx+lzVOzS4dV6z8Qw8ai+72bYo=\n\tdep\tgithub.com/tree-sitter/tree-sitter-rust\tv0.23.3\th1:v41N2Dx5ZEzouqeQJ0IIH2cUwVw/iepwrUoE9D56IL4=\n\tdep\tgithub.com/tree-sitter/tree-sitter-scala\tv0.24.1\th1:jO4zDfb3vQWmqCDpLfhENVtP3RvOSLYNR69m0R/T6wY=\n\tdep\tgithub.com/tree-sitter/tree-sitter-typescript\tv0.23.2\th1:/Odvphn18PniVixb9e97X0DbNVsU6Qocv9mfkyzdXwU=\n\tdep\tgithub.com/yosida95/uritemplate/v3\tv3.0.2\th1:Ed3Oyj9yrmi9087+NczuL5BwkIc4wvTb5zIM+UJPGz4=\n\tdep\tgolang.org/x/crypto\tv0.37.0\th1:kJNSjF/Xp7kU0iB2Z+9viTPMW4EqqsrywMXLJOOsXSE=\n\tdep\tgolang.org/x/oauth2\tv0.35.0\th1:Mv2mzuHuZuY2+bkyWXIHMfhNdJAdwW3FuWeCPYN5GVQ=\n\tdep\tgolang.org/x/sync\tv0.20.0\th1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=\n\tdep\tgolang.org/x/sys\tv0.48.0\th1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=\n\tdep\tgolang.org/x/time\tv0.15.0\th1:bbrp8t3bGUeFOx08pvsMYRTCVSMk89u4tKbNOZbp88U=\n\tdep\tgopkg.in/yaml.v3\tv3.0.1\th1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tDefaultGODEBUG=tracebacklabels=0,x509sslcertoverrideplatform=0\n\tbuild\tCGO_ENABLED=1\n\tbuild\tGOARCH=arm64\n\tbuild\tGOOS=darwin\n\tbuild\tGOARM64=v8.0\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=3957b50cf721a04262395589b97d4ac4d1587d03\n\tbuild\tvcs.time=2026-09-23T15:44:44Z\n\tbuild\tvcs.modified=false\n",
+    "note": "count1 independent parent initial for package-gate history case; shared host diagnostic"
+  }
+}

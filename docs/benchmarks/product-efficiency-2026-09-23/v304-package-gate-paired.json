@@ -1,0 +1,196 @@
+{
+  "provenance": {
+    "parent": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+    "child": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+    "repo": "/tmp/enola-stage5-main-case06/live",
+    "binary": {
+      "baseline": {
+        "path": "/tmp/enola-stage5-baseline-main/enola",
+        "sha256": "c7716144dd207d945f6fbac68ce7c3b176ec5c7a0bd29b8b96b1c59b15e57c2e",
+        "go_version_m": "/tmp/enola-stage5-baseline-main/enola: go1.27.1\n\tpath\tgithub.com/enola-labs/enola/cmd/enola\n\tmod\tgithub.com/enola-labs/enola\tv0.0.0-20260923154444-3957b50cf721\t\n\tdep\tgithub.com/ebitengine/purego\tv0.10.2\th1:W809HbnvzAxgdm+aOvlSekrM16wGCdT/e76+9tS7gzE=\n\tdep\tgithub.com/fsnotify/fsnotify\tv1.9.0\th1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=\n\tdep\tgithub.com/google/jsonschema-go\tv0.4.3\th1:/DBOLZTfDow7pe2GmaJNhltueGTtDKICi8V8p+DQPd0=\n\tdep\tgithub.com/klauspost/compress\tv1.18.0\th1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=\n\tdep\tgithub.com/mattn/go-pointer\tv0.0.1\th1:n+XhsuGeVO6MEAp7xyEukFINEa+Quek5psIR/ylA6o0=\n\tdep\tgithub.com/modelcontextprotocol/go-sdk\tv1.8.0\th1:KIvahhYqwtbeniWVPs3TcXEA7b8jEtwfBpOTAI+Urx4=\n\tdep\tgithub.com/nats-io/nats.go\tv1.47.0\th1:YQdADw6J/UfGUd2Oy6tn4Hq6YHxCaJrVKayxxFqYrgM=\n\tdep\tgithub.com/nats-io/nkeys\tv0.4.11\th1:q44qGV008kYd9W1b1nEBkNzvnWxtRSQ7A8BoqRrcfa0=\n\tdep\tgithub.com/nats-io/nuid\tv1.0.1\th1:5iA8DT8V7q8WK2EScv2padNa/rTESc1KdnPw4TC2paw=\n\tdep\tgithub.com/pbnjay/memory\tv0.0.0-20210728143218-7b4eea64cf58\th1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=\n\tdep\tgithub.com/segmentio/asm\tv1.1.3\th1:WM03sfUOENvvKexOLp+pCqgb/WDjsi7EK8gIsICtzhc=\n\tdep\tgithub.com/segmentio/encoding\tv0.5.4\th1:OW1VRern8Nw6ITAtwSZ7Idrl3MXCFwXHPgqESYfvNt0=\n\tdep\tgithub.com/tree-sitter-grammars/tree-sitter-kotlin\tv1.1.0\th1:SWIUDASa+WPhDDem1U5IJpYwQEezkqXrUI61OcnORzM=\n\tdep\tgithub.com/tree-sitter/go-tree-sitter\tv0.24.0\th1:kRZb6aBNfcI/u0Qh8XEt3zjNVnmxTisDBN+kXK0xRYQ=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c\tv0.23.6\th1:aHcghKEBgyUDUcCKFT5fELp26UBU7RBltj5MkRYxyy8=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c-sharp\tv0.23.1\th1:ddG6osP34sMieVNN6lu5ZG/3N8Wn+67+43BmipqidyM=\n\tdep\tgithub.com/tree-sitter/tree-sitter-cpp\tv0.23.4\th1:LaWZsiqQKvR65yHgKmnaqA+uz6tlDJTJFCyFIeZU/8w=\n\tdep\tgithub.com/tree-sitter/tree-sitter-java\tv0.23.5\th1:J9YeMGMwXYlKSP3K4Us8CitC6hjtMjqpeOf2GGo6tig=\n\tdep\tgithub.com/tree-sitter/tree-sitter-php\tv0.23.12\th1:zgnxrV5RUEbK9d3jm9R8CjR3uSA1pBPbvq7Tbjg8j0k=\n\tdep\tgithub.com/tree-sitter/tree-sitter-python\tv0.23.6\th1:qHnWFR5WhtMQpxBZRwiaU5Hk/29vGju6CVtmvu5Haas=\n\tdep\tgithub.com/tree-sitter/tree-sitter-ruby\tv0.23.1\th1:T/NKHUA+iVbHM440hFx+lzVOzS4dV6z8Qw8ai+72bYo=\n\tdep\tgithub.com/tree-sitter/tree-sitter-rust\tv0.23.3\th1:v41N2Dx5ZEzouqeQJ0IIH2cUwVw/iepwrUoE9D56IL4=\n\tdep\tgithub.com/tree-sitter/tree-sitter-scala\tv0.24.1\th1:jO4zDfb3vQWmqCDpLfhENVtP3RvOSLYNR69m0R/T6wY=\n\tdep\tgithub.com/tree-sitter/tree-sitter-typescript\tv0.23.2\th1:/Odvphn18PniVixb9e97X0DbNVsU6Qocv9mfkyzdXwU=\n\tdep\tgithub.com/yosida95/uritemplate/v3\tv3.0.2\th1:Ed3Oyj9yrmi9087+NczuL5BwkIc4wvTb5zIM+UJPGz4=\n\tdep\tgolang.org/x/crypto\tv0.37.0\th1:kJNSjF/Xp7kU0iB2Z+9viTPMW4EqqsrywMXLJOOsXSE=\n\tdep\tgolang.org/x/oauth2\tv0.35.0\th1:Mv2mzuHuZuY2+bkyWXIHMfhNdJAdwW3FuWeCPYN5GVQ=\n\tdep\tgolang.org/x/sync\tv0.20.0\th1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=\n\tdep\tgolang.org/x/sys\tv0.48.0\th1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=\n\tdep\tgolang.org/x/time\tv0.15.0\th1:bbrp8t3bGUeFOx08pvsMYRTCVSMk89u4tKbNOZbp88U=\n\tdep\tgopkg.in/yaml.v3\tv3.0.1\th1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tDefaultGODEBUG=tracebacklabels=0,x509sslcertoverrideplatform=0\n\tbuild\tCGO_ENABLED=1\n\tbuild\tGOARCH=arm64\n\tbuild\tGOOS=darwin\n\tbuild\tGOARM64=v8.0\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=3957b50cf721a04262395589b97d4ac4d1587d03\n\tbuild\tvcs.time=2026-09-23T15:44:44Z\n\tbuild\tvcs.modified=false\n",
+        "go_version_m_sha256": "dd83801ed076db7dc9c78c324cad93aaf6a75478daff65a5f66a44393865c27b",
+        "go_version": "/tmp/enola-stage5-baseline-main/enola: go1.27.1",
+        "vcs_revision": "3957b50cf721a04262395589b97d4ac4d1587d03",
+        "vcs_modified": "false"
+      },
+      "candidate": {
+        "path": "/tmp/enola-stage5-main-review/enola",
+        "sha256": "8a30aa9ca3a5285cce0972912356c587f8e18ddd500c909d6d77c11350ec9778",
+        "go_version_m": "/tmp/enola-stage5-main-review/enola: go1.27.1\n\tpath\tgithub.com/enola-labs/enola/cmd/enola\n\tmod\tgithub.com/enola-labs/enola\tv0.0.0-20260923154444-3957b50cf721+dirty\t\n\tdep\tgithub.com/ebitengine/purego\tv0.10.2\th1:W809HbnvzAxgdm+aOvlSekrM16wGCdT/e76+9tS7gzE=\n\tdep\tgithub.com/fsnotify/fsnotify\tv1.9.0\th1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=\n\tdep\tgithub.com/google/jsonschema-go\tv0.4.3\th1:/DBOLZTfDow7pe2GmaJNhltueGTtDKICi8V8p+DQPd0=\n\tdep\tgithub.com/klauspost/compress\tv1.18.0\th1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=\n\tdep\tgithub.com/mattn/go-pointer\tv0.0.1\th1:n+XhsuGeVO6MEAp7xyEukFINEa+Quek5psIR/ylA6o0=\n\tdep\tgithub.com/modelcontextprotocol/go-sdk\tv1.8.0\th1:KIvahhYqwtbeniWVPs3TcXEA7b8jEtwfBpOTAI+Urx4=\n\tdep\tgithub.com/nats-io/nats.go\tv1.47.0\th1:YQdADw6J/UfGUd2Oy6tn4Hq6YHxCaJrVKayxxFqYrgM=\n\tdep\tgithub.com/nats-io/nkeys\tv0.4.11\th1:q44qGV008kYd9W1b1nEBkNzvnWxtRSQ7A8BoqRrcfa0=\n\tdep\tgithub.com/nats-io/nuid\tv1.0.1\th1:5iA8DT8V7q8WK2EScv2padNa/rTESc1KdnPw4TC2paw=\n\tdep\tgithub.com/pbnjay/memory\tv0.0.0-20210728143218-7b4eea64cf58\th1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=\n\tdep\tgithub.com/segmentio/asm\tv1.1.3\th1:WM03sfUOENvvKexOLp+pCqgb/WDjsi7EK8gIsICtzhc=\n\tdep\tgithub.com/segmentio/encoding\tv0.5.4\th1:OW1VRern8Nw6ITAtwSZ7Idrl3MXCFwXHPgqESYfvNt0=\n\tdep\tgithub.com/tree-sitter-grammars/tree-sitter-kotlin\tv1.1.0\th1:SWIUDASa+WPhDDem1U5IJpYwQEezkqXrUI61OcnORzM=\n\tdep\tgithub.com/tree-sitter/go-tree-sitter\tv0.24.0\th1:kRZb6aBNfcI/u0Qh8XEt3zjNVnmxTisDBN+kXK0xRYQ=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c\tv0.23.6\th1:aHcghKEBgyUDUcCKFT5fELp26UBU7RBltj5MkRYxyy8=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c-sharp\tv0.23.1\th1:ddG6osP34sMieVNN6lu5ZG/3N8Wn+67+43BmipqidyM=\n\tdep\tgithub.com/tree-sitter/tree-sitter-cpp\tv0.23.4\th1:LaWZsiqQKvR65yHgKmnaqA+uz6tlDJTJFCyFIeZU/8w=\n\tdep\tgithub.com/tree-sitter/tree-sitter-java\tv0.23.5\th1:J9YeMGMwXYlKSP3K4Us8CitC6hjtMjqpeOf2GGo6tig=\n\tdep\tgithub.com/tree-sitter/tree-sitter-php\tv0.23.12\th1:zgnxrV5RUEbK9d3jm9R8CjR3uSA1pBPbvq7Tbjg8j0k=\n\tdep\tgithub.com/tree-sitter/tree-sitter-python\tv0.23.6\th1:qHnWFR5WhtMQpxBZRwiaU5Hk/29vGju6CVtmvu5Haas=\n\tdep\tgithub.com/tree-sitter/tree-sitter-ruby\tv0.23.1\th1:T/NKHUA+iVbHM440hFx+lzVOzS4dV6z8Qw8ai+72bYo=\n\tdep\tgithub.com/tree-sitter/tree-sitter-rust\tv0.23.3\th1:v41N2Dx5ZEzouqeQJ0IIH2cUwVw/iepwrUoE9D56IL4=\n\tdep\tgithub.com/tree-sitter/tree-sitter-scala\tv0.24.1\th1:jO4zDfb3vQWmqCDpLfhENVtP3RvOSLYNR69m0R/T6wY=\n\tdep\tgithub.com/tree-sitter/tree-sitter-typescript\tv0.23.2\th1:/Odvphn18PniVixb9e97X0DbNVsU6Qocv9mfkyzdXwU=\n\tdep\tgithub.com/yosida95/uritemplate/v3\tv3.0.2\th1:Ed3Oyj9yrmi9087+NczuL5BwkIc4wvTb5zIM+UJPGz4=\n\tdep\tgolang.org/x/crypto\tv0.37.0\th1:kJNSjF/Xp7kU0iB2Z+9viTPMW4EqqsrywMXLJOOsXSE=\n\tdep\tgolang.org/x/oauth2\tv0.35.0\th1:Mv2mzuHuZuY2+bkyWXIHMfhNdJAdwW3FuWeCPYN5GVQ=\n\tdep\tgolang.org/x/sync\tv0.20.0\th1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=\n\tdep\tgolang.org/x/sys\tv0.48.0\th1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=\n\tdep\tgolang.org/x/time\tv0.15.0\th1:bbrp8t3bGUeFOx08pvsMYRTCVSMk89u4tKbNOZbp88U=\n\tdep\tgopkg.in/yaml.v3\tv3.0.1\th1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tDefaultGODEBUG=tracebacklabels=0,x509sslcertoverrideplatform=0\n\tbuild\tCGO_ENABLED=1\n\tbuild\tGOARCH=arm64\n\tbuild\tGOOS=darwin\n\tbuild\tGOARM64=v8.0\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=3957b50cf721a04262395589b97d4ac4d1587d03\n\tbuild\tvcs.time=2026-09-23T15:44:44Z\n\tbuild\tvcs.modified=true\n",
+        "go_version_m_sha256": "fcdd09157714e3482dd6638b052cd68cd82b3ccc6c5de216ff9dfd06111d1ac9",
+        "go_version": "/tmp/enola-stage5-main-review/enola: go1.27.1",
+        "vcs_revision": "3957b50cf721a04262395589b97d4ac4d1587d03",
+        "vcs_modified": "true"
+      }
+    },
+    "mode": "fresh CLI, file sink, context-version-specific parent seeds restored per repetition",
+    "order": [
+      "baseline",
+      "candidate",
+      "candidate",
+      "baseline"
+    ],
+    "limitations": "shared host; not resident watch or NATS acceptance"
+  },
+  "runs": [
+    {
+      "iteration": 0,
+      "build": "baseline",
+      "run": {
+        "exit": 0,
+        "wall_s": 30.705,
+        "sink": "file",
+        "parsed": 4028,
+        "cached": 0,
+        "files_read": 4080,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 4963,
+        "events": 2318,
+        "run_id": "product-scope-scope-bench-2-1790180100028519000",
+        "stderr_graph": "[graph] /tmp/enola-stage5-main-case06/live: generation 1\u21922 parsed=4028 cached=0 early_local=0 fallbacks=4\n[graph] fallback typescript: all owned files (TS owning package gates changed)\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "begin_owners": 8477,
+      "exact_cold": true,
+      "graph_hash": "7652ba2f60cacf9c9fe26ad7620dbb3fb9b073286b3de7bcf5736217ac6e21ab",
+      "event_offset": 75421633
+    },
+    {
+      "iteration": 1,
+      "build": "candidate",
+      "run": {
+        "exit": 0,
+        "wall_s": 6.527,
+        "sink": "file",
+        "parsed": 111,
+        "cached": 3969,
+        "files_read": 111,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 767,
+        "events": 256,
+        "run_id": "product-scope-scope-bench-2-1790180139208088000",
+        "stderr_graph": "[graph] /tmp/enola-stage5-main-case06/live: generation 1\u21922 parsed=111 cached=3969 early_local=0 fallbacks=3\n[graph] fallback graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "begin_owners": 778,
+      "exact_cold": true,
+      "graph_hash": "7652ba2f60cacf9c9fe26ad7620dbb3fb9b073286b3de7bcf5736217ac6e21ab",
+      "event_offset": 75421633
+    },
+    {
+      "iteration": 2,
+      "build": "candidate",
+      "run": {
+        "exit": 0,
+        "wall_s": 7.621,
+        "sink": "file",
+        "parsed": 111,
+        "cached": 3969,
+        "files_read": 111,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 767,
+        "events": 256,
+        "run_id": "product-scope-scope-bench-2-1790180152447556000",
+        "stderr_graph": "[graph] /tmp/enola-stage5-main-case06/live: generation 1\u21922 parsed=111 cached=3969 early_local=0 fallbacks=3\n[graph] fallback graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "begin_owners": 778,
+      "exact_cold": true,
+      "graph_hash": "7652ba2f60cacf9c9fe26ad7620dbb3fb9b073286b3de7bcf5736217ac6e21ab",
+      "event_offset": 84738309
+    },
+    {
+      "iteration": 3,
+      "build": "baseline",
+      "run": {
+        "exit": 0,
+        "wall_s": 35.103,
+        "sink": "file",
+        "parsed": 4028,
+        "cached": 0,
+        "files_read": 4080,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 4963,
+        "events": 2318,
+        "run_id": "product-scope-scope-bench-2-1790180165486082000",
+        "stderr_graph": "[graph] /tmp/enola-stage5-main-case06/live: generation 1\u21922 parsed=4028 cached=0 early_local=0 fallbacks=4\n[graph] fallback typescript: all owned files (TS owning package gates changed)\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "begin_owners": 8477,
+      "exact_cold": true,
+      "graph_hash": "7652ba2f60cacf9c9fe26ad7620dbb3fb9b073286b3de7bcf5736217ac6e21ab",
+      "event_offset": 150869406
+    }
+  ],
+  "initial": {
+    "baseline": {
+      "exit": 0,
+      "wall_s": 34.536,
+      "sink": "file",
+      "parsed": 4027,
+      "cached": 0,
+      "files_read": 4079,
+      "generation": [
+        0,
+        1
+      ],
+      "owners_published": 4962,
+      "events": 2317,
+      "run_id": "product-scope-scope-bench-1-1790179903291628000",
+      "stderr_graph": "[graph] /tmp/enola-stage5-main-case06/live: generation 0\u21921 parsed=4027 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    },
+    "candidate": {
+      "exit": 0,
+      "wall_s": 34.324,
+      "sink": "file",
+      "parsed": 4027,
+      "cached": 0,
+      "files_read": 4079,
+      "generation": [
+        0,
+        1
+      ],
+      "owners_published": 4962,
+      "events": 2317,
+      "run_id": "product-scope-scope-bench-1-1790179939772319000",
+      "stderr_graph": "[graph] /tmp/enola-stage5-main-case06/live: generation 0\u21921 parsed=4027 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    }
+  },
+  "cold": {
+    "exit": 0,
+    "wall_s": 34.342,
+    "sink": "file",
+    "parsed": 4028,
+    "cached": 0,
+    "files_read": 4080,
+    "generation": [
+      0,
+      1
+    ],
+    "owners_published": 4963,
+    "events": 2318,
+    "run_id": "product-scope-scope-bench-1-1790179978892607000",
+    "stderr_graph": "[graph] /tmp/enola-stage5-main-case06/live: generation 0\u21921 parsed=4028 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+  },
+  "excluded_attempt": {
+    "reason": "Harness changed file sink after parent seed; Enola rejected sink mismatch before transaction. No timing accepted. Resuming existing valid parent seeds and cold oracle with original sink paths.",
+    "exit": 2
+  },
+  "artifact_root": "/tmp/enola-stage5-paired-history",
+  "freeze_manifest": {
+    "internal/extractors/tsextractor/context.go": "cdd65c6b372fb68cab1c13c076a5c47a8fecab0194f26dc5a06833702082c5bb",
+    "internal/extractors/tsextractor/packagegates.go": "9692e39679e8eddcc59093c92c792e74581939ecaa61fac0a78ab26563ef9152",
+    "internal/graphsession/config_scope.go": "87a3b308f6dd8fc45432a7370198e4d51b0d1f4eaba58c66180b16afc4d31bca",
+    "internal/graphsession/package_gate_scope_regression_test.go": "d747ccc658d34c8c6e79286eb9b1c14c765fb93ced7585233f5f79a280eed016",
+    "internal/extractors/tsextractor/packagegates_effective_test.go": "9ca67a963f0af369bb99126e47dc61a62565c8b567146671805e0f4324753624",
+    "pkg/bootstrap/independent_package_gates_test.go": "fbf1a3ffa15924e09542b4aeef69178f1ee65fb9faf41a485d23d82912c30360"
+  }
+}

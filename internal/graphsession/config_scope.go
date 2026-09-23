@@ -29,9 +29,20 @@ import (
 //     context. readRuntimeInputs hands SessionContext the same sorted path list
 //     and the same captured bytes the fingerprint hashed, and that projection
 //     either interprets a path - package.json validity, tsconfig alias parse,
-//     selected root, framework and ORM gates, configured clients - or digests it
-//     raw. An unprojected path is already a conservative byte comparison, so an
-//     unchanged context is a statement about all of them, not only the known ones.
+//     selected root, repository-wide framework and ORM gates, the any-package
+//     Prisma gate, configured clients - or digests it raw. An unprojected path is
+//     already a conservative byte comparison, so an unchanged context is a
+//     statement about all of them, not only the known ones.
+//
+// Part of that last projection is per file rather than repository-wide: the
+// nearest owning package name, the alias set a file's specifiers resolve
+// against, and the Vue/TypeORM/Drizzle declarations of the package that owns it.
+// Those are configuration bytes too, and the comparison here does not see them,
+// so a bounded answer is not on its own a statement that nothing moved. It does
+// not have to be: the caller that acts on it compares TSFileContext file by file
+// immediately afterwards and seeds every file whose own context moved as both
+// dirty and an owner, so a configuration edit that reaches only some files
+// reaches the frozen plan through that seed rather than through this one digest.
 //
 // Consumers other than TypeScript are bounded by their own declarations rather
 // than here: a configuration path such an extractor reads is a declared content
