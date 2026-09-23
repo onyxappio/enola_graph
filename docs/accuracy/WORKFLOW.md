@@ -66,3 +66,11 @@ The user replaces Shiki with `@twinkleplop/typescript` and
 Embed generated markup and theme CSS; preserve offline viewing and exact annotated
 code. Use matching HTML/Markdown grammars. Unsupported Swift stays unhighlighted.
 Renderer and pinned dependencies: `docs/accuracy/tools/`.
+
+## Coding model update — 2026-09-24
+
+Use **GPT Luna (`gpt-6-luna`) with `xhigh` reasoning** for subsequent coding
+assignments, as authorized by the user. This supersedes the Grok 4.6 coding
+selection above. Research remains Opus 5.5; the primary independently verifies
+results. Existing completed implementation remains subject to its normal
+acceptance checks. Keep worker notification, isolation, and publication rules.
