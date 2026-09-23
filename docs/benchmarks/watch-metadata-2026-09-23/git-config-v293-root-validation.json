@@ -1,0 +1,92 @@
+{
+  "merged-v293": {
+    "exact_cold_equality": true,
+    "details": {
+      "": {
+        "records": 6,
+        "runs": [
+          {
+            "run_id": "/tmp/enola-gitconfig-final-probe/repo-merged-v293-default-1-1790150183867813000",
+            "records": 3,
+            "complete": true,
+            "validation": {
+              "run_id": "/tmp/enola-gitconfig-final-probe/repo-merged-v293-default-1-1790150183867813000",
+              "scope": [
+                "file:.gitignore",
+                "file:src/a.ts",
+                "file:src/barrel.ts",
+                "file:src/pair.ts",
+                "file:src/solo.ts",
+                "file:src/tail.ts",
+                "file:src/use.ts"
+              ],
+              "batch_count": 1,
+              "base_generation": 0,
+              "target_generation": 1
+            },
+            "parsed": [
+              6
+            ]
+          },
+          {
+            "run_id": "/tmp/enola-gitconfig-final-probe/repo-merged-v293-default-2-1790150196470729000",
+            "records": 3,
+            "complete": true,
+            "validation": {
+              "run_id": "/tmp/enola-gitconfig-final-probe/repo-merged-v293-default-2-1790150196470729000",
+              "scope": [
+                "file:.gitignore",
+                "file:gen/tracked.ts",
+                "file:src/a.ts",
+                "file:src/barrel.ts",
+                "file:src/pair.ts",
+                "file:src/solo.ts",
+                "file:src/tail.ts",
+                "file:src/use.ts"
+              ],
+              "batch_count": 1,
+              "base_generation": 1,
+              "target_generation": 2
+            },
+            "parsed": [
+              1
+            ]
+          }
+        ],
+        "completed_generation": 2,
+        "graph_hash": "6a7e1b0f1262f06c8a63025e714bdb087f7df094290ae3a3d432c04e19c960b0"
+      },
+      "-cold": {
+        "records": 3,
+        "runs": [
+          {
+            "run_id": "/tmp/enola-gitconfig-final-probe/repo-merged-v293-default-1-1790150201975312000",
+            "records": 3,
+            "complete": true,
+            "validation": {
+              "run_id": "/tmp/enola-gitconfig-final-probe/repo-merged-v293-default-1-1790150201975312000",
+              "scope": [
+                "file:.gitignore",
+                "file:gen/tracked.ts",
+                "file:src/a.ts",
+                "file:src/barrel.ts",
+                "file:src/pair.ts",
+                "file:src/solo.ts",
+                "file:src/tail.ts",
+                "file:src/use.ts"
+              ],
+              "batch_count": 1,
+              "base_generation": 0,
+              "target_generation": 1
+            },
+            "parsed": [
+              7
+            ]
+          }
+        ],
+        "completed_generation": 1,
+        "graph_hash": "6a7e1b0f1262f06c8a63025e714bdb087f7df094290ae3a3d432c04e19c960b0"
+      }
+    }
+  }
+}
