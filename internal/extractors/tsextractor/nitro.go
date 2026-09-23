@@ -18,7 +18,7 @@ var (
 		"delete": "DELETE", "options": "OPTIONS", "head": "HEAD",
 		"all": "*",
 	}
-	handlerResolvePath = regexp.MustCompile(`(?:^|[,{])\s*handler\s*:\s*(?:[A-Za-z_$][\w$]*\s*\.\s*resolve\s*\(\s*)?["'](\./[^"']+)["']`)
+	handlerResolvePath = regexp.MustCompile(`(?:^|[,{])\s*(?:handler|file)\s*:\s*(?:[A-Za-z_$][\w$]*\s*\.\s*resolve\s*\(\s*)?["'](\./[^"']+)["']`)
 )
 
 func extractNitroFacts(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, isNuxt bool, aliases map[string]tsAlias, knownFiles map[string]bool) []facts.Fact {

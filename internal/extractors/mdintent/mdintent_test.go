@@ -138,6 +138,30 @@ func TestMDIntent_PlainPagesAreDocuments(t *testing.T) {
 	if got := names(doc, facts.RelDeclares); strings.Join(got, ",") != "docs,docs/notes.md#orders,docs/notes.md#how-it-works,docs/notes.md#how-it-works-1" {
 		t.Fatalf("document declares %v", got)
 	}
+	var mods []facts.Fact
+	for _, f := range ff {
+		if f.Kind == facts.KindModule && f.Name == "docs" {
+			mods = append(mods, f)
+		}
+	}
+	if len(mods) == 0 {
+		t.Fatal("missing markdown directory module")
+	}
+	var dirOwned, fileOwned bool
+	for _, m := range mods {
+		if m.File == "docs" {
+			dirOwned = true
+			continue
+		}
+		if strings.HasPrefix(m.File, "docs/") && strings.HasSuffix(m.File, ".md") {
+			fileOwned = true
+			continue
+		}
+		t.Fatalf("unexpected module file=%s", m.File)
+	}
+	if !dirOwned || !fileOwned {
+		t.Fatalf("want directory and file-owned modules, got %+v", mods)
+	}
 	if got := names(byName["docs/notes.md#orders"], facts.RelNames); strings.Join(got, ",") != "app/models/order.rb,lib/util.rb" {
 		t.Fatalf("section links %v", got)
 	}

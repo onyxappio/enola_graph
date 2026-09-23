@@ -187,7 +187,7 @@ export function run() { return build(); }
 			run = f
 		}
 	}
-	if !hasRelation(run, facts.RelCalls, "lib/oracles.make") {
-		t.Fatalf("aliased reexport call want lib/oracles.make, got %+v", run.Relations)
+	if !hasRelation(run, facts.RelCalls, "lib/oracles.createVerdict") {
+		t.Fatalf("aliased reexport call want leaf createVerdict, got %+v", run.Relations)
 	}
 }
