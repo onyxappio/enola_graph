@@ -304,10 +304,10 @@ func TestMDScopeModifiedPageRetiresItsOldContribution(t *testing.T) {
 }
 
 // A deleted page must lose its whole contribution. Retiring a published owner
-// that was never a TypeScript source still widens the frozen manifest to the
-// prior/current domain - the cached import graph cannot enumerate its consumers
-// - so what this case holds is the retirement itself: the narrowed markdown
-// seed must not cost a deleted page its removal.
+// that was never a TypeScript source is planned from the extractor's own
+// pre-Begin preview rather than from the import graph, so this case holds both
+// halves: the narrowed markdown seed must not cost a deleted page its removal,
+// and the removal must not cost the run its narrowing.
 func TestMDScopeRemovedPageRetiresItsContribution(t *testing.T) {
 	root := setupTSRepo(t, map[string]string{
 		"src/a.ts":      "export const a = 1;\n",
@@ -325,13 +325,16 @@ func TestMDScopeRemovedPageRetiresItsContribution(t *testing.T) {
 		t.Fatal(err)
 	}
 	sink := &graphstream.MemorySink{}
-	if _, err := Run(context.Background(), eng, root, sink, opts); err != nil {
+	delta, err := Run(context.Background(), eng, root, sink, opts)
+	if err != nil {
 		t.Fatal(err)
 	}
 	applyRun(t, cons, sink)
 
 	owners, ids := beginScope(t, sink)
 	requireOwners(t, owners, ids, "docs/old.md")
+	forbidOwners(t, owners, ids, "src/a.ts", "file:src/a.ts")
+	requireNoWholeDomainFallback(t, delta, ids)
 	if ownsFile(cons, "docs/old.md") {
 		t.Fatal("facts owned by the deleted docs/old.md survived the delta")
 	}

@@ -747,6 +747,13 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				// still have a bounded owner domain. Seed the frozen plan with
 				// those files and prior contributions instead of every repository
 				// owner; the extractor will replace exactly that owner set below.
+				//
+				// previewed records which of them actually reached one of the two
+				// bounded routes below. It is what lets a deleted page be planned
+				// at all: membershipScope cannot tell a retirement whose consumers
+				// this loop already enumerated from one whose consumers nothing
+				// has looked at.
+				previewed := map[string]bool{}
 				for name, need := range needByExt {
 					if !need || name == "typescript" {
 						continue
@@ -775,12 +782,13 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 						// consumes it, so reading it here would let mdintent's
 						// narrowing silently swallow the next extractor's seed
 						// and leave its owners outside the frozen manifest.
-						narrowed, previewed, perr := s.prepareMDScope(ctx, ext, inv.Files, prevFiles, hashes, repoID, nonTSForceAll || nonTSConfigChanged)
+						narrowed, ok, perr := s.prepareMDScope(ctx, ext, inv.Files, prevFiles, hashes, repoID, nonTSForceAll || nonTSConfigChanged)
 						if perr != nil {
 							return nil, perr
 						}
-						if previewed {
+						if ok {
 							extraOwners = append(extraOwners, narrowed...)
+							previewed[name] = true
 							break
 						}
 						for _, file := range ownedFiles(ext, inv.Files) {
@@ -807,6 +815,12 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 							break
 						}
 						extraOwners = append(extraOwners, closure...)
+						// The seed claimed every file this extractor owns and
+						// every owner it retires, and the closure took every
+						// cached owner naming a candidate it moved. That is the
+						// same bound the captured-bytes preview gives, so this
+						// extractor's own retirements are planned too.
+						previewed[name] = true
 						break
 					}
 				}
@@ -816,7 +830,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				// previewed before the name and composed route deltas run.
 				// inv.Files, not the policy-filtered current list, is the
 				// resolution universe the extractor itself will use.
-				membership = membershipScope(previous, current, inv.Files, prevFiles)
+				membership = membershipScopeWithProof(previous, current, inv.Files, prevFiles, provenRetiredOwners(prevFiles, previewed))
 				if membership.changed {
 					extraOwners = append(extraOwners, directoryModuleSiblings(previous, current, prevFiles)...)
 				}

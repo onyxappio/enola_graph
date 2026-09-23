@@ -276,6 +276,16 @@ type membershipDelta struct {
 // the policy-filtered semantic name list - a name the graph policy drops is
 // still a resolution target for the next parse.
 func membershipScope(previous, current, sessionFiles []string, prevFiles map[string]*FileState) membershipDelta {
+	return membershipScopeWithProof(previous, current, sessionFiles, prevFiles, nil)
+}
+
+// membershipScopeWithProof is membershipScope with the retirements this run
+// already accounted for before Begin. provenRetired comes from
+// provenRetiredOwners, keyed by the extractors the caller actually previewed:
+// a retired owner in it has had every cached consumer of the names it withdrew
+// enumerated already, so it no longer forces the wider fallback. Every other
+// non-TypeScript retirement still does.
+func membershipScopeWithProof(previous, current, sessionFiles []string, prevFiles map[string]*FileState, provenRetired map[string]bool) membershipDelta {
 	md := membershipDelta{proven: true}
 	previousSet := make(map[string]bool, len(previous))
 	for _, f := range graphPublishedOwners(previous) {
@@ -297,10 +307,11 @@ func membershipScope(previous, current, sessionFiles []string, prevFiles map[str
 		}
 		md.changed = true
 		md.retired = append(md.retired, f)
-		if !tsextractor.IsSessionSource(f, false) {
+		if !tsextractor.IsSessionSource(f, false) && !provenRetired[f] {
 			// A published owner that left the tree without ever being a
-			// TypeScript source: its consumers are outside the cached import
-			// graph and the prior owner map cannot enumerate them.
+			// TypeScript source and without a pre-Begin proof: its consumers
+			// are outside the cached import graph and the prior owner map
+			// cannot enumerate them.
 			md.proven = false
 			md.reason = frozenScopeMembership
 		}

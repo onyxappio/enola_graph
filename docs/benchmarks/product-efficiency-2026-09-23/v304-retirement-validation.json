@@ -1,0 +1,23 @@
+{
+  "command": "go test ./...",
+  "exit_code": 0,
+  "log_sha256": "df6e2c6f344cef5b16ef472ea003cae3f389319555e0266056acaf5d97cf959a",
+  "graphsession_seconds": 351.015,
+  "bootstrap_seconds": 168.79,
+  "build": {
+    "base": "05607f7a1bd188d1db5f41cd1b72440685bc7868",
+    "source_sha256": {
+      "internal/graphsession/independent_manifest_retirement_test.go": "073d7015e8bbc68c6ff255dbf385359a06f3b6d0b500064c37b100c9e331bcc4",
+      "internal/graphsession/session.go": "a4db2c819eed85680fa877bda1851bd53b8f8f54994374dcb12bd543039510c5",
+      "internal/graphsession/md_retirement_scope_regression_test.go": "4cc5d295c04a1f00dfcad8c961bc4ab02880731625f8b80c3f88c2f47a5e97d2",
+      "internal/graphsession/independent_md_retirement_test.go": "08af42385b1f981939d2331d16b380d5bab5022b722b16355acf3f9c304b8840",
+      "internal/graphsession/invalidation_plan.go": "a11b283a20731ca6f450cffe378e835d7615c5f0473a92b22d74b4163679c82e",
+      "internal/graphsession/md_scope_regression_test.go": "80d3045cb17d8ed20d60021fef870c20085405056c98fc3a05d24a217968b4eb",
+      "internal/graphsession/retirement_proof.go": "148266f04b06a51af843eae4fa3a47fda534baa968d23847e76f83dc810f42aa"
+    },
+    "binary_sha256": "64cd606fc4706292d9544c1ce48358f1a9aedfb647410de1d6244e96d9159faf",
+    "command": "go build -o /tmp/enola-stage6-main-review/enola ./cmd/enola",
+    "scope": "main plus seven verified stage6 files"
+  },
+  "shared_host": true
+}
