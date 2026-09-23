@@ -2589,7 +2589,12 @@ import (
 // the child directory has no package.json. Prefer the most specific matching
 // Nuxt root; reject only a more-specific plain package.json below that root.
 // A root Nuxt dependency still does not leak into an unrelated nested package.
-const cacheVersion = "v314"
+// v315: TypeScript constructor parameter properties become instance members;
+// defineEndpoint function-valued url literals emit client routes; locally bound
+// fetch aliases emit client routes; Nuxt auto-import follows unique re-export
+// origins in registered directories; external import calls do not bind private
+// same-directory siblings.
+const cacheVersion = "v315"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

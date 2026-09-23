@@ -45,6 +45,41 @@
     ]
   },
   {
+    "source": "god-class",
+    "title": "High fan-in symbol: src/connectors.ResourceConnector (8 dependents)",
+    "confidence": 0.893016675602791,
+    "evidence": [
+      {
+        "file": "sdk/src/connectors/resource-connector.ts",
+        "detail": "8 symbols depend on this"
+      },
+      {
+        "detail": "depends on src/connectors.ResourceConnector"
+      },
+      {
+        "detail": "depends on src/connectors.ResourceConnector"
+      },
+      {
+        "detail": "depends on src/connectors.ResourceConnector"
+      },
+      {
+        "detail": "depends on src/connectors.ResourceConnector"
+      },
+      {
+        "detail": "depends on src/connectors.ResourceConnector"
+      },
+      {
+        "detail": "depends on src/connectors.ResourceConnector"
+      },
+      {
+        "detail": "depends on src/connectors.ResourceConnector"
+      },
+      {
+        "detail": "depends on src/connectors.ResourceConnector"
+      }
+    ]
+  },
+  {
     "source": "unused-routes",
     "title": "Unused endpoint candidates: 1 of 2 route(s) in gateway have no caller among loaded clients",
     "confidence": 0.6,

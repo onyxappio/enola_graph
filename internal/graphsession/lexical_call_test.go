@@ -1133,6 +1133,68 @@ func assertNestedNuxtConfigKinds(t *testing.T, c *Consumer, playgroundFunc bool)
 	}
 }
 
+func wave11UpgradeFixture() map[string]string {
+	return map[string]string{
+		"src/sem.ts": `export class Semaphore { constructor(private readonly max: number) {} tryAcquire() { return this.max } }
+`,
+		"src/ep.ts": "export const ep = { method: 'POST', url: (id: string) => `/platform/image/set-as-main/${id}` }\n",
+		"src/fetch.ts": `export async function go(input: { fetchImpl?: typeof fetch; baseUrl: string }) {
+  const fetchImpl = input.fetchImpl ?? globalThis.fetch
+  return fetchImpl(` + "`${input.baseUrl}/internal/billing/web2app-provision`" + `, { method: 'POST' })
+}
+`,
+		"tools/compare.mjs": "import pixelmatch from 'pixelmatch'\npixelmatch(1)\n",
+		"tools/sibling.mjs": "const pixelmatch = () => 1\n",
+	}
+}
+
+func TestPublishedWave11CachedUpgradeFromV314(t *testing.T) {
+	dir := setupTSRepo(t, wave11UpgradeFixture())
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("load state: %v %#v", err, st)
+	}
+	st.ExtractorVersion = "v314"
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	up := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, dir, up, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.ParsedFiles == 0 {
+		t.Fatal("v314 migration parsed no files")
+	}
+	c := applyGraph(t, first)
+	if err := c.ApplyRecords(up.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, coldSink))
+	quiet := &graphstream.MemorySink{}
+	again, err := Run(context.Background(), eng, dir, quiet, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if again.ParsedFiles != 0 {
+		t.Fatalf("silent nochange parsed=%d", again.ParsedFiles)
+	}
+	if engine.ExtractorVersion() == "v314" {
+		t.Fatal("cached upgrade test requires cacheVersion newer than v314")
+	}
+}
+
 func TestPublishedWave10CachedUpgradeFromV313(t *testing.T) {
 	dir := setupTSRepo(t, nestedNuxtFixture())
 	eng := testEngine(t, dir)

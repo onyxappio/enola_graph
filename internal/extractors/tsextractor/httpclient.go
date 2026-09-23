@@ -111,6 +111,9 @@ var urlProperty = regexp.MustCompile("\\burl\\s*:\\s*(?:\"([^\"]*)\"|'([^']*)'|`
 // store as pass 1b; an unresolvable name contributes nothing.
 var urlPropertyIdent = regexp.MustCompile(`\burl\s*:\s*([A-Za-z_$][\w$]*)\s*[,}]`)
 
+var fetchAliasDecl = regexp.MustCompile(`(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*(?::[^=;]+)?=\s*([^;\n]+)`)
+var fetchParamDefault = regexp.MustCompile(`(?:^|[,(])\s*([A-Za-z_$][\w$]*)\s*(?::[^,)=]*)?=\s*((?:globalThis\s*\.\s*)?fetch)\s*[,)]`)
+
 // requestVerbProperty extracts the verb of a request-options object from its
 // `type:`/`method:` property. The value may be an HTTP verb or an action verb
 // (query/post/put/delete); mapClientVerb reconciles both.
@@ -317,6 +320,17 @@ func extractHTTPClientFactsDeps(src []byte, relFile string, deps httpClientDeps)
 	if !hasFetch && !hasUpper && !hasLower && !hasURL {
 		return nil
 	}
+	return extractHTTPClientFactsPasses(src, relFile, deps, hasFetch, hasUpper, hasLower, hasURL)
+}
+
+// extractHTTPClientFactsUngated runs every HTTP-client pass without the
+// possibleHTTPClientSignal prefilter. Scanopt tests compare this reference
+// against the gated production path so the gate cannot silently drop facts.
+func extractHTTPClientFactsUngated(src []byte, relFile string) []facts.Fact {
+	return extractHTTPClientFactsPasses(src, relFile, httpClientDeps{}, true, true, true, true)
+}
+
+func extractHTTPClientFactsPasses(src []byte, relFile string, deps httpClientDeps, hasFetch, hasUpper, hasLower, hasURL bool) []facts.Fact {
 
 	dir := factpath.Dir(relFile)
 	api := tsAPIHint(relFile)
@@ -399,7 +413,11 @@ func extractHTTPClientFactsDeps(src []byte, relFile string, deps httpClientDeps)
 	// offset is the verb start (m[2]) — not m[0], which now includes the leading
 	// word-boundary char and would mis-count the line when that char is a newline.
 	if hasFetch {
+		lexCalls, skipFetch := lexicalFetchAnalysis(src, relFile)
 		for _, m := range httpClientCall.FindAllSubmatchIndex(src, -1) {
+			if skipFetch[m[2]] {
+				continue
+			}
 			raw := firstNonEmptyGroup(src, m, 2, 3, 4)
 			method := "GET"
 			if opts := optionsObjectAfter(src, m[1]); opts != nil {
@@ -409,13 +427,10 @@ func extractHTTPClientFactsDeps(src []byte, relFile string, deps httpClientDeps)
 			}
 			add(raw, method, "fetch", m[2], "")
 		}
-
-		// Pass 1b — positional fetch()/makeRequest() whose argument is a bare
-		// identifier assigned a literal exactly once in this file (litfold's
-		// single-assignment rule). The resolved literal flows through cleanTSPath
-		// exactly as an inline argument would, so `const url = ` + "`${config.HOST}/mcp`" + `;
-		// fetch(url)` models identically to the inline form.
 		for _, m := range identArgCall.FindAllSubmatchIndex(src, -1) {
+			if skipFetch[m[2]] {
+				continue
+			}
 			raw, ok := folds.Resolve(string(src[m[4]:m[5]]))
 			if !ok {
 				continue
@@ -427,6 +442,25 @@ func extractHTTPClientFactsDeps(src []byte, relFile string, deps httpClientDeps)
 				}
 			}
 			add(raw, method, "fetch", m[2], "single-assignment")
+		}
+		for _, call := range lexCalls {
+			raw := call.raw
+			derived := ""
+			if call.identArg {
+				var ok bool
+				raw, ok = folds.Resolve(call.raw)
+				if !ok {
+					continue
+				}
+				derived = "single-assignment"
+			}
+			method := "GET"
+			if opts := optionsObjectAfter(src, call.argEnd); opts != nil {
+				if mm := httpClientMethod.FindSubmatch(opts); mm != nil {
+					method = strings.ToUpper(string(mm[1]))
+				}
+			}
+			add(raw, method, "fetch", call.nameOff, derived)
 		}
 	}
 
@@ -543,8 +577,82 @@ func extractHTTPClientFactsDeps(src []byte, relFile string, deps httpClientDeps)
 			}
 			add(raw, method, "request-options", m[0], "single-assignment")
 		}
+
+		for _, u := range functionValuedURLProperties(src, relFile) {
+			window := enclosingObject(src, u.off, u.end)
+			if window == nil {
+				continue
+			}
+			method := "GET"
+			haveVerb := false
+			if vm := requestVerbProperty.FindSubmatch(window); vm != nil {
+				if v := mapClientVerb(string(vm[1])); v != "" {
+					method = v
+					haveVerb = true
+				}
+			}
+			if !haveVerb && !requestPayloadKey.Match(window) {
+				continue
+			}
+			add(u.raw, method, "request-options", u.off, "")
+		}
 	}
 
+	return out
+}
+
+func isFetchIdentity(expr string) bool {
+	s := strings.TrimSpace(expr)
+	return s == "fetch" || s == "globalThis.fetch" || strings.ReplaceAll(strings.ReplaceAll(s, " ", ""), "\t", "") == "globalThis.fetch"
+}
+
+func rhsIsProvenFetch(expr string) bool {
+	s := strings.TrimSpace(expr)
+	for {
+		i := strings.LastIndex(s, "??")
+		j := strings.LastIndex(s, "||")
+		if i < 0 && j < 0 {
+			return isFetchIdentity(s)
+		}
+		k := i
+		if j > k {
+			k = j
+		}
+		s = strings.TrimSpace(s[k+2:])
+	}
+}
+
+func provenFetchAliases(src []byte) map[string]bool {
+	out := map[string]bool{}
+	banned := map[string]bool{}
+	declared := map[int]bool{}
+	for _, m := range fetchAliasDecl.FindAllSubmatchIndex(src, -1) {
+		name := string(src[m[2]:m[3]])
+		rhs := string(src[m[4]:m[5]])
+		if rhsIsProvenFetch(rhs) {
+			out[name] = true
+			declared[m[2]] = true
+			continue
+		}
+		banned[name] = true
+		delete(out, name)
+	}
+	for _, m := range fetchParamDefault.FindAllSubmatchIndex(src, -1) {
+		name := string(src[m[2]:m[3]])
+		if banned[name] {
+			continue
+		}
+		out[name] = true
+	}
+	for _, m := range bareAssign.FindAllSubmatchIndex(src, -1) {
+		name := string(src[m[2]:m[3]])
+		if declared[m[2]] || !out[name] {
+			continue
+		}
+		delete(out, name)
+	}
+	delete(out, "fetch")
+	delete(out, "makeRequest")
 	return out
 }
 

@@ -476,7 +476,16 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 				extra = append(extra, d)
 			}
 		}
-		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, extra, sources, invertPackageNames(collectPackageNames(ctx, repoPath, inputScope)), pkgDirSet)
+		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, extra, sources, invertPackageNames(collectPackageNames(ctx, repoPath, inputScope)), pkgDirSet, knownFiles, func(rel string) []byte {
+			if b, ok := sources[rel]; ok {
+				return b
+			}
+			raw, err := overlayReadFile(ctx, filepath.Join(repoPath, rel), inputScope)
+			if err != nil {
+				return nil
+			}
+			return raw
+		}, pkgAliases, exportCache, records, dirty)
 	}
 	applyDirectIOContract(allFacts)
 
@@ -1035,23 +1044,28 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 		extraSeen[d] = true
 		extraDirs = append(extraDirs, d)
 	}
-	for _, rec := range prev {
-		if rec == nil {
-			continue
+	if len(nuxtPkgs) > 0 {
+		for rel, rec := range prev {
+			if rec == nil {
+				continue
+			}
+			if dirty != nil && dirty[rel] {
+				continue
+			}
+			for _, d := range rec.AutoImportDirs {
+				addExtra(d)
+			}
 		}
-		for _, d := range rec.AutoImportDirs {
-			addExtra(d)
-		}
-	}
-	for rel, src := range sources {
-		if src == nil {
-			continue
-		}
-		if !allDirty && dirty != nil && !dirty[rel] {
-			continue
-		}
-		for _, d := range addImportsDirsFromFile(rel, src) {
-			addExtra(d)
+		for rel, src := range sources {
+			if src == nil {
+				continue
+			}
+			if dirty != nil && !dirty[rel] && prev[rel] != nil {
+				continue
+			}
+			for _, d := range addImportsDirsFromFile(rel, src) {
+				addExtra(d)
+			}
 		}
 	}
 	var auto []string
@@ -1080,7 +1094,57 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 		sum := sha256.Sum256(src)
 		auto = append(auto, rel+"="+hex.EncodeToString(sum[:]))
 	}
+	pkgAliases := collectPackageAliases(ctx, repoPath, known, inputScope)
+	exportCache := newNamedExportCache()
+	readAuto := func(rel string) []byte {
+		if sources != nil {
+			if b := sources[rel]; b != nil {
+				return b
+			}
+		}
+		raw, err := overlayReadFile(ctx, filepath.Join(repoPath, rel), inputScope)
+		if err != nil {
+			return nil
+		}
+		return raw
+	}
+	for _, rel := range files {
+		if !nuxtAutoImportDir(rel, nuxtPkgs, extraDirs, pkgDirSet) {
+			continue
+		}
+		idx := exportCache.index(rel, readAuto, pkgAliases, known)
+		if idx == nil {
+			continue
+		}
+		for exported := range idx.named {
+			leaf, orig, kind := followNamedExportFile(rel, exported, readAuto, pkgAliases, known, exportCache, nil)
+			if kind != followOne || leaf == "" || filepath.ToSlash(leaf) == filepath.ToSlash(rel) {
+				continue
+			}
+			b := readAuto(leaf)
+			sum := sha256.Sum256(b)
+			auto = append(auto, rel+"~"+exported+"~"+orig+"~"+filepath.ToSlash(leaf)+"="+hex.EncodeToString(sum[:]))
+		}
+	}
 	sort.Strings(auto)
+	var visExtra map[string][]string
+	var visCons map[string][]string
+	if len(nuxtPkgs) > 0 {
+		visExtra = extraDirsByNuxtPackageRead(sources, known, readAuto, nuxtPkgs, pkgDirSet, prev, dirty)
+		visCons = nuxtModuleConsumersRead(sources, known, readAuto, nuxtPkgs, invertPackageNames(collectPackageNames(ctx, repoPath, inputScope)), pkgDirSet)
+	}
+	var vis []string
+	for pkg, dirs := range visExtra {
+		cp := append([]string{}, dirs...)
+		sort.Strings(cp)
+		vis = append(vis, "extra:"+pkg+"="+strings.Join(cp, ","))
+	}
+	for consumer, mods := range visCons {
+		cp := append([]string{}, mods...)
+		sort.Strings(cp)
+		vis = append(vis, "mod:"+consumer+"="+strings.Join(cp, ","))
+	}
+	sort.Strings(vis)
 	h := sha256.New()
 	if gql.enabled {
 		h.Write([]byte("gql-on"))
@@ -1095,5 +1159,7 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 	h.Write([]byte(strings.Join(nuxt, ";")))
 	h.Write([]byte{0})
 	h.Write([]byte(strings.Join(auto, ";")))
+	h.Write([]byte{0})
+	h.Write([]byte(strings.Join(vis, ";")))
 	return hex.EncodeToString(h.Sum(nil)), nil
 }
