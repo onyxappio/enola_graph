@@ -1,0 +1,90 @@
+{
+  "seed": {
+    "exit": 0,
+    "wall_s": 10.875,
+    "sink": "file",
+    "parsed": 101,
+    "cached": 3926,
+    "files_read": 205,
+    "generation": [
+      1,
+      2
+    ],
+    "owners_published": 822,
+    "events": 379,
+    "run_id": "product-scope-scope-bench-2-1790182844180035000",
+    "stderr_graph": "[graph] /tmp/enola-stage6-exploratory-case05/live: generation 1\u21922 parsed=101 cached=3926 early_local=0 fallbacks=2\n[graph] fallback graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+  },
+  "seed_scope": 823,
+  "seed_exact_cold": true,
+  "rows": [
+    {
+      "run": {
+        "exit": 0,
+        "wall_s": 2.477,
+        "sink": "file",
+        "parsed": 0,
+        "cached": 4079,
+        "files_read": 0,
+        "generation": [
+          2,
+          2
+        ],
+        "owners_published": 0,
+        "run_id": "",
+        "stderr_graph": "[graph] /tmp/enola-stage6-exploratory-case05/live: generation 2\u21922 parsed=0 cached=4079 early_local=0 fallbacks=0",
+        "sink_total_events_after_run": 3452,
+        "events": 0
+      },
+      "new_events": 0,
+      "state_json_hashes_unchanged": true
+    },
+    {
+      "run": {
+        "exit": 0,
+        "wall_s": 2.646,
+        "sink": "file",
+        "parsed": 0,
+        "cached": 4079,
+        "files_read": 0,
+        "generation": [
+          2,
+          2
+        ],
+        "owners_published": 0,
+        "run_id": "",
+        "stderr_graph": "[graph] /tmp/enola-stage6-exploratory-case05/live: generation 2\u21922 parsed=0 cached=4079 early_local=0 fallbacks=0",
+        "sink_total_events_after_run": 3452,
+        "events": 0
+      },
+      "new_events": 0,
+      "state_json_hashes_unchanged": true
+    },
+    {
+      "run": {
+        "exit": 0,
+        "wall_s": 2.376,
+        "sink": "file",
+        "parsed": 0,
+        "cached": 4079,
+        "files_read": 0,
+        "generation": [
+          2,
+          2
+        ],
+        "owners_published": 0,
+        "run_id": "",
+        "stderr_graph": "[graph] /tmp/enola-stage6-exploratory-case05/live: generation 2\u21922 parsed=0 cached=4079 early_local=0 fallbacks=0",
+        "sink_total_events_after_run": 3452,
+        "events": 0
+      },
+      "new_events": 0,
+      "state_json_hashes_unchanged": true
+    }
+  ],
+  "state_hashes": {
+    "state.json": "a57ac8bca63079846f71fb7e295f2d89586bebecd27c8f50a639dcf2535339be",
+    "commit.json": "4798a89045ba2d6c9d8e6c45f7ce67662cb33ea1c87d90756d86926a72e3581e",
+    "identity.json": "a64fbc3f27bc4e21b62834f1ff9feeabc0121c7952c518f237a90f1145d0b4fa"
+  }
+}

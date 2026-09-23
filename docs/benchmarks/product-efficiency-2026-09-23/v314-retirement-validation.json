@@ -1,0 +1,26 @@
+{
+  "command": "go test ./...",
+  "exit_code": 0,
+  "source_commit": "1ba06f9",
+  "base": "c648dd7",
+  "log_sha256": "4c21c53cd66d5b2e96f5a26aaaba5921821c74c48cda8f7047259b0d958b1239",
+  "package_seconds": {
+    "cmd/enola": 10.194,
+    "internal/cachecov": 1.013,
+    "internal/docslint": 3.472,
+    "internal/engine": 85.68,
+    "internal/explainers/messagingcoverage": 2.168,
+    "internal/extractors/tsextractor": 50.129,
+    "internal/facts": 5.32,
+    "internal/graphsession": 494.041,
+    "internal/intent": 4.316,
+    "internal/server": 17.841,
+    "pkg/bootstrap": 230.834,
+    "pkg/check": 10.827,
+    "pkg/command": 10.489,
+    "pkg/coverage": 2.451,
+    "pkg/dashboard": 2.859,
+    "pkg/explain": 0.897,
+    "pkg/plan": 1.784
+  }
+}

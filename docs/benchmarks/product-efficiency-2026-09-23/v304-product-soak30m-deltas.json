@@ -1,0 +1,51 @@
+{
+  "begin_to_end_ms": {
+    "sum": 85428.842,
+    "mean": 1154.4438108108109,
+    "median": 971.1859999999999,
+    "min": 616.23,
+    "max": 2181.789
+  },
+  "owner_scope_count": {
+    "sum": 21701,
+    "mean": 293.2567567567568,
+    "median": 2.0,
+    "min": 1,
+    "max": 620
+  },
+  "batches_observed": {
+    "sum": 4869,
+    "mean": 65.79729729729729,
+    "median": 1.0,
+    "min": 1,
+    "max": 138
+  },
+  "completeness_parsed_files": {
+    "sum": 84,
+    "mean": 1.135135135135135,
+    "median": 1.0,
+    "min": 0,
+    "max": 2
+  },
+  "node_records_sent": {
+    "sum": 255347,
+    "mean": 3450.635135135135,
+    "median": 12.0,
+    "min": 2,
+    "max": 7294
+  },
+  "edge_records_sent": {
+    "sum": 305756,
+    "mean": 4131.8378378378375,
+    "median": 14.0,
+    "min": 1,
+    "max": 8735
+  },
+  "payload_bytes_total": {
+    "sum": 212284409,
+    "mean": 2868708.2297297297,
+    "median": 8500.0,
+    "min": 1971,
+    "max": 6063507
+  }
+}
