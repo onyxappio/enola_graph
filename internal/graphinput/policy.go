@@ -633,6 +633,53 @@ func (p *Policy) semanticDeps() []Dependency {
 	return out
 }
 
+// policyMemo caches the two pure decision functions for the span of a single
+// identity computation. hard and gitIgnored read only entries, states, exclude,
+// caches and ignored, and Build fills all five before it computes identities, so
+// within that span each name has one answer and computing it twice is waste.
+//
+// The cache is transaction-local on purpose: it is created per computation and
+// discarded with it, so it cannot outlive the immutability it relies on. A nil
+// memo evaluates directly, which is what the exported callers still do.
+//
+// The redundancy this removes is not incidental. computeIdentities evaluates
+// hard over every tracked name, then trackedAdmission evaluates it over every
+// tracked name again and walks each name's ancestor directories, which revisits
+// the same directories once per tracked file beneath them.
+type policyMemo struct {
+	hard   map[string]string
+	git    map[string]bool
+	walked map[string]bool
+}
+
+func newPolicyMemo() *policyMemo {
+	return &policyMemo{hard: map[string]string{}, git: map[string]bool{}, walked: map[string]bool{}}
+}
+
+func (p *Policy) hardMemo(m *policyMemo, name string) string {
+	if m == nil {
+		return p.hard(name)
+	}
+	if why, ok := m.hard[name]; ok {
+		return why
+	}
+	why := p.hard(name)
+	m.hard[name] = why
+	return why
+}
+
+func (p *Policy) gitIgnoredMemo(m *policyMemo, name string) bool {
+	if m == nil {
+		return p.gitIgnored(name)
+	}
+	if ign, ok := m.git[name]; ok {
+		return ign
+	}
+	ign := p.gitIgnored(name)
+	m.git[name] = ign
+	return ign
+}
+
 // trackedAdmission returns the tracked entries whose index membership can move a
 // decision: the ones Git ignores and no hard rule already excludes. A hard
 // exclusion is evaluated before the override and wins over it, so a tracked
@@ -653,17 +700,34 @@ func (p *Policy) semanticDeps() []Dependency {
 // decision function rather than merely for the leaf decisions: staging a build
 // artifact under an ignored directory moves neither.
 func (p *Policy) trackedAdmission() (files, dirs []string) {
+	return p.trackedAdmissionWith(newPolicyMemo())
+}
+
+// trackedAdmissionWith is trackedAdmission sharing one memo with the caller, so
+// the hard evaluations computeIdentities already paid for are not repeated here.
+func (p *Policy) trackedAdmissionWith(m *policyMemo) (files, dirs []string) {
 	files = []string{}
 	dirSet := map[string]bool{}
 	for name := range p.tracked {
-		if p.hard(name) != "" {
+		if p.hardMemo(m, name) != "" {
 			continue
 		}
-		if p.gitIgnored(name) {
+		if p.gitIgnoredMemo(m, name) {
 			files = append(files, name)
 		}
 		for dir := filepath.ToSlash(filepath.Dir(name)); dir != "."; dir = filepath.ToSlash(filepath.Dir(dir)) {
-			if p.trackedDirs[dir] && p.hard(dir) == "" && p.gitIgnored(dir) {
+			// Deciding a directory is deterministic and idempotent, and a pass
+			// that reached this directory continued from it up to the root, so
+			// every ancestor above it was decided by that pass too. Stopping at
+			// the first already-walked directory therefore visits each ancestor
+			// chain once without changing which directories dirSet ends up with.
+			if m != nil {
+				if m.walked[dir] {
+					break
+				}
+				m.walked[dir] = true
+			}
+			if p.trackedDirs[dir] && p.hardMemo(m, dir) == "" && p.gitIgnoredMemo(m, dir) {
 				dirSet[dir] = true
 			}
 		}
@@ -681,9 +745,10 @@ func (p *Policy) trackedAdmission() (files, dirs []string) {
 // computeIdentities fills both digests from the policy's current inputs.
 func (p *Policy) computeIdentities() error {
 	semanticDeps := p.semanticDeps()
+	memo := newPolicyMemo()
 	tracked := []string{}
 	for name := range p.tracked {
-		if p.hard(name) == "" {
+		if p.hardMemo(memo, name) == "" {
 			tracked = append(tracked, name)
 		}
 	}
@@ -700,7 +765,7 @@ func (p *Policy) computeIdentities() error {
 	}
 	sum := sha256.Sum256(encoded)
 	p.identity = hex.EncodeToString(sum[:])
-	admittedFiles, admittedDirs := p.trackedAdmission()
+	admittedFiles, admittedDirs := p.trackedAdmissionWith(memo)
 	// Both identities carry the projection. They differ in what they take from
 	// the index - the raw identity hashes every tracked name, the admission
 	// identity only the names that can move a decision - but a repository whose
