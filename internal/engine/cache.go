@@ -2504,7 +2504,14 @@ import (
 // fields declare their owning class so v2 constants keep a resolved target.
 // v295: Swift stored/computed properties of a same-file type declare that type
 // so v2 constants keep a resolved structural target (directory modules excluded).
-const cacheVersion = "v295"
+// v296: Vue SFC runtime component keeps the file-derived value-space identity when
+// a same-named local type exists (type-space facts use a #type suffix only on that
+// FactID collision); file-scope lexical bindings including destructuring prove
+// TargetFile; JSX file_ref uses the same import/local provenance as function
+// calls; awaited literal dynamic-import destructuring binds in lexical scope;
+// extensionless relative imports fall back to declaration-only .d.ts after
+// implementation candidates.
+const cacheVersion = "v296"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

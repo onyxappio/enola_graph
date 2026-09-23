@@ -318,6 +318,59 @@ func TestPublishedNamedReexportCachedUpgradeFromV281(t *testing.T) {
 	}
 }
 
+func TestPublishedWave8CachedUpgradeFromV295(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"src/schema.d.ts": "export interface TsLibGeneratorSchema { name: string }\n",
+		"src/schema.json": "{\"type\":\"object\"}\n",
+		"src/generator.ts": "import type { TsLibGeneratorSchema } from './schema'\nexport function run(s: TsLibGeneratorSchema) { return s }\n",
+		"src/a.ts": `export function useStep() { return { nextDelayed: (s: string) => s } }
+const { nextDelayed } = useStep()
+export function handleNextClick() { nextDelayed('start') }
+`,
+		"src/b.ts": `export function useStep() { return { nextDelayed: (s: string) => s } }
+const { nextDelayed } = useStep()
+export function handleNextClick() { nextDelayed('other') }
+`,
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("load state: %v %#v", err, st)
+	}
+	st.ExtractorVersion = "v295"
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	up := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, dir, up, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.ParsedFiles == 0 {
+		t.Fatal("v295 migration parsed no files")
+	}
+	c := applyGraph(t, first)
+	if err := c.ApplyRecords(up.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, coldSink))
+	assertCallResolvedToFile(t, c, "src/generator.ts", "src.TsLibGeneratorSchema", "src/schema.d.ts")
+	assertCallResolvedToFile(t, c, "src/a.ts", "src.nextDelayed", "src/a.ts")
+	if engine.ExtractorVersion() == "v295" {
+		t.Fatal("cached upgrade test requires cacheVersion newer than v295")
+	}
+}
+
 func TestPublishedBridgeTargetChangeResolvesToC(t *testing.T) {
 	dir := setupTSRepo(t, map[string]string{
 		"src/a.ts":      "import { round } from './bridge';\nexport function caller() { return round(1); }\n",
