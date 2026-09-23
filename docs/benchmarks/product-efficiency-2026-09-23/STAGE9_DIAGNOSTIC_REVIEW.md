@@ -1,6 +1,6 @@
 # Stage 9 diagnostic review
 
-Status at 2026-09-23 19:10 UTC: candidate code is not integrated. These are diagnostic findings, not final performance acceptance. The ongoing AI-editor watch uses the previously validated stage 8 binary, not this candidate.
+Initial review at 2026-09-23 19:10 UTC preceded integration. Patch 1 is now integrated with its discovery and same-metadata regression tests; the other candidates remain unintegrated. These are diagnostic findings, not final performance acceptance. The ongoing AI-editor watch uses the previously validated stage 8 binary, not this candidate.
 
 ## Shared TypeScript discovery enumeration
 

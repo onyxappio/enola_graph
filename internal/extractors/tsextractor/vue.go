@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/enola-labs/enola/internal/extractors/tsutil"
-	"io/fs"
 
 	"path/filepath"
 	"regexp"
@@ -124,31 +123,23 @@ func detectNuxtAt(ctx context.Context, dir string, inputScopes ...*inputscope.Sc
 func collectNuxtPackages(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) []string {
 	inputScope := inputscope.First(inputScopes)
 	var out []string
-	_ = overlayWalkDir(ctx, repoPath, inputScope, func(path string, d fs.DirEntry, err error) error {
+	for _, e := range sharedDiscoveryEntries(ctx, repoPath, inputScope) {
+		if !e.isDir {
+			continue
+		}
+		if !detectNuxtAt(ctx, e.path, inputScope) {
+			continue
+		}
+		rel, err := filepath.Rel(repoPath, e.path)
 		if err != nil {
-			return nil
-		}
-		if !d.IsDir() {
-			return nil
-		}
-		name := d.Name()
-		if path != repoPath && (strings.HasPrefix(name, ".") || tsSkipDirs[name] || name == "testdata") {
-			return filepath.SkipDir
-		}
-		if !detectNuxtAt(ctx, path, inputScope) {
-			return nil
-		}
-		rel, err := filepath.Rel(repoPath, path)
-		if err != nil {
-			return nil
+			continue
 		}
 		rel = factpath.Slash(rel)
 		if rel == "." {
 			rel = ""
 		}
 		out = append(out, rel)
-		return nil
-	})
+	}
 	sort.Slice(out, func(i, j int) bool { return len(out[i]) > len(out[j]) })
 	return out
 }

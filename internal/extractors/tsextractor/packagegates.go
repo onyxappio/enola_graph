@@ -3,7 +3,6 @@ package tsextractor
 import (
 	"context"
 	"encoding/json"
-	"io/fs"
 	"path/filepath"
 	"strings"
 
@@ -27,31 +26,21 @@ type packageGates struct {
 func collectPackageGates(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) packageGates {
 	inputScope := inputscope.First(inputScopes)
 	g := packageGates{byDir: map[string]pkgGate{}}
-	_ = overlayWalkDir(ctx, repoPath, inputScope, func(path string, d fs.DirEntry, err error) error {
+	for _, e := range sharedDiscoveryEntries(ctx, repoPath, inputScope) {
+		if e.isDir || e.name != "package.json" {
+			continue
+		}
+		data, err := overlayReadFile(ctx, e.path, inputScope)
 		if err != nil {
-			return nil
-		}
-		if d.IsDir() {
-			name := d.Name()
-			if path != repoPath && (strings.HasPrefix(name, ".") || tsSkipDirs[name] || name == "testdata") {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-		if d.Name() != "package.json" {
-			return nil
-		}
-		data, err := overlayReadFile(ctx, path, inputScope)
-		if err != nil {
-			return nil
+			continue
 		}
 		var p map[string]any
 		if err := json.Unmarshal(data, &p); err != nil || p == nil {
-			return nil
+			continue
 		}
-		rel, err := filepath.Rel(repoPath, filepath.Dir(path)) //factpath:host
+		rel, err := filepath.Rel(repoPath, filepath.Dir(e.path)) //factpath:host
 		if err != nil {
-			return nil
+			continue
 		}
 		pkgDir := factpath.Slash(rel)
 		gate := pkgGate{
@@ -64,8 +53,7 @@ func collectPackageGates(ctx context.Context, repoPath string, inputScopes ...*i
 		if gate.Prisma {
 			g.anyPrisma = true
 		}
-		return nil
-	})
+	}
 	return g
 }
 
