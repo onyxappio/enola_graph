@@ -1,0 +1,13 @@
+=== RUN   TestRootProbeTrackedAdditionPolicyScope
+=== RUN   TestRootProbeTrackedAdditionPolicyScope/untracked
+    root_policy_membership_probe_test.go:13: staged=false owners=[src/new-independent.ts] policy=false parsed=1 fallback=""
+=== RUN   TestRootProbeTrackedAdditionPolicyScope/tracked
+    root_policy_membership_probe_test.go:13: staged=true owners=[package.json src/alone.ts src/leaf.ts src/new-independent.ts src/use.ts tsconfig.json] policy=true parsed=1 fallback="frozen scope: global name-resolution domain"
+--- PASS: TestRootProbeTrackedAdditionPolicyScope (2.51s)
+    --- PASS: TestRootProbeTrackedAdditionPolicyScope/untracked (1.25s)
+    --- PASS: TestRootProbeTrackedAdditionPolicyScope/tracked (1.26s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	3.035s
+real 4.60
+user 3.18
+sys 1.63

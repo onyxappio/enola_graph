@@ -1,0 +1,1525 @@
+{
+  "history": {
+    "provenance": {
+      "note": "first-parent history; persistent delta state; cold oracle per commit; file-sink --events JSONL timings, not NATS JetStream",
+      "sink": "file",
+      "source_tree": "/tmp/enola-product-history-source",
+      "source_dirty_untracked": "?? .enola/\n?? mcp-arch.yaml",
+      "fetch_clone": "/tmp/enola-history-config-exploratory-2/product-fetch",
+      "ref": "a609c19f3861971930fae7b33dcb2950598953c5",
+      "ref_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+      "first_parent_shas": [
+        "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+        "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+        "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+        "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+        "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+        "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+        "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+        "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+        "a6f1f3a91a36ea3dead786560412a4944a009694",
+        "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+        "a609c19f3861971930fae7b33dcb2950598953c5"
+      ],
+      "selected_transitions": [
+        "4d104e600f89..07fb4a41ddaf",
+        "07fb4a41ddaf..fec1eac346c4",
+        "fec1eac346c4..9fc7ae5b4c3f",
+        "9fc7ae5b4c3f..1c2607479b6d",
+        "1c2607479b6d..599575d0aa39",
+        "599575d0aa39..ae233c5f5695",
+        "ae233c5f5695..4168360e2e7f",
+        "4168360e2e7f..a6f1f3a91a36",
+        "a6f1f3a91a36..5dfb2c8f276d",
+        "5dfb2c8f276d..a609c19f3861"
+      ],
+      "enola": {
+        "revision": "41e530e9ea5eb24543e9629d4ae59ac39674b526",
+        "dirty": true,
+        "status_porcelain": "?? bin/\n?? cmd/benchobserver/\n?? cmd/benchresident/\n?? snapshot-provenance.json",
+        "diff_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+        "untracked_names_sha256": "33e4c65cbc9ccca38af70602c003dae9c508e2111662807731a855fea57e1b14"
+      },
+      "binary": {
+        "path": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/config-exploratory-2-snapshot/bin/enola",
+        "sha256": "1cc5dbba923ca54265df4594986779e4dbe98516d113a20b019a0606121e0249",
+        "go_version_m": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/config-exploratory-2-snapshot/bin/enola: go1.26.8\n\tpath\tgithub.com/enola-labs/enola/cmd/enola\n\tmod\tgithub.com/enola-labs/enola\tv0.0.0-20260923053303-41e530e9ea5e+dirty\t\n\tdep\tgithub.com/ebitengine/purego\tv0.10.2\th1:W809HbnvzAxgdm+aOvlSekrM16wGCdT/e76+9tS7gzE=\n\tdep\tgithub.com/fsnotify/fsnotify\tv1.9.0\th1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=\n\tdep\tgithub.com/google/jsonschema-go\tv0.4.3\th1:/DBOLZTfDow7pe2GmaJNhltueGTtDKICi8V8p+DQPd0=\n\tdep\tgithub.com/klauspost/compress\tv1.18.0\th1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=\n\tdep\tgithub.com/mattn/go-pointer\tv0.0.1\th1:n+XhsuGeVO6MEAp7xyEukFINEa+Quek5psIR/ylA6o0=\n\tdep\tgithub.com/modelcontextprotocol/go-sdk\tv1.8.0\th1:KIvahhYqwtbeniWVPs3TcXEA7b8jEtwfBpOTAI+Urx4=\n\tdep\tgithub.com/nats-io/nats.go\tv1.47.0\th1:YQdADw6J/UfGUd2Oy6tn4Hq6YHxCaJrVKayxxFqYrgM=\n\tdep\tgithub.com/nats-io/nkeys\tv0.4.11\th1:q44qGV008kYd9W1b1nEBkNzvnWxtRSQ7A8BoqRrcfa0=\n\tdep\tgithub.com/nats-io/nuid\tv1.0.1\th1:5iA8DT8V7q8WK2EScv2padNa/rTESc1KdnPw4TC2paw=\n\tdep\tgithub.com/pbnjay/memory\tv0.0.0-20210728143218-7b4eea64cf58\th1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=\n\tdep\tgithub.com/segmentio/asm\tv1.1.3\th1:WM03sfUOENvvKexOLp+pCqgb/WDjsi7EK8gIsICtzhc=\n\tdep\tgithub.com/segmentio/encoding\tv0.5.4\th1:OW1VRern8Nw6ITAtwSZ7Idrl3MXCFwXHPgqESYfvNt0=\n\tdep\tgithub.com/tree-sitter-grammars/tree-sitter-kotlin\tv1.1.0\th1:SWIUDASa+WPhDDem1U5IJpYwQEezkqXrUI61OcnORzM=\n\tdep\tgithub.com/tree-sitter/go-tree-sitter\tv0.24.0\th1:kRZb6aBNfcI/u0Qh8XEt3zjNVnmxTisDBN+kXK0xRYQ=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c\tv0.23.6\th1:aHcghKEBgyUDUcCKFT5fELp26UBU7RBltj5MkRYxyy8=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c-sharp\tv0.23.1\th1:ddG6osP34sMieVNN6lu5ZG/3N8Wn+67+43BmipqidyM=\n\tdep\tgithub.com/tree-sitter/tree-sitter-cpp\tv0.23.4\th1:LaWZsiqQKvR65yHgKmnaqA+uz6tlDJTJFCyFIeZU/8w=\n\tdep\tgithub.com/tree-sitter/tree-sitter-java\tv0.23.5\th1:J9YeMGMwXYlKSP3K4Us8CitC6hjtMjqpeOf2GGo6tig=\n\tdep\tgithub.com/tree-sitter/tree-sitter-php\tv0.23.12\th1:zgnxrV5RUEbK9d3jm9R8CjR3uSA1pBPbvq7Tbjg8j0k=\n\tdep\tgithub.com/tree-sitter/tree-sitter-python\tv0.23.6\th1:qHnWFR5WhtMQpxBZRwiaU5Hk/29vGju6CVtmvu5Haas=\n\tdep\tgithub.com/tree-sitter/tree-sitter-ruby\tv0.23.1\th1:T/NKHUA+iVbHM440hFx+lzVOzS4dV6z8Qw8ai+72bYo=\n\tdep\tgithub.com/tree-sitter/tree-sitter-rust\tv0.23.3\th1:v41N2Dx5ZEzouqeQJ0IIH2cUwVw/iepwrUoE9D56IL4=\n\tdep\tgithub.com/tree-sitter/tree-sitter-scala\tv0.24.1\th1:jO4zDfb3vQWmqCDpLfhENVtP3RvOSLYNR69m0R/T6wY=\n\tdep\tgithub.com/tree-sitter/tree-sitter-typescript\tv0.23.2\th1:/Odvphn18PniVixb9e97X0DbNVsU6Qocv9mfkyzdXwU=\n\tdep\tgithub.com/yosida95/uritemplate/v3\tv3.0.2\th1:Ed3Oyj9yrmi9087+NczuL5BwkIc4wvTb5zIM+UJPGz4=\n\tdep\tgolang.org/x/crypto\tv0.37.0\th1:kJNSjF/Xp7kU0iB2Z+9viTPMW4EqqsrywMXLJOOsXSE=\n\tdep\tgolang.org/x/oauth2\tv0.35.0\th1:Mv2mzuHuZuY2+bkyWXIHMfhNdJAdwW3FuWeCPYN5GVQ=\n\tdep\tgolang.org/x/sync\tv0.20.0\th1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=\n\tdep\tgolang.org/x/sys\tv0.48.0\th1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=\n\tdep\tgolang.org/x/time\tv0.15.0\th1:bbrp8t3bGUeFOx08pvsMYRTCVSMk89u4tKbNOZbp88U=\n\tdep\tgopkg.in/yaml.v3\tv3.0.1\th1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\tCGO_ENABLED=1\n\tbuild\tCGO_CFLAGS=\n\tbuild\tCGO_CPPFLAGS=\n\tbuild\tCGO_CXXFLAGS=\n\tbuild\tCGO_LDFLAGS=\n\tbuild\tGOARCH=arm64\n\tbuild\tGOOS=darwin\n\tbuild\tGOARM64=v8.0\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=41e530e9ea5eb24543e9629d4ae59ac39674b526\n\tbuild\tvcs.time=2026-09-23T05:33:03Z\n\tbuild\tvcs.modified=true\n",
+        "go_version_m_sha256": "ce47f8b400e358e9140f9457c5a3934fa4010b4fc0d36436d77c1200de2edc99",
+        "go_version": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/config-exploratory-2-snapshot/bin/enola: go1.26.8",
+        "vcs_revision": "41e530e9ea5eb24543e9629d4ae59ac39674b526",
+        "vcs_modified": "true"
+      },
+      "input_policy": {
+        "pinned_source": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/product-mcp-arch.yaml",
+        "pinned_sha256": "4fd513e2cddf987e9f0f9afbc51a6d39e388fae2111b24489cb418cadc786db6",
+        "source_mcp_arch": "/tmp/enola-product-history-source/mcp-arch.yaml",
+        "source_mcp_arch_sha256": "4fd513e2cddf987e9f0f9afbc51a6d39e388fae2111b24489cb418cadc786db6",
+        "source_matches_pin": true,
+        "note": "pinned overlay applied only when the SHA has no tracked mcp-arch.yaml; historical tracked config is left in place",
+        "lockfiles_excluded_from_required_owners": true
+      },
+      "baseline": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/invalidation-history-2026-09-22/results.baseline-invalid-chronology.json"
+    },
+    "initial_sha": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+    "transitions": [
+      {
+        "id": "00-4d104e600f89..07fb4a41ddaf",
+        "index": 0,
+        "parent": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+        "child": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+        "changed_file_count": 6,
+        "required_owner_count": 2,
+        "required_owners_sample": [
+          "file:packages/tracking-client/src/core/tracker.ts",
+          "file:packages/tracking-client/src/web/beacon.ts"
+        ],
+        "delta": {
+          "exit": 0,
+          "wall_s": 3.595,
+          "sink": "file",
+          "parsed": 3,
+          "cached": 4219,
+          "files_read": 3,
+          "generation": [
+            1,
+            2
+          ],
+          "owners_published": 27,
+          "events": 12,
+          "run_id": "product-scope-scope-bench-2-1790141727243152000",
+          "manifest": {
+            "begin_count": 38,
+            "begin_digest": "289ca32ac1c02fe1d6a011c842780ba7a7ef23fae7fa96134421fd638e89ac18",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              1,
+              2
+            ],
+            "end_batch_count": 10,
+            "end_batch_digest": "f87a0b582c5ff5efbc70c2a4de298d4f0f325a7a0cdad4b2d5659142bbf7b311",
+            "end_owner_scope_len": 38,
+            "end_owner_scope_digest": "289ca32ac1c02fe1d6a011c842780ba7a7ef23fae7fa96134421fd638e89ac18",
+            "batch_seq_count": 10,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "cold": {
+          "exit": 0,
+          "wall_s": 29.126,
+          "sink": "file",
+          "parsed": 4120,
+          "cached": 0,
+          "files_read": 4220,
+          "generation": [
+            0,
+            1
+          ],
+          "owners_published": 5039,
+          "events": 2673,
+          "run_id": "product-scope-scope-bench-1-1790141762093780000",
+          "manifest": {
+            "begin_count": 8609,
+            "begin_digest": "fcfd526d24136fb8fd446fd6c9cec72c0b132bdf06f5bb4aa63df2e3fdec94a5",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              0,
+              1
+            ],
+            "end_batch_count": 2671,
+            "end_batch_digest": "ee816daa14653d6ddc5d9d2a91e7e80255aa14397561b8076cc684e2f7b8ef60",
+            "end_owner_scope_len": 8609,
+            "end_owner_scope_digest": "fcfd526d24136fb8fd446fd6c9cec72c0b132bdf06f5bb4aa63df2e3fdec94a5",
+            "batch_seq_count": 2671,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "begin_scope_count": 38,
+        "necessary_owner_count": 2,
+        "necessary_owners_sample": [
+          "file:packages/tracking-client/src/core/tracker.ts",
+          "file:packages/tracking-client/src/web/beacon.ts"
+        ],
+        "extra_begin_owner_count": 36,
+        "extra_begin_owners_sample": [
+          "file:.deepsec/package.json",
+          "file:analytics/dbt/pyproject.toml",
+          "file:apps/architect-console/package.json",
+          "file:apps/behavior-visualizer/package.json",
+          "file:apps/marketing-web/package.json",
+          "file:apps/mobile/modules/onyx-scroll-edge/package.json",
+          "file:apps/mobile/package.json",
+          "file:apps/safari-extension/package.json",
+          "file:infra/pulumi/package.json",
+          "file:package.json",
+          "file:packages/checkout-vue/package.json",
+          "file:packages/clickhouse/package.json",
+          "file:packages/contracts/package.json",
+          "file:packages/crypto/package.json",
+          "file:packages/database/package.json",
+          "file:packages/observability/package.json",
+          "file:packages/scan-engine/package.json",
+          "file:packages/state-machine-kernel/package.json",
+          "file:packages/state-machine-runtime/package.json",
+          "file:packages/state-machine-telemetry/package.json",
+          "file:packages/state-machine-visualization-contracts/package.json",
+          "file:packages/tracking-client/package.json",
+          "file:packages/tracking-client/src/index.ts",
+          "file:packages/tracking-client/src/native/index.ts",
+          "file:packages/tracking-client/src/vue/index.ts"
+        ],
+        "graph_hash_equal": true,
+        "kind": "delta",
+        "completed_generation": 2,
+        "sink": "file",
+        "blocker": null
+      },
+      {
+        "id": "01-07fb4a41ddaf..fec1eac346c4",
+        "index": 1,
+        "parent": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+        "child": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+        "changed_file_count": 9345,
+        "required_owner_count": 94,
+        "required_owners_sample": [
+          "file:apps/mobile/scripts/gate-shard-ci.ts",
+          "file:apps/mobile/src/appSurfaces/protect/protectSteadyStateAppSurface.tsx",
+          "file:apps/mobile/src/appSurfaces/visualCaptureAppSurface.tsx",
+          "file:apps/mobile/src/components/figma/bottomSheet/BottomSheet.tsx",
+          "file:apps/mobile/src/components/figma/buttons/Button.tsx",
+          "file:apps/mobile/src/components/figma/cards/CourseCardPreview.tsx",
+          "file:apps/mobile/src/components/figma/cards/FeatureCard.tsx",
+          "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingBrowsing.tsx",
+          "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingWelcome.tsx",
+          "file:apps/mobile/src/components/figma/cards/SettingsListCard.tsx",
+          "file:apps/mobile/src/components/figma/cards/SubscriptionInfoCard.tsx",
+          "file:apps/mobile/src/components/figma/cards/featureCardBorderInset.ts",
+          "file:apps/mobile/src/components/figma/coursePath/CoursePathCertificateSkiaCanvas.tsx",
+          "file:apps/mobile/src/components/figma/coursePath/CoursePathNodeSkiaCanvas.tsx",
+          "file:apps/mobile/src/components/figma/device/PointRowAction.tsx",
+          "file:apps/mobile/src/components/figma/device/PointsCard.tsx",
+          "file:apps/mobile/src/components/figma/device/pointsCardRowSeparator.ts",
+          "file:apps/mobile/src/components/figma/icons/GlassIconLock.tsx",
+          "file:apps/mobile/src/components/figma/icons/GlassIconPhone.tsx",
+          "file:apps/mobile/src/components/figma/icons/GlassIconShield.tsx",
+          "file:apps/mobile/src/components/figma/icons/GlassIconUser.tsx",
+          "file:apps/mobile/src/components/figma/icons/glass/GlassIcon.tsx",
+          "file:apps/mobile/src/components/figma/navigation/FilterGroup.tsx",
+          "file:apps/mobile/src/components/figma/navigation/IconButton.tsx",
+          "file:apps/mobile/src/components/figma/navigation/ProgressBarGroup.tsx"
+        ],
+        "delta": {
+          "exit": 0,
+          "wall_s": 27.281,
+          "sink": "file",
+          "parsed": 1671,
+          "cached": 2647,
+          "files_read": 1673,
+          "generation": [
+            2,
+            3
+          ],
+          "owners_published": 5043,
+          "events": 2679,
+          "run_id": "product-scope-scope-bench-3-1790141808853656000",
+          "manifest": {
+            "begin_count": 8613,
+            "begin_digest": "23837d126fe83712f0e485c4eb3bb39f4b865d1d634e451678c0b63836361289",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              2,
+              3
+            ],
+            "end_batch_count": 2677,
+            "end_batch_digest": "791a7bb27b0a6812b15a1a502d438adaa488ba6b5d01d933ef938a52db9ec871",
+            "end_owner_scope_len": 8613,
+            "end_owner_scope_digest": "23837d126fe83712f0e485c4eb3bb39f4b865d1d634e451678c0b63836361289",
+            "batch_seq_count": 2677,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "cold": {
+          "exit": 0,
+          "wall_s": 24.99,
+          "sink": "file",
+          "parsed": 4124,
+          "cached": 0,
+          "files_read": 4224,
+          "generation": [
+            0,
+            1
+          ],
+          "owners_published": 5043,
+          "events": 2679,
+          "run_id": "product-scope-scope-bench-1-1790141881011835000",
+          "manifest": {
+            "begin_count": 8613,
+            "begin_digest": "23837d126fe83712f0e485c4eb3bb39f4b865d1d634e451678c0b63836361289",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              0,
+              1
+            ],
+            "end_batch_count": 2677,
+            "end_batch_digest": "0ed2dc1e6b2cb0225977200b1820078df049f1dccbb3d76ad349476a6490fcac",
+            "end_owner_scope_len": 8613,
+            "end_owner_scope_digest": "23837d126fe83712f0e485c4eb3bb39f4b865d1d634e451678c0b63836361289",
+            "batch_seq_count": 2677,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "begin_scope_count": 8613,
+        "necessary_owner_count": 81,
+        "necessary_owners_sample": [
+          "file:apps/mobile/scripts/gate-shard-ci.ts",
+          "file:apps/mobile/src/appSurfaces/protect/protectSteadyStateAppSurface.tsx",
+          "file:apps/mobile/src/appSurfaces/visualCaptureAppSurface.tsx",
+          "file:apps/mobile/src/components/figma/buttons/Button.tsx",
+          "file:apps/mobile/src/components/figma/cards/CourseCardPreview.tsx",
+          "file:apps/mobile/src/components/figma/cards/FeatureCard.tsx",
+          "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingBrowsing.tsx",
+          "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingWelcome.tsx",
+          "file:apps/mobile/src/components/figma/cards/SettingsListCard.tsx",
+          "file:apps/mobile/src/components/figma/cards/SubscriptionInfoCard.tsx",
+          "file:apps/mobile/src/components/figma/cards/featureCardBorderInset.ts",
+          "file:apps/mobile/src/components/figma/coursePath/CoursePathCertificateSkiaCanvas.tsx",
+          "file:apps/mobile/src/components/figma/coursePath/CoursePathNodeSkiaCanvas.tsx",
+          "file:apps/mobile/src/components/figma/device/PointRowAction.tsx",
+          "file:apps/mobile/src/components/figma/device/PointsCard.tsx",
+          "file:apps/mobile/src/components/figma/device/pointsCardRowSeparator.ts",
+          "file:apps/mobile/src/components/figma/icons/GlassIconLock.tsx",
+          "file:apps/mobile/src/components/figma/icons/GlassIconPhone.tsx",
+          "file:apps/mobile/src/components/figma/icons/GlassIconShield.tsx",
+          "file:apps/mobile/src/components/figma/icons/GlassIconUser.tsx",
+          "file:apps/mobile/src/components/figma/icons/glass/GlassIcon.tsx",
+          "file:apps/mobile/src/components/figma/navigation/FilterGroup.tsx",
+          "file:apps/mobile/src/components/figma/navigation/IconButton.tsx",
+          "file:apps/mobile/src/components/figma/navigation/ProgressBarGroup.tsx",
+          "file:apps/mobile/src/components/figma/navigation/SectionHeader.tsx"
+        ],
+        "extra_begin_owner_count": 8532,
+        "extra_begin_owners_sample": [
+          "file:.claude/agents/codex-implementer.md",
+          "file:.deepsec/.gitignore",
+          "file:.deepsec/AGENTS.md",
+          "file:.deepsec/README.md",
+          "file:.deepsec/data/product/INFO.md",
+          "file:.deepsec/data/product/SETUP.md",
+          "file:.deepsec/data/product/tech.json",
+          "file:.deepsec/deepsec.config.ts",
+          "file:.deepsec/package.json",
+          "file:.deepsec/pnpm-workspace.yaml",
+          "file:.dockerignore",
+          "file:.easignore",
+          "file:.gitattributes",
+          "file:.githooks/post-checkout",
+          "file:.githooks/post-commit",
+          "file:.githooks/post-merge",
+          "file:.githooks/pre-commit",
+          "file:.githooks/pre-push",
+          "file:.github/actions/setup-node-pnpm/action.yml",
+          "file:.github/workflows/clickhouse-ci-cleanup.yml",
+          "file:.github/workflows/customerio-test-delivery-smoke.yml",
+          "file:.github/workflows/dbt-test-deploy.yml",
+          "file:.github/workflows/deploy-marketing-api.yml",
+          "file:.github/workflows/live-provider-smoke.yml",
+          "file:.github/workflows/mobile-qa-shards.yml"
+        ],
+        "graph_hash_equal": true,
+        "kind": "delta",
+        "completed_generation": 3,
+        "sink": "file",
+        "blocker": null
+      },
+      {
+        "id": "02-fec1eac346c4..9fc7ae5b4c3f",
+        "index": 2,
+        "parent": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+        "child": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+        "changed_file_count": 8125,
+        "required_owner_count": 17,
+        "required_owners_sample": [
+          "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingWelcome.tsx",
+          "file:apps/mobile/src/components/figma/cards/ListCardHeader.tsx",
+          "file:apps/mobile/src/components/figma/device/PointRowAction.tsx",
+          "file:apps/mobile/src/screens/train/TrainRuntimeScreen.tsx",
+          "file:apps/mobile/src/visual-diff/collapsedComponentVisibleText.ts",
+          "file:apps/mobile/src/visual-diff/componentActualBoundsDiff.ts",
+          "file:apps/mobile/src/visual-diff/componentLayoutMaskDiff.ts",
+          "file:apps/mobile/src/visual-diff/componentSlotOwnership.ts",
+          "file:apps/mobile/src/visual-diff/figmaMarkerManifest.ts",
+          "file:apps/mobile/src/visual-diff/figmaMarkerOwnership.ts",
+          "file:apps/mobile/src/visual-diff/gateEvaluatorOwnership.ts",
+          "file:apps/mobile/src/visual-diff/gateInputsHash.ts",
+          "file:apps/mobile/src/visual-diff/gateSourceClosure.ts",
+          "file:apps/mobile/src/visual-diff/gateStructureEval.ts",
+          "file:apps/mobile/src/visual-diff/screenComponentGateClosure.ts",
+          "file:apps/mobile/src/visual-diff/screenGateWaivers.ts",
+          "file:docs/engineering/sot-conflicts/2026-09-19-train-intentional-runtime-divergences.md"
+        ],
+        "delta": {
+          "exit": 0,
+          "wall_s": 25.845,
+          "sink": "file",
+          "parsed": 1599,
+          "cached": 2643,
+          "files_read": 1599,
+          "generation": [
+            3,
+            4
+          ],
+          "owners_published": 5046,
+          "events": 2681,
+          "run_id": "product-scope-scope-bench-4-1790141916512774000",
+          "manifest": {
+            "begin_count": 8616,
+            "begin_digest": "6f472cde2c810f6c11a376e6dbf358a7d58ad75739f0206108043b148f58cc9e",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              3,
+              4
+            ],
+            "end_batch_count": 2679,
+            "end_batch_digest": "f52057140ca3b331a0131cb378cb84de747520fb08fb8733d3e7e96519b76739",
+            "end_owner_scope_len": 8616,
+            "end_owner_scope_digest": "6f472cde2c810f6c11a376e6dbf358a7d58ad75739f0206108043b148f58cc9e",
+            "batch_seq_count": 2679,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "cold": {
+          "exit": 0,
+          "wall_s": 24.466,
+          "sink": "file",
+          "parsed": 4126,
+          "cached": 0,
+          "files_read": 4226,
+          "generation": [
+            0,
+            1
+          ],
+          "owners_published": 5046,
+          "events": 2681,
+          "run_id": "product-scope-scope-bench-1-1790141977980321000",
+          "manifest": {
+            "begin_count": 8616,
+            "begin_digest": "6f472cde2c810f6c11a376e6dbf358a7d58ad75739f0206108043b148f58cc9e",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              0,
+              1
+            ],
+            "end_batch_count": 2679,
+            "end_batch_digest": "34572b048bc082d7cf9405f33e2e9f01e6ae74f293c45c4d4b89f871cb837bd2",
+            "end_owner_scope_len": 8616,
+            "end_owner_scope_digest": "6f472cde2c810f6c11a376e6dbf358a7d58ad75739f0206108043b148f58cc9e",
+            "batch_seq_count": 2679,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "begin_scope_count": 8616,
+        "necessary_owner_count": 17,
+        "necessary_owners_sample": [
+          "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingWelcome.tsx",
+          "file:apps/mobile/src/components/figma/cards/ListCardHeader.tsx",
+          "file:apps/mobile/src/components/figma/device/PointRowAction.tsx",
+          "file:apps/mobile/src/screens/train/TrainRuntimeScreen.tsx",
+          "file:apps/mobile/src/visual-diff/collapsedComponentVisibleText.ts",
+          "file:apps/mobile/src/visual-diff/componentActualBoundsDiff.ts",
+          "file:apps/mobile/src/visual-diff/componentLayoutMaskDiff.ts",
+          "file:apps/mobile/src/visual-diff/componentSlotOwnership.ts",
+          "file:apps/mobile/src/visual-diff/figmaMarkerManifest.ts",
+          "file:apps/mobile/src/visual-diff/figmaMarkerOwnership.ts",
+          "file:apps/mobile/src/visual-diff/gateEvaluatorOwnership.ts",
+          "file:apps/mobile/src/visual-diff/gateInputsHash.ts",
+          "file:apps/mobile/src/visual-diff/gateSourceClosure.ts",
+          "file:apps/mobile/src/visual-diff/gateStructureEval.ts",
+          "file:apps/mobile/src/visual-diff/screenComponentGateClosure.ts",
+          "file:apps/mobile/src/visual-diff/screenGateWaivers.ts",
+          "file:docs/engineering/sot-conflicts/2026-09-19-train-intentional-runtime-divergences.md"
+        ],
+        "extra_begin_owner_count": 8599,
+        "extra_begin_owners_sample": [
+          "file:.claude/agents/codex-implementer.md",
+          "file:.deepsec/.gitignore",
+          "file:.deepsec/AGENTS.md",
+          "file:.deepsec/README.md",
+          "file:.deepsec/data/product/INFO.md",
+          "file:.deepsec/data/product/SETUP.md",
+          "file:.deepsec/data/product/tech.json",
+          "file:.deepsec/deepsec.config.ts",
+          "file:.deepsec/package.json",
+          "file:.deepsec/pnpm-workspace.yaml",
+          "file:.dockerignore",
+          "file:.easignore",
+          "file:.gitattributes",
+          "file:.githooks/post-checkout",
+          "file:.githooks/post-commit",
+          "file:.githooks/post-merge",
+          "file:.githooks/pre-commit",
+          "file:.githooks/pre-push",
+          "file:.github/actions/setup-node-pnpm/action.yml",
+          "file:.github/workflows/clickhouse-ci-cleanup.yml",
+          "file:.github/workflows/customerio-test-delivery-smoke.yml",
+          "file:.github/workflows/dbt-test-deploy.yml",
+          "file:.github/workflows/deploy-marketing-api.yml",
+          "file:.github/workflows/live-provider-smoke.yml",
+          "file:.github/workflows/mobile-qa-shards.yml"
+        ],
+        "graph_hash_equal": true,
+        "kind": "delta",
+        "completed_generation": 4,
+        "sink": "file",
+        "blocker": null
+      },
+      {
+        "id": "03-9fc7ae5b4c3f..1c2607479b6d",
+        "index": 3,
+        "parent": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+        "child": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+        "changed_file_count": 70,
+        "required_owner_count": 41,
+        "required_owners_sample": [
+          "file:docs/reports/T-578-managed-hosted-checkout-implementation.md",
+          "file:docs/reports/T-578-prod-stripe-managed-offers-unavailable.md",
+          "file:infra/pulumi/README.md",
+          "file:infra/pulumi/config/payment-seed-offers/README.md",
+          "file:infra/pulumi/src/environmentProfile.ts",
+          "file:infra/pulumi/src/gcp/cloudRun.ts",
+          "file:infra/pulumi/src/onyxEnvironment.ts",
+          "file:packages/checkout-vue/src/api.ts",
+          "file:packages/checkout-vue/src/paymentForm.ts",
+          "file:packages/checkout-vue/src/types.ts",
+          "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+          "file:packages/clickhouse/src/productCoreClickPipes.ts",
+          "file:packages/contracts/src/payment/checkoutAuthorization.ts",
+          "file:packages/contracts/src/payment/funnel.ts",
+          "file:packages/contracts/src/payment/paymentMode.ts",
+          "file:packages/database/src/productCoreCdcColumns.ts",
+          "file:packages/database/src/schema.ts",
+          "file:scripts/deploy/cloudflare-origin.test.mjs",
+          "file:scripts/deploy/configure-pulumi-stack.mjs",
+          "file:scripts/deploy/payment-api-deploy.test.mjs",
+          "file:scripts/deploy/pr-demo-fingerprint.mjs",
+          "file:scripts/deploy/pr-demo-fingerprint.test.mjs",
+          "file:scripts/deploy/product-core-clickpipes-test-image-provenance.mjs",
+          "file:scripts/deploy/reconcile-expired-tracking-subscriptions.test.mjs",
+          "file:scripts/deploy/stripe-checkout-runtime-config.mjs"
+        ],
+        "delta": {
+          "exit": 0,
+          "wall_s": 25.905,
+          "sink": "file",
+          "parsed": 52,
+          "cached": 4213,
+          "files_read": 52,
+          "generation": [
+            4,
+            5
+          ],
+          "owners_published": 5050,
+          "events": 2685,
+          "run_id": "product-scope-scope-bench-5-1790142011752958000",
+          "manifest": {
+            "begin_count": 8622,
+            "begin_digest": "1440b93fa3b61a13a891593915c3906a509ae5c43d25016347ebbd87ed32d1d8",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              4,
+              5
+            ],
+            "end_batch_count": 2683,
+            "end_batch_digest": "432d8a9151b85092a5df730772494d161622ce6e1a20335d835a9b4f8a687a53",
+            "end_owner_scope_len": 8622,
+            "end_owner_scope_digest": "1440b93fa3b61a13a891593915c3906a509ae5c43d25016347ebbd87ed32d1d8",
+            "batch_seq_count": 2683,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "cold": {
+          "exit": 0,
+          "wall_s": 29.51,
+          "sink": "file",
+          "parsed": 4128,
+          "cached": 0,
+          "files_read": 4228,
+          "generation": [
+            0,
+            1
+          ],
+          "owners_published": 5050,
+          "events": 2685,
+          "run_id": "product-scope-scope-bench-1-1790142073820722000",
+          "manifest": {
+            "begin_count": 8622,
+            "begin_digest": "1440b93fa3b61a13a891593915c3906a509ae5c43d25016347ebbd87ed32d1d8",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              0,
+              1
+            ],
+            "end_batch_count": 2683,
+            "end_batch_digest": "7dacf19357be041e15049098a224a1a1d8ef7a80f3576b34fc408e5617cff417",
+            "end_owner_scope_len": 8622,
+            "end_owner_scope_digest": "1440b93fa3b61a13a891593915c3906a509ae5c43d25016347ebbd87ed32d1d8",
+            "batch_seq_count": 2683,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "begin_scope_count": 8622,
+        "necessary_owner_count": 35,
+        "necessary_owners_sample": [
+          "file:docs/reports/T-578-managed-hosted-checkout-implementation.md",
+          "file:docs/reports/T-578-prod-stripe-managed-offers-unavailable.md",
+          "file:infra/pulumi/README.md",
+          "file:infra/pulumi/src/environmentProfile.ts",
+          "file:infra/pulumi/src/gcp/cloudRun.ts",
+          "file:packages/checkout-vue/src/api.ts",
+          "file:packages/checkout-vue/src/paymentForm.ts",
+          "file:packages/checkout-vue/src/types.ts",
+          "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+          "file:packages/clickhouse/src/productCoreClickPipes.ts",
+          "file:packages/contracts/src/payment/checkoutAuthorization.ts",
+          "file:packages/contracts/src/payment/funnel.ts",
+          "file:packages/database/src/productCoreCdcColumns.ts",
+          "file:packages/database/src/schema.ts",
+          "file:scripts/deploy/configure-pulumi-stack.mjs",
+          "file:scripts/deploy/payment-api-deploy.test.mjs",
+          "file:scripts/deploy/pr-demo-fingerprint.mjs",
+          "file:scripts/deploy/product-core-clickpipes-test-image-provenance.mjs",
+          "file:scripts/deploy/reconcile-expired-tracking-subscriptions.test.mjs",
+          "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+          "file:scripts/deploy/stripe-checkout-runtime-config.test.mjs",
+          "file:services/payment-api/src/checkoutAuthorization.ts",
+          "file:services/payment-api/src/checkoutReturn.ts",
+          "file:services/payment-api/src/config.ts",
+          "file:services/payment-api/src/domain.ts"
+        ],
+        "extra_begin_owner_count": 8587,
+        "extra_begin_owners_sample": [
+          "file:.claude/agents/codex-implementer.md",
+          "file:.deepsec/.gitignore",
+          "file:.deepsec/AGENTS.md",
+          "file:.deepsec/README.md",
+          "file:.deepsec/data/product/INFO.md",
+          "file:.deepsec/data/product/SETUP.md",
+          "file:.deepsec/data/product/tech.json",
+          "file:.deepsec/deepsec.config.ts",
+          "file:.deepsec/package.json",
+          "file:.deepsec/pnpm-workspace.yaml",
+          "file:.dockerignore",
+          "file:.easignore",
+          "file:.gitattributes",
+          "file:.githooks/post-checkout",
+          "file:.githooks/post-commit",
+          "file:.githooks/post-merge",
+          "file:.githooks/pre-commit",
+          "file:.githooks/pre-push",
+          "file:.github/actions/setup-node-pnpm/action.yml",
+          "file:.github/workflows/clickhouse-ci-cleanup.yml",
+          "file:.github/workflows/customerio-test-delivery-smoke.yml",
+          "file:.github/workflows/dbt-test-deploy.yml",
+          "file:.github/workflows/deploy-marketing-api.yml",
+          "file:.github/workflows/live-provider-smoke.yml",
+          "file:.github/workflows/mobile-qa-shards.yml"
+        ],
+        "graph_hash_equal": true,
+        "kind": "delta",
+        "completed_generation": 5,
+        "sink": "file",
+        "blocker": null
+      },
+      {
+        "id": "04-1c2607479b6d..599575d0aa39",
+        "index": 4,
+        "parent": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+        "child": "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+        "changed_file_count": 15,
+        "required_owner_count": 10,
+        "required_owners_sample": [
+          "file:docs/reports/T-578-managed-hosted-checkout-implementation.md",
+          "file:infra/pulumi/README.md",
+          "file:infra/pulumi/src/environmentProfile.ts",
+          "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+          "file:scripts/deploy/stripe-checkout-runtime-config.test.mjs",
+          "file:services/payment-api/src/checkoutReturn.ts",
+          "file:services/payment-api/src/config.ts",
+          "file:services/payment-api/src/providers/stripe.ts",
+          "file:services/payment-api/src/providers/types.ts",
+          "file:services/payment-api/src/routes/funnel.ts"
+        ],
+        "delta": {
+          "exit": 0,
+          "wall_s": 8.423,
+          "sink": "file",
+          "parsed": 22,
+          "cached": 4214,
+          "files_read": 22,
+          "generation": [
+            5,
+            6
+          ],
+          "owners_published": 191,
+          "events": 254,
+          "run_id": "product-scope-scope-bench-6-1790142114116318000",
+          "manifest": {
+            "begin_count": 202,
+            "begin_digest": "aac00ba9c845f70c00bd864f201d238a4b4cc9e99d29a812e1d4c9e75a7537f6",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              5,
+              6
+            ],
+            "end_batch_count": 252,
+            "end_batch_digest": "cb9e4e3043fd85ec5bd22cef54426f04aa17021b86bb4e02ad56f09a9e4cb390",
+            "end_owner_scope_len": 202,
+            "end_owner_scope_digest": "aac00ba9c845f70c00bd864f201d238a4b4cc9e99d29a812e1d4c9e75a7537f6",
+            "batch_seq_count": 252,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "cold": {
+          "exit": 0,
+          "wall_s": 36.614,
+          "sink": "file",
+          "parsed": 4128,
+          "cached": 0,
+          "files_read": 4228,
+          "generation": [
+            0,
+            1
+          ],
+          "owners_published": 5050,
+          "events": 2685,
+          "run_id": "product-scope-scope-bench-1-1790142573038696000",
+          "manifest": {
+            "begin_count": 8622,
+            "begin_digest": "1440b93fa3b61a13a891593915c3906a509ae5c43d25016347ebbd87ed32d1d8",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              0,
+              1
+            ],
+            "end_batch_count": 2683,
+            "end_batch_digest": "1534e02916b826c6932c0a9a07df8ee78d95f2c2feaadd9bc97107bd5cec23ba",
+            "end_owner_scope_len": 8622,
+            "end_owner_scope_digest": "1440b93fa3b61a13a891593915c3906a509ae5c43d25016347ebbd87ed32d1d8",
+            "batch_seq_count": 2683,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "begin_scope_count": 202,
+        "necessary_owner_count": 6,
+        "necessary_owners_sample": [
+          "file:infra/pulumi/src/environmentProfile.ts",
+          "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+          "file:services/payment-api/src/checkoutReturn.ts",
+          "file:services/payment-api/src/config.ts",
+          "file:services/payment-api/src/providers/stripe.ts",
+          "file:services/payment-api/src/routes/funnel.ts"
+        ],
+        "extra_begin_owner_count": 196,
+        "extra_begin_owners_sample": [
+          "file:.deepsec/package.json",
+          "file:analytics/dbt/pyproject.toml",
+          "file:apps/architect-console/package.json",
+          "file:apps/behavior-visualizer/package.json",
+          "file:apps/marketing-web/package.json",
+          "file:apps/mobile/modules/onyx-scroll-edge/package.json",
+          "file:apps/mobile/package.json",
+          "file:apps/safari-extension/package.json",
+          "file:docs/reports/T-578-managed-hosted-checkout-implementation.md",
+          "file:infra/pulumi/README.md",
+          "file:infra/pulumi/package.json",
+          "file:infra/pulumi/src/cloudflare/access.ts",
+          "file:infra/pulumi/src/cloudflare/qaTelemetryAccessPolicy.ts",
+          "file:infra/pulumi/src/cloudflare/rateLimit.ts",
+          "file:infra/pulumi/src/cloudflare/trainMediaCache.ts",
+          "file:infra/pulumi/src/config.ts",
+          "file:infra/pulumi/src/gcp/architectConsole.ts",
+          "file:infra/pulumi/src/gcp/capiSender.ts",
+          "file:infra/pulumi/src/gcp/cloudRun.ts",
+          "file:infra/pulumi/src/gcp/data.ts",
+          "file:infra/pulumi/src/gcp/databaseMigrations.ts",
+          "file:infra/pulumi/src/gcp/lightdash.ts",
+          "file:infra/pulumi/src/gcp/loadBalancer.ts",
+          "file:infra/pulumi/src/gcp/memoryProvider.ts",
+          "file:infra/pulumi/src/gcp/otelGateway.ts"
+        ],
+        "graph_hash_equal": true,
+        "kind": "delta",
+        "completed_generation": 6,
+        "sink": "file",
+        "blocker": null
+      },
+      {
+        "id": "05-599575d0aa39..ae233c5f5695",
+        "index": 5,
+        "parent": "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+        "child": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+        "changed_file_count": 60,
+        "required_owner_count": 31,
+        "required_owners_sample": [
+          "file:docs/plans/2026-09-19-t578-payment-offer-catalog-sync.md",
+          "file:docs/qa/mb-2-payment-api-test-offers.md",
+          "file:docs/reports/T-578-prod-stripe-managed-offers-unavailable.md",
+          "file:docs/specs/2026-09-19-t578-payment-offer-catalog-sync.md",
+          "file:infra/pulumi/README.md",
+          "file:infra/pulumi/config/payment-seed-offers/README.md",
+          "file:infra/pulumi/src/environmentProfile.ts",
+          "file:infra/pulumi/src/gcp/cloudRun.ts",
+          "file:infra/pulumi/src/onyxEnvironment.ts",
+          "file:packages/database/catalogs/payment-offers/README.md",
+          "file:packages/database/package.json",
+          "file:packages/database/src/index.ts",
+          "file:packages/database/src/paymentDemoRuntime.mjs",
+          "file:packages/database/src/paymentOfferCatalog.ts",
+          "file:packages/database/src/paymentOfferSeed.ts",
+          "file:packages/database/src/paymentOfferSync.ts",
+          "file:packages/database/src/paymentOfferSyncCli.ts",
+          "file:packages/database/src/schema.ts",
+          "file:scripts/deploy/configure-pulumi-stack.mjs",
+          "file:scripts/deploy/payment-api-deploy.test.mjs",
+          "file:scripts/deploy/payment-offer-sync.test.mjs",
+          "file:scripts/deploy/pr-demo-fingerprint.mjs",
+          "file:scripts/deploy/pr-demo-fingerprint.test.mjs",
+          "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+          "file:scripts/deploy/stripe-checkout-runtime-config.test.mjs"
+        ],
+        "delta": {
+          "exit": 0,
+          "wall_s": 32.892,
+          "sink": "file",
+          "parsed": 111,
+          "cached": 4147,
+          "files_read": 111,
+          "generation": [
+            6,
+            7
+          ],
+          "owners_published": 5059,
+          "events": 2687,
+          "run_id": "product-scope-scope-bench-7-1790142620210886000",
+          "manifest": {
+            "begin_count": 8636,
+            "begin_digest": "61990e16729808e82b64974b380ba69adb2220e0825cedcb8dd621bff16108ba",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              6,
+              7
+            ],
+            "end_batch_count": 2685,
+            "end_batch_digest": "fa8977d2380fb52fd94617fbb10153f6e99dbaeb0c596af45f19bf02ff05fd3b",
+            "end_owner_scope_len": 8636,
+            "end_owner_scope_digest": "61990e16729808e82b64974b380ba69adb2220e0825cedcb8dd621bff16108ba",
+            "batch_seq_count": 2685,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "cold": {
+          "exit": 0,
+          "wall_s": 27.659,
+          "sink": "file",
+          "parsed": 4135,
+          "cached": 0,
+          "files_read": 4235,
+          "generation": [
+            0,
+            1
+          ],
+          "owners_published": 5059,
+          "events": 2687,
+          "run_id": "product-scope-scope-bench-1-1790142696508464000",
+          "manifest": {
+            "begin_count": 8635,
+            "begin_digest": "e454cc22af7c7f5f74e62ca473c88b6191a0fd9cdc66e17b92f131ca967fdf63",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              0,
+              1
+            ],
+            "end_batch_count": 2685,
+            "end_batch_digest": "98cdc05e3452771005c33ecb8a320c3fb7221ae2db92d69c78eeb0b99633ae6c",
+            "end_owner_scope_len": 8635,
+            "end_owner_scope_digest": "e454cc22af7c7f5f74e62ca473c88b6191a0fd9cdc66e17b92f131ca967fdf63",
+            "batch_seq_count": 2685,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "begin_scope_count": 8636,
+        "necessary_owner_count": 29,
+        "necessary_owners_sample": [
+          "file:docs/gangsta/t432-analytics-users-dimension/plans/2026-08-25-execution-plan.md",
+          "file:docs/gangsta/t432-clickpipes-product-core-bronze/plans/2026-08-27-execution-plan.md",
+          "file:docs/plans/2026-09-19-t578-payment-offer-catalog-sync.md",
+          "file:docs/qa/mb-2-payment-api-test-offers.md",
+          "file:docs/reports/T-578-prod-stripe-managed-offers-unavailable.md",
+          "file:docs/specs/2026-09-19-t578-payment-offer-catalog-sync.md",
+          "file:infra/pulumi/README.md",
+          "file:infra/pulumi/config/payment-seed-offers/README.md",
+          "file:infra/pulumi/src/environmentProfile.ts",
+          "file:infra/pulumi/src/gcp/cloudRun.ts",
+          "file:packages/database/catalogs/payment-offers/README.md",
+          "file:packages/database/src/index.ts",
+          "file:packages/database/src/paymentDemoRuntime.mjs",
+          "file:packages/database/src/paymentOfferCatalog.ts",
+          "file:packages/database/src/paymentOfferSeed.ts",
+          "file:packages/database/src/paymentOfferSync.ts",
+          "file:packages/database/src/paymentOfferSyncCli.ts",
+          "file:packages/database/src/schema.ts",
+          "file:scripts/deploy/configure-pulumi-stack.mjs",
+          "file:scripts/deploy/payment-api-deploy.test.mjs",
+          "file:scripts/deploy/payment-offer-sync.test.mjs",
+          "file:scripts/deploy/pr-demo-fingerprint.mjs",
+          "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+          "file:scripts/deploy/stripe-checkout-runtime-config.test.mjs",
+          "file:services/payment-api/src/config.ts"
+        ],
+        "extra_begin_owner_count": 8607,
+        "extra_begin_owners_sample": [
+          "file:.claude/agents/codex-implementer.md",
+          "file:.deepsec/.gitignore",
+          "file:.deepsec/AGENTS.md",
+          "file:.deepsec/README.md",
+          "file:.deepsec/data/product/INFO.md",
+          "file:.deepsec/data/product/SETUP.md",
+          "file:.deepsec/data/product/tech.json",
+          "file:.deepsec/deepsec.config.ts",
+          "file:.deepsec/package.json",
+          "file:.deepsec/pnpm-workspace.yaml",
+          "file:.dockerignore",
+          "file:.easignore",
+          "file:.gitattributes",
+          "file:.githooks/post-checkout",
+          "file:.githooks/post-commit",
+          "file:.githooks/post-merge",
+          "file:.githooks/pre-commit",
+          "file:.githooks/pre-push",
+          "file:.github/actions/setup-node-pnpm/action.yml",
+          "file:.github/workflows/clickhouse-ci-cleanup.yml",
+          "file:.github/workflows/customerio-test-delivery-smoke.yml",
+          "file:.github/workflows/dbt-test-deploy.yml",
+          "file:.github/workflows/deploy-marketing-api.yml",
+          "file:.github/workflows/live-provider-smoke.yml",
+          "file:.github/workflows/mobile-qa-shards.yml"
+        ],
+        "graph_hash_equal": true,
+        "kind": "delta",
+        "completed_generation": 7,
+        "sink": "file",
+        "blocker": null
+      },
+      {
+        "id": "06-ae233c5f5695..4168360e2e7f",
+        "index": 6,
+        "parent": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+        "child": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+        "changed_file_count": 15,
+        "required_owner_count": 10,
+        "required_owners_sample": [
+          "file:docs/analytics/product-core-bronze.md",
+          "file:packages/clickhouse/package.json",
+          "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+          "file:packages/clickhouse/src/productCoreBronze/schemaVerifier.ts",
+          "file:packages/clickhouse/src/productCoreClickPipes.ts",
+          "file:packages/database/src/productCoreCdcCli.ts",
+          "file:packages/database/src/productCoreCdcExpansion.ts",
+          "file:packages/database/src/productCoreCdcPostgres.ts",
+          "file:packages/database/src/productCoreCdcProjection.ts",
+          "file:packages/database/src/productCoreCdcTypes.ts"
+        ],
+        "delta": {
+          "exit": 0,
+          "wall_s": 23.49,
+          "sink": "file",
+          "parsed": 13,
+          "cached": 4231,
+          "files_read": 13,
+          "generation": [
+            7,
+            8
+          ],
+          "owners_published": 5060,
+          "events": 2688,
+          "run_id": "product-scope-scope-bench-8-1790142733354234000",
+          "manifest": {
+            "begin_count": 8636,
+            "begin_digest": "4733f83f35f5c9666f5caf1c0b7deae16df0d5d773abd5361c697ff9f132bfae",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              7,
+              8
+            ],
+            "end_batch_count": 2686,
+            "end_batch_digest": "41f3f21dff8ba4e1d61ba2ec7e0b679a1cf7fc533d9215058ebeeb6c59381e72",
+            "end_owner_scope_len": 8636,
+            "end_owner_scope_digest": "4733f83f35f5c9666f5caf1c0b7deae16df0d5d773abd5361c697ff9f132bfae",
+            "batch_seq_count": 2686,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "cold": {
+          "exit": 0,
+          "wall_s": 24.797,
+          "sink": "file",
+          "parsed": 4136,
+          "cached": 0,
+          "files_read": 4236,
+          "generation": [
+            0,
+            1
+          ],
+          "owners_published": 5060,
+          "events": 2688,
+          "run_id": "product-scope-scope-bench-1-1790142794136656000",
+          "manifest": {
+            "begin_count": 8636,
+            "begin_digest": "4733f83f35f5c9666f5caf1c0b7deae16df0d5d773abd5361c697ff9f132bfae",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              0,
+              1
+            ],
+            "end_batch_count": 2686,
+            "end_batch_digest": "3e5a5e831d2c84208f29198d3bf22c6e8d90cd27278715877a60a76119620870",
+            "end_owner_scope_len": 8636,
+            "end_owner_scope_digest": "4733f83f35f5c9666f5caf1c0b7deae16df0d5d773abd5361c697ff9f132bfae",
+            "batch_seq_count": 2686,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "begin_scope_count": 8636,
+        "necessary_owner_count": 10,
+        "necessary_owners_sample": [
+          "file:docs/analytics/product-core-bronze.md",
+          "file:packages/clickhouse/package.json",
+          "file:packages/clickhouse/src/productCoreBronze/schemaVerifier.ts",
+          "file:packages/clickhouse/src/productCoreClickPipes.ts",
+          "file:packages/database/package.json",
+          "file:packages/database/src/productCoreCdcCli.ts",
+          "file:packages/database/src/productCoreCdcExpansion.ts",
+          "file:packages/database/src/productCoreCdcPostgres.ts",
+          "file:packages/database/src/productCoreCdcProjection.ts",
+          "file:packages/database/src/productCoreCdcTypes.ts"
+        ],
+        "extra_begin_owner_count": 8626,
+        "extra_begin_owners_sample": [
+          "file:.claude/agents/codex-implementer.md",
+          "file:.deepsec/.gitignore",
+          "file:.deepsec/AGENTS.md",
+          "file:.deepsec/README.md",
+          "file:.deepsec/data/product/INFO.md",
+          "file:.deepsec/data/product/SETUP.md",
+          "file:.deepsec/data/product/tech.json",
+          "file:.deepsec/deepsec.config.ts",
+          "file:.deepsec/package.json",
+          "file:.deepsec/pnpm-workspace.yaml",
+          "file:.dockerignore",
+          "file:.easignore",
+          "file:.gitattributes",
+          "file:.githooks/post-checkout",
+          "file:.githooks/post-commit",
+          "file:.githooks/post-merge",
+          "file:.githooks/pre-commit",
+          "file:.githooks/pre-push",
+          "file:.github/actions/setup-node-pnpm/action.yml",
+          "file:.github/workflows/clickhouse-ci-cleanup.yml",
+          "file:.github/workflows/customerio-test-delivery-smoke.yml",
+          "file:.github/workflows/dbt-test-deploy.yml",
+          "file:.github/workflows/deploy-marketing-api.yml",
+          "file:.github/workflows/live-provider-smoke.yml",
+          "file:.github/workflows/mobile-qa-shards.yml"
+        ],
+        "graph_hash_equal": true,
+        "kind": "delta",
+        "completed_generation": 8,
+        "sink": "file",
+        "blocker": null
+      },
+      {
+        "id": "07-4168360e2e7f..a6f1f3a91a36",
+        "index": 7,
+        "parent": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+        "child": "a6f1f3a91a36ea3dead786560412a4944a009694",
+        "changed_file_count": 5,
+        "required_owner_count": 4,
+        "required_owners_sample": [
+          "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+          "file:packages/clickhouse/src/productCoreClickPipes.ts",
+          "file:packages/database/src/productCoreCdc.ts",
+          "file:packages/database/src/productCoreCdcColumns.ts"
+        ],
+        "delta": {
+          "exit": 0,
+          "wall_s": 3.808,
+          "sink": "file",
+          "parsed": 4,
+          "cached": 4232,
+          "files_read": 4,
+          "generation": [
+            8,
+            9
+          ],
+          "owners_published": 33,
+          "events": 34,
+          "run_id": "product-scope-scope-bench-9-1790142828320087000",
+          "manifest": {
+            "begin_count": 33,
+            "begin_digest": "c2c3539799098656ab78c0c986728fb24ed84cc592683af7aa39832eb91d5eb7",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              8,
+              9
+            ],
+            "end_batch_count": 32,
+            "end_batch_digest": "7ffc3f6e3e9508e35b969babc932fe4b59ff5d45f3158ae436e8d75ec7675610",
+            "end_owner_scope_len": 33,
+            "end_owner_scope_digest": "c2c3539799098656ab78c0c986728fb24ed84cc592683af7aa39832eb91d5eb7",
+            "batch_seq_count": 32,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "cold": {
+          "exit": 0,
+          "wall_s": 26.362,
+          "sink": "file",
+          "parsed": 4136,
+          "cached": 0,
+          "files_read": 4236,
+          "generation": [
+            0,
+            1
+          ],
+          "owners_published": 5060,
+          "events": 2688,
+          "run_id": "product-scope-scope-bench-1-1790142866489816000",
+          "manifest": {
+            "begin_count": 8636,
+            "begin_digest": "4733f83f35f5c9666f5caf1c0b7deae16df0d5d773abd5361c697ff9f132bfae",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              0,
+              1
+            ],
+            "end_batch_count": 2686,
+            "end_batch_digest": "bd2230623aee0b78bc553c7a241687318635e764b7be77ed31b5dd8f8a47f5a1",
+            "end_owner_scope_len": 8636,
+            "end_owner_scope_digest": "4733f83f35f5c9666f5caf1c0b7deae16df0d5d773abd5361c697ff9f132bfae",
+            "batch_seq_count": 2686,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "begin_scope_count": 33,
+        "necessary_owner_count": 4,
+        "necessary_owners_sample": [
+          "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+          "file:packages/clickhouse/src/productCoreClickPipes.ts",
+          "file:packages/database/src/productCoreCdc.ts",
+          "file:packages/database/src/productCoreCdcColumns.ts"
+        ],
+        "extra_begin_owner_count": 29,
+        "extra_begin_owners_sample": [
+          "file:packages/clickhouse/src/index.ts",
+          "file:packages/clickhouse/src/productCoreBronze/canonical.ts",
+          "file:packages/clickhouse/src/productCoreBronze/currentState.ts",
+          "file:packages/clickhouse/src/productCoreBronze/digestQuery.ts",
+          "file:packages/clickhouse/src/productCoreBronze/index.ts",
+          "file:packages/clickhouse/src/productCoreBronze/inspect.ts",
+          "file:packages/clickhouse/src/productCoreBronze/schemaVerifier.ts",
+          "file:packages/clickhouse/src/productCoreSchemaEvolution.ts",
+          "file:packages/database/src/index.ts",
+          "file:packages/database/src/productCoreCdcBootstrap.ts",
+          "file:packages/database/src/productCoreCdcCli.ts",
+          "file:packages/database/src/productCoreCdcExpansion.ts",
+          "file:packages/database/src/productCoreCdcInspection.ts",
+          "file:packages/database/src/productCoreCdcInspectionTables.ts",
+          "file:packages/database/src/productCoreCdcPostgres.ts",
+          "file:packages/database/src/productCoreCdcPreflight.ts",
+          "file:packages/database/src/productCoreCdcProjection.ts",
+          "file:packages/database/src/productCoreCdcSlots.ts",
+          "file:packages/database/src/productCoreCdcTestSlotLoss.ts",
+          "file:packages/database/src/productCoreCdcTypes.ts",
+          "file:packages/database/src/productCoreCdcVerification.ts",
+          "file:scripts/clickhouse/cleanup-ci-databases.ts",
+          "file:scripts/clickhouse/product-core-clickpipes-provider.ts",
+          "file:scripts/clickhouse/product-core-clickpipes.test.mjs",
+          "file:scripts/clickhouse/product-core-clickpipes.ts"
+        ],
+        "graph_hash_equal": true,
+        "kind": "delta",
+        "completed_generation": 9,
+        "sink": "file",
+        "blocker": null
+      },
+      {
+        "id": "08-a6f1f3a91a36..5dfb2c8f276d",
+        "index": 8,
+        "parent": "a6f1f3a91a36ea3dead786560412a4944a009694",
+        "child": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+        "changed_file_count": 15,
+        "required_owner_count": 11,
+        "required_owners_sample": [
+          "file:docs/analytics/product-core-bronze.md",
+          "file:packages/clickhouse/src/productCoreBronze/index.ts",
+          "file:packages/clickhouse/src/productCoreBronze/prepareDestination.ts",
+          "file:scripts/deploy/product-core-bronze-containment-decision.mjs",
+          "file:scripts/deploy/product-core-bronze-containment-decision.test.mjs",
+          "file:scripts/deploy/product-core-bronze-pending-only.mjs",
+          "file:scripts/deploy/product-core-bronze-pending-only.test.mjs",
+          "file:scripts/deploy/product-core-clickpipes-evidence.mjs",
+          "file:scripts/deploy/product-core-clickpipes-evidence.test.mjs",
+          "file:scripts/deploy/product-core-clickpipes-production-workflow.test.mjs",
+          "file:scripts/deploy/product-core-clickpipes-test-workflow.test.mjs"
+        ],
+        "delta": {
+          "exit": 0,
+          "wall_s": 25.264,
+          "sink": "file",
+          "parsed": 83,
+          "cached": 4168,
+          "files_read": 83,
+          "generation": [
+            9,
+            10
+          ],
+          "owners_published": 5065,
+          "events": 2691,
+          "run_id": "product-scope-scope-bench-10-1790142901861873000",
+          "manifest": {
+            "begin_count": 8641,
+            "begin_digest": "3993f83452d6e4fb389de55d8834f45899b8e50850cb7d293cac182959571445",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              9,
+              10
+            ],
+            "end_batch_count": 2689,
+            "end_batch_digest": "ed3a4d72149aede5482f3a48f7906f5cf5b641420f1c58f36f213c4e460cc39d",
+            "end_owner_scope_len": 8641,
+            "end_owner_scope_digest": "3993f83452d6e4fb389de55d8834f45899b8e50850cb7d293cac182959571445",
+            "batch_seq_count": 2689,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "cold": {
+          "exit": 0,
+          "wall_s": 25.061,
+          "sink": "file",
+          "parsed": 4141,
+          "cached": 0,
+          "files_read": 4241,
+          "generation": [
+            0,
+            1
+          ],
+          "owners_published": 5065,
+          "events": 2691,
+          "run_id": "product-scope-scope-bench-1-1790142964055451000",
+          "manifest": {
+            "begin_count": 8641,
+            "begin_digest": "3993f83452d6e4fb389de55d8834f45899b8e50850cb7d293cac182959571445",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              0,
+              1
+            ],
+            "end_batch_count": 2689,
+            "end_batch_digest": "983f0dd30bf498ba99d979f7d0f10e50ea5959884c8a7f27eff06491932796bb",
+            "end_owner_scope_len": 8641,
+            "end_owner_scope_digest": "3993f83452d6e4fb389de55d8834f45899b8e50850cb7d293cac182959571445",
+            "batch_seq_count": 2689,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "begin_scope_count": 8641,
+        "necessary_owner_count": 31,
+        "necessary_owners_sample": [
+          "file:packages/clickhouse/src/productCoreBronze/index.ts",
+          "file:packages/clickhouse/src/productCoreBronze/prepareDestination.ts",
+          "file:scripts/deploy/bootstrap-t013-gcp-deny-adapter.test.mjs",
+          "file:scripts/deploy/bootstrap-t013-pulumi-handoff-operator.test.mjs",
+          "file:scripts/deploy/product-core-bronze-containment-decision.mjs",
+          "file:scripts/deploy/product-core-bronze-containment-decision.test.mjs",
+          "file:scripts/deploy/product-core-bronze-health-report.mjs",
+          "file:scripts/deploy/product-core-bronze-health-report.test.mjs",
+          "file:scripts/deploy/product-core-bronze-pending-only.mjs",
+          "file:scripts/deploy/product-core-bronze-pending-only.test.mjs",
+          "file:scripts/deploy/product-core-clickpipes-evidence.mjs",
+          "file:scripts/deploy/product-core-clickpipes-evidence.test.mjs",
+          "file:scripts/deploy/product-core-clickpipes-initial-snapshot-diagnostic.mjs",
+          "file:scripts/deploy/product-core-clickpipes-initial-snapshot-diagnostic.test.mjs",
+          "file:scripts/deploy/product-core-clickpipes-monitor-fault-evidence.mjs",
+          "file:scripts/deploy/product-core-clickpipes-monitor-fault-evidence.test.mjs",
+          "file:scripts/deploy/product-core-clickpipes-production-workflow.test.mjs",
+          "file:scripts/deploy/product-core-clickpipes-provenance.mjs",
+          "file:scripts/deploy/product-core-clickpipes-provenance.test.mjs",
+          "file:scripts/deploy/product-core-clickpipes-test-workflow.test.mjs",
+          "file:scripts/deploy/product-users-sync-acceptance.mjs",
+          "file:scripts/deploy/product-users-sync-delivery-evidence.mjs",
+          "file:scripts/deploy/product-users-sync-production-proof.mjs",
+          "file:scripts/deploy/production-emergency-rollback.test.mjs",
+          "file:scripts/deploy/production-release-state.mjs"
+        ],
+        "extra_begin_owner_count": 8610,
+        "extra_begin_owners_sample": [
+          "file:.claude/agents/codex-implementer.md",
+          "file:.deepsec/.gitignore",
+          "file:.deepsec/AGENTS.md",
+          "file:.deepsec/README.md",
+          "file:.deepsec/data/product/INFO.md",
+          "file:.deepsec/data/product/SETUP.md",
+          "file:.deepsec/data/product/tech.json",
+          "file:.deepsec/deepsec.config.ts",
+          "file:.deepsec/package.json",
+          "file:.deepsec/pnpm-workspace.yaml",
+          "file:.dockerignore",
+          "file:.easignore",
+          "file:.gitattributes",
+          "file:.githooks/post-checkout",
+          "file:.githooks/post-commit",
+          "file:.githooks/post-merge",
+          "file:.githooks/pre-commit",
+          "file:.githooks/pre-push",
+          "file:.github/actions/setup-node-pnpm/action.yml",
+          "file:.github/workflows/clickhouse-ci-cleanup.yml",
+          "file:.github/workflows/customerio-test-delivery-smoke.yml",
+          "file:.github/workflows/dbt-test-deploy.yml",
+          "file:.github/workflows/deploy-marketing-api.yml",
+          "file:.github/workflows/live-provider-smoke.yml",
+          "file:.github/workflows/mobile-qa-shards.yml"
+        ],
+        "graph_hash_equal": true,
+        "kind": "delta",
+        "completed_generation": 10,
+        "sink": "file",
+        "blocker": null
+      },
+      {
+        "id": "09-5dfb2c8f276d..a609c19f3861",
+        "index": 9,
+        "parent": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+        "child": "a609c19f3861971930fae7b33dcb2950598953c5",
+        "changed_file_count": 19,
+        "required_owner_count": 12,
+        "required_owners_sample": [
+          "file:docs/analytics/product-core-bronze.md",
+          "file:infra/pulumi/src/gcp/productCoreClickPipes.ts",
+          "file:infra/pulumi/src/index.ts",
+          "file:infra/pulumi/src/onyxEnvironment.ts",
+          "file:packages/clickhouse/scripts/clickhouse/print-product-core-contract-digest.ts",
+          "file:packages/clickhouse/src/productCoreBronze/contractDigest.ts",
+          "file:packages/clickhouse/src/productCoreBronze/index.ts",
+          "file:scripts/clickhouse/print-product-core-contract-digest.ts",
+          "file:scripts/deploy/prod-deploy-clickpipes-continuity.test.mjs",
+          "file:scripts/deploy/product-core-clickpipes-production-workflow.test.mjs",
+          "file:scripts/deploy/product-core-clickpipes-runbook.test.mjs",
+          "file:scripts/deploy/product-core-clickpipes-test-workflow.test.mjs"
+        ],
+        "delta": {
+          "exit": 0,
+          "wall_s": 23.935,
+          "sink": "file",
+          "parsed": 13,
+          "cached": 4242,
+          "files_read": 13,
+          "generation": [
+            10,
+            11
+          ],
+          "owners_published": 5068,
+          "events": 2691,
+          "run_id": "product-scope-scope-bench-11-1790142998266461000",
+          "manifest": {
+            "begin_count": 8645,
+            "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              10,
+              11
+            ],
+            "end_batch_count": 2689,
+            "end_batch_digest": "bdd075e0c304d5002448bcb2b248d906f639bd9a23c2edbe370a154f437d7ab9",
+            "end_owner_scope_len": 8645,
+            "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+            "batch_seq_count": 2689,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "cold": {
+          "exit": 0,
+          "wall_s": 23.77,
+          "sink": "file",
+          "parsed": 4144,
+          "cached": 0,
+          "files_read": 4244,
+          "generation": [
+            0,
+            1
+          ],
+          "owners_published": 5068,
+          "events": 2691,
+          "run_id": "product-scope-scope-bench-1-1790143061532842000",
+          "manifest": {
+            "begin_count": 8645,
+            "begin_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+            "begin_schema": "enola.graph.v2",
+            "begin_generation": [
+              0,
+              1
+            ],
+            "end_batch_count": 2689,
+            "end_batch_digest": "963a94d10f0ed23e0241cdf06a81aaf57e9bd9e6fd1e5234b2e7a61850b1e119",
+            "end_owner_scope_len": 8645,
+            "end_owner_scope_digest": "97d89a878cc6b0dfdd875a0dfb61ef3ef15deb6430f10b211bd17738ade4259b",
+            "batch_seq_count": 2689,
+            "batch_phase_set": [
+              "resolved"
+            ]
+          }
+        },
+        "begin_scope_count": 8645,
+        "necessary_owner_count": 9,
+        "necessary_owners_sample": [
+          "file:docs/analytics/product-core-bronze.md",
+          "file:infra/pulumi/src/gcp/productCoreClickPipes.ts",
+          "file:infra/pulumi/src/index.ts",
+          "file:packages/clickhouse/scripts/clickhouse/print-product-core-contract-digest.ts",
+          "file:packages/clickhouse/src/productCoreBronze/contractDigest.ts",
+          "file:packages/clickhouse/src/productCoreBronze/index.ts",
+          "file:scripts/clickhouse/print-product-core-contract-digest.ts",
+          "file:scripts/deploy/product-core-clickpipes-production-workflow.test.mjs",
+          "file:scripts/deploy/product-core-clickpipes-test-workflow.test.mjs"
+        ],
+        "extra_begin_owner_count": 8636,
+        "extra_begin_owners_sample": [
+          "file:.claude/agents/codex-implementer.md",
+          "file:.deepsec/.gitignore",
+          "file:.deepsec/AGENTS.md",
+          "file:.deepsec/README.md",
+          "file:.deepsec/data/product/INFO.md",
+          "file:.deepsec/data/product/SETUP.md",
+          "file:.deepsec/data/product/tech.json",
+          "file:.deepsec/deepsec.config.ts",
+          "file:.deepsec/package.json",
+          "file:.deepsec/pnpm-workspace.yaml",
+          "file:.dockerignore",
+          "file:.easignore",
+          "file:.gitattributes",
+          "file:.githooks/post-checkout",
+          "file:.githooks/post-commit",
+          "file:.githooks/post-merge",
+          "file:.githooks/pre-commit",
+          "file:.githooks/pre-push",
+          "file:.github/actions/setup-node-pnpm/action.yml",
+          "file:.github/workflows/clickhouse-ci-cleanup.yml",
+          "file:.github/workflows/customerio-test-delivery-smoke.yml",
+          "file:.github/workflows/dbt-test-deploy.yml",
+          "file:.github/workflows/deploy-marketing-api.yml",
+          "file:.github/workflows/live-provider-smoke.yml",
+          "file:.github/workflows/mobile-qa-shards.yml"
+        ],
+        "graph_hash_equal": true,
+        "kind": "delta",
+        "completed_generation": 11,
+        "sink": "file",
+        "blocker": null
+      }
+    ],
+    "work": "/tmp/enola-history-config-exploratory-2",
+    "output": "/tmp/enola-history-config-exploratory-2/results.json",
+    "sink": "file",
+    "repeat_limitation": "file-sink diagnostic; not a NATS JetStream or performance-acceptance run; launch the 10-case only when agreed"
+  },
+  "initial": {
+    "id": "00-initial-4d104e600f89",
+    "sha": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+    "initial": {
+      "exit": 0,
+      "wall_s": 26.747,
+      "sink": "file",
+      "parsed": 4120,
+      "cached": 0,
+      "files_read": 4220,
+      "generation": [
+        0,
+        1
+      ],
+      "owners_published": 5039,
+      "events": 2672,
+      "run_id": "product-scope-scope-bench-1-1790141697959970000",
+      "manifest": {
+        "begin_count": 8609,
+        "begin_digest": "fcfd526d24136fb8fd446fd6c9cec72c0b132bdf06f5bb4aa63df2e3fdec94a5",
+        "begin_schema": "enola.graph.v2",
+        "begin_generation": [
+          0,
+          1
+        ],
+        "end_batch_count": 2670,
+        "end_batch_digest": "2f570fa37887db23271b8e66d2031b550c01a1a6dc911c5da0666c605ca03801",
+        "end_owner_scope_len": 8609,
+        "end_owner_scope_digest": "fcfd526d24136fb8fd446fd6c9cec72c0b132bdf06f5bb4aa63df2e3fdec94a5",
+        "batch_seq_count": 2670,
+        "batch_phase_set": [
+          "resolved"
+        ]
+      }
+    },
+    "begin_scope_count": 8609,
+    "sink": "file"
+  },
+  "build_provenance": {
+    "kind": "experimental-patch",
+    "main_parent": "665f3c959248910e955b14c705a62ff64659f362",
+    "private_unpushed_commit": "41e530e9ea5eb24543e9629d4ae59ac39674b526",
+    "files_sha256": {
+      "internal/engine/engine.go": "1950239b8059f8f6763c539ac40e0c3a883d89a1cbb7b2be136f640f911597fc",
+      "internal/extractors/manifestextractor/delta.go": "ea04c40777a38eda54bb16d94f1b0aa4672119a77e22e02604b1527c3a6a271d",
+      "internal/extractors/manifestextractor/manifest.go": "5d3eecc177d5e2953ab9db419b5707c0189704a109527a9cb6986c979175a76f",
+      "internal/graphsession/session.go": "f1906425aab1b7fa27f5ba71894590e91d045bebd6d50e40ea1032146ecaeefa",
+      "internal/graphsession/config_scope.go": "02066807176e5710c5a29e1ce0d37aa11b5dc3ac33bcf07be6ddc9e66b4fa49b",
+      "internal/graphsession/nonts_candidate_scope.go": "d6d3bb44e0c1f7e0c29961243f2a6ea0e09094f5ce443af955b49f8306e4b958"
+    },
+    "snapshot": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/config-exploratory-2-snapshot",
+    "exit_code": 0,
+    "build_wall_seconds": 20.126
+  },
+  "acceptance": "diagnostic only; final candidate removes planOnly tier and is a different build"
+}

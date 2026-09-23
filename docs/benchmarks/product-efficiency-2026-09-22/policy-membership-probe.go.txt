@@ -1,0 +1,29 @@
+package graphsession
+import("os/exec";"testing")
+func TestRootProbeTrackedAdditionPolicyScope(t *testing.T){
+ for _, staged:=range []bool{false,true}{ name:="untracked";if staged{name="tracked"};t.Run(name,func(t *testing.T){
+ root:=configScopeRepo(t)
+ git:=func(args ...string){t.Helper(); c:=exec.Command("git",append([]string{"-C",root},args...)...);if out,err:=c.CombinedOutput();err!=nil{t.Fatalf("git %v: %v %s",args,err,out)}}
+ git("init","--quiet");git("add",".")
+ opts:=Options{StateDir:t.TempDir(),AuthoritativeFiles:true};cons:=NewConsumer()
+ configScopeRun(t,configScopeEngine(t,root),root,opts,cons)
+ writeRepoFile(t,root,"src/new-independent.ts","export const newlyIndependent = 5;\n")
+ if staged{git("add","src/new-independent.ts")}
+ res,_,ids:=configScopeRun(t,configScopeEngine(t,root),root,opts,cons)
+ t.Logf("staged=%v owners=%v policy=%v parsed=%d fallback=%q",staged,ids,res.Invalidation.PolicyReconciled,res.ParsedFiles,wholeDomainFallback(res))
+ assertAppliedEqualsCold(t,cons,coldConsumer(t,configScopeEngine(t,root),root))
+ })}
+}
+
+func TestRootProbePureStagingAlreadyAnalyzedSource(t *testing.T){
+ root:=configScopeRepo(t)
+ git:=func(args ...string){t.Helper();c:=exec.Command("git",append([]string{"-C",root},args...)...);if out,err:=c.CombinedOutput();err!=nil{t.Fatalf("git: %v %s",err,out)}}
+ git("init","--quiet");git("add",".")
+ writeRepoFile(t,root,"src/new-independent.ts","export const newlyIndependent = 5;\n")
+ opts:=Options{StateDir:t.TempDir(),AuthoritativeFiles:true};cons:=NewConsumer()
+ configScopeRun(t,configScopeEngine(t,root),root,opts,cons)
+ git("add","src/new-independent.ts")
+ res,_,ids:=configScopeRun(t,configScopeEngine(t,root),root,opts,cons)
+ t.Logf("pure staging owners=%v policy=%v parsed=%d generation=%d->%d fallback=%q",ids,res.Invalidation.PolicyReconciled,res.ParsedFiles,res.BaseGeneration,res.TargetGeneration,wholeDomainFallback(res))
+ assertAppliedEqualsCold(t,cons,coldConsumer(t,configScopeEngine(t,root),root))
+}
