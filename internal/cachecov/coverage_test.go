@@ -33,6 +33,7 @@ import (
 // test functions that assert the behavior that version introduced. v1 is the
 // implicit baseline (no changelog line), so coverage starts at v2.
 var versionCoverage = map[int][]string{
+	305: {"TestExtract_Wave10NxTreeNotHTTPClient", "TestExtract_Wave10NuxtPageHandledByComponent", "TestExtract_Wave10ClassMethodsDeclareClass", "TestExtract_Wave10DefaultCallKind", "TestExtract_Wave10DefaultObjectValue", "TestPublishedWave10CachedUpgradeFromV304"},
 	304: {"TestExtract_Wave9CommonJSRequireValueAndNamespace", "TestPublishedWave9CachedUpgradeFromV303"},
 	303: {"TestExtract_Wave9ScopedLiteralRequireCalls", "TestPublishedWave9CachedUpgradeFromV302"},
 	302: {"TestExtract_Wave9ScopedLiteralRequireCalls", "TestPublishedWave9CachedUpgradeFromV301"},

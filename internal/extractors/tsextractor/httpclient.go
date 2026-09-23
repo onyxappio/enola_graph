@@ -302,7 +302,17 @@ func hasURLPropertySignal(src []byte) bool {
 // verb. Paths are kept as written (with the /api or /v2 prefix and any .json
 // suffix); the cross-repo linker's normalization reconciles prefixes and format
 // suffixes.
+type httpClientDeps struct {
+	knownFiles map[string]bool
+	readSrc    func(string) []byte
+	sideReads  map[string]bool
+}
+
 func extractHTTPClientFacts(src []byte, relFile string) []facts.Fact {
+	return extractHTTPClientFactsDeps(src, relFile, httpClientDeps{})
+}
+
+func extractHTTPClientFactsDeps(src []byte, relFile string, deps httpClientDeps) []facts.Fact {
 	hasFetch, hasUpper, hasLower, hasURL := possibleHTTPClientSignal(src)
 	if !hasFetch && !hasUpper && !hasLower && !hasURL {
 		return nil
@@ -445,8 +455,10 @@ func extractHTTPClientFacts(src []byte, relFile string) []facts.Fact {
 		if len(lower) > 0 || len(tmpl) > 0 {
 			serverRecv := serverBindings(src)
 			fastifyScopes := serverLexicalScopes(src)
+			nxScopes := nxTreeScopes(src, relFile, deps.knownFiles, deps.readSrc, deps.sideReads)
 			for _, m := range lower {
-				if isServerReceiverAt(serverRecv, fastifyScopes, identifierEndingAt(src, m[0]), m[0]) {
+				recv := identifierEndingAt(src, m[0])
+				if isServerReceiverAt(serverRecv, fastifyScopes, recv, m[0]) || isNxTreeReceiverAt(nxScopes, recv, m[0]) {
 					continue
 				}
 				method := strings.ToUpper(string(src[m[2]:m[3]]))
@@ -458,7 +470,8 @@ func extractHTTPClientFacts(src []byte, relFile string) []facts.Fact {
 			// template with a "/"-rooted literal tail (litfold's template-tail rule).
 			// cleanTSPath resolves or strips the base; the tail is the path.
 			for _, m := range tmpl {
-				if isServerReceiverAt(serverRecv, fastifyScopes, identifierEndingAt(src, m[0]), m[0]) {
+				recv := identifierEndingAt(src, m[0])
+				if isServerReceiverAt(serverRecv, fastifyScopes, recv, m[0]) || isNxTreeReceiverAt(nxScopes, recv, m[0]) {
 					continue
 				}
 				raw := string(src[m[4]:m[5]])

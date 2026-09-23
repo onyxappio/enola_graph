@@ -2541,7 +2541,13 @@ import (
 // and a value/callable (`x()`, `mount(x)`). Namespace-only classification had
 // dropped existing CommonJS value uses; dual-bind keeps v302/v303 shadows and
 // missing-module specifier provenance.
-const cacheVersion = "v304"
+// v305: TypeScript default-export objects/arrays and ordinary default-call
+// values become variable nodes; default imports bind the proven default export
+// (not a filename guess). Class methods declare their enclosing class like
+// fields. Nuxt file-convention page routes gain handled_by to the same-file
+// component. Proven Nx Tree receivers (including a directly imported schema
+// field typed Tree from @nx/devkit) are not HTTP client routes.
+const cacheVersion = "v305"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

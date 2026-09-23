@@ -1152,10 +1152,6 @@ func TestExtract_FileRef_FolderIndexAnonymousDefault(t *testing.T) {
 	if !hasTarget(targets, "src/feed_item.FeedItemIndex") {
 		t.Errorf("app.jsx must reference the module's default export (the wrapper); got %v", targets)
 	}
-	// The inner component is still referenced too (via JSX), at its folder dir.
-	if !hasTarget(targets, "src/feed_item.FeedItem") {
-		t.Errorf("app.jsx should also reference the inner component; got %v", targets)
-	}
 }
 
 // A named import through a folder index resolves to the exact declaring dir (not the

@@ -187,6 +187,40 @@ func hasPkgDependency(dir, pkg string, inputScopes ...*inputscope.Scope) bool {
 }
 
 // detectNuxtRoute checks if a .vue file path corresponds to a Nuxt route.
+func attachSameFilePageHandler(route *facts.Fact, ff []facts.Fact, relFile string) {
+	if route == nil {
+		return
+	}
+	file := filepath.ToSlash(relFile)
+	want := factpath.Dir(file) + "." + fileSymbolName(file)
+	var target string
+	var n int
+	for _, f := range ff {
+		if f.Kind != facts.KindSymbol || filepath.ToSlash(f.File) != file {
+			continue
+		}
+		if vueTypeSpaceSymbol(f) {
+			continue
+		}
+		if f.Name != want && f.PropString("web_component") != "component" {
+			continue
+		}
+		n++
+		target = f.Name
+	}
+	if n != 1 || target == "" {
+		return
+	}
+	if route.HasRelation(facts.RelHandledBy, target) {
+		return
+	}
+	route.Relations = append(route.Relations, facts.Relation{
+		Kind:       facts.RelHandledBy,
+		Target:     target,
+		TargetFile: file,
+	})
+}
+
 func detectNuxtRoute(relFile string) *facts.Fact {
 	ext := filepath.Ext(relFile)
 	switch strings.ToLower(ext) {
@@ -1038,8 +1072,12 @@ func (e *TSExtractor) extractVueSFC(kinds *tsutil.KindTable, rawSrc []byte, relF
 
 	if isNuxt {
 		if routeFact := detectNuxtConventionPage(relFile, knownFiles); routeFact != nil {
+			attachSameFilePageHandler(routeFact, result, relFile)
 			result = append(result, *routeFact)
-			result = append(result, extractDefinePageMetaRoutes(rawSrc, relFile, routeFact.Name)...)
+			for _, alias := range extractDefinePageMetaRoutes(rawSrc, relFile, routeFact.Name) {
+				attachSameFilePageHandler(&alias, result, relFile)
+				result = append(result, alias)
+			}
 		}
 	}
 

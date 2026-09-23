@@ -877,6 +877,64 @@ export function missingValue() {
 	}
 }
 
+func TestPublishedWave10CachedUpgradeFromV304(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"src/ids.ts": `export class BoundedIdSet {
+  order: string[] = [];
+  constructor() {}
+  add() {}
+}
+export default { ok: true };
+`,
+		"src/use.ts": `import ids from './ids';
+export function use() { return ids.ok; }
+`,
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("load state: %v %#v", err, st)
+	}
+	st.ExtractorVersion = "v304"
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	up := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, dir, up, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.ParsedFiles == 0 {
+		t.Fatal("v304 migration parsed no files")
+	}
+	c := applyGraph(t, first)
+	if err := c.ApplyRecords(up.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, coldSink))
+	quiet := &graphstream.MemorySink{}
+	again, err := Run(context.Background(), eng, dir, quiet, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if again.ParsedFiles != 0 {
+		t.Fatalf("silent nochange parsed=%d", again.ParsedFiles)
+	}
+	if engine.ExtractorVersion() == "v304" {
+		t.Fatal("cached upgrade test requires cacheVersion newer than v304")
+	}
+}
+
 func TestPublishedBridgeTargetChangeResolvesToC(t *testing.T) {
 	dir := setupTSRepo(t, map[string]string{
 		"src/a.ts":      "import { round } from './bridge';\nexport function caller() { return round(1); }\n",

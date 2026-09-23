@@ -621,7 +621,11 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 		if graphqlServer.enabled {
 			result = append(result, extractGraphQLServerSDL(src, relFile)...)
 		}
-		result = append(result, extractHTTPClientFacts(src, relFile)...)
+		result = append(result, extractHTTPClientFactsDeps(src, relFile, httpClientDeps{
+			knownFiles: knownFiles,
+			readSrc:    readSrc,
+			sideReads:  sideReads,
+		})...)
 		// Call-registered server routes (Express/Fastify/Hono/Koa). Same test-path
 		// gate: an e2e suite that spins up its own app would otherwise contribute
 		// server routes no production client calls.
@@ -807,6 +811,7 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 	// supported extensions here.
 	if isNuxt && !isVueFile(relFile) {
 		if route := detectNuxtConventionPage(relFile, knownFiles); route != nil {
+			attachSameFilePageHandler(route, result, relFile)
 			result = append(result, *route)
 		}
 	}
@@ -968,7 +973,7 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 		}
 		// Anonymous default export of a value: name it after the file.
 		if isDefault {
-			for _, k := range []string{"function_expression", "generator_function", "class", "arrow_function", "call_expression"} {
+			for _, k := range []string{"function_expression", "generator_function", "class", "arrow_function", "call_expression", "object", "array", "parenthesized_expression"} {
 				if c := findChildByKind(kinds, node, k); c != nil {
 					return e.extractNode(kinds, c, ctx, true, fb)
 				}
@@ -991,10 +996,24 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 			result = append(result, e.funcSymbol(kinds, node, node, ctx, fallbackName, isExported))
 		}
 
-	case "call_expression":
-		// Reached for `export default memo(...)` / `forwardRef(...)`.
+	case "parenthesized_expression":
+		if inner := node.NamedChild(0); inner != nil && fallbackName != "" {
+			return e.extractNode(kinds, inner, ctx, isExported, fallbackName)
+		}
+
+	case "object", "array":
 		if fallbackName != "" {
-			result = append(result, e.funcSymbol(kinds, node, node, ctx, fallbackName, isExported))
+			result = append(result, e.valueSymbol(kinds, node, node, ctx, fallbackName, isExported))
+		}
+
+	case "call_expression":
+		// Reached for `export default memo(...)` / `forwardRef(...)` / ordinary values.
+		if fallbackName != "" {
+			if isKnownFunctionValueCall(kinds, node, src) {
+				result = append(result, e.funcSymbol(kinds, node, node, ctx, fallbackName, isExported))
+			} else {
+				result = append(result, e.valueSymbol(kinds, node, node, ctx, fallbackName, isExported))
+			}
 		}
 
 	case "class_declaration", "abstract_class_declaration", "class":
@@ -1138,9 +1157,9 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 					}
 				}
 				dataField := kindOf(kinds, member) == "public_field_definition" && !classFieldIsFunctionValued(kinds, member)
-				mRels := []facts.Relation{{Kind: facts.RelDeclares, Target: dir}}
-				if dataField {
-					mRels = append(mRels, facts.Relation{Kind: facts.RelDeclares, Target: dir + "." + symbolName, TargetFile: relFile})
+				mRels := []facts.Relation{
+					{Kind: facts.RelDeclares, Target: dir},
+					{Kind: facts.RelDeclares, Target: dir + "." + symbolName, TargetFile: relFile},
 				}
 				callRels, m := collectCallsWithMetrics(kinds, member, src, dir, symbolName, ctx, dir+"."+symbolName+"."+mName, mName)
 				mRels = append(mRels, callRels...)
@@ -1401,6 +1420,50 @@ func commonJSExportName(kinds *tsutil.KindTable, left *sitter.Node, src []byte) 
 		}
 	}
 	return ""
+}
+
+func (e *TSExtractor) valueSymbol(kinds *tsutil.KindTable, declNode, body *sitter.Node, ctx *extractCtx, name string, exported bool) facts.Fact {
+	rels := []facts.Relation{{Kind: facts.RelDeclares, Target: ctx.dir}}
+	callRels, _ := collectCallsWithMetrics(kinds, body, ctx.src, ctx.dir, "", ctx, ctx.dir+"."+name, name)
+	rels = append(rels, callRels...)
+	f := facts.Fact{
+		Kind: facts.KindSymbol,
+		Name: ctx.dir + "." + name,
+		File: ctx.relFile,
+		Line: int(declNode.StartPosition().Row) + 1,
+		Props: map[string]any{
+			"symbol_kind": facts.SymbolVariable,
+			"exported":    exported,
+			"language":    "typescript",
+		},
+		Relations: rels,
+	}
+	classifySymbol(kinds, &f, name, body, ctx, facts.SymbolVariable)
+	return f
+}
+
+func isKnownFunctionValueCall(kinds *tsutil.KindTable, call *sitter.Node, src []byte) bool {
+	if isComponentWrapper(kinds, call, src) {
+		return true
+	}
+	fn := call.ChildByFieldName("function")
+	if fn == nil {
+		return false
+	}
+	name := ""
+	switch kindOf(kinds, fn) {
+	case "identifier":
+		name = nodeText(fn, src)
+	case "member_expression":
+		if prop := fn.ChildByFieldName("property"); prop != nil {
+			name = nodeText(prop, src)
+		}
+	}
+	switch name {
+	case "defineEventHandler", "defineComponent", "defineNuxtComponent", "defineNitroPlugin", "modifier", "helper":
+		return true
+	}
+	return false
 }
 
 func (e *TSExtractor) funcSymbol(kinds *tsutil.KindTable, declNode, body *sitter.Node, ctx *extractCtx, name string, exported bool) facts.Fact {
@@ -3089,7 +3152,11 @@ func bindImportedSymbol(moduleDir, indexPath, exportName, resolved string, found
 				name = orig
 			}
 			if name == "default" {
-				name = fileSymbolName(leaf)
+				if orig != "" && orig != "default" {
+					name = orig
+				} else {
+					name = fileSymbolName(leaf)
+				}
 			}
 			target = factpath.Dir(leaf) + "." + name
 		}
@@ -3178,20 +3245,20 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 	namespaces := make(map[string]string)     // `import * as ns` local -> module dir
 	namespaceFiles := make(map[string]string) // `import * as ns` local -> module file
 	var reexports []facts.Relation            // proven source-export targets of `export { x } from './y'`
-	var defaultRefs []string                  // default-export targets of default-imported modules
+	var defaultRefs []facts.Relation          // proven default-export targets of default-imported modules
 
+	note := func(f string) {
+		if ctx.sideReads == nil {
+			return
+		}
+		f = filepath.ToSlash(f)
+		if f != "" && f != filepath.ToSlash(ctx.relFile) {
+			ctx.sideReads[f] = true
+		}
+	}
 	bind := func(local, moduleDir, exportName, indexPath, resolved string, foundFile bool) {
 		if local == "" {
 			return
-		}
-		note := func(f string) {
-			if ctx.sideReads == nil {
-				return
-			}
-			f = filepath.ToSlash(f)
-			if f != "" && f != filepath.ToSlash(ctx.relFile) {
-				ctx.sideReads[f] = true
-			}
 		}
 		target, file := bindImportedSymbol(moduleDir, indexPath, exportName, resolved, foundFile, ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, note)
 		internal[local] = target
@@ -3239,14 +3306,11 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 				switch kindOf(kinds, c) {
 				case "identifier": // default import: `import Foo from './x'`
 					local := nodeText(c, src)
-					bind(local, moduleDir, local, indexPath, "", indexPath != "")
-					// A default import IS a use of the module's default export, whose
-					// symbol is named by fileSymbolName (an anonymous
-					// `export default connect(...)(X)` in a folder index becomes
-					// "<Folder>Index" — unmatchable by the local name). Record it so the
-					// wrapper symbol is not falsely reported dead.
+					bind(local, moduleDir, "default", indexPath, "", indexPath != "")
+					// A default import IS a use of the module's default export.
 					if indexPath != "" {
-						defaultRefs = append(defaultRefs, moduleDir+"."+fileSymbolName(indexPath))
+						target, file := bindImportedSymbol(moduleDir, indexPath, "default", "", indexPath != "", ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, note)
+						defaultRefs = append(defaultRefs, facts.Relation{Kind: facts.RelCalls, Target: target, TargetFile: file})
 					}
 				case "namespace_import": // `import * as ns from './x'`
 					if id := findChildByKind(kinds, c, "identifier"); id != nil {
@@ -3770,7 +3834,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 		add(t.Target, t.TargetFile)
 	}
 	for _, t := range defaultRefs {
-		add(t, "")
+		add(t.Target, t.TargetFile)
 	}
 	if len(targets) == 0 {
 		return nil
