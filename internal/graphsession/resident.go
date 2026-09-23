@@ -37,6 +37,7 @@ type runtimeInputs struct {
 	tsContext         map[string]string
 	tsFileContext     map[string]string
 	policyIdentity    string
+	admissionIdentity string
 	coverageVersion   uint64
 	generation        int64
 	resolution        *idIndex
@@ -93,6 +94,7 @@ func readRuntimeInputs(eng *engine.Engine, abs string, st *State, work *WorkCoun
 	result := &runtimeInputs{inventory: inv, detected: detected, hashes: hashes, contexts: contexts, configHash: cfgHash, config: cfg, angular: tsextractor.RepoUsesAngular(abs, eng.GraphScope()), configPaths: paths}
 	if scope := eng.GraphScope(); scope != nil {
 		result.policyIdentity = scope.Policy.Identity()
+		result.admissionIdentity = scope.Policy.AdmissionIdentity()
 		result.engineContextHash = engineContextFingerprint(eng)
 		for _, ext := range eng.Extractors() {
 			if ts, ok := ext.(*tsextractor.TSExtractor); ok {

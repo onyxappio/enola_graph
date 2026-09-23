@@ -28,7 +28,13 @@ type State struct {
 	TSContext         map[string]string `json:"ts_context,omitempty"`
 	TSFileContext     map[string]string `json:"ts_file_context,omitempty"`
 	PolicyIdentity    string            `json:"policy_identity,omitempty"`
-	FrameworkSig      string            `json:"framework_sig,omitempty"`
+	// PolicyAdmissionIdentity fingerprints the admission rules the state was
+	// built under, as opposed to PolicyIdentity, which also moves when the Git
+	// index moves without any decision moving with it. Absent means the state
+	// predates the fingerprint: it is not evidence of equal rules, so a run with
+	// graph work to do reconciles rather than adopting it.
+	PolicyAdmissionIdentity string `json:"policy_admission_identity,omitempty"`
+	FrameworkSig            string `json:"framework_sig,omitempty"`
 	// ScanHash is a digest of walked names (including ignore-glob files) and
 	// their content hashes. Unknown-owner extractors use it as their input set.
 	ScanHash        string            `json:"scan_hash,omitempty"`

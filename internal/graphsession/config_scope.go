@@ -16,8 +16,12 @@ import (
 // analysisFingerprintInputs has a projection this session already computes:
 //
 //   - the extractor version, proven by a complete prior state at this version;
-//   - the graph input policy identity, which carries cfg.Ignore because that
-//     list reaches graphinput.Options.Exclude, proven by PolicyIdentity;
+//   - the graph input policy, whose options carry cfg.Ignore because that list
+//     reaches graphinput.Options.Exclude, proven by PolicyAdmissionIdentity.
+//     That fingerprint hashes the options and the semantic policy dependencies,
+//     which is the whole of what the configuration contributes to the policy;
+//     the tracked names the raw identity also hashes are repository state, not
+//     configuration, and cannot be what a configuration edit moved;
 //   - each ConfigKeyed extractor's config key, proven by EngineContextHash;
 //   - the enabled extractor set, proven by the detected extractors together
 //     with the extractors the stored state records having contributed;
@@ -48,8 +52,8 @@ func (s *session) rawConfigScopeBounded(haveCache bool, input *runtimeInputs, de
 	if s.state.EngineContextHash == "" || s.state.EngineContextHash != input.engineContextHash {
 		return false, "engine extractor context changed with the configuration"
 	}
-	if s.state.PolicyIdentity == "" || s.state.PolicyIdentity != input.policyIdentity {
-		return false, "graph input policy identity changed with the configuration"
+	if s.state.PolicyAdmissionIdentity == "" || s.state.PolicyAdmissionIdentity != input.admissionIdentity {
+		return false, "graph input policy admission identity changed with the configuration"
 	}
 	if len(s.state.TSContext) == 0 {
 		return false, "no stored TypeScript session context to compare the configuration against"

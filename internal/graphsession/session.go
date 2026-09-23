@@ -70,6 +70,91 @@ type InvalidationStats struct {
 	ParsedByReason               map[string]int
 }
 
+// policyReconciles reports whether the graph input policy of this run has to be
+// treated as a different policy from the one the stored state was built under.
+//
+// The comparison is the admission fingerprint, not the raw identity. The raw
+// identity hashes every non-hard-excluded tracked name, so it moves on a pure
+// `git add` or `git rm --cached` of an already-admitted, unignored, unchanged
+// file - an edit that moves no decision this session makes, because the tracked
+// set reaches Classify at exactly one place and only for names Git ignores.
+// Treating that as a policy change is what turns staging into a whole-domain
+// Begin. The raw identity is still stored and still compared, for stale-state
+// detection here and as the value the post-run fence revalidates against.
+//
+// Equal admission fingerprints mean equal decision functions over equivalent
+// paths. They say nothing about which files exist, so the caller still has to
+// diff the observed membership; this predicate replaces neither the inventory
+// comparison nor membershipScope.
+//
+// An absent admission fingerprint is a state written before admission was
+// fingerprinted. Nothing in it proves which rules produced it, so it reconciles,
+// and because this predicate is one of the terms of the changed gate itself, the
+// first run under this code over such a state always has graph work to do. The
+// fallback is therefore taken once per old state rather than conditionally, and
+// no run adopts the field without having reconciled under it.
+func policyReconciles(st *State, input *runtimeInputs) bool {
+	if st == nil {
+		return true
+	}
+	if input.admissionIdentity == "" {
+		// No active graph input policy. A state that carries a fingerprint was
+		// built with one running, and losing the policy is itself a change.
+		return st.PolicyIdentity != "" || st.PolicyAdmissionIdentity != ""
+	}
+	return st.PolicyIdentity == "" || st.PolicyAdmissionIdentity == "" || st.PolicyAdmissionIdentity != input.admissionIdentity
+}
+
+// policyBookkeepingFenced reports whether a run that published nothing may write
+// this run's policy fingerprints back into the completed state.
+//
+// The pure staging case is exactly this one: the index moved, no admission
+// decision moved with it, the scan digest and the configuration fingerprint both
+// matched, so the run parsed nothing, emitted no event and left the completed
+// generation where it was. Leaving the stored identity behind would make every
+// later run recompute the same difference forever, so the fingerprints are
+// refreshed - and only the fingerprints.
+//
+// The write is fenced on both sides. Before it, the run has already proven the
+// stored graph describes the tree as it stands - the scan digest matched, the
+// raw analysis fingerprint was rechecked, and the transaction's own input fence
+// re-read every declared policy dependency, the Git index included, refusing the
+// run outright if one had moved. This recheck covers what is left of that
+// window: the interval between that fence and the save, re-reading the same
+// declared inputs and requiring the pair they produce to still be the pair this
+// run planned with. It is narrower than it sounds and deliberately so; it is not
+// a proof that the policy is fresh, only that these two values still describe
+// it. Declining is always safe in that direction: it can only cost a later
+// reconciliation, never skip one.
+//
+// The recheck reads two Git processes and every declared dependency, so it is
+// reached only when the stored pair actually differs from this run's. An idle
+// resident whose state already carries both fingerprints returns on the first
+// comparison, and because the refresh below also advances s.state, a run that
+// does pay for it pays once rather than on every later idle request.
+func (s *session) policyBookkeepingFenced(input *runtimeInputs) (bool, error) {
+	if s.state == nil || s.fast || input.admissionIdentity == "" {
+		// A fast run reuses the previous run's inputs rather than rebuilding the
+		// policy, so its fingerprints are not an observation of the tree now.
+		return false, nil
+	}
+	if s.state.PolicyIdentity == input.policyIdentity && s.state.PolicyAdmissionIdentity == input.admissionIdentity {
+		return false, nil
+	}
+	scope := s.eng.GraphScope()
+	if scope == nil || scope.Policy == nil {
+		return false, nil
+	}
+	identity, admission, ok, err := scope.Policy.RecheckDeclaredInputs()
+	if err != nil {
+		return false, err
+	}
+	if !ok || identity != input.policyIdentity || admission != input.admissionIdentity {
+		return false, nil
+	}
+	return true, nil
+}
+
 type Result struct {
 	Invalidation     InvalidationStats
 	RunID            string
@@ -302,7 +387,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	var invalidationMu sync.Mutex
 	if s.state != nil {
 		invalidation.RawConfigChanged = s.state.ConfigHash != cfgHash
-		invalidation.PolicyReconciled = s.state.PolicyIdentity != input.policyIdentity
+		invalidation.PolicyReconciled = policyReconciles(s.state, input)
 	}
 	currentSources := map[string]bool{}
 	for _, p := range inv.Files {
@@ -462,7 +547,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		// Empty initial and last-file deletion still Begin before extraction so
 		// the frozen manifest is immutable for the run.
 		scanChanged := s.state != nil && !scanHashEquivalent(s.state, inv.AllNames, graphSemanticNames(s.eng, inv.AllNames), hashes, scanHash)
-		changed := initial || forceAll || nonTSNeed || s.state == nil || scanChanged || s.state.ConfigHash != cfgHash || s.state.PolicyIdentity != input.policyIdentity
+		changed := initial || forceAll || nonTSNeed || s.state == nil || scanChanged || s.state.ConfigHash != cfgHash || policyReconciles(s.state, input)
 		if changed {
 			previous := []string{}
 			if s.state != nil {
@@ -481,7 +566,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			// Initial/global-context changes still require the complete domain.
 			// For an ordinary content delta, derive the manifest from changed
 			// files plus reverse file-to-file dependents in the prior state.
-			wholeDomain := initial || forceAll || s.state == nil || configChanged || s.state.PolicyIdentity != input.policyIdentity || incompleteDependencyRecords(prevFiles)
+			wholeDomain := initial || forceAll || s.state == nil || configChanged || policyReconciles(s.state, input) || incompleteDependencyRecords(prevFiles)
 			// A raw configuration byte change is not by itself a reason to
 			// replace every owner. It is a reason to do so when no active
 			// consumer can prove a smaller boundary for it; rawConfigScopeBounded
@@ -1329,16 +1414,38 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				return nil, err
 			}
 		}
-		if s.opts.AuthoritativeFiles && s.state != nil && (s.state.ScanHashVersion != scanHashVersion || s.state.ScanHash != scanHash) && scanHashEquivalent(s.state, inv.AllNames, graphSemanticNames(s.eng, inv.AllNames), hashes, scanHash) {
+		// A run that publishes nothing can still be holding bookkeeping the
+		// stored state has not caught up with. Both refreshes below rewrite a
+		// digest and nothing else - the generation, the file records and every
+		// published fact are carried over untouched - so they are collapsed
+		// into one clone and one save rather than racing each other's write,
+		// and the result is adopted as this session's state so that a resident
+		// holding it in memory sees the same metadata the file now carries
+		// without rereading it, and without a second run repeating the work.
+		refreshScan := s.opts.AuthoritativeFiles && s.state != nil &&
+			(s.state.ScanHashVersion != scanHashVersion || s.state.ScanHash != scanHash) &&
+			scanHashEquivalent(s.state, inv.AllNames, graphSemanticNames(s.eng, inv.AllNames), hashes, scanHash)
+		refreshPolicy, perr := s.policyBookkeepingFenced(input)
+		if perr != nil {
+			return nil, perr
+		}
+		if refreshScan || refreshPolicy {
 			st, err := cloneState(s.state)
 			if err != nil {
 				return nil, err
 			}
-			st.ScanHash = scanHash
-			st.ScanHashVersion = scanHashVersion
+			if refreshScan {
+				st.ScanHash = scanHash
+				st.ScanHashVersion = scanHashVersion
+			}
+			if refreshPolicy {
+				st.PolicyIdentity = input.policyIdentity
+				st.PolicyAdmissionIdentity = input.admissionIdentity
+			}
 			if err := saveState(s.opts.StateDir, st); err != nil {
 				return nil, err
 			}
+			s.state = st
 		}
 		return &Result{
 			Invalidation:     invalidation,
@@ -1465,6 +1572,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	next.TSFileContext = input.tsFileContext
 	next.EngineContextHash = input.engineContextHash
 	next.PolicyIdentity = input.policyIdentity
+	next.PolicyAdmissionIdentity = input.admissionIdentity
 	next.FrameworkSig = s.frameworkSig
 	next.SinkID = s.opts.SinkID
 	next.Files = newFiles
@@ -2251,7 +2359,12 @@ func analysisFingerprintInputs(abs string, eng *engine.Engine) (string, map[stri
 	captured := map[string][]byte{}
 	paths := tsextractor.ConfigInputPaths(abs, eng.GraphScope())
 	if scope := eng.GraphScope(); scope != nil {
-		h.Write([]byte("graph-input-profile-v2/" + scope.Policy.Identity()))
+		// The admission fingerprint, not the raw identity: the configuration
+		// fingerprint answers "did an analysis input move", and the tracked
+		// names the raw identity also hashes are repository state that moves on
+		// a pure `git add`. Hashing those here would make every index edit a
+		// configuration change and defeat the no-publication path below.
+		h.Write([]byte("graph-input-profile-v3/" + scope.Policy.AdmissionIdentity()))
 		filtered := paths[:0]
 		for _, p := range paths {
 			full := p

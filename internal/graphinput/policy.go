@@ -79,10 +79,13 @@ type Policy struct {
 	ignored                   map[string]bool
 	tracked                   map[string]bool
 	trackedDirs               map[string]bool
+	admitDirs                 map[string]bool
 	deps                      []Dependency
 	depSet                    map[string]bool
 	gitDirs                   []string
+	options                   Options
 	identity                  string
+	admission                 string
 }
 
 var defaultCaches = []string{
@@ -164,7 +167,14 @@ func (p *Policy) Classify(name string, directory bool) Decision {
 		return Decision{Excluded, true, why}
 	}
 	_, known := p.entries[rel]
-	if p.gitIgnored(rel) && !p.tracked[rel] && !(directory && p.trackedDirs[rel]) {
+	// The directory override consults admitDirs rather than every tracked
+	// ancestor. A gitignored directory earns an exemption from the tracked files
+	// under it that this policy could otherwise admit; one whose only tracked
+	// descendants are hard-excluded exempts nothing, because every file under it
+	// is excluded either by that hard rule or by gitignore with no tracking to
+	// override it. Keeping the two sets equal is what lets the admission digest
+	// stand for the decision function: see trackedAdmission.
+	if p.gitIgnored(rel) && !p.tracked[rel] && !(directory && p.admitDirs[rel]) {
 		return Decision{Excluded, known, "gitignore"}
 	}
 	if !directory && !p.conservative && !p.semantic.MatchAny(rel) && media(rel) {
@@ -220,6 +230,25 @@ func (p *Policy) ClassifyEvent(name string, directory bool, event Event) Action 
 
 func (p *Policy) Identity() string           { return p.identity }
 func (p *Policy) Dependencies() []Dependency { return append([]Dependency(nil), p.deps...) }
+
+// AdmissionIdentity fingerprints the policy's admission rules rather than the
+// index that happens to satisfy them. Identity hashes every non-hard-excluded
+// tracked name, so staging or untracking an ordinary source moves it even though
+// no decision this package makes moves with it: p.tracked and the tracked
+// directory set are read at exactly one place, the gitignore override in
+// Classify, and that override only ever applies to a name Git ignores and no
+// hard rule already removed. The directory half of that override reads
+// p.admitDirs, which is the set hashed here, so the two cannot disagree. AdmissionIdentity therefore hashes the policy inputs - the options
+// and the semantic dependencies, which carry the .gitignore bytes - together
+// with only that override's own membership.
+//
+// Equal admission identities mean the two policies are the same decision
+// function, applied to equivalent paths. They do not mean the two runs see the
+// same inventory: files still appear and disappear on disk under an unchanged
+// rule set, and a caller has to keep comparing the observed membership itself.
+// Identity stays the raw value for validation, stale-state detection and race
+// fencing, and stays the value a caller persists for those uses.
+func (p *Policy) AdmissionIdentity() string { return p.admission }
 
 func media(name string) bool {
 	switch strings.ToLower(filepath.Ext(name)) {
@@ -376,9 +405,18 @@ func Build(root string, options Options) (*Policy, error) {
 		}
 	}
 	sort.Slice(p.deps, func(i, j int) bool { return p.deps[i].Path < p.deps[j].Path })
-	// Index bytes are a reconciliation signal, not identity: index stat refreshes and
-	// lock-only staging must not change the graph policy identity.
-	semanticDeps := []Dependency{}
+	p.options = options
+	if err := p.computeIdentities(); err != nil {
+		return nil, err
+	}
+	return p, nil
+}
+
+// semanticDeps drops the Git control files from the dependency list.
+// Index bytes are a reconciliation signal, not identity: index stat refreshes and
+// lock-only staging must not change the graph policy identity.
+func (p *Policy) semanticDeps() []Dependency {
+	out := []Dependency{}
 	for _, d := range p.deps {
 		control := false
 		for _, dir := range p.gitDirs {
@@ -387,9 +425,60 @@ func Build(root string, options Options) (*Policy, error) {
 			}
 		}
 		if !control {
-			semanticDeps = append(semanticDeps, d)
+			out = append(out, d)
 		}
 	}
+	return out
+}
+
+// trackedAdmission returns the tracked entries whose index membership can move a
+// decision: the ones Git ignores and no hard rule already excludes. A hard
+// exclusion is evaluated before the override and wins over it, so a tracked
+// lockfile, state directory or Enola-excluded path entering or leaving the index
+// changes nothing and must not change the digest.
+//
+// Directories stay in their own list because the override itself distinguishes
+// them - it exempts a directory query only - so a name that is a tracked
+// directory is not interchangeable with the same name as a tracked file. A
+// directory earns its place from the tracked files under it rather than from
+// p.trackedDirs, which holds an ancestor of every tracked name including the
+// hard-excluded ones: a gitignored directory whose only tracked descendants are
+// hard-excluded exempts nothing, since every file under it is already excluded
+// by that hard rule or by gitignore with no tracking to override it.
+//
+// The directory set is published as p.admitDirs and is the set Classify itself
+// consults, so the two cannot drift. That is what makes the digest stand for the
+// decision function rather than merely for the leaf decisions: staging a build
+// artifact under an ignored directory moves neither.
+func (p *Policy) trackedAdmission() (files, dirs []string) {
+	files = []string{}
+	dirSet := map[string]bool{}
+	for name := range p.tracked {
+		if p.hard(name) != "" {
+			continue
+		}
+		if p.gitIgnored(name) {
+			files = append(files, name)
+		}
+		for dir := filepath.ToSlash(filepath.Dir(name)); dir != "."; dir = filepath.ToSlash(filepath.Dir(dir)) {
+			if p.trackedDirs[dir] && p.hard(dir) == "" && p.gitIgnored(dir) {
+				dirSet[dir] = true
+			}
+		}
+	}
+	dirs = []string{}
+	for dir := range dirSet {
+		dirs = append(dirs, dir)
+	}
+	sort.Strings(files)
+	sort.Strings(dirs)
+	p.admitDirs = dirSet
+	return files, dirs
+}
+
+// computeIdentities fills both digests from the policy's current inputs.
+func (p *Policy) computeIdentities() error {
+	semanticDeps := p.semanticDeps()
 	tracked := []string{}
 	for name := range p.tracked {
 		if p.hard(name) == "" {
@@ -402,13 +491,92 @@ func Build(root string, options Options) (*Policy, error) {
 		Options      Options
 		Dependencies []Dependency
 		Tracked      []string
-	}{"graph-input-v1", options, semanticDeps, tracked})
+	}{"graph-input-v1", p.options, semanticDeps, tracked})
 	if err != nil {
-		return nil, err
+		return err
 	}
 	sum := sha256.Sum256(encoded)
 	p.identity = hex.EncodeToString(sum[:])
-	return p, nil
+	admittedFiles, admittedDirs := p.trackedAdmission()
+	encoded, err = json.Marshal(struct {
+		Version             string
+		Options             Options
+		Dependencies        []Dependency
+		TrackedIgnoredFiles []string
+		TrackedIgnoredDirs  []string
+	}{"graph-input-admission-v1", p.options, semanticDeps, admittedFiles, admittedDirs})
+	if err != nil {
+		return err
+	}
+	sum = sha256.Sum256(encoded)
+	p.admission = hex.EncodeToString(sum[:])
+	return nil
+}
+
+// RecheckDeclaredInputs re-reads this policy's declared inputs and reports the
+// identity pair they produce now. It is a fence, not a rebuild, and its name is
+// the whole of its claim: it re-reads the dependencies this policy declared and
+// re-enumerates the index, and it reuses the directory walk and the ignore
+// evaluation this policy already performed. A rule file that did not exist when
+// this policy was built is not consulted here.
+//
+// That is sound for the caller it exists for - one comparing the pair against
+// Identity and AdmissionIdentity before writing bookkeeping on a run that
+// published nothing. A declared rule file, meaning the .gitignore files, the
+// configuration paths and the Git control files, is re-read; membership is
+// re-enumerated rather than trusted; and an undeclared rule file is a new
+// admitted file in the tree, so it moves that caller's inventory and the run
+// never reaches the decision this fence guards. A repository that has
+// disappeared since the policy was built declines through a false ok rather than
+// reporting the identities of a tree with no index, which would compare equal
+// for the wrong reason.
+//
+// This policy is left unchanged either way.
+func (p *Policy) RecheckDeclaredInputs() (identity, admission string, ok bool, err error) {
+	q := *p
+	q.deps = nil
+	q.depSet = map[string]bool{}
+	q.tracked = map[string]bool{}
+	q.trackedDirs = map[string]bool{}
+	for _, d := range p.deps {
+		if q.depSet[d.Path] {
+			continue
+		}
+		q.depSet[d.Path] = true
+		b, rerr := os.ReadFile(d.Path)
+		digest := "missing"
+		if rerr == nil {
+			sum := sha256.Sum256(b)
+			digest = hex.EncodeToString(sum[:])
+		} else if !os.IsNotExist(rerr) {
+			return "", "", false, rerr
+		}
+		q.deps = append(q.deps, Dependency{d.Path, digest})
+	}
+	git := func(args ...string) ([]byte, error) { return runGit(p.root, "", nil, args...) }
+	_, gerr := git("rev-parse", "--show-toplevel")
+	if gerr != nil && len(p.gitDirs) > 0 {
+		return "", "", false, nil
+	}
+	if gerr == nil {
+		out, e := git("ls-files", "-z", "--cached", "--", ".")
+		if e != nil {
+			return "", "", false, e
+		}
+		for _, name := range strings.Split(string(out), "\x00") {
+			if name == "" {
+				continue
+			}
+			q.tracked[name] = true
+			for dir := filepath.ToSlash(filepath.Dir(name)); dir != "."; dir = filepath.ToSlash(filepath.Dir(dir)) {
+				q.trackedDirs[dir] = true
+			}
+		}
+	}
+	if err := q.computeIdentities(); err != nil {
+		return "", "", false, err
+	}
+	return q.identity, q.admission, true, nil
 }
 
 func runGit(root, gitDir string, input []byte, args ...string) ([]byte, error) {

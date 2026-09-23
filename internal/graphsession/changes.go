@@ -358,7 +358,12 @@ func (s *FileChangeSource) CoverSessionInputs(r *Resident) error {
 	policyChanged := false
 	if scope := r.eng.GraphScope(); scope != nil {
 		old := s.policy.Load()
-		policyChanged = old == nil || old.Identity() != scope.Policy.Identity()
+		// Watch coverage follows the admitted tree, so it is the admission
+		// fingerprint that has to move before the registration is rebuilt and
+		// the queue is declared lost. A pure index edit produces a different
+		// raw identity and the same admitted tree, and dropping coverage for it
+		// would turn `git add` of an already-watched file into a reconciliation.
+		policyChanged = old == nil || old.AdmissionIdentity() != scope.Policy.AdmissionIdentity()
 		s.policy.Store(scope.Policy)
 		if policyChanged {
 			if err := s.register(s.root); err != nil {

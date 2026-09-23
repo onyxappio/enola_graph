@@ -128,7 +128,10 @@ func TestScopedTrackedMembershipAndResolution(t *testing.T) {
 	graphWrite(t, root, "added.ts", "export const fresh=1")
 	graphGit(t, root, "add", "added.ts")
 	res := apply("added.ts")
-	if res.ParsedFiles != 1 || !res.Invalidation.PolicyReconciled || len(res.Invalidation.ContextReasons) != 0 {
+	// Staging a source Git does not ignore moves the index but no admission
+	// decision, so this is a membership addition and not a policy change: the
+	// one new file parses without the policy being reconciled around it.
+	if res.ParsedFiles != 1 || res.Invalidation.PolicyReconciled || len(res.Invalidation.ContextReasons) != 0 {
 		t.Fatalf("tracked source forced global parse: %+v", res)
 	}
 	graphColdEqual(t, root, sink)
