@@ -321,8 +321,8 @@ func TestPublishedNamedReexportCachedUpgradeFromV281(t *testing.T) {
 
 func TestPublishedWave8CachedUpgradeFromV295(t *testing.T) {
 	dir := setupTSRepo(t, map[string]string{
-		"src/schema.d.ts": "export interface TsLibGeneratorSchema { name: string }\n",
-		"src/schema.json": "{\"type\":\"object\"}\n",
+		"src/schema.d.ts":  "export interface TsLibGeneratorSchema { name: string }\n",
+		"src/schema.json":  "{\"type\":\"object\"}\n",
 		"src/generator.ts": "import type { TsLibGeneratorSchema } from './schema'\nexport function run(s: TsLibGeneratorSchema) { return s }\n",
 		"src/a.ts": `export function useStep() { return { nextDelayed: (s: string) => s } }
 const { nextDelayed } = useStep()
@@ -428,6 +428,134 @@ func TestPublishedWave8CachedUpgradeFromV296(t *testing.T) {
 	}
 	if engine.ExtractorVersion() == "v296" {
 		t.Fatal("cached upgrade test requires cacheVersion newer than v296")
+	}
+}
+
+func TestPublishedWave9CachedUpgradeFromV297(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"src/index.ts":    "export { Decision } from './decision';\nexport { max as alias } from './max';\n",
+		"src/decision.ts": "export const Decision = { ok: true };\n",
+		"src/types.ts":    "export type Decision = { ok: boolean };\n",
+		"src/max.ts":      "export function max() { return 1; }\nexport function alias() { return 2; }\n",
+		"src/app.ts":      "export function isLocalRequest(host: string) { return host === 'localhost'; }\n",
+		"src/server.ts":   "export const host = '0.0.0.0';\n",
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("load state: %v %#v", err, st)
+	}
+	st.ExtractorVersion = "v297"
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	up := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, dir, up, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.ParsedFiles == 0 {
+		t.Fatal("v297 migration parsed no files")
+	}
+	c := applyGraph(t, first)
+	if err := c.ApplyRecords(up.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, coldSink))
+	assertCallResolvedToFile(t, c, "src/index.ts", "src.Decision", "src/decision.ts")
+	assertCallResolvedToFile(t, c, "src/index.ts", "src.max", "src/max.ts")
+	quiet := &graphstream.MemorySink{}
+	again, err := Run(context.Background(), eng, dir, quiet, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if again.ParsedFiles != 0 {
+		t.Fatalf("silent nochange parsed=%d", again.ParsedFiles)
+	}
+	if engine.ExtractorVersion() == "v297" {
+		t.Fatal("cached upgrade test requires cacheVersion newer than v297")
+	}
+
+	v1 := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, v1, Options{StateDir: filepath.Join(dir, ".enola", "v1"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	v2 := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, v2, Options{StateDir: filepath.Join(dir, ".enola", "v2"), ForceInitial: true, AuthoritativeFiles: true, MaxBeginBytes: 1048576}); err != nil {
+		t.Fatal(err)
+	}
+	c1, c2 := applyGraph(t, v1), applyGraph(t, v2)
+	assertCallResolvedToFile(t, c1, "src/index.ts", "src.Decision", "src/decision.ts")
+	assertCallResolvedToFile(t, c2, "src/index.ts", "src.Decision", "src/decision.ts")
+}
+
+func TestPublishedWave9CachedUpgradeFromV298(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"src/dep.ts": "export function callback() { return 1; }\nexport function keep() { return 2; }\n",
+		"src/app.ts": `
+import { callback, keep } from './dep';
+export function run() {
+  type callback = string;
+  interface keep { n: number }
+  callback();
+  keep();
+}
+`,
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("load state: %v %#v", err, st)
+	}
+	st.ExtractorVersion = "v298"
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	up := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, dir, up, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.ParsedFiles == 0 {
+		t.Fatal("v298 migration parsed no files")
+	}
+	c := applyGraph(t, first)
+	if err := c.ApplyRecords(up.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, coldSink))
+	assertCallResolvedToFile(t, c, "src/app.ts", "src.callback", "src/dep.ts")
+	assertCallResolvedToFile(t, c, "src/app.ts", "src.keep", "src/dep.ts")
+	quiet := &graphstream.MemorySink{}
+	again, err := Run(context.Background(), eng, dir, quiet, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if again.ParsedFiles != 0 {
+		t.Fatalf("silent nochange parsed=%d", again.ParsedFiles)
+	}
+	if engine.ExtractorVersion() == "v298" {
+		t.Fatal("cached upgrade test requires cacheVersion newer than v298")
 	}
 }
 

@@ -33,6 +33,8 @@ import (
 // test functions that assert the behavior that version introduced. v1 is the
 // implicit baseline (no changelog line), so coverage starts at v2.
 var versionCoverage = map[int][]string{
+	299: {"TestExtract_Wave9TypeAndInterfaceDoNotShadowValueImports", "TestPublishedWave9CachedUpgradeFromV298"},
+	298: {"TestExtract_Wave9ReexportFileRefProvenance", "TestExtract_Wave9LexicalShadowFileRefAndSymbolCalls", "TestPublishedWave9CachedUpgradeFromV297"},
 	297: {"TestExtract_AwaitImportDestructureLexicalCalls", "TestPublishedWave8CachedUpgradeFromV296"},
 	296: {"TestExtract_VueComponentDistinctFromSameNamedType", "TestExtract_SameFileLexicalBindingHasTargetFile", "TestExtract_JSXFileRefKeepsImportedTargetFile", "TestExtract_AwaitImportDestructureLexicalCalls", "TestExtract_ExtensionlessDeclarationOnlyModule", "TestPublishedWave8CachedUpgradeFromV295"},
 	295: {"TestPropertyDeclaresEnclosingType", "TestPublishedSwiftConstantDeclaresClassV2"},
