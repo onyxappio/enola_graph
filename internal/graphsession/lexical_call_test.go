@@ -877,6 +877,60 @@ export function missingValue() {
 	}
 }
 
+func TestPublishedWave10CachedUpgradeFromV306(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"src/client.ts": `import type { Tree } from '@nx/devkit';
+type HttpClient = { delete: (url: string) => unknown };
+export function send(tree: Tree | HttpClient, base: string) {
+  tree.delete(` + "`${base}/http`" + `);
+}
+`,
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("load state: %v %#v", err, st)
+	}
+	st.ExtractorVersion = "v306"
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	up := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, dir, up, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.ParsedFiles == 0 {
+		t.Fatal("v306 migration parsed no files")
+	}
+	c := applyGraph(t, first)
+	if err := c.ApplyRecords(up.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, coldSink))
+	quiet := &graphstream.MemorySink{}
+	again, err := Run(context.Background(), eng, dir, quiet, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if again.ParsedFiles != 0 {
+		t.Fatalf("silent nochange parsed=%d", again.ParsedFiles)
+	}
+	if engine.ExtractorVersion() == "v306" {
+		t.Fatal("cached upgrade test requires cacheVersion newer than v306")
+	}
+}
+
 func TestPublishedWave10CachedUpgradeFromV305(t *testing.T) {
 	dir := setupTSRepo(t, map[string]string{
 		"src/client.ts": `import type { Tree } from '@nx/devkit';

@@ -3,16 +3,20 @@ package tsextractor
 import (
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/extractors/tsutil"
 	"github.com/enola-labs/enola/internal/factpath"
+	sitter "github.com/tree-sitter/go-tree-sitter"
+	typescript "github.com/tree-sitter/tree-sitter-typescript/bindings/go"
 )
 
 // Proven Nx Tree bindings for HTTP-client suppression. Name-only "tree"
 // identifiers, an @nx/devkit import with no typed binding, and sibling
 // .write/.delete evidence are not sufficient. Unknown HTTP receivers named
-// tree still emit client routes.
+// tree still emit client routes. A recognized identifier prefix is not proof
+// of the complete annotation: unions, intersections, generics, local type
+// shadows, and ambiguous schema sources stay conservative.
 
 type nxTreeScope struct {
 	name       string
@@ -23,9 +27,6 @@ type nxTreeScope struct {
 var (
 	nxDevkitNamedImport = regexp.MustCompile(`(?m)import\s+(?:type\s+)?\{([^}]+)\}\s+from\s+['"]@nx/devkit['"]`)
 	relativeNamedImport = regexp.MustCompile(`(?m)import\s+(?:type\s+)?\{([^}]+)\}\s+from\s+['"](\.[^'"]+)['"]`)
-	typedIdentDecl      = regexp.MustCompile(`\b([A-Za-z_$][\w$]*)\s*:\s*([A-Za-z_$][\w$]*)\b`)
-	objectDestructure   = regexp.MustCompile(`(?:const|let|var)\s*\{([^}]+)\}\s*=\s*([A-Za-z_$][\w$]*)`)
-	plainIdentBinding   = regexp.MustCompile(`(?:const|let|var)\s+([A-Za-z_$][\w$]*)\b`)
 	interfaceOpen       = regexp.MustCompile(`(?:export\s+)?(?:declare\s+)?interface\s+([A-Za-z_$][\w$]*)\s*\{`)
 	typeObjectOpen      = regexp.MustCompile(`(?:export\s+)?(?:declare\s+)?type\s+([A-Za-z_$][\w$]*)\s*=\s*\{`)
 	schemaField         = regexp.MustCompile(`(?m)^\s*([A-Za-z_$][\w$]*)\s*\??\s*:\s*([A-Za-z_$][\w$]*)\s*[;,\n]`)
@@ -241,15 +242,27 @@ type nxTypedBinding struct {
 	start, end int
 }
 
+type nxTypeDecl struct {
+	name       string
+	start, end int
+	nxImport   bool
+}
+
 func nxTreeScopes(src []byte, relFile string, knownFiles map[string]bool, readSrc func(string) []byte, sideReads map[string]bool) []nxTreeScope {
 	treeTypes := importedNxTreeNames(src)
 	schemaFields := schemaNxTreeFields(src, relFile, knownFiles, readSrc, sideReads)
 	if len(treeTypes) == 0 && len(schemaFields) == 0 {
 		return nil
 	}
-	mask := tsCommentStringMask(src)
-	var scopes []nxTreeScope
+	kinds, root, closeParse := parseNxTSRoot(src, relFile)
+	if closeParse != nil {
+		defer closeParse()
+	}
+	if root == nil {
+		return nil
+	}
 
+	var scopes []nxTreeScope
 	add := func(name string, start, end int, isTree bool) {
 		if name == "" || start < 0 || end <= start {
 			return
@@ -257,93 +270,290 @@ func nxTreeScopes(src []byte, relFile string, knownFiles map[string]bool, readSr
 		scopes = append(scopes, nxTreeScope{name: name, start: start, end: end, isTree: isTree})
 	}
 
+	typeDecls := make([]nxTypeDecl, 0, len(treeTypes)+4)
+	for name := range treeTypes {
+		typeDecls = append(typeDecls, nxTypeDecl{name: name, start: 0, end: len(src), nxImport: true})
+	}
+	var collectTypes func(n *sitter.Node)
+	collectTypes = func(n *sitter.Node) {
+		if n == nil {
+			return
+		}
+		kind := kindOf(kinds, n)
+		if kind == "type_alias_declaration" || kind == "interface_declaration" {
+			if nameN := n.ChildByFieldName("name"); nameN != nil {
+				name := nodeText(nameN, src)
+				_, blockEnd := nxEnclosingValueScope(kinds, n)
+				typeDecls = append(typeDecls, nxTypeDecl{
+					name: name, start: int(n.StartByte()), end: blockEnd, nxImport: false,
+				})
+			}
+		}
+		for i := range n.ChildCount() {
+			collectTypes(n.Child(i))
+		}
+	}
+	collectTypes(root)
+
 	var typedBinds []nxTypedBinding
-	seenParam := map[string]bool{}
-	for _, m := range typedIdentDecl.FindAllSubmatchIndex(src, -1) {
-		if mask[m[0]] {
-			continue
+	var walk func(n *sitter.Node)
+	walk = func(n *sitter.Node) {
+		if n == nil {
+			return
 		}
-		ident, typ := string(src[m[2]:m[3]]), string(src[m[4]:m[5]])
-		isTree := treeTypes[typ]
-		param := isFunctionParameter(src, mask, m[2])
-		bodyStart, bodyEnd, ok := functionBodyAroundParam(src, mask, m[2])
-		if param && ok {
-			add(ident, bodyStart, bodyEnd, isTree)
-			typedBinds = append(typedBinds, nxTypedBinding{name: ident, typ: typ, start: bodyStart, end: bodyEnd})
-			seenParam[ident+"\x00"+fmtSpan(bodyStart, bodyEnd)] = true
-			continue
-		}
-		if !looksLikeTypedValueBinding(src, mask, m[2]) {
-			continue
-		}
-		bodyStart, bodyEnd = enclosingBlock(src, mask, m[2])
-		if bodyEnd <= bodyStart {
-			continue
-		}
-		add(ident, m[2], bodyEnd, isTree)
-	}
-
-	for _, sc := range collectParamNameScopes(src) {
-		key := sc.name + "\x00" + fmtSpan(sc.start, sc.end)
-		if seenParam[key] {
-			continue
-		}
-		add(sc.name, sc.start, sc.end, false)
-		typedBinds = append(typedBinds, nxTypedBinding{name: sc.name, typ: "", start: sc.start, end: sc.end})
-	}
-
-	for _, m := range objectDestructure.FindAllSubmatchIndex(src, -1) {
-		if mask[m[0]] {
-			continue
-		}
-		fields := string(src[m[2]:m[3]])
-		srcName := string(src[m[4]:m[5]])
-		_, blockEnd := enclosingBlock(src, mask, m[0])
-		nearest, ok := nearestTypedBinding(typedBinds, srcName, m[0])
-		for _, entry := range strings.Split(fields, ",") {
-			entry = strings.TrimSpace(entry)
-			if entry == "" {
-				continue
+		kind := kindOf(kinds, n)
+		switch kind {
+		case "required_parameter", "optional_parameter":
+			pat := n.ChildByFieldName("pattern")
+			if pat == nil {
+				pat = n.ChildByFieldName("name")
 			}
-			orig, local := entry, entry
-			if parts := strings.Split(entry, ":"); len(parts) == 2 {
-				orig = strings.TrimSpace(parts[0])
-				local = strings.TrimSpace(parts[1])
+			if pat != nil && kindOf(kinds, pat) == "identifier" {
+				ident := nodeText(pat, src)
+				typ, okType := soleTypeIdentifier(kinds, nxTypeAnnotation(kinds, n), src)
+				bodyStart, bodyEnd := nxParamBodyRange(kinds, n, src)
+				isTree := false
+				if okType {
+					isTree = nxImportedTreeAt(typeDecls, treeTypes, typ, int(pat.StartByte()))
+				}
+				add(ident, bodyStart, bodyEnd, isTree)
+				if !okType {
+					typ = ""
+				}
+				typedBinds = append(typedBinds, nxTypedBinding{name: ident, typ: typ, start: bodyStart, end: bodyEnd})
 			}
-			orig = strings.TrimPrefix(orig, "...")
-			if orig == "" || local == "" {
-				continue
+		case "variable_declarator":
+			nameN := n.ChildByFieldName("name")
+			if nameN == nil {
+				break
 			}
-			proven := false
-			if ok {
-				if treeFields := schemaFields[nearest.typ]; treeFields[orig] {
-					proven = true
+			nk := kindOf(kinds, nameN)
+			declStart := int(n.StartByte())
+			_, blockEnd := nxEnclosingValueScope(kinds, n)
+			typ, okType := soleTypeIdentifier(kinds, nxTypeAnnotation(kinds, n), src)
+			if nk == "identifier" {
+				ident := nodeText(nameN, src)
+				isTree := false
+				if okType {
+					isTree = nxImportedTreeAt(typeDecls, treeTypes, typ, declStart)
+				}
+				add(ident, declStart, blockEnd, isTree)
+				if !okType {
+					typ = ""
+				}
+				typedBinds = append(typedBinds, nxTypedBinding{name: ident, typ: typ, start: declStart, end: blockEnd})
+			}
+			if nk == "object_pattern" {
+				srcName, srcOK := nxDestructureSourceIdent(kinds, n, src)
+				nearest, ok := nearestTypedBinding(typedBinds, srcName, declStart)
+				for _, b := range nxObjectPatternBindings(kinds, nameN, src) {
+					proven := false
+					if srcOK && ok {
+						if treeFields := schemaFields[nearest.typ]; treeFields[b.orig] {
+							proven = true
+						}
+					}
+					add(b.local, declStart, blockEnd, proven)
 				}
 			}
-			add(local, m[0], blockEnd, proven)
+		}
+		if tsTypeLikeKind(kind) {
+			return
+		}
+		for i := range n.ChildCount() {
+			walk(n.Child(i))
 		}
 	}
-
-	for _, m := range plainIdentBinding.FindAllSubmatchIndex(src, -1) {
-		if mask[m[0]] {
-			continue
-		}
-		name := string(src[m[2]:m[3]])
-		after := m[3]
-		for after < len(src) && (src[after] == ' ' || src[after] == '\t') {
-			after++
-		}
-		if after < len(src) && src[after] == ':' {
-			continue
-		}
-		_, blockEnd := enclosingBlock(src, mask, m[0])
-		add(name, m[0], blockEnd, false)
-	}
+	walk(root)
 	return scopes
 }
 
-func fmtSpan(start, end int) string {
-	return strconv.Itoa(start) + ":" + strconv.Itoa(end)
+func parseNxTSRoot(src []byte, relFile string) (*tsutil.KindTable, *sitter.Node, func()) {
+	if len(src) == 0 {
+		return nil, nil, nil
+	}
+	isTSX := strings.HasSuffix(relFile, ".tsx") || strings.HasSuffix(relFile, ".jsx")
+	kinds := tsKindsFor(isTSX)
+	lang := typescript.LanguageTypescript()
+	if isTSX {
+		lang = typescript.LanguageTSX()
+	}
+	parser := sitter.NewParser()
+	if err := parser.SetLanguage(sitter.NewLanguage(lang)); err != nil {
+		parser.Close()
+		return nil, nil, nil
+	}
+	tree := parser.Parse(src, nil)
+	return kinds, tree.RootNode(), func() {
+		tree.Close()
+		parser.Close()
+	}
+}
+
+func nxTypeAnnotation(kinds *tsutil.KindTable, n *sitter.Node) *sitter.Node {
+	if n == nil {
+		return nil
+	}
+	if t := n.ChildByFieldName("type"); t != nil {
+		return t
+	}
+	for i := range n.NamedChildCount() {
+		ch := n.NamedChild(i)
+		if kindOf(kinds, ch) == "type_annotation" {
+			return ch
+		}
+	}
+	return nil
+}
+
+func soleTypeIdentifier(kinds *tsutil.KindTable, n *sitter.Node, src []byte) (string, bool) {
+	n = unwrapSoleType(kinds, n)
+	if n == nil || kindOf(kinds, n) != "type_identifier" {
+		return "", false
+	}
+	name := strings.TrimSpace(nodeText(n, src))
+	if name == "" {
+		return "", false
+	}
+	return name, true
+}
+
+func unwrapSoleType(kinds *tsutil.KindTable, n *sitter.Node) *sitter.Node {
+	for n != nil {
+		switch kindOf(kinds, n) {
+		case "type_annotation", "parenthesized_type":
+			if inner := n.ChildByFieldName("type"); inner != nil && inner != n {
+				n = inner
+				continue
+			}
+			var next *sitter.Node
+			for i := range n.NamedChildCount() {
+				ch := n.NamedChild(i)
+				if ch == nil || !tsTypeLikeKind(kindOf(kinds, ch)) {
+					continue
+				}
+				if next != nil {
+					return n
+				}
+				next = ch
+			}
+			if next == nil || next == n {
+				return n
+			}
+			n = next
+		default:
+			return n
+		}
+	}
+	return n
+}
+
+func nxImportedTreeAt(decls []nxTypeDecl, imported map[string]bool, typ string, pos int) bool {
+	if !imported[typ] {
+		return false
+	}
+	d, ok := nearestTypeDecl(decls, typ, pos)
+	if !ok {
+		return false
+	}
+	return d.nxImport
+}
+
+func nearestTypeDecl(decls []nxTypeDecl, name string, pos int) (nxTypeDecl, bool) {
+	best := -1
+	span := int(^uint(0) >> 1)
+	for i, d := range decls {
+		if d.name != name || pos < d.start || pos > d.end {
+			continue
+		}
+		w := d.end - d.start
+		if w < span || (w == span && i > best) {
+			span = w
+			best = i
+		}
+	}
+	if best < 0 {
+		return nxTypeDecl{}, false
+	}
+	return decls[best], true
+}
+
+func nxParamBodyRange(kinds *tsutil.KindTable, param *sitter.Node, src []byte) (start, end int) {
+	for p := param.Parent(); p != nil; p = p.Parent() {
+		if !tsIsFunctionLike(kindOf(kinds, p)) {
+			continue
+		}
+		if body := p.ChildByFieldName("body"); body != nil {
+			return int(body.StartByte()), int(body.EndByte())
+		}
+		break
+	}
+	return int(param.StartByte()), len(src)
+}
+
+func nxEnclosingValueScope(kinds *tsutil.KindTable, n *sitter.Node) (start, end int) {
+	for p := n.Parent(); p != nil; p = p.Parent() {
+		switch kindOf(kinds, p) {
+		case "statement_block", "program", "class_body":
+			return int(p.StartByte()), int(p.EndByte())
+		}
+	}
+	return 0, int(n.EndByte())
+}
+
+func nxDestructureSourceIdent(kinds *tsutil.KindTable, decl *sitter.Node, src []byte) (string, bool) {
+	val := decl.ChildByFieldName("value")
+	if val == nil {
+		return "", false
+	}
+	val = unwrapTSSyntaxExpr(kinds, val)
+	if val == nil || kindOf(kinds, val) != "identifier" {
+		return "", false
+	}
+	name := strings.TrimSpace(nodeText(val, src))
+	return name, name != ""
+}
+
+type nxPatternBind struct {
+	orig, local string
+}
+
+func nxObjectPatternBindings(kinds *tsutil.KindTable, pat *sitter.Node, src []byte) []nxPatternBind {
+	var out []nxPatternBind
+	if pat == nil {
+		return out
+	}
+	for i := range pat.NamedChildCount() {
+		ch := pat.NamedChild(i)
+		switch kindOf(kinds, ch) {
+		case "shorthand_property_identifier_pattern", "shorthand_property_identifier":
+			name := strings.TrimSpace(nodeText(ch, src))
+			if name != "" {
+				out = append(out, nxPatternBind{orig: name, local: name})
+			}
+		case "pair_pattern", "object_assignment_pattern":
+			key := ch.ChildByFieldName("key")
+			if key == nil && ch.NamedChildCount() > 0 {
+				key = ch.NamedChild(0)
+			}
+			val := ch.ChildByFieldName("value")
+			if val == nil {
+				val = ch.ChildByFieldName("pattern")
+			}
+			if val == nil && ch.NamedChildCount() > 1 {
+				val = ch.NamedChild(1)
+			}
+			orig := strings.TrimSpace(nodeText(key, src))
+			local := orig
+			if val != nil && kindOf(kinds, val) == "identifier" {
+				local = strings.TrimSpace(nodeText(val, src))
+			}
+			if orig != "" && local != "" {
+				out = append(out, nxPatternBind{orig: orig, local: local})
+			}
+		}
+	}
+	return out
 }
 
 func nearestTypedBinding(binds []nxTypedBinding, name string, pos int) (nxTypedBinding, bool) {
@@ -363,46 +573,6 @@ func nearestTypedBinding(binds []nxTypedBinding, name string, pos int) (nxTypedB
 		return nxTypedBinding{}, false
 	}
 	return binds[best], true
-}
-
-func looksLikeTypedValueBinding(src []byte, mask []bool, identPos int) bool {
-	i := identPos - 1
-	for i >= 0 && (src[i] == ' ' || src[i] == '\t') {
-		i--
-	}
-	if i < 0 || mask[i] || !isJSIdentPart(src[i]) {
-		return false
-	}
-	end := i + 1
-	for i >= 0 && isJSIdentPart(src[i]) {
-		i--
-	}
-	kw := string(src[i+1 : end])
-	return kw == "const" || kw == "let" || kw == "var"
-}
-
-func enclosingBlock(src []byte, mask []bool, pos int) (start, end int) {
-	depth := 0
-	start = 0
-	for i := pos; i >= 0; i-- {
-		if mask[i] {
-			continue
-		}
-		switch src[i] {
-		case '}':
-			depth++
-		case '{':
-			if depth == 0 {
-				end := matchBrace(src, mask, i)
-				if end >= 0 {
-					return i, end
-				}
-				return 0, len(src)
-			}
-			depth--
-		}
-	}
-	return 0, len(src)
 }
 
 func isNxTreeReceiverAt(scopes []nxTreeScope, name string, pos int) bool {

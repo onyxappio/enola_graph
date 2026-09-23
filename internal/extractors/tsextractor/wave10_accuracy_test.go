@@ -194,6 +194,125 @@ export function outer(tree: Tree, base: string) {
 	}
 }
 
+func TestExtract_Wave10NxUnionTreeKeepsHTTP(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/client.ts": `import type { Tree } from '@nx/devkit';
+type HttpClient = { delete: (url: string) => unknown };
+export function send(tree: Tree | HttpClient, base: string) {
+  tree.delete(` + "`${base}/http`" + `);
+}
+export function proven(tree: Tree, base: string) {
+  tree.delete(` + "`${base}/fs`" + `);
+}
+`,
+	}, false)
+	if _, ok := wave10Route(ff, "/http"); !ok {
+		t.Fatal("union Tree | HttpClient is not proven Nx; /http must stay")
+	}
+	if _, ok := wave10Route(ff, "/fs"); ok {
+		t.Fatal("unambiguous Tree parameter must not emit /fs")
+	}
+}
+
+func TestExtract_Wave10NxUnionSchemaKeepsHTTP(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/schema.ts": `import type { Tree } from '@nx/devkit';
+export interface Options {
+  tree: Tree
+}
+`,
+		"src/client.ts": `import type { Options } from './schema';
+type Other = { tree: any };
+export function send(options: Options | Other, base: string) {
+  const { tree } = options;
+  tree.delete(` + "`${base}/http`" + `);
+}
+export function proven(options: Options, base: string) {
+  const { tree } = options;
+  tree.delete(` + "`${base}/fs`" + `);
+}
+`,
+	}, false)
+	if _, ok := wave10Route(ff, "/http"); !ok {
+		t.Fatal("Options | Other cannot prove options.tree; /http must stay")
+	}
+	if _, ok := wave10Route(ff, "/fs"); ok {
+		t.Fatal("direct Options.tree must suppress /fs")
+	}
+}
+
+func TestExtract_Wave10NxSchemaValueShadowKeepsInnerHTTP(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/schema.ts": `import type { Tree } from '@nx/devkit';
+export interface Options {
+  tree: Tree
+}
+`,
+		"src/client.ts": `import type { Options } from './schema';
+const httpOptions: any = {};
+export function outer(options: Options, base: string) {
+  const { tree } = options;
+  tree.delete(` + "`${base}/fs`" + `);
+  {
+    const options: any = httpOptions;
+    const { tree } = options;
+    tree.delete(` + "`${base}/http`" + `);
+  }
+}
+`,
+	}, false)
+	if _, ok := wave10Route(ff, "/fs"); ok {
+		t.Fatal("outer Options.tree must not emit /fs")
+	}
+	if _, ok := wave10Route(ff, "/http"); !ok {
+		t.Fatal("inner const options:any destructure must keep /http")
+	}
+}
+
+func TestExtract_Wave10NxLocalTypeShadowKeepsHTTP(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/client.ts": `import type { Tree } from '@nx/devkit';
+export function outer(base: string) {
+  type Tree = { delete: (url: string) => unknown };
+  function send(tree: Tree) {
+    tree.delete(` + "`${base}/http`" + `);
+  }
+}
+export function proven(tree: Tree, base: string) {
+  tree.delete(` + "`${base}/fs`" + `);
+}
+`,
+	}, false)
+	if _, ok := wave10Route(ff, "/http"); !ok {
+		t.Fatal("local type Tree shadow must keep /http")
+	}
+	if _, ok := wave10Route(ff, "/fs"); ok {
+		t.Fatal("module-imported Tree parameter must not emit /fs")
+	}
+}
+
+func TestExtract_Wave10NxIntersectionAndGenericStayClient(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/client.ts": `import type { Tree } from '@nx/devkit';
+export function inter(tree: Tree & { extra: 1 }, base: string) {
+  tree.delete(` + "`${base}/http`" + `);
+}
+export function gen(tree: Tree<string>, base: string) {
+  tree.delete(` + "`${base}/also`" + `);
+}
+`,
+	}, false)
+	if _, ok := wave10Route(ff, "/http"); !ok {
+		t.Fatal("intersection Tree & shape is not proven Nx; /http must stay")
+	}
+	if _, ok := wave10Route(ff, "/also"); !ok {
+		t.Fatal("generic Tree<string> is not proven Nx; /also must stay")
+	}
+	if _, ok := wave10Route(ff, "/fs"); ok {
+		t.Fatal("unexpected /fs")
+	}
+}
+
 func TestExtract_Wave10NxImportedAliasSchemaStillSuppresses(t *testing.T) {
 	ff := extractAll(t, map[string]string{
 		"src/schema.ts": `import type { Tree as FileTree } from '@nx/devkit';

@@ -2551,7 +2551,11 @@ import (
 // members, and comment-masked fields. Inner any/unknown params, destructured
 // any options, nested schema Tree fields, and block const shadows keep HTTP
 // fallback; only proven Tree provenance removes the client route.
-const cacheVersion = "v306"
+// v307: Nx Tree provenance requires the complete annotation to be an unambiguous
+// imported Tree (or a direct schema field of that Tree). Unions, intersections,
+// generics, local type shadows, and nearest const/let schema-source shadows keep
+// HTTP client routes; identifier prefixes are not proof.
+const cacheVersion = "v307"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //
