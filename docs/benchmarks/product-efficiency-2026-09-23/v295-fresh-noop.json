@@ -1,0 +1,120 @@
+{
+  "baseline_revision": "b4c9a6a",
+  "semantics": "v295",
+  "product_revision": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+  "binary_sha256": "ead864a95d8a1d981f178ab01456200e3a6029742f2937d59c97ee2f3edfe097",
+  "label": "3 fresh-CLI no-op runs; file sink; shared-host diagnostic; initial is setup, not repeated acceptance",
+  "initial": {
+    "exit": 0,
+    "wall_s": 27.23,
+    "sink": "file",
+    "parsed": 4018,
+    "cached": 0,
+    "files_read": 4070,
+    "generation": [
+      0,
+      1
+    ],
+    "owners_published": 4949,
+    "events": 2656,
+    "run_id": "product-scope-scope-bench-1-1790155051466471000",
+    "stderr_graph": "[graph] /tmp/enola-scope-snapshot-2-history-probe/live: generation 0\u21921 parsed=4018 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+  },
+  "noops": [
+    {
+      "exit": 0,
+      "wall_s": 3.112,
+      "sink": "file",
+      "parsed": 0,
+      "cached": 4070,
+      "files_read": 0,
+      "generation": [
+        1,
+        1
+      ],
+      "owners_published": 0,
+      "events": 2656,
+      "run_id": "",
+      "stderr_graph": "[graph] /tmp/enola-scope-snapshot-2-history-probe/live: generation 1\u21921 parsed=0 cached=4070 early_local=0 fallbacks=0",
+      "new_event_bytes": 0
+    },
+    {
+      "exit": 0,
+      "wall_s": 3.018,
+      "sink": "file",
+      "parsed": 0,
+      "cached": 4070,
+      "files_read": 0,
+      "generation": [
+        1,
+        1
+      ],
+      "owners_published": 0,
+      "events": 2656,
+      "run_id": "",
+      "stderr_graph": "[graph] /tmp/enola-scope-snapshot-2-history-probe/live: generation 1\u21921 parsed=0 cached=4070 early_local=0 fallbacks=0",
+      "new_event_bytes": 0
+    },
+    {
+      "exit": 0,
+      "wall_s": 2.987,
+      "sink": "file",
+      "parsed": 0,
+      "cached": 4070,
+      "files_read": 0,
+      "generation": [
+        1,
+        1
+      ],
+      "owners_published": 0,
+      "events": 2656,
+      "run_id": "",
+      "stderr_graph": "[graph] /tmp/enola-scope-snapshot-2-history-probe/live: generation 1\u21921 parsed=0 cached=4070 early_local=0 fallbacks=0",
+      "new_event_bytes": 0
+    }
+  ],
+  "median_wall_s": 3.018,
+  "cpu_diagnostic": {
+    "profile_duration_s": 3.15,
+    "sample_cpu_s": 3.16,
+    "cumulative_cpu_s": {
+      "WalkDir": 1.07,
+      "readRuntimeInputs": 0.93,
+      "graphinput.Build": 0.83,
+      "Policy.computeIdentities": 0.58,
+      "loadCommittedState": 0.18
+    },
+    "note": "nested cumulative CPU, not additive wall phases",
+    "profile_binary_sha256": "7f975b9412b3d916e1e92b44c22d7fd87c556cd2a6efb618a1fcdbd79dc89525",
+    "summary": [
+      {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {}
+        },
+        "RunID": "",
+        "BaseGeneration": 1,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 4070,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0
+        },
+        "Fallbacks": null,
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 0,
+        "EarlyLocal": 0,
+        "Facts": null
+      }
+    ]
+  }
+}
