@@ -2523,7 +2523,10 @@ import (
 // `type callback = string` or `interface callback {}` does not hide an imported
 // callable `callback` on symbol-owned or file_ref RelCalls; type-identifier
 // annotations still respect type-space shadowing.
-const cacheVersion = "v299"
+// v300: TypeScript catch_clause is a cyclomatic decision again. Body-walk lexical
+// catch shadowing still walks children, then returns; the catch itself must be
+// counted before that return so try/catch complexity matches prior metrics.
+const cacheVersion = "v300"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

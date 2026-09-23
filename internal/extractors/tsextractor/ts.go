@@ -4318,6 +4318,11 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 	}
 	kind := kindOf(w.kinds, n)
 	if kind == "catch_clause" {
+		// Count the catch decision here: this branch returns before the shared
+		// cyclomatic switch so lexical catch bindings can shadow for the subtree.
+		if w.metrics != nil {
+			w.metrics.decisions++
+		}
 		w.pushShadowScope(tsPatternBindingNames(w.kinds, n, w.src)...)
 		for i := range n.ChildCount() {
 			w.walk(n.Child(i))

@@ -229,3 +229,67 @@ func TestTsComplexity_CallsInScalingLoop_AbsentWithoutLoopCalls(t *testing.T) {
 		t.Fatalf("calls_in_scaling_loop must be absent when calls_in_loop is")
 	}
 }
+
+func TestTsComplexity_CatchClauseCountsDecision(t *testing.T) {
+	bare := tsExtractFunc(t, "export function run() { try { return 1; } catch { return 0; } }\n", "src.run")
+	if got := tsIntProp(t, bare, "cyclomatic"); got != 2 {
+		t.Errorf("bare catch cyclomatic = %d, want 2", got)
+	}
+	bound := tsExtractFunc(t, "export function run() { try { return 1; } catch (e) { return e; } }\n", "src.run")
+	if got := tsIntProp(t, bound, "cyclomatic"); got != 2 {
+		t.Errorf("bound catch cyclomatic = %d, want 2", got)
+	}
+	nested := tsExtractFunc(t, `export function run() {
+  try {
+    try { return 1; } catch { return 2; }
+  } catch (e) { return 3; }
+}
+`, "src.run")
+	if got := tsIntProp(t, nested, "cyclomatic"); got != 3 {
+		t.Errorf("nested catch cyclomatic = %d, want 3", got)
+	}
+	mixed := tsExtractFunc(t, `export function run(x: number) {
+  if (x) { return 1; }
+  try { return x || 0; } catch { return 0; }
+}
+`, "src.run")
+	if got := tsIntProp(t, mixed, "cyclomatic"); got != 4 {
+		t.Errorf("if+||+catch cyclomatic = %d, want 4", got)
+	}
+}
+
+func TestTsComplexity_CatchDoesNotDropOtherDecisionsOrImportedCalls(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/x.ts": `
+import { helper } from './dep';
+export function run(flag: boolean) {
+  if (flag) { helper(); }
+  try { return helper(); } catch { return helper(); }
+}
+export function catchShadow() {
+  try { throw new Error('x'); } catch (helper) { return helper(); }
+}
+`,
+		"src/dep.ts": "export function helper() { return 1; }\n",
+	}, false)
+	run, ok := findFact(ff, "src.run")
+	if !ok {
+		t.Fatal("src.run missing")
+	}
+	if got := tsIntProp(t, run, "cyclomatic"); got != 3 {
+		t.Errorf("run cyclomatic = %d, want 3 (if + catch)", got)
+	}
+	if !hasCallToFile(run, "src.helper", "src/dep.ts") {
+		t.Fatalf("imported helper call dropped: %+v", run.Relations)
+	}
+	shadow, ok := findFact(ff, "src.catchShadow")
+	if !ok {
+		t.Fatal("src.catchShadow missing")
+	}
+	if hasCallToFile(shadow, "src.helper", "src/dep.ts") {
+		t.Fatalf("catch param helper must shadow import: %+v", shadow.Relations)
+	}
+	if got := tsIntProp(t, shadow, "cyclomatic"); got != 2 {
+		t.Errorf("catchShadow cyclomatic = %d, want 2", got)
+	}
+}
