@@ -346,7 +346,7 @@ func TestFileInvalidationRejectsInvalidPaths(t *testing.T) {
 // inv.Files, which can be wider than the policy-filtered current list.
 func planForTest(previous, current []string, prevFiles map[string]*FileState, hashes map[string]string, wholeDomain bool, extraOwners []string) (*fileInvalidationPlan, string, error) {
 	return authoritativeFilePlan(previous, current, prevFiles, hashes, wholeDomain, extraOwners,
-		membershipScope(previous, current, current, prevFiles))
+		membershipScope(previous, current, current, prevFiles), nil)
 }
 
 func TestAuthoritativeFilePlanUsesChangedFilesAndReverseDependents(t *testing.T) {

@@ -509,11 +509,15 @@ func TestFrozenNarrowContentDeltaExcludesIndependentFile(t *testing.T) {
 	for _, o := range bs[0].OwnerScope {
 		owners[o.ID] = true
 	}
-	if !owners["a.ts"] || !owners["b.ts"] {
-		t.Fatalf("narrow scope missing importer/imported: %v", bs[0].OwnerScope)
+	if !owners["b.ts"] {
+		t.Fatalf("edited file missing from content-delta scope: %v", bs[0].OwnerScope)
 	}
-	if owners["independent.ts"] {
-		t.Fatalf("independent file leaked into content-delta scope: %v", bs[0].OwnerScope)
+	// a.ts imports b and still names it after the edit: b.ts keeps its name, its
+	// export and its imports, so nothing a.ts contributes can have moved and
+	// replacing its owner would only republish what is already published. The
+	// cold comparison below is the authority for leaving it out.
+	if owners["a.ts"] || owners["independent.ts"] {
+		t.Fatalf("unchanged contributions leaked into content-delta scope: %v", bs[0].OwnerScope)
 	}
 	if delta.ParsedFiles != 1 {
 		t.Fatalf("planning extract must be reused; parsed=%d", delta.ParsedFiles)
@@ -588,7 +592,8 @@ func TestFrozenImportTargetBodyStaysNarrow(t *testing.T) {
 	eng := testEngine(t, root)
 	state := t.TempDir()
 	opts := Options{StateDir: state, AuthoritativeFiles: true}
-	if _, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, opts); err != nil {
+	initial := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, initial, opts); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(filepath.Join(root, "lib.ts"), []byte("export function lib(){ return 2; }"), 0o644); err != nil {
@@ -613,12 +618,31 @@ func TestFrozenImportTargetBodyStaysNarrow(t *testing.T) {
 	for _, o := range bs[0].OwnerScope {
 		owners[o.ID] = true
 	}
-	if !owners["lib.ts"] || !owners["use.ts"] {
-		t.Fatalf("import-target scope %v", bs[0].OwnerScope)
+	if !owners["lib.ts"] {
+		t.Fatalf("edited import target missing from scope %v", bs[0].OwnerScope)
 	}
-	if owners["other.ts"] {
-		t.Fatalf("unrelated file in import-target scope %v", bs[0].OwnerScope)
+	// use.ts calls lib() before and after: the body under that name moved, the
+	// name did not, so the call edge use.ts owns is the same edge. It is no more
+	// in scope than the file that never imported anything.
+	if owners["use.ts"] || owners["other.ts"] {
+		t.Fatalf("unchanged contributions in import-target scope %v", bs[0].OwnerScope)
 	}
+	cons := NewConsumer()
+	if err := cons.ApplyRecords(initial.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	if err := cons.ApplyRecords(sink.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	cold := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, cold, Options{StateDir: t.TempDir(), AuthoritativeFiles: true}); err != nil {
+		t.Fatal(err)
+	}
+	oracle := NewConsumer()
+	if err := oracle.ApplyRecords(cold.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, cons, oracle)
 }
 
 // TestFrozenAddFileNarrowsMembershipScope is the end-to-end form of the

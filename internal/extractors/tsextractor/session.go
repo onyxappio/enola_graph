@@ -56,13 +56,34 @@ type FileRecord struct {
 	// this contribution even when this file is untouched.
 	SideReads      []string          `json:"side_reads,omitempty"`
 	SideReadHashes map[string]string `json:"side_read_hashes,omitempty"`
-	GraphQLServer  bool              `json:"graphql_server,omitempty"`
-	GraphQLSDL     []string          `json:"graphql_sdl,omitempty"`
-	GraphQLParsed  bool              `json:"graphql_parsed,omitempty"`
-	GRPC           *GRPCRecord       `json:"grpc,omitempty"`
-	Router         *RouterDTO        `json:"router,omitempty"`
-	ParseKind      string            `json:"parse_kind,omitempty"`
-	AutoImportDirs []string          `json:"auto_import_dirs,omitempty"`
+	// ExportSurface is the file's observable export membership as the binder sees
+	// it - the encoded namedExportIndex, see (*namedExportIndex).surface. Nothing
+	// else on this record describes it: Declared holds every declaration whether
+	// exported or not, so dropping `export` from one of them, or removing a name
+	// from an `export { ... }` clause, moves no other field while consumers of
+	// that name stop resolving. ExportSurfaceRecorded says the surface was
+	// computed rather than merely empty, so a record written before this field
+	// existed reads as unknown instead of as a file that exports nothing.
+	ExportSurface         []string    `json:"export_surface,omitempty"`
+	ExportSurfaceRecorded bool        `json:"export_surface_recorded,omitempty"`
+	GraphQLServer         bool        `json:"graphql_server,omitempty"`
+	GraphQLSDL            []string    `json:"graphql_sdl,omitempty"`
+	GraphQLParsed         bool        `json:"graphql_parsed,omitempty"`
+	GRPC                  *GRPCRecord `json:"grpc,omitempty"`
+	Router                *RouterDTO  `json:"router,omitempty"`
+	ParseKind             string      `json:"parse_kind,omitempty"`
+	AutoImportDirs        []string    `json:"auto_import_dirs,omitempty"`
+}
+
+// BindsNoImports reports whether the file resolves no import or re-export of its
+// own, and so cannot be a link in anyone's re-export chain. It is both the
+// condition under which an export surface is worth recording and the condition
+// under which one may be trusted, kept in one place so those two cannot drift
+// apart: a file the extractor judged ineligible must never be one the planner
+// judged provable.
+func (r *FileRecord) BindsNoImports() bool {
+	return r != nil && len(r.ImportSpecs) == 0 && len(r.ResolvedFiles) == 0 &&
+		len(r.UnresolvedSpecs) == 0 && len(r.Reexports) == 0
 }
 
 // SessionResult is one TS analysis pass under the local-fact contract.
@@ -311,6 +332,20 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			// counted after merge; workers must not race on stats
 		}
 		fillRecord(rec, res, knownFiles, freshGQL[relFile], freshGRPC[relFile], statsKind)
+		// After fillRecord, because eligibility is read off the finished record.
+		// A surface is only ever consulted for a file that binds nothing - one
+		// that cannot be a link in anyone's re-export chain - so indexing the rest
+		// would buy nothing and cost a scan each; they keep an unrecorded surface,
+		// which reads as unknown and never proves anything. Through exportCache
+		// rather than around it: the index recorded here is the same object the
+		// binder consults for this file, so a record cannot describe a surface the
+		// binder did not use, and the scan is counted in SummaryScans like every
+		// other. Indexing independently would have hidden both - a second full
+		// parse per file, uncounted, and a second answer nothing reconciles.
+		if rec.BindsNoImports() {
+			rec.ExportSurface = exportCache.index(relFile, readSrc, aliases, knownFiles).surface()
+			rec.ExportSurfaceRecorded = true
+		}
 		if hooks.OnFileLocal != nil {
 			hooks.OnFileLocal(rec)
 		}

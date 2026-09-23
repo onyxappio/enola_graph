@@ -167,9 +167,11 @@ func TestRawConfigVersionBumpKeepsBeginBounded(t *testing.T) {
 	assertAppliedEqualsCold(t, cons, coldConsumer(t, configScopeEngine(t, root), root))
 }
 
-// The combined case: one edited source and the same inert version bump. Scope
-// is the edited file, its cached importer and the manifest owner - not the
-// repository, and not the untouched third source.
+// The combined case: one edited source and the same inert version bump. The
+// edit is value-only - leaf keeps its name, its export and its imports - so
+// the importer's own contribution cannot move and it stays out of Begin along
+// with the untouched third source. The cold comparison below is the authority
+// for that: it replays the whole repository and must match byte for byte.
 func TestRawConfigVersionBumpWithSourceEditKeepsBeginBounded(t *testing.T) {
 	root := configScopeRepo(t)
 	eng := configScopeEngine(t, root)
@@ -184,8 +186,11 @@ func TestRawConfigVersionBumpWithSourceEditKeepsBeginBounded(t *testing.T) {
 	if reason := wholeDomainFallback(res); reason != "" {
 		t.Fatalf("combined source and version change fell back to the whole domain (%s); scope was %v", reason, ids)
 	}
-	requireOwners(t, owners, ids, "package.json", "src/leaf.ts", "src/use.ts")
-	forbidOwners(t, owners, ids, "src/alone.ts")
+	requireOwners(t, owners, ids, "package.json", "src/leaf.ts")
+	forbidOwners(t, owners, ids, "src/use.ts", "src/alone.ts")
+	if res.ParsedFiles != 1 {
+		t.Fatalf("parsed=%d, want only the edited leaf reparsed", res.ParsedFiles)
+	}
 	assertAppliedEqualsCold(t, cons, coldConsumer(t, configScopeEngine(t, root), root))
 }
 

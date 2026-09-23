@@ -2,6 +2,7 @@ package tsextractor
 
 import (
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -15,8 +16,17 @@ import (
 // namedExportCache holds one parsed export index per file for a session.
 type namedExportCache struct {
 	mu     sync.Mutex
-	byFile map[string]*namedExportIndex
+	byFile map[string]*namedExportEntry
 	scans  *atomic.Int32
+}
+
+// namedExportEntry is one file's index, parsed once however many goroutines ask
+// for it at once. The single flight is also what makes scans a count of files
+// scanned rather than of races lost: under the previous check-then-act two
+// workers could miss together, parse the same file twice, and both increment.
+type namedExportEntry struct {
+	once sync.Once
+	idx  *namedExportIndex
 }
 
 type namedExportIndex struct {
@@ -28,7 +38,7 @@ type namedExportIndex struct {
 }
 
 func newNamedExportCache() *namedExportCache {
-	return &namedExportCache{byFile: map[string]*namedExportIndex{}, scans: &atomic.Int32{}}
+	return &namedExportCache{byFile: map[string]*namedExportEntry{}, scans: &atomic.Int32{}}
 }
 
 func (c *namedExportCache) summaryScans() int {
@@ -44,23 +54,19 @@ func (c *namedExportCache) index(file string, readSrc func(string) []byte, alias
 		return parseNamedExportIndex(file, readSrc, aliases, knownFiles)
 	}
 	c.mu.Lock()
-	if idx, ok := c.byFile[file]; ok {
-		c.mu.Unlock()
-		return idx
+	entry, ok := c.byFile[file]
+	if !ok {
+		entry = &namedExportEntry{}
+		c.byFile[file] = entry
 	}
 	c.mu.Unlock()
-	idx := parseNamedExportIndex(file, readSrc, aliases, knownFiles)
-	if c.scans != nil {
-		c.scans.Add(1)
-	}
-	c.mu.Lock()
-	if existing, ok := c.byFile[file]; ok {
-		c.mu.Unlock()
-		return existing
-	}
-	c.byFile[file] = idx
-	c.mu.Unlock()
-	return idx
+	entry.once.Do(func() {
+		entry.idx = parseNamedExportIndex(file, readSrc, aliases, knownFiles)
+		if c.scans != nil {
+			c.scans.Add(1)
+		}
+	})
+	return entry.idx
 }
 
 func parseNamedExportIndex(file string, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool) *namedExportIndex {
@@ -447,4 +453,40 @@ func declExportsName(kinds *tsutil.KindTable, decl *sitter.Node, src []byte, exp
 		}
 	}
 	return false
+}
+
+// surface encodes everything a consumer can observe about this file's exports
+// through followNamedExportFile, as a deterministic sorted list.
+//
+// This is the binder's own view, not a summary of it: `local` decides whether an
+// exported name resolves here at all, `named` and `stars` decide which other file
+// it forwards to and under which original name, and `defaultName` answers the
+// export name `default`. Nothing else in the index is consulted, so two states
+// with equal surfaces are indistinguishable to every consumer that reads these
+// bytes - and a state whose surface moved is one where at least one consumer can
+// bind differently, whatever the rest of the file did.
+func (idx *namedExportIndex) surface() []string {
+	if idx == nil {
+		return nil
+	}
+	if idx.empty {
+		return []string{"empty"}
+	}
+	out := make([]string, 0, len(idx.local)+len(idx.named)+len(idx.stars)+1)
+	for name := range idx.local {
+		out = append(out, "local:"+name)
+	}
+	for exported, targets := range idx.named {
+		for _, t := range targets {
+			out = append(out, "named:"+exported+"="+t[0]+"#"+t[1])
+		}
+	}
+	for _, mod := range idx.stars {
+		out = append(out, "star:"+mod)
+	}
+	if idx.defaultName != "" {
+		out = append(out, "default:"+idx.defaultName)
+	}
+	sort.Strings(out)
+	return out
 }

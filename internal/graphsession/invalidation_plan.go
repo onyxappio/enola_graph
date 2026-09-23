@@ -30,7 +30,7 @@ const (
 // the importers a membership change rebinds are reparses whose names and route
 // mounts can move, so they have to be previewed before the name and composed
 // route deltas run, not discovered once those have finished.
-func authoritativeFilePlan(previous, current []string, prevFiles map[string]*FileState, hashes map[string]string, wholeDomain bool, extraOwners []string, membership membershipDelta) (*fileInvalidationPlan, string, error) {
+func authoritativeFilePlan(previous, current []string, prevFiles map[string]*FileState, hashes map[string]string, wholeDomain bool, extraOwners []string, membership membershipDelta, proof *frozenPreview) (*fileInvalidationPlan, string, error) {
 	previous = graphPublishedOwners(previous)
 	current = graphSemanticNames(nil, current)
 	domain := append(append([]string{}, previous...), current...)
@@ -78,6 +78,29 @@ func authoritativeFilePlan(previous, current []string, prevFiles map[string]*Fil
 			changed[f] = true
 		}
 	}
+	// A file the pre-Begin preview reparsed carries no reverse edges here. The
+	// preview already took exactly the dependents its observed surface proved
+	// are affected and merged them into the seed, so closing over the same file
+	// again would re-derive the old reachability answer and undo it. Dropping
+	// the edge rather than the seed also stops a closure that arrives at such a
+	// file from some other owner, which is sound for the same reason. Without a
+	// proof - no preview ran, or the session keeps the broad rule - every seed
+	// reverse-closes exactly as before.
+	settled := map[string]bool{}
+	if proof != nil && !proof.broad {
+		settled = proof.closed
+		// The preview reparses more than the byte-changed files: it adds the
+		// dependents its observed surfaces proved are affected. Their own bytes did
+		// not move, so nothing above claimed them, yet extraction will replace
+		// their contributions and the plan has to carry them. Reverse-closing them
+		// is a no-op - the edges into a settled file are dropped below - so they
+		// cost only their own membership.
+		for f := range settled {
+			if known[f] {
+				changed[f] = true
+			}
+		}
+	}
 	deps := make(map[string][]string)
 	for path, st := range prevFiles {
 		if st == nil {
@@ -87,13 +110,13 @@ func authoritativeFilePlan(previous, current []string, prevFiles map[string]*Fil
 		if st.TS != nil {
 			for _, dep := range st.TS.ResolvedFiles {
 				dep = filepath.ToSlash(dep)
-				if known[dep] {
+				if known[dep] && !settled[dep] {
 					deps[from] = append(deps[from], dep)
 				}
 			}
 			for _, dep := range st.TS.SideReads {
 				dep = filepath.ToSlash(dep)
-				if known[dep] {
+				if known[dep] && !settled[dep] {
 					deps[from] = append(deps[from], dep)
 				}
 			}
@@ -142,14 +165,14 @@ func authoritativeFilePlan(previous, current []string, prevFiles map[string]*Fil
 	// instead of discarding the plan for the whole domain. The enlarged plan is
 	// a superset, so the second check can only fail if the records stopped
 	// naming them; the global fallback stays for that case.
-	nameDeps := declaredNameDependents(p, prevFiles, changed)
+	nameDeps := declaredNameDependents(p, prevFiles, changed, proof)
 	if len(nameDeps) > 0 {
 		extraOwners = append(extraOwners, nameDeps...)
 		p, err = planFileInvalidation(append(seed, nameDeps...), previous, current, deps, false, nil)
 		if err != nil {
 			return p, "", err
 		}
-		if len(declaredNameDependents(p, prevFiles, changed)) > 0 {
+		if len(declaredNameDependents(p, prevFiles, changed, proof)) > 0 {
 			p, err = planFileInvalidation(domain, previous, current, nil, true, domain)
 			return p, frozenScopeWholeDomain, err
 		}
@@ -572,13 +595,37 @@ func composedRouteOwnerDelta(prevFiles map[string]*FileState, dirty map[string]b
 // file dependency connecting it to the change; it has to be inside Begin for the
 // frozen replacement to be able to rewrite it. Returning them lets the caller
 // widen the plan by exactly this set instead of falling back to the whole domain.
-func declaredNameDependents(p *fileInvalidationPlan, prevFiles map[string]*FileState, dirty map[string]bool) []string {
+// declaredNameDependents lists cached owners outside the plan whose Referenced
+// surface mentions a name a dirty file declares. The cached record shows only the
+// names a file declared BEFORE the edit, so an added export has no cached
+// evidence at all; when a preview ran, its observed name delta supplies those.
+func declaredNameDependents(p *fileInvalidationPlan, prevFiles map[string]*FileState, dirty map[string]bool, proof *frozenPreview) []string {
 	if p == nil {
 		return nil
 	}
 	declared := map[string]bool{}
+	proven := map[string]bool{}
+	if proof != nil && !proof.broad {
+		proven = proof.recorded
+		// The preview reparsed these files, so the names that actually entered or
+		// left the global index are known exactly. Every other name a dirty file
+		// declares is still declared by it and still resolves to the same
+		// candidate, and a consumer that only mentions one of those sees nothing
+		// move. Without the proof the cached record shows the old surface alone,
+		// so the whole surface has to count.
+		for n := range proof.declaredAdded {
+			if n != "" {
+				declared[n] = true
+			}
+		}
+		for n := range proof.declaredRemoved {
+			if n != "" {
+				declared[n] = true
+			}
+		}
+	}
 	for f, d := range dirty {
-		if !d {
+		if !d || proven[f] || proven[filepath.ToSlash(f)] {
 			continue
 		}
 		rec := tsRecord(lookupState(prevFiles, f))

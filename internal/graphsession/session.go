@@ -316,6 +316,11 @@ type session struct {
 	// so name-delta planning uses composed facts. The later TS path reuses it.
 	preparedTS    *tsextractor.SessionResult
 	preparedDirty map[string]bool
+	// preparedParses is one entry per file the preview actually parsed, with
+	// the reason it was parsed for. The extraction site replays it when it
+	// adopts the preview, so a parse is classified and reported to
+	// OnBeforeParse exactly once whichever of the two sites read the file.
+	preparedParses []preparedParse
 	// preparedMD is the mdintent extraction this run made before Begin to plan
 	// the manifest with; see prepareMDScope.
 	preparedMD *preparedMD
@@ -329,6 +334,12 @@ type session struct {
 	// context digest, so a lockfile that appeared, vanished or became
 	// unreadable mid-run is caught too.
 	previewFences []func() error
+}
+
+// preparedParse is a parse the pre-Begin preview performed on the session's behalf.
+type preparedParse struct {
+	path   string
+	reason string
 }
 
 func (s *session) analyze(ctx context.Context) (*Result, error) {
@@ -592,6 +603,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			}
 			var extraOwners []string
 			var membership membershipDelta
+			var proof *frozenPreview
 			if !wholeDomain && s.state != nil {
 				// Non-TypeScript extractors without per-file incremental support
 				// still have a bounded owner domain. Seed the frozen plan with
@@ -725,12 +737,17 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 							dirty[p] = true
 						}
 					}
-					preview, perr := s.prepareFrozenTS(ctx, prevFiles, inv.Files, dirty, angular)
+					previewFacts, previewProof, perr := s.prepareFrozenTS(ctx, prevFiles, inv.Files, hashes, dirty, retired, angular)
 					if perr != nil {
 						wholeDomain = true
 						fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: "planning extract of dirty files failed; using whole domain"})
 					} else {
-						extraOwners = append(extraOwners, ownersForNameDelta(prevFiles, dirty, preview)...)
+						// An angular session never gets here: it sets forceAll
+						// above, and wholeDomain is forceAll or better. broad is
+						// carried anyway so the narrowing cannot outlive that
+						// coupling if it is ever relaxed.
+						proof = previewProof
+						extraOwners = append(extraOwners, ownersForNameDelta(prevFiles, dirty, previewFacts)...)
 						var previewRecs map[string]*tsextractor.FileRecord
 						if s.preparedTS != nil {
 							previewRecs = s.preparedTS.Records
@@ -740,7 +757,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				}
 			}
 			var planReason string
-			s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, wholeDomain, extraOwners, membership)
+			s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, wholeDomain, extraOwners, membership, proof)
 			if err != nil {
 				return nil, err
 			}
@@ -752,7 +769,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				// the frozen contract safe by replacing the complete prior/current
 				// domain rather than publishing an empty manifest.
 				wholeDomain = true
-				s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, true, nil, membership)
+				s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, true, nil, membership, nil)
 				if err != nil {
 					return nil, err
 				}
@@ -823,18 +840,6 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 						dirty[f] = true
 					}
 				}
-				for path, rec := range prevRecs {
-					if rec == nil || len(rec.SideReadHashes) == 0 {
-						continue
-					}
-					for side, want := range rec.SideReadHashes {
-						got, ok := lookupHash(hashes, side)
-						if !ok || got != want {
-							dirty[path] = true
-							break
-						}
-					}
-				}
 				if s.eng.GraphScope() != nil {
 					for _, f := range owned {
 						if prevRecs[f] != nil && s.state.TSFileContext[f] != input.tsFileContext[f] {
@@ -847,6 +852,18 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				var broadenAll bool
 				var invReason string
 				dirty, broadenAll, invReason = invalidateTS(dirty, prevRecs, owned, hashes)
+				// The frozen preview already ran this closure and parsed what it
+				// found, and the plan was frozen around exactly that set. Adopt it
+				// so the two sites agree on one dirty set: otherwise the loop below
+				// re-derives the preview's own dependents and parses them a second
+				// time, and the manifest and the parse count stop matching.
+				if s.preparedTS != nil && coversDirty(s.preparedDirty, dirty) {
+					for f, d := range s.preparedDirty {
+						if d {
+							dirty[f] = true
+						}
+					}
+				}
 				if broadenAll {
 					forceAll = true
 					fallbacks = append(fallbacks, graphstream.Fallback{
@@ -1024,9 +1041,26 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			// a stale surface into the graph.
 			if s.preparedTS != nil && coversDirty(s.preparedDirty, dirtyArg) {
 				res = s.preparedTS
+				// hooks below never fire for these: the preview read the files.
+				// Replay what it recorded so the counters and the test hook
+				// still see every parse of this delta, exactly once.
+				for _, p := range s.preparedParses {
+					invalidationMu.Lock()
+					invalidation.ParsedByReason[p.reason]++
+					invalidationMu.Unlock()
+					if s.opts.OnBeforeParse != nil {
+						s.opts.OnBeforeParse(p.path)
+					}
+				}
+			}
+			if res == nil && s.preparedTS != nil {
+				// The preview still read those files; saying nothing here would
+				// report the wider extraction below as the whole cost of the delta.
+				tr.Mark("ts_preview_discarded", fmt.Sprintf("parsed=%d", s.preparedTS.Stats.FilesParsed))
 			}
 			s.preparedTS = nil
 			s.preparedDirty = nil
+			s.preparedParses = nil
 			if res == nil {
 				var xerr error
 				res, xerr = ts.ExtractSession(ctx, s.abs, owned, prevRecs, dirtyArg, hooks)
@@ -1063,86 +1097,76 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				}
 			}
 			if !forceAll {
-				changed := map[string]bool{}
-				for path, rec := range res.Records {
-					if surfaceChanged(prevRecs[path], rec) {
-						changed[filepath.ToSlash(path)] = true
+				// The same observed-surface closure the frozen preview ran, so
+				// extraction never asks for an owner the plan did not carry. It is
+				// a loop for the same reason the preview is one: a dependent this
+				// round pulls in can publish a changed surface of its own, and
+				// only a reparse can show that. seen holds every file already
+				// parsed with its final source, so no member is parsed twice.
+				prevSlash := make(map[string]*tsextractor.FileRecord, len(prevRecs))
+				for path, rec := range prevRecs {
+					prevSlash[filepath.ToSlash(path)] = rec
+				}
+				seen := map[string]bool{}
+				for p, d := range dirty {
+					if d {
+						seen[filepath.ToSlash(p)] = true
 					}
 				}
-				newNames := map[string]bool{}
-				removedNames := map[string]bool{}
-				for path, rec := range res.Records {
-					old := prevRecs[path]
-					if rec == nil {
-						continue
-					}
-					have := map[string]bool{}
-					if old != nil {
-						for _, n := range old.Declared {
-							have[n] = true
+				// The last round's verdicts outlive the loop: they are the proof
+				// behind every side read it decided not to follow.
+				changed := map[string]bool{}
+				proven := map[string]bool{}
+				for {
+					changed = map[string]bool{}
+					for path, rec := range res.Records {
+						if surfaceChanged(prevRecs[path], rec) {
+							changed[filepath.ToSlash(path)] = true
 						}
 					}
-					now := map[string]bool{}
-					for _, n := range rec.Declared {
-						now[n] = true
-						if !have[n] {
-							newNames[n] = true
+					// A prior record with no new one and no current hash is retired:
+					// it takes its declared names out of the index with it.
+					retired := map[string]bool{}
+					for path, old := range prevRecs {
+						if old == nil {
+							continue
 						}
+						if res.Records[path] != nil || res.Records[filepath.ToSlash(path)] != nil {
+							continue
+						}
+						if _, still := lookupHash(hashes, path); still {
+							continue
+						}
+						retired[filepath.ToSlash(path)] = true
 					}
-					if old != nil {
-						for _, n := range old.Declared {
-							if !now[n] {
-								removedNames[n] = true
+					newNames, removedNames := declaredNameDelta(prevSlash, res.Records, retired)
+					extra := surfaceDependents(seen, changed, workRecs, prevSlash, angular)
+					for f := range nameDependents(prevSlash, newNames, removedNames, seen) {
+						extra[f] = true
+					}
+					proven = provenSideReadSources(seen, prevSlash, workRecs)
+					for f := range sideReadDependents(seen, proven, prevSlash, hashes, angular) {
+						extra[f] = true
+					}
+					need := map[string]bool{}
+					for p, d := range extra {
+						if !d || seen[p] {
+							continue
+						}
+						need[p] = true
+						dirty[p] = true
+					}
+					if len(need) == 0 {
+						break
+					}
+					if s.opts.AuthoritativeFiles && s.plan != nil {
+						for p := range need {
+							id := filepath.ToSlash(p)
+							if !s.plan.member[id] {
+								return nil, fmt.Errorf("frozen invalidation plan missed post-parse dependent %s", id)
 							}
 						}
 					}
-				}
-				for path, old := range prevRecs {
-					if old == nil {
-						continue
-					}
-					if res.Records[path] != nil || res.Records[filepath.ToSlash(path)] != nil {
-						continue
-					}
-					if _, still := lookupHash(hashes, path); still {
-						continue
-					}
-					for _, n := range old.Declared {
-						removedNames[n] = true
-					}
-				}
-				extra := reverseClose(changed, workRecs)
-				for path, rec := range prevRecs {
-					if rec == nil || extra[filepath.ToSlash(path)] {
-						continue
-					}
-					for _, n := range rec.Referenced {
-						if newNames[n] || removedNames[n] {
-							extra[filepath.ToSlash(path)] = true
-							break
-						}
-					}
-				}
-				need := map[string]bool{}
-				for p, d := range extra {
-					if !d {
-						continue
-					}
-					if dirtyArg[p] || dirtyArg[filepath.ToSlash(p)] {
-						continue
-					}
-					need[p] = true
-					dirty[p] = true
-				}
-				if len(need) > 0 && s.opts.AuthoritativeFiles && s.plan != nil {
-					for p := range need {
-						id := filepath.ToSlash(p)
-						if !s.plan.member[id] {
-							return nil, fmt.Errorf("frozen invalidation plan missed post-parse dependent %s", id)
-						}
-					}
-				}
-				if len(need) > 0 {
 					if s.capturedSources == nil {
 						s.capturedSources = map[string][]byte{}
 					}
@@ -1172,7 +1196,11 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 					res.Stats.SFCParsed = acc.SFCParsed + more.Stats.SFCParsed
 					res.Stats.SummaryScans = acc.SummaryScans + more.Stats.SummaryScans
 					workRecs = more.Records
+					for p := range need {
+						seen[p] = true
+					}
 				}
+				refreshProvenSideReads(res.Records, seen, proven, hashes, angular)
 			}
 			if err := s.flushPhase(ctx, runID, graphstream.PhaseLocal); err != nil {
 				return nil, err
@@ -2300,10 +2328,40 @@ func coversDirty(prepared, want map[string]bool) bool {
 	return true
 }
 
-func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*FileState, files []string, dirty map[string]bool, angular bool) (map[string][]facts.Fact, error) {
+// frozenPreview is what the pre-Begin planning extract proved. closed lists the
+// files whose dependents it already resolved under the observed-surface rule, so
+// the frozen plan carries them as plain members instead of reverse-closing them a
+// second time. declaredAdded and declaredRemoved are the name-surface delta the
+// preview observed; the cached records alone cannot show an added name. broad is
+// set when the session keeps the old reachability rule and the plan must too.
+type frozenPreview struct {
+	closed          map[string]bool
+	declaredAdded   map[string]bool
+	declaredRemoved map[string]bool
+	// recorded is the subset of closed the preview actually produced a record
+	// for, so a file it could not read falls back to its whole cached name
+	// surface instead of to a delta computed from nothing.
+	recorded map[string]bool
+	broad    bool
+}
+
+// prepareFrozenTS parses the dirty files before Begin and closes over the files
+// their reparse proved are affected, growing dirty in place.
+//
+// The closure is a fixed point over observed surfaces, not over reachability: a
+// hop takes every dependent of a file whose reparse published a changed
+// import/export surface, every dependent of a dirty file that cannot prove its
+// own cross-file reads, and every cached owner whose Referenced surface mentions
+// a name the delta added or removed. Each hop passes the records it already has
+// as the cached input and only the newly added files as dirty, so an unchanged
+// member is parsed once for the whole preview however many hops run. Parsing
+// reads source bytes and the fixed session filename context, never another
+// file's record, so a file parsed in an early hop needs no reparse when a cycle
+// partner changes surface later.
+func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*FileState, files []string, hashes map[string]string, dirty, retired map[string]bool, angular bool) (map[string][]facts.Fact, *frozenPreview, error) {
 	out := map[string][]facts.Fact{}
 	if len(dirty) == 0 {
-		return out, nil
+		return out, nil, nil
 	}
 	var ts *tsextractor.TSExtractor
 	for _, ext := range s.eng.Extractors() {
@@ -2313,24 +2371,169 @@ func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*Fil
 		}
 	}
 	if ts == nil {
-		return nil, fmt.Errorf("no typescript extractor for planning extract")
+		return nil, nil, fmt.Errorf("no typescript extractor for planning extract")
 	}
 	owned := tsextractor.SessionFiles(files, angular)
+	ownedSet := make(map[string]bool, len(owned))
+	for _, f := range owned {
+		ownedSet[filepath.ToSlash(f)] = true
+	}
 	prevRecs := map[string]*tsextractor.FileRecord{}
 	for path, st := range prevFiles {
 		if st != nil && st.TS != nil {
-			prevRecs[path] = st.TS
+			prevRecs[filepath.ToSlash(path)] = st.TS
 		}
 	}
-	res, err := ts.ExtractSession(ctx, s.abs, owned, prevRecs, dirty, tsextractor.SessionHooks{
+	// The seed is the dirt the invalidator found; everything the hops add on top
+	// of it was reached through a dependency, which is the extraction site's
+	// "resolution". Snapshot it before the loop starts widening dirty.
+	seed := make(map[string]bool, len(dirty))
+	for f, d := range dirty {
+		if d {
+			seed[filepath.ToSlash(f)] = true
+		}
+	}
+	parseReason := func(path string) string {
+		id := filepath.ToSlash(path)
+		prev := lookupState(prevFiles, id)
+		if prev == nil || prev.TS == nil {
+			return "added source"
+		}
+		if h, _ := lookupHash(hashes, id); prev.Hash != h {
+			return "source content"
+		}
+		if seed[id] {
+			return "file semantic context"
+		}
+		return "resolution"
+	}
+	var parseMu sync.Mutex
+	var parses []preparedParse
+	hooks := tsextractor.SessionHooks{
 		SkipConfigPaths: true,
 		Sources:         s.capturedSources,
-	})
-	if err != nil {
-		return nil, err
+		OnBeforeParse: func(path string) {
+			parseMu.Lock()
+			parses = append(parses, preparedParse{path: path, reason: parseReason(path)})
+			parseMu.Unlock()
+		},
 	}
+	work := make(map[string]*tsextractor.FileRecord, len(prevRecs))
+	for k, v := range prevRecs {
+		work[k] = v
+	}
+	pending := make(map[string]bool, len(dirty))
+	for f, d := range dirty {
+		if d {
+			pending[filepath.ToSlash(f)] = true
+		}
+	}
+	var res *tsextractor.SessionResult
+	var stats tsextractor.ExtractStats
+	parsed := map[string]bool{}
+	changed := map[string]bool{}
+	parsedBefore := 0
+	unreadable := map[string]bool{}
+	for {
+		r, err := ts.ExtractSession(ctx, s.abs, owned, work, pending, hooks)
+		if err != nil {
+			return nil, nil, err
+		}
+		stats.FilesRead += r.Stats.FilesRead
+		stats.FilesParsed += r.Stats.FilesParsed
+		stats.GraphQLParsed += r.Stats.GraphQLParsed
+		stats.SFCParsed += r.Stats.SFCParsed
+		stats.SummaryScans += r.Stats.SummaryScans
+		for _, u := range r.Unreadable {
+			unreadable[u] = true
+		}
+		res = r
+		for path, rec := range r.Records {
+			work[filepath.ToSlash(path)] = rec
+		}
+		// Only a file this hop actually reparsed can have published a new surface.
+		// The verdict is kept across hops: a side-read owner reached later still
+		// has to be judged against what an earlier hop observed.
+		for f := range pending {
+			parsed[f] = true
+			if surfaceChanged(prevRecs[f], work[f]) {
+				changed[f] = true
+			}
+		}
+		next := surfaceDependents(dirty, changed, work, prevRecs, angular)
+		added, removed := declaredNameDelta(prevRecs, work, retired)
+		for f := range nameDependents(prevRecs, added, removed, dirty) {
+			next[f] = true
+		}
+		for f := range sideReadDependents(dirty, provenSideReadSources(parsed, prevRecs, work), prevRecs, hashes, angular) {
+			next[f] = true
+		}
+		parsedBefore += r.Stats.FilesParsed
+		pending = map[string]bool{}
+		for f := range next {
+			// Only a session source can be reparsed. A non-TS or retired dependent
+			// still has to reach the plan; extraOwners and the deltas carry it.
+			if !dirty[f] && ownedSet[f] {
+				pending[f] = true
+			}
+		}
+		if len(pending) == 0 {
+			break
+		}
+		// The next hop is inside the same transaction as the first one. Bytes it
+		// reads for the first time have to be captured, or the pre-End fence
+		// cannot prove the file the plan was frozen around is the file that was
+		// published.
+		if s.capturedSources == nil {
+			s.capturedSources = map[string][]byte{}
+			hooks.Sources = s.capturedSources
+		}
+		for f := range pending {
+			if _, ok := s.capturedSources[f]; ok {
+				continue
+			}
+			if b, rerr := os.ReadFile(filepath.Join(s.abs, f)); rerr == nil {
+				s.capturedSources[f] = b
+			}
+		}
+		for f := range pending {
+			dirty[f] = true
+		}
+	}
+	// CachedFiles on the last hop counts every file it did not parse, including
+	// the ones earlier hops parsed. Subtract those so the figure still means
+	// "reused without reading source" for the preview as a whole.
+	stats.CachedFiles = res.Stats.CachedFiles - (parsedBefore - res.Stats.FilesParsed)
+	if stats.CachedFiles < 0 {
+		stats.CachedFiles = 0
+	}
+	res.Stats = stats
+	unread := make([]string, 0, len(unreadable))
+	for u := range unreadable {
+		unread = append(unread, u)
+	}
+	sort.Strings(unread)
+	res.Unreadable = unread
 	s.preparedTS = res
 	s.preparedDirty = dirty
+	s.preparedParses = parses
+	added, removed := declaredNameDelta(prevRecs, work, retired)
+	proof := &frozenPreview{
+		closed:          make(map[string]bool, len(dirty)),
+		declaredAdded:   added,
+		declaredRemoved: removed,
+		recorded:        make(map[string]bool, len(dirty)),
+		broad:           angular,
+	}
+	for f, d := range dirty {
+		if d {
+			id := filepath.ToSlash(f)
+			proof.closed[id] = true
+			if retired[id] || work[id] != nil {
+				proof.recorded[id] = true
+			}
+		}
+	}
 	for path, rec := range res.Records {
 		id := filepath.ToSlash(path)
 		if rec == nil || !dirty[id] && !dirty[path] {
@@ -2340,7 +2543,7 @@ func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*Fil
 		applyLocalIO(ff)
 		out[id] = ff
 	}
-	return out, nil
+	return out, proof, nil
 }
 
 func tagRepo(ff []facts.Fact, repo string) {
