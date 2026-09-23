@@ -873,7 +873,7 @@ def check_product(args) -> int:
         original = edit_path.read_text()
         mutated = original.replace(
             "return email.trim().toLowerCase();",
-            "return email.normalize('NFKC').trim().toLowerCase();",
+            "currentScryptParameters(); return email.trim().toLowerCase();",
         )
         if mutated == original:
             problems.append(f"edit anchor snippet not found in {edit_path}")
@@ -1018,14 +1018,14 @@ def run_watch(args) -> int:
             original = edit_path.read_text()
             mutated = original.replace(
                 "return email.trim().toLowerCase();",
-                "return email.normalize('NFKC').trim().toLowerCase();",
+                "currentScryptParameters(); return email.trim().toLowerCase();",
             )
             if mutated == original:
                 raise RuntimeError("Product body edit snippet missing")
             burst_texts = [
                 mutated,
-                mutated.replace("NFKC", "NFKD"),
-                mutated.replace("NFKC", "NFC"),
+                mutated.replace("currentScryptParameters(); return email", "resolveScryptCost(); return email"),
+                mutated.replace("currentScryptParameters(); return email", "currentScryptParameters(); resolveScryptCost(); return email"),
             ]
             fixture = "product"
         else:
@@ -1160,9 +1160,7 @@ def run_watch(args) -> int:
                 "burst did not change the normalized graph "
                 f"({initial_hash[:12]}); cold equality would be vacuous"
             )
-            if fixture == "tiny":
-                raise RuntimeError(msg)
-            print("WARNING:", msg, file=sys.stderr)
+            raise RuntimeError(msg)
 
         cold_ctx = COLD_CTX
         # Target the exact cold context/run. Waiting on a total frame count
