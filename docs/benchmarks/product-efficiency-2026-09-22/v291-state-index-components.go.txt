@@ -1,0 +1,13 @@
+// Test-only benchmark appended via Go -overlay to owner_resolution_test.go.
+// Add encoding/json and os imports; set ENOLA_PROBE_STATE to the retained state.json.
+var enolaProbeIndex *idIndex
+var enolaProbeState *State
+func BenchmarkEnolaV291StateAndIndex(b *testing.B) {
+ raw, err := os.ReadFile(os.Getenv("ENOLA_PROBE_STATE")); if err != nil { b.Fatal(err) }
+ var st State; if err := json.Unmarshal(raw, &st); err != nil { b.Fatal(err) }
+ ff := fileContributionFacts(st.Files, st.RepoID)
+ b.Logf("state_bytes=%d file_owners=%d cached_contribution_facts=%d; cached contributions exclude assembly-only composition", len(raw), len(st.Files), len(ff))
+ b.Run("DecodeState",func(b *testing.B){b.ReportAllocs(); for i:=0;i<b.N;i++ { var v State; if err:=json.Unmarshal(raw,&v);err!=nil {b.Fatal(err)};enolaProbeState=&v }})
+ b.Run("BuildIndexCachedContributions",func(b *testing.B){b.ReportAllocs();for i:=0;i<b.N;i++ {enolaProbeIndex=buildIndex(ff)}})
+ b.Run("ResolutionIndexesCachedContributions",func(b *testing.B){b.ReportAllocs();for i:=0;i<b.N;i++ { old, next:=resolutionIndexes(st.Files,st.Files,ff,st.RepoID);enolaProbeIndex=next;if len(changedCandidateNames(old,next,nil))!=0 {b.Fatal("same contributions unexpectedly changed resolution domain")}}})
+}

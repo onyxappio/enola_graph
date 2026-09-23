@@ -1,0 +1,35 @@
+import argparse,collections,hashlib,json
+from pathlib import Path
+p=argparse.ArgumentParser();p.add_argument('work');a=p.parse_args();w=Path(a.work)
+prior=w/'state-before-controlled-edit.json';after=w/'state-watch/state.json'
+old=json.loads(prior.read_text());new=json.loads(after.read_text());assert old['generation']==1 and new['generation']==2
+before={k:v['ts'] for k,v in old['files'].items() if v.get('ts')};current={k:v['ts'] for k,v in new['files'].items() if v.get('ts')}
+content={k for k,v in current.items() if k not in before or v.get('hash')!=before[k].get('hash')}
+context={k for k in current if k in before and old.get('ts_file_context',{}).get(k)!=new.get('ts_file_context',{}).get(k)}
+side=set();missing=set();hashes={}
+for k,v in before.items():
+ for f,want in v.get('side_read_hashes',{}).items():
+  if f not in hashes:
+   path=w/'product-live'/f
+   try: hashes[f]=hashlib.sha256(path.read_bytes()).hexdigest()
+   except OSError: hashes[f]=None;missing.add(f)
+  if hashes[f] is not None and hashes[f]!=want:side.add(k)
+surface_keys=['declared','reexports','resolved_files','unresolved_specs','import_specs']
+surface={k for k,v in current.items() if k not in before or any(v.get(f,[])!=before[k].get(f,[]) for f in surface_keys)}
+reverse=collections.defaultdict(set)
+for k,v in current.items():
+ for f in v.get('resolved_files',[])+v.get('side_reads',[]): reverse[f].add(k)
+def close(seeds):
+ result=set(seeds);q=list(seeds)
+ for f in q:
+  for dep in reverse[f]-result:result.add(dep);q.append(dep)
+ return result
+closure=close(surface);initial=content|context|side
+same_records={k for k in closure if k in before and k in current and before[k]==current[k]}
+diffs=collections.Counter()
+for k in closure:
+ if k in before and k in current:
+  for f in set(before[k])|set(current[k]):
+   if before[k].get(f)!=current[k].get(f):diffs[f]+=1
+out={'method':'Before/after committed-state comparison plus reproduction of reverse dependency closure, not live OnBeforeParse tracing. Identical FileRecords demonstrate unchanged results, not by themselves a safe rule for skipping a parse.','before_sha256':hashlib.sha256(prior.read_bytes()).hexdigest(),'after_sha256':hashlib.sha256(after.read_bytes()).hexdigest(),'content_dirty_count':len(content),'content_dirty':sorted(content),'context_dirty_count':len(context),'side_read_hash_dirty_count':len(side),'side_read_hash_dirty':sorted(side),'side_read_missing_input_count':len(missing),'surface_changed_count':len(surface),'surface_changed':sorted(surface),'surface_reverse_closure_count':len(closure),'first_pass_seed_union_count':len(initial),'closure_outside_first_pass_count':len(closure-initial),'entire_record_identical_in_closure_count':len(same_records),'record_changed_fields_in_closure':dict(diffs),'closure_sample':sorted(closure)[:20]}
+(w/'parse-attribution.json').write_text(json.dumps(out,indent=2)+'\n');print(json.dumps(out,indent=2))

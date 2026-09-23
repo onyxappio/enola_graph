@@ -1,0 +1,223 @@
+{
+  "fixed": {
+    "exact_cold_equality": true,
+    "details": {
+      "": {
+        "records": 6,
+        "runs": [
+          {
+            "run_id": "/tmp/enola-gitconfig-final-probe/repo-fixed-default-1-1790149447855987000",
+            "records": 3,
+            "complete": true,
+            "validation": {
+              "run_id": "/tmp/enola-gitconfig-final-probe/repo-fixed-default-1-1790149447855987000",
+              "scope": [
+                "file:.gitignore",
+                "file:src/a.ts",
+                "file:src/barrel.ts",
+                "file:src/pair.ts",
+                "file:src/solo.ts",
+                "file:src/tail.ts",
+                "file:src/use.ts"
+              ],
+              "batch_count": 1,
+              "base_generation": 0,
+              "target_generation": 1
+            },
+            "parsed": [
+              6
+            ]
+          },
+          {
+            "run_id": "/tmp/enola-gitconfig-final-probe/repo-fixed-default-2-1790149460315019000",
+            "records": 3,
+            "complete": true,
+            "validation": {
+              "run_id": "/tmp/enola-gitconfig-final-probe/repo-fixed-default-2-1790149460315019000",
+              "scope": [
+                "file:.gitignore",
+                "file:gen/tracked.ts",
+                "file:src/a.ts",
+                "file:src/barrel.ts",
+                "file:src/pair.ts",
+                "file:src/solo.ts",
+                "file:src/tail.ts",
+                "file:src/use.ts"
+              ],
+              "batch_count": 1,
+              "base_generation": 1,
+              "target_generation": 2
+            },
+            "parsed": [
+              1
+            ]
+          }
+        ],
+        "completed_generation": 2,
+        "graph_hash": "eab7088cefb1b7d7968aa218743cec12d6d404fbd8b01fa4d93c6ecd8db90d7e"
+      },
+      "-cold": {
+        "records": 3,
+        "runs": [
+          {
+            "run_id": "/tmp/enola-gitconfig-final-probe/repo-fixed-default-1-1790149465709000000",
+            "records": 3,
+            "complete": true,
+            "validation": {
+              "run_id": "/tmp/enola-gitconfig-final-probe/repo-fixed-default-1-1790149465709000000",
+              "scope": [
+                "file:.gitignore",
+                "file:gen/tracked.ts",
+                "file:src/a.ts",
+                "file:src/barrel.ts",
+                "file:src/pair.ts",
+                "file:src/solo.ts",
+                "file:src/tail.ts",
+                "file:src/use.ts"
+              ],
+              "batch_count": 1,
+              "base_generation": 0,
+              "target_generation": 1
+            },
+            "parsed": [
+              7
+            ]
+          }
+        ],
+        "completed_generation": 1,
+        "graph_hash": "eab7088cefb1b7d7968aa218743cec12d6d404fbd8b01fa4d93c6ecd8db90d7e"
+      }
+    }
+  },
+  "head": {
+    "exact_cold_equality": true,
+    "details": {
+      "": {
+        "records": 13,
+        "runs": [
+          {
+            "run_id": "/tmp/enola-gitconfig-final-probe/repo-head-default-1-1790149478560017000",
+            "records": 3,
+            "complete": true,
+            "validation": {
+              "run_id": "/tmp/enola-gitconfig-final-probe/repo-head-default-1-1790149478560017000",
+              "scope": [
+                "file:.gitignore",
+                "file:src/a.ts",
+                "file:src/barrel.ts",
+                "file:src/pair.ts",
+                "file:src/solo.ts",
+                "file:src/tail.ts",
+                "file:src/use.ts"
+              ],
+              "batch_count": 1,
+              "base_generation": 0,
+              "target_generation": 1
+            },
+            "parsed": [
+              6
+            ]
+          },
+          {
+            "run_id": "/tmp/enola-gitconfig-final-probe/repo-head-default-2-1790149480218105000",
+            "records": 2,
+            "complete": false,
+            "validation": {
+              "interrupted": true
+            },
+            "parsed": []
+          },
+          {
+            "run_id": "/tmp/enola-gitconfig-final-probe/repo-head-default-2-1790149481521771000",
+            "records": 2,
+            "complete": false,
+            "validation": {
+              "interrupted": true
+            },
+            "parsed": []
+          },
+          {
+            "run_id": "/tmp/enola-gitconfig-final-probe/repo-head-default-2-1790149482743830000",
+            "records": 3,
+            "complete": true,
+            "validation": {
+              "run_id": "/tmp/enola-gitconfig-final-probe/repo-head-default-2-1790149482743830000",
+              "scope": [
+                "file:.gitignore",
+                "file:src/a.ts",
+                "file:src/barrel.ts",
+                "file:src/pair.ts",
+                "file:src/solo.ts",
+                "file:src/tail.ts",
+                "file:src/use.ts"
+              ],
+              "batch_count": 1,
+              "base_generation": 1,
+              "target_generation": 2
+            },
+            "parsed": [
+              0
+            ]
+          },
+          {
+            "run_id": "/tmp/enola-gitconfig-final-probe/repo-head-default-3-1790149491156124000",
+            "records": 3,
+            "complete": true,
+            "validation": {
+              "run_id": "/tmp/enola-gitconfig-final-probe/repo-head-default-3-1790149491156124000",
+              "scope": [
+                "file:.gitignore",
+                "file:gen/tracked.ts",
+                "file:src/a.ts",
+                "file:src/barrel.ts",
+                "file:src/pair.ts",
+                "file:src/solo.ts",
+                "file:src/tail.ts",
+                "file:src/use.ts"
+              ],
+              "batch_count": 1,
+              "base_generation": 2,
+              "target_generation": 3
+            },
+            "parsed": [
+              1
+            ]
+          }
+        ],
+        "completed_generation": 3,
+        "graph_hash": "2100998d30b609cf3ebee32961053db258d51f536b9936063cff26551d4a7429"
+      },
+      "-cold": {
+        "records": 3,
+        "runs": [
+          {
+            "run_id": "/tmp/enola-gitconfig-final-probe/repo-head-default-1-1790149496636612000",
+            "records": 3,
+            "complete": true,
+            "validation": {
+              "run_id": "/tmp/enola-gitconfig-final-probe/repo-head-default-1-1790149496636612000",
+              "scope": [
+                "file:.gitignore",
+                "file:gen/tracked.ts",
+                "file:src/a.ts",
+                "file:src/barrel.ts",
+                "file:src/pair.ts",
+                "file:src/solo.ts",
+                "file:src/tail.ts",
+                "file:src/use.ts"
+              ],
+              "batch_count": 1,
+              "base_generation": 0,
+              "target_generation": 1
+            },
+            "parsed": [
+              7
+            ]
+          }
+        ],
+        "completed_generation": 1,
+        "graph_hash": "2100998d30b609cf3ebee32961053db258d51f536b9936063cff26551d4a7429"
+      }
+    }
+  }
+}

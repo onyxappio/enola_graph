@@ -1,0 +1,22 @@
+{
+  "command": [
+    "/tmp/enola-toolchain/go/bin/go",
+    "test",
+    "-overlay",
+    "/tmp/enola-v291-index-probe/overlay.json",
+    "./internal/graphsession",
+    "-run",
+    "^$",
+    "-bench",
+    "^BenchmarkEnolaV291StateAndIndex$",
+    "-benchtime=1x",
+    "-count=3",
+    "-benchmem"
+  ],
+  "root_head": "a15bf9a1bc6096fd3a0ea051fce1bb86697a8326",
+  "state_path": "/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-live-product-to46zesc/accuracy-admission-matched-1-candidate-1/state-watch/state.json",
+  "state_sha256": "74031b71545f6c89e68d7cf3eaa34f2d3a93951ca2907080a0b67ecf98156a75",
+  "exit_code": 0,
+  "wall_seconds": 23.184,
+  "limitation": "Component probe with retained cached contributions, not end-to-end pipeline or full assembled/composed domain. Shared host while Product benchmark runs. ResolutionIndexes benchmark includes changedCandidateNames comparison; DecodeState excludes disk read because bytes are read before timing. One iteration per sample, three samples; not a throughput acceptance benchmark."
+}

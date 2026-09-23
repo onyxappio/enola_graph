@@ -1,0 +1,52 @@
+{
+  "method": "Before/after committed-state comparison plus reproduction of reverse dependency closure, not live OnBeforeParse tracing. Identical FileRecords demonstrate unchanged results, not by themselves a safe rule for skipping a parse.",
+  "before_sha256": "350e4f0899a7ce4e5a79cc756c70c905d46ed002fa2c6bba6e3bef12c54f7b85",
+  "after_sha256": "65e5533f9c19c3470ad29a93171d649c7c58bff26bdb73dc7f899281bfd98be8",
+  "content_dirty_count": 1,
+  "content_dirty": [
+    "packages/tracking-client/src/index.ts"
+  ],
+  "context_dirty_count": 0,
+  "side_read_hash_dirty_count": 1,
+  "side_read_hash_dirty": [
+    "apps/mobile/src/analytics/trackerRuntimeDeps.web.ts"
+  ],
+  "side_read_missing_input_count": 0,
+  "surface_changed_count": 1,
+  "surface_changed": [
+    "packages/tracking-client/src/index.ts"
+  ],
+  "surface_reverse_closure_count": 1597,
+  "first_pass_seed_union_count": 2,
+  "closure_outside_first_pass_count": 1595,
+  "entire_record_identical_in_closure_count": 1595,
+  "record_changed_fields_in_closure": {
+    "side_read_hashes": 1,
+    "facts": 1,
+    "hash": 1,
+    "referenced": 1,
+    "declared": 1
+  },
+  "closure_sample": [
+    "apps/mobile/.storybook/captureSourceAttestationPlugin.ts",
+    "apps/mobile/.storybook/gatesControlInventoryServer.ts",
+    "apps/mobile/.storybook/gatesControlPlugin.ts",
+    "apps/mobile/.storybook/gatesControlRollupServer.ts",
+    "apps/mobile/.storybook/index.ts",
+    "apps/mobile/.storybook/journeyLabScenarioServer.ts",
+    "apps/mobile/.storybook/main.ts",
+    "apps/mobile/.storybook/plugins/componentContextToolbar/ComponentContextToolbarView.tsx",
+    "apps/mobile/.storybook/plugins/componentContextToolbar/componentContextToolbarSelection.ts",
+    "apps/mobile/.storybook/plugins/componentContextToolbar/manager.js",
+    "apps/mobile/.storybook/plugins/componentContextToolbar/manager.tsx",
+    "apps/mobile/.storybook/preview.ts",
+    "apps/mobile/.storybook/storybook.requires.ts",
+    "apps/mobile/.storybook/textFidelityLabEvaluate.ts",
+    "apps/mobile/index.ts",
+    "apps/mobile/scripts/benchmark-affected-scenario-journeys-phase3.ts",
+    "apps/mobile/scripts/benchmark-affected-scenario-journeys-phase4.ts",
+    "apps/mobile/scripts/benchmark-affected-scenario-journeys-phase5.ts",
+    "apps/mobile/scripts/benchmark-affected-scenario-journeys.ts",
+    "apps/mobile/scripts/benchmark-affected-visual-gates.ts"
+  ]
+}
