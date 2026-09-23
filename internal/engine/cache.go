@@ -2495,7 +2495,10 @@ import (
 // clauses follow the imported leaf; Nuxt file-convention pages require an
 // app nuxt.config while extendPages/definePageMeta register debug routes;
 // markdown and per-file TypeScript emit file-owned directory modules.
-const cacheVersion = "v292"
+// v293: nested statement blocks restore outer JSX import bindings; import/export
+// alias bridges bind the leaf original name; markdown emits file-owned modules
+// alongside directory-shaped v1 identities.
+const cacheVersion = "v293"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

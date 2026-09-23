@@ -253,18 +253,18 @@ const (
 // followNamedExportFile walks proven `export { name } from` and `export * from`
 // edges. followOne returns the unique declaring file; followMany is a collision;
 // followNone is a missing or renamed-away export.
-func followNamedExportFile(file, exportName string, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool, cache *namedExportCache, note func(string)) (string, followKind) {
+func followNamedExportFile(file, exportName string, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool, cache *namedExportCache, note func(string)) (string, string, followKind) {
 	return followNamedExportFileSeen(file, exportName, readSrc, aliases, knownFiles, cache, note, map[string]bool{})
 }
 
-func followNamedExportFileSeen(file, exportName string, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool, cache *namedExportCache, note func(string), seen map[string]bool) (string, followKind) {
+func followNamedExportFileSeen(file, exportName string, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool, cache *namedExportCache, note func(string), seen map[string]bool) (string, string, followKind) {
 	file = filepath.ToSlash(file)
 	if file == "" || exportName == "" || readSrc == nil {
-		return "", followNone
+		return "", "", followNone
 	}
 	key := file + "\x00" + exportName
 	if seen[key] {
-		return "", followNone
+		return "", "", followNone
 	}
 	seen[key] = true
 	if note != nil {
@@ -272,14 +272,17 @@ func followNamedExportFileSeen(file, exportName string, readSrc func(string) []b
 	}
 	idx := cache.index(file, readSrc, aliases, knownFiles)
 	if idx == nil || idx.empty {
-		return "", followNone
+		return "", "", followNone
 	}
 	if idx.local[exportName] {
-		return file, followOne
+		return file, exportName, followOne
 	}
-	var owners []string
+	type owner struct {
+		file, orig string
+	}
+	var owners []owner
 	many := false
-	add := func(o string, k followKind) {
+	add := func(o, orig string, k followKind) {
 		if k == followMany {
 			many = true
 			return
@@ -288,32 +291,32 @@ func followNamedExportFileSeen(file, exportName string, readSrc func(string) []b
 			return
 		}
 		for _, x := range owners {
-			if x == o {
+			if x.file == o && x.orig == orig {
 				return
 			}
 		}
-		owners = append(owners, o)
+		owners = append(owners, owner{file: o, orig: orig})
 	}
 	for _, n := range idx.named[exportName] {
-		leaf, k := followNamedExportFileSeen(n[0], n[1], readSrc, aliases, knownFiles, cache, note, seen)
-		add(leaf, k)
+		leaf, orig, k := followNamedExportFileSeen(n[0], n[1], readSrc, aliases, knownFiles, cache, note, seen)
+		add(leaf, orig, k)
 	}
 	for _, s := range idx.stars {
-		leaf, k := followNamedExportFileSeen(s, exportName, readSrc, aliases, knownFiles, cache, note, seen)
-		add(leaf, k)
+		leaf, orig, k := followNamedExportFileSeen(s, exportName, readSrc, aliases, knownFiles, cache, note, seen)
+		add(leaf, orig, k)
 	}
 	if many || len(owners) > 1 {
-		return "", followMany
+		return "", "", followMany
 	}
 	if len(owners) == 1 {
-		return owners[0], followOne
+		return owners[0].file, owners[0].orig, followOne
 	}
-	return "", followNone
+	return "", "", followNone
 }
 
-func bindNamedImportFile(indexPath, exportName string, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool, cache *namedExportCache, note func(string)) string {
+func bindNamedImportFile(indexPath, exportName string, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool, cache *namedExportCache, note func(string)) (string, string, followKind) {
 	if indexPath == "" {
-		return ""
+		return "", "", followNone
 	}
 	start := filepath.ToSlash(indexPath)
 	chainNote := func(f string) {
@@ -323,17 +326,17 @@ func bindNamedImportFile(indexPath, exportName string, readSrc func(string) []by
 		}
 		note(f)
 	}
-	leaf, kind := followNamedExportFile(indexPath, exportName, readSrc, aliases, knownFiles, cache, chainNote)
+	leaf, orig, kind := followNamedExportFile(indexPath, exportName, readSrc, aliases, knownFiles, cache, chainNote)
 	if note != nil && (kind != followOne || filepath.ToSlash(leaf) != start) {
 		note(start)
 	}
 	switch kind {
 	case followOne:
-		return leaf
+		return leaf, orig, followOne
 	case followMany:
-		return ""
+		return "", "", followMany
 	default:
-		return indexPath
+		return indexPath, exportName, followNone
 	}
 }
 

@@ -147,6 +147,33 @@ export function read() { return CONFETTI_STATIC_PROGRESS }
 	}
 }
 
+func TestExtract_JSXBlockRecoveryAndImportExportAlias(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/leaf.tsx": "export function Widget(){return null}",
+		"src/use.tsx":  "import {Widget} from './leaf';export function Render(){ {const Widget=()=>null;const ignored=<Widget/>;}return <Widget/>}",
+		"src/orig.ts":  "export function original(){return 1}",
+		"src/bridge.ts": "import {original as local} from './orig'; export {local as publicName};",
+		"src/call.ts":  "import {publicName as selected} from './bridge';export function run(){return selected()}",
+	}, false)
+	render, _ := findFact(ff, "src.Render")
+	if !hasRelation(render, facts.RelCalls, "src.Widget") {
+		t.Fatalf("imported Widget after nested block missing: %+v", render.Relations)
+	}
+	run, _ := findFact(ff, "src.run")
+	found := false
+	for _, r := range run.Relations {
+		if r.Kind == facts.RelCalls && r.TargetFile == "src/orig.ts" {
+			found = true
+			if r.Target != "src.original" {
+				t.Fatalf("alias bridge target=%s want src.original", r.Target)
+			}
+		}
+	}
+	if !found {
+		t.Fatalf("alias bridge unresolved: %+v", run.Relations)
+	}
+}
+
 func TestExtract_NuxtModuleRuntimePagesAreRegistrations(t *testing.T) {
 	ff := extractAll(t, map[string]string{
 		"apps/land-test9/package.json":    `{"name":"land-test9","dependencies":{"nuxt":"3.0.0","vue":"3.0.0"}}`,

@@ -2660,12 +2660,17 @@ func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, 
 func bindImportedSymbol(moduleDir, indexPath, exportName, resolved string, foundFile bool, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool, cache *namedExportCache, note func(string)) (target, file string) {
 	target = moduleDir + "." + exportName
 	if foundFile && indexPath != "" {
-		leaf := bindNamedImportFile(indexPath, exportName, readSrc, aliases, knownFiles, cache, note)
+		leaf, orig, kind := bindNamedImportFile(indexPath, exportName, readSrc, aliases, knownFiles, cache, note)
+		if kind == followMany {
+			return target, ""
+		}
 		if leaf != "" {
 			file = leaf
-			if filepath.ToSlash(leaf) != filepath.ToSlash(indexPath) {
-				target = factpath.Dir(leaf) + "." + exportName
+			name := exportName
+			if kind == followOne && orig != "" {
+				name = orig
 			}
+			target = factpath.Dir(leaf) + "." + name
 		}
 		return target, file
 	}
@@ -3721,6 +3726,14 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 		return
 	}
 	kind := kindOf(w.kinds, n)
+	if kind == "statement_block" {
+		w.pushShadowScope()
+		for i := range n.ChildCount() {
+			w.walk(n.Child(i))
+		}
+		w.popShadowScope()
+		return
+	}
 	if kind == "lexical_declaration" || kind == "variable_declaration" {
 		if len(w.shadows) == 0 {
 			w.pushShadowScope()

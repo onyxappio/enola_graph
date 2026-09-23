@@ -140,10 +140,20 @@ func documentFacts(scope *inScope, relFile string, src []byte, count *linkCount)
 	for _, sec := range sections {
 		out = append(out, *sec.fact)
 	}
+	// Directory-shaped module keeps v1 synthetic identity stable. A second
+	// file-owned copy is the v2 resolution target (synthetic owners are not
+	// published there).
 	out = append(out, facts.Fact{
 		Kind: facts.KindModule,
 		Name: dir,
 		File: dir,
+		Props: map[string]any{
+			"language": "markdown",
+		},
+	}, facts.Fact{
+		Kind: facts.KindModule,
+		Name: dir,
+		File: slashed,
 		Props: map[string]any{
 			"language": "markdown",
 		},

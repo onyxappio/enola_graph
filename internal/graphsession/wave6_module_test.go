@@ -68,8 +68,13 @@ func TestPublishedMarkdownDirectoryModuleV1AndV2(t *testing.T) {
 	v1 := run(false, "v1")
 	assertDeclaresModuleResolved(t, v1, "docs/feedback-fixes/README.md", "docs/feedback-fixes")
 	v2 := run(true, "v2")
-	if _, ok := moduleNode(v2, "docs/feedback-fixes"); ok {
-		t.Fatal("v2 must not publish synthetic directory modules; see CF1/#30 protocol note")
+	assertDeclaresModuleResolved(t, v2, "docs/feedback-fixes/README.md", "docs/feedback-fixes")
+	mod, ok := moduleNode(v2, "docs/feedback-fixes")
+	if !ok {
+		t.Fatal("v2 must publish a file-owned markdown module")
+	}
+	if mod.File == "docs/feedback-fixes" || mod.File == "" {
+		t.Fatalf("v2 module must be file-owned, file=%q", mod.File)
 	}
 }
 
