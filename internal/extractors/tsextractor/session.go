@@ -86,6 +86,10 @@ type FileRecord struct {
 	Router                *RouterDTO  `json:"router,omitempty"`
 	ParseKind             string      `json:"parse_kind,omitempty"`
 	AutoImportDirs        []string    `json:"auto_import_dirs,omitempty"`
+	// NuxtAliases are statically assigned nuxt.options.alias pairs from this
+	// file ("prefix=>target"), used to honor module runtime aliases on later
+	// incremental extracts without rereading clean sources.
+	NuxtAliases []string `json:"nuxt_aliases,omitempty"`
 	// NuxtScope is the owning Nuxt application for this file: "-" when none,
 	// "." for a repo-root Nuxt app, otherwise the application directory.
 	// Empty means a record written before this field existed.
@@ -199,6 +203,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	pkgAliases := disc.packageAliasesFor(knownFiles)
 	graphprofile.Since("ts_disc_package_aliases", tAliases, fmt.Sprintf("aliases=%d", len(pkgAliases)))
 
+	aliasDirtyPkgs := map[string]bool{}
 	need := func(rel string) bool {
 		if allDirty {
 			return true
@@ -227,6 +232,9 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		}
 		pkg, inNuxt := nuxtPackageForFile(nuxtPkgs, rel, pkgDirSet)
 		if rec.NuxtScope == "" || rec.NuxtScope != nuxtScopeKey(pkg, inNuxt) {
+			return true
+		}
+		if inNuxt && aliasDirtyPkgs[pkg] {
 			return true
 		}
 		return false
@@ -268,6 +276,66 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		}
 		sources[toRead[i]] = read.src
 	}
+	if isNuxt && !allDirty {
+		readAlias := func(rel string) []byte {
+			if b, ok := sources[rel]; ok {
+				return b
+			}
+			if hooks.Sources != nil {
+				if src, ok := hooks.Sources[rel]; ok {
+					return src
+				}
+			}
+			raw, err := overlayReadFile(ctx, filepath.Join(repoPath, rel), inputScope)
+			if err != nil {
+				return nil
+			}
+			return raw
+		}
+		aliasDirtyPkgs = nuxtAliasVisibilityChangedPkgs(sources, knownFiles, readAlias, prev, dirty, nuxtPkgs, invertPackageNames(pkgNamesEarly), pkgDirSet)
+		if len(aliasDirtyPkgs) > 0 {
+			var extra []string
+			for _, rel := range tsFiles {
+				if sources[rel] != nil {
+					continue
+				}
+				if !need(rel) {
+					continue
+				}
+				extra = append(extra, rel)
+			}
+			if len(extra) > 0 {
+				more := parallel.MapFiles(ctx, extra, func(relFile string) struct {
+					src []byte
+					err error
+				} {
+					if hooks.Sources != nil {
+						if src, ok := hooks.Sources[relFile]; ok {
+							return struct {
+								src []byte
+								err error
+							}{src, nil}
+						}
+					}
+					src, err := overlayReadFile(ctx, filepath.Join(repoPath, relFile), inputScope)
+					return struct {
+						src []byte
+						err error
+					}{src, err}
+				})
+				for i, read := range more {
+					stats.FilesRead++
+					stats.CachedFiles--
+					if read.err != nil {
+						log.Printf("[ts-extractor] error reading %s: %v", extra[i], read.err)
+						continue
+					}
+					sources[extra[i]] = read.src
+				}
+				toRead = append(toRead, extra...)
+			}
+		}
+	}
 	tr.Mark("ts_read_dirty", fmt.Sprintf("to_read=%d cached=%d", len(toRead), stats.CachedFiles))
 
 	// GraphQL + gRPC indexes from cached summaries plus newly read files.
@@ -305,6 +373,19 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	}
 	if grpcIdx.empty() {
 		grpcIdx = nil
+	}
+
+	if isNuxt {
+		aliasRoots = withNuxtRuntimeAliases(aliasRoots, sources, knownFiles, func(rel string) []byte {
+			if b, ok := sources[rel]; ok {
+				return b
+			}
+			raw, err := overlayReadFile(ctx, filepath.Join(repoPath, rel), inputScope)
+			if err != nil {
+				return nil
+			}
+			return raw
+		}, prev, dirty, nuxtPkgs, pkgDirSet, invertPackageNames(pkgNamesEarly))
 	}
 
 	nuxtAutoByPkg := map[string]map[string]string{}
@@ -361,6 +442,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		fileOrms, fileVue := pkgGates.forFile(pkgNamesEarly, relFile)
 		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, fileVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, fileOrms, aliases, knownFiles, readSrc, auto, grpcIdx, exportCache, sideReads)
 		rec.AutoImportDirs = addImportsDirsFromFile(relFile, src)
+		rec.NuxtAliases = nuxtRuntimeAliasesFromFile(relFile, src)
 		if len(sideReads) > 0 {
 			rec.SideReads = make([]string, 0, len(sideReads))
 			rec.SideReadHashes = make(map[string]string, len(sideReads))
@@ -476,7 +558,16 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 				extra = append(extra, d)
 			}
 		}
-		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, extra, sources, invertPackageNames(collectPackageNames(ctx, repoPath, inputScope)), pkgDirSet)
+		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, extra, sources, invertPackageNames(collectPackageNames(ctx, repoPath, inputScope)), pkgDirSet, knownFiles, func(rel string) []byte {
+			if b, ok := sources[rel]; ok {
+				return b
+			}
+			raw, err := overlayReadFile(ctx, filepath.Join(repoPath, rel), inputScope)
+			if err != nil {
+				return nil
+			}
+			return raw
+		}, pkgAliases, exportCache, records, dirty)
 	}
 	applyDirectIOContract(allFacts)
 
@@ -1035,23 +1126,28 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 		extraSeen[d] = true
 		extraDirs = append(extraDirs, d)
 	}
-	for _, rec := range prev {
-		if rec == nil {
-			continue
+	if len(nuxtPkgs) > 0 {
+		for rel, rec := range prev {
+			if rec == nil {
+				continue
+			}
+			if dirty != nil && dirty[rel] {
+				continue
+			}
+			for _, d := range rec.AutoImportDirs {
+				addExtra(d)
+			}
 		}
-		for _, d := range rec.AutoImportDirs {
-			addExtra(d)
-		}
-	}
-	for rel, src := range sources {
-		if src == nil {
-			continue
-		}
-		if !allDirty && dirty != nil && !dirty[rel] {
-			continue
-		}
-		for _, d := range addImportsDirsFromFile(rel, src) {
-			addExtra(d)
+		for rel, src := range sources {
+			if src == nil {
+				continue
+			}
+			if dirty != nil && !dirty[rel] && prev[rel] != nil {
+				continue
+			}
+			for _, d := range addImportsDirsFromFile(rel, src) {
+				addExtra(d)
+			}
 		}
 	}
 	var auto []string
@@ -1080,7 +1176,65 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 		sum := sha256.Sum256(src)
 		auto = append(auto, rel+"="+hex.EncodeToString(sum[:]))
 	}
+	pkgAliases := collectPackageAliases(ctx, repoPath, known, inputScope)
+	exportCache := newNamedExportCache()
+	readAuto := func(rel string) []byte {
+		if sources != nil {
+			if b := sources[rel]; b != nil {
+				return b
+			}
+		}
+		raw, err := overlayReadFile(ctx, filepath.Join(repoPath, rel), inputScope)
+		if err != nil {
+			return nil
+		}
+		return raw
+	}
+	for _, rel := range files {
+		if !nuxtAutoImportDir(rel, nuxtPkgs, extraDirs, pkgDirSet) {
+			continue
+		}
+		idx := exportCache.index(rel, readAuto, pkgAliases, known)
+		if idx == nil {
+			continue
+		}
+		for exported := range idx.named {
+			leaf, orig, kind := followNamedExportFile(rel, exported, readAuto, pkgAliases, known, exportCache, nil)
+			if kind != followOne || leaf == "" || filepath.ToSlash(leaf) == filepath.ToSlash(rel) {
+				continue
+			}
+			b := readAuto(leaf)
+			sum := sha256.Sum256(b)
+			auto = append(auto, rel+"~"+exported+"~"+orig+"~"+filepath.ToSlash(leaf)+"="+hex.EncodeToString(sum[:]))
+		}
+	}
 	sort.Strings(auto)
+	var visExtra map[string][]string
+	var visCons map[string][]string
+	if len(nuxtPkgs) > 0 {
+		visExtra = extraDirsByNuxtPackageRead(sources, known, readAuto, nuxtPkgs, pkgDirSet, prev, dirty)
+		visCons = nuxtModuleConsumersRead(sources, known, readAuto, nuxtPkgs, invertPackageNames(collectPackageNames(ctx, repoPath, inputScope)), pkgDirSet)
+	}
+	var vis []string
+	for pkg, dirs := range visExtra {
+		cp := append([]string{}, dirs...)
+		sort.Strings(cp)
+		vis = append(vis, "extra:"+pkg+"="+strings.Join(cp, ","))
+	}
+	for consumer, mods := range visCons {
+		cp := append([]string{}, mods...)
+		sort.Strings(cp)
+		vis = append(vis, "mod:"+consumer+"="+strings.Join(cp, ","))
+	}
+	if len(nuxtPkgs) > 0 {
+		aliasVis := nuxtRuntimeAliasVisibility(sources, known, readAuto, prev, dirty, nuxtPkgs, invertPackageNames(collectPackageNames(ctx, repoPath, inputScope)), pkgDirSet)
+		for pkg, pairs := range aliasVis {
+			cp := append([]string{}, pairs...)
+			sort.Strings(cp)
+			vis = append(vis, "alias:"+pkg+"="+strings.Join(cp, ","))
+		}
+	}
+	sort.Strings(vis)
 	h := sha256.New()
 	if gql.enabled {
 		h.Write([]byte("gql-on"))
@@ -1095,5 +1249,7 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 	h.Write([]byte(strings.Join(nuxt, ";")))
 	h.Write([]byte{0})
 	h.Write([]byte(strings.Join(auto, ";")))
+	h.Write([]byte{0})
+	h.Write([]byte(strings.Join(vis, ";")))
 	return hex.EncodeToString(h.Sum(nil)), nil
 }

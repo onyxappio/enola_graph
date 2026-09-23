@@ -269,6 +269,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 		}
 	}
 	pkgAliases := collectPackageAliases(ctx, repoPath, knownFiles, inputScope)
+	nuxtPkgDirByName := invertPackageNames(pkgNames)
 	nuxtAutoByPkg := map[string]map[string]string{}
 	for _, p := range nuxtPkgs {
 		nuxtAutoByPkg[p] = nuxtAutoComponentIndex(knownFiles, p, nuxtPkgs, pkgDirSet)
@@ -300,6 +301,11 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	}
 	grpcStubs := buildGRPCStubIndex(tsFiles, sources)
 	graphqlServer := detectGraphQLServerUsage(tsFiles, sources)
+	if isNuxt {
+		aliasRoots = withNuxtRuntimeAliases(aliasRoots, sources, knownFiles, func(rel string) []byte {
+			return sources[rel]
+		}, nil, nil, nuxtPkgs, pkgDirSet, nuxtPkgDirByName)
+	}
 
 	exportCache := newNamedExportCache()
 	perFile := parallel.MapFiles(ctx, tsFiles, func(relFile string) tsFileResult {
@@ -336,7 +342,6 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 		return res
 	})
 	nuxtExtraDirs := collectAddImportsDirs(sources)
-	nuxtPkgDirByName := invertPackageNames(pkgNames)
 	nuxtSources := sources
 	if !isNuxt {
 		nuxtSources = nil
@@ -411,7 +416,9 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	// symbol. Transitive caller tagging is intentionally not applied; reachability
 	// belongs in graph queries. See applyDirectIOContract.
 	if isNuxt {
-		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, nuxtExtraDirs, nuxtSources, nuxtPkgDirByName, pkgDirSet)
+		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, nuxtExtraDirs, nuxtSources, nuxtPkgDirByName, pkgDirSet, knownFiles, func(rel string) []byte {
+			return nuxtSources[rel]
+		}, pkgAliases, exportCache, nil, nil)
 	}
 	applyDirectIOContract(allFacts)
 
@@ -531,29 +538,31 @@ func appendTSDirectoryModules(allFacts []facts.Fact, dirs map[string]bool, pkgNa
 // extractCtx bundles the per-file state threaded through declaration extraction
 // so symbols can be enriched with React/Next.js semantic classification.
 type extractCtx struct {
-	src          []byte
-	relFile      string
-	dir          string
-	isTSX        bool
-	isNextJS     bool
-	isVue        bool
-	isNuxt       bool
-	isSvelteKit  bool
-	orms         ormFlags
-	importMap    map[string]string
-	importFiles  map[string]string // local import name → known source file of that specifier
-	nsDirs       map[string]string // `import * as ns` local → module directory
-	nsIndex      map[string]string // `import * as ns` local → resolved module file
-	namedImports map[string]namedImportOrigin
-	nsImports    map[string]string   // `import * as ns` local → original specifier
-	localNames   map[string]bool     // file-scope function/const names that may own a local call
-	imports      emberImportBindings // the file's import table, read for the module a superclass identifier came from
-	ioBindings   map[string]bool     // local names bound to imports from a network module (I/O sinks)
-	knownFiles   map[string]bool     // repo-relative (slash) paths of all indexed TS/JS files
-	aliases      map[string]tsAlias  // this directory's tsconfig path aliases, for resolving an import written as a bare specifier
-	readSrc      func(string) []byte // known file bytes for following named re-exports
-	exportCache  *namedExportCache
-	sideReads    map[string]bool
+	src           []byte
+	relFile       string
+	dir           string
+	isTSX         bool
+	isNextJS      bool
+	isVue         bool
+	isNuxt        bool
+	isSvelteKit   bool
+	orms          ormFlags
+	importMap     map[string]string
+	importFiles   map[string]string // local import name → known source file of that specifier
+	nsDirs        map[string]string // `import * as ns` local → module directory
+	nsIndex       map[string]string // `import * as ns` local → resolved module file
+	namedImports  map[string]namedImportOrigin
+	nsImports     map[string]string   // `import * as ns` local → original specifier
+	externalNames map[string]bool     // locals bound to external (npm/node:) specifiers
+	virtualNames  map[string]bool     // locals bound to framework virtual modules (#imports/#app)
+	localNames    map[string]bool     // file-scope function/const names that may own a local call
+	imports       emberImportBindings // the file's import table, read for the module a superclass identifier came from
+	ioBindings    map[string]bool     // local names bound to imports from a network module (I/O sinks)
+	knownFiles    map[string]bool     // repo-relative (slash) paths of all indexed TS/JS files
+	aliases       map[string]tsAlias  // this directory's tsconfig path aliases, for resolving an import written as a bare specifier
+	readSrc       func(string) []byte // known file bytes for following named re-exports
+	exportCache   *namedExportCache
+	sideReads     map[string]bool
 }
 
 func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, isNuxt, isSvelteKit, isEmber, isReactNav, isAngular bool, graphqlServer graphqlServerContext, orms ormFlags, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, nuxtAutoComponents map[string]string, grpcStubs *grpcStubIndex, exportCache *namedExportCache, sideReads map[string]bool) ([]facts.Fact, angularCounts, *angularRouterFile, map[string]*angularTemplate, *angularHTTPFile, clientCounts) {
@@ -708,6 +717,7 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 	}
 	ctx.importMap, ctx.importFiles, ctx.nsDirs, ctx.nsIndex = buildImportSymbols(kinds, root, src, relFile, aliases, knownFiles, readSrc, exportCache, sideReads)
 	ctx.namedImports, ctx.nsImports = collectImportOrigins(kinds, root, src)
+	ctx.externalNames, ctx.virtualNames = collectImportNameClasses(kinds, root, src, relFile, aliases)
 	ctx.localNames = collectFileScopeCallNames(kinds, root, src)
 	decls := e.extractDeclarations(kinds, root, ctx)
 
@@ -1113,6 +1123,7 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 
 		// Extract class methods
 		if classBody != nil {
+			seenMembers := map[string]bool{}
 			var pendingDecorators []string
 			for j := range classBody.ChildCount() {
 				member := classBody.Child(j)
@@ -1199,6 +1210,7 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 				if !dataField {
 					applyTSMetrics(mProps, m)
 				}
+				seenMembers[mName] = true
 				result = append(result, facts.Fact{
 					Kind:      facts.KindSymbol,
 					Name:      dir + "." + symbolName + "." + mName,
@@ -1208,6 +1220,7 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 					Relations: mRels,
 				})
 			}
+			result = append(result, constructorParameterPropertyFacts(kinds, classBody, src, dir, symbolName, relFile, isExported, seenMembers)...)
 		}
 
 	case "expression_statement":
@@ -1679,6 +1692,101 @@ func (e *TSExtractor) funcSymbol(kinds *tsutil.KindTable, declNode, body *sitter
 	applyTSMetrics(f.Props, m)
 	classifySymbol(kinds, &f, name, body, ctx, facts.SymbolFunc)
 	return f
+}
+
+// constructorParameterPropertyFacts emits instance members created by TypeScript
+// constructor parameter properties (`constructor(private readonly max: number)`).
+// A plain parameter with no accessibility or readonly modifier is not a field.
+func constructorParameterPropertyFacts(kinds *tsutil.KindTable, classBody *sitter.Node, src []byte, dir, className, relFile string, classExported bool, seen map[string]bool) []facts.Fact {
+	if classBody == nil {
+		return nil
+	}
+	var out []facts.Fact
+	for j := range classBody.ChildCount() {
+		member := classBody.Child(j)
+		if kindOf(kinds, member) != "method_definition" {
+			continue
+		}
+		nameNode := findChildByKind(kinds, member, "property_identifier")
+		if nameNode == nil {
+			nameNode = findChildByKind(kinds, member, "identifier")
+		}
+		if nameNode == nil || nodeText(nameNode, src) != "constructor" {
+			continue
+		}
+		params := findChildByKind(kinds, member, "formal_parameters")
+		if params == nil {
+			continue
+		}
+		for i := range params.ChildCount() {
+			p := params.Child(i)
+			pk := kindOf(kinds, p)
+			if pk != "required_parameter" && pk != "optional_parameter" {
+				continue
+			}
+			name, isPrivate, isReadonly, ok := tsConstructorParameterProperty(kinds, p, src)
+			if !ok || name == "" || strings.HasPrefix(name, "#") {
+				continue
+			}
+			if seen[name] {
+				continue
+			}
+			seen[name] = true
+			kind := facts.SymbolVariable
+			if isReadonly {
+				kind = facts.SymbolConstant
+			}
+			out = append(out, facts.Fact{
+				Kind: facts.KindSymbol,
+				Name: dir + "." + className + "." + name,
+				File: relFile,
+				Line: int(p.StartPosition().Row) + 1,
+				Props: map[string]any{
+					"symbol_kind": kind,
+					"exported":    classExported && !isPrivate,
+					"language":    "typescript",
+					"receiver":    className,
+				},
+				Relations: []facts.Relation{
+					{Kind: facts.RelDeclares, Target: dir},
+					{Kind: facts.RelDeclares, Target: dir + "." + className, TargetFile: relFile},
+				},
+			})
+		}
+	}
+	return out
+}
+
+func tsConstructorParameterProperty(kinds *tsutil.KindTable, param *sitter.Node, src []byte) (name string, isPrivate, isReadonly, ok bool) {
+	if param == nil {
+		return "", false, false, false
+	}
+	hasMod := false
+	for i := range param.ChildCount() {
+		c := param.Child(i)
+		ck := kindOf(kinds, c)
+		switch {
+		case ck == "accessibility_modifier":
+			hasMod = true
+			if nodeText(c, src) == "private" {
+				isPrivate = true
+			}
+		case ck == "readonly" || nodeText(c, src) == "readonly":
+			hasMod = true
+			isReadonly = true
+		}
+	}
+	if !hasMod {
+		return "", false, false, false
+	}
+	pat := param.ChildByFieldName("pattern")
+	if pat == nil {
+		pat = findChildByKind(kinds, param, "identifier")
+	}
+	if pat == nil || kindOf(kinds, pat) != "identifier" {
+		return "", false, false, false
+	}
+	return nodeText(pat, src), isPrivate, isReadonly, true
 }
 
 func classFieldIsFunctionValued(kinds *tsutil.KindTable, member *sitter.Node) bool {
@@ -3467,6 +3575,12 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			ctx.sideReads[f] = true
 		}
 	}
+	externalLocals := map[string]bool{}
+	if ctx.externalNames != nil {
+		for n := range ctx.externalNames {
+			externalLocals[n] = true
+		}
+	}
 	bind := func(local, moduleDir, exportName, indexPath, resolved string, foundFile bool) {
 		if local == "" {
 			return
@@ -4011,7 +4125,9 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 					// lexical binding: never fall back to sibling-file symbols
 				} else if ok {
 					add(t, file)
-				} else {
+				} else if ctx.localNames[name] {
+					add(ctx.dir+"."+name, ctx.relFile)
+				} else if !externalLocals[name] {
 					add(resolveLocalOrImport(name, ctx.dir, internal), callFile(name))
 				}
 			}
@@ -4023,7 +4139,9 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 							// lexical binding: never fall back to sibling-file symbols
 						} else if ok {
 							add(t, file)
-						} else {
+						} else if ctx.localNames[name] {
+							add(ctx.dir+"."+name, ctx.relFile)
+						} else if !externalLocals[name] {
 							add(resolveLocalOrImport(name, ctx.dir, internal), callFile(name))
 						}
 					}
@@ -4769,6 +4887,17 @@ func (w *tsBodyWalker) lookupImport(name string) (string, string, bool) {
 	}
 	if t, ok := w.importMap[name]; ok {
 		return t, w.importFiles[name], true
+	}
+	if w.localNames[name] {
+		return w.dir + "." + name, w.relFile, true
+	}
+	if w.ctx != nil && w.ctx.externalNames[name] {
+		return "", "", true
+	}
+	if w.ctx != nil && w.ctx.virtualNames[name] {
+		// Framework virtual binding: suppress sibling fallback but keep a
+		// dangling same-owner name so Nuxt composition can bind a unique target.
+		return w.dir + "." + name, "", true
 	}
 	return "", "", false
 }
@@ -5653,6 +5782,9 @@ func resolveTSCall(kinds *tsutil.KindTable, call *sitter.Node, src []byte, dir, 
 		if localNames[name] {
 			return dir + "." + name, relFile
 		}
+		if ctx != nil && ctx.externalNames[name] {
+			return "", ""
+		}
 		return dir + "." + name, ""
 	case "member_expression":
 		object := fn.ChildByFieldName("object")
@@ -5711,6 +5843,120 @@ func resolveTSConstructor(kinds *tsutil.KindTable, ctor *sitter.Node, src []byte
 		return dir + "." + name, relFile
 	}
 	return "", ""
+}
+
+func collectImportNameClasses(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias) (external, virtual map[string]bool) {
+	external = map[string]bool{}
+	virtual = map[string]bool{}
+	if root == nil {
+		return external, virtual
+	}
+	fileDir := factpath.Dir(relFile)
+	addNames := func(dst map[string]bool, stmt *sitter.Node, specifier string, fromRequire bool) {
+		if specifier == "" || dst == nil {
+			return
+		}
+		if !fromRequire && importStatementIsTypeOnly(kinds, stmt, src) {
+			return
+		}
+		if fromRequire {
+			nameNode := stmt.ChildByFieldName("name")
+			if nameNode == nil {
+				return
+			}
+			if kindOf(kinds, nameNode) == "identifier" {
+				if n := nodeText(nameNode, src); n != "" {
+					dst[n] = true
+				}
+				return
+			}
+			if kindOf(kinds, nameNode) == "object_pattern" {
+				for _, b := range objectPatternImportBindings(kinds, nameNode, src) {
+					if b.local != "" {
+						dst[b.local] = true
+					}
+				}
+			}
+			return
+		}
+		clause := findChildByKind(kinds, stmt, "import_clause")
+		if clause == nil {
+			return
+		}
+		if nsimp := findChildByKind(kinds, clause, "namespace_import"); nsimp != nil {
+			if id := findChildByKind(kinds, nsimp, "identifier"); id != nil {
+				if n := nodeText(id, src); n != "" {
+					dst[n] = true
+				}
+			}
+		}
+		for j := range clause.ChildCount() {
+			c := clause.Child(j)
+			if kindOf(kinds, c) == "identifier" {
+				if n := nodeText(c, src); n != "" {
+					dst[n] = true
+				}
+			}
+		}
+		named := findChildByKind(kinds, clause, "named_imports")
+		if named == nil {
+			return
+		}
+		for j := range named.ChildCount() {
+			spec := named.Child(j)
+			if kindOf(kinds, spec) != "import_specifier" {
+				continue
+			}
+			if importSpecifierIsTypeOnly(kinds, spec, src) {
+				continue
+			}
+			nameNode := spec.ChildByFieldName("name")
+			if nameNode == nil {
+				continue
+			}
+			local := nodeText(nameNode, src)
+			if a := spec.ChildByFieldName("alias"); a != nil {
+				local = nodeText(a, src)
+			}
+			if local != "" {
+				dst[local] = true
+			}
+		}
+	}
+	classOf := func(specifier string) map[string]bool {
+		if isNuxtAppSpecifier(specifier) {
+			return virtual
+		}
+		if _, ext := resolveImportPath(specifier, fileDir, aliases); ext {
+			return external
+		}
+		return nil
+	}
+	for i := range root.ChildCount() {
+		child := root.Child(i)
+		switch kindOf(kinds, child) {
+		case "import_statement":
+			source := findChildByKind(kinds, child, "string")
+			if source == nil {
+				continue
+			}
+			spec := strings.Trim(nodeText(source, src), `"'`)
+			addNames(classOf(spec), child, spec, false)
+		case "lexical_declaration", "variable_declaration":
+			for j := range child.ChildCount() {
+				d := child.Child(j)
+				if kindOf(kinds, d) != "variable_declarator" {
+					continue
+				}
+				spec, ok := literalRequireSpecifier(kinds, d.ChildByFieldName("value"), src)
+				if !ok {
+					continue
+				}
+				addNames(classOf(spec), d, spec, true)
+			}
+		}
+	}
+	return external, virtual
 }
 
 // tsGrammarKey and tsGrammarLanguage name the grammar a tree was parsed with, so a
