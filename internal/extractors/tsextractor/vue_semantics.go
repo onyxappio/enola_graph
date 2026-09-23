@@ -426,11 +426,11 @@ func collectAddImportsDirs(sources map[string][]byte) []string {
 	return out
 }
 
-func extraDirsByNuxtPackage(sources map[string][]byte, nuxtPkgs []string) map[string][]string {
+func extraDirsByNuxtPackage(sources map[string][]byte, nuxtPkgs []string, pkgDirs map[string]bool) map[string][]string {
 	out := map[string][]string{}
 	seen := map[string]map[string]bool{}
 	for file, src := range sources {
-		pkg, ok := nuxtPackageForFile(nuxtPkgs, file)
+		pkg, ok := nuxtPackageForFile(nuxtPkgs, file, pkgDirs)
 		if !ok {
 			continue
 		}
@@ -462,7 +462,7 @@ func isNuxtConfigFile(file string) bool {
 
 // nuxtModuleConsumers maps a consuming Nuxt package to packages whose addImportsDir
 // trees it registered via nuxt.config modules (identifier or string specifier).
-func nuxtModuleConsumers(sources map[string][]byte, nuxtPkgs []string, pkgDirByName map[string]string) map[string][]string {
+func nuxtModuleConsumers(sources map[string][]byte, nuxtPkgs []string, pkgDirByName map[string]string, pkgDirs map[string]bool) map[string][]string {
 	out := map[string][]string{}
 	seen := map[string]map[string]bool{}
 	add := func(consumer, mod string) {
@@ -482,14 +482,14 @@ func nuxtModuleConsumers(sources map[string][]byte, nuxtPkgs []string, pkgDirByN
 		if src == nil || !isNuxtConfigFile(file) {
 			continue
 		}
-		consumer, ok := nuxtPackageForFile(nuxtPkgs, file)
+		consumer, ok := nuxtPackageForFile(nuxtPkgs, file, pkgDirs)
 		if !ok {
 			continue
 		}
 		idents := map[string]string{}
 		for _, m := range nuxtDefaultImport.FindAllSubmatch(src, -1) {
 			spec := string(m[2])
-			mod := resolveNuxtModuleSpec(spec, file, nuxtPkgs, pkgDirByName)
+			mod := resolveNuxtModuleSpec(spec, file, nuxtPkgs, pkgDirByName, pkgDirs)
 			if mod == "" {
 				continue
 			}
@@ -501,7 +501,7 @@ func nuxtModuleConsumers(sources map[string][]byte, nuxtPkgs []string, pkgDirByN
 		}
 		inner := block[1]
 		for _, m := range nuxtModulesString.FindAllSubmatch(inner, -1) {
-			if mod := resolveNuxtModuleSpec(string(m[1]), file, nuxtPkgs, pkgDirByName); mod != "" {
+			if mod := resolveNuxtModuleSpec(string(m[1]), file, nuxtPkgs, pkgDirByName, pkgDirs); mod != "" {
 				add(consumer, mod)
 			}
 		}
@@ -514,9 +514,9 @@ func nuxtModuleConsumers(sources map[string][]byte, nuxtPkgs []string, pkgDirByN
 	return out
 }
 
-func resolveNuxtModuleSpec(spec, fromFile string, nuxtPkgs []string, pkgDirByName map[string]string) string {
+func resolveNuxtModuleSpec(spec, fromFile string, nuxtPkgs []string, pkgDirByName map[string]string, pkgDirs map[string]bool) string {
 	if dir, ok := pkgDirByName[spec]; ok {
-		if pkg, in := nuxtPackageForFile(nuxtPkgs, dir+"/package.json"); in {
+		if pkg, in := nuxtPackageForFile(nuxtPkgs, dir+"/package.json", pkgDirs); in {
 			return pkg
 		}
 		return dir
@@ -528,13 +528,13 @@ func resolveNuxtModuleSpec(spec, fromFile string, nuxtPkgs []string, pkgDirByNam
 	if external || resolved == "" {
 		return ""
 	}
-	if pkg, in := nuxtPackageForFile(nuxtPkgs, resolved); in {
+	if pkg, in := nuxtPackageForFile(nuxtPkgs, resolved, pkgDirs); in {
 		return pkg
 	}
 	return factpath.Dir(resolved)
 }
 
-func nuxtAutoImportDir(file string, nuxtPkgs, extraDirs []string) bool {
+func nuxtAutoImportDir(file string, nuxtPkgs, extraDirs []string, pkgDirs map[string]bool) bool {
 	file = filepath.ToSlash(file)
 	parent := factpath.Dir(file)
 	base := filepath.Base(parent)
@@ -546,7 +546,7 @@ func nuxtAutoImportDir(file string, nuxtPkgs, extraDirs []string) bool {
 			return true
 		}
 	}
-	_, inNuxt := nuxtPackageForFile(nuxtPkgs, file)
+	_, inNuxt := nuxtPackageForFile(nuxtPkgs, file, pkgDirs)
 	return inNuxt
 }
 
@@ -565,7 +565,7 @@ func extraDirOf(file string, extraDirs []string) (string, bool) {
 // statically registered addImportsDir trees). Ambiguous names stay unresolved.
 // Extra dirs registered inside another Nuxt package (a module) are visible only
 // to apps that list that module in nuxt.config, not pooled globally.
-func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []string, sources map[string][]byte, pkgDirByName map[string]string) {
+func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []string, sources map[string][]byte, pkgDirByName map[string]string, pkgDirs map[string]bool) {
 	exists := make(map[string]bool)
 	byPkg := make(map[string]map[string]map[string]bool)
 	byExtra := make(map[string]map[string]map[string]bool)
@@ -578,7 +578,7 @@ func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []stri
 		if v, ok := f.Props["exported"].(bool); ok && !v {
 			continue
 		}
-		if !nuxtAutoImportDir(f.File, nuxtPkgs, extraDirs) {
+		if !nuxtAutoImportDir(f.File, nuxtPkgs, extraDirs, pkgDirs) {
 			continue
 		}
 		name := f.Name[strings.LastIndexByte(f.Name, '.')+1:]
@@ -594,7 +594,7 @@ func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []stri
 			}
 			byExtra[dir][name][f.Name] = true
 		}
-		pkg, inNuxt := nuxtPackageForFile(nuxtPkgs, f.File)
+		pkg, inNuxt := nuxtPackageForFile(nuxtPkgs, f.File, pkgDirs)
 		if inNuxt {
 			if byPkg[pkg] == nil {
 				byPkg[pkg] = make(map[string]map[string]bool)
@@ -610,8 +610,8 @@ func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []stri
 		}
 		unowned[name][f.Name] = true
 	}
-	extraByPkg := extraDirsByNuxtPackage(sources, nuxtPkgs)
-	consumes := nuxtModuleConsumers(sources, nuxtPkgs, pkgDirByName)
+	extraByPkg := extraDirsByNuxtPackage(sources, nuxtPkgs, pkgDirs)
+	consumes := nuxtModuleConsumers(sources, nuxtPkgs, pkgDirByName, pkgDirs)
 	visibleDirs := func(pkg string) []string {
 		seen := map[string]bool{}
 		var dirs []string
@@ -657,7 +657,7 @@ func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []stri
 		return ""
 	}
 	for i := range all {
-		pkg, inNuxt := nuxtPackageForFile(nuxtPkgs, all[i].File)
+		pkg, inNuxt := nuxtPackageForFile(nuxtPkgs, all[i].File, pkgDirs)
 		if !inNuxt {
 			continue
 		}

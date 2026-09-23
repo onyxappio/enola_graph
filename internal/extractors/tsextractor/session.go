@@ -169,6 +169,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	isReactNav := disc.reactNav
 	isAngular := disc.angular
 	pkgGates := disc.gates
+	pkgDirSet := packageDirSet(pkgGates)
 	pkgNamesEarly := disc.pkgNames
 	isPrisma := pkgGates.anyPrisma
 	aliasRoots := disc.aliasRootsFor()
@@ -300,7 +301,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 
 	nuxtAutoByPkg := map[string]map[string]string{}
 	for _, p := range nuxtPkgs {
-		nuxtAutoByPkg[p] = nuxtAutoComponentIndex(knownFiles, p, nuxtPkgs)
+		nuxtAutoByPkg[p] = nuxtAutoComponentIndex(knownFiles, p, nuxtPkgs, pkgDirSet)
 	}
 
 	type fileOut struct {
@@ -331,7 +332,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			hooks.OnBeforeParse(relFile)
 		}
 		aliases := mergePackageAliases(aliasesForDir(aliasRoots, factpath.Dir(relFile)), pkgAliases)
-		fileNuxt, inNuxt := nuxtPackageForFile(nuxtPkgs, relFile)
+		fileNuxt, inNuxt := nuxtPackageForFile(nuxtPkgs, relFile, pkgDirSet)
 		var auto map[string]string
 		if inNuxt {
 			auto = nuxtAutoByPkg[fileNuxt]
@@ -466,7 +467,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 				extra = append(extra, d)
 			}
 		}
-		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, extra, sources, invertPackageNames(collectPackageNames(ctx, repoPath, inputScope)))
+		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, extra, sources, invertPackageNames(collectPackageNames(ctx, repoPath, inputScope)), pkgDirSet)
 	}
 	applyDirectIOContract(allFacts)
 
@@ -1009,8 +1010,9 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 	sort.Strings(grpcParts)
 	var nuxt []string
 	nuxtPkgs := collectNuxtPackages(ctx, repoPath, inputScope)
+	pkgDirSet := packageDirSet(collectPackageGates(ctx, repoPath, inputScope))
 	for _, pkg := range nuxtPkgs {
-		for n, t := range nuxtAutoComponentIndex(known, pkg, nuxtPkgs) {
+		for n, t := range nuxtAutoComponentIndex(known, pkg, nuxtPkgs, pkgDirSet) {
 			nuxt = append(nuxt, pkg+"/"+n+"="+t)
 		}
 	}
@@ -1045,7 +1047,7 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 	}
 	var auto []string
 	for _, rel := range files {
-		if !nuxtAutoImportDir(rel, nuxtPkgs, extraDirs) {
+		if !nuxtAutoImportDir(rel, nuxtPkgs, extraDirs, pkgDirSet) {
 			continue
 		}
 		usePrev := !allDirty && dirty != nil && !dirty[rel] && prev[rel] != nil

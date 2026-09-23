@@ -993,6 +993,130 @@ export default defineNuxtPlugin({
 	assertAppliedEqualsCold(t, c, applyGraph(t, cold2))
 }
 
+func TestPublishedWave10CachedUpgradeFromV312(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"package.json": `{"private":true,"workspaces":["packages/*"],"devDependencies":{"nuxt":"4.3.1"}}
+`,
+		"packages/app/package.json": `{"name":"nuxt-app","dependencies":{"nuxt":"4.3.1"}}
+`,
+		"packages/app/nuxt.config.ts": `export default defineNuxtConfig({ name: 'app' })
+`,
+		"packages/app/plugins/entry.ts": `export default defineNuxtPlugin(() => ({}))
+`,
+		"packages/plain/package.json": `{"name":"plain"}
+`,
+		"packages/plain/plugins/entry.ts": `export default defineNuxtPlugin(() => ({}))
+`,
+		"packages/plain/src/explicit.ts": `import { defineNuxtPlugin } from '#imports'
+export default defineNuxtPlugin(() => ({}))
+`,
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	assertNuxtWorkspaceBoundaryKinds(t, applyGraph(t, first))
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("load state: %v %#v", err, st)
+	}
+	st.ExtractorVersion = "v312"
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	up := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, dir, up, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.ParsedFiles == 0 {
+		t.Fatal("v312 migration parsed no files")
+	}
+	c := applyGraph(t, first)
+	if err := c.ApplyRecords(up.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, coldSink))
+	assertNuxtWorkspaceBoundaryKinds(t, c)
+	quiet := &graphstream.MemorySink{}
+	again, err := Run(context.Background(), eng, dir, quiet, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if again.ParsedFiles != 0 {
+		t.Fatalf("silent nochange parsed=%d", again.ParsedFiles)
+	}
+	if engine.ExtractorVersion() == "v312" {
+		t.Fatal("cached upgrade test requires cacheVersion newer than v312")
+	}
+
+	cfg := filepath.Join(dir, "packages/app/nuxt.config.ts")
+	if err := os.WriteFile(cfg, []byte("export default defineNuxtConfig({ name: 'app', srcDir: 'src' })\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	mut := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, mut, opts); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.ApplyRecords(mut.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	cold2 := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, cold2, Options{StateDir: filepath.Join(dir, ".enola", "cold2"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, cold2))
+	assertNuxtWorkspaceBoundaryKinds(t, c)
+	quiet2 := &graphstream.MemorySink{}
+	still, err := Run(context.Background(), eng, dir, quiet2, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if still.ParsedFiles != 0 {
+		t.Fatalf("silent nochange after config edit parsed=%d", still.ParsedFiles)
+	}
+}
+
+func assertNuxtWorkspaceBoundaryKinds(t *testing.T, c *Consumer) {
+	t.Helper()
+	want := map[string]struct {
+		file string
+		kind any
+	}{
+		"packages/app/plugins.Entry":   {"packages/app/plugins/entry.ts", facts.SymbolFunc},
+		"packages/plain/plugins.Entry": {"packages/plain/plugins/entry.ts", facts.SymbolVariable},
+		"packages/plain/src.Explicit":  {"packages/plain/src/explicit.ts", facts.SymbolFunc},
+	}
+	found := map[string]bool{}
+	for _, nodes := range c.Owners {
+		for _, n := range nodes {
+			spec, ok := want[n.Name]
+			if !ok || n.Kind != facts.KindSymbol {
+				continue
+			}
+			if n.File != spec.file {
+				t.Fatalf("%s file=%s want %s", n.Name, n.File, spec.file)
+			}
+			if n.Props["symbol_kind"] != spec.kind {
+				t.Fatalf("%s kind=%v want %v", n.Name, n.Props["symbol_kind"], spec.kind)
+			}
+			found[n.Name] = true
+		}
+	}
+	for name := range want {
+		if !found[name] {
+			t.Fatalf("missing %s", name)
+		}
+	}
+}
+
 func TestPublishedWave10CachedUpgradeFromV311(t *testing.T) {
 	dir := setupTSRepo(t, map[string]string{
 		"packages/landings-module-image/src/runtime/images/ipxHandler.ts": `import { lazyEventHandler } from 'h3'

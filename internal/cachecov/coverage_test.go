@@ -33,6 +33,7 @@ import (
 // test functions that assert the behavior that version introduced. v1 is the
 // implicit baseline (no changelog line), so coverage starts at v2.
 var versionCoverage = map[int][]string{
+	313: {"TestExtract_Wave10NuxtWorkspacePackageBoundary", "TestPublishedWave10CachedUpgradeFromV312"},
 	312: {"TestExtract_Wave10H3LazyEventHandlerKind", "TestPublishedWave10CachedUpgradeFromV311"},
 	311: {"TestExtract_Wave10NuxtPluginFactoryKind", "TestPublishedWave10CachedUpgradeFromV310"},
 	310: {"TestBodyScopeDefaultOriginSwitchRebindsConsumers", "TestPublishedWave10CachedUpgradeFromV309"},

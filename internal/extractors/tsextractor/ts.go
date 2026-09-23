@@ -233,6 +233,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	isReactNav := detectReactNavigation(ctx, repoPath, inputScope)
 	isAngular := detectAngular(ctx, repoPath, inputScope)
 	pkgGates := collectPackageGates(ctx, repoPath, inputScope)
+	pkgDirSet := packageDirSet(pkgGates)
 	pkgNames := collectPackageNames(ctx, repoPath, inputScope)
 	isPrisma := pkgGates.anyPrisma
 
@@ -271,7 +272,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	pkgAliases := collectPackageAliases(ctx, repoPath, knownFiles, inputScope)
 	nuxtAutoByPkg := map[string]map[string]string{}
 	for _, p := range nuxtPkgs {
-		nuxtAutoByPkg[p] = nuxtAutoComponentIndex(knownFiles, p, nuxtPkgs)
+		nuxtAutoByPkg[p] = nuxtAutoComponentIndex(knownFiles, p, nuxtPkgs, pkgDirSet)
 	}
 
 	// Repo-wide pre-pass: resolve generated gRPC-web client stubs (service FQN +
@@ -315,7 +316,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 			return tsFileResult{}
 		}
 		aliases := mergePackageAliases(aliasesForDir(aliasRoots, factpath.Dir(relFile)), pkgAliases)
-		fileNuxt, inNuxt := nuxtPackageForFile(nuxtPkgs, relFile)
+		fileNuxt, inNuxt := nuxtPackageForFile(nuxtPkgs, relFile, pkgDirSet)
 		var auto map[string]string
 		if inNuxt {
 			auto = nuxtAutoByPkg[fileNuxt]
@@ -411,7 +412,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	// symbol. Transitive caller tagging is intentionally not applied; reachability
 	// belongs in graph queries. See applyDirectIOContract.
 	if isNuxt {
-		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, nuxtExtraDirs, nuxtSources, nuxtPkgDirByName)
+		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, nuxtExtraDirs, nuxtSources, nuxtPkgDirByName, pkgDirSet)
 	}
 	applyDirectIOContract(allFacts)
 

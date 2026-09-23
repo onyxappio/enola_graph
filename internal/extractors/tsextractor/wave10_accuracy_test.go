@@ -606,6 +606,61 @@ export default defineNuxtPlugin({ name: 'plain-value' })
 	}
 }
 
+func TestExtract_Wave10NuxtWorkspacePackageBoundary(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"package.json": `{"private":true,"workspaces":["packages/*"],"devDependencies":{"nuxt":"4.3.1"}}
+`,
+		"packages/app/package.json": `{"name":"nuxt-app","dependencies":{"nuxt":"4.3.1"}}
+`,
+		"packages/app/nuxt.config.ts": `export default defineNuxtConfig({})
+`,
+		"packages/app/plugins/entry.ts": `export default defineNuxtPlugin(() => ({}))
+`,
+		"packages/app/runtime/nested.ts": `export default definePayloadPlugin(() => ({}))
+`,
+		"packages/plain/package.json": `{"name":"plain"}
+`,
+		"packages/plain/plugins/entry.ts": `export default defineNuxtPlugin(() => ({}))
+`,
+		"packages/plain/src/explicit.ts": `import { defineNuxtPlugin } from '#imports'
+export default defineNuxtPlugin(() => ({}))
+`,
+		"packages/plain/src/explicitApp.ts": `import { defineNuxtPlugin } from '#app'
+export default defineNuxtPlugin(() => ({}))
+`,
+		"packages/plain/src/config.ts": `export default defineNuxtConfig({})
+`,
+	}, false)
+
+	for _, name := range []string{
+		"packages/app/plugins.Entry",
+		"packages/app/runtime.Nested",
+		"packages/plain/src.Explicit",
+		"packages/plain/src.ExplicitApp",
+	} {
+		f, ok := findFact(ff, name)
+		if !ok {
+			t.Fatalf("missing %s", name)
+		}
+		if f.Props["symbol_kind"] != facts.SymbolFunc {
+			t.Fatalf("%s kind=%v want function", name, f.Props["symbol_kind"])
+		}
+	}
+	for _, name := range []string{
+		"packages/plain/plugins.Entry",
+		"packages/plain/src.Config",
+		"packages/app.NuxtConfig",
+	} {
+		f, ok := findFact(ff, name)
+		if !ok {
+			t.Fatalf("missing %s", name)
+		}
+		if f.Props["symbol_kind"] != facts.SymbolVariable {
+			t.Fatalf("%s kind=%v want variable", name, f.Props["symbol_kind"])
+		}
+	}
+}
+
 func TestExtract_Wave10H3LazyEventHandlerKind(t *testing.T) {
 	ff := extractAll(t, map[string]string{
 		"packages/landings-module-image/src/runtime/images/ipxHandler.ts": `import { lazyEventHandler } from 'h3'

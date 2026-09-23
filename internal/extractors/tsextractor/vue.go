@@ -153,14 +153,69 @@ func collectNuxtPackages(ctx context.Context, repoPath string, inputScopes ...*i
 	return out
 }
 
-func nuxtPackageForFile(pkgs []string, relFile string) (string, bool) {
+func packageDirSet(g packageGates) map[string]bool {
+	if len(g.byDir) == 0 {
+		return nil
+	}
+	out := make(map[string]bool, len(g.byDir))
+	for d := range g.byDir {
+		out[d] = true
+	}
+	return out
+}
+
+func nearestDeclaredPackageDir(pkgDirs map[string]bool, relFile string) (string, bool) {
+	if len(pkgDirs) == 0 {
+		return "", false
+	}
+	for d := filepath.ToSlash(factpath.Dir(relFile)); ; {
+		if pkgDirs[d] {
+			if d == "." {
+				return "", true
+			}
+			return d, true
+		}
+		if d == "." || d == "" {
+			if pkgDirs[""] {
+				return "", true
+			}
+			return "", false
+		}
+		i := strings.LastIndexByte(d, '/')
+		if i < 0 {
+			d = "."
+			continue
+		}
+		d = d[:i]
+	}
+}
+
+// nuxtPackageForFile returns the nearest Nuxt package that owns relFile.
+// A root Nuxt declaration (empty prefix) does not cross a nested package.json
+// that does not itself declare Nuxt, so a workspace neighbor stays independent.
+// Nested folders without their own package.json still belong to the containing
+// Nuxt package.
+func nuxtPackageForFile(pkgs []string, relFile string, pkgDirs map[string]bool) (string, bool) {
+	if owner, ok := nearestDeclaredPackageDir(pkgDirs, relFile); ok {
+		for _, p := range pkgs {
+			if p == owner {
+				return p, true
+			}
+		}
+		return "", false
+	}
 	file := filepath.ToSlash(relFile)
 	for _, p := range pkgs {
 		if p == "" {
-			return "", true
+			continue
 		}
 		if file == p || strings.HasPrefix(file, p+"/") {
 			return p, true
+		}
+	}
+	for _, p := range pkgs {
+		if p == "" {
+			return "", true
 		}
 	}
 	return "", false
@@ -650,14 +705,14 @@ func buildVueImportBindings(kinds *tsutil.KindTable, root *sitter.Node, src []by
 // may configure pathPrefix off. pkgDir limits the index to one Nuxt package
 // (empty means the repository root package). Lazy* aliases are Nuxt's async
 // wrapper convention for the same component.
-func nuxtAutoComponentIndex(knownFiles map[string]bool, pkgDir string, pkgs []string) map[string]string {
+func nuxtAutoComponentIndex(knownFiles map[string]bool, pkgDir string, pkgs []string, pkgDirs map[string]bool) map[string]string {
 	candidates := make(map[string]map[string]bool)
 	for file := range knownFiles {
 		if !isVueFile(file) {
 			continue
 		}
 		file = filepath.ToSlash(file)
-		owner, ok := nuxtPackageForFile(pkgs, file)
+		owner, ok := nuxtPackageForFile(pkgs, file, pkgDirs)
 		if !ok || owner != pkgDir {
 			continue
 		}

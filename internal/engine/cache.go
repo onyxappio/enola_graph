@@ -2579,7 +2579,13 @@ import (
 // assignment of those exports). Local same-name functions, object members,
 // type-only imports, unrelated specifiers, and bare names stay variables.
 // defineEventHandler is unchanged.
-const cacheVersion = "v312"
+// v313: implicit Nuxt plugin factories (defineNuxtPlugin / definePayloadPlugin)
+// are scoped to the nearest package.json that declares Nuxt or nuxt.config.
+// A root workspace Nuxt dependency does not auto-import into a sibling package
+// that has its own manifest without Nuxt. Nested folders without a package.json
+// still belong to the containing Nuxt project. Explicit #imports/#app/nuxt/app
+// factory imports remain functions regardless of the Nuxt manifest.
+const cacheVersion = "v313"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //
