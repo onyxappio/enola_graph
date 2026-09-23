@@ -1,0 +1,14 @@
+{
+  "acceptance": "failed autonomous-watch robustness; NATS in-flight verdict invalidated",
+  "raw_report_unchanged": true,
+  "watch_unexpected_exits": 7,
+  "edit_operations": 91,
+  "completed_generations": 17,
+  "abandoned_begins": 13,
+  "final_exact_cold": true,
+  "outage_caught_begin_age_seconds": 155.654817,
+  "outage_caught_run": "watch-bench-soak-watch-2-1790183192457894000",
+  "latest_begin_at_outage": "watch-bench-soak-watch-11-1790183342924585000",
+  "finding": "old open_begins()[0] chose superseded attempt; raw during_publish=true does not establish active publication",
+  "harness_fix": "select classify_begins active head after watcher restart; regression self-test passes and old algorithm fails"
+}

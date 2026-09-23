@@ -461,6 +461,15 @@ def summarize(values: list) -> dict:
     }
 
 
+def latest_open_begin(records: list, context: str, restarted_ns: int = 0):
+    """Only the latest Begin in this watcher lifetime can be in flight.
+
+    Fail-closed attempts can leave older Begins without End forever. They are
+    not evidence that publication is active after a later run or process restart.
+    """
+    return wt.classify_begins(records, context, restarted_ns)["active"]
+
+
 def outage_verdict(obs: dict, generations_after: int) -> str:
     """State what the outage actually showed. Never upgrade it to acceptance.
 
@@ -732,11 +741,11 @@ def run_soak(args) -> int:
                     # into a dead broker and so proves nothing.
                     catch_until = time.monotonic() + max(every_s * 4, 20)
                     while time.monotonic() < catch_until:
-                        pending = wt.open_begins(
-                            wt.read_lifecycle(lifecycle_path), WATCH_CTX
+                        pending = latest_open_begin(
+                            wt.read_lifecycle(lifecycle_path), WATCH_CTX, last_restart_ns
                         )
                         if pending:
-                            caught = pending[0].get("run_id")
+                            caught = pending.get("run_id")
                             break
                         if watch_proc.poll() is not None:
                             break
@@ -1134,6 +1143,17 @@ def self_test() -> int:
     check("soak uses the same interval definitions as watch",
           '"frame_detection_poll_interval_s": wt.FRAME_POLL_INTERVAL_S' in text
           and "wt._ms_from_ns(" in text)
+
+    # Stale Begins from failed attempts must not trigger the outage injector.
+    old_begin = {"record": "begin", "run_id": "old", "context": WATCH_CTX, "broker_ns": 10}
+    new_begin = {"record": "begin", "run_id": "new", "context": WATCH_CTX, "broker_ns": 20}
+    new_end = {"record": "end", "run_id": "new", "context": WATCH_CTX, "broker_ns": 30}
+    check("outage ignores old Begin superseded by completed run",
+          latest_open_begin([old_begin, new_begin, new_end], WATCH_CTX) is None)
+    check("outage ignores Begin from prior watcher process",
+          latest_open_begin([old_begin], WATCH_CTX, 15) is None)
+    check("outage selects newest active Begin",
+          latest_open_begin([old_begin, new_begin], WATCH_CTX, 15) == new_begin)
 
     # --- broker outage verdicts: never upgrade a bounce to acceptance -----
     check("no outage requested is untested",
