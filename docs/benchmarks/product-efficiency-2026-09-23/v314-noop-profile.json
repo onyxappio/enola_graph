@@ -1,0 +1,58 @@
+{
+  "command": [
+    "/tmp/enola-stage6-wave10-review/enola",
+    "graph",
+    "delta",
+    "--authoritative-scope",
+    "--max-begin-bytes",
+    "1048576",
+    "--events",
+    "/tmp/enola-stage6-wave10-paired-history/candidate-initial.jsonl",
+    "--state-dir",
+    "/tmp/enola-stage6-wave10-paired-history/candidate-noop-state",
+    "--context",
+    "scope-bench",
+    "--repo-id",
+    "product-scope",
+    "--summary-json",
+    "/tmp/enola-stage6-exploratory-case05/live"
+  ],
+  "exit": 0,
+  "wall_s": 3.087707542,
+  "new_event_bytes": 0,
+  "state_json_hashes_unchanged": true,
+  "binary_sha256": "1e4fbe4d8e65cd26f49b0391585454658354ff610f5380df755f44ba31973c8c",
+  "limitation": "one diagnostic shared-host profile; concurrent regression suite; no speedup claim",
+  "summary": {
+    "Invalidation": {
+      "RawConfigChanged": false,
+      "PolicyReconciled": false,
+      "AddedSources": 0,
+      "RemovedSources": 0,
+      "ContextAffectedSources": 0,
+      "ContextReasons": null,
+      "ParsedByReason": {}
+    },
+    "RunID": "",
+    "BaseGeneration": 2,
+    "TargetGeneration": 2,
+    "Stats": {
+      "files_read": 0,
+      "files_parsed": 0,
+      "cached_files": 4079,
+      "graphql_parsed": 0,
+      "sfc_parsed": 0,
+      "summary_scans": 0,
+      "derived_indexes": 0,
+      "discovery_passes": 0
+    },
+    "Fallbacks": null,
+    "Unreadable": null,
+    "OwnersPublished": 0,
+    "ParsedFiles": 0,
+    "EarlyLocal": 0,
+    "Facts": null
+  },
+  "production_revision": "1ba06f9",
+  "product_revision": "ae233c5f56959ce5852c8381edd6cb472c4b9f95"
+}
