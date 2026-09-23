@@ -638,3 +638,57 @@ func TestAdmissionIndexEditAfterBeginFailsTheResidentRun(t *testing.T) {
 		})
 	}
 }
+
+// The directory override is the half of the admission digest that is not a leaf
+// decision, and this is the case that separates it from the tracked-ancestor
+// set it replaced. A gitignored parent that no hard rule excludes, whose only
+// tracked descendant is hard-excluded by an exact leaf exclusion, exempts
+// nothing: every file under it is already excluded, by that hard rule or by
+// gitignore with no tracking to override it. So staging that leaf must move
+// neither the parent's decision nor the digest.
+//
+// Reverting the override to the tracked-ancestor set fails this case with the
+// parent moving Excluded to semantic while the digest stands still, which is
+// the drift the two sets being equal exists to prevent. The contrast at the end
+// is what keeps the case honest: an admissible ignored sibling entering the
+// index must move both together.
+func TestAdmissionIgnoredParentWithOnlyHardExcludedTrackedChild(t *testing.T) {
+	dir := admissionRepo(t, map[string]string{
+		".gitignore":    "gen/\n",
+		"gen/bundle.ts": "export const bundled = 1;\n",
+		"gen/keep.ts":   "export const keep = 2;\n",
+	})
+	popts := graphinput.Options{Exclude: []string{"gen/bundle.ts"}}
+	genDir := filepath.Join(dir, "gen")
+	base := admissionPolicy(t, dir, popts)
+
+	if d := base.Classify(filepath.Join(dir, "gen/bundle.ts"), false); d.Kind != graphinput.Excluded || d.Reason != "enola exclusion" {
+		t.Fatalf("the fixture's leaf is not hard-excluded: %+v", d)
+	}
+	if d := base.Classify(filepath.Join(dir, "gen/keep.ts"), false); d.Kind != graphinput.Excluded {
+		t.Fatalf("the fixture's untracked ignored sibling is not excluded: %+v", d)
+	}
+	beforeDir := base.Classify(genDir, true)
+	beforeID := base.AdmissionIdentity()
+
+	admissionGit(t, dir, "add", "-f", "gen/bundle.ts")
+	staged := admissionPolicy(t, dir, popts)
+	if got := staged.Classify(genDir, true); got.Kind != beforeDir.Kind {
+		t.Fatalf("staging the hard-excluded leaf moved the parent decision: %+v then %+v", beforeDir, got)
+	}
+	if got := staged.Classify(filepath.Join(dir, "gen/keep.ts"), false); got.Kind != graphinput.Excluded {
+		t.Fatalf("staging the hard-excluded leaf admitted its untracked sibling: %+v", got)
+	}
+	if staged.AdmissionIdentity() != beforeID {
+		t.Fatal("staging the hard-excluded leaf moved the admission identity")
+	}
+
+	admissionGit(t, dir, "add", "-f", "gen/keep.ts")
+	both := admissionPolicy(t, dir, popts)
+	if both.AdmissionIdentity() == beforeID {
+		t.Fatal("tracking an admissible ignored file left the admission identity unchanged")
+	}
+	if got := both.Classify(genDir, true); got.Kind == graphinput.Excluded {
+		t.Fatalf("an admissible tracked descendant did not exempt its ignored parent: %+v", got)
+	}
+}

@@ -127,8 +127,9 @@ func policyReconciles(st *State, input *runtimeInputs) bool {
 // it. Declining is always safe in that direction: it can only cost a later
 // reconciliation, never skip one.
 //
-// The recheck reads two Git processes and every declared dependency, so it is
-// reached only when the stored pair actually differs from this run's. An idle
+// The recheck re-runs Git discovery and the index enumeration and re-reads
+// every declared dependency, so it is reached only when the stored pair
+// actually differs from this run's. An idle
 // resident whose state already carries both fingerprints returns on the first
 // comparison, and because the refresh below also advances s.state, a run that
 // does pay for it pays once rather than on every later idle request.

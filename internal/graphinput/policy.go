@@ -83,6 +83,7 @@ type Policy struct {
 	deps                      []Dependency
 	depSet                    map[string]bool
 	gitDirs                   []string
+	git                       gitState
 	options                   Options
 	identity                  string
 	admission                 string
@@ -261,6 +262,63 @@ func media(name string) bool {
 // Build evaluates repository .gitignore files with Git itself, isolated from global
 // excludes and .git/info/exclude. The real index is used only for tracked exemption.
 // Non-Git directories also support .gitignore. Git is required at build time.
+// gitState is the effective Git state Build resolved. The identities hash this
+// projection instead of the repository configuration's raw bytes, because the
+// only things configuration can move here are discovery and which index is
+// enumerated; ignore evaluation runs against an isolated git dir it cannot
+// reach. See docs: a key that moves neither result is not an input here.
+type gitState struct {
+	Repository bool
+	TopLevel   string
+	Dirs       []string
+}
+
+// discoverGit returns a zero state and no error outside a repository, which is
+// a supported input rather than a failure.
+func discoverGit(root string) (gitState, []string, error) {
+	git := func(args ...string) ([]byte, error) { return runGit(root, "", nil, args...) }
+	top, err := git("rev-parse", "--show-toplevel")
+	if err != nil {
+		return gitState{}, nil, nil
+	}
+	st := gitState{Repository: true, TopLevel: filepath.Clean(strings.TrimSpace(string(top)))}
+	var dirs []string
+	for _, flag := range []string{"--absolute-git-dir", "--git-common-dir"} {
+		out, e := git("rev-parse", flag)
+		if e != nil {
+			return gitState{}, nil, e
+		}
+		dir := strings.TrimSpace(string(out))
+		if !filepath.IsAbs(dir) {
+			dir = filepath.Join(root, dir)
+		}
+		dirs = append(dirs, dir)
+	}
+	st.Dirs = append([]string(nil), dirs...)
+	return st, dirs, nil
+}
+
+// indexNames re-enumerates on every call: the tracked exemption is never
+// carried over, so a configuration change selecting a different index is
+// observed rather than assumed away.
+func indexNames(root string) (tracked, dirs map[string]bool, err error) {
+	tracked, dirs = map[string]bool{}, map[string]bool{}
+	out, e := runGit(root, "", nil, "ls-files", "-z", "--cached", "--", ".")
+	if e != nil {
+		return nil, nil, e
+	}
+	for _, name := range strings.Split(string(out), "\x00") {
+		if name == "" {
+			continue
+		}
+		tracked[name] = true
+		for dir := filepath.ToSlash(filepath.Dir(name)); dir != "."; dir = filepath.ToSlash(filepath.Dir(dir)) {
+			dirs[dir] = true
+		}
+	}
+	return tracked, dirs, nil
+}
+
 func Build(root string, options Options) (*Policy, error) {
 	root, err := filepath.Abs(root)
 	if err != nil {
@@ -318,37 +376,26 @@ func Build(root string, options Options) (*Policy, error) {
 			return nil, err
 		}
 	}
-	git := func(args ...string) ([]byte, error) { return runGit(root, "", nil, args...) }
-	if _, e := git("rev-parse", "--show-toplevel"); e == nil {
-		for _, flag := range []string{"--absolute-git-dir", "--git-common-dir"} {
-			out, e := git("rev-parse", flag)
-			if e != nil {
-				return nil, e
-			}
-			dir := strings.TrimSpace(string(out))
-			if !filepath.IsAbs(dir) {
-				dir = filepath.Join(root, dir)
-			}
-			p.gitDirs = append(p.gitDirs, dir)
-			for _, n := range []string{"index", "HEAD", "config"} {
+	// Still declared though the identities no longer hash them: declaring is what
+	// registers the watch and what the run's input fence re-reads.
+	st, dirs, err := discoverGit(root)
+	if err != nil {
+		return nil, err
+	}
+	p.git, p.gitDirs = st, dirs
+	if st.Repository {
+		for _, dir := range dirs {
+			for _, n := range gitControlNames {
 				if err := addDep(filepath.Join(dir, n)); err != nil {
 					return nil, err
 				}
 			}
 		}
-		out, e := git("ls-files", "-z", "--cached", "--", ".")
+		tracked, trackedDirs, e := indexNames(root)
 		if e != nil {
 			return nil, e
 		}
-		for _, name := range strings.Split(string(out), "\x00") {
-			if name == "" {
-				continue
-			}
-			p.tracked[name] = true
-			for dir := filepath.ToSlash(filepath.Dir(name)); dir != "."; dir = filepath.ToSlash(filepath.Dir(dir)) {
-				p.trackedDirs[dir] = true
-			}
-		}
+		p.tracked, p.trackedDirs = tracked, trackedDirs
 	}
 	var names []string
 	var ignoreFiles []string
@@ -412,21 +459,36 @@ func Build(root string, options Options) (*Policy, error) {
 	return p, nil
 }
 
-// semanticDeps drops the Git control files from the dependency list.
-// Index bytes are a reconciliation signal, not identity: index stat refreshes and
-// lock-only staging must not change the graph policy identity.
+// config.worktree carries core.worktree under extensions.worktreeConfig, so a
+// linked worktree can be redirected without config ever being touched; a linked
+// worktree's git dir has no config file of its own at all.
+var gitControlNames = []string{"index", "HEAD", "config", "config.worktree"}
+
+// controlFile reports whether a dependency is a Git control file under a
+// discovered git dir. The gitfile at <root>/.git is deliberately excluded: it
+// redirects discovery, so its bytes are an input to the projection.
+func (p *Policy) controlFile(path string) bool {
+	for _, dir := range p.gitDirs {
+		for _, n := range gitControlNames {
+			if path == filepath.Join(dir, n) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// semanticDeps drops the Git control files from what the identities hash. They
+// stay declared, so the watcher and the input fence still see them; what they
+// stop being is identity. An index stat refresh, a lock-only staging, or an
+// unrelated configuration key must not move the policy identity.
 func (p *Policy) semanticDeps() []Dependency {
 	out := []Dependency{}
 	for _, d := range p.deps {
-		control := false
-		for _, dir := range p.gitDirs {
-			if d.Path == filepath.Join(dir, "index") || d.Path == filepath.Join(dir, "HEAD") {
-				control = true
-			}
+		if p.controlFile(d.Path) {
+			continue
 		}
-		if !control {
-			out = append(out, d)
-		}
+		out = append(out, d)
 	}
 	return out
 }
@@ -490,21 +552,28 @@ func (p *Policy) computeIdentities() error {
 		Version      string
 		Options      Options
 		Dependencies []Dependency
+		Git          gitState
 		Tracked      []string
-	}{"graph-input-v1", p.options, semanticDeps, tracked})
+	}{"graph-input-v2", p.options, semanticDeps, p.git, tracked})
 	if err != nil {
 		return err
 	}
 	sum := sha256.Sum256(encoded)
 	p.identity = hex.EncodeToString(sum[:])
 	admittedFiles, admittedDirs := p.trackedAdmission()
+	// Both identities carry the projection. They differ in what they take from
+	// the index - the raw identity hashes every tracked name, the admission
+	// identity only the names that can move a decision - but a repository whose
+	// discovery moved is a different repository to both of them, and that is
+	// the conservative side of an unknown Git effect.
 	encoded, err = json.Marshal(struct {
 		Version             string
 		Options             Options
 		Dependencies        []Dependency
+		Git                 gitState
 		TrackedIgnoredFiles []string
 		TrackedIgnoredDirs  []string
-	}{"graph-input-admission-v1", p.options, semanticDeps, admittedFiles, admittedDirs})
+	}{"graph-input-admission-v2", p.options, semanticDeps, p.git, admittedFiles, admittedDirs})
 	if err != nil {
 		return err
 	}
@@ -524,12 +593,17 @@ func (p *Policy) computeIdentities() error {
 // Identity and AdmissionIdentity before writing bookkeeping on a run that
 // published nothing. A declared rule file, meaning the .gitignore files, the
 // configuration paths and the Git control files, is re-read; membership is
-// re-enumerated rather than trusted; and an undeclared rule file is a new
-// admitted file in the tree, so it moves that caller's inventory and the run
-// never reaches the decision this fence guards. A repository that has
-// disappeared since the policy was built declines through a false ok rather than
-// reporting the identities of a tree with no index, which would compare equal
-// for the wrong reason.
+// re-enumerated rather than trusted; Git discovery is re-run rather than
+// carried over, so a worktree or git-dir redirect taking effect inside this
+// window moves the pair; and an undeclared rule file is a new admitted file in
+// the tree, so it moves that caller's inventory and the run never reaches the
+// decision this fence guards. A repository that has disappeared since the
+// policy was built declines through a false ok rather than reporting the
+// identities of a tree with no index, which would compare equal for the wrong
+// reason.
+//
+// Re-reading the control files no longer moves the pair by itself; their bytes
+// are held by the run's own input fence instead.
 //
 // This policy is left unchanged either way.
 func (p *Policy) RecheckDeclaredInputs() (identity, admission string, ok bool, err error) {
@@ -553,25 +627,24 @@ func (p *Policy) RecheckDeclaredInputs() (identity, admission string, ok bool, e
 		}
 		q.deps = append(q.deps, Dependency{d.Path, digest})
 	}
-	git := func(args ...string) ([]byte, error) { return runGit(p.root, "", nil, args...) }
-	_, gerr := git("rev-parse", "--show-toplevel")
-	if gerr != nil && len(p.gitDirs) > 0 {
+	// Re-run rather than carried over: the identities read discovery only through
+	// the projection now, so re-reading the declared bytes would not see a
+	// redirect. q.gitDirs stays the built set, since it classifies the declared
+	// paths being re-read.
+	st, _, derr := discoverGit(p.root)
+	if derr != nil {
+		return "", "", false, derr
+	}
+	if !st.Repository && len(p.gitDirs) > 0 {
 		return "", "", false, nil
 	}
-	if gerr == nil {
-		out, e := git("ls-files", "-z", "--cached", "--", ".")
+	q.git = st
+	if st.Repository {
+		tracked, trackedDirs, e := indexNames(p.root)
 		if e != nil {
 			return "", "", false, e
 		}
-		for _, name := range strings.Split(string(out), "\x00") {
-			if name == "" {
-				continue
-			}
-			q.tracked[name] = true
-			for dir := filepath.ToSlash(filepath.Dir(name)); dir != "."; dir = filepath.ToSlash(filepath.Dir(dir)) {
-				q.trackedDirs[dir] = true
-			}
-		}
+		q.tracked, q.trackedDirs = tracked, trackedDirs
 	}
 	if err := q.computeIdentities(); err != nil {
 		return "", "", false, err
