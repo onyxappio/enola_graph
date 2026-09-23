@@ -294,3 +294,300 @@ export function run() {
 		}
 	}
 }
+
+func TestExtract_Wave9ScopedLiteralRequireCalls(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/figma.ts": "export function readScreenStructureFileKey() { return 'k'; }\nexport function otherFigma() { return 1; }\n",
+		"src/crop.ts":  "export function shouldRunInstanceCropCompare() { return true; }\n",
+		"src/sib.ts": "export function readScreenStructureFileKey() { return 'sib'; }\nexport function shouldRunInstanceCropCompare() { return false; }\nexport function helper() { return 9; }\nexport function aliased() { return 8; }\nexport function nsFn() { return 7; }\nexport function load() { return 6; }\nexport function keep() { return 5; }\n",
+		"src/gate.ts": `
+export function runSuitePipeline() {
+  const { readScreenStructureFileKey, otherFigma } = require('./figma') as typeof import('./figma');
+  const { shouldRunInstanceCropCompare } = require('./crop') as typeof import('./crop');
+  const { helper: aliased } = require('./local');
+  const localMod = require('./local');
+  for (const x of [1]) {
+    readScreenStructureFileKey();
+    shouldRunInstanceCropCompare();
+  }
+  aliased();
+  return otherFigma();
+}
+export function innerLocalShadow() {
+  const { helper } = require('./local') as typeof import('./local');
+  {
+    const helper = () => 0;
+    return helper();
+  }
+}
+export function paramShadow(helper: () => number) {
+  const { keep } = require('./local');
+  helper();
+  return keep();
+}
+export function catchShadow() {
+  const { helper } = require('./local');
+  try { throw new Error('x'); } catch (helper) { return helper; }
+}
+export function unrelatedNeighbor() {
+  return 1;
+}
+export async function awaitedStill() {
+  const { helper } = await import('./local');
+  return helper();
+}
+export function unawaitedImport() {
+  const { helper } = import('./local');
+  return helper();
+}
+export function computedRequire(path: string) {
+  const { helper } = require(path);
+  return helper();
+}
+export function laterRequireCapture() {
+  const run = () => load();
+  const { load } = require('./local');
+  return run();
+}
+export function afterRequire() {
+  const { load } = require('./local');
+  const run = () => load();
+  return run();
+}
+export function typeSpaceKeep() {
+  const { keep } = require('./local') satisfies typeof import('./local');
+  type keep = string;
+  return keep();
+}
+export function parenRequire() {
+  const { helper } = (require('./local'));
+  return helper();
+}
+export function ordinaryForward() {
+  const value = () => load();
+  const load = () => 1;
+  return value();
+}
+export function namespaceRequire() {
+  const sdk = require('./local');
+  return sdk.helper();
+}
+export function namespaceRequireAs() {
+  const sdk = require('./local') as typeof import('./local');
+  return sdk.keep();
+}
+export function shadowedRequireLocal() {
+  const require = (p: string) => ({ helper: () => 0 });
+  const { helper } = require('./local');
+  return helper();
+}
+export function shadowedRequireParameter(require: any) {
+  const { helper } = require('./local');
+  return helper();
+}
+export function nestedRequireNoLeak() {
+  {
+    const { keep } = require('./local');
+    keep();
+  }
+  helper();
+}
+`,
+		"src/factory.ts": "export function factory(p: string) { return { work: () => 0 }; }\n",
+		"src/modshadow.ts": `
+import { keep } from './local';
+const require = (p: string) => ({ work: () => 0 });
+export function run() {
+  const { work } = require('./local');
+  work();
+  keep();
+}
+`,
+		"src/impshadow.ts": `
+import { factory as require } from './factory';
+import { keep } from './local';
+export function run() {
+  const { work } = require('./local');
+  work();
+  keep();
+}
+`,
+		"src/nsshadow.ts": `
+import * as require from './factory';
+import { keep } from './local';
+export function run() {
+  const { work } = require('./local');
+  work();
+  keep();
+}
+`,
+		"src/cjsmod.ts": `
+import { keep } from './local';
+const { work } = require('./local');
+export function run() {
+  work();
+  keep();
+}
+`,
+		"src/missingns.ts": `
+import { keep } from './local';
+export function run() {
+  const sdk = require('./gone');
+  sdk.work();
+  keep();
+}
+`,
+		"src/local.ts": "export function helper() { return 1; }\nexport function keep() { return 2; }\nexport function load() { return 3; }\nexport function nsFn() { return 4; }\nexport function localMod() { return 0; }\nexport function work() { return 0; }\n",
+	}, false)
+
+	gateFR := fileRefFact(ff, "src/gate.ts")
+	if gateFR.Name == "" {
+		t.Fatal("gate file_ref missing")
+	}
+	if !hasCallToFile(gateFR, "src.readScreenStructureFileKey", "src/figma.ts") {
+		t.Fatalf("file_ref lost typed require readScreenStructureFileKey: %+v", gateFR.Relations)
+	}
+	if !hasCallToFile(gateFR, "src.shouldRunInstanceCropCompare", "src/crop.ts") {
+		t.Fatalf("file_ref lost typed require shouldRunInstanceCropCompare: %+v", gateFR.Relations)
+	}
+	if hasCallToFile(gateFR, "src.readScreenStructureFileKey", "src/sib.ts") || hasCallToFile(gateFR, "src.shouldRunInstanceCropCompare", "src/sib.ts") {
+		t.Fatalf("file_ref bound sibling require names: %+v", gateFR.Relations)
+	}
+	if !hasCallToFile(gateFR, "src.helper", "src/local.ts") {
+		t.Fatalf("file_ref lost aliased/parenthesized helper: %+v", gateFR.Relations)
+	}
+	if !hasCallToFile(gateFR, "src.keep", "src/local.ts") {
+		t.Fatalf("file_ref lost keep: %+v", gateFR.Relations)
+	}
+
+	run, ok := findFact(ff, "src.runSuitePipeline")
+	if !ok {
+		t.Fatal("runSuitePipeline missing")
+	}
+	if !hasCallToFile(run, "src.readScreenStructureFileKey", "src/figma.ts") {
+		t.Fatalf("symbol-owned lost figma require: %+v", run.Relations)
+	}
+	if !hasCallToFile(run, "src.shouldRunInstanceCropCompare", "src/crop.ts") {
+		t.Fatalf("symbol-owned lost crop require: %+v", run.Relations)
+	}
+	if hasCallToFile(run, "src.readScreenStructureFileKey", "src/sib.ts") {
+		t.Fatalf("symbol-owned bound sibling figma: %+v", run.Relations)
+	}
+	cil := tsStrSlice(run, "calls_in_loop")
+	if !tsContains(cil, "src.readScreenStructureFileKey") && !tsContains(cil, "src/figma.readScreenStructureFileKey") {
+		t.Fatalf("calls_in_loop missing required figma call: %v rels=%+v", cil, run.Relations)
+	}
+
+	inner, _ := findFact(ff, "src.innerLocalShadow")
+	if hasCallToFile(inner, "src.helper", "src/local.ts") || hasCallToFile(inner, "src.helper", "src/sib.ts") {
+		t.Fatalf("inner local helper must shadow require: %+v", inner.Relations)
+	}
+	param, _ := findFact(ff, "src.paramShadow")
+	if hasCallToFile(param, "src.helper", "src/local.ts") || hasCallToFile(param, "src.helper", "src/sib.ts") {
+		t.Fatalf("param helper must shadow: %+v", param.Relations)
+	}
+	if !hasCallToFile(param, "src.keep", "src/local.ts") {
+		t.Fatalf("paramShadow must still call required keep: %+v", param.Relations)
+	}
+	catchF, _ := findFact(ff, "src.catchShadow")
+	if hasCallToFile(catchF, "src.helper", "src/local.ts") {
+		t.Fatalf("catch helper must shadow require: %+v", catchF.Relations)
+	}
+	awaited, _ := findFact(ff, "src.awaitedStill")
+	if !hasCallToFile(awaited, "src.helper", "src/local.ts") {
+		t.Fatalf("awaited import helper lost: %+v", awaited.Relations)
+	}
+	unawaited, _ := findFact(ff, "src.unawaitedImport")
+	if hasCallToFile(unawaited, "src.helper", "src/local.ts") || hasCallToFile(unawaited, "src.helper", "src/sib.ts") {
+		t.Fatalf("unawaited import must not bind: %+v", unawaited.Relations)
+	}
+	computed, _ := findFact(ff, "src.computedRequire")
+	if hasCallToFile(computed, "src.helper", "src/local.ts") || hasCallToFile(computed, "src.helper", "src/sib.ts") {
+		t.Fatalf("computed require must stay unbound: %+v", computed.Relations)
+	}
+	later, _ := findFact(ff, "src.laterRequireCapture")
+	if hasCallToFile(later, "src.load", "src/sib.ts") {
+		t.Fatalf("early closure must not fall back to sibling load: %+v", later.Relations)
+	}
+	if !hasCallToFile(later, "src.load", "src/local.ts") {
+		t.Fatalf("closure must capture later required load: %+v", later.Relations)
+	}
+	after, _ := findFact(ff, "src.afterRequire")
+	if !hasCallToFile(after, "src.load", "src/local.ts") {
+		t.Fatalf("call after require must bind load: %+v", after.Relations)
+	}
+	typed, _ := findFact(ff, "src.typeSpaceKeep")
+	if !hasCallToFile(typed, "src.keep", "src/local.ts") {
+		t.Fatalf("type keep must not hide required keep: %+v", typed.Relations)
+	}
+	paren, _ := findFact(ff, "src.parenRequire")
+	if !hasCallToFile(paren, "src.helper", "src/local.ts") {
+		t.Fatalf("parenthesized require lost helper: %+v", paren.Relations)
+	}
+	ord, _ := findFact(ff, "src.ordinaryForward")
+	if hasCallToFile(ord, "src.load", "src/local.ts") || hasCallToFile(ord, "src.load", "src/sib.ts") {
+		t.Fatalf("ordinary forward local must not bind sibling load: %+v", ord.Relations)
+	}
+	nsReq, _ := findFact(ff, "src.namespaceRequire")
+	if !hasCallToFile(nsReq, "src.helper", "src/local.ts") {
+		t.Fatalf("namespace require sdk.helper lost: %+v", nsReq.Relations)
+	}
+	if hasCallToFile(nsReq, "src.helper", "src/sib.ts") {
+		t.Fatalf("namespace require bound sibling helper: %+v", nsReq.Relations)
+	}
+	nsAs, _ := findFact(ff, "src.namespaceRequireAs")
+	if !hasCallToFile(nsAs, "src.keep", "src/local.ts") {
+		t.Fatalf("namespace require as keep lost: %+v", nsAs.Relations)
+	}
+	shLocal, _ := findFact(ff, "src.shadowedRequireLocal")
+	if hasCallToFile(shLocal, "src.helper", "src/local.ts") || hasCallToFile(shLocal, "src.helper", "src/sib.ts") {
+		t.Fatalf("local require binding must not be CommonJS: %+v", shLocal.Relations)
+	}
+	shParam, _ := findFact(ff, "src.shadowedRequireParameter")
+	if hasCallToFile(shParam, "src.helper", "src/local.ts") || hasCallToFile(shParam, "src.helper", "src/sib.ts") {
+		t.Fatalf("parameter require binding must not be CommonJS: %+v", shParam.Relations)
+	}
+	noLeak, _ := findFact(ff, "src.nestedRequireNoLeak")
+	if !hasCallToFile(noLeak, "src.keep", "src/local.ts") {
+		t.Fatalf("inner-block required keep lost: %+v", noLeak.Relations)
+	}
+	if hasCallToFile(noLeak, "src.helper", "src/local.ts") || hasCallToFile(noLeak, "src.helper", "src/sib.ts") {
+		t.Fatalf("inner-block require must not leak to outer helper(): %+v", noLeak.Relations)
+	}
+
+	for _, file := range []string{"src/modshadow.ts", "src/impshadow.ts", "src/nsshadow.ts"} {
+		fr := fileRefFact(ff, file)
+		run, _ := findFactNamedIn(ff, "src.run", file)
+		if hasCallToFile(fr, "src.work", "src/local.ts") || hasCallToFile(fr, "src.work", "src/sib.ts") {
+			t.Fatalf("%s file_ref bound require-named import as CommonJS: %+v", file, fr.Relations)
+		}
+		if hasCallToFile(run, "src.work", "src/local.ts") || hasCallToFile(run, "src.work", "src/sib.ts") {
+			t.Fatalf("%s symbol bound require-named import as CommonJS: %+v", file, run.Relations)
+		}
+		if !hasCallToFile(fr, "src.keep", "src/local.ts") && !hasCallToFile(run, "src.keep", "src/local.ts") {
+			t.Fatalf("%s lost keep: fr=%+v run=%+v", file, fr.Relations, run.Relations)
+		}
+	}
+	cjs, _ := findFactNamedIn(ff, "src.run", "src/cjsmod.ts")
+	cjsFR := fileRefFact(ff, "src/cjsmod.ts")
+	if !hasCallToFile(cjs, "src.work", "src/local.ts") && !hasCallToFile(cjsFR, "src.work", "src/local.ts") {
+		t.Fatalf("module-level CommonJS require must still bind work: %+v %+v", cjs.Relations, cjsFR.Relations)
+	}
+	miss, _ := findFactNamedIn(ff, "src.run", "src/missingns.ts")
+	missFR := fileRefFact(ff, "src/missingns.ts")
+	if hasCallToFile(miss, "src.work", "src/sib.ts") || hasCallToFile(missFR, "src.work", "src/sib.ts") || hasCallToFile(miss, "src.work", "src/local.ts") || hasCallToFile(missFR, "src.work", "src/local.ts") {
+		t.Fatalf("missing namespace require must not fall back to sibling work: miss=%+v fr=%+v", miss.Relations, missFR.Relations)
+	}
+	if !hasCallToFile(miss, "src.keep", "src/local.ts") && !hasCallToFile(missFR, "src.keep", "src/local.ts") {
+		t.Fatalf("missing namespace require lost keep: %+v %+v", miss.Relations, missFR.Relations)
+	}
+}
+
+func findFactNamedIn(ff []facts.Fact, name, file string) (facts.Fact, bool) {
+	for _, f := range ff {
+		if f.Name == name && f.File == file {
+			return f, true
+		}
+	}
+	return facts.Fact{}, false
+}

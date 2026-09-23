@@ -618,6 +618,198 @@ export function catchShadow() {
 	}
 }
 
+func TestPublishedWave9CachedUpgradeFromV300(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"src/figma.ts": "export function readScreenStructureFileKey() { return 'k'; }\n",
+		"src/crop.ts":  "export function shouldRunInstanceCropCompare() { return true; }\n",
+		"src/sib.ts":   "export function readScreenStructureFileKey() { return 'sib'; }\nexport function shouldRunInstanceCropCompare() { return false; }\n",
+		"src/app.ts": `
+export function runSuitePipeline() {
+  const { readScreenStructureFileKey } = require('./figma') as typeof import('./figma');
+  const { shouldRunInstanceCropCompare } = require('./crop') as typeof import('./crop');
+  return readScreenStructureFileKey() && shouldRunInstanceCropCompare();
+}
+`,
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("load state: %v %#v", err, st)
+	}
+	st.ExtractorVersion = "v300"
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	up := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, dir, up, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.ParsedFiles == 0 {
+		t.Fatal("v300 migration parsed no files")
+	}
+	c := applyGraph(t, first)
+	if err := c.ApplyRecords(up.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, coldSink))
+	assertCallResolvedToFile(t, c, "src/app.ts", "src.readScreenStructureFileKey", "src/figma.ts")
+	assertCallResolvedToFile(t, c, "src/app.ts", "src.shouldRunInstanceCropCompare", "src/crop.ts")
+	quiet := &graphstream.MemorySink{}
+	again, err := Run(context.Background(), eng, dir, quiet, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if again.ParsedFiles != 0 {
+		t.Fatalf("silent nochange parsed=%d", again.ParsedFiles)
+	}
+	if engine.ExtractorVersion() == "v300" {
+		t.Fatal("cached upgrade test requires cacheVersion newer than v300")
+	}
+}
+
+func TestPublishedWave9CachedUpgradeFromV301(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"src/dep.ts": "export function work() { return 1; }\nexport function keep() { return 2; }\n",
+		"src/sib.ts": "export function work() { return 9; }\n",
+		"src/app.ts": `
+export function namespaceRequire() {
+  const sdk = require('./dep');
+  return sdk.work();
+}
+export function shadowedRequireLocal() {
+  const require = (p: string) => ({ work: () => 0 });
+  const { work } = require('./dep');
+  return work();
+}
+export function laterRequireCapture() {
+  const run = () => work();
+  const { work } = require('./dep');
+  return run();
+}
+`,
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("load state: %v %#v", err, st)
+	}
+	st.ExtractorVersion = "v301"
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	up := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, dir, up, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.ParsedFiles == 0 {
+		t.Fatal("v301 migration parsed no files")
+	}
+	c := applyGraph(t, first)
+	if err := c.ApplyRecords(up.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, coldSink))
+	assertCallResolvedToFile(t, c, "src/app.ts", "src.work", "src/dep.ts")
+	quiet := &graphstream.MemorySink{}
+	again, err := Run(context.Background(), eng, dir, quiet, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if again.ParsedFiles != 0 {
+		t.Fatalf("silent nochange parsed=%d", again.ParsedFiles)
+	}
+	if engine.ExtractorVersion() == "v301" {
+		t.Fatal("cached upgrade test requires cacheVersion newer than v301")
+	}
+}
+
+func TestPublishedWave9CachedUpgradeFromV302(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"src/factory.ts": "export function factory(p: string) { return { work: () => 0 }; }\n",
+		"src/local.ts":   "export function work() { return 1; }\nexport function keep() { return 2; }\n",
+		"src/sib.ts":     "export function work() { return 9; }\n",
+		"src/app.ts": `
+import { factory as require } from './factory';
+import { keep } from './local';
+export function run() {
+  const { work } = require('./local');
+  work();
+  keep();
+}
+export function missingNs() {
+  const sdk = require('./gone') as typeof import('./gone');
+  return sdk.work();
+}
+`,
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("load state: %v %#v", err, st)
+	}
+	st.ExtractorVersion = "v302"
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	up := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, dir, up, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.ParsedFiles == 0 {
+		t.Fatal("v302 migration parsed no files")
+	}
+	c := applyGraph(t, first)
+	if err := c.ApplyRecords(up.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, coldSink))
+	assertCallResolvedToFile(t, c, "src/app.ts", "src.keep", "src/local.ts")
+	quiet := &graphstream.MemorySink{}
+	again, err := Run(context.Background(), eng, dir, quiet, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if again.ParsedFiles != 0 {
+		t.Fatalf("silent nochange parsed=%d", again.ParsedFiles)
+	}
+	if engine.ExtractorVersion() == "v302" {
+		t.Fatal("cached upgrade test requires cacheVersion newer than v302")
+	}
+}
+
 func TestPublishedBridgeTargetChangeResolvesToC(t *testing.T) {
 	dir := setupTSRepo(t, map[string]string{
 		"src/a.ts":      "import { round } from './bridge';\nexport function caller() { return round(1); }\n",
