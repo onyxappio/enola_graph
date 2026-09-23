@@ -1561,6 +1561,24 @@ func isNuxtAppPluginExport(export string) bool {
 	return export == "defineNuxtPlugin" || export == "definePayloadPlugin"
 }
 
+func isH3Specifier(spec string) bool {
+	return spec == "h3" || strings.HasPrefix(spec, "h3/")
+}
+
+func isH3LazyEventHandlerExport(export string) bool {
+	return export == "lazyEventHandler" || export == "defineLazyEventHandler"
+}
+
+func isH3LazyEventHandlerOrigin(origin namedImportOrigin, local string) bool {
+	if !isH3Specifier(origin.specifier) {
+		return false
+	}
+	if isH3LazyEventHandlerExport(origin.export) {
+		return true
+	}
+	return origin.export == "default" && isH3LazyEventHandlerExport(local)
+}
+
 func isNuxtAutoImportedPluginFactory(name string, ctx *extractCtx) bool {
 	if ctx == nil || !ctx.isNuxt || !isNuxtAppPluginExport(name) {
 		return false
@@ -1603,6 +1621,9 @@ func isKnownFunctionValueCall(kinds *tsutil.KindTable, call *sitter.Node, src []
 				if isEmberEngineBuildRoutesOrigin(origin) {
 					return true
 				}
+				if isH3LazyEventHandlerOrigin(origin, name) {
+					return true
+				}
 			} else if isNuxtAutoImportedPluginFactory(name, ctx) {
 				return true
 			}
@@ -1620,6 +1641,9 @@ func isKnownFunctionValueCall(kinds *tsutil.KindTable, call *sitter.Node, src []
 						return true
 					}
 					if isEmberEngineRoutesSpecifier(spec) && (name == "default" || name == "buildRoutes") {
+						return true
+					}
+					if isH3Specifier(spec) && isH3LazyEventHandlerExport(name) {
 						return true
 					}
 				}

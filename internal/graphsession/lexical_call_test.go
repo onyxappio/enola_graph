@@ -993,6 +993,115 @@ export default defineNuxtPlugin({
 	assertAppliedEqualsCold(t, c, applyGraph(t, cold2))
 }
 
+func TestPublishedWave10CachedUpgradeFromV311(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"packages/landings-module-image/src/runtime/images/ipxHandler.ts": `import { lazyEventHandler } from 'h3'
+export default lazyEventHandler(() => {
+  return () => ({})
+})
+`,
+		"runtime/local.ts": `function lazyEventHandler(value: any) { return value }
+export default lazyEventHandler({ name: 'plain-value' })
+`,
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("load state: %v %#v", err, st)
+	}
+	st.ExtractorVersion = "v311"
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	up := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, dir, up, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.ParsedFiles == 0 {
+		t.Fatal("v311 migration parsed no files")
+	}
+	c := applyGraph(t, first)
+	if err := c.ApplyRecords(up.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, coldSink))
+	quiet := &graphstream.MemorySink{}
+	again, err := Run(context.Background(), eng, dir, quiet, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if again.ParsedFiles != 0 {
+		t.Fatalf("silent nochange parsed=%d", again.ParsedFiles)
+	}
+	if engine.ExtractorVersion() == "v311" {
+		t.Fatal("cached upgrade test requires cacheVersion newer than v311")
+	}
+
+	handler := filepath.Join(dir, "packages/landings-module-image/src/runtime/images/ipxHandler.ts")
+	shadow := `function lazyEventHandler(value: any) { return value }
+export default lazyEventHandler({ name: 'plain-value' })
+`
+	if err := os.WriteFile(handler, []byte(shadow), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	mut := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, mut, opts); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.ApplyRecords(mut.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	shadowed := false
+	for _, nodes := range c.Owners {
+		for _, n := range nodes {
+			if n.File != "packages/landings-module-image/src/runtime/images/ipxHandler.ts" || n.Kind != facts.KindSymbol {
+				continue
+			}
+			if n.Name != "packages/landings-module-image/src/runtime/images.IpxHandler" {
+				continue
+			}
+			if n.Props["symbol_kind"] != facts.SymbolVariable {
+				t.Fatalf("shadowed handler kind=%v want variable name=%s", n.Props["symbol_kind"], n.Name)
+			}
+			shadowed = true
+		}
+	}
+	if !shadowed {
+		t.Fatal("missing shadowed ipxHandler symbol")
+	}
+	orig := `import { lazyEventHandler } from 'h3'
+export default lazyEventHandler(() => {
+  return () => ({})
+})
+`
+	if err := os.WriteFile(handler, []byte(orig), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	rest := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, rest, opts); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.ApplyRecords(rest.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	cold2 := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, cold2, Options{StateDir: filepath.Join(dir, ".enola", "cold2"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, cold2))
+}
+
 func TestPublishedWave10CachedUpgradeFromV309(t *testing.T) {
 	dir := setupTSRepo(t, map[string]string{
 		"src/a.ts":      "import { pick } from './barrel';\nexport function caller() { return pick(1); }\n",

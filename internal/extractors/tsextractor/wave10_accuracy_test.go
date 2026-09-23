@@ -606,6 +606,109 @@ export default defineNuxtPlugin({ name: 'plain-value' })
 	}
 }
 
+func TestExtract_Wave10H3LazyEventHandlerKind(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"packages/landings-module-image/src/runtime/images/ipxHandler.ts": `import { lazyEventHandler } from 'h3'
+import { createIPX, ipxFSStorage, ipxHttpStorage, createIPXH3Handler } from 'ipx'
+export default lazyEventHandler(() => {
+  const ipxOptions = { maxAge: 3600 }
+  const ipx = createIPX({
+    storage: ipxFSStorage({ dir: ipxOptions.dir ?? './public' }),
+    httpStorage: ipxHttpStorage({ domains: ipxOptions.domains }),
+    ...ipxOptions,
+  })
+  const handler = createIPXH3Handler(ipx)
+  return handler
+})
+`,
+		"runtime/named.ts": `import { defineLazyEventHandler } from 'h3'
+export default defineLazyEventHandler(() => {
+  return () => ({})
+})
+`,
+		"runtime/alias.ts": `import { lazyEventHandler as lazy } from 'h3'
+export default lazy(() => () => ({}))
+`,
+		"runtime/namespace.ts": `import * as h3 from 'h3'
+export default h3.lazyEventHandler(() => () => ({}))
+`,
+		"runtime/nsDefine.ts": `import * as h3 from 'h3'
+export default h3.defineLazyEventHandler(() => () => ({}))
+`,
+		"runtime/defaultLazy.ts": `import lazyEventHandler from 'h3'
+export default lazyEventHandler(() => () => ({}))
+`,
+		"runtime/defaultDefine.ts": `import defineLazyEventHandler from 'h3'
+export default defineLazyEventHandler(() => () => ({}))
+`,
+		"runtime/subpath.ts": `import { lazyEventHandler } from 'h3/utils'
+export default lazyEventHandler(() => () => ({}))
+`,
+		"runtime/event.ts": `import { defineEventHandler } from 'h3'
+export default defineEventHandler(() => ({}))
+`,
+		"runtime/bareEvent.ts": "export default defineEventHandler(() => ({}))\n",
+		"runtime/constlazy.ts": `import { lazyEventHandler } from 'h3'
+export const handler = lazyEventHandler(() => () => ({}))
+`,
+		"runtime/local.ts": `function lazyEventHandler(value: any) { return value }
+export default lazyEventHandler({ name: 'plain-value' })
+`,
+		"runtime/member.ts": `const local = { lazyEventHandler: (value: any) => value }
+export default local.lazyEventHandler({ name: 'plain-value' })
+`,
+		"runtime/typeonly.ts": `import type { lazyEventHandler } from 'h3'
+function lazyEventHandler(value: any) { return value }
+export default lazyEventHandler({ name: 'plain-value' })
+`,
+		"runtime/typeonlyDefine.ts": `import type { defineLazyEventHandler } from 'h3'
+function defineLazyEventHandler(value: any) { return value }
+export default defineLazyEventHandler({ name: 'plain-value' })
+`,
+		"runtime/foreign.ts": `import { lazyEventHandler } from 'not-h3'
+export default lazyEventHandler({ name: 'plain-value' })
+`,
+		"runtime/localmod.ts": `import { lazyEventHandler } from './helpers'
+export default lazyEventHandler({ name: 'plain-value' })
+`,
+		"runtime/helpers.ts": `export function lazyEventHandler(value: any) { return value }
+`,
+		"runtime/ordinary.ts": "export default Object.fromEntries([['a', 1]])\n",
+		"runtime/bareLazy.ts": "export default lazyEventHandler(() => ({}))\n",
+	}, false)
+
+	wantFunc := []string{
+		"packages/landings-module-image/src/runtime/images.IpxHandler",
+		"runtime.Named", "runtime.Alias", "runtime.Namespace", "runtime.NsDefine",
+		"runtime.DefaultLazy", "runtime.DefaultDefine", "runtime.Subpath",
+		"runtime.Event", "runtime.BareEvent", "runtime.handler",
+	}
+	for _, name := range wantFunc {
+		f, ok := findFact(ff, name)
+		if !ok {
+			t.Fatalf("missing %s", name)
+		}
+		if f.Props["symbol_kind"] != facts.SymbolFunc {
+			t.Fatalf("%s kind=%v want function", name, f.Props["symbol_kind"])
+		}
+		if _, ok := f.Props["cyclomatic"]; !ok {
+			t.Fatalf("%s missing function metrics", name)
+		}
+	}
+	for _, name := range []string{
+		"runtime.Local", "runtime.Member", "runtime.Typeonly", "runtime.TypeonlyDefine",
+		"runtime.Ordinary", "runtime.Foreign", "runtime.Localmod", "runtime.BareLazy",
+	} {
+		f, ok := findFact(ff, name)
+		if !ok {
+			t.Fatalf("missing %s", name)
+		}
+		if f.Props["symbol_kind"] != facts.SymbolVariable {
+			t.Fatalf("%s kind=%v want variable", name, f.Props["symbol_kind"])
+		}
+	}
+}
+
 func TestExtract_Wave10DefaultObjectValue(t *testing.T) {
 	ff := extractAll(t, map[string]string{
 		"packages/web-push/src/utils/base64.ts": `export function urlBase64ToUint8Array(s: string) { return s; }

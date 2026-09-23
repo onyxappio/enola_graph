@@ -2574,7 +2574,12 @@ import (
 // nuxt/app provenance is unchanged. Local declarations, parameters, type-only
 // imports, and unrelated specifiers remain variables; defineNuxtConfig stays a
 // value object.
-const cacheVersion = "v311"
+// v312: h3 lazyEventHandler / defineLazyEventHandler keep function identity when
+// proven via a value import from h3 (named, aliased, namespace, or default
+// assignment of those exports). Local same-name functions, object members,
+// type-only imports, unrelated specifiers, and bare names stay variables.
+// defineEventHandler is unchanged.
+const cacheVersion = "v312"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //
