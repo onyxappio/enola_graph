@@ -1,0 +1,43 @@
+{
+  "source_report": "v314-watch-outage5m.json",
+  "caught_begin": {
+    "base_generation": 13,
+    "broker_ns": 1790188321067210000,
+    "context": "soak-watch",
+    "observed_local_ns": 1790188321070244000,
+    "owner_scope_count": 619,
+    "record": "begin",
+    "repo_id": "watch-bench",
+    "run_id": "watch-bench-soak-watch-14-1790188320387954000",
+    "scope_mode": "complete",
+    "target_generation": 14
+  },
+  "recovery_begin": {
+    "base_generation": 13,
+    "broker_ns": 1790188337896141000,
+    "context": "soak-watch",
+    "observed_local_ns": 1790188337898137000,
+    "owner_scope_count": 621,
+    "record": "begin",
+    "repo_id": "watch-bench",
+    "run_id": "watch-bench-soak-watch-14-1790188337253478000",
+    "scope_mode": "complete",
+    "target_generation": 14
+  },
+  "caught_run_has_successful_end": false,
+  "publish_error": "graphstream publish watch-bench-soak-watch-14-1790188320387954000:batch:8: context deadline exceeded",
+  "watcher_exited": true,
+  "harness_restarted_watcher": true,
+  "completed_generation_preserved_at_restart": 13,
+  "resumed_target_generation": 14,
+  "begin_to_stop_request_ms": 19.723,
+  "confirmed_broker_stopped_to_ready_ms": 12062.781,
+  "exact_cold_equal": true,
+  "whole_checkout_stable_during_cold": true,
+  "limits": [
+    "scripted editor, not real AI feature",
+    "harness restart, not same-process recovery",
+    "not performance speedup acceptance",
+    "no claim that the abandoned run itself was replayed to successful End"
+  ]
+}
