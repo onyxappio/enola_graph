@@ -1,0 +1,35 @@
+=== RUN   TestRootRetainedHistoryReboundAttribution
+    root_rebound_attribution_test.go:62: {
+          "added_universe": [
+            "apps/mobile/src/components/figma/cards/featureCardBorderInset.ts",
+            "apps/mobile/src/components/pointerEventsContext.ts",
+            "apps/mobile/src/stories/profileVisualPinCopy.ts",
+            "apps/mobile/src/strictCanonicalTimestamp.ts"
+          ],
+          "basis": "offline cached-record projection using cold target record keys as current universe; not instrumented live branch attribution",
+          "changed_target_importer_counts": {},
+          "content_changed_prior_records": 92,
+          "deleted_universe": [],
+          "first_matching_name_counts": {},
+          "m2_rebound_all": 0,
+          "m2_rebound_byte_and_context_stable": 0,
+          "m3_combined_need": 1577,
+          "m3_name_wave_additions": 0,
+          "m3_name_wave_need": 0,
+          "m3_reverse_closure_need": 1577,
+          "m3_reverse_closure_total": 1657,
+          "new_declared_names": 74,
+          "next_records": 4224,
+          "prior_records": 4220,
+          "projected_first_pass_sources": 96,
+          "projected_need_changed_fact_owners": [],
+          "projected_need_identical_fact_slices": 1577,
+          "projected_need_identical_full_records": 1577,
+          "rebound_owners": [],
+          "removed_declared_names": 5,
+          "semantic_context_changes": 0,
+          "surface_changed_seeds": 45
+        }
+--- PASS: TestRootRetainedHistoryReboundAttribution (1.00s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	1.442s

@@ -193,7 +193,14 @@
     "benchmark_commit": "1e77fa7d7031cc7d3eedd1ae228c4db82dd46224",
     "comparison": "git trees under internal, cmd, go.mod, go.sum; excludes _test.go",
     "production_trees_equal": true,
-    "binary_sha256": "7edfe82a084b7d1f64ef272fbc48d0af7110fc8ae944e2c5fcfd1a09fa0c62f7"
+    "binary_sha256": "7edfe82a084b7d1f64ef272fbc48d0af7110fc8ae944e2c5fcfd1a09fa0c62f7",
+    "all_tracked_tree_differences": [
+      "internal/graphsession/md_scope_regression_test.go",
+      "internal/graphsession/nonts_candidate_scope_regression_test.go",
+      "internal/graphsession/ownership_regression_test.go",
+      "internal/graphsession/raw_config_scope_regression_test.go"
+    ],
+    "all_differences_are_tests": true
   },
   "runs": [
     {

@@ -1,6 +1,6 @@
 # Manifest/config scope: repeated Product watch comparison
 
-Candidate production code is local commit 9ca81a4, measured through private snapshot 1e77fa7d; production trees under internal, cmd, go.mod and go.sum match, excluding tests. Baseline snapshot bb89663 has production code equivalent to 5627150. This compares one isolated optimization, not completion of the overall efficiency goal.
+Candidate production code is local commit 9ca81a4, measured through private snapshot 1e77fa7d; comparison of every tracked file finds only four regression-test differences, with no production-source differences. Baseline snapshot bb89663 has production code equivalent to 5627150. This compares one isolated optimization, not completion of the overall efficiency goal.
 
 All runs use pinned Product a609c19f3861971930fae7b33dcb2950598953c5, the same full extractor profile and repository scope, an isolated NATS broker, and a 5-second watch buffer. A script changes tracking-client package version 0.7.2 to 0.7.3 and appends one exported constant to its source. This is a scripted two-file burst, not an AI-editor soak. Each run observes for 180 seconds and compares the applied graph to a cold target analysis, with identical input hashes before and after cold verification.
 
