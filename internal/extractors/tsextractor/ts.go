@@ -368,7 +368,6 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	// module, so a directory containing only skipped bundles (e.g. a vendored
 	// scripts dir) stays out of the graph rather than surfacing as an empty module.
 	modules := make(map[string]bool)
-	var moduleFiles []string
 	routerFiles := make([]*routerFile, 0, len(perFile))
 	var angular angularCounts
 	var angularRouters []*angularRouterFile
@@ -396,7 +395,6 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 		}
 		allFacts = append(allFacts, res.facts...)
 		modules[factpath.Dir(tsFiles[i])] = true
-		moduleFiles = append(moduleFiles, tsFiles[i])
 	}
 
 	// Express sub-routers mounted from another file. The per-file pass holds their
@@ -506,13 +504,12 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	if isAngular {
 		projects = angularProjectNames(repoPath, inputScope)
 	}
-	allFacts = appendTSDirectoryModules(allFacts, modules, moduleFiles, pkgNames, projects)
+	allFacts = appendTSDirectoryModules(allFacts, modules, pkgNames, projects)
 
 	return allFacts, nil
 }
 
-func appendTSDirectoryModules(allFacts []facts.Fact, dirs map[string]bool, files []string, pkgNames, projects map[string]string) []facts.Fact {
-	_ = files
+func appendTSDirectoryModules(allFacts []facts.Fact, dirs map[string]bool, pkgNames, projects map[string]string) []facts.Fact {
 	for dir := range dirs {
 		props := map[string]any{"language": "typescript"}
 		if name := nearestPackageName(pkgNames, dir); name != "" {

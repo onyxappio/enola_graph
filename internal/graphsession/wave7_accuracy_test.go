@@ -6,6 +6,9 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/enola-labs/enola/internal/config"
+	"github.com/enola-labs/enola/internal/engine"
+	"github.com/enola-labs/enola/internal/extractors/swiftextractor"
 	"github.com/enola-labs/enola/internal/facts"
 	"github.com/enola-labs/enola/internal/graphstream"
 )
@@ -165,6 +168,61 @@ export class RecaptureRequiredError extends Error {
 		t.Fatal(err)
 	}
 	assertAppliedEqualsCold(t, cons, applyGraph(t, cold))
+}
+
+func TestPublishedSwiftConstantDeclaresClassV2(t *testing.T) {
+	dir := t.TempDir()
+	writeFile(t, dir, "Package.swift", "// swift-tools-version: 5.9\n")
+	writeFile(t, dir, "src/OnyxGlassModule.swift", "final class OnyxGlassView {\n  private let effectView: Int = 1\n}\n")
+	writeFile(t, dir, "src/sibling.swift", "let anchor = 1\n")
+	cfg := config.Default()
+	cfg.Repo = dir
+	cfg.Output.Dir = ".enola"
+	eng, err := engine.New(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	eng.RegisterExtractor(swiftextractor.New())
+
+	run := func(auth bool, state string) *Consumer {
+		sink := &graphstream.MemorySink{}
+		opts := Options{StateDir: filepath.Join(dir, state), ForceInitial: true, AuthoritativeFiles: auth}
+		if auth {
+			opts.MaxBeginBytes = 1048576
+		}
+		if _, err := Run(context.Background(), eng, dir, sink, opts); err != nil {
+			t.Fatal(err)
+		}
+		return applyGraph(t, sink)
+	}
+	v1 := run(false, "v1")
+	assertConstantClassResolved(t, v1, "src.OnyxGlassView.effectView", "src.OnyxGlassView")
+	v2 := run(true, "v2")
+	assertConstantClassResolved(t, v2, "src.OnyxGlassView.effectView", "src.OnyxGlassView")
+	assertConstantResolvedDegree(t, v2, "src.OnyxGlassView.effectView", 1)
+
+	opts := Options{StateDir: filepath.Join(dir, "v2-live"), AuthoritativeFiles: true, MaxBeginBytes: 1048576}
+	live := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, live, opts); err != nil {
+		t.Fatal(err)
+	}
+	cons := applyGraph(t, live)
+	if err := os.WriteFile(filepath.Join(dir, "src/OnyxGlassModule.swift"), []byte("final class OnyxGlassView {\n  private let effectView: Int = 2\n}\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	d := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, d, opts); err != nil {
+		t.Fatal(err)
+	}
+	if err := cons.ApplyRecords(d.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	cold := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, cold, Options{StateDir: filepath.Join(dir, "v2-cold"), ForceInitial: true, AuthoritativeFiles: true, MaxBeginBytes: 1048576}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, cons, applyGraph(t, cold))
+	assertConstantClassResolved(t, cons, "src.OnyxGlassView.effectView", "src.OnyxGlassView")
 }
 
 func assertFileRefExists(t *testing.T, c *Consumer, file string) {

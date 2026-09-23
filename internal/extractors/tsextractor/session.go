@@ -320,7 +320,6 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	records := make(map[string]*FileRecord, len(tsFiles))
 	var allFacts []facts.Fact
 	modules := make(map[string]bool)
-	var moduleFiles []string
 	routerFiles := make([]*routerFile, 0, len(perFile))
 	var angular angularCounts
 	var angularRouters []*angularRouterFile
@@ -365,7 +364,6 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		}
 		allFacts = append(allFacts, cloneFactSlice(res.facts)...)
 		modules[factpath.Dir(rel)] = true
-		moduleFiles = append(moduleFiles, rel)
 	}
 	stats.FilesParsed = parsed
 	stats.SFCParsed = sfc
@@ -488,7 +486,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	if isAngular {
 		projects = angularProjectNames(repoPath, inputScope)
 	}
-	allFacts = appendTSDirectoryModules(allFacts, modules, moduleFiles, pkgNames, projects)
+	allFacts = appendTSDirectoryModules(allFacts, modules, pkgNames, projects)
 
 	for _, rec := range records {
 		if rec != nil && rec.Unreadable {

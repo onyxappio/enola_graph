@@ -2502,7 +2502,9 @@ import (
 // destructured bindings emit symbols; every parsed TS/JS/Vue file has a file_ref;
 // JS emit specifiers prefer implementation over sibling declarations; class
 // fields declare their owning class so v2 constants keep a resolved target.
-const cacheVersion = "v294"
+// v295: Swift stored/computed properties of a same-file type declare that type
+// so v2 constants keep a resolved structural target (directory modules excluded).
+const cacheVersion = "v295"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //
