@@ -8,8 +8,7 @@ import (
 )
 
 func TestExtract_Wave11ConstructorParameterProperties(t *testing.T) {
-	ff := extractAll(t, map[string]string{
-		"src/analytics.ts": `
+	analytics := `
 export class Semaphore {
   constructor(private readonly max: number) {}
   tryAcquire() { return this.max }
@@ -23,7 +22,9 @@ export class Shadow {
   readonly max = 1
   constructor(private readonly max: number) {}
 }
-`,
+`
+	ff := extractAll(t, map[string]string{
+		"src/analytics.ts": analytics,
 	}, false)
 	sem, ok := findFact(ff, "src.Semaphore.max")
 	if !ok {
@@ -55,8 +56,19 @@ export class Shadow {
 	if _, ok := findFact(ff, "src.Mixed.plain"); ok {
 		t.Fatal("plain constructor parameter must not become a field")
 	}
-	if _, ok := findFact(ff, "src.Shadow.max"); !ok {
+	sh, ok := findFact(ff, "src.Shadow.max")
+	if !ok {
 		t.Fatal("explicit field must remain")
+	}
+	fieldLine := 0
+	for i, line := range strings.Split(analytics, "\n") {
+		if strings.TrimSpace(line) == "readonly max = 1" {
+			fieldLine = i + 1
+			break
+		}
+	}
+	if fieldLine == 0 || sh.Line != fieldLine {
+		t.Fatalf("Shadow.max must be the explicit field at line %d, got %d", fieldLine, sh.Line)
 	}
 	count := 0
 	for _, f := range ff {
@@ -101,6 +113,48 @@ export const dynamic = defineEndpoint({
 	}
 	if _, ok := wave10Route(ff, "/not-a-route/{}"); ok {
 		t.Fatal("unrelated callback must not emit a client route")
+	}
+}
+
+func TestExtract_Wave11DefineEndpointURLExpressionBounds(t *testing.T) {
+	src := `
+import { defineEndpoint } from './define'
+export const setImageAsMainEndpoint = defineEndpoint({
+  name: 'setImageAsMain',
+  method: 'POST',
+  url: (id: string) => ` + "`/platform/image/set-as-main/${id}`" + `,
+})
+`
+	ff := extractAll(t, map[string]string{
+		"src/define.ts":                     `export function defineEndpoint(cfg: object) { return cfg }`,
+		"src/image-set-as-main.endpoint.ts": src,
+	}, false)
+	if _, ok := wave10Route(ff, "/platform/image/set-as-main/{}"); !ok {
+		t.Fatalf("literal template missing: %v", clientRouteNames(ff))
+	}
+
+	concat := strings.Replace(src, "`/platform/image/set-as-main/${id}`", "`/platform/image/set-as-main/${id}` + '/details'", 1)
+	ff = extractAll(t, map[string]string{
+		"src/define.ts":                     `export function defineEndpoint(cfg: object) { return cfg }`,
+		"src/image-set-as-main.endpoint.ts": concat,
+	}, false)
+	if _, ok := wave10Route(ff, "/platform/image/set-as-main/{}"); ok {
+		t.Fatalf("concat must not emit truncated path: %v", clientRouteNames(ff))
+	}
+	if _, ok := wave10Route(ff, "/platform/image/set-as-main/{}/details"); !ok {
+		t.Fatalf("concat suffix route missing: %v", clientRouteNames(ff))
+	}
+
+	repl := strings.Replace(src, "`/platform/image/set-as-main/${id}`", "`/platform/image/set-as-main/${id}`.replace('/platform/image/', '/platform/photo/')", 1)
+	ff = extractAll(t, map[string]string{
+		"src/define.ts":                     `export function defineEndpoint(cfg: object) { return cfg }`,
+		"src/image-set-as-main.endpoint.ts": repl,
+	}, false)
+	if _, ok := wave10Route(ff, "/platform/image/set-as-main/{}"); ok {
+		t.Fatalf("replace must not emit pre-transform path: %v", clientRouteNames(ff))
+	}
+	if _, ok := wave10Route(ff, "/platform/photo/set-as-main/{}"); !ok {
+		t.Fatalf("replaced route missing: %v", clientRouteNames(ff))
 	}
 }
 
@@ -188,6 +242,51 @@ export async function onlyParam(fetchImpl: any) {
 		if _, ok := wave10Route(ff, p); ok {
 			t.Errorf("guard/shadow/reassign emitted %s", p)
 		}
+	}
+}
+
+func TestExtract_Wave11FetchAliasLexicalScope(t *testing.T) {
+	base := `
+export async function provision(input: { fetchImpl?: typeof fetch; baseUrl: string }) {
+  const fetchImpl = input.fetchImpl ?? globalThis.fetch
+  const response = await fetchImpl(` + "`${input.baseUrl}/internal/billing/web2app-provision`" + `, { method: 'POST' })
+  return response
+}
+`
+	cases := []struct {
+		name    string
+		extra   string
+		replace string
+		want    bool
+		bad     string
+	}{
+		{name: "sibling_param", extra: "\nexport function localCallback(fetchImpl: (s: string, o: unknown) => unknown) { return fetchImpl(\"/guard/not-http\", {method:\"POST\"}); }\n", want: true, bad: "/guard/not-http"},
+		{name: "sibling_local", extra: "\nexport function localCallback(helper: (s: string, o: unknown) => unknown) { const fetchImpl = helper; return fetchImpl(\"/guard/not-http\", {method:\"POST\"}); }\n", want: true, bad: "/guard/not-http"},
+		{name: "same_spelling_member", extra: "\nexport function localCallback(obj: {fetchImpl: (s: string, o: unknown) => unknown}) { return obj.fetchImpl(\"/guard/not-http\", {method:\"POST\"}); }\n", want: true, bad: "/guard/not-http"},
+		{name: "shadow_global", replace: "const globalThis = {fetch: (url: string, opts: unknown): any => ({})};\n  const fetchImpl = globalThis.fetch;", want: false},
+		{name: "reassigned", replace: "let fetchImpl = globalThis.fetch;\n  fetchImpl = ((url: string, opts: unknown): any => ({}));", want: false},
+	}
+	needle := "const fetchImpl = input.fetchImpl ?? globalThis.fetch"
+	for _, tc := range cases {
+		src := base
+		if tc.replace != "" {
+			src = strings.Replace(src, needle, tc.replace, 1)
+		}
+		src += tc.extra
+		ff := extractAll(t, map[string]string{"src/web2app.ts": src}, false)
+		_, has := wave10Route(ff, "/internal/billing/web2app-provision")
+		if has != tc.want {
+			t.Errorf("%s real route has=%v want=%v routes=%v", tc.name, has, tc.want, clientRouteNames(ff))
+		}
+		if tc.bad != "" {
+			if _, ok := wave10Route(ff, tc.bad); ok {
+				t.Errorf("%s emitted unrelated %s in %v", tc.name, tc.bad, clientRouteNames(ff))
+			}
+		}
+	}
+	restore := extractAll(t, map[string]string{"src/web2app.ts": base}, false)
+	if _, ok := wave10Route(restore, "/internal/billing/web2app-provision"); !ok {
+		t.Fatalf("restore missing real route: %v", clientRouteNames(restore))
 	}
 }
 

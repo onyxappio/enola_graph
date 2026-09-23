@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"path/filepath"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -112,20 +111,8 @@ var urlProperty = regexp.MustCompile("\\burl\\s*:\\s*(?:\"([^\"]*)\"|'([^']*)'|`
 // store as pass 1b; an unresolvable name contributes nothing.
 var urlPropertyIdent = regexp.MustCompile(`\burl\s*:\s*([A-Za-z_$][\w$]*)\s*[,}]`)
 
-// urlPropertyFn matches a `url:` property whose value is a function that
-// immediately returns a string or template literal — defineEndpoint-style
-// `url: (id: string) => `/platform/image/set-as-main/${id}“. The return
-// literal is captured; the function is not evaluated.
-var urlPropertyFn = regexp.MustCompile("\\burl\\s*:\\s*(?:async\\s*)?(?:\\([^)]*\\)|[A-Za-z_$][\\w$]*)\\s*(?::[^=,{]+)?=>\\s*(?:\\{\\s*return\\s+)?(?:\"([^\"]*)\"|'([^']*)'|`([^`]*)`)")
-
 var fetchAliasDecl = regexp.MustCompile(`(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*(?::[^=;]+)?=\s*([^;\n]+)`)
 var fetchParamDefault = regexp.MustCompile(`(?:^|[,(])\s*([A-Za-z_$][\w$]*)\s*(?::[^,)=]*)?=\s*((?:globalThis\s*\.\s*)?fetch)\s*[,)]`)
-
-var fetchAliasCallCache struct {
-	names string
-	re    *regexp.Regexp
-	ident *regexp.Regexp
-}
 
 // requestVerbProperty extracts the verb of a request-options object from its
 // `type:`/`method:` property. The value may be an HTTP verb or an action verb
@@ -414,10 +401,8 @@ func extractHTTPClientFactsDeps(src []byte, relFile string, deps httpClientDeps)
 	// Group 1 is the verb, so the URL literal is in groups 2-4 and the reported
 	// offset is the verb start (m[2]) — not m[0], which now includes the leading
 	// word-boundary char and would mis-count the line when that char is a newline.
-	aliases := provenFetchAliases(src)
-	if hasFetch || len(aliases) > 0 {
-		litRE, identRE := fetchAliasCallPatterns(aliases)
-		for _, m := range litRE.FindAllSubmatchIndex(src, -1) {
+	if hasFetch {
+		for _, m := range httpClientCall.FindAllSubmatchIndex(src, -1) {
 			raw := firstNonEmptyGroup(src, m, 2, 3, 4)
 			method := "GET"
 			if opts := optionsObjectAfter(src, m[1]); opts != nil {
@@ -427,13 +412,7 @@ func extractHTTPClientFactsDeps(src []byte, relFile string, deps httpClientDeps)
 			}
 			add(raw, method, "fetch", m[2], "")
 		}
-
-		// Pass 1b — positional fetch()/makeRequest() whose argument is a bare
-		// identifier assigned a literal exactly once in this file (litfold's
-		// single-assignment rule). The resolved literal flows through cleanTSPath
-		// exactly as an inline argument would, so `const url = ` + "`${config.HOST}/mcp`" + `;
-		// fetch(url)` models identically to the inline form.
-		for _, m := range identRE.FindAllSubmatchIndex(src, -1) {
+		for _, m := range identArgCall.FindAllSubmatchIndex(src, -1) {
 			raw, ok := folds.Resolve(string(src[m[4]:m[5]]))
 			if !ok {
 				continue
@@ -445,6 +424,25 @@ func extractHTTPClientFactsDeps(src []byte, relFile string, deps httpClientDeps)
 				}
 			}
 			add(raw, method, "fetch", m[2], "single-assignment")
+		}
+		for _, call := range lexicalFetchCalls(src, relFile) {
+			raw := call.raw
+			derived := ""
+			if call.identArg {
+				var ok bool
+				raw, ok = folds.Resolve(call.raw)
+				if !ok {
+					continue
+				}
+				derived = "single-assignment"
+			}
+			method := "GET"
+			if opts := optionsObjectAfter(src, call.argEnd); opts != nil {
+				if mm := httpClientMethod.FindSubmatch(opts); mm != nil {
+					method = strings.ToUpper(string(mm[1]))
+				}
+			}
+			add(raw, method, "fetch", call.nameOff, derived)
 		}
 	}
 
@@ -562,8 +560,8 @@ func extractHTTPClientFactsDeps(src []byte, relFile string, deps httpClientDeps)
 			add(raw, method, "request-options", m[0], "single-assignment")
 		}
 
-		for _, m := range urlPropertyFn.FindAllSubmatchIndex(src, -1) {
-			window := enclosingObject(src, m[0], m[1])
+		for _, u := range functionValuedURLProperties(src, relFile) {
+			window := enclosingObject(src, u.off, u.end)
 			if window == nil {
 				continue
 			}
@@ -578,8 +576,7 @@ func extractHTTPClientFactsDeps(src []byte, relFile string, deps httpClientDeps)
 			if !haveVerb && !requestPayloadKey.Match(window) {
 				continue
 			}
-			raw := firstNonEmptyGroup(src, m, 1, 2, 3)
-			add(raw, method, "request-options", m[0], "")
+			add(u.raw, method, "request-options", u.off, "")
 		}
 	}
 
@@ -639,31 +636,6 @@ func provenFetchAliases(src []byte) map[string]bool {
 	delete(out, "fetch")
 	delete(out, "makeRequest")
 	return out
-}
-
-func fetchAliasCallPatterns(aliases map[string]bool) (lit, ident *regexp.Regexp) {
-	names := []string{"fetch", "makeRequest"}
-	for n := range aliases {
-		if n == "" || n == "fetch" || n == "makeRequest" {
-			continue
-		}
-		names = append(names, n)
-	}
-	sort.Strings(names)
-	quoted := make([]string, len(names))
-	for i, n := range names {
-		quoted[i] = regexp.QuoteMeta(n)
-	}
-	key := strings.Join(quoted, "|")
-	if fetchAliasCallCache.names == key && fetchAliasCallCache.re != nil {
-		return fetchAliasCallCache.re, fetchAliasCallCache.ident
-	}
-	lit = regexp.MustCompile("(?:^|[^\\w])(" + key + ")\\s*(?:<[^()]*>)?\\s*\\(\\s*(?:\"([^\"]*)\"|'([^']*)'|`([^`]*)`)")
-	ident = regexp.MustCompile(`(?:^|[^\w])(` + key + `)\s*(?:<[^()]*>)?\s*\(\s*([A-Za-z_$][\w$]*)\s*[,)]`)
-	fetchAliasCallCache.names = key
-	fetchAliasCallCache.re = lit
-	fetchAliasCallCache.ident = ident
-	return lit, ident
 }
 
 // enclosingObject returns the bytes of the object literal that immediately
