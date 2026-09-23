@@ -1151,6 +1151,50 @@ func TestMembershipScopeReportsSpecThatTheAdditionResolves(t *testing.T) {
 	}
 }
 
+func TestMembershipScopeReplaysFrameworkResolverTargets(t *testing.T) {
+	registrar := &tsextractor.FileRecord{
+		File:            "packages/mod/src/registerRoutes.ts",
+		ResolutionSpecs: []string{"packages/mod/src/runtime/pages/images.vue"},
+		ImportComplete:  true,
+	}
+	page := &tsextractor.FileRecord{File: "packages/mod/src/runtime/pages/images.vue", ImportComplete: true}
+	cases := []struct {
+		name    string
+		prev    []string
+		current []string
+		records map[string]*FileState
+	}{
+		{
+			name:    "target deleted",
+			prev:    []string{registrar.File, page.File},
+			current: []string{registrar.File},
+			records: map[string]*FileState{
+				registrar.File: {Hash: "r1", Extractor: "typescript", TS: registrar},
+				page.File:      {Hash: "p1", Extractor: "typescript", TS: page},
+			},
+		},
+		{
+			name:    "missing target appeared",
+			prev:    []string{registrar.File},
+			current: []string{registrar.File, page.File},
+			records: map[string]*FileState{
+				registrar.File: {Hash: "r1", Extractor: "typescript", TS: registrar},
+			},
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			md := membershipScope(tc.prev, tc.current, tc.current, tc.records)
+			if !md.changed || !md.proven {
+				t.Fatalf("membership changed=%v proven=%v reason=%q", md.changed, md.proven, md.reason)
+			}
+			if !slicesEqual(md.rebound, []string{registrar.File}) {
+				t.Fatalf("rebound=%v, want registrar %s", md.rebound, registrar.File)
+			}
+		})
+	}
+}
+
 // invalidateTS and membershipScope must stay the same predicate, or the frozen
 // scope stops being a superset of the reparse set.
 func TestInvalidateTSMatchesMembershipReboundOnUnresolvedSpecs(t *testing.T) {

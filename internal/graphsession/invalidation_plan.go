@@ -363,7 +363,7 @@ func membershipScopeWithProof(previous, current, sessionFiles []string, prevFile
 		return md
 	}
 	for file, rec := range prevRecs {
-		if len(rec.ImportSpecs) == 0 {
+		if len(rec.ImportSpecs) == 0 && len(rec.ResolutionSpecs) == 0 {
 			if len(rec.ResolvedFiles) > 0 || len(rec.UnresolvedSpecs) > 0 {
 				// Resolution outcomes without the specifiers that produced them,
 				// so this importer's resolution cannot be replayed at all. The
@@ -375,7 +375,7 @@ func membershipScopeWithProof(previous, current, sessionFiles []string, prevFile
 			}
 			continue
 		}
-		if !rec.ImportComplete && len(rec.UnresolvedSpecs) == 0 && len(rec.ResolvedFiles) == 0 {
+		if !rec.ImportComplete && len(rec.ResolutionSpecs) == 0 && len(rec.UnresolvedSpecs) == 0 && len(rec.ResolvedFiles) == 0 {
 			// Specs stored without any evidence that resolution ran, so the
 			// replay below would read absence as "never resolved".
 			return membershipDelta{changed: true, proven: false, reason: frozenScopeMembership, retired: md.retired}

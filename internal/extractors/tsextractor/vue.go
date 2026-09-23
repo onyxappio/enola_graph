@@ -433,7 +433,7 @@ func detectNuxtConventionPage(relFile string, knownFiles map[string]bool) *facts
 	return detectNuxtRoute(relFile)
 }
 
-func extractExtendPagesFacts(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool) []facts.Fact {
+func extractExtendPagesFacts(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, sideReads, resolutionSpecs map[string]bool) []facts.Fact {
 	if !bytes.Contains(src, []byte("extendPages")) {
 		return nil
 	}
@@ -455,7 +455,7 @@ func extractExtendPagesFacts(kinds *tsutil.KindTable, root *sitter.Node, src []b
 			if fn != nil && kindOf(kinds, fn) == "identifier" {
 				name := nodeText(fn, src)
 				if locals[name] && !graphqlImportedNameShadowed(kinds, fn, src, name) {
-					out = append(out, extendPagesFromCall(n, src, relFile, aliases, knownFiles)...)
+					out = append(out, extendPagesFromCall(n, src, relFile, aliases, knownFiles, readSrc, sideReads, resolutionSpecs)...)
 				}
 			}
 		}
@@ -467,13 +467,14 @@ func extractExtendPagesFacts(kinds *tsutil.KindTable, root *sitter.Node, src []b
 	return out
 }
 
-func extendPagesFromCall(call *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool) []facts.Fact {
+func extendPagesFromCall(call *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, sideReads, resolutionSpecs map[string]bool) []facts.Fact {
 	if call == nil {
 		return nil
 	}
 	body := src[call.StartByte():call.EndByte()]
 	var out []facts.Fact
 	seen := map[string]bool{}
+	defaultTargets := map[string]defaultHandlerResolution{}
 	for i := 0; i < len(body); i++ {
 		if body[i] != '{' {
 			continue
@@ -488,21 +489,15 @@ func extendPagesFromCall(call *sitter.Node, src []byte, relFile string, aliases 
 			continue
 		}
 		handler := ""
+		target, targetFile := "", ""
+		spec := ""
 		if hm := handlerResolvePath.FindSubmatch(obj); hm != nil {
-			spec := string(hm[1])
-			resolved, ext := resolveImportPath(spec, factpath.Dir(relFile), aliases)
-			if !ext {
-				if file, _, found := resolveModuleFile(resolved, knownFiles); found {
-					handler = file
-				}
-			}
+			spec = string(hm[1])
 		} else if fileField := objectLiteralStringField(obj, "file"); fileField != "" {
-			resolved, ext := resolveImportPath(fileField, factpath.Dir(relFile), aliases)
-			if !ext {
-				if file, _, found := resolveModuleFile(resolved, knownFiles); found {
-					handler = file
-				}
-			}
+			spec = fileField
+		}
+		if spec != "" {
+			handler, target, targetFile, _ = resolveStaticHandlerTarget(spec, relFile, aliases, knownFiles, readSrc, sideReads, resolutionSpecs, defaultTargets)
 		}
 		if handler == "" {
 			continue
@@ -527,12 +522,18 @@ func extendPagesFromCall(call *sitter.Node, src []byte, relFile string, aliases 
 			props["mode"] = mode
 		}
 		out = append(out, facts.Fact{
-			Kind:      facts.KindRoute,
-			Name:      pathRaw,
-			File:      relFile,
-			Line:      1 + bytes.Count(src[:int(call.StartByte())+i], []byte("\n")),
-			Props:     props,
-			Relations: []facts.Relation{{Kind: facts.RelDeclares, Target: factpath.Dir(relFile)}},
+			Kind:  facts.KindRoute,
+			Name:  pathRaw,
+			File:  relFile,
+			Line:  1 + bytes.Count(src[:int(call.StartByte())+i], []byte("\n")),
+			Props: props,
+			Relations: func() []facts.Relation {
+				rels := []facts.Relation{{Kind: facts.RelDeclares, Target: factpath.Dir(relFile)}}
+				if target != "" && targetFile != "" {
+					rels = append(rels, facts.Relation{Kind: facts.RelHandledBy, Target: target, TargetFile: targetFile})
+				}
+				return rels
+			}(),
 		})
 	}
 	return out

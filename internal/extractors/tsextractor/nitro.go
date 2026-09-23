@@ -10,6 +10,7 @@ import (
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 	sitter "github.com/tree-sitter/go-tree-sitter"
+	typescript "github.com/tree-sitter/tree-sitter-typescript/bindings/go"
 )
 
 var (
@@ -21,15 +22,18 @@ var (
 	handlerResolvePath = regexp.MustCompile(`(?:^|[,{])\s*(?:handler|file)\s*:\s*(?:[A-Za-z_$][\w$]*\s*\.\s*resolve\s*\(\s*)?["'](\./[^"']+)["']`)
 )
 
-func extractNitroFacts(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, isNuxt bool, aliases map[string]tsAlias, knownFiles map[string]bool) []facts.Fact {
+func extractNitroFacts(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, isNuxt bool, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, sideReads, resolutionSpecs map[string]bool, currentFacts []facts.Fact) []facts.Fact {
 	var out []facts.Fact
 	if isNuxt {
 		if route := detectNitroFileRoute(relFile); route != nil {
+			if name, ok := defaultHandlerSymbolName(kinds, root, src, relFile); ok && hasSymbolFact(currentFacts, factpath.Dir(relFile)+"."+name, relFile) {
+				route.Relations = append(route.Relations, facts.Relation{Kind: facts.RelHandledBy, Target: factpath.Dir(relFile) + "." + name, TargetFile: filepath.ToSlash(relFile)})
+			}
 			out = append(out, *route)
 		}
 	}
 	if bytes.Contains(src, []byte("@nuxt/kit")) {
-		out = append(out, extractAddServerHandlerFacts(kinds, root, src, relFile, aliases, knownFiles)...)
+		out = append(out, extractAddServerHandlerFacts(kinds, root, src, relFile, aliases, knownFiles, readSrc, sideReads, resolutionSpecs)...)
 	}
 	return out
 }
@@ -107,7 +111,7 @@ func detectNitroFileRoute(relFile string) *facts.Fact {
 	}
 }
 
-func extractAddServerHandlerFacts(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool) []facts.Fact {
+func extractAddServerHandlerFacts(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, sideReads, resolutionSpecs map[string]bool) []facts.Fact {
 	if !bytes.Contains(src, []byte("addServerHandler")) {
 		return nil
 	}
@@ -117,8 +121,10 @@ func extractAddServerHandlerFacts(kinds *tsutil.KindTable, root *sitter.Node, sr
 	}
 	type decl struct {
 		path, handler, method string
+		target, targetFile    string
 		line                  int
 	}
+	defaultTargets := map[string]defaultHandlerResolution{}
 	var decls []decl
 	addObj := func(open int) {
 		end, ok := matchObjectLiteral(src, open)
@@ -132,13 +138,12 @@ func extractAddServerHandlerFacts(kinds *tsutil.KindTable, root *sitter.Node, sr
 			return
 		}
 		handler := ""
+		target, targetFile := "", ""
 		if hm := handlerResolvePath.FindSubmatch(obj); hm != nil {
 			spec := string(hm[1])
-			resolved, ext := resolveImportPath(spec, factpath.Dir(relFile), aliases)
-			if !ext {
-				if file, _, found := resolveModuleFile(resolved, knownFiles); found {
-					handler = file
-				} else if resolved != "" {
+			handler, target, targetFile, _ = resolveStaticHandlerTarget(spec, relFile, aliases, knownFiles, readSrc, sideReads, resolutionSpecs, defaultTargets)
+			if handler == "" {
+				if resolved, ext := resolveImportPath(spec, factpath.Dir(relFile), aliases); !ext && resolved != "" {
 					handler = filepath.ToSlash(resolved)
 				}
 			}
@@ -148,10 +153,12 @@ func extractAddServerHandlerFacts(kinds *tsutil.KindTable, root *sitter.Node, sr
 			method = joinRouteMethods(methods)
 		}
 		decls = append(decls, decl{
-			path:    path,
-			handler: handler,
-			line:    1 + bytes.Count(src[:open], []byte("\n")),
-			method:  method,
+			path:       path,
+			handler:    handler,
+			target:     target,
+			targetFile: targetFile,
+			line:       1 + bytes.Count(src[:open], []byte("\n")),
+			method:     method,
 		})
 	}
 	var walk func(*sitter.Node)
@@ -198,11 +205,18 @@ func extractAddServerHandlerFacts(kinds *tsutil.KindTable, root *sitter.Node, sr
 	for _, path := range order {
 		group := byPath[path]
 		handlers := map[string]bool{}
+		targets := map[string]bool{}
+		targetComplete := true
 		methods := map[string]bool{}
 		line := group[0].line
 		for _, d := range group {
 			if d.handler != "" {
 				handlers[d.handler] = true
+			}
+			if d.target == "" || d.targetFile == "" {
+				targetComplete = false
+			} else {
+				targets[d.target+"\x00"+d.targetFile] = true
 			}
 			methods[d.method] = true
 			if d.line < line {
@@ -233,9 +247,145 @@ func extractAddServerHandlerFacts(kinds *tsutil.KindTable, root *sitter.Node, sr
 				f.Props["handler"] = h
 			}
 		}
+		if targetComplete && len(targets) == 1 {
+			for key := range targets {
+				target, targetFile, _ := strings.Cut(key, "\x00")
+				f.Relations = append(f.Relations, facts.Relation{Kind: facts.RelHandledBy, Target: target, TargetFile: targetFile})
+			}
+		}
 		out = append(out, f)
 	}
 	return out
+}
+
+type defaultHandlerResolution struct {
+	name string
+	file string
+}
+
+// resolveStaticHandlerTarget records the resolver input even when no file
+// currently matches it. A later add/delete/rename can therefore be replayed
+// before BeginReplace. The relation is attached only when the resolved file has
+// one source-proven default function or Vue component.
+func resolveStaticHandlerTarget(spec, fromFile string, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, sideReads, resolutionSpecs map[string]bool, cache map[string]defaultHandlerResolution) (handler, target, targetFile, normalized string) {
+	resolved, external := resolveImportPath(spec, factpath.Dir(fromFile), aliases)
+	if external || resolved == "" {
+		return "", "", "", ""
+	}
+	normalized = filepath.ToSlash(resolved)
+	if resolutionSpecs != nil {
+		resolutionSpecs[normalized] = true
+	}
+	file, _, ok := resolveModuleFile(resolved, knownFiles)
+	if !ok {
+		return "", "", "", normalized
+	}
+	file = filepath.ToSlash(file)
+	handler = file
+	if sideReads != nil {
+		sideReads[file] = true
+	}
+	if cached, ok := cache[file]; ok {
+		return handler, cached.name, cached.file, normalized
+	}
+	name, ok := defaultHandlerSymbolNameForFile(file, readSrc)
+	resolvedTarget := defaultHandlerResolution{}
+	if ok {
+		resolvedTarget = defaultHandlerResolution{name: factpath.Dir(file) + "." + name, file: file}
+	}
+	if cache != nil {
+		cache[file] = resolvedTarget
+	}
+	return handler, resolvedTarget.name, resolvedTarget.file, normalized
+}
+
+func defaultHandlerSymbolNameForFile(file string, readSrc func(string) []byte) (string, bool) {
+	if readSrc == nil {
+		return "", false
+	}
+	src := readSrc(filepath.ToSlash(file))
+	if isVueFile(file) {
+		// extractVueSFC always supplies the file-derived component node for an SFC.
+		return fileSymbolName(file), true
+	}
+	isTSX := strings.HasSuffix(file, ".tsx") || strings.HasSuffix(file, ".jsx")
+	kinds := tsKindsFor(isTSX)
+	lang := typescript.LanguageTypescript()
+	if isTSX {
+		lang = typescript.LanguageTSX()
+	}
+	parser := sitter.NewParser()
+	defer parser.Close()
+	if err := parser.SetLanguage(sitter.NewLanguage(lang)); err != nil {
+		return "", false
+	}
+	tree := parser.Parse(src, nil)
+	defer tree.Close()
+	return defaultHandlerSymbolName(kinds, tree.RootNode(), src, file)
+}
+
+func defaultHandlerSymbolName(kinds *tsutil.KindTable, root *sitter.Node, src []byte, file string) (string, bool) {
+	if root == nil {
+		return "", false
+	}
+	var exports []*sitter.Node
+	for i := range root.ChildCount() {
+		child := root.Child(i)
+		if kindOf(kinds, child) == "export_statement" && hasChildKind(kinds, child, "default") {
+			exports = append(exports, child)
+		}
+	}
+	if len(exports) != 1 {
+		return "", false
+	}
+	export := exports[0]
+	if decl := firstDeclChild(kinds, export); decl != nil {
+		switch kindOf(kinds, decl) {
+		case "function_declaration", "generator_function_declaration":
+			if name := decl.ChildByFieldName("name"); name != nil && nodeText(name, src) != "" {
+				return nodeText(name, src), true
+			}
+			return fileSymbolName(file), true
+		default:
+			return "", false
+		}
+	}
+	var value *sitter.Node
+	for i := range export.NamedChildCount() {
+		child := export.NamedChild(i)
+		if hasChildKind(kinds, child, "default") {
+			continue
+		}
+		switch kindOf(kinds, child) {
+		case "arrow_function", "function_expression", "generator_function":
+			return fileSymbolName(file), true
+		case "call_expression":
+			value = child
+		case "identifier":
+			// A default identifier may name a local helper, but without a
+			// dedicated alias proof it is not a direct handler declaration.
+			return "", false
+		}
+	}
+	if value == nil {
+		return "", false
+	}
+	named, namespaced := collectImportOrigins(kinds, root, src)
+	ctx := &extractCtx{src: src, relFile: file, dir: factpath.Dir(file), namedImports: named, nsImports: namespaced}
+	if !isKnownFunctionValueCall(kinds, value, src, ctx) {
+		return "", false
+	}
+	return fileSymbolName(file), true
+}
+
+func hasSymbolFact(ff []facts.Fact, name, file string) bool {
+	n := 0
+	for _, f := range ff {
+		if f.Kind == facts.KindSymbol && f.Name == name && filepath.ToSlash(f.File) == filepath.ToSlash(file) {
+			n++
+		}
+	}
+	return n == 1
 }
 
 func nuxtKitAddServerHandlerLocals(kinds *tsutil.KindTable, root *sitter.Node, src []byte) map[string]bool {
