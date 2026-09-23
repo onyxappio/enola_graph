@@ -2987,8 +2987,8 @@ func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, 
 			if id := findChildByKind(kinds, ns, "identifier"); id != nil {
 				local := nodeText(id, src)
 				nsDirs[local] = moduleDir
-				if foundFile && indexPath != "" {
-					nsIndex[local] = indexPath
+				if key := namespaceFileProvenance(indexPath, resolved, foundFile); key != "" {
+					nsIndex[local] = key
 				}
 			}
 		}
@@ -3018,6 +3018,40 @@ func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, 
 		}
 	}
 	return m, files, nsDirs, nsIndex
+}
+
+func namespaceFileProvenance(indexPath, resolved string, foundFile bool) string {
+	if foundFile && indexPath != "" {
+		return indexPath
+	}
+	if resolved != "" {
+		return filepath.ToSlash(resolved)
+	}
+	return indexPath
+}
+
+func bindNamespaceExport(moduleDir, nsFile, exportName string, ctx *extractCtx, note func(string)) (target, file string) {
+	if ctx == nil || exportName == "" {
+		return "", ""
+	}
+	idx := nsFile
+	found := idx != "" && ctx.knownFiles[filepath.ToSlash(idx)]
+	if !found && idx != "" {
+		if leaf, _, ok := resolveModuleFile(idx, ctx.knownFiles); ok {
+			found, idx = true, leaf
+		}
+	}
+	return bindImportedSymbol(moduleDir, idx, exportName, nsFile, found, ctx.readSrc, ctx.aliases, ctx.knownFiles, ctx.exportCache, note)
+}
+
+func moduleRequireValueBound(ctx *extractCtx) bool {
+	if ctx == nil {
+		return false
+	}
+	if ctx.importMap["require"] != "" || ctx.nsDirs["require"] != "" {
+		return true
+	}
+	return ctx.localNames["require"]
 }
 
 func bindImportedSymbol(moduleDir, indexPath, exportName, resolved string, foundFile bool, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool, cache *namedExportCache, note func(string)) (target, file string) {
@@ -3197,8 +3231,15 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 					if id := findChildByKind(kinds, c, "identifier"); id != nil {
 						local := nodeText(id, src)
 						namespaces[local] = moduleDir
-						if indexPath != "" {
-							namespaceFiles[local] = indexPath
+						resolved := ""
+						if srcNode := findChildByKind(kinds, child, "string"); srcNode != nil {
+							importPath := strings.Trim(nodeText(srcNode, src), `"'`)
+							if r, ext := resolveImportPath(importPath, fileDir, aliases); !ext {
+								resolved = r
+							}
+						}
+						if key := namespaceFileProvenance(indexPath, resolved, indexPath != ""); key != "" {
+							namespaceFiles[local] = key
 						}
 					}
 				case "named_imports":
@@ -3284,7 +3325,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 					continue
 				}
 				spec, ok := literalRequireSpecifier(kinds, d.ChildByFieldName("value"), src)
-				if !ok {
+				if !ok || moduleRequireValueBound(ctx) {
 					continue
 				}
 				resolved, isExternal := resolveImportPath(spec, fileDir, aliases)
@@ -3309,8 +3350,8 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 						continue
 					}
 					namespaces[local] = moduleDir
-					if foundFile && indexPath != "" {
-						namespaceFiles[local] = indexPath
+					if key := namespaceFileProvenance(indexPath, resolved, foundFile); key != "" {
+						namespaceFiles[local] = key
 					}
 				case "object_pattern":
 					for _, b := range objectPatternImportBindings(kinds, nameNode, src) {
@@ -3391,13 +3432,13 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 	frRequireFree := func() bool {
 		for i := len(frShadows) - 1; i >= 0; i-- {
 			if frImp[i]["require"] != "" || frNS[i]["require"] != "" {
-				return true
+				return false
 			}
 			if frShadows[i]["require"] {
 				return false
 			}
 		}
-		return true
+		return !moduleRequireValueBound(ctx)
 	}
 	frLookupNS := func(name string, typeSpace bool) (target, file string, ok, shadowed bool) {
 		nested := frFnNesting > 0
@@ -3474,8 +3515,8 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 					continue
 				}
 				ns[local] = dir
-				if found && idx != "" {
-					nsF[local] = idx
+				if key := namespaceFileProvenance(idx, resolved, found); key != "" {
+					nsF[local] = key
 				}
 			case "object_pattern":
 				for _, b := range objectPatternImportBindings(kinds, nameNode, src) {
@@ -3607,7 +3648,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 				}
 				if nsOK && prop != nil && kindOf(kinds, prop) == "property_identifier" {
 					exportName := nodeText(prop, src)
-					target, file := bindImportedSymbol(nsDir, nsFile, exportName, "", nsFile != "", ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, func(f string) {
+					target, file := bindNamespaceExport(nsDir, nsFile, exportName, ctx, func(f string) {
 						if ctx.sideReads == nil {
 							return
 						}
@@ -3978,7 +4019,7 @@ func resolveJSXCall(kinds *tsutil.KindTable, nameNode *sitter.Node, src []byte, 
 		if ctx != nil {
 			if nsDir, ok := ctx.nsDirs[root]; ok {
 				exportName := nodeText(prop, src)
-				return bindImportedSymbol(nsDir, ctx.nsIndex[root], exportName, "", ctx.nsIndex[root] != "", ctx.readSrc, ctx.aliases, ctx.knownFiles, ctx.exportCache, func(f string) {
+				return bindNamespaceExport(nsDir, ctx.nsIndex[root], exportName, ctx, func(f string) {
 					if ctx.sideReads == nil {
 						return
 					}
@@ -4352,13 +4393,19 @@ func (w *tsBodyWalker) requireFree() bool {
 func (w *tsBodyWalker) nameIsFree(name string) bool {
 	for i := len(w.shadows) - 1; i >= 0; i-- {
 		if w.importScopes[i][name] != "" || w.nsScopes[i][name] != "" {
-			return true
+			return false
 		}
 		if w.shadows[i][name] {
 			return false
 		}
 	}
-	return true
+	if w.importMap[name] != "" {
+		return false
+	}
+	if w.ctx != nil && w.ctx.nsDirs[name] != "" {
+		return false
+	}
+	return !w.localNames[name]
 }
 
 func (w *tsBodyWalker) shadowed(name string) bool {
@@ -4412,7 +4459,7 @@ func (w *tsBodyWalker) resolveCall(call *sitter.Node) (string, string) {
 			recv := nodeText(obj, w.src)
 			if dir, idx, ok := w.lookupNamespace(recv); ok && w.ctx != nil {
 				exportName := nodeText(prop, w.src)
-				return bindImportedSymbol(dir, idx, exportName, "", idx != "", w.ctx.readSrc, w.ctx.aliases, w.ctx.knownFiles, w.ctx.exportCache, func(f string) {
+				return bindNamespaceExport(dir, idx, exportName, w.ctx, func(f string) {
 					if w.ctx.sideReads == nil {
 						return
 					}
@@ -4549,8 +4596,8 @@ func (w *tsBodyWalker) harvestLiteralImports(n *sitter.Node, named, namedF, ns, 
 				continue
 			}
 			ns[local] = dir
-			if found && idx != "" {
-				nsF[local] = idx
+			if key := namespaceFileProvenance(idx, resolved, found); key != "" {
+				nsF[local] = key
 			}
 		case "object_pattern":
 			note := func(f string) {
@@ -5247,7 +5294,7 @@ func resolveTSCall(kinds *tsutil.KindTable, call *sitter.Node, src []byte, dir, 
 			if ctx != nil {
 				if nsDir, ok := ctx.nsDirs[recv]; ok {
 					exportName := nodeText(property, src)
-					return bindImportedSymbol(nsDir, ctx.nsIndex[recv], exportName, "", ctx.nsIndex[recv] != "", ctx.readSrc, ctx.aliases, ctx.knownFiles, ctx.exportCache, func(f string) {
+					return bindNamespaceExport(nsDir, ctx.nsIndex[recv], exportName, ctx, func(f string) {
 						if ctx.sideReads == nil {
 							return
 						}

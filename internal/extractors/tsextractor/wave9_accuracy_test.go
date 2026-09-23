@@ -393,7 +393,51 @@ export function nestedRequireNoLeak() {
   helper();
 }
 `,
-		"src/local.ts": "export function helper() { return 1; }\nexport function keep() { return 2; }\nexport function load() { return 3; }\nexport function nsFn() { return 4; }\nexport function localMod() { return 0; }\n",
+		"src/factory.ts": "export function factory(p: string) { return { work: () => 0 }; }\n",
+		"src/modshadow.ts": `
+import { keep } from './local';
+const require = (p: string) => ({ work: () => 0 });
+export function run() {
+  const { work } = require('./local');
+  work();
+  keep();
+}
+`,
+		"src/impshadow.ts": `
+import { factory as require } from './factory';
+import { keep } from './local';
+export function run() {
+  const { work } = require('./local');
+  work();
+  keep();
+}
+`,
+		"src/nsshadow.ts": `
+import * as require from './factory';
+import { keep } from './local';
+export function run() {
+  const { work } = require('./local');
+  work();
+  keep();
+}
+`,
+		"src/cjsmod.ts": `
+import { keep } from './local';
+const { work } = require('./local');
+export function run() {
+  work();
+  keep();
+}
+`,
+		"src/missingns.ts": `
+import { keep } from './local';
+export function run() {
+  const sdk = require('./gone');
+  sdk.work();
+  keep();
+}
+`,
+		"src/local.ts": "export function helper() { return 1; }\nexport function keep() { return 2; }\nexport function load() { return 3; }\nexport function nsFn() { return 4; }\nexport function localMod() { return 0; }\nexport function work() { return 0; }\n",
 	}, false)
 
 	gateFR := fileRefFact(ff, "src/gate.ts")
@@ -510,4 +554,40 @@ export function nestedRequireNoLeak() {
 	if hasCallToFile(noLeak, "src.helper", "src/local.ts") || hasCallToFile(noLeak, "src.helper", "src/sib.ts") {
 		t.Fatalf("inner-block require must not leak to outer helper(): %+v", noLeak.Relations)
 	}
+
+	for _, file := range []string{"src/modshadow.ts", "src/impshadow.ts", "src/nsshadow.ts"} {
+		fr := fileRefFact(ff, file)
+		run, _ := findFactNamedIn(ff, "src.run", file)
+		if hasCallToFile(fr, "src.work", "src/local.ts") || hasCallToFile(fr, "src.work", "src/sib.ts") {
+			t.Fatalf("%s file_ref bound require-named import as CommonJS: %+v", file, fr.Relations)
+		}
+		if hasCallToFile(run, "src.work", "src/local.ts") || hasCallToFile(run, "src.work", "src/sib.ts") {
+			t.Fatalf("%s symbol bound require-named import as CommonJS: %+v", file, run.Relations)
+		}
+		if !hasCallToFile(fr, "src.keep", "src/local.ts") && !hasCallToFile(run, "src.keep", "src/local.ts") {
+			t.Fatalf("%s lost keep: fr=%+v run=%+v", file, fr.Relations, run.Relations)
+		}
+	}
+	cjs, _ := findFactNamedIn(ff, "src.run", "src/cjsmod.ts")
+	cjsFR := fileRefFact(ff, "src/cjsmod.ts")
+	if !hasCallToFile(cjs, "src.work", "src/local.ts") && !hasCallToFile(cjsFR, "src.work", "src/local.ts") {
+		t.Fatalf("module-level CommonJS require must still bind work: %+v %+v", cjs.Relations, cjsFR.Relations)
+	}
+	miss, _ := findFactNamedIn(ff, "src.run", "src/missingns.ts")
+	missFR := fileRefFact(ff, "src/missingns.ts")
+	if hasCallToFile(miss, "src.work", "src/sib.ts") || hasCallToFile(missFR, "src.work", "src/sib.ts") || hasCallToFile(miss, "src.work", "src/local.ts") || hasCallToFile(missFR, "src.work", "src/local.ts") {
+		t.Fatalf("missing namespace require must not fall back to sibling work: miss=%+v fr=%+v", miss.Relations, missFR.Relations)
+	}
+	if !hasCallToFile(miss, "src.keep", "src/local.ts") && !hasCallToFile(missFR, "src.keep", "src/local.ts") {
+		t.Fatalf("missing namespace require lost keep: %+v %+v", miss.Relations, missFR.Relations)
+	}
+}
+
+func findFactNamedIn(ff []facts.Fact, name, file string) (facts.Fact, bool) {
+	for _, f := range ff {
+		if f.Name == name && f.File == file {
+			return f, true
+		}
+	}
+	return facts.Fact{}, false
 }

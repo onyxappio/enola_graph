@@ -2534,7 +2534,10 @@ import (
 // (`sdk.work()`); a value binding named require is not CommonJS; closures may
 // capture a later const import in the same block without binding ordinary
 // forward locals or leaking nested-scope imports.
-const cacheVersion = "v302"
+// v303: Module-level lexical/import names of require are not CommonJS;
+// namespace require/import * missing modules keep unresolved specifier
+// provenance instead of binding a sibling export of the same name.
+const cacheVersion = "v303"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //
