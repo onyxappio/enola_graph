@@ -149,6 +149,46 @@ export function register(app: FastifyInstance) {
 	}
 }
 
+func TestServerRoutes_LocalVarShadowDoesNotInheritFactory(t *testing.T) {
+	src := `
+import Fastify from 'fastify'
+import { FastifyInstance } from 'fastify'
+const app = Fastify()
+app.route({ url: '/server', method: 'GET', handler: () => 1 })
+function shadow() {
+  const app = { route: (x: unknown) => x }
+  app.route({ url: '/shadow', method: 'GET', handler: () => 1 })
+}
+function nested() {
+  {
+    const app = { route: (x: unknown) => x }
+    app.route({ url: '/block', method: 'GET', handler: () => 1 })
+  }
+  app.route({ url: '/after-block', method: 'GET', handler: () => 1 })
+}
+export function register(app: FastifyInstance) {
+  app.route({ url: '/typed', method: 'GET', handler: () => 1 })
+}
+`
+	ff := extractTS(t, src, "src/index.ts")
+	got := serverRoutes(ff)
+	if got["/server"] == "" {
+		t.Fatalf("module Fastify receiver lost: %+v", got)
+	}
+	if got["/typed"] == "" {
+		t.Fatalf("typed FastifyInstance receiver lost: %+v", got)
+	}
+	if got["/after-block"] == "" {
+		t.Fatalf("module receiver after nested block lost: %+v", got)
+	}
+	if _, ok := got["/shadow"]; ok {
+		t.Fatalf("local variable shadow inherited factory: %+v", got)
+	}
+	if _, ok := got["/block"]; ok {
+		t.Fatalf("block-scoped local inherited factory: %+v", got)
+	}
+}
+
 func TestServerRoutes_RouteObjectDoesNotStealClient(t *testing.T) {
 	src := `
 import axios from "axios";

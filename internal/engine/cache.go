@@ -2468,7 +2468,9 @@ import (
 // v284: Fastify lexical parameter shadows; Nuxt auto-import per owning package;
 // explicit import provenance not overridden; package export aliases and
 // auto-import declaration names participate in incremental invalidation.
-const cacheVersion = "v284"
+// v285: Nuxt registered-module addImportsDir visible to consuming apps when the
+// module package is itself Nuxt; Fastify local-variable lexical shadows.
+const cacheVersion = "v285"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

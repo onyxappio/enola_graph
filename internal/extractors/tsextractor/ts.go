@@ -336,6 +336,11 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 		return res
 	})
 	nuxtExtraDirs := collectAddImportsDirs(sources)
+	nuxtPkgDirByName := invertPackageNames(pkgNames)
+	nuxtSources := sources
+	if !isNuxt {
+		nuxtSources = nil
+	}
 	sources = nil
 
 	// Templates are scanned in parallel with no parser: an Angular template is not
@@ -406,7 +411,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	// symbol. Transitive caller tagging is intentionally not applied; reachability
 	// belongs in graph queries. See applyDirectIOContract.
 	if isNuxt {
-		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, nuxtExtraDirs)
+		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, nuxtExtraDirs, nuxtSources, nuxtPkgDirByName)
 	}
 	applyDirectIOContract(allFacts)
 
@@ -1544,6 +1549,17 @@ func collectPackageNames(repoPath string, inputScopes ...*inputscope.Scope) map[
 		out[factpath.Slash(rel)] = pkg.Name
 		return nil
 	})
+	return out
+}
+
+func invertPackageNames(dirToName map[string]string) map[string]string {
+	out := map[string]string{}
+	for dir, name := range dirToName {
+		if name == "" {
+			continue
+		}
+		out[name] = dir
+	}
 	return out
 }
 

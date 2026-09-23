@@ -444,7 +444,7 @@ func extractHTTPClientFacts(src []byte, relFile string) []facts.Fact {
 		tmpl := lowerVerbTemplateCall.FindAllSubmatchIndex(src, -1)
 		if len(lower) > 0 || len(tmpl) > 0 {
 			serverRecv := serverBindings(src)
-			fastifyScopes := mergeFastifyScopes(typedFastifyParamScopes(src), collectParamNameScopes(src))
+			fastifyScopes := serverLexicalScopes(src)
 			for _, m := range lower {
 				if isServerReceiverAt(serverRecv, fastifyScopes, identifierEndingAt(src, m[0]), m[0]) {
 					continue

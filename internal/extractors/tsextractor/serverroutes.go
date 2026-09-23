@@ -155,7 +155,7 @@ func serverBindings(src []byte) map[string]serverBinding {
 // (the shape of goextractor/routeprefix.go); it is deliberately not attempted here.
 func extractServerRouteFacts(src []byte, relFile string) []facts.Fact {
 	bindings := serverBindings(src)
-	scopes := mergeFastifyScopes(typedFastifyParamScopes(src), collectParamNameScopes(src))
+	scopes := serverLexicalScopes(src)
 	if len(bindings) == 0 && len(scopes) == 0 {
 		return nil
 	}
@@ -639,6 +639,82 @@ func mergeFastifyScopes(typed, params []fastifyParamScope) []fastifyParamScope {
 	out = append(out, typed...)
 	out = append(out, params...)
 	return out
+}
+
+func serverLexicalScopes(src []byte) []fastifyParamScope {
+	return mergeFastifyScopes(
+		mergeFastifyScopes(typedFastifyParamScopes(src), collectParamNameScopes(src)),
+		collectLocalBindingScopes(src),
+	)
+}
+
+var localVarBinding = regexp.MustCompile(`(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*(?::[^=;]*)?=\s*`)
+
+var localFactoryRHS = regexp.MustCompile(`^(?:new\s+)?(express|fastify|Fastify|Hono|Koa)\s*\(`)
+var localRouterRHS = regexp.MustCompile(`^(?:new\s+)?(?:express\s*\.\s*Router|Router)\s*\(`)
+
+func collectLocalBindingScopes(src []byte) []fastifyParamScope {
+	mask := tsCommentStringMask(src)
+	var out []fastifyParamScope
+	for _, m := range localVarBinding.FindAllSubmatchIndex(src, -1) {
+		if mask[m[0]] {
+			continue
+		}
+		name := string(src[m[2]:m[3]])
+		rhs := m[1]
+		end := enclosingBlockEnd(src, mask, m[0])
+		if end < rhs {
+			continue
+		}
+		rest := src[rhs:]
+		if localRouterRHS.Match(rest) {
+			continue
+		}
+		b := serverBinding{}
+		if fm := localFactoryRHS.FindSubmatch(rest); fm != nil {
+			b = serverBinding{framework: frameworkOf[string(fm[1])], mounted: true}
+		} else {
+			i := 0
+			for i < len(rest) && (rest[i] == ' ' || rest[i] == '\t' || rest[i] == '\n' || rest[i] == '\r') {
+				i++
+			}
+			if i >= len(rest) || rest[i] != '{' {
+				continue
+			}
+		}
+		out = append(out, fastifyParamScope{
+			name:    name,
+			start:   rhs,
+			end:     end,
+			binding: b,
+		})
+	}
+	return out
+}
+
+func enclosingBlockEnd(src []byte, mask []bool, pos int) int {
+	var opens []int
+	for i := 0; i < pos && i < len(src); i++ {
+		if mask[i] {
+			continue
+		}
+		switch src[i] {
+		case '{':
+			opens = append(opens, i)
+		case '}':
+			if len(opens) > 0 {
+				opens = opens[:len(opens)-1]
+			}
+		}
+	}
+	if len(opens) == 0 {
+		return len(src)
+	}
+	end := matchBrace(src, mask, opens[len(opens)-1])
+	if end < 0 {
+		return len(src)
+	}
+	return end
 }
 
 func collectParamNameScopes(src []byte) []fastifyParamScope {

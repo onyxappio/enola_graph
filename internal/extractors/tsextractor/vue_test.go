@@ -1002,6 +1002,72 @@ func TestExtract_NuxtExplicitMissingImportNotOverriddenByAutoImport(t *testing.T
 	}
 }
 
+func TestExtract_NuxtRegisteredModuleAutoImportsWhenModulePackageIsNuxt(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"apps/landings/package.json":   `{"name":"landings","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0","landings-module":"workspace:*"}}`,
+		"apps/landings/nuxt.config.ts": `
+import landingModule from 'landings-module'
+export default defineNuxtConfig({ modules: [landingModule] })
+`,
+		"apps/landings/composables/useIsPreloadMount.ts": `export function useIsPreloadMount() { return false }`,
+		"apps/landings/pages/ThankYou.vue": `<script setup lang="ts">
+setLandPageMetadata({ page: 'thanks' })
+useIsPreloadMount()
+</script><template><p /></template>`,
+		"apps/landings/pages/Payment.vue": `<script setup lang="ts">
+setLandPageMetadata({ page: 'pay' })
+</script><template><p /></template>`,
+		"packages/landings-module/package.json": `{"name":"landings-module","dependencies":{"nuxt":"^3.0.0"}}`,
+		"packages/landings-module/src/module.ts": `
+export default function setup() {
+  addImportsDir(resolver.resolve('./runtime/composables/'))
+}
+`,
+		"packages/landings-module/src/runtime/composables/setLandPageMetadata.ts": `export function setLandPageMetadata(meta: Record<string, string>) {}`,
+	}, false)
+	want := "packages/landings-module/src/runtime/composables.setLandPageMetadata"
+	for _, page := range []string{"apps/landings/pages/ThankYou.vue", "apps/landings/pages/Payment.vue"} {
+		targets := fileRefTargets(ff, page)
+		if !hasTarget(targets, want) {
+			t.Errorf("%s: registered module composable unresolved: %v", page, targets)
+		}
+	}
+	thanks := fileRefTargets(ff, "apps/landings/pages/ThankYou.vue")
+	if !hasTarget(thanks, "apps/landings/composables.useIsPreloadMount") {
+		t.Errorf("app-local composable lost: %v", thanks)
+	}
+}
+
+func TestExtract_NuxtRegisteredModuleAutoImportsDoNotLeakToUnrelatedApp(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"apps/landings/package.json":   `{"name":"landings","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0","landings-module":"workspace:*"}}`,
+		"apps/landings/nuxt.config.ts": `
+import landingModule from 'landings-module'
+export default defineNuxtConfig({ modules: [landingModule] })
+`,
+		"apps/landings/pages/ThankYou.vue": `<script setup lang="ts">setLandPageMetadata({ page: 'thanks' })</script><template><p /></template>`,
+		"apps/other/package.json":          `{"name":"other","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"apps/other/nuxt.config.ts":        `export default defineNuxtConfig({})`,
+		"apps/other/pages/index.vue":       `<script setup lang="ts">setLandPageMetadata({ page: 'x' })</script><template><p /></template>`,
+		"packages/landings-module/package.json": `{"name":"landings-module","dependencies":{"nuxt":"^3.0.0"}}`,
+		"packages/landings-module/src/module.ts": `
+export default function setup() {
+  addImportsDir(resolver.resolve('./runtime/composables/'))
+}
+`,
+		"packages/landings-module/src/runtime/composables/setLandPageMetadata.ts": `export function setLandPageMetadata(meta: Record<string, string>) {}`,
+	}, false)
+	want := "packages/landings-module/src/runtime/composables.setLandPageMetadata"
+	land := fileRefTargets(ff, "apps/landings/pages/ThankYou.vue")
+	if !hasTarget(land, want) {
+		t.Errorf("consuming app must bind registered module: %v", land)
+	}
+	other := fileRefTargets(ff, "apps/other/pages/index.vue")
+	if hasTarget(other, want) {
+		t.Errorf("unrelated app received module auto-import: %v", other)
+	}
+}
+
 func TestExtract_NuxtAmbiguousAutoImportedComposableIsNotGuessed(t *testing.T) {
 	ff := extractVue(t, map[string]string{
 		"layers/a/composables/useAuth.ts": `export function useAuth() {}`,
