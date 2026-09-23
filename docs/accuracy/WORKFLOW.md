@@ -8,7 +8,7 @@ The user authorized **auto approval for all future candidates**. This supersedes
 
 - Work in waves of five on real Product and landings-base source.
 - First state the expected entities/direct relationship, run the analyzer, and prove the discrepancy with source and controls. Auto approval does not waive evidence or independent review.
-- Research: Fable 5.1 through Claude Code. Coding: Grok 4.6 through the configured local CLIProxy launcher. Primary orchestrates and independently verifies.
+- Research: Opus 5.5 through Claude Code (replaces Fable 5.1). Coding: Grok 4.6 through the configured local CLIProxy launcher. Primary independently verifies.
 - Workers must not send Telegram messages. Primary alone sends important updates with `bash ~/.claude/skills/user-send/send.sh -t enola-2 -T term_b4d33c66-3033-42d6-8870-0852aa948bfd`.
 - Start workers in the authorized unattended/always-approve mode. Keep all work in this isolated branch. Workers make local commits only and must not push/merge or disturb other sessions. The primary integrates completed waves under the synchronization policy below.
 - Preserve exact cold/delta equality, silent no-change runs, cache migration, source evidence, and negative controls.

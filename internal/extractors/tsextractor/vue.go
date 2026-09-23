@@ -935,12 +935,22 @@ func (e *TSExtractor) extractVueSFC(kinds *tsutil.KindTable, rawSrc []byte, relF
 		fw = "nuxt"
 	}
 
-	// If the script block already emitted a symbol with the component name
-	// (e.g. from `export default defineComponent(...)`), enrich it with Vue
+	// FactID is repo/kind/name/file and ignores symbol_kind. A local type that
+	// shares the SFC file-derived name would otherwise occupy the same identity
+	// as the runtime component. Keep the component in value space (`dir.Name`)
+	// and move only that colliding type-space fact to `dir.Name#type`.
+	for i := range result {
+		if result[i].Kind == facts.KindSymbol && result[i].Name == factName && vueTypeSpaceSymbol(result[i]) {
+			result[i].Name = factName + "#type"
+		}
+	}
+
+	// If the script block already emitted a value-space symbol with the component
+	// name (e.g. from `export default defineComponent(...)`), enrich it with Vue
 	// classification instead of creating a duplicate.
 	found := false
 	for i := range result {
-		if result[i].Kind == facts.KindSymbol && result[i].Name == factName {
+		if result[i].Kind == facts.KindSymbol && result[i].Name == factName && !vueTypeSpaceSymbol(result[i]) {
 			result[i].Props["web_component"] = "component"
 			result[i].Props["framework"] = fw
 			if isSetup {
@@ -1118,4 +1128,13 @@ func (e *TSExtractor) extractVueScriptBlock(kinds *tsutil.KindTable, block *vueS
 	}
 
 	return result, bindings, macros, contracts, declaredTypes
+}
+
+func vueTypeSpaceSymbol(f facts.Fact) bool {
+	sk, _ := f.Props["symbol_kind"].(string)
+	switch sk {
+	case facts.SymbolType, facts.SymbolInterface, facts.SymbolEnum:
+		return true
+	}
+	return false
 }
