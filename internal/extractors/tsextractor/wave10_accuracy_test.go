@@ -82,6 +82,140 @@ export async function createDirectory(options: CreateDirectoryOptions) {
 	}
 }
 
+func TestExtract_Wave10NxLexicalShadowKeepsInnerHTTP(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/client.ts": `import type { Tree } from '@nx/devkit';
+export function outer(tree: Tree, base: string) {
+  tree.delete(` + "`${base}/fs`" + `);
+  function inner(tree: any) {
+    tree.delete(` + "`${base}/http`" + `);
+  }
+}
+`,
+	}, false)
+	if _, ok := wave10Route(ff, "/fs"); ok {
+		t.Fatal("outer Tree parameter must not emit /fs")
+	}
+	if _, ok := wave10Route(ff, "/http"); !ok {
+		t.Fatal("inner any parameter must keep /http")
+	}
+}
+
+func TestExtract_Wave10NxNearestOptionsBindingKeepsInnerHTTP(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/schema.ts": `import type { Tree } from '@nx/devkit';
+export interface Options {
+  tree: Tree
+}
+`,
+		"src/client.ts": `import type { Options } from './schema';
+export function outer(options: Options, base: string) {
+  const {tree} = options;
+  tree.delete(` + "`${base}/fs`" + `);
+  function inner(options: any) {
+    const {tree} = options;
+    tree.delete(` + "`${base}/http`" + `);
+  }
+}
+`,
+	}, false)
+	if _, ok := wave10Route(ff, "/fs"); ok {
+		t.Fatal("outer schema Tree field must not emit /fs")
+	}
+	if _, ok := wave10Route(ff, "/http"); !ok {
+		t.Fatal("inner any options destructure must keep /http")
+	}
+}
+
+func TestExtract_Wave10NxCommentedSchemaFieldKeepsHTTP(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/schema.ts": `import type { Tree } from '@nx/devkit';
+export interface Options {
+  /*
+  tree: Tree
+  */
+  tree: any
+}
+`,
+		"src/client.ts": `import type { Options } from './schema';
+export function send(options: Options, base: string) {
+  const {tree} = options;
+  tree.delete(` + "`${base}/http`" + `);
+}
+`,
+	}, false)
+	if _, ok := wave10Route(ff, "/http"); !ok {
+		t.Fatal("commented tree: Tree is not evidence; /http must stay")
+	}
+	if _, ok := wave10Route(ff, "/fs"); ok {
+		t.Fatal("unexpected /fs")
+	}
+}
+
+func TestExtract_Wave10NxNestedSchemaFieldDoesNotProveDirect(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/schema.ts": `import type { Tree } from '@nx/devkit';
+export interface Options {
+  nested: {
+    tree: Tree
+  };
+  tree: any
+}
+`,
+		"src/client.ts": `import type { Options } from './schema';
+export function send(options: Options, base: string) {
+  const {tree} = options;
+  tree.delete(` + "`${base}/http`" + `);
+}
+`,
+	}, false)
+	if _, ok := wave10Route(ff, "/http"); !ok {
+		t.Fatal("nested tree: Tree does not prove the direct field; /http must stay")
+	}
+}
+
+func TestExtract_Wave10NxBlockConstShadowsParam(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/client.ts": `import type { Tree } from '@nx/devkit';
+export function outer(tree: Tree, base: string) {
+  tree.delete(` + "`${base}/fs`" + `);
+  {
+    const tree: any = client;
+    tree.delete(` + "`${base}/http`" + `);
+  }
+}
+`,
+	}, false)
+	if _, ok := wave10Route(ff, "/fs"); ok {
+		t.Fatal("outer Tree parameter must not emit /fs")
+	}
+	if _, ok := wave10Route(ff, "/http"); !ok {
+		t.Fatal("inner const tree: any must keep /http")
+	}
+}
+
+func TestExtract_Wave10NxImportedAliasSchemaStillSuppresses(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/schema.ts": `import type { Tree as FileTree } from '@nx/devkit';
+export interface Options {
+  tree: FileTree
+}
+`,
+		"src/client.ts": `import type { Options as Input } from './schema';
+export function send(options: Input, base: string) {
+  const {tree: files} = options;
+  files.delete(` + "`${base}/fs`" + `);
+}
+`,
+	}, false)
+	if _, ok := wave10Route(ff, "/fs"); ok {
+		t.Fatal("imported-alias schema Tree field must suppress /fs")
+	}
+	if _, ok := wave10Route(ff, "/http"); ok {
+		t.Fatal("unexpected /http")
+	}
+}
+
 func TestExtract_Wave10NuxtPageHandledByComponent(t *testing.T) {
 	ff := extractVue(t, map[string]string{
 		"pages/index.vue": `<template><h1>Home</h1></template>

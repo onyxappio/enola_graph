@@ -3,6 +3,7 @@ package tsextractor
 import (
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/enola-labs/enola/internal/factpath"
@@ -160,9 +161,8 @@ func explicitNxTreeFields(src []byte, treeTypes map[string]bool) map[string]map[
 			if end < 0 {
 				continue
 			}
-			body := src[open+1 : end]
-			for _, fm := range schemaField.FindAllSubmatch(body, -1) {
-				field, typ := string(fm[1]), string(fm[2])
+			direct := directSchemaMembers(src[open+1:end], mask[open+1:end])
+			for field, typ := range direct {
 				if !treeTypes[typ] {
 					continue
 				}
@@ -176,6 +176,69 @@ func explicitNxTreeFields(src []byte, treeTypes map[string]bool) map[string]map[
 	collect(interfaceOpen)
 	collect(typeObjectOpen)
 	return out
+}
+
+// directSchemaMembers returns identifier fields declared on the interface
+// object itself. Nested object literals and comment/string bodies are ignored.
+func directSchemaMembers(body []byte, mask []bool) map[string]string {
+	out := map[string]string{}
+	depth := 0
+	i := 0
+	for i < len(body) {
+		if mask[i] {
+			i++
+			continue
+		}
+		switch body[i] {
+		case '{':
+			depth++
+			i++
+			continue
+		case '}':
+			if depth > 0 {
+				depth--
+			}
+			i++
+			continue
+		}
+		if depth != 0 {
+			i++
+			continue
+		}
+		lineStart := i == 0
+		if !lineStart {
+			for j := i - 1; j >= 0; j-- {
+				if mask[j] {
+					continue
+				}
+				if body[j] == '\n' {
+					lineStart = true
+				}
+				break
+			}
+		}
+		if !lineStart {
+			i++
+			continue
+		}
+		fm := schemaField.FindSubmatchIndex(body[i:])
+		if fm == nil || fm[0] != 0 {
+			i++
+			continue
+		}
+		field := string(body[i+fm[2] : i+fm[3]])
+		typ := string(body[i+fm[4] : i+fm[5]])
+		if !mask[i+fm[2]] {
+			out[field] = typ
+		}
+		i += fm[1]
+	}
+	return out
+}
+
+type nxTypedBinding struct {
+	name, typ  string
+	start, end int
 }
 
 func nxTreeScopes(src []byte, relFile string, knownFiles map[string]bool, readSrc func(string) []byte, sideReads map[string]bool) []nxTreeScope {
@@ -194,41 +257,39 @@ func nxTreeScopes(src []byte, relFile string, knownFiles map[string]bool, readSr
 		scopes = append(scopes, nxTreeScope{name: name, start: start, end: end, isTree: isTree})
 	}
 
-	typedParams := map[string][]fastifyParamScope{} // param name -> typed schema/tree scopes
+	var typedBinds []nxTypedBinding
+	seenParam := map[string]bool{}
 	for _, m := range typedIdentDecl.FindAllSubmatchIndex(src, -1) {
 		if mask[m[0]] {
 			continue
 		}
 		ident, typ := string(src[m[2]:m[3]]), string(src[m[4]:m[5]])
 		isTree := treeTypes[typ]
-		_, isSchema := schemaFields[typ]
-		if !isTree && !isSchema {
+		param := isFunctionParameter(src, mask, m[2])
+		bodyStart, bodyEnd, ok := functionBodyAroundParam(src, mask, m[2])
+		if param && ok {
+			add(ident, bodyStart, bodyEnd, isTree)
+			typedBinds = append(typedBinds, nxTypedBinding{name: ident, typ: typ, start: bodyStart, end: bodyEnd})
+			seenParam[ident+"\x00"+fmtSpan(bodyStart, bodyEnd)] = true
 			continue
 		}
-		if !isFunctionParameter(src, mask, m[0]) && !looksLikeTypedConst(src, mask, m[0]) {
-			// Still allow function params via functionBodyAroundParam.
+		if !looksLikeTypedValueBinding(src, mask, m[2]) {
+			continue
 		}
-		bodyStart, bodyEnd, ok := functionBodyAroundParam(src, mask, m[0])
-		if !ok {
-			// typed const: bind from the declaration to the enclosing block
-			bodyStart, bodyEnd = enclosingBlock(src, mask, m[0])
-			if bodyEnd <= bodyStart {
-				continue
-			}
+		bodyStart, bodyEnd = enclosingBlock(src, mask, m[2])
+		if bodyEnd <= bodyStart {
+			continue
 		}
-		if isTree {
-			add(ident, bodyStart, bodyEnd, true)
+		add(ident, m[2], bodyEnd, isTree)
+	}
+
+	for _, sc := range collectParamNameScopes(src) {
+		key := sc.name + "\x00" + fmtSpan(sc.start, sc.end)
+		if seenParam[key] {
+			continue
 		}
-		typedParams[ident] = append(typedParams[ident], fastifyParamScope{
-			name: ident, start: bodyStart, end: bodyEnd,
-		})
-		if fields, ok := schemaFields[typ]; ok {
-			// Remember schema-typed params for destructure matching below.
-			_ = fields
-			typedParams[ident+"\x00"+typ] = append(typedParams[ident+"\x00"+typ], fastifyParamScope{
-				name: ident, start: bodyStart, end: bodyEnd,
-			})
-		}
+		add(sc.name, sc.start, sc.end, false)
+		typedBinds = append(typedBinds, nxTypedBinding{name: sc.name, typ: "", start: sc.start, end: sc.end})
 	}
 
 	for _, m := range objectDestructure.FindAllSubmatchIndex(src, -1) {
@@ -237,7 +298,8 @@ func nxTreeScopes(src []byte, relFile string, knownFiles map[string]bool, readSr
 		}
 		fields := string(src[m[2]:m[3]])
 		srcName := string(src[m[4]:m[5]])
-		blockStart, blockEnd := enclosingBlock(src, mask, m[0])
+		_, blockEnd := enclosingBlock(src, mask, m[0])
+		nearest, ok := nearestTypedBinding(typedBinds, srcName, m[0])
 		for _, entry := range strings.Split(fields, ",") {
 			entry = strings.TrimSpace(entry)
 			if entry == "" {
@@ -253,25 +315,12 @@ func nxTreeScopes(src []byte, relFile string, knownFiles map[string]bool, readSr
 				continue
 			}
 			proven := false
-			for typ, treeFields := range schemaFields {
-				if !treeFields[orig] {
-					continue
-				}
-				for _, sc := range typedParams[srcName+"\x00"+typ] {
-					if m[0] >= sc.start && m[0] <= sc.end {
-						proven = true
-						break
-					}
-				}
-				if proven {
-					break
+			if ok {
+				if treeFields := schemaFields[nearest.typ]; treeFields[orig] {
+					proven = true
 				}
 			}
 			add(local, m[0], blockEnd, proven)
-			if !proven && blockEnd > blockStart {
-				// shadowing of a proven tree name
-				add(local, m[0], blockEnd, false)
-			}
 		}
 	}
 
@@ -280,7 +329,6 @@ func nxTreeScopes(src []byte, relFile string, knownFiles map[string]bool, readSr
 			continue
 		}
 		name := string(src[m[2]:m[3]])
-		// Skip typed Tree consts already recorded.
 		after := m[3]
 		for after < len(src) && (src[after] == ' ' || src[after] == '\t') {
 			after++
@@ -294,12 +342,43 @@ func nxTreeScopes(src []byte, relFile string, knownFiles map[string]bool, readSr
 	return scopes
 }
 
-func looksLikeTypedConst(src []byte, mask []bool, pos int) bool {
-	i := pos
-	for i > 0 && (src[i] == ' ' || src[i] == '\t') {
+func fmtSpan(start, end int) string {
+	return strconv.Itoa(start) + ":" + strconv.Itoa(end)
+}
+
+func nearestTypedBinding(binds []nxTypedBinding, name string, pos int) (nxTypedBinding, bool) {
+	best := -1
+	span := int(^uint(0) >> 1)
+	for i, b := range binds {
+		if b.name != name || pos < b.start || pos > b.end {
+			continue
+		}
+		w := b.end - b.start
+		if w < span || (w == span && i > best) {
+			span = w
+			best = i
+		}
+	}
+	if best < 0 {
+		return nxTypedBinding{}, false
+	}
+	return binds[best], true
+}
+
+func looksLikeTypedValueBinding(src []byte, mask []bool, identPos int) bool {
+	i := identPos - 1
+	for i >= 0 && (src[i] == ' ' || src[i] == '\t') {
 		i--
 	}
-	return i >= 0 && !mask[i]
+	if i < 0 || mask[i] || !isJSIdentPart(src[i]) {
+		return false
+	}
+	end := i + 1
+	for i >= 0 && isJSIdentPart(src[i]) {
+		i--
+	}
+	kw := string(src[i+1 : end])
+	return kw == "const" || kw == "let" || kw == "var"
 }
 
 func enclosingBlock(src []byte, mask []bool, pos int) (start, end int) {

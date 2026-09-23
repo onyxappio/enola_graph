@@ -2547,7 +2547,11 @@ import (
 // fields. Nuxt file-convention page routes gain handled_by to the same-file
 // component. Proven Nx Tree receivers (including a directly imported schema
 // field typed Tree from @nx/devkit) are not HTTP client routes.
-const cacheVersion = "v305"
+// v306: Nx Tree HTTP suppression uses nearest value/type binding, direct schema
+// members, and comment-masked fields. Inner any/unknown params, destructured
+// any options, nested schema Tree fields, and block const shadows keep HTTP
+// fallback; only proven Tree provenance removes the client route.
+const cacheVersion = "v306"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //
