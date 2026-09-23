@@ -184,7 +184,8 @@ func baselineExtractHTTPClientFacts(src []byte, relFile string) []facts.Fact {
 		})
 	}
 
-	for _, m := range httpClientCall.FindAllSubmatchIndex(src, -1) {
+	litRE, identRE := fetchAliasCallPatterns(provenFetchAliases(src))
+	for _, m := range litRE.FindAllSubmatchIndex(src, -1) {
 		raw := firstNonEmptyGroup(src, m, 2, 3, 4)
 		method := "GET"
 		if opts := optionsObjectAfter(src, m[1]); opts != nil {
@@ -194,7 +195,7 @@ func baselineExtractHTTPClientFacts(src []byte, relFile string) []facts.Fact {
 		}
 		add(raw, method, "fetch", m[2], "")
 	}
-	for _, m := range identArgCall.FindAllSubmatchIndex(src, -1) {
+	for _, m := range identRE.FindAllSubmatchIndex(src, -1) {
 		raw, ok := folds.Resolve(string(src[m[4]:m[5]]))
 		if !ok {
 			continue
@@ -273,6 +274,25 @@ func baselineExtractHTTPClientFacts(src []byte, relFile string) []facts.Fact {
 			continue
 		}
 		add(raw, method, "request-options", m[0], "single-assignment")
+	}
+	for _, m := range urlPropertyFn.FindAllSubmatchIndex(src, -1) {
+		window := enclosingObject(src, m[0], m[1])
+		if window == nil {
+			continue
+		}
+		method := "GET"
+		haveVerb := false
+		if vm := requestVerbProperty.FindSubmatch(window); vm != nil {
+			if v := mapClientVerb(string(vm[1])); v != "" {
+				method = v
+				haveVerb = true
+			}
+		}
+		if !haveVerb && !requestPayloadKey.Match(window) {
+			continue
+		}
+		raw := firstNonEmptyGroup(src, m, 1, 2, 3)
+		add(raw, method, "request-options", m[0], "")
 	}
 	return out
 }

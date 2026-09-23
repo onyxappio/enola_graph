@@ -565,36 +565,26 @@ func extraDirOf(file string, extraDirs []string) (string, bool) {
 // statically registered addImportsDir trees). Ambiguous names stay unresolved.
 // Extra dirs registered inside another Nuxt package (a module) are visible only
 // to apps that list that module in nuxt.config, not pooled globally.
-func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []string, sources map[string][]byte, pkgDirByName map[string]string, pkgDirs map[string]bool) {
+func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []string, sources map[string][]byte, pkgDirByName map[string]string, pkgDirs map[string]bool, knownFiles map[string]bool, readSrc func(string) []byte, aliases map[string]tsAlias, cache *namedExportCache) {
 	exists := make(map[string]bool)
+	byFileShort := make(map[string]string)
 	byPkg := make(map[string]map[string]map[string]bool)
 	byExtra := make(map[string]map[string]map[string]bool)
 	unowned := make(map[string]map[string]bool)
-	for _, f := range all {
-		if f.Kind != facts.KindSymbol {
-			continue
+	addName := func(file, name, factName string) {
+		if name == "" || factName == "" {
+			return
 		}
-		exists[f.Name] = true
-		if v, ok := f.Props["exported"].(bool); ok && !v {
-			continue
-		}
-		if !nuxtAutoImportDir(f.File, nuxtPkgs, extraDirs, pkgDirs) {
-			continue
-		}
-		name := f.Name[strings.LastIndexByte(f.Name, '.')+1:]
-		if name == "" {
-			continue
-		}
-		if dir, ok := extraDirOf(f.File, extraDirs); ok {
+		if dir, ok := extraDirOf(file, extraDirs); ok {
 			if byExtra[dir] == nil {
 				byExtra[dir] = make(map[string]map[string]bool)
 			}
 			if byExtra[dir][name] == nil {
 				byExtra[dir][name] = make(map[string]bool)
 			}
-			byExtra[dir][name][f.Name] = true
+			byExtra[dir][name][factName] = true
 		}
-		pkg, inNuxt := nuxtPackageForFile(nuxtPkgs, f.File, pkgDirs)
+		pkg, inNuxt := nuxtPackageForFile(nuxtPkgs, file, pkgDirs)
 		if inNuxt {
 			if byPkg[pkg] == nil {
 				byPkg[pkg] = make(map[string]map[string]bool)
@@ -602,13 +592,65 @@ func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []stri
 			if byPkg[pkg][name] == nil {
 				byPkg[pkg][name] = make(map[string]bool)
 			}
-			byPkg[pkg][name][f.Name] = true
-			continue
+			byPkg[pkg][name][factName] = true
+			return
 		}
 		if unowned[name] == nil {
 			unowned[name] = make(map[string]bool)
 		}
-		unowned[name][f.Name] = true
+		unowned[name][factName] = true
+	}
+	for _, f := range all {
+		if f.Kind != facts.KindSymbol {
+			continue
+		}
+		exists[f.Name] = true
+		short := f.Name[strings.LastIndexByte(f.Name, '.')+1:]
+		if short != "" {
+			byFileShort[filepath.ToSlash(f.File)+"\x00"+short] = f.Name
+		}
+		if v, ok := f.Props["exported"].(bool); ok && !v {
+			continue
+		}
+		if !nuxtAutoImportDir(f.File, nuxtPkgs, extraDirs, pkgDirs) {
+			continue
+		}
+		addName(f.File, short, f.Name)
+	}
+	if readSrc != nil && knownFiles != nil {
+		if cache == nil {
+			cache = newNamedExportCache()
+		}
+		for file := range knownFiles {
+			file = filepath.ToSlash(file)
+			if !nuxtAutoImportDir(file, nuxtPkgs, extraDirs, pkgDirs) {
+				continue
+			}
+			idx := cache.index(file, readSrc, aliases, knownFiles)
+			if idx == nil || idx.empty {
+				continue
+			}
+			for exported, hops := range idx.named {
+				if exported == "" || len(hops) == 0 {
+					continue
+				}
+				leaf, orig, kind := followNamedExportFile(file, exported, readSrc, aliases, knownFiles, cache, nil)
+				if kind != followOne || leaf == "" {
+					continue
+				}
+				if orig == "" {
+					orig = exported
+				}
+				factName := byFileShort[filepath.ToSlash(leaf)+"\x00"+orig]
+				if factName == "" {
+					continue
+				}
+				if v, ok := allFactExported(all, factName); ok && !v {
+					continue
+				}
+				addName(file, exported, factName)
+			}
+		}
 	}
 	extraByPkg := extraDirsByNuxtPackage(sources, nuxtPkgs, pkgDirs)
 	consumes := nuxtModuleConsumers(sources, nuxtPkgs, pkgDirByName, pkgDirs)
@@ -672,4 +714,17 @@ func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []stri
 			}
 		}
 	}
+}
+
+func allFactExported(all []facts.Fact, name string) (bool, bool) {
+	for _, f := range all {
+		if f.Kind != facts.KindSymbol || f.Name != name {
+			continue
+		}
+		if v, ok := f.Props["exported"].(bool); ok {
+			return v, true
+		}
+		return true, true
+	}
+	return false, false
 }
