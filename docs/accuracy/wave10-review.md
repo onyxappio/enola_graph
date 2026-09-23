@@ -1,8 +1,8 @@
 # Wave 10 — independent accuracy review
 
-Verified implementation: `8e19a6fb650f40464658ea403d2064da656bfe6b`, cache **v314**.
-Includes main `3957b50cf721a04262395589b97d4ac4d1587d03`, retaining discovery reuse and the fresh input-policy proof.
-Independent binary SHA256: `0a26750c71e90e62521f6770e23b7336828415aa42c5df0e5a85f194739102f1`.
+Verified implementation: `b30365f5570c345b56329d3dfbe4f3d79ece01a3`, cache **v314**.
+Includes main `f0101f114c60af1f394df371e5e5b1edf7b5af7f`, retaining discovery reuse, the fresh input-policy proof, and per-file package gates alongside NuxtScope.
+Independent binary SHA256: `1bf56b4c63b24af02072dc9e10840cb8739edead3a89d2e42b6befe94001b87c`.
 
 ## Behavior
 
@@ -19,7 +19,7 @@ Primary review additionally protected Ember gts/gjs test references, Svelte defa
 ## Validation
 
 - Seven final gate groups passed, including 13 broader groups with 22 previous regression scripts, provenance controls and cold/delta lifecycle checks.
-- Full `GOMAXPROCS=1 go test -p 1 ./...`: **PASS, 721.798 s**.
+- Full `GOMAXPROCS=1 go test -p 1 ./...`: **PASS, 608.475 s**.
 - Four supported forks of published v304 checkpoints migrated to v314. Exact applied-versus-cold record equality, fork identity, zero-parse/event no-change and stable generation passed for both protocols and repositories. No raw cache copying.
 - Full wave 5–10 semantic assertions passed, plus all nine real Nuxt plugin defaults and the H3 lazy handler callable guard.
 - Earlier v310/v312/v313 correction migrations passed on the pre-main2 v314 binary. These are historical receipts, not rerun claims. Final full-repository migrations used the exact binary above.
@@ -33,6 +33,12 @@ Primary review additionally protected Ember gts/gjs test references, Svelte defa
 
 These are protocol record counts, not unique logical-entity counts.
 
+## Latest-main integration and same-version cache upgrade
+
+All four final graphs exactly equal the independently accepted `8e19a6f` graphs. Four supported forks of those v314 states upgraded to the new v314 without a cache-version bump: persisted global context v4 and per-file contexts exactly match fresh cold state, graph replay equals cold, and no-change remains silent. Nuxt scope and owning-package Vue/ORM inputs both remain in the per-file context digest.
+
+Publication integration `ee2c2ce6a19b7b5003727a970c5c3bfabf11a5ab` includes later main benchmark-only changes through `05607f7`. Its executable is byte-identical to the tested build above; the runtime source did not change.
+
 ## Source and graph audit
 
 Product inputs: `a609c19f3861971930fae7b33dcb2950598953c5`; Landings: `e263a0942efce56e9cd02abc425c0aa4d0327632`. All 13,650 included Product files and 3,293 Landings files match their Git blobs. Product's 31,455 omitted tracked files are all in the authorized `apps/mobile/e2e/artifacts/**` or `worker-reports/**` exclusions; no unexpected missing or changed files.
@@ -45,11 +51,11 @@ Prior source checks, retained by exact graph comparison, cover 193 method/class 
 
 ## Reproduction evidence
 
-Local acceptance receipt: `/tmp/enola-wave10-final-acceptance.json`.
-Final build, gates, full Go and full-repository job receipts use `/tmp/enola-wave10-v314-main2-*`.
-Four registry entries: `/tmp/enola-wave10-final-full-review/{v1,v2}-{product,landings}.json`; each points to immutable run outputs, exact graph comparison, source samples, relation-survival review and v310 comparison. Their migration states are consumed; preserve them instead of rerunning migrations in place.
+Final acceptance receipt: `/tmp/enola-wave10-main3-acceptance.json`; prior detailed source audit: `/tmp/enola-wave10-final-acceptance.json`.
+Final build, gates, full Go and full-repository job receipts use `/tmp/enola-wave10-v314-main3-*`.
+Four registry entries: `/tmp/enola-wave10-main3-final-full-review/{v1,v2}-{product,landings}.json`; each points to immutable run outputs, exact graph comparison, source samples and complete main2 equality. The prior accepted registries retain relation-survival and v310 source audits. Same-version context upgrades are recorded in `/tmp/enola-wave10-main3-context-verification.json`. Their migration states are consumed; preserve them instead of rerunning migrations in place.
 
-The full Go failure before main2 was two missing host-path markers. Commit `6e96ca5` changed comments only, retained an identical executable hash and passed the full suite. Main2 integrated the equivalent upstream annotations; the final full suite above passed. Original failure receipts are retained.
+The full Go failure before main2 was two missing host-path markers. Commit `6e96ca5` changed comments only, retained an identical executable hash and passed the full suite. Main2 integrated the equivalent upstream annotations; main3 retained them and passed the final full suite above. Original failure receipts are retained.
 
 ## Report and limits
 
