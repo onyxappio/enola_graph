@@ -1,0 +1,363 @@
+{
+  "provenance": {
+    "parent": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+    "child": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+    "repo": "/tmp/enola-stage7-exploratory-case01/live",
+    "binary": {
+      "baseline": {
+        "path": "/tmp/enola-stage6-wave10-review/enola",
+        "sha256": "1e4fbe4d8e65cd26f49b0391585454658354ff610f5380df755f44ba31973c8c",
+        "go_version_m": "/tmp/enola-stage6-wave10-review/enola: go1.27.1\n\tpath\tgithub.com/enola-labs/enola/cmd/enola\n\tmod\tgithub.com/enola-labs/enola\tv0.0.0-20260923165358-1ba06f9b8447\t\n\tdep\tgithub.com/ebitengine/purego\tv0.10.2\th1:W809HbnvzAxgdm+aOvlSekrM16wGCdT/e76+9tS7gzE=\n\tdep\tgithub.com/fsnotify/fsnotify\tv1.9.0\th1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=\n\tdep\tgithub.com/google/jsonschema-go\tv0.4.3\th1:/DBOLZTfDow7pe2GmaJNhltueGTtDKICi8V8p+DQPd0=\n\tdep\tgithub.com/klauspost/compress\tv1.18.0\th1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=\n\tdep\tgithub.com/mattn/go-pointer\tv0.0.1\th1:n+XhsuGeVO6MEAp7xyEukFINEa+Quek5psIR/ylA6o0=\n\tdep\tgithub.com/modelcontextprotocol/go-sdk\tv1.8.0\th1:KIvahhYqwtbeniWVPs3TcXEA7b8jEtwfBpOTAI+Urx4=\n\tdep\tgithub.com/nats-io/nats.go\tv1.47.0\th1:YQdADw6J/UfGUd2Oy6tn4Hq6YHxCaJrVKayxxFqYrgM=\n\tdep\tgithub.com/nats-io/nkeys\tv0.4.11\th1:q44qGV008kYd9W1b1nEBkNzvnWxtRSQ7A8BoqRrcfa0=\n\tdep\tgithub.com/nats-io/nuid\tv1.0.1\th1:5iA8DT8V7q8WK2EScv2padNa/rTESc1KdnPw4TC2paw=\n\tdep\tgithub.com/pbnjay/memory\tv0.0.0-20210728143218-7b4eea64cf58\th1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=\n\tdep\tgithub.com/segmentio/asm\tv1.1.3\th1:WM03sfUOENvvKexOLp+pCqgb/WDjsi7EK8gIsICtzhc=\n\tdep\tgithub.com/segmentio/encoding\tv0.5.4\th1:OW1VRern8Nw6ITAtwSZ7Idrl3MXCFwXHPgqESYfvNt0=\n\tdep\tgithub.com/tree-sitter-grammars/tree-sitter-kotlin\tv1.1.0\th1:SWIUDASa+WPhDDem1U5IJpYwQEezkqXrUI61OcnORzM=\n\tdep\tgithub.com/tree-sitter/go-tree-sitter\tv0.24.0\th1:kRZb6aBNfcI/u0Qh8XEt3zjNVnmxTisDBN+kXK0xRYQ=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c\tv0.23.6\th1:aHcghKEBgyUDUcCKFT5fELp26UBU7RBltj5MkRYxyy8=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c-sharp\tv0.23.1\th1:ddG6osP34sMieVNN6lu5ZG/3N8Wn+67+43BmipqidyM=\n\tdep\tgithub.com/tree-sitter/tree-sitter-cpp\tv0.23.4\th1:LaWZsiqQKvR65yHgKmnaqA+uz6tlDJTJFCyFIeZU/8w=\n\tdep\tgithub.com/tree-sitter/tree-sitter-java\tv0.23.5\th1:J9YeMGMwXYlKSP3K4Us8CitC6hjtMjqpeOf2GGo6tig=\n\tdep\tgithub.com/tree-sitter/tree-sitter-php\tv0.23.12\th1:zgnxrV5RUEbK9d3jm9R8CjR3uSA1pBPbvq7Tbjg8j0k=\n\tdep\tgithub.com/tree-sitter/tree-sitter-python\tv0.23.6\th1:qHnWFR5WhtMQpxBZRwiaU5Hk/29vGju6CVtmvu5Haas=\n\tdep\tgithub.com/tree-sitter/tree-sitter-ruby\tv0.23.1\th1:T/NKHUA+iVbHM440hFx+lzVOzS4dV6z8Qw8ai+72bYo=\n\tdep\tgithub.com/tree-sitter/tree-sitter-rust\tv0.23.3\th1:v41N2Dx5ZEzouqeQJ0IIH2cUwVw/iepwrUoE9D56IL4=\n\tdep\tgithub.com/tree-sitter/tree-sitter-scala\tv0.24.1\th1:jO4zDfb3vQWmqCDpLfhENVtP3RvOSLYNR69m0R/T6wY=\n\tdep\tgithub.com/tree-sitter/tree-sitter-typescript\tv0.23.2\th1:/Odvphn18PniVixb9e97X0DbNVsU6Qocv9mfkyzdXwU=\n\tdep\tgithub.com/yosida95/uritemplate/v3\tv3.0.2\th1:Ed3Oyj9yrmi9087+NczuL5BwkIc4wvTb5zIM+UJPGz4=\n\tdep\tgolang.org/x/crypto\tv0.37.0\th1:kJNSjF/Xp7kU0iB2Z+9viTPMW4EqqsrywMXLJOOsXSE=\n\tdep\tgolang.org/x/oauth2\tv0.35.0\th1:Mv2mzuHuZuY2+bkyWXIHMfhNdJAdwW3FuWeCPYN5GVQ=\n\tdep\tgolang.org/x/sync\tv0.20.0\th1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=\n\tdep\tgolang.org/x/sys\tv0.48.0\th1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=\n\tdep\tgolang.org/x/time\tv0.15.0\th1:bbrp8t3bGUeFOx08pvsMYRTCVSMk89u4tKbNOZbp88U=\n\tdep\tgopkg.in/yaml.v3\tv3.0.1\th1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tDefaultGODEBUG=tracebacklabels=0,x509sslcertoverrideplatform=0\n\tbuild\tCGO_ENABLED=1\n\tbuild\tGOARCH=arm64\n\tbuild\tGOOS=darwin\n\tbuild\tGOARM64=v8.0\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=1ba06f9b8447f62b1c8921c3a851649196f1112b\n\tbuild\tvcs.time=2026-09-23T16:53:58Z\n\tbuild\tvcs.modified=false\n",
+        "go_version_m_sha256": "3230a2214e0b0d5f4e4ddef8026e55549f8d71d314086191120f50f327bce3e0",
+        "go_version": "/tmp/enola-stage6-wave10-review/enola: go1.27.1",
+        "vcs_revision": "1ba06f9b8447f62b1c8921c3a851649196f1112b",
+        "vcs_modified": "false"
+      },
+      "candidate": {
+        "path": "/tmp/enola-stage7-main-review/enola",
+        "sha256": "2f03c3e831b6a3087bffd2033966c2e901e703d2849a9fbf4340745f3a6d8f6d",
+        "go_version_m": "/tmp/enola-stage7-main-review/enola: go1.27.1\n\tpath\tgithub.com/enola-labs/enola/cmd/enola\n\tmod\tgithub.com/enola-labs/enola\tv0.0.0-20260923173349-742ff51e6e9c+dirty\t\n\tdep\tgithub.com/ebitengine/purego\tv0.10.2\th1:W809HbnvzAxgdm+aOvlSekrM16wGCdT/e76+9tS7gzE=\n\tdep\tgithub.com/fsnotify/fsnotify\tv1.9.0\th1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=\n\tdep\tgithub.com/google/jsonschema-go\tv0.4.3\th1:/DBOLZTfDow7pe2GmaJNhltueGTtDKICi8V8p+DQPd0=\n\tdep\tgithub.com/klauspost/compress\tv1.18.0\th1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=\n\tdep\tgithub.com/mattn/go-pointer\tv0.0.1\th1:n+XhsuGeVO6MEAp7xyEukFINEa+Quek5psIR/ylA6o0=\n\tdep\tgithub.com/modelcontextprotocol/go-sdk\tv1.8.0\th1:KIvahhYqwtbeniWVPs3TcXEA7b8jEtwfBpOTAI+Urx4=\n\tdep\tgithub.com/nats-io/nats.go\tv1.47.0\th1:YQdADw6J/UfGUd2Oy6tn4Hq6YHxCaJrVKayxxFqYrgM=\n\tdep\tgithub.com/nats-io/nkeys\tv0.4.11\th1:q44qGV008kYd9W1b1nEBkNzvnWxtRSQ7A8BoqRrcfa0=\n\tdep\tgithub.com/nats-io/nuid\tv1.0.1\th1:5iA8DT8V7q8WK2EScv2padNa/rTESc1KdnPw4TC2paw=\n\tdep\tgithub.com/pbnjay/memory\tv0.0.0-20210728143218-7b4eea64cf58\th1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=\n\tdep\tgithub.com/segmentio/asm\tv1.1.3\th1:WM03sfUOENvvKexOLp+pCqgb/WDjsi7EK8gIsICtzhc=\n\tdep\tgithub.com/segmentio/encoding\tv0.5.4\th1:OW1VRern8Nw6ITAtwSZ7Idrl3MXCFwXHPgqESYfvNt0=\n\tdep\tgithub.com/tree-sitter-grammars/tree-sitter-kotlin\tv1.1.0\th1:SWIUDASa+WPhDDem1U5IJpYwQEezkqXrUI61OcnORzM=\n\tdep\tgithub.com/tree-sitter/go-tree-sitter\tv0.24.0\th1:kRZb6aBNfcI/u0Qh8XEt3zjNVnmxTisDBN+kXK0xRYQ=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c\tv0.23.6\th1:aHcghKEBgyUDUcCKFT5fELp26UBU7RBltj5MkRYxyy8=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c-sharp\tv0.23.1\th1:ddG6osP34sMieVNN6lu5ZG/3N8Wn+67+43BmipqidyM=\n\tdep\tgithub.com/tree-sitter/tree-sitter-cpp\tv0.23.4\th1:LaWZsiqQKvR65yHgKmnaqA+uz6tlDJTJFCyFIeZU/8w=\n\tdep\tgithub.com/tree-sitter/tree-sitter-java\tv0.23.5\th1:J9YeMGMwXYlKSP3K4Us8CitC6hjtMjqpeOf2GGo6tig=\n\tdep\tgithub.com/tree-sitter/tree-sitter-php\tv0.23.12\th1:zgnxrV5RUEbK9d3jm9R8CjR3uSA1pBPbvq7Tbjg8j0k=\n\tdep\tgithub.com/tree-sitter/tree-sitter-python\tv0.23.6\th1:qHnWFR5WhtMQpxBZRwiaU5Hk/29vGju6CVtmvu5Haas=\n\tdep\tgithub.com/tree-sitter/tree-sitter-ruby\tv0.23.1\th1:T/NKHUA+iVbHM440hFx+lzVOzS4dV6z8Qw8ai+72bYo=\n\tdep\tgithub.com/tree-sitter/tree-sitter-rust\tv0.23.3\th1:v41N2Dx5ZEzouqeQJ0IIH2cUwVw/iepwrUoE9D56IL4=\n\tdep\tgithub.com/tree-sitter/tree-sitter-scala\tv0.24.1\th1:jO4zDfb3vQWmqCDpLfhENVtP3RvOSLYNR69m0R/T6wY=\n\tdep\tgithub.com/tree-sitter/tree-sitter-typescript\tv0.23.2\th1:/Odvphn18PniVixb9e97X0DbNVsU6Qocv9mfkyzdXwU=\n\tdep\tgithub.com/yosida95/uritemplate/v3\tv3.0.2\th1:Ed3Oyj9yrmi9087+NczuL5BwkIc4wvTb5zIM+UJPGz4=\n\tdep\tgolang.org/x/crypto\tv0.37.0\th1:kJNSjF/Xp7kU0iB2Z+9viTPMW4EqqsrywMXLJOOsXSE=\n\tdep\tgolang.org/x/oauth2\tv0.35.0\th1:Mv2mzuHuZuY2+bkyWXIHMfhNdJAdwW3FuWeCPYN5GVQ=\n\tdep\tgolang.org/x/sync\tv0.20.0\th1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=\n\tdep\tgolang.org/x/sys\tv0.48.0\th1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=\n\tdep\tgolang.org/x/time\tv0.15.0\th1:bbrp8t3bGUeFOx08pvsMYRTCVSMk89u4tKbNOZbp88U=\n\tdep\tgopkg.in/yaml.v3\tv3.0.1\th1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tDefaultGODEBUG=tracebacklabels=0,x509sslcertoverrideplatform=0\n\tbuild\tCGO_ENABLED=1\n\tbuild\tGOARCH=arm64\n\tbuild\tGOOS=darwin\n\tbuild\tGOARM64=v8.0\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=742ff51e6e9c547993fc1e683dc380c60d8fe01a\n\tbuild\tvcs.time=2026-09-23T17:33:49Z\n\tbuild\tvcs.modified=true\n",
+        "go_version_m_sha256": "471e3109c75f61cd16dfa2de54e5c496ca5034c5e5013748bda19654bd561e78",
+        "go_version": "/tmp/enola-stage7-main-review/enola: go1.27.1",
+        "vcs_revision": "742ff51e6e9c547993fc1e683dc380c60d8fe01a",
+        "vcs_modified": "true"
+      }
+    },
+    "mode": "fresh CLI, file sink, context-version-specific parent seeds restored per repetition",
+    "order": [
+      "baseline",
+      "candidate",
+      "candidate",
+      "baseline"
+    ],
+    "limitations": "shared host; not resident watch or NATS acceptance"
+  },
+  "integration": {
+    "main_base": "742ff51e6e9c547993fc1e683dc380c60d8fe01a",
+    "worker_base": "bc0c72c",
+    "source": "/tmp/enola-stage7-wave10",
+    "hashes": {
+      "session.go": "a73229d8b8bf2904b7f00c1be394f9816539b14ad8f40d56105cd113a1bc3e8f",
+      "invalidate.go": "b751ec4898626c5fd8a327fd2c918bd289fcbe6cf4ebcf1d31b9eea936b623b9",
+      "body_scope_regression_test.go": "af729d356b20414a67a30391bfe514a8f0bc2cf9823b35daf7e8d6a138a83152",
+      "resolution_replay.go": "030b9bd1fda25548552679e29882d27b03a2efa0c2232f101bf98484e4403d52",
+      "resolution_replay_regression_test.go": "42dc07b400a9688735bf46f8e486e173b89a93571ee04c5701ed25fe28db97c1",
+      "independent_resolution_replay_test.go": "dd5bc2d2ce29f08f2e27e931df71e04eebae8a664cb1f5a4dd63b0b27f47fb27",
+      "independent_global_replay_test.go": "227b31f4a684b40c4ba95cc1b8548f813abdebfc9210533d2b754e4a9735d037",
+      "independent_mixed_replay_test.go": "6134475f1ea483601ae0586d0fb82b0733f9daa4088132f726747d03cc81a031"
+    },
+    "patch_sha256": "f79dc4866b3ab764528dc9816458d04c740a6efca3a6358d89e928da9ccb87b2",
+    "suites_log": "/tmp/enola-stage7-logs/affected-suites-final-20260923T172853Z.log"
+  },
+  "validation": [
+    {
+      "name": "build",
+      "command": [
+        "/tmp/enola-toolchain/go/bin/go",
+        "build",
+        "-trimpath",
+        "-o",
+        "/tmp/enola-stage7-main-review/enola",
+        "./cmd/enola"
+      ],
+      "exit": 0,
+      "seconds": 2.988882541
+    },
+    {
+      "name": "full-tests",
+      "command": [
+        "/tmp/enola-toolchain/go/bin/go",
+        "test",
+        "./..."
+      ],
+      "exit": 0,
+      "seconds": 334.014459084
+    }
+  ],
+  "benchmark_build": {
+    "command": [
+      "/opt/homebrew/bin/go",
+      "build",
+      "-trimpath",
+      "-o",
+      "/tmp/enola-stage7-main-review/enola",
+      "./cmd/enola"
+    ],
+    "exit": 0,
+    "seconds": 5.433622084,
+    "note": "benchmark candidate rebuilt with baseline Go1.27.1; earlier Go1.26.8 build preserved and not benchmarked",
+    "sha256": "2f03c3e831b6a3087bffd2033966c2e901e703d2849a9fbf4340745f3a6d8f6d",
+    "go_version_m": "/tmp/enola-stage7-main-review/enola: go1.27.1\n\tpath\tgithub.com/enola-labs/enola/cmd/enola\n\tmod\tgithub.com/enola-labs/enola\tv0.0.0-20260923173349-742ff51e6e9c+dirty\t\n\tdep\tgithub.com/ebitengine/purego\tv0.10.2\th1:W809HbnvzAxgdm+aOvlSekrM16wGCdT/e76+9tS7gzE=\n\tdep\tgithub.com/fsnotify/fsnotify\tv1.9.0\th1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=\n\tdep\tgithub.com/google/jsonschema-go\tv0.4.3\th1:/DBOLZTfDow7pe2GmaJNhltueGTtDKICi8V8p+DQPd0=\n\tdep\tgithub.com/klauspost/compress\tv1.18.0\th1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=\n\tdep\tgithub.com/mattn/go-pointer\tv0.0.1\th1:n+XhsuGeVO6MEAp7xyEukFINEa+Quek5psIR/ylA6o0=\n\tdep\tgithub.com/modelcontextprotocol/go-sdk\tv1.8.0\th1:KIvahhYqwtbeniWVPs3TcXEA7b8jEtwfBpOTAI+Urx4=\n\tdep\tgithub.com/nats-io/nats.go\tv1.47.0\th1:YQdADw6J/UfGUd2Oy6tn4Hq6YHxCaJrVKayxxFqYrgM=\n\tdep\tgithub.com/nats-io/nkeys\tv0.4.11\th1:q44qGV008kYd9W1b1nEBkNzvnWxtRSQ7A8BoqRrcfa0=\n\tdep\tgithub.com/nats-io/nuid\tv1.0.1\th1:5iA8DT8V7q8WK2EScv2padNa/rTESc1KdnPw4TC2paw=\n\tdep\tgithub.com/pbnjay/memory\tv0.0.0-20210728143218-7b4eea64cf58\th1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=\n\tdep\tgithub.com/segmentio/asm\tv1.1.3\th1:WM03sfUOENvvKexOLp+pCqgb/WDjsi7EK8gIsICtzhc=\n\tdep\tgithub.com/segmentio/encoding\tv0.5.4\th1:OW1VRern8Nw6ITAtwSZ7Idrl3MXCFwXHPgqESYfvNt0=\n\tdep\tgithub.com/tree-sitter-grammars/tree-sitter-kotlin\tv1.1.0\th1:SWIUDASa+WPhDDem1U5IJpYwQEezkqXrUI61OcnORzM=\n\tdep\tgithub.com/tree-sitter/go-tree-sitter\tv0.24.0\th1:kRZb6aBNfcI/u0Qh8XEt3zjNVnmxTisDBN+kXK0xRYQ=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c\tv0.23.6\th1:aHcghKEBgyUDUcCKFT5fELp26UBU7RBltj5MkRYxyy8=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c-sharp\tv0.23.1\th1:ddG6osP34sMieVNN6lu5ZG/3N8Wn+67+43BmipqidyM=\n\tdep\tgithub.com/tree-sitter/tree-sitter-cpp\tv0.23.4\th1:LaWZsiqQKvR65yHgKmnaqA+uz6tlDJTJFCyFIeZU/8w=\n\tdep\tgithub.com/tree-sitter/tree-sitter-java\tv0.23.5\th1:J9YeMGMwXYlKSP3K4Us8CitC6hjtMjqpeOf2GGo6tig=\n\tdep\tgithub.com/tree-sitter/tree-sitter-php\tv0.23.12\th1:zgnxrV5RUEbK9d3jm9R8CjR3uSA1pBPbvq7Tbjg8j0k=\n\tdep\tgithub.com/tree-sitter/tree-sitter-python\tv0.23.6\th1:qHnWFR5WhtMQpxBZRwiaU5Hk/29vGju6CVtmvu5Haas=\n\tdep\tgithub.com/tree-sitter/tree-sitter-ruby\tv0.23.1\th1:T/NKHUA+iVbHM440hFx+lzVOzS4dV6z8Qw8ai+72bYo=\n\tdep\tgithub.com/tree-sitter/tree-sitter-rust\tv0.23.3\th1:v41N2Dx5ZEzouqeQJ0IIH2cUwVw/iepwrUoE9D56IL4=\n\tdep\tgithub.com/tree-sitter/tree-sitter-scala\tv0.24.1\th1:jO4zDfb3vQWmqCDpLfhENVtP3RvOSLYNR69m0R/T6wY=\n\tdep\tgithub.com/tree-sitter/tree-sitter-typescript\tv0.23.2\th1:/Odvphn18PniVixb9e97X0DbNVsU6Qocv9mfkyzdXwU=\n\tdep\tgithub.com/yosida95/uritemplate/v3\tv3.0.2\th1:Ed3Oyj9yrmi9087+NczuL5BwkIc4wvTb5zIM+UJPGz4=\n\tdep\tgolang.org/x/crypto\tv0.37.0\th1:kJNSjF/Xp7kU0iB2Z+9viTPMW4EqqsrywMXLJOOsXSE=\n\tdep\tgolang.org/x/oauth2\tv0.35.0\th1:Mv2mzuHuZuY2+bkyWXIHMfhNdJAdwW3FuWeCPYN5GVQ=\n\tdep\tgolang.org/x/sync\tv0.20.0\th1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=\n\tdep\tgolang.org/x/sys\tv0.48.0\th1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=\n\tdep\tgolang.org/x/time\tv0.15.0\th1:bbrp8t3bGUeFOx08pvsMYRTCVSMk89u4tKbNOZbp88U=\n\tdep\tgopkg.in/yaml.v3\tv3.0.1\th1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tDefaultGODEBUG=tracebacklabels=0,x509sslcertoverrideplatform=0\n\tbuild\tCGO_ENABLED=1\n\tbuild\tGOARCH=arm64\n\tbuild\tGOOS=darwin\n\tbuild\tGOARM64=v8.0\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=742ff51e6e9c547993fc1e683dc380c60d8fe01a\n\tbuild\tvcs.time=2026-09-23T17:33:49Z\n\tbuild\tvcs.modified=true\n"
+  },
+  "benchmark_receipt": {
+    "command": [
+      "python3",
+      "/tmp/enola-stage7-paired-history.py"
+    ],
+    "exit": 0,
+    "seconds": 181.93466379199998,
+    "prerequisite": {
+      "name": "full-tests",
+      "command": [
+        "/tmp/enola-toolchain/go/bin/go",
+        "test",
+        "./..."
+      ],
+      "exit": 0,
+      "seconds": 334.014459084
+    }
+  },
+  "rows": [
+    {
+      "iteration": 0,
+      "build": "baseline",
+      "run": {
+        "exit": 0,
+        "wall_s": 12.441,
+        "sink": "file",
+        "parsed": 624,
+        "cached": 3392,
+        "files_read": 728,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 1811,
+        "events": 1045,
+        "run_id": "product-scope-scope-bench-2-1790185461609099000",
+        "stderr_graph": "[graph] /tmp/enola-stage7-exploratory-case01/live: generation 1\u21922 parsed=624 cached=3392 early_local=0 fallbacks=1\n[graph] fallback graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)"
+      },
+      "begin_owners": 1811,
+      "exact_cold": true,
+      "graph_hash": "4256e76439e7c1d9df6673069acd926e0016ed1cc5c4d4764e42bc0821364606",
+      "parse_reasons": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 4,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "added source": 4,
+          "resolution": 528,
+          "source content": 92
+        }
+      }
+    },
+    {
+      "iteration": 1,
+      "build": "candidate",
+      "run": {
+        "exit": 0,
+        "wall_s": 12.38,
+        "sink": "file",
+        "parsed": 591,
+        "cached": 3425,
+        "files_read": 695,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 1783,
+        "events": 1033,
+        "run_id": "product-scope-scope-bench-2-1790185483494374000",
+        "stderr_graph": "[graph] /tmp/enola-stage7-exploratory-case01/live: generation 1\u21922 parsed=591 cached=3425 early_local=0 fallbacks=1\n[graph] fallback graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)"
+      },
+      "begin_owners": 1783,
+      "exact_cold": true,
+      "graph_hash": "4256e76439e7c1d9df6673069acd926e0016ed1cc5c4d4764e42bc0821364606",
+      "parse_reasons": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 4,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "added source": 4,
+          "resolution": 495,
+          "source content": 92
+        }
+      }
+    },
+    {
+      "iteration": 2,
+      "build": "candidate",
+      "run": {
+        "exit": 0,
+        "wall_s": 12.262,
+        "sink": "file",
+        "parsed": 591,
+        "cached": 3425,
+        "files_read": 695,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 1783,
+        "events": 1033,
+        "run_id": "product-scope-scope-bench-2-1790185506073051000",
+        "stderr_graph": "[graph] /tmp/enola-stage7-exploratory-case01/live: generation 1\u21922 parsed=591 cached=3425 early_local=0 fallbacks=1\n[graph] fallback graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)"
+      },
+      "begin_owners": 1783,
+      "exact_cold": true,
+      "graph_hash": "4256e76439e7c1d9df6673069acd926e0016ed1cc5c4d4764e42bc0821364606",
+      "parse_reasons": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 4,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "added source": 4,
+          "resolution": 495,
+          "source content": 92
+        }
+      }
+    },
+    {
+      "iteration": 3,
+      "build": "baseline",
+      "run": {
+        "exit": 0,
+        "wall_s": 12.461,
+        "sink": "file",
+        "parsed": 624,
+        "cached": 3392,
+        "files_read": 728,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 1811,
+        "events": 1045,
+        "run_id": "product-scope-scope-bench-2-1790185529132786000",
+        "stderr_graph": "[graph] /tmp/enola-stage7-exploratory-case01/live: generation 1\u21922 parsed=624 cached=3392 early_local=0 fallbacks=1\n[graph] fallback graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)"
+      },
+      "begin_owners": 1811,
+      "exact_cold": true,
+      "graph_hash": "4256e76439e7c1d9df6673069acd926e0016ed1cc5c4d4764e42bc0821364606",
+      "parse_reasons": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 4,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "added source": 4,
+          "resolution": 528,
+          "source content": 92
+        }
+      }
+    }
+  ],
+  "noops": [
+    {
+      "iteration": 0,
+      "build": "baseline",
+      "run": {
+        "exit": 0,
+        "wall_s": 2.066,
+        "sink": "file",
+        "parsed": 0,
+        "cached": 4068,
+        "files_read": 0,
+        "generation": [
+          2,
+          2
+        ],
+        "owners_published": 0,
+        "events": 0,
+        "run_id": "",
+        "stderr_graph": "[graph] /tmp/enola-stage7-exploratory-case01/live: generation 2\u21922 parsed=0 cached=4068 early_local=0 fallbacks=0"
+      },
+      "state_json_hashes_unchanged": true
+    },
+    {
+      "iteration": 1,
+      "build": "candidate",
+      "run": {
+        "exit": 0,
+        "wall_s": 2.155,
+        "sink": "file",
+        "parsed": 0,
+        "cached": 4068,
+        "files_read": 0,
+        "generation": [
+          2,
+          2
+        ],
+        "owners_published": 0,
+        "events": 0,
+        "run_id": "",
+        "stderr_graph": "[graph] /tmp/enola-stage7-exploratory-case01/live: generation 2\u21922 parsed=0 cached=4068 early_local=0 fallbacks=0"
+      },
+      "state_json_hashes_unchanged": true
+    },
+    {
+      "iteration": 2,
+      "build": "candidate",
+      "run": {
+        "exit": 0,
+        "wall_s": 2.076,
+        "sink": "file",
+        "parsed": 0,
+        "cached": 4068,
+        "files_read": 0,
+        "generation": [
+          2,
+          2
+        ],
+        "owners_published": 0,
+        "events": 0,
+        "run_id": "",
+        "stderr_graph": "[graph] /tmp/enola-stage7-exploratory-case01/live: generation 2\u21922 parsed=0 cached=4068 early_local=0 fallbacks=0"
+      },
+      "state_json_hashes_unchanged": true
+    },
+    {
+      "iteration": 3,
+      "build": "baseline",
+      "run": {
+        "exit": 0,
+        "wall_s": 2.092,
+        "sink": "file",
+        "parsed": 0,
+        "cached": 4068,
+        "files_read": 0,
+        "generation": [
+          2,
+          2
+        ],
+        "owners_published": 0,
+        "events": 0,
+        "run_id": "",
+        "stderr_graph": "[graph] /tmp/enola-stage7-exploratory-case01/live: generation 2\u21922 parsed=0 cached=4068 early_local=0 fallbacks=0"
+      },
+      "state_json_hashes_unchanged": true
+    }
+  ],
+  "restore": {
+    "head": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+    "config_sha256": "4fd513e2cddf987e9f0f9afbc51a6d39e388fae2111b24489cb418cadc786db6",
+    "status": "?? mcp-arch.yaml"
+  },
+  "cold": {
+    "exit": 0,
+    "wall_s": 22.667,
+    "sink": "file",
+    "parsed": 4016,
+    "cached": 0,
+    "files_read": 4068,
+    "generation": [
+      0,
+      1
+    ],
+    "owners_published": 4946,
+    "events": 2310,
+    "run_id": "product-scope-scope-bench-1-1790185433303563000",
+    "stderr_graph": "[graph] /tmp/enola-stage7-exploratory-case01/live: generation 0\u21921 parsed=4016 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+  }
+}

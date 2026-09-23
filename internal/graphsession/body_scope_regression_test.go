@@ -149,11 +149,13 @@ func TestBodyScopeColdLocalBodyEditStaysOnTheEditedFile(t *testing.T) {
 	}
 }
 
-// A changed export surface does reach importers, but only the ones that import
-// it. The barrel re-exports the new name so it is reparsed; the files behind the
-// barrel are reparsed only because the barrel's own Reexports then changed. A
-// second module that imports the barrel without naming anything new must not be
-// dragged in transitively beyond that.
+// Where a changed export surface stops. core.ts is imported by mid.ts, which is
+// imported by far.ts; none of them re-exports anything. Adding a name nobody
+// imports moves only what core.ts declares, and the name delta already
+// enumerates who could bind it, so an importer that names nothing new is left
+// alone - and far.ts, which the old rule reached purely by reachability, stays
+// out either way. Renaming a name mid.ts does import is the other half: that
+// importer is read again, and the closure still stops before far.ts.
 func TestBodyScopeColdAddedExportStopsAtObservedSurfaceChanges(t *testing.T) {
 	root := setupTSRepo(t, map[string]string{
 		"core.ts":  "export const a = 1;\n",
@@ -168,12 +170,21 @@ func TestBodyScopeColdAddedExportStopsAtObservedSurfaceChanges(t *testing.T) {
 	writeFile(t, root, "core.ts", "export const a = 1;\nexport const added = 2;\n")
 
 	res, owners, ids := bodyScopeDelta(t, eng, root, opts, cons)
+	requireOwners(t, owners, ids, "core.ts")
+	// mid.ts binds no name that moved and declares the same names as before, so
+	// neither it nor anything behind it has a reason to be read or rewritten.
+	forbidOwners(t, owners, ids, "mid.ts", "far.ts", "other.ts")
+	if res.ParsedFiles != 1 {
+		t.Fatalf("parsed=%d, want only the file whose declarations moved: %v", res.ParsedFiles, ids)
+	}
+
+	writeFile(t, root, "core.ts", "export const renamed = 1;\nexport const added = 2;\n")
+
+	res, owners, ids = bodyScopeDelta(t, eng, root, opts, cons)
 	requireOwners(t, owners, ids, "core.ts", "mid.ts")
-	// mid.ts declares the same names as before, so nothing it exports moved and
-	// far.ts sees no difference: the old rule reached it purely by reachability.
 	forbidOwners(t, owners, ids, "far.ts", "other.ts")
 	if res.ParsedFiles != 2 {
-		t.Fatalf("parsed=%d, want core.ts and its direct importer: %v", res.ParsedFiles, ids)
+		t.Fatalf("parsed=%d, want core.ts and the importer whose binding moved: %v", res.ParsedFiles, ids)
 	}
 }
 
@@ -325,6 +336,20 @@ func TestBodyScopeColdImportCycleParsesEachMemberOnce(t *testing.T) {
 	writeFile(t, root, "a.ts", "import { b } from './b';\nexport const a = b + 1;\nexport const added = 2;\n")
 
 	res, owners, ids := bodyScopeDelta(t, eng, root, opts, cons)
+	requireOwners(t, owners, ids, "a.ts")
+	// The partner imports a name that did not move, so the cycle is not entered
+	// at all for an addition nobody binds.
+	forbidOwners(t, owners, ids, "b.ts", "other.ts")
+	if res.ParsedFiles != 1 {
+		t.Fatalf("parsed=%d, want only the edited member: %v", res.ParsedFiles, ids)
+	}
+
+	// Renaming the name the partner does import enters the cycle, and the
+	// original guard holds there: each member is read once and the closure
+	// terminates rather than chasing the edge back.
+	writeFile(t, root, "a.ts", "import { b } from './b';\nexport const renamed = b + 1;\nexport const added = 2;\n")
+
+	res, owners, ids = bodyScopeDelta(t, eng, root, opts, cons)
 	requireOwners(t, owners, ids, "a.ts", "b.ts")
 	forbidOwners(t, owners, ids, "other.ts")
 	if res.ParsedFiles != 2 {

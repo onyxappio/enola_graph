@@ -2690,6 +2690,10 @@ func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*Fil
 	changed := map[string]bool{}
 	parsedBefore := 0
 	unreadable := map[string]bool{}
+	// Owners the name delta took that have so far proven they only need their
+	// cached facts republished. Held across hops rather than committed on the
+	// spot: see the reconsideration below.
+	rebind := map[string]bool{}
 	for {
 		r, err := ts.ExtractSession(ctx, s.abs, owned, work, pending, hooks)
 		if err != nil {
@@ -2722,10 +2726,26 @@ func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*Fil
 		next := surfaceDependents(dirty, changed, work, prevRecs, angular)
 		added, removed := declaredNameDelta(prevRecs, work, retired)
 		for f := range nameDependents(prevRecs, added, removed, dirty) {
+			if !angular && !next[f] && rebindableConsumer(prevRecs[f], dirty) {
+				rebind[f] = true
+				continue
+			}
 			next[f] = true
 		}
 		for f := range sideReadDependents(dirty, provenSideReadSources(parsed, prevRecs, work), prevRecs, hashes, angular) {
 			next[f] = true
+		}
+		// A candidate is provisional until the closure settles. Dirt a later hop
+		// adds can reach an edge it held, and a later hop can take it for a
+		// reason of its own, so every candidate is judged again against the dirt
+		// as it now stands and is parsed like any other dependent the moment it
+		// stops proving itself. Nothing has read it yet, so promoting it is just
+		// an ordinary pending file.
+		for f := range rebind {
+			if next[f] || !rebindableConsumer(prevRecs[f], dirty) {
+				delete(rebind, f)
+				next[f] = true
+			}
 		}
 		parsedBefore += r.Stats.FilesParsed
 		pending = map[string]bool{}
@@ -2737,6 +2757,13 @@ func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*Fil
 			}
 		}
 		if len(pending) == 0 {
+			// Nothing further will be read, so a candidate that survived every
+			// hop is proven: republished, not reparsed. The scope has to carry
+			// it so the owner is rewritten, and pending never did, so nothing
+			// read its bytes.
+			for f := range rebind {
+				dirty[f] = true
+			}
 			break
 		}
 		// The next hop is inside the same transaction as the first one. Bytes it

@@ -262,7 +262,9 @@ func replayableDependent(rec *tsextractor.FileRecord) bool {
 }
 
 // surfaceDependents is one hop of the observed-surface closure. Dependents of a
-// file whose reparse published a changed surface are always taken; dependents of
+// file whose reparse published a changed surface are always taken, unless the
+// change was confined to the names it declares, in which case the dependents
+// whose rebinding the name delta already enumerates are left out; dependents of
 // a file that is merely dirty are taken only when they cannot prove their own
 // bindings, or when broad forces the old reachability rule for the whole session.
 //
@@ -286,25 +288,44 @@ func surfaceDependents(have, changed map[string]bool, recs, prev map[string]*tse
 		}
 	}
 	out := map[string]bool{}
-	take := func(dep string, all bool) {
+	take := func(dep string, rule takeRule) {
 		for _, user := range importers[dep] {
 			if have[user] || out[user] {
 				continue
 			}
-			if all || !replayableDependent(prev[user]) {
+			switch rule {
+			case takeProvenBindings:
+				if !replayableDependent(prev[user]) {
+					out[user] = true
+				}
+			case takeNameScoped:
+				if !nameScopedDependent(prev[user]) {
+					out[user] = true
+				}
+			default:
 				out[user] = true
 			}
 		}
 	}
+	dirtyRule := takeProvenBindings
+	if broad {
+		dirtyRule = takeEveryDependent
+	}
 	for f, d := range have {
 		if d {
-			take(filepath.ToSlash(f), broad)
+			take(filepath.ToSlash(f), dirtyRule)
 		}
 	}
 	for f, d := range changed {
-		if d {
-			take(filepath.ToSlash(f), true)
+		if !d {
+			continue
 		}
+		id := filepath.ToSlash(f)
+		rule := takeEveryDependent
+		if !broad && nameOnlySurfaceShift(recordFor(prev, id), recordFor(recs, id)) {
+			rule = takeNameScoped
+		}
+		take(id, rule)
 	}
 	return out
 }
