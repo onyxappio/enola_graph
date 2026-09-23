@@ -1,0 +1,181 @@
+{
+  "method": "Complete node/edge JSON per owner, preserving duplicates; excludes only run envelopes",
+  "limitation": "Unchanged final contribution does not alone prove it was safe to omit planning or analysis",
+  "completed_publishing_cases": [
+    {
+      "case": "00-4d104e600f89..07fb4a41ddaf",
+      "scope": 7,
+      "changed_contributions_in_scope": 2,
+      "unchanged_contributions_in_scope": 5,
+      "scope_extensions": {
+        ".ts": 6,
+        ".json": 1
+      },
+      "changed_extensions": {
+        ".ts": 2
+      },
+      "unchanged_markdown": 0,
+      "cold_equal": true
+    },
+    {
+      "case": "01-07fb4a41ddaf..fec1eac346c4",
+      "scope": 1783,
+      "changed_contributions_in_scope": 83,
+      "unchanged_contributions_in_scope": 1700,
+      "scope_extensions": {
+        ".tsx": 665,
+        ".md": 615,
+        ".ts": 502,
+        ".js": 1
+      },
+      "changed_extensions": {
+        ".tsx": 48,
+        ".ts": 35
+      },
+      "unchanged_markdown": 615,
+      "cold_equal": true
+    },
+    {
+      "case": "02-fec1eac346c4..9fc7ae5b4c3f",
+      "scope": 2267,
+      "changed_contributions_in_scope": 17,
+      "unchanged_contributions_in_scope": 2250,
+      "scope_extensions": {
+        ".ts": 878,
+        ".tsx": 755,
+        ".md": 633,
+        ".js": 1
+      },
+      "changed_extensions": {
+        ".ts": 12,
+        ".tsx": 4,
+        ".md": 1
+      },
+      "unchanged_markdown": 632,
+      "cold_equal": true
+    },
+    {
+      "case": "03-9fc7ae5b4c3f..1c2607479b6d",
+      "scope": 1118,
+      "changed_contributions_in_scope": 32,
+      "unchanged_contributions_in_scope": 1086,
+      "scope_extensions": {
+        ".md": 617,
+        ".ts": 364,
+        ".tsx": 69,
+        ".mjs": 68
+      },
+      "changed_extensions": {
+        ".ts": 25,
+        ".mjs": 4,
+        ".md": 3
+      },
+      "unchanged_markdown": 614,
+      "cold_equal": true
+    },
+    {
+      "case": "04-1c2607479b6d..599575d0aa39",
+      "scope": 9,
+      "changed_contributions_in_scope": 6,
+      "unchanged_contributions_in_scope": 3,
+      "scope_extensions": {
+        ".ts": 6,
+        ".md": 2,
+        ".mjs": 1
+      },
+      "changed_extensions": {
+        ".ts": 5,
+        ".mjs": 1
+      },
+      "unchanged_markdown": 2,
+      "cold_equal": true
+    },
+    {
+      "case": "05-599575d0aa39..ae233c5f5695",
+      "scope": 823,
+      "changed_contributions_in_scope": 25,
+      "unchanged_contributions_in_scope": 798,
+      "scope_extensions": {
+        ".md": 638,
+        ".ts": 114,
+        ".mjs": 69,
+        ".json": 1,
+        ".mts": 1
+      },
+      "changed_extensions": {
+        ".ts": 13,
+        ".md": 7,
+        ".mjs": 4,
+        ".mts": 1
+      },
+      "unchanged_markdown": 631,
+      "cold_equal": true
+    },
+    {
+      "case": "06-ae233c5f5695..4168360e2e7f",
+      "scope": 778,
+      "changed_contributions_in_scope": 10,
+      "unchanged_contributions_in_scope": 768,
+      "scope_extensions": {
+        ".md": 618,
+        ".ts": 128,
+        ".json": 31,
+        ".toml": 1
+      },
+      "changed_extensions": {
+        ".ts": 7,
+        ".json": 2,
+        ".md": 1
+      },
+      "unchanged_markdown": 617,
+      "cold_equal": true
+    },
+    {
+      "case": "07-4168360e2e7f..a6f1f3a91a36",
+      "scope": 80,
+      "changed_contributions_in_scope": 4,
+      "unchanged_contributions_in_scope": 76,
+      "scope_extensions": {
+        ".ts": 80
+      },
+      "changed_extensions": {
+        ".ts": 4
+      },
+      "unchanged_markdown": 0,
+      "cold_equal": true
+    },
+    {
+      "case": "08-a6f1f3a91a36..5dfb2c8f276d",
+      "scope": 743,
+      "changed_contributions_in_scope": 5,
+      "unchanged_contributions_in_scope": 738,
+      "scope_extensions": {
+        ".md": 618,
+        ".mjs": 86,
+        ".ts": 39
+      },
+      "changed_extensions": {
+        ".mjs": 3,
+        ".ts": 2
+      },
+      "unchanged_markdown": 618,
+      "cold_equal": true
+    },
+    {
+      "case": "09-5dfb2c8f276d..a609c19f3861",
+      "scope": 663,
+      "changed_contributions_in_scope": 7,
+      "unchanged_contributions_in_scope": 656,
+      "scope_extensions": {
+        ".md": 618,
+        ".ts": 45
+      },
+      "changed_extensions": {
+        ".ts": 6,
+        ".md": 1
+      },
+      "unchanged_markdown": 617,
+      "cold_equal": true
+    }
+  ]
+}

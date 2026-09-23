@@ -1,5 +1,5 @@
 {
-  "purpose": "Final stage9 matched historical correctness cohort; no performance results yet",
+  "purpose": "Stage9 historical correctness cohort completed on50b64fd; performance gaps remain",
   "source": "/tmp/enola-product-history-source",
   "pinned_ref": "a609c19f3861971930fae7b33dcb2950598953c5",
   "freshness": "local pinned main, not remotely refreshed",
@@ -112,7 +112,7 @@
     "config": "packages/state-machine-telemetry/tsconfig.json",
     "changed_paths": 14,
     "lockfile_policy": "pnpm-lock.yaml remains ignored, manifest changes remain semantic",
-    "status": "selected, not executed",
+    "status": "executed: exact graph/protocol pass; whole-project reparse performance gap",
     "runner_args": [
       "--count",
       "1",

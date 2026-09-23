@@ -1,0 +1,35 @@
+{
+  "kind": "noop",
+  "run": {
+    "exit": 0,
+    "wall_s": 2.431,
+    "sink": "file",
+    "parsed": 0,
+    "cached": 3992,
+    "files_read": 0,
+    "generation": [
+      2,
+      2
+    ],
+    "owners_published": 0,
+    "events": 0,
+    "run_id": "",
+    "stderr_graph": "[graph] /tmp/enola-stage9-main-config-history/live: generation 2\u21922 parsed=0 cached=3992 early_local=0 fallbacks=0"
+  },
+  "completed_generation": 2,
+  "state_unchanged": true,
+  "state_hashes": {
+    "acks.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "commit.json": "b676383fb11c66d1a796b2c20910bba11eb34b7a17c18f20081ab1e4b62262db",
+    "fences.jsonl": "a62c7d0ec6430cf6dd15c6dc8090981a99fa3e2d0d78888f37dfc968563d946b",
+    "identity.json": "790c7cb8e2888d4b09324b5069ab32d6fda658a91520ed61bbd9ce757cab0ba4",
+    "payloads.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "protocol": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+    "state.json": "ba3b446490aee557ba3aa19d1035280f482ab1cc0a347d5635c85188c200b9e9",
+    "tombstones.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "event_bytes_unchanged": 139561487,
+  "coverage": "Final history state only; not each intermediate transition",
+  "sink": "file",
+  "timing": "Single diagnostic fresh CLI run on shared host"
+}
