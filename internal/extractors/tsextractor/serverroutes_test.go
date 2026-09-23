@@ -233,6 +233,70 @@ export function register(app: FastifyInstance) {
 	}
 }
 
+func TestServerRoutes_FunctionInitializerLocalDoesNotInheritFactory(t *testing.T) {
+	src := `
+import Fastify from 'fastify'
+import { FastifyInstance } from 'fastify'
+const app = Fastify()
+app.route({ url: '/server', method: 'GET', handler: () => 1 })
+export const shadow = (candidate: any) => {
+  const app = candidate
+  app.route({ url: '/shadow', method: 'GET', handler: () => 1 })
+}
+export const expr = function (candidate: any) {
+  const app = candidate
+  app.route({ url: '/expr', method: 'GET', handler: () => 1 })
+}
+export const nested = (candidate: any) => {
+  {
+    const app = candidate
+    app.route({ url: '/block', method: 'GET', handler: () => 1 })
+  }
+  app.route({ url: '/after-block', method: 'GET', handler: () => 1 })
+}
+export const destructure = (candidate: any) => {
+  const { app } = candidate
+  app.route({ url: '/destructure', method: 'GET', handler: () => 1 })
+}
+export const innerFactory = () => {
+  const app = Fastify()
+  app.route({ url: '/nested-factory', method: 'GET', handler: () => 1 })
+}
+export function register(app: FastifyInstance) {
+  app.route({ url: '/typed', method: 'GET', handler: () => 1 })
+}
+`
+	ff := extractTS(t, src, "src/index.ts")
+	got := serverRoutes(ff)
+	if got["/server"] == "" {
+		t.Fatalf("module Fastify receiver lost: %+v", got)
+	}
+	if got["/typed"] == "" {
+		t.Fatalf("typed FastifyInstance receiver lost: %+v", got)
+	}
+	if got["/after-block"] == "" {
+		t.Fatalf("module receiver after nested block lost: %+v", got)
+	}
+	if got["/nested-factory"] == "" {
+		t.Fatalf("known nested Fastify factory lost: %+v", got)
+	}
+	if _, ok := got["/shadow"]; ok {
+		t.Fatalf("arrow initializer unknown alias inherited factory: %+v", got)
+	}
+	if _, ok := got["/expr"]; ok {
+		t.Fatalf("function initializer unknown alias inherited factory: %+v", got)
+	}
+	if _, ok := got["/block"]; ok {
+		t.Fatalf("block-scoped initializer local inherited factory: %+v", got)
+	}
+	if _, ok := got["/destructure"]; ok {
+		t.Fatalf("destructured initializer unknown inherited factory: %+v", got)
+	}
+	if clientRoutes(ff)["/shadow"] == "" {
+		t.Fatalf("arrow initializer route must remain a client call: %+v", clientRoutes(ff))
+	}
+}
+
 func TestServerRoutes_RouteObjectDoesNotStealClient(t *testing.T) {
 	src := `
 import axios from "axios";

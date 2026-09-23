@@ -673,6 +673,7 @@ func collectLocalBindingScopes(src []byte) []fastifyParamScope {
 		declStart := i
 		i += len(kw)
 		blockEnd := enclosingBlockEnd(src, mask, declStart)
+		nestedScan := -1
 		for i < len(src) && i < blockEnd {
 			i = skipTSSpace(src, mask, i)
 			if i >= len(src) || i >= blockEnd {
@@ -702,6 +703,12 @@ func collectLocalBindingScopes(src []byte) []fastifyParamScope {
 					b = serverBinding{framework: frameworkOf[string(fm[1])], mounted: true}
 				}
 				i = skipTSInitializer(src, mask, i, blockEnd)
+				// Nested function/arrow/object initializers can declare their
+				// own const/let/var bindings. skipTSInitializer must not hide
+				// those names from lexical discovery.
+				if nestedScan < 0 || rhs < nestedScan {
+					nestedScan = rhs
+				}
 			}
 			if rhs > blockEnd {
 				break
@@ -731,6 +738,9 @@ func collectLocalBindingScopes(src []byte) []fastifyParamScope {
 				continue
 			}
 			break
+		}
+		if nestedScan >= 0 && nestedScan < i {
+			i = nestedScan
 		}
 	}
 	return out

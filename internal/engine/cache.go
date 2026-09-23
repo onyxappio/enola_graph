@@ -2473,7 +2473,9 @@ import (
 // v286: Fastify local const/let/var/destructuring bindings always lexically
 // shadow outer same-name factories; only a proven local app-factory RHS is a
 // server receiver (unknown/alias RHS does not inherit outer bindings).
-const cacheVersion = "v286"
+// v287: lexical local-binding discovery walks nested function/arrow
+// initializer bodies instead of skipping them with skipTSInitializer.
+const cacheVersion = "v287"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //
