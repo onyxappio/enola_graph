@@ -626,6 +626,44 @@ func (idx *idIndex) resolve(fromRepo, target string) (id, status string) {
 	return idx.resolveRel(fromRepo, "", "", target)
 }
 
+func moduleCandidates(cands []facts.Fact, fromRepo string) []facts.Fact {
+	var mods []facts.Fact
+	for _, f := range cands {
+		if f.Kind != facts.KindModule {
+			continue
+		}
+		if fromRepo != "" && f.Repo != fromRepo && f.Repo != "" {
+			continue
+		}
+		mods = append(mods, f)
+	}
+	return mods
+}
+
+func pickModuleIdentity(mods []facts.Fact) (string, string) {
+	if len(mods) == 0 {
+		return "", graphstream.ResUnresolved
+	}
+	better := func(a, b facts.Fact) bool {
+		aSyn := a.File == a.Name || a.File == "" || a.File == a.Name+"/"
+		bSyn := b.File == b.Name || b.File == "" || b.File == b.Name+"/"
+		if aSyn != bSyn {
+			return aSyn
+		}
+		if a.File != b.File {
+			return a.File < b.File
+		}
+		return a.Identity() < b.Identity()
+	}
+	pick := mods[0]
+	for _, f := range mods[1:] {
+		if better(f, pick) {
+			pick = f
+		}
+	}
+	return pick.Identity(), graphstream.ResResolved
+}
+
 func preferredResolveKind(fromKind, relKind string) string {
 	if fromKind == facts.KindStorage && relKind == facts.RelDependsOn {
 		return facts.KindStorage
@@ -656,6 +694,11 @@ func (idx *idIndex) resolveRelConstrained(fromRepo, fromKind, relKind, target st
 	cands := idx.byName[target]
 	if len(cands) == 0 {
 		return "", graphstream.ResUnresolved
+	}
+	if relKind == facts.RelDeclares || relKind == facts.RelImports {
+		if mods := moduleCandidates(cands, fromRepo); len(mods) > 0 {
+			return pickModuleIdentity(mods)
+		}
 	}
 	// RelCalls may carry extractor-proven TargetFile. That is lexical evidence
 	// for the callee's file (imported specifier or a locally declared name).

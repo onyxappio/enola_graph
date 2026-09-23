@@ -369,7 +369,9 @@ func TestMDScopeGlobalNameConsumerIncludedThoughItsPageIsUnchanged(t *testing.T)
 
 	owners, ids := beginScope(t, sink)
 	requireOwners(t, owners, ids, "docs/a.md", "docs/b.md")
-	forbidOwners(t, owners, ids, "docs/keep.md")
+	// keep.md shares the docs/ directory module. Turning b.md into a document
+	// adds a file-owned module candidate, so keep.md's declares edge retargets.
+	requireOwners(t, owners, ids, "docs/keep.md")
 	requireNoWholeDomainFallback(t, delta, ids)
 
 	assertAppliedEqualsCold(t, cons, coldConsumer(t, eng, root))

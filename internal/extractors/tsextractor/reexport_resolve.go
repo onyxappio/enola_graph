@@ -14,16 +14,16 @@ import (
 
 // namedExportCache holds one parsed export index per file for a session.
 type namedExportCache struct {
-	mu    sync.Mutex
+	mu     sync.Mutex
 	byFile map[string]*namedExportIndex
-	scans *atomic.Int32
+	scans  *atomic.Int32
 }
 
 type namedExportIndex struct {
-	local  map[string]bool
-	named  map[string][][2]string // exported name → (module file, original name)
-	stars  []string
-	empty  bool
+	local map[string]bool
+	named map[string][][2]string // exported name → (module file, original name)
+	stars []string
+	empty bool
 }
 
 func newNamedExportCache() *namedExportCache {
@@ -89,6 +89,9 @@ func parseNamedExportIndex(file string, readSrc func(string) []byte, aliases map
 	defer tree.Close()
 	root := tree.RootNode()
 	fileDir := factpath.Dir(file)
+	imported := map[string][2]string{}
+	localBind := map[string]bool{}
+	collectModuleBindings(kinds, root, src, fileDir, aliases, knownFiles, imported, localBind)
 
 	for i := range root.ChildCount() {
 		child := root.Child(i)
@@ -150,15 +153,93 @@ func parseNamedExportIndex(file string, readSrc func(string) []byte, aliases map
 				if nameNode == nil {
 					continue
 				}
-				exported := nodeText(nameNode, src)
+				local := nodeText(nameNode, src)
+				exported := local
 				if a := spec.ChildByFieldName("alias"); a != nil {
 					exported = nodeText(a, src)
+				}
+				if !localBind[local] {
+					if bind, ok := imported[local]; ok {
+						idx.named[exported] = append(idx.named[exported], bind)
+						continue
+					}
 				}
 				idx.local[exported] = true
 			}
 		}
 	}
 	return idx
+}
+
+func collectModuleBindings(kinds *tsutil.KindTable, root *sitter.Node, src []byte, fileDir string, aliases map[string]tsAlias, knownFiles map[string]bool, imported map[string][2]string, localBind map[string]bool) {
+	if root == nil {
+		return
+	}
+	for i := range root.ChildCount() {
+		child := root.Child(i)
+		kind := kindOf(kinds, child)
+		switch kind {
+		case "import_statement":
+			source := findChildByKind(kinds, child, "string")
+			if source == nil {
+				continue
+			}
+			importPath := strings.Trim(nodeText(source, src), `"'`)
+			resolved, external := resolveImportPath(importPath, fileDir, aliases)
+			if external {
+				continue
+			}
+			mod, _, ok := resolveModuleFile(resolved, knownFiles)
+			if !ok {
+				continue
+			}
+			clause := findChildByKind(kinds, child, "import_clause")
+			if clause == nil {
+				continue
+			}
+			var walkClause func(*sitter.Node)
+			walkClause = func(n *sitter.Node) {
+				if n == nil {
+					return
+				}
+				if kindOf(kinds, n) == "import_specifier" {
+					nameNode := n.ChildByFieldName("name")
+					if nameNode == nil {
+						return
+					}
+					orig := nodeText(nameNode, src)
+					local := orig
+					if a := n.ChildByFieldName("alias"); a != nil {
+						local = nodeText(a, src)
+					}
+					if local != "" {
+						imported[local] = [2]string{mod, orig}
+					}
+					return
+				}
+				for j := range n.NamedChildCount() {
+					walkClause(n.NamedChild(j))
+				}
+			}
+			walkClause(clause)
+		case "export_statement":
+			if decl := firstDeclChild(kinds, child); decl != nil {
+				for _, n := range declExportedNames(kinds, decl, src) {
+					localBind[n] = true
+				}
+			}
+		case "function_declaration", "class_declaration", "abstract_class_declaration", "enum_declaration", "interface_declaration", "type_alias_declaration":
+			if id := child.ChildByFieldName("name"); id != nil {
+				if n := nodeText(id, src); n != "" {
+					localBind[n] = true
+				}
+			}
+		case "lexical_declaration", "variable_declaration":
+			for _, n := range declExportedNames(kinds, child, src) {
+				localBind[n] = true
+			}
+		}
+	}
 }
 
 type followKind int
@@ -172,18 +253,18 @@ const (
 // followNamedExportFile walks proven `export { name } from` and `export * from`
 // edges. followOne returns the unique declaring file; followMany is a collision;
 // followNone is a missing or renamed-away export.
-func followNamedExportFile(file, exportName string, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool, cache *namedExportCache, note func(string)) (string, followKind) {
+func followNamedExportFile(file, exportName string, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool, cache *namedExportCache, note func(string)) (string, string, followKind) {
 	return followNamedExportFileSeen(file, exportName, readSrc, aliases, knownFiles, cache, note, map[string]bool{})
 }
 
-func followNamedExportFileSeen(file, exportName string, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool, cache *namedExportCache, note func(string), seen map[string]bool) (string, followKind) {
+func followNamedExportFileSeen(file, exportName string, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool, cache *namedExportCache, note func(string), seen map[string]bool) (string, string, followKind) {
 	file = filepath.ToSlash(file)
 	if file == "" || exportName == "" || readSrc == nil {
-		return "", followNone
+		return "", "", followNone
 	}
 	key := file + "\x00" + exportName
 	if seen[key] {
-		return "", followNone
+		return "", "", followNone
 	}
 	seen[key] = true
 	if note != nil {
@@ -191,14 +272,17 @@ func followNamedExportFileSeen(file, exportName string, readSrc func(string) []b
 	}
 	idx := cache.index(file, readSrc, aliases, knownFiles)
 	if idx == nil || idx.empty {
-		return "", followNone
+		return "", "", followNone
 	}
 	if idx.local[exportName] {
-		return file, followOne
+		return file, exportName, followOne
 	}
-	var owners []string
+	type owner struct {
+		file, orig string
+	}
+	var owners []owner
 	many := false
-	add := func(o string, k followKind) {
+	add := func(o, orig string, k followKind) {
 		if k == followMany {
 			many = true
 			return
@@ -207,32 +291,32 @@ func followNamedExportFileSeen(file, exportName string, readSrc func(string) []b
 			return
 		}
 		for _, x := range owners {
-			if x == o {
+			if x.file == o && x.orig == orig {
 				return
 			}
 		}
-		owners = append(owners, o)
+		owners = append(owners, owner{file: o, orig: orig})
 	}
 	for _, n := range idx.named[exportName] {
-		leaf, k := followNamedExportFileSeen(n[0], n[1], readSrc, aliases, knownFiles, cache, note, seen)
-		add(leaf, k)
+		leaf, orig, k := followNamedExportFileSeen(n[0], n[1], readSrc, aliases, knownFiles, cache, note, seen)
+		add(leaf, orig, k)
 	}
 	for _, s := range idx.stars {
-		leaf, k := followNamedExportFileSeen(s, exportName, readSrc, aliases, knownFiles, cache, note, seen)
-		add(leaf, k)
+		leaf, orig, k := followNamedExportFileSeen(s, exportName, readSrc, aliases, knownFiles, cache, note, seen)
+		add(leaf, orig, k)
 	}
 	if many || len(owners) > 1 {
-		return "", followMany
+		return "", "", followMany
 	}
 	if len(owners) == 1 {
-		return owners[0], followOne
+		return owners[0].file, owners[0].orig, followOne
 	}
-	return "", followNone
+	return "", "", followNone
 }
 
-func bindNamedImportFile(indexPath, exportName string, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool, cache *namedExportCache, note func(string)) string {
+func bindNamedImportFile(indexPath, exportName string, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool, cache *namedExportCache, note func(string)) (string, string, followKind) {
 	if indexPath == "" {
-		return ""
+		return "", "", followNone
 	}
 	start := filepath.ToSlash(indexPath)
 	chainNote := func(f string) {
@@ -242,17 +326,17 @@ func bindNamedImportFile(indexPath, exportName string, readSrc func(string) []by
 		}
 		note(f)
 	}
-	leaf, kind := followNamedExportFile(indexPath, exportName, readSrc, aliases, knownFiles, cache, chainNote)
+	leaf, orig, kind := followNamedExportFile(indexPath, exportName, readSrc, aliases, knownFiles, cache, chainNote)
 	if note != nil && (kind != followOne || filepath.ToSlash(leaf) != start) {
 		note(start)
 	}
 	switch kind {
 	case followOne:
-		return leaf
+		return leaf, orig, followOne
 	case followMany:
-		return ""
+		return "", "", followMany
 	default:
-		return indexPath
+		return indexPath, exportName, followNone
 	}
 }
 

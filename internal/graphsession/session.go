@@ -666,6 +666,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				// inv.Files, not the policy-filtered current list, is the
 				// resolution universe the extractor itself will use.
 				membership = membershipScope(previous, current, inv.Files, prevFiles)
+				if membership.changed {
+					extraOwners = append(extraOwners, directoryModuleSiblings(previous, current, prevFiles)...)
+				}
 				if membership.changed && !membership.proven {
 					wholeDomain = true
 					fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "graph", Scope: "all prior/current file owners", Reason: membership.reason})

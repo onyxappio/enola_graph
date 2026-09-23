@@ -2490,7 +2490,15 @@ import (
 // Both branches used v288 independently; no old cache may cross this merge.
 // v291: addServerHandler routes require a source-proven @nuxt/kit lexical
 // binding at the call site (parameter/local shadows are not Nitro).
-const cacheVersion = "v291"
+// v292: minified classification ignores over-length comments/strings in
+// multi-line modules; JSX tags emit symbol-owned calls; import-then-export
+// clauses follow the imported leaf; Nuxt file-convention pages require an
+// app nuxt.config while extendPages/definePageMeta register debug routes;
+// markdown and per-file TypeScript emit file-owned directory modules.
+// v293: nested statement blocks restore outer JSX import bindings; import/export
+// alias bridges bind the leaf original name; markdown emits file-owned modules
+// alongside directory-shaped v1 identities.
+const cacheVersion = "v293"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

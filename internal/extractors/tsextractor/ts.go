@@ -542,10 +542,10 @@ type extractCtx struct {
 	isSvelteKit bool
 	orms        ormFlags
 	importMap   map[string]string
-	importFiles map[string]string // local import name → known source file of that specifier
-	nsDirs      map[string]string // `import * as ns` local → module directory
-	nsIndex     map[string]string // `import * as ns` local → resolved module file
-	localNames  map[string]bool   // file-scope function/const names that may own a local call
+	importFiles map[string]string   // local import name → known source file of that specifier
+	nsDirs      map[string]string   // `import * as ns` local → module directory
+	nsIndex     map[string]string   // `import * as ns` local → resolved module file
+	localNames  map[string]bool     // file-scope function/const names that may own a local call
 	imports     emberImportBindings // the file's import table, read for the module a superclass identifier came from
 	ioBindings  map[string]bool     // local names bound to imports from a network module (I/O sinks)
 	knownFiles  map[string]bool     // repo-relative (slash) paths of all indexed TS/JS files
@@ -790,12 +790,13 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 	// the early SFC return above and are emitted by extractVueSFC; emit the other
 	// supported extensions here.
 	if isNuxt && !isVueFile(relFile) {
-		if route := detectNuxtRoute(relFile); route != nil {
+		if route := detectNuxtConventionPage(relFile, knownFiles); route != nil {
 			result = append(result, *route)
 		}
 	}
 	if !facts.IsTestPath(relFile) {
 		result = append(result, extractNitroFacts(kinds, root, src, relFile, isNuxt, aliases, knownFiles)...)
+		result = append(result, extractExtendPagesFacts(kinds, root, src, relFile, aliases, knownFiles)...)
 	}
 
 	return result, angular, router, inlineTemplates, httpFile, clients
@@ -1732,25 +1733,119 @@ func isTypeScriptFile(path string) bool {
 const minifiedLineThreshold = 2000
 
 // isMinifiedSource reports whether content looks like a minified or bundled
-// artifact rather than hand-written source, by the presence of any line longer
-// than minifiedLineThreshold. Parsing such files (e.g. a checked-in webpack /
-// vendor bundle served statically) pollutes the fact graph with obfuscated
-// symbols and drives spurious complexity/hotspot findings, so they are skipped.
-// The scan is bounded: it stops at the first over-length line without buffering
-// the whole file.
+// artifact rather than hand-written source. A single over-length comment or
+// string literal in an otherwise ordinary module is not enough: those lines are
+// data. A line whose remaining *code* (outside comments and string/template
+// contents) still exceeds minifiedLineThreshold is a bundle. A tiny file whose
+// only lines are over-length is also treated as bundled, covering the
+// one-statement vendor chunk that is nothing but a string assignment.
 func isMinifiedSource(content []byte) bool {
+	lines := 1
 	col := 0
-	for _, b := range content {
+	codeCol := 0
+	longAny := false
+	inLineComment := false
+	inBlockComment := false
+	var str byte
+	esc := false
+	n := len(content)
+	flush := func() bool {
+		if col > minifiedLineThreshold {
+			longAny = true
+			if codeCol > minifiedLineThreshold {
+				return true
+			}
+		}
+		col = 0
+		codeCol = 0
+		return false
+	}
+	for i := 0; i < n; i++ {
+		b := content[i]
+		if inLineComment {
+			if b == '\n' {
+				inLineComment = false
+				lines++
+				if flush() {
+					return true
+				}
+			}
+			continue
+		}
+		if inBlockComment {
+			if b == '\n' {
+				lines++
+				if flush() {
+					return true
+				}
+				continue
+			}
+			if b == '*' && i+1 < n && content[i+1] == '/' {
+				inBlockComment = false
+				i++
+			}
+			continue
+		}
+		if str != 0 {
+			col++
+			if esc {
+				esc = false
+				continue
+			}
+			if b == '\\' && str != '`' {
+				esc = true
+				continue
+			}
+			if b == '\n' {
+				lines++
+				if flush() {
+					return true
+				}
+				if str != '`' {
+					str = 0
+				}
+				continue
+			}
+			if b == str {
+				str = 0
+			}
+			continue
+		}
+		if b == '/' && i+1 < n {
+			switch content[i+1] {
+			case '/':
+				inLineComment = true
+				i++
+				continue
+			case '*':
+				inBlockComment = true
+				i++
+				continue
+			}
+		}
+		if b == '"' || b == '\'' || b == '`' {
+			str = b
+			col++
+			codeCol++
+			continue
+		}
 		if b == '\n' {
-			col = 0
+			lines++
+			if flush() {
+				return true
+			}
 			continue
 		}
 		col++
-		if col > minifiedLineThreshold {
+		codeCol++
+	}
+	if col > minifiedLineThreshold {
+		longAny = true
+		if codeCol > minifiedLineThreshold {
 			return true
 		}
 	}
-	return false
+	return longAny && lines <= 1
 }
 
 // OwnsFile implements plugin.FileOwner for incremental caching.
@@ -2565,12 +2660,17 @@ func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, 
 func bindImportedSymbol(moduleDir, indexPath, exportName, resolved string, foundFile bool, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool, cache *namedExportCache, note func(string)) (target, file string) {
 	target = moduleDir + "." + exportName
 	if foundFile && indexPath != "" {
-		leaf := bindNamedImportFile(indexPath, exportName, readSrc, aliases, knownFiles, cache, note)
+		leaf, orig, kind := bindNamedImportFile(indexPath, exportName, readSrc, aliases, knownFiles, cache, note)
+		if kind == followMany {
+			return target, ""
+		}
 		if leaf != "" {
 			file = leaf
-			if filepath.ToSlash(leaf) != filepath.ToSlash(indexPath) {
-				target = factpath.Dir(leaf) + "." + exportName
+			name := exportName
+			if kind == followOne && orig != "" {
+				name = orig
 			}
+			target = factpath.Dir(leaf) + "." + name
 		}
 		return target, file
 	}
@@ -2654,8 +2754,8 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 	internalFiles := make(map[string]string)
 	namespaces := make(map[string]string)     // `import * as ns` local -> module dir
 	namespaceFiles := make(map[string]string) // `import * as ns` local -> module file
-	var reexports []string                // canonical targets re-exported via `export { x } from './y'`
-	var defaultRefs []string              // default-export targets of default-imported modules
+	var reexports []string                    // canonical targets re-exported via `export { x } from './y'`
+	var defaultRefs []string                  // default-export targets of default-imported modules
 
 	bind := func(local, moduleDir, exportName, indexPath, resolved string, foundFile bool) {
 		if local == "" {
@@ -3130,6 +3230,57 @@ func resolveJSXTag(kinds *tsutil.KindTable, nameNode *sitter.Node, src []byte, d
 	return ""
 }
 
+// resolveJSXCall binds a JSX tag in a function body to a source-proven callee.
+// Intrinsic lowercase tags, unimported PascalCase names, and member tags without
+// a namespace import are left unbound rather than guessed.
+func resolveJSXCall(kinds *tsutil.KindTable, nameNode *sitter.Node, src []byte, dir string, importMap, importFiles map[string]string, localNames map[string]bool, relFile string, shadowed func(string) bool, ctx *extractCtx) (string, string) {
+	switch kindOf(kinds, nameNode) {
+	case "identifier":
+		name := nodeText(nameNode, src)
+		if !isComponentName(name) {
+			return "", ""
+		}
+		if shadowed != nil && shadowed(name) {
+			return "", ""
+		}
+		if target, ok := importMap[name]; ok {
+			return target, importFiles[name]
+		}
+		if localNames[name] {
+			return dir + "." + name, relFile
+		}
+		return "", ""
+	case "member_expression", "nested_identifier":
+		obj := nameNode.ChildByFieldName("object")
+		if obj == nil && nameNode.ChildCount() > 0 {
+			obj = nameNode.Child(0)
+		}
+		prop := nameNode.ChildByFieldName("property")
+		if obj == nil || prop == nil || kindOf(kinds, obj) != "identifier" {
+			return "", ""
+		}
+		root := nodeText(obj, src)
+		if shadowed != nil && shadowed(root) {
+			return "", ""
+		}
+		if ctx != nil {
+			if nsDir, ok := ctx.nsDirs[root]; ok {
+				exportName := nodeText(prop, src)
+				return bindImportedSymbol(nsDir, ctx.nsIndex[root], exportName, "", ctx.nsIndex[root] != "", ctx.readSrc, ctx.aliases, ctx.knownFiles, ctx.exportCache, func(f string) {
+					if ctx.sideReads == nil {
+						return
+					}
+					f = filepath.ToSlash(f)
+					if f != "" && f != filepath.ToSlash(ctx.relFile) {
+						ctx.sideReads[f] = true
+					}
+				})
+			}
+		}
+	}
+	return "", ""
+}
+
 // tsBodyMetrics accumulates per-function complexity signals during the single
 // body walk — mirrors the Go/Python/Ruby/Swift/Kotlin extractors.
 type tsBodyMetrics struct {
@@ -3575,7 +3726,18 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 		return
 	}
 	kind := kindOf(w.kinds, n)
+	if kind == "statement_block" {
+		w.pushShadowScope()
+		for i := range n.ChildCount() {
+			w.walk(n.Child(i))
+		}
+		w.popShadowScope()
+		return
+	}
 	if kind == "lexical_declaration" || kind == "variable_declaration" {
+		if len(w.shadows) == 0 {
+			w.pushShadowScope()
+		}
 		w.noteShadowBindings(n)
 	}
 	if (kind == "class_declaration" || kind == "class") && len(w.shadows) > 0 {
@@ -3655,6 +3817,19 @@ func (w *tsBodyWalker) walk(n *sitter.Node) {
 			w.repeatDepth--
 		}
 		return
+	}
+
+	if kind == "jsx_opening_element" || kind == "jsx_self_closing_element" {
+		if nameNode := n.ChildByFieldName("name"); nameNode != nil {
+			if target, targetFile := resolveJSXCall(w.kinds, nameNode, w.src, w.dir, w.importMap, w.importFiles, w.localNames, w.relFile, w.shadowed, w.ctx); target != "" {
+				key := target + "\x00" + targetFile
+				if !w.seen[key] {
+					w.seen[key] = true
+					w.rels = append(w.rels, facts.Relation{Kind: facts.RelCalls, Target: target, TargetFile: targetFile})
+				}
+				w.recordCall(target)
+			}
+		}
 	}
 
 	if kind == "call_expression" {

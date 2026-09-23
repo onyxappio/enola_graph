@@ -164,6 +164,61 @@ func authoritativeFilePlan(previous, current []string, prevFiles map[string]*Fil
 	return p, reason, err
 }
 
+// directoryModuleSiblings lists markdown owners that share a directory with a
+// file that entered or left the published set. Directory module identity is
+// shared across those pages, so a last-owner or sibling TS change must
+// republish their declares edges.
+func directoryModuleSiblings(previous, current []string, prevFiles map[string]*FileState) []string {
+	prevSet := map[string]bool{}
+	for _, f := range previous {
+		prevSet[filepath.ToSlash(f)] = true
+	}
+	currSet := map[string]bool{}
+	for _, f := range current {
+		currSet[filepath.ToSlash(f)] = true
+	}
+	dirs := map[string]bool{}
+	mark := func(f string, in map[string]bool) {
+		if in[f] {
+			return
+		}
+		dirs[filepath.ToSlash(filepath.Dir(f))] = true
+	}
+	for f := range prevSet {
+		mark(f, currSet)
+	}
+	for f := range currSet {
+		mark(f, prevSet)
+	}
+	if len(dirs) == 0 {
+		return nil
+	}
+	seen := map[string]bool{}
+	var out []string
+	add := func(f string) {
+		f = filepath.ToSlash(f)
+		if f == "" || seen[f] || !strings.HasSuffix(strings.ToLower(f), ".md") {
+			return
+		}
+		if !dirs[filepath.ToSlash(filepath.Dir(f))] {
+			return
+		}
+		seen[f] = true
+		out = append(out, f)
+	}
+	for f := range prevSet {
+		add(f)
+	}
+	for f := range currSet {
+		add(f)
+	}
+	for path := range prevFiles {
+		add(path)
+	}
+	sort.Strings(out)
+	return out
+}
+
 // membershipDelta is the pre-Begin answer to what an add, delete or rename
 // moves besides the files themselves. It is computed once, before the planning
 // extract, because the importers it names are reparses like any other: their

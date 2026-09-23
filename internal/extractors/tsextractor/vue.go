@@ -242,6 +242,281 @@ func detectNuxtRoute(relFile string) *facts.Fact {
 	return nil
 }
 
+func nuxtConfigPackageOf(relFile string, knownFiles map[string]bool) (string, bool) {
+	if knownFiles == nil {
+		return "", false
+	}
+	dir := factpath.Dir(filepath.ToSlash(relFile))
+	for {
+		for _, name := range []string{"nuxt.config.ts", "nuxt.config.js", "nuxt.config.mjs"} {
+			cand := name
+			if dir != "" && dir != "." {
+				cand = dir + "/" + name
+			}
+			if knownFiles[cand] {
+				if dir == "." {
+					return "", true
+				}
+				return dir, true
+			}
+		}
+		if dir == "" || dir == "." {
+			return "", false
+		}
+		parent := factpath.Dir(dir)
+		if parent == dir {
+			return "", false
+		}
+		dir = parent
+	}
+}
+
+func detectNuxtConventionPage(relFile string, knownFiles map[string]bool) *facts.Fact {
+	file := filepath.ToSlash(relFile)
+	parts := strings.Split(file, "/")
+	for i, p := range parts {
+		if p == "pages" && i > 0 && parts[i-1] == "runtime" {
+			return nil
+		}
+	}
+	if _, ok := nuxtConfigPackageOf(relFile, knownFiles); ok {
+		pkg, _ := nuxtConfigPackageOf(relFile, knownFiles)
+		if pkg != "" && !strings.HasPrefix(file, pkg+"/") && file != pkg {
+			return nil
+		}
+		return detectNuxtRoute(relFile)
+	}
+	hasConfig := false
+	if knownFiles != nil {
+		for f := range knownFiles {
+			base := filepath.Base(f)
+			if base == "nuxt.config.ts" || base == "nuxt.config.js" || base == "nuxt.config.mjs" {
+				hasConfig = true
+				break
+			}
+		}
+	}
+	if hasConfig {
+		return nil
+	}
+	return detectNuxtRoute(relFile)
+}
+
+func extractExtendPagesFacts(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool) []facts.Fact {
+	if !bytes.Contains(src, []byte("extendPages")) {
+		return nil
+	}
+	locals := nuxtKitNamedLocals(kinds, root, src, "extendPages")
+	if len(locals) == 0 && bytes.Contains(src, []byte("@nuxt/kit")) {
+		locals = map[string]bool{"extendPages": true}
+	}
+	if len(locals) == 0 {
+		return nil
+	}
+	var out []facts.Fact
+	var walk func(*sitter.Node)
+	walk = func(n *sitter.Node) {
+		if n == nil {
+			return
+		}
+		if kindOf(kinds, n) == "call_expression" {
+			fn := n.ChildByFieldName("function")
+			if fn != nil && kindOf(kinds, fn) == "identifier" {
+				name := nodeText(fn, src)
+				if locals[name] && !graphqlImportedNameShadowed(kinds, fn, src, name) {
+					out = append(out, extendPagesFromCall(n, src, relFile, aliases, knownFiles)...)
+				}
+			}
+		}
+		for i := range n.NamedChildCount() {
+			walk(n.NamedChild(i))
+		}
+	}
+	walk(root)
+	return out
+}
+
+func extendPagesFromCall(call *sitter.Node, src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool) []facts.Fact {
+	if call == nil {
+		return nil
+	}
+	body := src[call.StartByte():call.EndByte()]
+	var out []facts.Fact
+	seen := map[string]bool{}
+	for i := 0; i < len(body); i++ {
+		if body[i] != '{' {
+			continue
+		}
+		end, ok := matchObjectLiteral(body, i)
+		if !ok {
+			continue
+		}
+		obj := body[i : end+1]
+		pathRaw := objectLiteralStringField(obj, "path")
+		if pathRaw == "" || !strings.HasPrefix(pathRaw, "/") {
+			continue
+		}
+		handler := ""
+		if hm := handlerResolvePath.FindSubmatch(obj); hm != nil {
+			spec := string(hm[1])
+			resolved, ext := resolveImportPath(spec, factpath.Dir(relFile), aliases)
+			if !ext {
+				if file, _, found := resolveModuleFile(resolved, knownFiles); found {
+					handler = file
+				}
+			}
+		} else if fileField := objectLiteralStringField(obj, "file"); fileField != "" {
+			resolved, ext := resolveImportPath(fileField, factpath.Dir(relFile), aliases)
+			if !ext {
+				if file, _, found := resolveModuleFile(resolved, knownFiles); found {
+					handler = file
+				}
+			}
+		}
+		if handler == "" {
+			continue
+		}
+		if seen[pathRaw] {
+			continue
+		}
+		seen[pathRaw] = true
+		mode := objectLiteralStringField(obj, "mode")
+		props := map[string]any{
+			"method":        "GET",
+			"type":          "page",
+			"router":        "pages",
+			"language":      "typescript",
+			"framework":     "nuxt",
+			"registered_by": relFile,
+			"handler":       handler,
+			"file":          handler,
+			"declaration":   "extendPages",
+		}
+		if mode != "" {
+			props["mode"] = mode
+		}
+		out = append(out, facts.Fact{
+			Kind:      facts.KindRoute,
+			Name:      pathRaw,
+			File:      relFile,
+			Line:      1 + bytes.Count(src[:int(call.StartByte())+i], []byte("\n")),
+			Props:     props,
+			Relations: []facts.Relation{{Kind: facts.RelDeclares, Target: factpath.Dir(relFile)}},
+		})
+	}
+	return out
+}
+
+func extractDefinePageMetaRoutes(src []byte, relFile, pagePath string) []facts.Fact {
+	if !bytes.Contains(src, []byte("definePageMeta")) {
+		return nil
+	}
+	if bytes.Contains(src, []byte("function definePageMeta")) || bytes.Contains(src, []byte("definePageMeta:")) {
+		return nil
+	}
+	idx := bytes.Index(src, []byte("definePageMeta"))
+	rest := src[idx:]
+	open := bytes.IndexByte(rest, '{')
+	if open < 0 {
+		return nil
+	}
+	end, ok := matchObjectLiteral(rest, open)
+	if !ok {
+		return nil
+	}
+	obj := rest[open : end+1]
+	var aliases []string
+	if field := objectLiteralStringField(obj, "alias"); field != "" && strings.HasPrefix(field, "/") {
+		aliases = []string{field}
+	} else {
+		aliases = objectLiteralStringArray(obj, "alias")
+	}
+	var out []facts.Fact
+	for _, alias := range aliases {
+		if !strings.HasPrefix(alias, "/") {
+			continue
+		}
+		out = append(out, facts.Fact{
+			Kind: facts.KindRoute,
+			Name: alias,
+			File: relFile,
+			Line: 1 + bytes.Count(src[:idx], []byte("\n")),
+			Props: map[string]any{
+				"method":      "GET",
+				"type":        "page",
+				"router":      "pages",
+				"language":    "typescript",
+				"framework":   "nuxt",
+				"alias_of":    pagePath,
+				"declaration": "definePageMeta",
+			},
+			Relations: []facts.Relation{{Kind: facts.RelDeclares, Target: factpath.Dir(relFile)}},
+		})
+	}
+	return out
+}
+
+func objectLiteralStringArray(obj []byte, key string) []string {
+	re := regexp.MustCompile(`(?:^|[,{])\s*` + regexp.QuoteMeta(key) + `\s*:\s*\[([^\]]*)\]`)
+	m := re.FindSubmatch(obj)
+	if m == nil {
+		return nil
+	}
+	inner := m[1]
+	item := regexp.MustCompile(`["']([^"']+)["']`)
+	var out []string
+	for _, sm := range item.FindAllSubmatch(inner, -1) {
+		out = append(out, string(sm[1]))
+	}
+	return out
+}
+
+func nuxtKitNamedLocals(kinds *tsutil.KindTable, root *sitter.Node, src []byte, exported string) map[string]bool {
+	out := map[string]bool{}
+	if kinds == nil || root == nil || exported == "" {
+		return out
+	}
+	for i := range root.ChildCount() {
+		stmt := root.Child(i)
+		if kindOf(kinds, stmt) != "import_statement" {
+			continue
+		}
+		source := findChildByKind(kinds, stmt, "string")
+		if source == nil {
+			continue
+		}
+		pkg := strings.Trim(nodeText(source, src), `"'`)
+		if pkg != "@nuxt/kit" {
+			continue
+		}
+		var walkClause func(*sitter.Node)
+		walkClause = func(n *sitter.Node) {
+			if n == nil {
+				return
+			}
+			switch kindOf(kinds, n) {
+			case "import_specifier":
+				imported := n.ChildByFieldName("name")
+				local := n.ChildByFieldName("alias")
+				if local == nil {
+					local = imported
+				}
+				if imported != nil && nodeText(imported, src) == exported && local != nil {
+					if name := nodeText(local, src); name != "" {
+						out[name] = true
+					}
+				}
+			default:
+				for j := range n.NamedChildCount() {
+					walkClause(n.NamedChild(j))
+				}
+			}
+		}
+		walkClause(stmt)
+	}
+	return out
+}
+
 var (
 	vueInterpolationRe  = regexp.MustCompile(`(?s)\{\{(.*?)\}\}`)
 	vueDirectiveValueRe = regexp.MustCompile(`(?is)(?:^|\s)(?:v-[\w-]+(?::[\w-]+)?(?:\.[\w-]+)*|[@:#][^\s=]+)\s*=\s*(?:"([^"]*)"|'([^']*)')`)
@@ -722,8 +997,9 @@ func (e *TSExtractor) extractVueSFC(kinds *tsutil.KindTable, rawSrc []byte, relF
 	}
 
 	if isNuxt {
-		if routeFact := detectNuxtRoute(relFile); routeFact != nil {
+		if routeFact := detectNuxtConventionPage(relFile, knownFiles); routeFact != nil {
 			result = append(result, *routeFact)
+			result = append(result, extractDefinePageMetaRoutes(rawSrc, relFile, routeFact.Name)...)
 		}
 	}
 
