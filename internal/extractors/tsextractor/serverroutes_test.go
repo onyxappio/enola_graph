@@ -99,6 +99,217 @@ app.get('/healthcheck', handler);
 // former as a client call. Only a receiver BOUND to an app/router in this file may
 // become a server route, and an unknown receiver must keep its v141 behaviour
 // exactly — reclassifying one would move existing facts.
+func TestServerRoutes_FastifyRouteObjectLiteral(t *testing.T) {
+	src := `
+import Fastify from 'fastify'
+const app = Fastify()
+app.route({
+  url: '/graphql',
+  method: ['GET', 'POST', 'OPTIONS'],
+  handler: async (req, reply) => {}
+})
+app.get('/health', async () => {})
+`
+	ff := extractTS(t, src, "services/memory-provider/src/app.ts")
+	got := serverRoutes(ff)
+	if got["/graphql"] == "" {
+		t.Fatalf("expected /graphql from app.route: %+v", got)
+	}
+	if got["/health"] != "GET" {
+		t.Errorf("sibling verb route lost: %+v", got)
+	}
+}
+
+func TestServerRoutes_ParameterShadowDoesNotInheritFactory(t *testing.T) {
+	src := `
+import Fastify from 'fastify'
+import { FastifyInstance } from 'fastify'
+const app = Fastify()
+app.route({ url: '/server', method: 'GET', handler: () => 1 })
+function shadow(app: any) {
+  app.route({ url: '/shadow', method: 'GET', handler: () => 1 })
+}
+export function register(app: FastifyInstance) {
+  app.route({ url: '/typed', method: 'GET', handler: () => 1 })
+}
+`
+	ff := extractTS(t, src, "src/index.ts")
+	got := serverRoutes(ff)
+	if got["/server"] == "" {
+		t.Fatalf("module Fastify receiver lost: %+v", got)
+	}
+	if got["/typed"] == "" {
+		t.Fatalf("typed FastifyInstance receiver lost: %+v", got)
+	}
+	if _, ok := got["/shadow"]; ok {
+		t.Fatalf("shadowed any parameter inherited factory: %+v", got)
+	}
+	if clientRoutes(ff)["/shadow"] == "" {
+		t.Fatalf("shadowed route must remain a client call: %+v", clientRoutes(ff))
+	}
+}
+
+func TestServerRoutes_LocalVarShadowDoesNotInheritFactory(t *testing.T) {
+	src := `
+import Fastify from 'fastify'
+import { FastifyInstance } from 'fastify'
+const app = Fastify()
+app.route({ url: '/server', method: 'GET', handler: () => 1 })
+function shadow() {
+  const app = { route: (x: unknown) => x }
+  app.route({ url: '/shadow', method: 'GET', handler: () => 1 })
+}
+function nested() {
+  {
+    const app = { route: (x: unknown) => x }
+    app.route({ url: '/block', method: 'GET', handler: () => 1 })
+  }
+  app.route({ url: '/after-block', method: 'GET', handler: () => 1 })
+}
+export function register(app: FastifyInstance) {
+  app.route({ url: '/typed', method: 'GET', handler: () => 1 })
+}
+`
+	ff := extractTS(t, src, "src/index.ts")
+	got := serverRoutes(ff)
+	if got["/server"] == "" {
+		t.Fatalf("module Fastify receiver lost: %+v", got)
+	}
+	if got["/typed"] == "" {
+		t.Fatalf("typed FastifyInstance receiver lost: %+v", got)
+	}
+	if got["/after-block"] == "" {
+		t.Fatalf("module receiver after nested block lost: %+v", got)
+	}
+	if _, ok := got["/shadow"]; ok {
+		t.Fatalf("local variable shadow inherited factory: %+v", got)
+	}
+	if _, ok := got["/block"]; ok {
+		t.Fatalf("block-scoped local inherited factory: %+v", got)
+	}
+}
+
+func TestServerRoutes_UnknownAliasLocalDoesNotInheritFactory(t *testing.T) {
+	src := `
+import Fastify from 'fastify'
+import { FastifyInstance } from 'fastify'
+const app = Fastify()
+app.route({ url: '/server', method: 'GET', handler: () => 1 })
+function shadow(candidate: any) {
+  const app = candidate
+  app.route({ url: '/shadow', method: 'GET', handler: () => 1 })
+}
+function destructure(candidate: any) {
+  const { app } = candidate
+  app.route({ url: '/destructure', method: 'GET', handler: () => 1 })
+}
+function nestedFactory() {
+  const app = Fastify()
+  app.route({ url: '/nested-factory', method: 'GET', handler: () => 1 })
+}
+export function register(app: FastifyInstance) {
+  app.route({ url: '/typed', method: 'GET', handler: () => 1 })
+}
+`
+	ff := extractTS(t, src, "src/index.ts")
+	got := serverRoutes(ff)
+	if got["/server"] == "" {
+		t.Fatalf("module Fastify receiver lost: %+v", got)
+	}
+	if got["/typed"] == "" {
+		t.Fatalf("typed FastifyInstance receiver lost: %+v", got)
+	}
+	if got["/nested-factory"] == "" {
+		t.Fatalf("known nested Fastify factory lost: %+v", got)
+	}
+	if _, ok := got["/shadow"]; ok {
+		t.Fatalf("unknown alias inherited factory: %+v", got)
+	}
+	if _, ok := got["/destructure"]; ok {
+		t.Fatalf("destructured unknown inherited factory: %+v", got)
+	}
+	if clientRoutes(ff)["/shadow"] == "" {
+		t.Fatalf("unknown alias route must remain a client call: %+v", clientRoutes(ff))
+	}
+}
+
+func TestServerRoutes_FunctionInitializerLocalDoesNotInheritFactory(t *testing.T) {
+	src := `
+import Fastify from 'fastify'
+import { FastifyInstance } from 'fastify'
+const app = Fastify()
+app.route({ url: '/server', method: 'GET', handler: () => 1 })
+export const shadow = (candidate: any) => {
+  const app = candidate
+  app.route({ url: '/shadow', method: 'GET', handler: () => 1 })
+}
+export const expr = function (candidate: any) {
+  const app = candidate
+  app.route({ url: '/expr', method: 'GET', handler: () => 1 })
+}
+export const nested = (candidate: any) => {
+  {
+    const app = candidate
+    app.route({ url: '/block', method: 'GET', handler: () => 1 })
+  }
+  app.route({ url: '/after-block', method: 'GET', handler: () => 1 })
+}
+export const destructure = (candidate: any) => {
+  const { app } = candidate
+  app.route({ url: '/destructure', method: 'GET', handler: () => 1 })
+}
+export const innerFactory = () => {
+  const app = Fastify()
+  app.route({ url: '/nested-factory', method: 'GET', handler: () => 1 })
+}
+export function register(app: FastifyInstance) {
+  app.route({ url: '/typed', method: 'GET', handler: () => 1 })
+}
+`
+	ff := extractTS(t, src, "src/index.ts")
+	got := serverRoutes(ff)
+	if got["/server"] == "" {
+		t.Fatalf("module Fastify receiver lost: %+v", got)
+	}
+	if got["/typed"] == "" {
+		t.Fatalf("typed FastifyInstance receiver lost: %+v", got)
+	}
+	if got["/after-block"] == "" {
+		t.Fatalf("module receiver after nested block lost: %+v", got)
+	}
+	if got["/nested-factory"] == "" {
+		t.Fatalf("known nested Fastify factory lost: %+v", got)
+	}
+	if _, ok := got["/shadow"]; ok {
+		t.Fatalf("arrow initializer unknown alias inherited factory: %+v", got)
+	}
+	if _, ok := got["/expr"]; ok {
+		t.Fatalf("function initializer unknown alias inherited factory: %+v", got)
+	}
+	if _, ok := got["/block"]; ok {
+		t.Fatalf("block-scoped initializer local inherited factory: %+v", got)
+	}
+	if _, ok := got["/destructure"]; ok {
+		t.Fatalf("destructured initializer unknown inherited factory: %+v", got)
+	}
+	if clientRoutes(ff)["/shadow"] == "" {
+		t.Fatalf("arrow initializer route must remain a client call: %+v", clientRoutes(ff))
+	}
+}
+
+func TestServerRoutes_RouteObjectDoesNotStealClient(t *testing.T) {
+	src := `
+import axios from "axios";
+export async function load() {
+  await axios.route({ url: '/graphql', method: 'POST' });
+}
+`
+	ff := extractTS(t, src, "src/client.ts")
+	if got := serverRoutes(ff); len(got) != 0 {
+		t.Errorf("axios.route must not become a server route: %+v", got)
+	}
+}
+
 func TestServerRoutes_DoNotStealClientCalls(t *testing.T) {
 	src := `
 import axios from "axios";
@@ -204,6 +415,143 @@ api.put(` + "`/queue`" + `, handler);
 		if !found {
 			t.Errorf("route %q missing — quote style must not decide extraction", path)
 		}
+	}
+}
+
+func TestServerRoutes_TypedFastifyInstanceParameter(t *testing.T) {
+	src := `
+import { FastifyInstance } from 'fastify';
+import type { AppDeps } from './deps';
+
+export function registerTrackRoute(app: FastifyInstance, deps: AppDeps): void {
+  app.post('/v1/track', { bodyLimit: 1024 }, async (request, reply) => {
+    return reply.send({});
+  });
+}
+`
+	ff := extractTS(t, src, "services/tracking-api/src/http/trackRoute.ts")
+	got := serverRoutes(ff)
+	if got["/v1/track"] != "POST" {
+		t.Fatalf("typed FastifyInstance parameter must emit server POST /v1/track: %+v", got)
+	}
+	var fw, role string
+	for _, f := range ff {
+		if f.Kind == facts.KindRoute && f.Name == "/v1/track" {
+			fw, _ = f.Props["framework"].(string)
+			role, _ = f.Props["role"].(string)
+		}
+	}
+	if fw != "fastify" || role != "server" {
+		t.Fatalf("framework/role = %s/%s want fastify/server", fw, role)
+	}
+	if got := clientRoutes(ff); len(got) != 0 {
+		t.Fatalf("must not also emit a client call: %+v", got)
+	}
+}
+
+func TestServerRoutes_TypedFastifyAliasAndImportType(t *testing.T) {
+	src := `
+import type { FastifyInstance as App } from 'fastify';
+export function register(server: App) {
+  server.get('/health', async () => ({ ok: true }));
+}
+`
+	ff := extractTS(t, src, "src/http/health.ts")
+	if serverRoutes(ff)["/health"] != "GET" {
+		t.Fatalf("aliased import type must bind: %+v", serverRoutes(ff))
+	}
+}
+
+func TestServerRoutes_NameAppWithoutFastifyTypeStaysClient(t *testing.T) {
+	src := `
+export function register(app) {
+  app.post('/v1/track', handler);
+}
+`
+	ff := extractTS(t, src, "src/http/trackRoute.ts")
+	if len(serverRoutes(ff)) != 0 {
+		t.Fatalf("untyped app must not become a server route: %+v", serverRoutes(ff))
+	}
+	if clientRoutes(ff)["/v1/track"] != "POST" {
+		t.Fatalf("untyped app.post must stay a client call: %+v", clientRoutes(ff))
+	}
+}
+
+func TestServerRoutes_LocalFastifyInstanceTypeIsNotImported(t *testing.T) {
+	src := `
+type FastifyInstance = { post(path: string, h: unknown): void };
+export function register(app: FastifyInstance) {
+  app.post('/v1/track', handler);
+}
+`
+	ff := extractTS(t, src, "src/http/trackRoute.ts")
+	if len(serverRoutes(ff)) != 0 {
+		t.Fatalf("local FastifyInstance type must not bind: %+v", serverRoutes(ff))
+	}
+}
+
+func TestServerRoutes_DoesNotStealAxiosWhenTypedFastifyPresent(t *testing.T) {
+	src := `
+import { FastifyInstance } from 'fastify';
+import axios from 'axios';
+export function register(app: FastifyInstance) {
+  app.get('/health', handler);
+  axios.get('/external');
+}
+`
+	ff := extractTS(t, src, "src/http/mix.ts")
+	if serverRoutes(ff)["/health"] != "GET" {
+		t.Fatalf("server route missing: %+v", serverRoutes(ff))
+	}
+	if clientRoutes(ff)["/external"] != "GET" {
+		t.Fatalf("axios call must stay client: %+v", clientRoutes(ff))
+	}
+}
+
+func TestServerRoutes_SiblingAxiosReceiverStaysClient(t *testing.T) {
+	src := `
+import type { FastifyInstance } from 'fastify';
+import type { AxiosInstance } from 'axios';
+export function register(app: FastifyInstance) { app.post('/server', async () => 'ok'); }
+export async function send(app: AxiosInstance) { return app.post('/client', { x: 1 }); }
+`
+	ff := extractTS(t, src, "src/routes.ts")
+	if serverRoutes(ff)["/server"] != "POST" {
+		t.Fatalf("typed Fastify register must stay server: %+v", serverRoutes(ff))
+	}
+	if _, ok := serverRoutes(ff)["/client"]; ok {
+		t.Fatalf("/client must not be a server route: %+v", serverRoutes(ff))
+	}
+	if clientRoutes(ff)["/client"] != "POST" {
+		t.Fatalf("/client must stay axios client: %+v", clientRoutes(ff))
+	}
+}
+
+func TestServerRoutes_FastifyPluginAsyncIsNotApp(t *testing.T) {
+	src := `
+import type { FastifyPluginAsync } from 'fastify';
+export const plugin: FastifyPluginAsync = async (app) => {
+  app.post('/maybe', handler);
+};
+`
+	ff := extractTS(t, src, "src/plugin.ts")
+	if len(serverRoutes(ff)) != 0 {
+		t.Fatalf("plugin function type is not an app instance: %+v", serverRoutes(ff))
+	}
+}
+
+func TestServerRoutes_CommentFastifyInstanceDoesNotBind(t *testing.T) {
+	src := `
+import type { AxiosInstance } from 'axios';
+// import type { FastifyInstance } from 'fastify';
+export async function send(app: AxiosInstance) { return app.post('/client', { x: 1 }); }
+`
+	ff := extractTS(t, src, "src/routes.ts")
+	if len(serverRoutes(ff)) != 0 {
+		t.Fatalf("commented FastifyInstance must not bind: %+v", serverRoutes(ff))
+	}
+	if clientRoutes(ff)["/client"] != "POST" {
+		t.Fatalf("want client /client, got %+v", clientRoutes(ff))
 	}
 }
 

@@ -24,6 +24,11 @@ type Fact struct {
 type Relation struct {
 	Kind   string `json:"kind"`   // e.g. "declares", "imports", "calls", "implements", "depends_on"
 	Target string `json:"target"` // Target fact name
+	// TargetFile is extractor-proven file provenance for RelCalls. When set,
+	// graph resolution may only bind a same-name symbol in that file. An empty
+	// value means the extractor did not prove a file, so same-directory names
+	// stay ambiguous rather than guessing the caller's file.
+	TargetFile string `json:"target_file,omitempty"`
 }
 
 // Fact kind constants.
@@ -146,6 +151,11 @@ const (
 // so a consumer resolving the target by name can tell which of a reopened
 // name's files the edge lands on. Absent, the target resolves by name alone.
 const PropTargetFile = "target_file"
+
+// PropImportSpec is the alias/relative-normalized import path used to replay
+// resolution against a later filename universe. RelImports.Target remains the
+// owning module directory; PropTargetFile remains the exact bound file.
+const PropImportSpec = "import_spec"
 
 // StorageKindTopic is the storage_kind prop value for a KindStorage fact that
 // represents a messaging topic reference (e.g. a Kafka topic a service produces to

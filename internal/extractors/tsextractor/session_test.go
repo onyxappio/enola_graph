@@ -107,6 +107,125 @@ func TestExtractSession_ReusesUnchangedFiles(t *testing.T) {
 	}
 }
 
+func writeSessionFiles(t *testing.T, dir string, files map[string]string) []string {
+	t.Helper()
+	var names []string
+	for rel, body := range files {
+		p := filepath.Join(dir, rel)
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, []byte(body), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		names = append(names, rel)
+	}
+	return names
+}
+
+func sessionRecord(t *testing.T, files map[string]string, owner string) *FileRecord {
+	t.Helper()
+	dir := t.TempDir()
+	names := writeSessionFiles(t, dir, files)
+	res, err := New().ExtractSession(context.Background(), dir, names, nil, nil, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	rec := res.Records[owner]
+	if rec == nil {
+		t.Fatalf("no record for %s", owner)
+	}
+	return rec
+}
+
+func hasString(ss []string, want string) bool {
+	for _, s := range ss {
+		if s == want {
+			return true
+		}
+	}
+	return false
+}
+
+func TestExtractSession_ImportReplaySpecRetainsFolderStem(t *testing.T) {
+	rec := sessionRecord(t, map[string]string{
+		"foo/index.ts": "export const value = 'index';\n",
+		"use.ts":       "import { value } from './foo';\nexport const used = value;\n",
+		"other.ts":     "export const other = 1;\n",
+	}, "use.ts")
+	if !hasString(rec.ImportSpecs, "foo") {
+		t.Fatalf("ImportSpecs = %v, want replay stem foo", rec.ImportSpecs)
+	}
+	if hasString(rec.ImportSpecs, "foo/index.ts") {
+		t.Fatalf("ImportSpecs replaced the replay stem with exact target: %v", rec.ImportSpecs)
+	}
+	if !hasString(rec.ResolvedFiles, "foo/index.ts") {
+		t.Fatalf("ResolvedFiles = %v, want exact foo/index.ts", rec.ResolvedFiles)
+	}
+	var sawSpec, sawFile bool
+	for _, f := range rec.Facts {
+		if f.PropString("import_spec") == "foo" {
+			sawSpec = true
+		}
+		if f.PropString("target_file") == "foo/index.ts" {
+			sawFile = true
+		}
+	}
+	if !sawSpec || !sawFile {
+		t.Fatalf("facts missing import_spec/target_file pair (spec=%v file=%v)", sawSpec, sawFile)
+	}
+}
+
+func TestExtractSession_ExplicitIndexImportKeepsIndexStem(t *testing.T) {
+	rec := sessionRecord(t, map[string]string{
+		"foo/index.ts": "export const value = 'index';\n",
+		"use.ts":       "import { value } from './foo/index';\nexport const used = value;\n",
+	}, "use.ts")
+	if !hasString(rec.ImportSpecs, "foo/index") {
+		t.Fatalf("ImportSpecs = %v, want explicit foo/index", rec.ImportSpecs)
+	}
+	if hasString(rec.ImportSpecs, "foo") && !hasString(rec.ImportSpecs, "foo/index") {
+		t.Fatalf("explicit index import collapsed to folder stem: %v", rec.ImportSpecs)
+	}
+	if !hasString(rec.ResolvedFiles, "foo/index.ts") {
+		t.Fatalf("ResolvedFiles = %v, want foo/index.ts", rec.ResolvedFiles)
+	}
+}
+
+func TestExtractSession_AliasReplaySpecIsNormalizedTarget(t *testing.T) {
+	rec := sessionRecord(t, map[string]string{
+		"tsconfig.json":         `{"compilerOptions":{"paths":{"@lib/util":["src/lib/util/index.ts"]}}}`,
+		"src/lib/util/index.ts": "export const n = 1;\n",
+		"src/app.ts":            "import { n } from '@lib/util';\nexport const v = n;\n",
+	}, "src/app.ts")
+	if !hasString(rec.ImportSpecs, "src/lib/util/index.ts") {
+		t.Fatalf("alias ImportSpecs = %v, want normalized src/lib/util/index.ts", rec.ImportSpecs)
+	}
+	if hasString(rec.ImportSpecs, "@lib/util") {
+		t.Fatalf("alias specifier was not normalized: %v", rec.ImportSpecs)
+	}
+	if !hasString(rec.ResolvedFiles, "src/lib/util/index.ts") {
+		t.Fatalf("ResolvedFiles = %v, want exact alias file", rec.ResolvedFiles)
+	}
+}
+
+func TestExtractSession_FileModuleNotReboundByFolderIndex(t *testing.T) {
+	rec := sessionRecord(t, map[string]string{
+		"bar.ts":       "export const value = 'file';\n",
+		"bar/index.ts": "export const value = 'index';\n",
+		"use.ts":       "import { value } from './bar';\nexport const used = value;\n",
+	}, "use.ts")
+	if !hasString(rec.ImportSpecs, "bar") {
+		t.Fatalf("ImportSpecs = %v, want replay stem bar", rec.ImportSpecs)
+	}
+	if !hasString(rec.ResolvedFiles, "bar.ts") {
+		t.Fatalf("ResolvedFiles = %v, want file module bar.ts over folder index", rec.ResolvedFiles)
+	}
+	if hasString(rec.ResolvedFiles, "bar/index.ts") {
+		t.Fatalf("folder index must not win over existing file module: %v", rec.ResolvedFiles)
+	}
+}
+
 func TestSessionFilesExcludesNonAngularHTML(t *testing.T) {
 	files := []string{"src/a.ts", "src/page.html", "readme.md"}
 	got := SessionFiles(files, false)

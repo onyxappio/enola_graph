@@ -149,7 +149,7 @@ func recordRebound(rec *tsextractor.FileRecord, priorKnown, known map[string]boo
 // specifier resolves: it becomes satisfiable, it stops resolving, or it still
 // resolves but now names a different file because an added path wins the exact /
 // extension / folder-index precedence in resolveModuleFile. Cached specs are the
-// extractor's own RelImports targets, already carrying tsconfig alias and
+// extractor's own ImportSpecs, already carrying tsconfig alias and
 // relative-directory resolution, so this replay is what the next extraction sees.
 //
 // A specifier that resolves in neither universe is not reported. resolveModuleFile
@@ -183,6 +183,9 @@ func reverseClose(seeds map[string]bool, recs map[string]*tsextractor.FileRecord
 		}
 		from := filepath.ToSlash(path)
 		for _, dep := range rec.ResolvedFiles {
+			importers[filepath.ToSlash(dep)] = append(importers[filepath.ToSlash(dep)], from)
+		}
+		for _, dep := range rec.SideReads {
 			importers[filepath.ToSlash(dep)] = append(importers[filepath.ToSlash(dep)], from)
 		}
 	}

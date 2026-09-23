@@ -91,6 +91,12 @@ func authoritativeFilePlan(previous, current []string, prevFiles map[string]*Fil
 					deps[from] = append(deps[from], dep)
 				}
 			}
+			for _, dep := range st.TS.SideReads {
+				dep = filepath.ToSlash(dep)
+				if known[dep] {
+					deps[from] = append(deps[from], dep)
+				}
+			}
 		}
 	}
 	// A new, renamed or deleted file changes module resolution for importers

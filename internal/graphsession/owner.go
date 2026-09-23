@@ -623,9 +623,84 @@ func buildIndex(ff []facts.Fact) *idIndex {
 }
 
 func (idx *idIndex) resolve(fromRepo, target string) (id, status string) {
+	return idx.resolveRel(fromRepo, "", "", target)
+}
+
+func preferredResolveKind(fromKind, relKind string) string {
+	if fromKind == facts.KindStorage && relKind == facts.RelDependsOn {
+		return facts.KindStorage
+	}
+	return ""
+}
+
+// fkStorageTargetRequired is true for storage depends_on edges that encode a
+// foreign key (fk_constraints). Those must resolve to a storage table, not an
+// ordinary same-name symbol. Other storage depends_on edges still prefer
+// storage but may fall back (for example EF Core DbContext → entity types).
+func fkStorageTargetRequired(from facts.Fact, rel facts.Relation) bool {
+	if from.Kind != facts.KindStorage || rel.Kind != facts.RelDependsOn {
+		return false
+	}
+	if from.Props == nil {
+		return false
+	}
+	spec, _ := from.Props["fk_constraints"].(string)
+	return spec != ""
+}
+
+func (idx *idIndex) resolveRel(fromRepo, fromKind, relKind, target string) (id, status string) {
+	return idx.resolveRelConstrained(fromRepo, fromKind, relKind, target, false, "")
+}
+
+func (idx *idIndex) resolveRelConstrained(fromRepo, fromKind, relKind, target string, requirePreferred bool, fromFile string) (id, status string) {
 	cands := idx.byName[target]
 	if len(cands) == 0 {
 		return "", graphstream.ResUnresolved
+	}
+	// RelCalls may carry extractor-proven TargetFile. That is lexical evidence
+	// for the callee's file (imported specifier or a locally declared name).
+	// The caller's file is not evidence: an import from a sibling can share
+	// the same "<dir>.<name>" as a local of the same spelling.
+	if relKind == facts.RelCalls && fromFile != "" {
+		var local []facts.Fact
+		for _, f := range cands {
+			if f.Kind == facts.KindSymbol && f.File == fromFile {
+				if fromRepo != "" && f.Repo != fromRepo {
+					continue
+				}
+				local = append(local, f)
+			}
+		}
+		if len(local) == 1 {
+			return local[0].Identity(), graphstream.ResResolved
+		}
+		if len(local) == 0 {
+			return "", graphstream.ResUnresolved
+		}
+		id0 := local[0].Identity()
+		for _, f := range local[1:] {
+			if f.Identity() != id0 {
+				return "", graphstream.ResAmbiguous
+			}
+		}
+		return id0, graphstream.ResResolved
+	}
+	if prefer := preferredResolveKind(fromKind, relKind); prefer != "" {
+		var filtered []facts.Fact
+		for _, f := range cands {
+			if fromRepo != "" && f.Repo != fromRepo {
+				continue
+			}
+			if f.Kind == prefer {
+				filtered = append(filtered, f)
+			}
+		}
+		if len(filtered) > 0 {
+			cands = filtered
+			fromRepo = ""
+		} else if requirePreferred {
+			return "", graphstream.ResUnresolved
+		}
 	}
 	pick := -1
 	for i, f := range cands {
@@ -709,7 +784,7 @@ func encodeOwner(o ownerOutput, idx *idIndex, pending bool) (nodes []graphstream
 			if pending {
 				e.Resolution = graphstream.ResPending
 			} else {
-				tid, st := idx.resolve(f.Repo, r.Target)
+				tid, st := idx.resolveRelConstrained(f.Repo, f.Kind, r.Kind, r.Target, fkStorageTargetRequired(f, r), r.TargetFile)
 				e.Resolution = st
 				e.TargetID = tid
 			}

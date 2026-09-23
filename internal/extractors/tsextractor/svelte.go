@@ -453,12 +453,12 @@ func extractSvelteMarkupRefs(rawSrc []byte, relFile string) *facts.Fact {
 }
 
 // extractSvelteSFC extracts architectural facts from a Svelte Single File Component.
-func (e *TSExtractor) extractSvelteSFC(kinds *tsutil.KindTable, rawSrc []byte, relFile string, isSvelteKit bool, aliases map[string]tsAlias) []facts.Fact {
+func (e *TSExtractor) extractSvelteSFC(kinds *tsutil.KindTable, rawSrc []byte, relFile string, isSvelteKit bool, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, exportCache *namedExportCache, sideReads map[string]bool) []facts.Fact {
 	var result []facts.Fact
 	blocks := extractSvelteScriptBlocks(rawSrc)
 
 	for _, block := range blocks {
-		result = append(result, e.extractSvelteScriptBlock(kinds, block, relFile, isSvelteKit, aliases)...)
+		result = append(result, e.extractSvelteScriptBlock(kinds, block, relFile, isSvelteKit, aliases, knownFiles, readSrc, exportCache, sideReads)...)
 	}
 
 	if ref := extractSvelteMarkupRefs(rawSrc, relFile); ref != nil {
@@ -508,7 +508,7 @@ func (e *TSExtractor) extractSvelteSFC(kinds *tsutil.KindTable, rawSrc []byte, r
 	return result
 }
 
-func (e *TSExtractor) extractSvelteScriptBlock(kinds *tsutil.KindTable, block *svelteScriptBlock, relFile string, isSvelteKit bool, aliases map[string]tsAlias) []facts.Fact {
+func (e *TSExtractor) extractSvelteScriptBlock(kinds *tsutil.KindTable, block *svelteScriptBlock, relFile string, isSvelteKit bool, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, exportCache *namedExportCache, sideReads map[string]bool) []facts.Fact {
 	isTSX := block.Lang == "tsx"
 	lang := typescript.LanguageTypescript()
 	if isTSX {
@@ -527,16 +527,22 @@ func (e *TSExtractor) extractSvelteScriptBlock(kinds *tsutil.KindTable, block *s
 	root := tree.RootNode()
 
 	var result []facts.Fact
-	result = append(result, e.extractImports(kinds, root, block.Content, relFile, aliases, isSvelteKit)...)
+	result = append(result, e.extractImports(kinds, root, block.Content, relFile, aliases, knownFiles, isSvelteKit)...)
 
 	ctx := &extractCtx{
-		src:       block.Content,
-		relFile:   relFile,
-		dir:       factpath.Dir(relFile),
-		isTSX:     isTSX,
-		importMap: buildImportSymbols(kinds, root, block.Content, relFile, aliases),
-		imports:   buildEmberImportBindings(kinds, root, block.Content, relFile, aliases),
+		src:     block.Content,
+		relFile: relFile,
+		dir:     factpath.Dir(relFile),
+		isTSX:   isTSX,
+		imports: buildEmberImportBindings(kinds, root, block.Content, relFile, aliases),
 	}
+	ctx.readSrc = readSrc
+	ctx.knownFiles = knownFiles
+	ctx.aliases = aliases
+	ctx.exportCache = exportCache
+	ctx.sideReads = sideReads
+	ctx.importMap, ctx.importFiles = buildImportSymbols(kinds, root, block.Content, relFile, aliases, knownFiles, readSrc, exportCache, sideReads)
+	ctx.localNames = collectFileScopeCallNames(kinds, root, block.Content)
 	decls := e.extractDeclarations(kinds, root, ctx)
 
 	if exported := collectExportedLocalNames(kinds, root, block.Content); len(exported) > 0 {

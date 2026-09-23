@@ -32,6 +32,12 @@ func baselineServerBindings(src []byte) map[string]serverBinding {
 			out[name] = serverBinding{framework: "express", isRouter: true}
 		}
 	}
+	for name, b := range typedFastifyParamBindings(src) {
+		if _, taken := out[name]; taken {
+			continue
+		}
+		out[name] = b
+	}
 	for _, m := range mountCall.FindAllSubmatch(src, -1) {
 		prefix := firstNonEmpty(m[2], m[3], m[4])
 		child := string(m[5])

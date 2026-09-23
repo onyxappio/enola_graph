@@ -444,8 +444,9 @@ func extractHTTPClientFacts(src []byte, relFile string) []facts.Fact {
 		tmpl := lowerVerbTemplateCall.FindAllSubmatchIndex(src, -1)
 		if len(lower) > 0 || len(tmpl) > 0 {
 			serverRecv := serverBindings(src)
+			fastifyScopes := serverLexicalScopes(src)
 			for _, m := range lower {
-				if isServerReceiver(serverRecv, identifierEndingAt(src, m[0])) {
+				if isServerReceiverAt(serverRecv, fastifyScopes, identifierEndingAt(src, m[0]), m[0]) {
 					continue
 				}
 				method := strings.ToUpper(string(src[m[2]:m[3]]))
@@ -457,7 +458,7 @@ func extractHTTPClientFacts(src []byte, relFile string) []facts.Fact {
 			// template with a "/"-rooted literal tail (litfold's template-tail rule).
 			// cleanTSPath resolves or strips the base; the tail is the path.
 			for _, m := range tmpl {
-				if isServerReceiver(serverRecv, identifierEndingAt(src, m[0])) {
+				if isServerReceiverAt(serverRecv, fastifyScopes, identifierEndingAt(src, m[0]), m[0]) {
 					continue
 				}
 				raw := string(src[m[4]:m[5]])

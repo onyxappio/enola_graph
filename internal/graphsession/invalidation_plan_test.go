@@ -782,6 +782,46 @@ func TestMembershipReboundFollowsResolvedAliasTarget(t *testing.T) {
 	}
 }
 
+func TestMembershipExplicitIndexImportDoesNotReboundOnSiblingFile(t *testing.T) {
+	previous := []string{"use.ts", "foo/index.ts"}
+	current := []string{"use.ts", "foo/index.ts", "foo.ts"}
+	state := map[string]*FileState{
+		"use.ts": {Hash: "u1", TS: &tsextractor.FileRecord{
+			File: "use.ts", ImportSpecs: []string{"foo/index"},
+			ResolvedFiles: []string{"foo/index.ts"}, ImportComplete: true,
+		}},
+		"foo/index.ts": {Hash: "i1", TS: &tsextractor.FileRecord{
+			File: "foo/index.ts", ImportComplete: true,
+		}},
+	}
+	md := membershipScope(previous, current, current, state)
+	for _, f := range md.rebound {
+		if f == "use.ts" {
+			t.Fatalf("explicit index import rebound on sibling file: %+v", md)
+		}
+	}
+}
+
+func TestMembershipFileModuleNotReboundByFolderIndexAdd(t *testing.T) {
+	previous := []string{"use.ts", "bar.ts"}
+	current := []string{"use.ts", "bar.ts", "bar/index.ts"}
+	state := map[string]*FileState{
+		"use.ts": {Hash: "u1", TS: &tsextractor.FileRecord{
+			File: "use.ts", ImportSpecs: []string{"bar"},
+			ResolvedFiles: []string{"bar.ts"}, ImportComplete: true,
+		}},
+		"bar.ts": {Hash: "b1", TS: &tsextractor.FileRecord{
+			File: "bar.ts", ImportComplete: true,
+		}},
+	}
+	md := membershipScope(previous, current, current, state)
+	for _, f := range md.rebound {
+		if f == "use.ts" {
+			t.Fatalf("file-module importer rebound when folder index was added: %+v", md)
+		}
+	}
+}
+
 // The frozen scope must be a superset of the reparse set extraction computes:
 // scope owners and parses are distinct sets, and a dirty file outside the plan
 // is a hard failure at extraction time.

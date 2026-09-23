@@ -1,5 +1,7 @@
 # Repository rules for agents
 
+For the ongoing `enola-2` accuracy task, follow [docs/accuracy/WORKFLOW.md](docs/accuracy/WORKFLOW.md), including auto approval of evidenced candidates and the cumulative HTML report.
+
 The agreed streaming/delta implementation contract is in
 [docs/STREAMING_INCREMENTAL.md](docs/STREAMING_INCREMENTAL.md). Use whole files as
 the reanalysis unit and publish file-owned replacement scopes through NATS JetStream;

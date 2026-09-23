@@ -34,26 +34,35 @@ type ExtractStats struct {
 
 // FileRecord is the immutable per-file contribution persisted between generations.
 type FileRecord struct {
-	File            string       `json:"file"`
-	Hash            string       `json:"hash,omitempty"`
-	Unreadable      bool         `json:"unreadable,omitempty"`
-	Minified        bool         `json:"minified,omitempty"`
-	Facts           []facts.Fact `json:"facts,omitempty"`
-	ImportSpecs     []string     `json:"import_specs,omitempty"`
-	ResolvedFiles   []string     `json:"resolved_files,omitempty"`
-	Declared        []string     `json:"declared,omitempty"`
-	Referenced      []string     `json:"referenced,omitempty"`
-	Reexports       []string     `json:"reexports,omitempty"`
-	UnresolvedSpecs []string     `json:"unresolved_specs,omitempty"`
+	File       string       `json:"file"`
+	Hash       string       `json:"hash,omitempty"`
+	Unreadable bool         `json:"unreadable,omitempty"`
+	Minified   bool         `json:"minified,omitempty"`
+	Facts      []facts.Fact `json:"facts,omitempty"`
+	// ImportSpecs are alias/relative-normalized replay paths (resolveImportPath
+	// output), not the exact bound file. Membership replay compares these
+	// against old/new filename universes; ResolvedFiles hold exact provenance.
+	ImportSpecs     []string `json:"import_specs,omitempty"`
+	ResolvedFiles   []string `json:"resolved_files,omitempty"`
+	Declared        []string `json:"declared,omitempty"`
+	Referenced      []string `json:"referenced,omitempty"`
+	Reexports       []string `json:"reexports,omitempty"`
+	UnresolvedSpecs []string `json:"unresolved_specs,omitempty"`
 	// ImportComplete is set after summarizeFacts runs. Empty resolved and
 	// unresolved lists are a valid graph when every import is external.
-	ImportComplete bool        `json:"import_complete,omitempty"`
-	GraphQLServer  bool        `json:"graphql_server,omitempty"`
-	GraphQLSDL     []string    `json:"graphql_sdl,omitempty"`
-	GraphQLParsed  bool        `json:"graphql_parsed,omitempty"`
-	GRPC           *GRPCRecord `json:"grpc,omitempty"`
-	Router         *RouterDTO  `json:"router,omitempty"`
-	ParseKind      string      `json:"parse_kind,omitempty"`
+	ImportComplete bool `json:"import_complete,omitempty"`
+	// SideReads are other source files whose bytes were consulted to derive
+	// this file's facts (named re-export chains). Hash changes there invalidate
+	// this contribution even when this file is untouched.
+	SideReads      []string          `json:"side_reads,omitempty"`
+	SideReadHashes map[string]string `json:"side_read_hashes,omitempty"`
+	GraphQLServer  bool              `json:"graphql_server,omitempty"`
+	GraphQLSDL     []string          `json:"graphql_sdl,omitempty"`
+	GraphQLParsed  bool              `json:"graphql_parsed,omitempty"`
+	GRPC           *GRPCRecord       `json:"grpc,omitempty"`
+	Router         *RouterDTO        `json:"router,omitempty"`
+	ParseKind      string            `json:"parse_kind,omitempty"`
+	AutoImportDirs []string          `json:"auto_import_dirs,omitempty"`
 }
 
 // SessionResult is one TS analysis pass under the local-fact contract.
@@ -94,17 +103,21 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	tr := graphprofile.Start()
 
 	isNextJS := detectNextJS(repoPath, inputScope)
-	isVue := detectVue(repoPath, inputScope)
-	isNuxt := detectNuxt(repoPath, inputScope)
+	nuxtPkgs := collectNuxtPackages(ctx, repoPath, inputScope)
+	isNuxt := len(nuxtPkgs) > 0
 	isSvelteKit := detectSvelteKit(repoPath, inputScope)
 	isEmber := detectEmber(repoPath, inputScope)
 	isReactNav := detectReactNavigation(repoPath, inputScope)
 	isAngular := detectAngular(repoPath, inputScope)
-	isTypeORM, isDrizzle, isPrisma := detectORMs(repoPath, inputScope)
-	orms := ormFlags{typeORM: isTypeORM, drizzle: isDrizzle}
+	pkgGates := collectPackageGates(ctx, repoPath, inputScope)
+	pkgNamesEarly := collectPackageNames(repoPath, inputScope)
+	isPrisma := pkgGates.anyPrisma
 	aliasRoots := collectTSAliasRoots(ctx, repoPath, inputScope)
 	if isSvelteKit {
 		aliasRoots = withSvelteKitAliasFallbacks(repoPath, aliasRoots, inputScope)
+	}
+	if isNuxt {
+		aliasRoots = withNuxtAliasFallbacks(repoPath, aliasRoots, nuxtPkgs, inputScope)
 	}
 	tr.Mark("ts_detect_frameworks", fmt.Sprintf("files=%d", len(files)))
 
@@ -120,6 +133,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			htmlFiles = append(htmlFiles, relFile)
 		}
 	}
+	pkgAliases := collectPackageAliases(ctx, repoPath, knownFiles, inputScope)
 
 	need := func(rel string) bool {
 		if allDirty {
@@ -129,7 +143,25 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			return true
 		}
 		rec := prev[rel]
-		return rec == nil
+		if rec == nil {
+			return true
+		}
+		for _, f := range rec.ResolvedFiles {
+			if !knownFiles[filepath.ToSlash(f)] {
+				return true
+			}
+		}
+		for _, spec := range rec.UnresolvedSpecs {
+			if _, ok := NormalizeImportTarget(spec, knownFiles); ok {
+				return true
+			}
+		}
+		for _, f := range rec.SideReads {
+			if !knownFiles[filepath.ToSlash(f)] {
+				return true
+			}
+		}
+		return false
 	}
 
 	var stats ExtractStats
@@ -207,9 +239,9 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		grpcIdx = nil
 	}
 
-	var nuxtAutoComponents map[string]string
-	if isNuxt {
-		nuxtAutoComponents = nuxtAutoComponentIndex(knownFiles)
+	nuxtAutoByPkg := map[string]map[string]string{}
+	for _, p := range nuxtPkgs {
+		nuxtAutoByPkg[p] = nuxtAutoComponentIndex(knownFiles, p, nuxtPkgs)
 	}
 
 	type fileOut struct {
@@ -217,6 +249,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		rec *FileRecord
 	}
 	tr.Mark("ts_graphql_grpc_index", fmt.Sprintf("ts_files=%d", len(tsFiles)))
+	exportCache := newNamedExportCache()
 	perFile := parallel.MapFiles(ctx, tsFiles, func(relFile string) fileOut {
 		if !need(relFile) {
 			rec := prev[relFile]
@@ -238,9 +271,38 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		if hooks.OnBeforeParse != nil {
 			hooks.OnBeforeParse(relFile)
 		}
-		aliases := aliasesForDir(aliasRoots, factpath.Dir(relFile))
+		aliases := mergePackageAliases(aliasesForDir(aliasRoots, factpath.Dir(relFile)), pkgAliases)
+		fileNuxt, inNuxt := nuxtPackageForFile(nuxtPkgs, relFile)
+		var auto map[string]string
+		if inNuxt {
+			auto = nuxtAutoByPkg[fileNuxt]
+		}
 		var res tsFileResult
-		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, isVue, isNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, orms, aliases, knownFiles, nuxtAutoComponents, grpcIdx)
+		sideReads := map[string]bool{}
+		readSrc := func(rel string) []byte {
+			if b, ok := sources[rel]; ok {
+				return b
+			}
+			raw, err := overlayReadFile(ctx, filepath.Join(repoPath, rel), inputScope)
+			if err != nil {
+				return nil
+			}
+			return raw
+		}
+		fileOrms, fileVue := pkgGates.forFile(pkgNamesEarly, relFile)
+		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, fileVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, fileOrms, aliases, knownFiles, readSrc, auto, grpcIdx, exportCache, sideReads)
+		rec.AutoImportDirs = addImportsDirsFromFile(relFile, src)
+		if len(sideReads) > 0 {
+			rec.SideReads = make([]string, 0, len(sideReads))
+			rec.SideReadHashes = make(map[string]string, len(sideReads))
+			for f := range sideReads {
+				rec.SideReads = append(rec.SideReads, f)
+				b := readSrc(f)
+				sum := sha256.Sum256(b)
+				rec.SideReadHashes[f] = hex.EncodeToString(sum[:])
+			}
+			sort.Strings(rec.SideReads)
+		}
 		if !facts.IsTestPath(relFile) {
 			res.routers = collectRouterFile(src, relFile, aliases, knownFiles)
 		}
@@ -305,7 +367,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	}
 	stats.FilesParsed = parsed
 	stats.SFCParsed = sfc
-	stats.SummaryScans = len(routerFiles) + len(angularRouters)
+	stats.SummaryScans = len(routerFiles) + len(angularRouters) + exportCache.summaryScans()
 	tr.Mark("ts_mapfiles_aggregate", fmt.Sprintf("parsed=%d facts=%d routers=%d", parsed, len(allFacts), len(routerFiles)))
 
 	if mounted := composeRouterMounts(routerFiles); len(mounted) > 0 {
@@ -316,7 +378,21 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	}
 
 	if isNuxt {
-		resolveNuxtAutoComposableCalls(allFacts)
+		var extra []string
+		seenDir := map[string]bool{}
+		for _, rec := range records {
+			if rec == nil {
+				continue
+			}
+			for _, d := range rec.AutoImportDirs {
+				if seenDir[d] {
+					continue
+				}
+				seenDir[d] = true
+				extra = append(extra, d)
+			}
+		}
+		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, extra, sources, invertPackageNames(collectPackageNames(repoPath, inputScope)))
 	}
 	applyDirectIOContract(allFacts)
 
@@ -405,7 +481,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		allFacts = append(allFacts, ff...)
 		unreadable = append(unreadable, unread...)
 	}
-	pkgNames := collectPackageNames(repoPath, inputScope)
+	pkgNames := pkgNamesEarly
 	var projects map[string]string
 	if isAngular {
 		projects = angularProjectNames(repoPath, inputScope)
@@ -510,12 +586,26 @@ func summarizeFacts(ff []facts.Fact, knownFiles map[string]bool) (specs, resolve
 				seenRef[r.Target] = true
 				referenced = append(referenced, r.Target)
 			}
-			if r.Kind != facts.RelImports || seenSpec[r.Target] {
+			if r.Kind != facts.RelImports {
 				continue
 			}
-			seenSpec[r.Target] = true
-			specs = append(specs, r.Target)
-			slash := filepath.ToSlash(r.Target)
+			spec := r.Target
+			if replay := f.PropString(facts.PropImportSpec); replay != "" {
+				spec = replay
+			}
+			if !seenSpec[spec] {
+				seenSpec[spec] = true
+				specs = append(specs, spec)
+			}
+			slash := filepath.ToSlash(spec)
+			if tf := f.PropString(facts.PropTargetFile); tf != "" {
+				tf = filepath.ToSlash(tf)
+				if !seenRes[tf] {
+					seenRes[tf] = true
+					resolved = append(resolved, tf)
+				}
+				continue
+			}
 			if file, ok := NormalizeImportTarget(slash, knownFiles); ok {
 				if !seenRes[file] {
 					seenRes[file] = true
@@ -850,12 +940,68 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 	}
 	sort.Strings(grpcParts)
 	var nuxt []string
-	if detectNuxt(repoPath, inputScope) {
-		for n, t := range nuxtAutoComponentIndex(known) {
-			nuxt = append(nuxt, n+"="+t)
+	nuxtPkgs := collectNuxtPackages(ctx, repoPath, inputScope)
+	for _, pkg := range nuxtPkgs {
+		for n, t := range nuxtAutoComponentIndex(known, pkg, nuxtPkgs) {
+			nuxt = append(nuxt, pkg+"/"+n+"="+t)
 		}
-		sort.Strings(nuxt)
 	}
+	sort.Strings(nuxt)
+	extraSeen := map[string]bool{}
+	var extraDirs []string
+	addExtra := func(d string) {
+		if d == "" || extraSeen[d] {
+			return
+		}
+		extraSeen[d] = true
+		extraDirs = append(extraDirs, d)
+	}
+	for _, rec := range prev {
+		if rec == nil {
+			continue
+		}
+		for _, d := range rec.AutoImportDirs {
+			addExtra(d)
+		}
+	}
+	for rel, src := range sources {
+		if src == nil {
+			continue
+		}
+		if !allDirty && dirty != nil && !dirty[rel] {
+			continue
+		}
+		for _, d := range addImportsDirsFromFile(rel, src) {
+			addExtra(d)
+		}
+	}
+	var auto []string
+	for _, rel := range files {
+		if !nuxtAutoImportDir(rel, nuxtPkgs, extraDirs) {
+			continue
+		}
+		usePrev := !allDirty && dirty != nil && !dirty[rel] && prev[rel] != nil
+		if usePrev {
+			for _, n := range prev[rel].Declared {
+				auto = append(auto, rel+"="+n)
+			}
+			continue
+		}
+		src := []byte(nil)
+		if sources != nil {
+			src = sources[rel]
+		}
+		if src == nil {
+			raw, err := overlayReadFile(ctx, filepath.Join(repoPath, rel), inputScope)
+			if err != nil {
+				return "", err
+			}
+			src = raw
+		}
+		sum := sha256.Sum256(src)
+		auto = append(auto, rel+"="+hex.EncodeToString(sum[:]))
+	}
+	sort.Strings(auto)
 	h := sha256.New()
 	if gql.enabled {
 		h.Write([]byte("gql-on"))
@@ -868,5 +1014,7 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 	h.Write([]byte(strings.Join(grpcParts, ";")))
 	h.Write([]byte{0})
 	h.Write([]byte(strings.Join(nuxt, ";")))
+	h.Write([]byte{0})
+	h.Write([]byte(strings.Join(auto, ";")))
 	return hex.EncodeToString(h.Sum(nil)), nil
 }

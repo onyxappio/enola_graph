@@ -2442,7 +2442,43 @@ import (
 // includes/iOS markers; detectors retain their independent discovery scopes.
 // v274: Graph policy controls manifest/Markdown discovery, no-lock graph inputs,
 // and versioned effective TS contexts separate raw validity from scoped reparsing.
-const cacheVersion = "v274"
+// v275: TypeScript import edges bind specifiers to the known source file (package.json
+// name aliases plus RelImports targeting the file path / KindFileRef), so internal
+// alias, import-type, dynamic, namespace, and re-export edges resolve.
+// v276: TS RelImports target the owning module directory (KindModule.Name) and keep
+// the exact file on target_file for ResolvedFiles; empty file_refs are not emitted
+// for every source file.
+// v277: Nested Nuxt packages, Lazy auto-components, Drizzle .references() FKs,
+// GraphQL Yoga resolver RelHandledBy, and imported implements qualification.
+// v278: Drizzle FK depends_on resolves only to storage tables; GraphQL Yoga/Tools
+// createSchema binding respects lexical shadowing and per-call typeDefs fields.
+// v279: TypeScript ESM JS-extension substitution; folder-index import symbol
+// ownership; lexically certain same-file RelCalls resolution; FastifyInstance
+// typed-parameter server routes; Nuxt default ~/ and @/ aliases without .nuxt.
+// v280: RelCalls carry proven target_file; FastifyInstance params are scoped per
+// function; Nuxt config alias/srcDir literals are honored without executing config.
+// v281: RelCalls target_file follows source-proven named/star re-exports to the
+// declaring file; colliding re-exports stay unconstrained.
+// v282: Failed/ambiguous named-import follow stays constrained to the import
+// file instead of unique-name fallback; importer fingerprints include reexport
+// chain side-reads so rename/remove invalidates derived target_file.
+// v283: package.json exports subpaths; owning-package ORM/Vue gates; Nuxt
+// composables/utils auto-imports including addImportsDir; Fastify app.route
+// object form; symbol-level RelInstantiates for `new ImportedClass()`.
+// v284: Fastify lexical parameter shadows; Nuxt auto-import per owning package;
+// explicit import provenance not overridden; package export aliases and
+// auto-import declaration names participate in incremental invalidation.
+// v285: Nuxt registered-module addImportsDir visible to consuming apps when the
+// module package is itself Nuxt; Fastify local-variable lexical shadows.
+// v286: Fastify local const/let/var/destructuring bindings always lexically
+// shadow outer same-name factories; only a proven local app-factory RHS is a
+// server receiver (unknown/alias RHS does not inherit outer bindings).
+// v287: lexical local-binding discovery walks nested function/arrow
+// initializer bodies instead of skipping them with skipTSInitializer.
+// v288: cached TypeScript ImportSpecs keep the alias/relative-normalized
+// replay specifier (including folder stems) while ResolvedFiles and
+// target_file keep the exact bound file.
+const cacheVersion = "v288"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

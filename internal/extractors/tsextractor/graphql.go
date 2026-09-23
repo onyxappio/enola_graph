@@ -248,15 +248,258 @@ func (b graphqlImportBindings) exportedName(local string, packages ...string) st
 
 func (b graphqlImportBindings) callExport(kinds *tsutil.KindTable, fn *sitter.Node, src []byte, pkg string) string {
 	if kindOf(kinds, fn) == "identifier" {
-		return b.named[pkg][nodeText(fn, src)]
+		local := nodeText(fn, src)
+		if graphqlImportedNameShadowed(kinds, fn, src, local) {
+			return ""
+		}
+		return b.named[pkg][local]
 	}
 	if kindOf(kinds, fn) == "member_expression" {
 		obj, prop := fn.ChildByFieldName("object"), fn.ChildByFieldName("property")
-		if obj != nil && prop != nil && b.namespaces[pkg][nodeText(obj, src)] {
+		if obj == nil || prop == nil {
+			return ""
+		}
+		ns := nodeText(obj, src)
+		if graphqlImportedNameShadowed(kinds, obj, src, ns) {
+			return ""
+		}
+		if b.namespaces[pkg][ns] {
 			return nodeText(prop, src)
 		}
 	}
 	return ""
+}
+
+// graphqlImportedNameShadowed reports a non-import lexical binding of name that
+// is in scope at ident (parameter, function name, catch binding, or a prior
+// local/block declaration). Module import bindings are the Yoga/Tools names
+// themselves and do not count as shadows.
+func graphqlImportedNameShadowed(kinds *tsutil.KindTable, ident *sitter.Node, src []byte, name string) bool {
+	if ident == nil || name == "" {
+		return false
+	}
+	at := ident.StartByte()
+	for p := ident.Parent(); p != nil; p = p.Parent() {
+		kind := kindOf(kinds, p)
+		if tsIsFunctionLike(kind) && tsFunctionBindsName(kinds, p, src, name) {
+			return true
+		}
+		if kind == "catch_clause" && tsPatternBindsName(kinds, p, src, name) {
+			return true
+		}
+		if kind == "statement_block" || kind == "program" || kind == "class_body" {
+			if tsScopeBindsNameBefore(kinds, p, src, name, at) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func tsFunctionBindsName(kinds *tsutil.KindTable, fn *sitter.Node, src []byte, name string) bool {
+	if n := fn.ChildByFieldName("name"); n != nil && nodeText(n, src) == name {
+		return true
+	}
+	params := fn.ChildByFieldName("parameters")
+	if params == nil {
+		params = fn.ChildByFieldName("parameter")
+	}
+	return tsPatternBindsName(kinds, params, src, name)
+}
+
+func tsScopeBindsNameBefore(kinds *tsutil.KindTable, scope *sitter.Node, src []byte, name string, at uint) bool {
+	for i := range scope.ChildCount() {
+		stmt := unwrapTSExport(kinds, scope.Child(i))
+		if stmt == nil {
+			continue
+		}
+		kind := kindOf(kinds, stmt)
+		if kind == "import_statement" {
+			continue
+		}
+		if kind == "function_declaration" || kind == "generator_function_declaration" || kind == "class_declaration" {
+			if n := stmt.ChildByFieldName("name"); n != nil && nodeText(n, src) == name {
+				return true
+			}
+			continue
+		}
+		if stmt.EndByte() > at {
+			continue
+		}
+		if kind == "lexical_declaration" || kind == "variable_declaration" {
+			if tsPatternBindsName(kinds, stmt, src, name) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func unwrapTSExport(kinds *tsutil.KindTable, n *sitter.Node) *sitter.Node {
+	if n != nil && kindOf(kinds, n) == "export_statement" {
+		if d := n.ChildByFieldName("declaration"); d != nil {
+			return d
+		}
+		for i := range n.ChildCount() {
+			ch := n.Child(i)
+			switch kindOf(kinds, ch) {
+			case "function_declaration", "generator_function_declaration", "class_declaration", "lexical_declaration", "variable_declaration":
+				return ch
+			}
+		}
+	}
+	return n
+}
+
+func tsPatternBindsName(kinds *tsutil.KindTable, n *sitter.Node, src []byte, name string) bool {
+	if n == nil {
+		return false
+	}
+	switch kindOf(kinds, n) {
+	case "identifier", "shorthand_property_identifier_pattern":
+		// Shorthand `{ createSchema }` is a leaf whose text is the bound name.
+		return nodeText(n, src) == name
+	case "pair_pattern":
+		// `{ createSchema: unrelated }` binds `unrelated` only. The property key
+		// is not a lexical binding even when it matches the imported name.
+		if v := n.ChildByFieldName("value"); v != nil {
+			return tsPatternBindsName(kinds, v, src, name)
+		}
+		if p := n.ChildByFieldName("pattern"); p != nil {
+			return tsPatternBindsName(kinds, p, src, name)
+		}
+		return false
+	case "assignment_pattern", "object_assignment_pattern":
+		// Defaults are expressions, not declarations: `{ createSchema = fn }`
+		// binds `createSchema`; identifiers inside the default do not.
+		if p := n.ChildByFieldName("left"); p != nil {
+			return tsPatternBindsName(kinds, p, src, name)
+		}
+		if p := n.ChildByFieldName("name"); p != nil {
+			return tsPatternBindsName(kinds, p, src, name)
+		}
+		if n.ChildCount() > 0 {
+			return tsPatternBindsName(kinds, n.Child(0), src, name)
+		}
+		return false
+	case "variable_declarator", "required_parameter", "optional_parameter", "rest_parameter", "rest_pattern":
+		if p := n.ChildByFieldName("name"); p != nil {
+			return tsPatternBindsName(kinds, p, src, name)
+		}
+		if p := n.ChildByFieldName("pattern"); p != nil {
+			return tsPatternBindsName(kinds, p, src, name)
+		}
+		for i := range n.ChildCount() {
+			ch := n.Child(i)
+			k := kindOf(kinds, ch)
+			if k == "identifier" || k == "shorthand_property_identifier_pattern" || k == "object_pattern" || k == "array_pattern" || k == "rest_pattern" || k == "assignment_pattern" || k == "object_assignment_pattern" {
+				if tsPatternBindsName(kinds, ch, src, name) {
+					return true
+				}
+			}
+		}
+		return false
+	case "object_pattern", "array_pattern", "formal_parameters", "lexical_declaration", "variable_declaration", "catch_clause":
+		for i := range n.ChildCount() {
+			if tsPatternBindsName(kinds, n.Child(i), src, name) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func graphqlCallTypeDefFields(kinds *tsutil.KindTable, cfg *sitter.Node, src []byte, root *sitter.Node) (map[string]bool, bool) {
+	td := objectPropValue(kinds, cfg, src, "typeDefs")
+	if td == nil {
+		td = objectPropValue(kinds, cfg, src, "typeDefinitions")
+	}
+	if td == nil {
+		return nil, false
+	}
+	out := map[string]bool{}
+	if !collectTypeDefFields(kinds, td, src, root, out, 0) || len(out) == 0 {
+		return nil, false
+	}
+	return out, true
+}
+
+func collectTypeDefFields(kinds *tsutil.KindTable, n *sitter.Node, src []byte, root *sitter.Node, out map[string]bool, depth int) bool {
+	if n == nil || depth > 8 {
+		return false
+	}
+	switch kindOf(kinds, n) {
+	case "template_string", "string":
+		for _, f := range sdlRootFields(unquoteTSString(nodeText(n, src)), "", 1) {
+			out[f.Name] = true
+		}
+		return true
+	case "call_expression":
+		args := n.ChildByFieldName("arguments")
+		if args == nil {
+			return false
+		}
+		ok := false
+		for i := range args.ChildCount() {
+			if collectTypeDefFields(kinds, args.Child(i), src, root, out, depth+1) {
+				ok = true
+			}
+		}
+		return ok
+	case "array":
+		ok := false
+		for i := range n.ChildCount() {
+			if collectTypeDefFields(kinds, n.Child(i), src, root, out, depth+1) {
+				ok = true
+			}
+		}
+		return ok
+	case "identifier":
+		if root == nil {
+			return false
+		}
+		name := nodeText(n, src)
+		if init := tsModuleBindingInit(kinds, root, src, name); init != nil {
+			return collectTypeDefFields(kinds, init, src, root, out, depth+1)
+		}
+		return false
+	}
+	return false
+}
+
+func unquoteTSString(s string) string {
+	if len(s) >= 2 {
+		switch s[0] {
+		case '`', '"', '\'':
+			if s[len(s)-1] == s[0] {
+				return s[1 : len(s)-1]
+			}
+		}
+	}
+	return s
+}
+
+func tsModuleBindingInit(kinds *tsutil.KindTable, root *sitter.Node, src []byte, name string) *sitter.Node {
+	for i := range root.ChildCount() {
+		stmt := unwrapTSExport(kinds, root.Child(i))
+		if stmt == nil {
+			continue
+		}
+		if kindOf(kinds, stmt) != "lexical_declaration" && kindOf(kinds, stmt) != "variable_declaration" {
+			continue
+		}
+		for j := range stmt.ChildCount() {
+			d := stmt.Child(j)
+			if kindOf(kinds, d) != "variable_declarator" {
+				continue
+			}
+			nm := d.ChildByFieldName("name")
+			if nm != nil && kindOf(kinds, nm) == "identifier" && nodeText(nm, src) == name {
+				return d.ChildByFieldName("value")
+			}
+		}
+	}
+	return nil
 }
 
 func collectPothosBuilders(kinds *tsutil.KindTable, root *sitter.Node, src []byte, bindings graphqlImportBindings) map[string]bool {
@@ -720,7 +963,7 @@ func graphQLServerASTSignals(src []byte, relFile string) (bool, []string) {
 		case "call_expression":
 			if fn := n.ChildByFieldName("function"); fn != nil {
 				name := nodeText(fn, src)
-				if name == "buildSchema" || name == "makeExecutableSchema" || name == "graphqlHTTP" {
+				if name == "buildSchema" || name == "makeExecutableSchema" || name == "graphqlHTTP" || name == "createSchema" {
 					server = true
 				}
 			}
@@ -1077,6 +1320,153 @@ func isSDLIdentStart(c byte) bool {
 
 func isSDLIdentChar(c byte) bool {
 	return c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
+}
+
+// bindGraphQLSchemaResolvers attaches RelHandledBy from SDL/code-first root
+// fields to explicit createSchema/makeExecutableSchema resolver functions.
+func bindGraphQLSchemaResolvers(kinds *tsutil.KindTable, root *sitter.Node, src []byte, relFile string, ff []facts.Fact, importMap map[string]string) []facts.Fact {
+	bindings := collectGraphQLImportBindings(kinds, root, src)
+	if !bindings.hasPackage("graphql-yoga") && !bindings.hasPackage("@graphql-tools/schema") {
+		return nil
+	}
+	dir := factpath.Dir(relFile)
+	routes := map[string]int{}
+	for i, f := range ff {
+		if f.Kind == facts.KindRoute && (f.Props[facts.PropRouteType] == facts.RouteTypeGraphQL || f.Props["type"] == "graphql") {
+			routes[f.Name] = i
+		}
+	}
+	var extra []facts.Fact
+	var calls []*sitter.Node
+	var walk func(*sitter.Node)
+	walk = func(n *sitter.Node) {
+		if n == nil {
+			return
+		}
+		if kindOf(kinds, n) == "call_expression" {
+			fn := n.ChildByFieldName("function")
+			if fn != nil {
+				exported := bindings.callExport(kinds, fn, src, "graphql-yoga")
+				if exported == "" {
+					exported = bindings.callExport(kinds, fn, src, "@graphql-tools/schema")
+				}
+				if exported == "createSchema" || exported == "makeExecutableSchema" {
+					calls = append(calls, n)
+				}
+			}
+		}
+		for i := range n.ChildCount() {
+			walk(n.Child(i))
+		}
+	}
+	walk(root)
+	for _, call := range calls {
+		extra = append(extra, bindSchemaResolverObject(kinds, call, src, relFile, dir, ff, routes, importMap, root, len(calls) > 1)...)
+	}
+	return extra
+}
+
+func bindSchemaResolverObject(kinds *tsutil.KindTable, call *sitter.Node, src []byte, relFile, dir string, ff []facts.Fact, routes map[string]int, importMap map[string]string, root *sitter.Node, multiCall bool) []facts.Fact {
+	args := call.ChildByFieldName("arguments")
+	if args == nil {
+		return nil
+	}
+	var cfg *sitter.Node
+	for i := range args.ChildCount() {
+		if kindOf(kinds, args.Child(i)) == "object" {
+			cfg = args.Child(i)
+			break
+		}
+	}
+	resolvers := objectPropValue(kinds, cfg, src, "resolvers")
+	if resolvers == nil || kindOf(kinds, resolvers) != "object" {
+		return nil
+	}
+	owned, haveOwned := graphqlCallTypeDefFields(kinds, cfg, src, root)
+	if !haveOwned && multiCall {
+		return nil
+	}
+	var extra []facts.Fact
+	for i := range resolvers.ChildCount() {
+		pair := resolvers.Child(i)
+		if kindOf(kinds, pair) != "pair" {
+			continue
+		}
+		key := pair.ChildByFieldName("key")
+		val := pair.ChildByFieldName("value")
+		if key == nil || val == nil {
+			continue
+		}
+		rootName := strings.Trim(nodeText(key, src), `"'`)
+		if rootName != "Query" && rootName != "Mutation" && rootName != "Subscription" {
+			continue
+		}
+		if kindOf(kinds, val) != "object" {
+			continue
+		}
+		for j := range val.ChildCount() {
+			field := val.Child(j)
+			if kindOf(kinds, field) != "pair" {
+				continue
+			}
+			fk := field.ChildByFieldName("key")
+			fv := field.ChildByFieldName("value")
+			if fk == nil || fv == nil {
+				continue
+			}
+			fieldName := strings.Trim(nodeText(fk, src), `"'`)
+			routeName := rootName + "." + fieldName
+			if haveOwned && !owned[routeName] {
+				continue
+			}
+			ri, ok := routes[routeName]
+			if !ok {
+				continue
+			}
+			handler, sym := graphqlResolverHandler(kinds, fv, src, relFile, dir, routeName, int(fv.StartPosition().Row)+1, importMap)
+			if handler == "" {
+				continue
+			}
+			if !ff[ri].HasRelation(facts.RelHandledBy, handler) {
+				ff[ri].Relations = append(ff[ri].Relations, facts.Relation{Kind: facts.RelHandledBy, Target: handler})
+			}
+			if ff[ri].Props == nil {
+				ff[ri].Props = map[string]any{}
+			}
+			ff[ri].Props["handler"] = handler
+			if sym != nil {
+				extra = append(extra, *sym)
+			}
+		}
+	}
+	return extra
+}
+
+func graphqlResolverHandler(kinds *tsutil.KindTable, value *sitter.Node, src []byte, relFile, dir, routeName string, line int, importMap map[string]string) (string, *facts.Fact) {
+	switch kindOf(kinds, value) {
+	case "identifier":
+		name := nodeText(value, src)
+		if canon := importMap[name]; canon != "" {
+			return canon, nil
+		}
+		return dir + "." + name, nil
+	case "arrow_function", "function_expression", "function_declaration":
+		name := dir + "." + routeName
+		return name, &facts.Fact{
+			Kind: facts.KindSymbol,
+			Name: name,
+			File: relFile,
+			Line: line,
+			Props: map[string]any{
+				"symbol_kind": facts.SymbolFunc,
+				"exported":    false,
+				"language":    "typescript",
+			},
+			Relations: []facts.Relation{{Kind: facts.RelDeclares, Target: dir}},
+		}
+	default:
+		return "", nil
+	}
 }
 
 // gqlTagOpen matches the opening of a gql`…` / graphql`…` tagged template.

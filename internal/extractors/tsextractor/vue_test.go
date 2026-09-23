@@ -406,6 +406,122 @@ import { UserCard as Card } from './cards'
 	}
 }
 
+func TestExtract_NestedNuxtPackageEmitsPackageRelativeRoute(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"apps/web/package.json":                        `{"dependencies":{"vue":"^3.0.0"}}`,
+		"apps/web/src/Plain.vue":                       `<template><p>plain</p></template>`,
+		"apps/landings/land-localtest1/package.json":   `{"dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"apps/landings/land-localtest1/nuxt.config.ts": `export default defineNuxtConfig({ components: [{ path: './components/', pathPrefix: true }] })`,
+		"apps/landings/land-localtest1/pages/index.vue": `<template>
+  <Stepper>
+    <template #step1>
+      <StepIndexWelcome />
+    </template>
+    <template #step2>
+      <LazyStepIndexElement />
+    </template>
+  </Stepper>
+</template>`,
+		"apps/landings/land-localtest1/components/step/index/StepIndexWelcome.vue": `<template><h1>welcome</h1></template>`,
+		"apps/landings/land-localtest1/components/step/index/StepIndexElement.vue": `<template><h1>element</h1></template>`,
+	}, false)
+	page, ok := findFact(ff, "apps/landings/land-localtest1/pages.PagesIndex")
+	if !ok {
+		t.Fatalf("nested page component missing; got %v", factNames(ff))
+	}
+	if page.Props["framework"] != "nuxt" {
+		t.Errorf("nested page framework = %v, want nuxt", page.Props["framework"])
+	}
+	routes := findFactsByKind(ff, facts.KindRoute)
+	found := false
+	for _, r := range routes {
+		if r.Name == "/" && r.Props["framework"] == "nuxt" && r.File == "apps/landings/land-localtest1/pages/index.vue" {
+			found = true
+		}
+	}
+	if !found {
+		t.Errorf("expected nested Nuxt route / on the package page; routes=%v", routes)
+	}
+	plain, ok := findFact(ff, "apps/web/src.Plain")
+	if !ok {
+		t.Fatal("ordinary Vue sibling missing")
+	}
+	if plain.Props["framework"] == "nuxt" {
+		t.Fatal("ordinary Vue sibling was attributed as Nuxt")
+	}
+	if !page.HasRelation(facts.RelCalls, "apps/landings/land-localtest1/components/step/index.StepIndexWelcome") {
+		t.Errorf("StepIndexWelcome not bound: %+v", page.Relations)
+	}
+	if !page.HasRelation(facts.RelCalls, "apps/landings/land-localtest1/components/step/index.StepIndexElement") {
+		t.Errorf("LazyStepIndexElement not bound: %+v", page.Relations)
+	}
+}
+
+func TestExtract_NuxtLazyAliasDoesNotOverrideRealLazyComponent(t *testing.T) {
+	ff := extractVue(t, map[string]string{
+		"app/components/step/index/StepIndexElement.vue": `<template><span>plain</span></template>`,
+		"app/components/LazyStepIndexElement.vue":        `<template><span>lazy-file</span></template>`,
+		"app/pages/index.vue":                            `<template><LazyStepIndexElement /></template>`,
+	}, true)
+	page, ok := findFact(ff, "app/pages.PagesIndex")
+	if !ok {
+		t.Fatal("page missing")
+	}
+	if !page.HasRelation(facts.RelCalls, "app/components.LazyStepIndexElement") {
+		t.Fatalf("real Lazy* component lost the tag: %+v", page.Relations)
+	}
+	if page.HasRelation(facts.RelCalls, "app/components/step/index.StepIndexElement") {
+		t.Fatal("Lazy alias overwrote a real Lazy* component")
+	}
+}
+
+func TestExtract_RootNuxtDoesNotBindNestedPackageComponents(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"package.json":                 `{"dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"nuxt.config.ts":               `export default defineNuxtConfig({})`,
+		"pages/index.vue":              `<template><LazyStepIndexElement /></template>`,
+		"apps/landings/package.json":   `{"dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"apps/landings/nuxt.config.ts": `export default defineNuxtConfig({})`,
+		"apps/landings/components/step/index/StepIndexElement.vue": `<template><h1>nested</h1></template>`,
+	}, false)
+	page, ok := findFact(ff, "pages.PagesIndex")
+	if !ok {
+		t.Fatal("root page missing")
+	}
+	if page.HasRelation(facts.RelCalls, "apps/landings/components/step/index.StepIndexElement") {
+		t.Fatal("root Nuxt page bound a nested package auto-component")
+	}
+}
+
+func TestExtract_NuxtLazyMissingComponentDoesNotBind(t *testing.T) {
+	ff := extractVue(t, map[string]string{
+		"app/pages/index.vue": `<template><LazyStepIndexElement /></template>`,
+	}, true)
+	page, ok := findFact(ff, "app/pages.PagesIndex")
+	if !ok {
+		t.Fatal("page missing")
+	}
+	for _, r := range page.Relations {
+		if r.Kind == facts.RelCalls && strings.Contains(r.Target, "StepIndexElement") {
+			t.Fatalf("Lazy target bound without a component file: %+v", page.Relations)
+		}
+	}
+}
+
+func TestExtract_NuxtLazyPrefixIsNotAppliedToPlainVue(t *testing.T) {
+	ff := extractVue(t, map[string]string{
+		"src/components/StepIndexElement.vue": `<template><span /></template>`,
+		"src/pages/index.vue":                 `<template><LazyStepIndexElement /></template>`,
+	}, false)
+	page, ok := findFact(ff, "src/pages.PagesIndex")
+	if !ok {
+		t.Fatal("page missing")
+	}
+	if page.HasRelation(facts.RelCalls, "src/components.StepIndexElement") {
+		t.Fatal("Lazy prefix was applied outside Nuxt")
+	}
+}
+
 func TestExtract_NuxtTemplateResolvesAutoImportedComponent(t *testing.T) {
 	ff := extractVue(t, map[string]string{
 		"app/components/UserCard.vue": `<template><article>User</article></template>`,
@@ -776,6 +892,179 @@ const auth = useAuth()
 	}
 	if hasTarget(targets, "app/pages.useAuth") {
 		t.Errorf("dangling same-directory composable target survived: %v", targets)
+	}
+}
+
+func TestExtract_NuxtAutoImportsNonUseUtilsAndAddImportsDir(t *testing.T) {
+	ff := extractVue(t, map[string]string{
+		"app/composables/useAuth.ts": `export function useAuth() { return 1 }`,
+		"packages/mod/src/module.ts": `
+export default function setup() {
+  addImportsDir(resolver.resolve('./runtime/composables/'))
+  addImportsDir(resolver.resolve('./runtime/utils/'))
+}
+`,
+		"packages/mod/src/runtime/composables/setLandPageMetadata.ts": `export function setLandPageMetadata(meta: Record<string, string>) {}`,
+		"packages/mod/src/runtime/utils/loadGeoFlags.ts":              `export function loadGeoFlags() {}`,
+		"app/pages/index.vue": `<script setup lang="ts">
+setLandPageMetadata({ page: 'x' })
+loadGeoFlags()
+useAuth()
+</script><template><p /></template>`,
+	}, true)
+	targets := fileRefTargets(ff, "app/pages/index.vue")
+	if !hasTarget(targets, "packages/mod/src/runtime/composables.setLandPageMetadata") {
+		t.Errorf("addImportsDir composable unresolved: %v", targets)
+	}
+	if !hasTarget(targets, "packages/mod/src/runtime/utils.loadGeoFlags") {
+		t.Errorf("addImportsDir utils unresolved: %v", targets)
+	}
+	if !hasTarget(targets, "app/composables.useAuth") {
+		t.Errorf("use* auto-import lost: %v", targets)
+	}
+}
+
+func TestExtract_NuxtAutoImportIgnoresUnrelatedPackageBasename(t *testing.T) {
+	ff := extractVue(t, map[string]string{
+		"other/src/helper.ts": `export function setLandPageMetadata() {}`,
+		"app/pages/index.vue": `<script setup lang="ts">setLandPageMetadata()</script><template><p /></template>`,
+	}, true)
+	targets := fileRefTargets(ff, "app/pages/index.vue")
+	if hasTarget(targets, "other/src.setLandPageMetadata") {
+		t.Errorf("unrelated package export was guessed: %v", targets)
+	}
+}
+
+func TestExtract_NuxtAutoImportDoesNotBindSiblingVuePackage(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"packages/a/package.json":                `{"name":"a","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"packages/a/nuxt.config.ts":              `export default defineNuxtConfig({})`,
+		"packages/a/composables/setMetadata.ts":  `export function setMetadata() {}`,
+		"packages/a/app.vue":                     `<script setup lang="ts">setMetadata()</script><template><p /></template>`,
+		"packages/b/package.json":                `{"name":"b","dependencies":{"vue":"^3.0.0"}}`,
+		"packages/b/composables/setMetadata.ts":  `export function setMetadata() {}`,
+		"packages/b/app.vue":                     `<script setup lang="ts">setMetadata()</script><template><p /></template>`,
+	}, false)
+	a := fileRefTargets(ff, "packages/a/app.vue")
+	if !hasTarget(a, "packages/a/composables.setMetadata") {
+		t.Errorf("Nuxt package A must bind its composable: %v", a)
+	}
+	b := fileRefTargets(ff, "packages/b/app.vue")
+	if hasTarget(b, "packages/a/composables.setMetadata") || hasTarget(b, "packages/b/composables.setMetadata") {
+		t.Errorf("plain Vue package B must not receive Nuxt auto-import: %v", b)
+	}
+}
+
+func TestExtract_TwoNuxtAppsBindOwnComposables(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"packages/a/package.json":               `{"name":"a","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"packages/a/nuxt.config.ts":             `export default defineNuxtConfig({})`,
+		"packages/a/composables/setMetadata.ts": `export function setMetadata() {}`,
+		"packages/a/app.vue":                    `<script setup lang="ts">setMetadata()</script><template><p /></template>`,
+		"packages/b/package.json":               `{"name":"b","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"packages/b/nuxt.config.ts":             `export default defineNuxtConfig({})`,
+		"packages/b/composables/setMetadata.ts": `export function setMetadata() {}`,
+		"packages/b/app.vue":                    `<script setup lang="ts">setMetadata()</script><template><p /></template>`,
+	}, false)
+	a := fileRefTargets(ff, "packages/a/app.vue")
+	b := fileRefTargets(ff, "packages/b/app.vue")
+	if !hasTarget(a, "packages/a/composables.setMetadata") {
+		t.Errorf("app A must bind its own composable: %v", a)
+	}
+	if hasTarget(a, "packages/b/composables.setMetadata") {
+		t.Errorf("app A bound the other app: %v", a)
+	}
+	if !hasTarget(b, "packages/b/composables.setMetadata") {
+		t.Errorf("app B must bind its own composable: %v", b)
+	}
+	if hasTarget(b, "packages/a/composables.setMetadata") {
+		t.Errorf("app B bound the other app: %v", b)
+	}
+}
+
+func TestExtract_NuxtExplicitMissingImportNotOverriddenByAutoImport(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"packages/a/package.json":               `{"name":"a","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"packages/a/nuxt.config.ts":             `export default defineNuxtConfig({})`,
+		"packages/a/composables/setMetadata.ts": `export function setMetadata() {}`,
+		"packages/a/app.vue":                    `<script setup lang="ts">import { setMetadata } from './missing'; setMetadata()</script><template><p /></template>`,
+		"packages/b/package.json":               `{"name":"b","dependencies":{"vue":"^3.0.0"}}`,
+		"packages/b/composables/setMetadata.ts": `export function setMetadata() {}`,
+		"packages/b/app.vue":                    `<script setup lang="ts">setMetadata()</script><template><p /></template>`,
+	}, false)
+	a := fileRefTargets(ff, "packages/a/app.vue")
+	if hasTarget(a, "packages/a/composables.setMetadata") {
+		t.Errorf("explicit missing import must not be rewritten to auto-import: %v", a)
+	}
+	b := fileRefTargets(ff, "packages/b/app.vue")
+	if hasTarget(b, "packages/a/composables.setMetadata") || hasTarget(b, "packages/b/composables.setMetadata") {
+		t.Errorf("plain Vue B must stay unbound: %v", b)
+	}
+}
+
+func TestExtract_NuxtRegisteredModuleAutoImportsWhenModulePackageIsNuxt(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"apps/landings/package.json":   `{"name":"landings","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0","landings-module":"workspace:*"}}`,
+		"apps/landings/nuxt.config.ts": `
+import landingModule from 'landings-module'
+export default defineNuxtConfig({ modules: [landingModule] })
+`,
+		"apps/landings/composables/useIsPreloadMount.ts": `export function useIsPreloadMount() { return false }`,
+		"apps/landings/pages/ThankYou.vue": `<script setup lang="ts">
+setLandPageMetadata({ page: 'thanks' })
+useIsPreloadMount()
+</script><template><p /></template>`,
+		"apps/landings/pages/Payment.vue": `<script setup lang="ts">
+setLandPageMetadata({ page: 'pay' })
+</script><template><p /></template>`,
+		"packages/landings-module/package.json": `{"name":"landings-module","dependencies":{"nuxt":"^3.0.0"}}`,
+		"packages/landings-module/src/module.ts": `
+export default function setup() {
+  addImportsDir(resolver.resolve('./runtime/composables/'))
+}
+`,
+		"packages/landings-module/src/runtime/composables/setLandPageMetadata.ts": `export function setLandPageMetadata(meta: Record<string, string>) {}`,
+	}, false)
+	want := "packages/landings-module/src/runtime/composables.setLandPageMetadata"
+	for _, page := range []string{"apps/landings/pages/ThankYou.vue", "apps/landings/pages/Payment.vue"} {
+		targets := fileRefTargets(ff, page)
+		if !hasTarget(targets, want) {
+			t.Errorf("%s: registered module composable unresolved: %v", page, targets)
+		}
+	}
+	thanks := fileRefTargets(ff, "apps/landings/pages/ThankYou.vue")
+	if !hasTarget(thanks, "apps/landings/composables.useIsPreloadMount") {
+		t.Errorf("app-local composable lost: %v", thanks)
+	}
+}
+
+func TestExtract_NuxtRegisteredModuleAutoImportsDoNotLeakToUnrelatedApp(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"apps/landings/package.json":   `{"name":"landings","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0","landings-module":"workspace:*"}}`,
+		"apps/landings/nuxt.config.ts": `
+import landingModule from 'landings-module'
+export default defineNuxtConfig({ modules: [landingModule] })
+`,
+		"apps/landings/pages/ThankYou.vue": `<script setup lang="ts">setLandPageMetadata({ page: 'thanks' })</script><template><p /></template>`,
+		"apps/other/package.json":          `{"name":"other","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"apps/other/nuxt.config.ts":        `export default defineNuxtConfig({})`,
+		"apps/other/pages/index.vue":       `<script setup lang="ts">setLandPageMetadata({ page: 'x' })</script><template><p /></template>`,
+		"packages/landings-module/package.json": `{"name":"landings-module","dependencies":{"nuxt":"^3.0.0"}}`,
+		"packages/landings-module/src/module.ts": `
+export default function setup() {
+  addImportsDir(resolver.resolve('./runtime/composables/'))
+}
+`,
+		"packages/landings-module/src/runtime/composables/setLandPageMetadata.ts": `export function setLandPageMetadata(meta: Record<string, string>) {}`,
+	}, false)
+	want := "packages/landings-module/src/runtime/composables.setLandPageMetadata"
+	land := fileRefTargets(ff, "apps/landings/pages/ThankYou.vue")
+	if !hasTarget(land, want) {
+		t.Errorf("consuming app must bind registered module: %v", land)
+	}
+	other := fileRefTargets(ff, "apps/other/pages/index.vue")
+	if hasTarget(other, want) {
+		t.Errorf("unrelated app received module auto-import: %v", other)
 	}
 }
 

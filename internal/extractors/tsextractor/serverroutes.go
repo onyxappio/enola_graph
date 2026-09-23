@@ -12,6 +12,7 @@ package tsextractor
 import (
 	"bytes"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -46,6 +47,8 @@ var mountCall = regexp.MustCompile("([A-Za-z_$][\\w$]*)\\s*\\.\\s*use\\s*\\(\\s*
 // serverVerbCall matches a route registration on a named receiver, capturing the
 // receiver so the binding table can rule on it.
 var serverVerbCall = regexp.MustCompile("([A-Za-z_$][\\w$]*)\\s*\\.\\s*(get|post|put|patch|delete|all|options|head)\\s*(?:<[^()]*>)?\\s*\\(\\s*(?:\"([^\"]*)\"|'([^']*)'|`([^`]*)`)")
+
+var serverRouteObjectCall = regexp.MustCompile(`([A-Za-z_$][\w$]*)\s*\.\s*route\s*\(\s*\{`)
 
 // frameworkOf normalises a factory token to the framework label emitted on facts.
 var frameworkOf = map[string]string{
@@ -152,7 +155,8 @@ func serverBindings(src []byte) map[string]serverBinding {
 // (the shape of goextractor/routeprefix.go); it is deliberately not attempted here.
 func extractServerRouteFacts(src []byte, relFile string) []facts.Fact {
 	bindings := serverBindings(src)
-	if len(bindings) == 0 {
+	scopes := serverLexicalScopes(src)
+	if len(bindings) == 0 && len(scopes) == 0 {
 		return nil
 	}
 	dir := factpath.Dir(relFile)
@@ -160,7 +164,8 @@ func extractServerRouteFacts(src []byte, relFile string) []facts.Fact {
 	var out []facts.Fact
 	seen := map[string]bool{}
 	for _, m := range serverVerbCall.FindAllSubmatchIndex(src, -1) {
-		b, ok := bindings[string(src[m[2]:m[3]])]
+		recv := string(src[m[2]:m[3]])
+		b, ok := serverReceiverAt(bindings, scopes, recv, m[0])
 		if !ok || !b.mounted {
 			continue
 		}
@@ -191,7 +196,164 @@ func extractServerRouteFacts(src []byte, relFile string) []facts.Fact {
 			Relations: []facts.Relation{{Kind: facts.RelDeclares, Target: dir}},
 		})
 	}
+	out = append(out, extractServerRouteObjects(src, relFile, dir, bindings, scopes, seen)...)
 	return out
+}
+
+func extractServerRouteObjects(src []byte, relFile, dir string, bindings map[string]serverBinding, scopes []fastifyParamScope, seen map[string]bool) []facts.Fact {
+	if !bytes.Contains(src, []byte(".route")) {
+		return nil
+	}
+	var out []facts.Fact
+	for _, m := range serverRouteObjectCall.FindAllSubmatchIndex(src, -1) {
+		recv := string(src[m[2]:m[3]])
+		b, ok := serverReceiverAt(bindings, scopes, recv, m[0])
+		if !ok || !b.mounted {
+			continue
+		}
+		brace := m[1] - 1
+		if brace < 0 || brace >= len(src) || src[brace] != '{' {
+			continue
+		}
+		end, ok := matchObjectLiteral(src, brace)
+		if !ok {
+			continue
+		}
+		obj := src[brace : end+1]
+		raw := objectLiteralStringField(obj, "url")
+		if raw == "" {
+			raw = objectLiteralStringField(obj, "path")
+		}
+		path, ok := cleanServerPath(raw)
+		if !ok {
+			continue
+		}
+		methods := objectLiteralMethods(obj)
+		verb := joinRouteMethods(methods)
+		full := facts.JoinRoutePath(b.prefix, path)
+		line := 1 + bytes.Count(src[:m[0]], []byte("\n"))
+		key := verb + "\x00" + full + "\x00" + strconv.Itoa(line)
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		out = append(out, facts.Fact{
+			Kind: facts.KindRoute,
+			Name: full,
+			File: relFile,
+			Line: line,
+			Props: map[string]any{
+				facts.PropRole: facts.RoleServer,
+				"method":       verb,
+				"framework":    b.framework,
+				"language":     "typescript",
+			},
+			Relations: []facts.Relation{{Kind: facts.RelDeclares, Target: dir}},
+		})
+	}
+	return out
+}
+
+func matchObjectLiteral(src []byte, open int) (int, bool) {
+	if open < 0 || open >= len(src) || src[open] != '{' {
+		return 0, false
+	}
+	depth := 0
+	var quote byte
+	esc := false
+	for i := open; i < len(src); i++ {
+		c := src[i]
+		if quote != 0 {
+			if esc {
+				esc = false
+				continue
+			}
+			if c == '\\' {
+				esc = true
+				continue
+			}
+			if c == quote {
+				quote = 0
+			}
+			continue
+		}
+		switch c {
+		case '\'', '"', '`':
+			quote = c
+		case '{':
+			depth++
+		case '}':
+			depth--
+			if depth == 0 {
+				return i, true
+			}
+		}
+	}
+	return 0, false
+}
+
+func objectLiteralStringField(obj []byte, key string) string {
+	re := regexp.MustCompile(`(?m)(?:^|[,{])\s*` + regexp.QuoteMeta(key) + `\s*:\s*(?:["']([^"']+)["']|` + "`" + `([^` + "`" + `]+)` + "`" + `)`)
+	m := re.FindSubmatch(obj)
+	if m == nil {
+		return ""
+	}
+	return firstNonEmpty(m[1], m[2])
+}
+
+func objectLiteralMethods(obj []byte) []string {
+	re := regexp.MustCompile(`(?m)(?:^|[,{])\s*method\s*:\s*`)
+	loc := re.FindIndex(obj)
+	if loc == nil {
+		return nil
+	}
+	rest := obj[loc[1]:]
+	rest = bytes.TrimSpace(rest)
+	if len(rest) == 0 {
+		return nil
+	}
+	if rest[0] == '[' {
+		end := bytes.IndexByte(rest, ']')
+		if end < 0 {
+			return nil
+		}
+		var methods []string
+		for _, m := range regexp.MustCompile(`["']([A-Za-z]+)["']`).FindAllSubmatch(rest[:end], -1) {
+			methods = append(methods, strings.ToUpper(string(m[1])))
+		}
+		return methods
+	}
+	if rest[0] == '"' || rest[0] == '\'' || rest[0] == '`' {
+		q := rest[0]
+		j := 1
+		for j < len(rest) && rest[j] != q {
+			j++
+		}
+		if j < len(rest) {
+			return []string{strings.ToUpper(string(rest[1:j]))}
+		}
+	}
+	return nil
+}
+
+func joinRouteMethods(methods []string) string {
+	if len(methods) == 0 {
+		return "GET"
+	}
+	seen := map[string]bool{}
+	var out []string
+	for _, m := range methods {
+		if m == "" || seen[m] {
+			continue
+		}
+		seen[m] = true
+		out = append(out, m)
+	}
+	if len(out) == 1 {
+		return out[0]
+	}
+	sort.Strings(out)
+	return strings.Join(out, "|")
 }
 
 // cleanServerPath accepts a declared route path, rejecting the ones that carry no
@@ -216,6 +378,712 @@ func cleanServerPath(raw string) (string, bool) {
 func isServerReceiver(bindings map[string]serverBinding, name string) bool {
 	_, ok := bindings[name]
 	return ok
+}
+
+func isServerReceiverAt(bindings map[string]serverBinding, scopes []fastifyParamScope, name string, pos int) bool {
+	if _, ok := fastifyScopeBinding(scopes, name, pos); ok {
+		b, bound := serverReceiverAt(bindings, scopes, name, pos)
+		return bound && b.mounted
+	}
+	return isServerReceiver(bindings, name)
+}
+
+func serverReceiverAt(bindings map[string]serverBinding, scopes []fastifyParamScope, name string, pos int) (serverBinding, bool) {
+	if b, ok := fastifyScopeBinding(scopes, name, pos); ok {
+		if !b.mounted {
+			return serverBinding{}, false
+		}
+		return b, true
+	}
+	if b, ok := bindings[name]; ok {
+		return b, true
+	}
+	return serverBinding{}, false
+}
+
+var (
+	fastifyNamedImport = regexp.MustCompile(`(?m)import\s+(?:type\s+)?\{([^}]+)\}\s+from\s+['"]fastify['"]`)
+	fastifyTypedParam  = regexp.MustCompile(`\b([A-Za-z_$][\w$]*)\s*:\s*([A-Za-z_$][\w$]*)\b`)
+)
+
+var fastifyImportedTypes = map[string]bool{
+	"FastifyInstance": true,
+}
+
+type fastifyParamScope struct {
+	name       string
+	start, end int
+	binding    serverBinding
+}
+
+// typedFastifyParamScopes maps FastifyInstance parameters to the function body
+// that owns them. FastifyPluginAsync/Callback name a plugin function, not an
+// application object. The same identifier in a sibling function with another
+// type is not a server receiver.
+func typedFastifyParamScopes(src []byte) []fastifyParamScope {
+	local := importedFastifyInstanceNames(src)
+	if len(local) == 0 {
+		return nil
+	}
+	mask := tsCommentStringMask(src)
+	var out []fastifyParamScope
+	for _, m := range fastifyTypedParam.FindAllSubmatchIndex(src, -1) {
+		if mask[m[0]] {
+			continue
+		}
+		ident, typ := string(src[m[2]:m[3]]), string(src[m[4]:m[5]])
+		if !local[typ] {
+			continue
+		}
+		bodyStart, bodyEnd, ok := functionBodyAroundParam(src, mask, m[0])
+		if !ok {
+			continue
+		}
+		out = append(out, fastifyParamScope{
+			name: ident, start: bodyStart, end: bodyEnd,
+			binding: serverBinding{framework: "fastify", mounted: true},
+		})
+	}
+	return out
+}
+
+func importedFastifyInstanceNames(src []byte) map[string]bool {
+	local := map[string]bool{}
+	mask := tsCommentStringMask(src)
+	for _, loc := range fastifyNamedImport.FindAllSubmatchIndex(src, -1) {
+		if mask[loc[0]] {
+			continue
+		}
+		inner := string(src[loc[2]:loc[3]])
+		for _, spec := range strings.Split(inner, ",") {
+			spec = strings.TrimSpace(spec)
+			spec = strings.TrimPrefix(spec, "type ")
+			spec = strings.TrimSpace(spec)
+			if spec == "" {
+				continue
+			}
+			name, alias := spec, ""
+			if parts := strings.Split(spec, " as "); len(parts) == 2 {
+				name = strings.TrimSpace(parts[0])
+				alias = strings.TrimSpace(parts[1])
+			}
+			if !fastifyImportedTypes[name] {
+				continue
+			}
+			if alias != "" {
+				local[alias] = true
+			} else {
+				local[name] = true
+			}
+		}
+	}
+	return local
+}
+
+func isFunctionParameter(src []byte, mask []bool, paramPos int) bool {
+	i := paramPos
+	for i > 0 && src[i] != '(' {
+		if src[i] == ')' || src[i] == '{' || src[i] == '}' {
+			return false
+		}
+		i--
+	}
+	if i < 0 || src[i] != '(' || mask[i] {
+		return false
+	}
+	j := i - 1
+	for j >= 0 && (src[j] == ' ' || src[j] == '\t' || src[j] == '\n' || src[j] == '\r') {
+		j--
+	}
+	if j >= 0 && isJSIdentPart(src[j]) {
+		end := j + 1
+		for j >= 0 && isJSIdentPart(src[j]) {
+			j--
+		}
+		name := string(src[j+1 : end])
+		if name == "function" {
+			return true
+		}
+		k := j
+		for k >= 0 && (src[k] == ' ' || src[k] == '\t' || src[k] == '\n' || src[k] == '\r') {
+			k--
+		}
+		if k >= 7 && string(src[k-7:k+1]) == "function" {
+			return true
+		}
+	}
+	depth := 0
+	for k := i; k < len(src); k++ {
+		if mask[k] {
+			continue
+		}
+		switch src[k] {
+		case '(':
+			depth++
+		case ')':
+			depth--
+			if depth == 0 {
+				p := k + 1
+				for p < len(src) && (src[p] == ' ' || src[p] == '\t' || src[p] == '\n' || src[p] == '\r') {
+					p++
+				}
+				if p+1 < len(src) && src[p] == '=' && src[p+1] == '>' {
+					return true
+				}
+				return false
+			}
+		}
+	}
+	return false
+}
+
+func functionBodyAroundParam(src []byte, mask []bool, paramPos int) (start, end int, ok bool) {
+	i := paramPos
+	for i > 0 && src[i] != '(' {
+		if src[i] == ')' || src[i] == '{' || src[i] == '}' {
+			return 0, 0, false
+		}
+		i--
+	}
+	if i < 0 || src[i] != '(' || mask[i] {
+		return 0, 0, false
+	}
+	depth := 0
+	for j := i; j < len(src); j++ {
+		if mask[j] {
+			continue
+		}
+		switch src[j] {
+		case '(':
+			depth++
+		case ')':
+			depth--
+			if depth == 0 {
+				k := j + 1
+				for k < len(src) && (src[k] == ' ' || src[k] == '\t' || src[k] == '\n' || src[k] == '\r') {
+					k++
+				}
+				for k < len(src) && src[k] != '{' && src[k] != ';' && src[k] != '\n' {
+					if src[k] == '=' && k+1 < len(src) && src[k+1] == '>' {
+						k += 2
+						for k < len(src) && (src[k] == ' ' || src[k] == '\t' || src[k] == '\n' || src[k] == '\r') {
+							k++
+						}
+						break
+					}
+					k++
+				}
+				for k < len(src) && (src[k] == ' ' || src[k] == '\t' || src[k] == '\n' || src[k] == '\r') {
+					k++
+				}
+				if k >= len(src) || src[k] != '{' || mask[k] {
+					return 0, 0, false
+				}
+				end := matchBrace(src, mask, k)
+				if end < 0 {
+					return 0, 0, false
+				}
+				return k, end, true
+			}
+		}
+	}
+	return 0, 0, false
+}
+
+func matchBrace(src []byte, mask []bool, open int) int {
+	depth := 0
+	for i := open; i < len(src); i++ {
+		if mask[i] {
+			continue
+		}
+		switch src[i] {
+		case '{':
+			depth++
+		case '}':
+			depth--
+			if depth == 0 {
+				return i
+			}
+		}
+	}
+	return -1
+}
+
+func fastifyScopeBinding(scopes []fastifyParamScope, name string, pos int) (serverBinding, bool) {
+	best := -1
+	bestSpan := int(^uint(0) >> 1)
+	for i, s := range scopes {
+		if s.name != name || pos < s.start || pos > s.end {
+			continue
+		}
+		span := s.end - s.start
+		if span < bestSpan || (span == bestSpan && best >= 0 && s.binding.mounted && !scopes[best].binding.mounted) {
+			bestSpan = span
+			best = i
+		}
+	}
+	if best < 0 {
+		return serverBinding{}, false
+	}
+	return scopes[best].binding, true
+}
+
+func mergeFastifyScopes(typed, params []fastifyParamScope) []fastifyParamScope {
+	if len(typed) == 0 {
+		return params
+	}
+	if len(params) == 0 {
+		return typed
+	}
+	out := make([]fastifyParamScope, 0, len(typed)+len(params))
+	out = append(out, typed...)
+	out = append(out, params...)
+	return out
+}
+
+func serverLexicalScopes(src []byte) []fastifyParamScope {
+	return mergeFastifyScopes(
+		mergeFastifyScopes(typedFastifyParamScopes(src), collectParamNameScopes(src)),
+		collectLocalBindingScopes(src),
+	)
+}
+
+var localFactoryRHS = regexp.MustCompile(`^(?:new\s+)?(express|fastify|Fastify|Hono|Koa)\s*\(`)
+var localRouterRHS = regexp.MustCompile(`^(?:new\s+)?(?:express\s*\.\s*Router|Router)\s*\(`)
+
+// collectLocalBindingScopes records const/let/var (including destructuring)
+// identifiers as lexical shadows of same-named outer receivers. A local name is
+// a proven server receiver only when its initializer is a recognized app
+// factory. Unknown, alias, object, and router RHS still occupy the scope so
+// they cannot inherit an unrelated outer factory of the same name.
+func collectLocalBindingScopes(src []byte) []fastifyParamScope {
+	mask := tsCommentStringMask(src)
+	var out []fastifyParamScope
+	i := 0
+	for i < len(src) {
+		if mask[i] {
+			i++
+			continue
+		}
+		kw, ok := localDeclKeywordAt(src, i)
+		if !ok {
+			i++
+			continue
+		}
+		declStart := i
+		i += len(kw)
+		blockEnd := enclosingBlockEnd(src, mask, declStart)
+		nestedScan := -1
+		for i < len(src) && i < blockEnd {
+			i = skipTSSpace(src, mask, i)
+			if i >= len(src) || i >= blockEnd {
+				break
+			}
+			if src[i] == ';' {
+				i++
+				break
+			}
+			names, next, ok := parseBindingPattern(src, mask, i)
+			if !ok {
+				break
+			}
+			i = skipTSSpace(src, mask, next)
+			if i < len(src) && src[i] == ':' {
+				i = skipTSTypeAnnot(src, mask, i)
+				i = skipTSSpace(src, mask, i)
+			}
+			rhs := i
+			b := serverBinding{}
+			if i < len(src) && src[i] == '=' {
+				i++
+				i = skipTSSpace(src, mask, i)
+				rhs = i
+				rest := src[i:]
+				if fm := localFactoryRHS.FindSubmatch(rest); fm != nil && !localRouterRHS.Match(rest) {
+					b = serverBinding{framework: frameworkOf[string(fm[1])], mounted: true}
+				}
+				i = skipTSInitializer(src, mask, i, blockEnd)
+				// Nested function/arrow/object initializers can declare their
+				// own const/let/var bindings. skipTSInitializer must not hide
+				// those names from lexical discovery.
+				if nestedScan < 0 || rhs < nestedScan {
+					nestedScan = rhs
+				}
+			}
+			if rhs > blockEnd {
+				break
+			}
+			// File-scope unmounted bindings (routers, unknown aliases) must not
+			// occupy the whole file: same-file app.use mounts live in
+			// serverBindings, and a file-wide empty shadow would hide them.
+			if !b.mounted && blockEnd >= len(src) {
+				i = skipTSSpace(src, mask, i)
+				if i < len(src) && src[i] == ',' {
+					i++
+					continue
+				}
+				break
+			}
+			for _, name := range names {
+				out = append(out, fastifyParamScope{
+					name:    name,
+					start:   rhs,
+					end:     blockEnd,
+					binding: b,
+				})
+			}
+			i = skipTSSpace(src, mask, i)
+			if i < len(src) && src[i] == ',' {
+				i++
+				continue
+			}
+			break
+		}
+		if nestedScan >= 0 && nestedScan < i {
+			i = nestedScan
+		}
+	}
+	return out
+}
+
+func localDeclKeywordAt(src []byte, i int) (string, bool) {
+	for _, kw := range []string{"const", "let", "var"} {
+		if i+len(kw) > len(src) {
+			continue
+		}
+		if string(src[i:i+len(kw)]) != kw {
+			continue
+		}
+		if i > 0 && isJSIdentPart(src[i-1]) {
+			continue
+		}
+		if i+len(kw) < len(src) && isJSIdentPart(src[i+len(kw)]) {
+			continue
+		}
+		return kw, true
+	}
+	return "", false
+}
+
+func skipTSSpace(src []byte, mask []bool, i int) int {
+	for i < len(src) {
+		if mask[i] || src[i] == ' ' || src[i] == '\t' || src[i] == '\n' || src[i] == '\r' {
+			i++
+			continue
+		}
+		break
+	}
+	return i
+}
+
+func parseBindingPattern(src []byte, mask []bool, i int) ([]string, int, bool) {
+	i = skipTSSpace(src, mask, i)
+	if i >= len(src) {
+		return nil, i, false
+	}
+	if isJSIdentStart(src[i]) {
+		start := i
+		i++
+		for i < len(src) && isJSIdentPart(src[i]) {
+			i++
+		}
+		return []string{string(src[start:i])}, i, true
+	}
+	if src[i] != '{' && src[i] != '[' {
+		return nil, i, false
+	}
+	open := src[i]
+	close := byte('}')
+	if open == '[' {
+		close = ']'
+	}
+	depth := 0
+	var names []string
+	i++
+	for i < len(src) {
+		if mask[i] {
+			i++
+			continue
+		}
+		c := src[i]
+		if c == open {
+			depth++
+			i++
+			continue
+		}
+		if c == close {
+			if depth == 0 {
+				return names, i + 1, true
+			}
+			depth--
+			i++
+			continue
+		}
+		if depth == 0 && isJSIdentStart(c) {
+			start := i
+			i++
+			for i < len(src) && isJSIdentPart(src[i]) {
+				i++
+			}
+			j := skipTSSpace(src, mask, i)
+			if j < len(src) && src[j] == ':' {
+				i = j
+				continue
+			}
+			names = append(names, string(src[start:i]))
+			continue
+		}
+		i++
+	}
+	return nil, i, false
+}
+
+func skipTSTypeAnnot(src []byte, mask []bool, i int) int {
+	if i >= len(src) || src[i] != ':' {
+		return i
+	}
+	i++
+	depthParen, depthBrace, depthBrack, depthAngle := 0, 0, 0, 0
+	for i < len(src) {
+		if mask[i] {
+			i++
+			continue
+		}
+		switch src[i] {
+		case '(':
+			depthParen++
+		case ')':
+			if depthParen > 0 {
+				depthParen--
+			}
+		case '{':
+			depthBrace++
+		case '}':
+			if depthBrace > 0 {
+				depthBrace--
+			}
+		case '[':
+			depthBrack++
+		case ']':
+			if depthBrack > 0 {
+				depthBrack--
+			}
+		case '<':
+			depthAngle++
+		case '>':
+			if depthAngle > 0 {
+				depthAngle--
+			}
+		case '=', ',', ';':
+			if depthParen+depthBrace+depthBrack+depthAngle == 0 {
+				return i
+			}
+		}
+		i++
+	}
+	return i
+}
+
+func skipTSInitializer(src []byte, mask []bool, i, limit int) int {
+	depthParen, depthBrace, depthBrack := 0, 0, 0
+	for i < len(src) && i < limit {
+		if mask[i] {
+			i++
+			continue
+		}
+		c := src[i]
+		depth := depthParen + depthBrace + depthBrack
+		if depth == 0 {
+			if c == ',' || c == ';' {
+				return i
+			}
+			if c == '}' {
+				return i
+			}
+			if c == '\n' {
+				j := skipTSSpace(src, mask, i+1)
+				if j >= len(src) || j >= limit {
+					return i
+				}
+				if !exprContinues(src[j]) {
+					return i
+				}
+			}
+		}
+		switch c {
+		case '(':
+			depthParen++
+		case ')':
+			if depthParen > 0 {
+				depthParen--
+			}
+		case '{':
+			depthBrace++
+		case '}':
+			if depthBrace > 0 {
+				depthBrace--
+			} else {
+				return i
+			}
+		case '[':
+			depthBrack++
+		case ']':
+			if depthBrack > 0 {
+				depthBrack--
+			}
+		}
+		i++
+	}
+	return i
+}
+
+func exprContinues(c byte) bool {
+	switch c {
+	case '.', '(', '[', '+', '-', '*', '/', '%', '&', '|', '?', ':', '`', '<', '>', '=', '!':
+		return true
+	}
+	return false
+}
+
+func enclosingBlockEnd(src []byte, mask []bool, pos int) int {
+	var opens []int
+	for i := 0; i < pos && i < len(src); i++ {
+		if mask[i] {
+			continue
+		}
+		switch src[i] {
+		case '{':
+			opens = append(opens, i)
+		case '}':
+			if len(opens) > 0 {
+				opens = opens[:len(opens)-1]
+			}
+		}
+	}
+	if len(opens) == 0 {
+		return len(src)
+	}
+	end := matchBrace(src, mask, opens[len(opens)-1])
+	if end < 0 {
+		return len(src)
+	}
+	return end
+}
+
+func collectParamNameScopes(src []byte) []fastifyParamScope {
+	mask := tsCommentStringMask(src)
+	var out []fastifyParamScope
+	i := 0
+	for i < len(src) {
+		if mask[i] {
+			i++
+			continue
+		}
+		if !isJSIdentStart(src[i]) {
+			i++
+			continue
+		}
+		start := i
+		i++
+		for i < len(src) && isJSIdentPart(src[i]) {
+			i++
+		}
+		j := start - 1
+		for j >= 0 && (src[j] == ' ' || src[j] == '\t' || src[j] == '\n' || src[j] == '\r') {
+			j--
+		}
+		if j < 0 || (src[j] != '(' && src[j] != ',') {
+			continue
+		}
+		if !isFunctionParameter(src, mask, start) {
+			continue
+		}
+		bodyStart, bodyEnd, ok := functionBodyAroundParam(src, mask, start)
+		if !ok {
+			continue
+		}
+		out = append(out, fastifyParamScope{
+			name:  string(src[start:i]),
+			start: bodyStart,
+			end:   bodyEnd,
+		})
+	}
+	return out
+}
+
+func isJSIdentStart(b byte) bool {
+	return b == '_' || b == '$' || (b >= 'A' && b <= 'Z') || (b >= 'a' && b <= 'z')
+}
+
+func isJSIdentPart(b byte) bool {
+	return isJSIdentStart(b) || (b >= '0' && b <= '9')
+}
+
+// tsCommentStringMask is true at bytes inside comments or string/template literals.
+func tsCommentStringMask(src []byte) []bool {
+	mask := make([]bool, len(src))
+	i := 0
+	for i < len(src) {
+		switch src[i] {
+		case '/':
+			if i+1 < len(src) && src[i+1] == '/' {
+				for i < len(src) && src[i] != '\n' {
+					mask[i] = true
+					i++
+				}
+				continue
+			}
+			if i+1 < len(src) && src[i+1] == '*' {
+				mask[i] = true
+				mask[i+1] = true
+				i += 2
+				for i < len(src) {
+					mask[i] = true
+					if src[i] == '*' && i+1 < len(src) && src[i+1] == '/' {
+						mask[i+1] = true
+						i += 2
+						break
+					}
+					i++
+				}
+				continue
+			}
+		case '\'', '"', '`':
+			q := src[i]
+			mask[i] = true
+			i++
+			for i < len(src) {
+				mask[i] = true
+				if src[i] == '\\' && i+1 < len(src) {
+					mask[i+1] = true
+					i += 2
+					continue
+				}
+				if src[i] == q {
+					i++
+					break
+				}
+				i++
+			}
+			continue
+		}
+		i++
+	}
+	return mask
+}
+
+// typedFastifyParamBindings is the union of scoped FastifyInstance parameters,
+// kept for tests that inspect the file-level name set. It must not be used as
+// a global receiver map.
+func typedFastifyParamBindings(src []byte) map[string]serverBinding {
+	out := map[string]serverBinding{}
+	for _, s := range typedFastifyParamScopes(src) {
+		out[s.name] = s.binding
+	}
+	if len(out) == 0 {
+		return nil
+	}
+	return out
 }
 
 // identifierEndingAt returns the identifier immediately preceding pos, or "".

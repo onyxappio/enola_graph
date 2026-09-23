@@ -677,6 +677,18 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 						dirty[f] = true
 					}
 				}
+				for path, rec := range prevRecs {
+					if rec == nil || len(rec.SideReadHashes) == 0 {
+						continue
+					}
+					for side, want := range rec.SideReadHashes {
+						got, ok := lookupHash(hashes, side)
+						if !ok || got != want {
+							dirty[path] = true
+							break
+						}
+					}
+				}
 				if s.eng.GraphScope() != nil {
 					for _, f := range owned {
 						if prevRecs[f] != nil && s.state.TSFileContext[f] != input.tsFileContext[f] {
