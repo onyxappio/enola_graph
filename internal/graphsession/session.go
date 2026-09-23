@@ -56,6 +56,17 @@ type Options struct {
 	MaxBeginBytes int
 	// OnBeforeParse is a test hook invoked before each dirty TypeScript file is parsed.
 	OnBeforeParse func(rel string)
+	// FreshEngine is the caller stating that it constructed this engine for this
+	// session, in this process, and has run nothing against it since. Only a
+	// caller can know that; the session cannot infer it from an engine value.
+	//
+	// It permits one thing: the first non-fast run may prove the graph input
+	// policy by re-reading the files that policy declared instead of building a
+	// second identical policy. The proof is not this flag. The flag only bounds
+	// the window the proof has to cover, and the run still refuses to skip if
+	// any declared input moved, if the configuration bracket around the check
+	// does not hold, or if anything has already run against the engine.
+	FreshEngine bool
 }
 
 // Result is the observable outcome of Analyze or Delta.
@@ -308,7 +319,7 @@ func OpenSession(ctx context.Context, eng *engine.Engine, repoPath string, sink 
 	}
 	tr.Mark("load_state", fmt.Sprintf("files=%d", nfiles))
 	opened = true
-	return &Resident{eng: eng, abs: abs, opts: opts, sink: sink, state: st, journal: journal, lock: lock}, nil
+	return &Resident{eng: eng, abs: abs, opts: opts, sink: sink, state: st, journal: journal, lock: lock, engineUnused: opts.FreshEngine}, nil
 }
 
 func identityOK(st *State, opts Options, abs string) error {

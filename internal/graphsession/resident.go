@@ -49,6 +49,14 @@ type WorkCounters struct {
 	// TSDiscoveries: together they say how many runs needed a discovery and how
 	// many of those had to read the tree for it.
 	TSDiscoveriesReused int
+	// GraphInputRebuilds counts the graph input policies a run constructed;
+	// GraphInputRebuildsProven counts the ones it did not have to construct
+	// because the policy it already held re-read identical. A fresh CLI builds
+	// one policy resolving its target and then, at the top of its first
+	// transaction, a second identical one; these two counters are what say
+	// which of the two happened, and they are reported separately so a proven
+	// skip can never be read as work that was never needed.
+	GraphInputRebuilds, GraphInputRebuildsProven int
 	// TSDiscoveryRechecks is what proving a retained snapshot cost: the
 	// presences re-observed, the side reads re-read, the directories
 	// re-enumerated. This is work this change introduces, not work it avoids,
@@ -209,6 +217,12 @@ type Resident struct {
 	epoch          string
 	watermark      uint64
 	failed, closed bool
+	// engineUnused is the caller's FreshEngine claim, still true. It survives
+	// exactly until the first transaction, because after that the engine is one
+	// this session has been running against rather than one just constructed,
+	// and the window a declared-input recheck would have to cover is no longer
+	// bounded by anything.
+	engineUnused bool
 }
 
 type OnlineResult struct {
@@ -278,6 +292,9 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 			r.eng = committedEngine
 		}
 	}()
+	// provenInputs records that this run answered the policy question by
+	// re-reading what the policy declared rather than by building a second one.
+	provenInputs := false
 	var beforeRebuild map[string][]byte
 	if !fast {
 		var captureErr error
@@ -288,13 +305,46 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 		rtr.Mark("effective_config_before", fmt.Sprintf("files=%d", len(beforeRebuild)))
 	}
 	if !fast {
-		fresh, err := r.eng.RebuildGraphInputs()
-		if err != nil {
-			return nil, WorkCounters{}, err
+		// The rebuild is here to make the policy an observation of this run's
+		// tree rather than of whenever the engine happened to be built. A fresh
+		// CLI pays for it twice: it constructs one policy resolving its target
+		// and an identical one here, microseconds later, and the second is a
+		// repository walk, a git index read and a check-ignore pass over every
+		// name.
+		//
+		// It can be skipped only with the same property proven a cheaper way:
+		// that building one now would read the same things. That is what
+		// ReusableOver asks - the declared reads, a rerun of the Git discovery
+		// and the walk, without the index read, the check-ignore pass or the
+		// identity computation, which are functions of them - inside the
+		// configuration bracket this function already holds, so a configuration
+		// edit racing the check still fails below. Every other case rebuilds,
+		// and the reason it rebuilt is recorded rather than inferred.
+		reason := ""
+		switch {
+		case !r.engineUnused:
+			reason = "engine already used"
+		case r.eng.GraphScope() == nil:
+			reason = "no graph scope"
+		default:
+			if why, ok := r.eng.GraphScope().Policy.ReusableOver(); !ok {
+				reason = why
+			}
 		}
-		r.eng = fresh
-		rtr.Mark("rebuild_graph_inputs", "")
+		if reason == "" {
+			provenInputs = true
+			rtr.Mark("graph_inputs_proven", "")
+		} else {
+			fresh, err := r.eng.RebuildGraphInputs()
+			if err != nil {
+				return nil, WorkCounters{}, err
+			}
+			r.eng = fresh
+			rtr.Mark("rebuild_graph_inputs", reason)
+		}
 	}
+	// Whatever happened above, the engine has now been used by a transaction.
+	r.engineUnused = false
 	effective := map[string][]byte(nil)
 	var err error
 	if fast {
@@ -337,7 +387,15 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 	s := &session{eng: r.eng, abs: r.abs, opts: r.opts, sink: r.sink, state: r.state, journal: r.journal, prof: graphprofile.StartNamed("session"), inputs: input, fast: fast}
 	s.retained, s.retainedFor = r.tsDiscovery, r.tsDiscoveryFor
 	if !fast && r.eng.GraphScope() != nil {
-		s.work.PolicyBuilds = 1
+		if provenInputs {
+			s.work.GraphInputRebuildsProven = 1
+		} else {
+			// PolicyBuilds stays what it has always been: the policies this
+			// transaction built. A proven run built none, and says so here
+			// rather than reporting one it did not do.
+			s.work.PolicyBuilds = 1
+			s.work.GraphInputRebuilds = 1
+		}
 	}
 	if reloaded {
 		s.opts.ForceInitial = true
@@ -458,6 +516,8 @@ func (r *Resident) ApplyChanges(ctx context.Context, batch ChangeBatch) (*Online
 	txWork.TSDiscoveries += work.TSDiscoveries
 	txWork.TSDiscoveriesReused += work.TSDiscoveriesReused
 	txWork.TSDiscoveryRechecks = txWork.TSDiscoveryRechecks.Add(work.TSDiscoveryRechecks)
+	txWork.GraphInputRebuilds += work.GraphInputRebuilds
+	txWork.GraphInputRebuildsProven += work.GraphInputRebuildsProven
 	r.epoch, r.watermark = batch.Epoch, batch.Through
 	res.Facts = nil
 	out := &OnlineResult{Result: *res, Work: txWork, Epoch: r.epoch, Watermark: r.watermark, Reconciled: reason != "", FallbackReason: reason}
