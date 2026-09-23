@@ -1,0 +1,65 @@
+{
+  "kind": "single instrumented fresh CLI no-op diagnostic, not speedup or broker acceptance",
+  "elapsed_s": 4.206685375,
+  "summary": {
+    "Invalidation": {
+      "RawConfigChanged": false,
+      "PolicyReconciled": false,
+      "AddedSources": 0,
+      "RemovedSources": 0,
+      "ContextAffectedSources": 0,
+      "ContextReasons": null,
+      "ParsedByReason": {}
+    },
+    "RunID": "",
+    "BaseGeneration": 2,
+    "TargetGeneration": 2,
+    "Stats": {
+      "files_read": 0,
+      "files_parsed": 0,
+      "cached_files": 4064,
+      "graphql_parsed": 0,
+      "sfc_parsed": 0,
+      "summary_scans": 0,
+      "derived_indexes": 0
+    },
+    "Fallbacks": null,
+    "Unreadable": null,
+    "OwnersPublished": 0,
+    "ParsedFiles": 0,
+    "EarlyLocal": 0,
+    "Facts": null
+  },
+  "binary_sha256": "f19c13adb6de6be16636316b4638fbc30d03fd6e5f4cac66a95f06e465aaf12a",
+  "source_revision": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+  "command": [
+    "/tmp/enola-discovery-comparison-baseline/enola",
+    "graph",
+    "delta",
+    "--authoritative-scope",
+    "--max-begin-bytes",
+    "1048576",
+    "--summary-json",
+    "--repo-id",
+    "product-scope",
+    "--context",
+    "discovery-noop-profile",
+    "--events",
+    "/tmp/enola-discovery-noop-profile/events.jsonl",
+    "--state-dir",
+    "/tmp/enola-discovery-noop-profile/state",
+    "/private/tmp/enola-scope-matched-v295-compare/baseline/live"
+  ],
+  "events": 0,
+  "fork_note": "fork exit 0; initial harness failed decoding empty fork stdout, resumed delta against successfully forked state",
+  "profile_log_sha256": "d1b0fc8c89e28c73f981b0ebd817b54253838e271a46db0f16c370aafeb8986a",
+  "profile_local_path": "/tmp/enola-discovery-noop-profile/delta.stderr",
+  "stage_seconds": {
+    "resolve_graph_target": 0.665,
+    "rebuild_graph_inputs": 0.645,
+    "load_state": 0.51,
+    "hash_content_inputs": 1.037,
+    "ts_session_context": 0.531
+  },
+  "stage_note": "Selected non-overlapping stage intervals; rounded trace values. Nested totals are not added. Single instrumented run; no repeat spread or speedup claim."
+}
