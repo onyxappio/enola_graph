@@ -1,6 +1,7 @@
 package tsextractor
 
 import (
+	"context"
 	"strings"
 	"testing"
 
@@ -617,5 +618,154 @@ export function use() { return codec.n; }
 	}
 	if _, ok := findFact(ff, "apps/mobile.EslintConfig"); !ok {
 		t.Fatal("eslint.config.mjs array default must emit a value node")
+	}
+}
+
+func TestExtract_Wave10GtsDefaultImportNamedUnlikeFile(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"app/components/stamp.gts": `import Component from '@glimmer/component';
+export default class KitBadge extends Component {
+  <template>
+    <span>{{yield}}</span>
+  </template>
+}
+`,
+		"app/components/card.gts": `import KitBadge from './stamp';
+export default class Card extends Component {
+  <template>
+    <KitBadge />
+  </template>
+}
+`,
+		"app/use.ts": `import KitBadge from './components/stamp';
+export function use() { return KitBadge; }
+`,
+		"src/plain.ts": `export default class Helper {}
+`,
+		"src/take.ts": `import Helper from './plain';
+export function take() { return Helper; }
+`,
+		"src/none.ts": `export const x = 1;
+`,
+		"src/fromnone.ts": `import Missing from './none';
+export function fromNone() { return Missing; }
+`,
+	}, false)
+
+	if _, ok := findFact(ff, "app/components.KitBadge"); !ok {
+		t.Fatal("gts default class must keep its declared name")
+	}
+	if _, ok := findFact(ff, "app/components.Stamp"); ok {
+		t.Fatal("gts default must not invent a filename alias Stamp")
+	}
+	use := fileRefFact(ff, "app/use.ts")
+	if !hasCallToFile(use, "app/components.KitBadge", "app/components/stamp.gts") {
+		t.Fatalf("normal import of gts default must bind KitBadge: %+v", use.Relations)
+	}
+	if hasCallTarget(use, "app/components.Stamp") || hasCallTarget(use, "app/components.default") {
+		t.Fatalf("gts default import guessed filename or unresolved default: %+v", use.Relations)
+	}
+	plain := fileRefFact(ff, "src/take.ts")
+	if !hasCallToFile(plain, "src.Helper", "src/plain.ts") {
+		t.Fatalf("ts default class import must stay Helper: %+v", plain.Relations)
+	}
+	missing := fileRefFact(ff, "src/fromnone.ts")
+	if !hasCallTarget(missing, "src.default") {
+		t.Fatalf("module without default must keep unresolved default: %+v", missing.Relations)
+	}
+}
+
+func TestExtract_Wave10GjsDefaultImportNamedUnlikeFile(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"app/components/chip.gjs": `import Component from '@glimmer/component';
+export default class StatusChip extends Component {
+  <template>
+    <span>{{yield}}</span>
+  </template>
+}
+`,
+		"app/read.js": `import StatusChip from './components/chip';
+export function read() { return StatusChip; }
+`,
+	}, false)
+	ref := fileRefFact(ff, "app/read.js")
+	if !hasCallToFile(ref, "app/components.StatusChip", "app/components/chip.gjs") {
+		t.Fatalf("gjs default import must bind StatusChip: %+v", ref.Relations)
+	}
+	if hasCallTarget(ref, "app/components.Chip") {
+		t.Fatalf("gjs default import guessed filename: %+v", ref.Relations)
+	}
+}
+
+func TestExtractTestRefs_Wave10GtsDefaultClassUnlikeFilename(t *testing.T) {
+	dir := setupTSProject(t, map[string]string{
+		"app/components/stamp.gts": `import Component from '@glimmer/component';
+export default class KitBadge extends Component {
+  <template>
+    <span>{{yield}}</span>
+  </template>
+}
+`,
+		"tests/acceptance/catalog-test.ts": `import KitBadge from '../../app/components/stamp';
+export function exercise() { return KitBadge; }
+`,
+	}, false)
+	ff, err := New().ExtractTestRefs(context.Background(), dir, []string{"tests/acceptance/catalog-test.ts"}, []string{"app/components/stamp.gts"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := testRefTargets(t, ff, "tests/acceptance/catalog-test.ts")
+	if !got["app/components.KitBadge"] {
+		t.Fatalf("test import of gts default must bind KitBadge; got %v", got)
+	}
+	if got["app/components.Stamp"] || got["app/components.default"] {
+		t.Fatalf("test import guessed filename or unresolved default: %v", got)
+	}
+}
+
+func TestExtract_Wave10BuildRoutesReturnIsFunction(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"lib/shop/addon/routes.js": `import buildRoutes from 'ember-engines/routes';
+export default buildRoutes(function () {
+  this.route('cart');
+});
+`,
+		"lib/shop/addon/alias.js": `import { default as mapEngine } from 'ember-engines/routes';
+export default mapEngine(function () { this.route('x'); });
+`,
+		"lib/shop/addon/ns.js": `import * as engines from 'ember-engines/routes';
+export default engines.default(function () { this.route('y'); });
+`,
+		"lib/shop/addon/local.js": `function buildRoutes(value) { return value; }
+export default buildRoutes(function () { this.route('z'); });
+`,
+		"lib/shop/addon/member.js": `const local = { buildRoutes: (value) => value };
+export default local.buildRoutes(function () { this.route('m'); });
+`,
+		"lib/shop/addon/typeonly.js": `import type buildRoutes from 'ember-engines/routes';
+function buildRoutes(value) { return value; }
+export default buildRoutes(function () { this.route('t'); });
+`,
+		"lib/shop/addon/other.js": `import buildRoutes from 'not-engines/routes';
+export default buildRoutes(function () { this.route('o'); });
+`,
+	}, false)
+	for _, name := range []string{"lib/shop/addon.Routes", "lib/shop/addon.Alias", "lib/shop/addon.Ns"} {
+		f, ok := findFact(ff, name)
+		if !ok {
+			t.Fatalf("missing %s", name)
+		}
+		if f.Props["symbol_kind"] != facts.SymbolFunc {
+			t.Fatalf("%s kind=%v want function (buildRoutes returns the callback)", name, f.Props["symbol_kind"])
+		}
+	}
+	for _, name := range []string{"lib/shop/addon.Local", "lib/shop/addon.Member", "lib/shop/addon.Typeonly", "lib/shop/addon.Other"} {
+		f, ok := findFact(ff, name)
+		if !ok {
+			t.Fatalf("missing %s", name)
+		}
+		if f.Props["symbol_kind"] != facts.SymbolVariable {
+			t.Fatalf("%s kind=%v want variable", name, f.Props["symbol_kind"])
+		}
 	}
 }

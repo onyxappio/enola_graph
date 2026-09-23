@@ -657,12 +657,12 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 	// question this root already answers. Offer it to the session cache before
 	// anything asks, so the answer is ready without a second parse. Only a
 	// context-free index is offered (buildNamedExportIndex decides), and only
-	// for a file whose bytes are the ones on disk - an Ember template-tag file
-	// has had its <template> blocks blanked by now, so its tree is not a
-	// faithful stand-in for a scan of the file. Adoption never replaces an
-	// existing entry, so a scan that already ran still wins and nothing an
-	// earlier consumer saw can change underneath it.
-	if exportCache != nil && !isEmberFile {
+	// for a file whose bytes match a later scan. Ember template-tag files are
+	// blanked before this parse, and parseNamedExportIndex blanks the same way,
+	// so the tree is a faithful stand-in. Adoption never replaces an existing
+	// entry, so a scan that already ran still wins and nothing an earlier
+	// consumer saw can change underneath it.
+	if exportCache != nil {
 		if idx, contextFree := buildNamedExportIndex(relFile, src, kinds, root, aliases, knownFiles); contextFree {
 			exportCache.adopt(relFile, idx)
 		}
@@ -1478,6 +1478,16 @@ func collectImportOrigins(kinds *tsutil.KindTable, root *sitter.Node, src []byte
 				ns[nodeText(id, src)] = specifier
 			}
 		}
+		for j := range clause.ChildCount() {
+			c := clause.Child(j)
+			if kindOf(kinds, c) != "identifier" {
+				continue
+			}
+			local := nodeText(c, src)
+			if local != "" {
+				named[local] = namedImportOrigin{specifier: specifier, export: "default"}
+			}
+		}
 		namedClause := findChildByKind(kinds, clause, "named_imports")
 		if namedClause == nil {
 			continue
@@ -1547,6 +1557,18 @@ func isNuxtAppPluginExport(export string) bool {
 	return export == "defineNuxtPlugin" || export == "definePayloadPlugin"
 }
 
+func isEmberEngineRoutesSpecifier(spec string) bool {
+	spec = strings.TrimSuffix(strings.TrimSuffix(spec, ".js"), ".ts")
+	return spec == "ember-engines/routes"
+}
+
+func isEmberEngineBuildRoutesOrigin(origin namedImportOrigin) bool {
+	if !isEmberEngineRoutesSpecifier(origin.specifier) {
+		return false
+	}
+	return origin.export == "default" || origin.export == "buildRoutes"
+}
+
 func isKnownFunctionValueCall(kinds *tsutil.KindTable, call *sitter.Node, src []byte, ctx *extractCtx) bool {
 	if isComponentWrapper(kinds, call, src) {
 		return true
@@ -1560,8 +1582,13 @@ func isKnownFunctionValueCall(kinds *tsutil.KindTable, call *sitter.Node, src []
 	case "identifier":
 		name = nodeText(fn, src)
 		if ctx != nil {
-			if origin, ok := ctx.namedImports[name]; ok && isNuxtAppSpecifier(origin.specifier) && isNuxtAppPluginExport(origin.export) {
-				return true
+			if origin, ok := ctx.namedImports[name]; ok {
+				if isNuxtAppSpecifier(origin.specifier) && isNuxtAppPluginExport(origin.export) {
+					return true
+				}
+				if isEmberEngineBuildRoutesOrigin(origin) {
+					return true
+				}
 			}
 		}
 	case "member_expression":
@@ -1572,8 +1599,13 @@ func isKnownFunctionValueCall(kinds *tsutil.KindTable, call *sitter.Node, src []
 			obj := fn.ChildByFieldName("object")
 			if obj != nil && kindOf(kinds, obj) == "identifier" {
 				nsName := nodeText(obj, src)
-				if spec, ok := ctx.nsImports[nsName]; ok && isNuxtAppSpecifier(spec) && isNuxtAppPluginExport(name) {
-					return true
+				if spec, ok := ctx.nsImports[nsName]; ok {
+					if isNuxtAppSpecifier(spec) && isNuxtAppPluginExport(name) {
+						return true
+					}
+					if isEmberEngineRoutesSpecifier(spec) && (name == "default" || name == "buildRoutes") {
+						return true
+					}
 				}
 			}
 		}
@@ -3205,6 +3237,21 @@ func buildImportSymbols(kinds *tsutil.KindTable, root *sitter.Node, src []byte, 
 				}
 			}
 		}
+		for j := range clause.ChildCount() {
+			c := clause.Child(j)
+			if kindOf(kinds, c) != "identifier" {
+				continue
+			}
+			local := nodeText(c, src)
+			if local == "" {
+				continue
+			}
+			target, leaf := bindImportedSymbol(moduleDir, indexPath, "default", resolved, foundFile, readSrc, aliases, knownFiles, cache, note)
+			m[local] = target
+			if leaf != "" {
+				files[local] = leaf
+			}
+		}
 		named := findChildByKind(kinds, clause, "named_imports")
 		if named == nil {
 			continue
@@ -3301,12 +3348,8 @@ func bindImportedSymbol(moduleDir, indexPath, exportName, resolved string, found
 			if kind == followOne && orig != "" {
 				name = orig
 			}
-			if name == "default" {
-				if orig != "" && orig != "default" {
-					name = orig
-				} else {
-					name = fileSymbolName(leaf)
-				}
+			if name == "default" && orig != "" && orig != "default" {
+				name = orig
 			}
 			target = factpath.Dir(leaf) + "." + name
 		}
@@ -3531,11 +3574,8 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 					// Target the SOURCE export (orig), never the public alias.
 					// `export { default as X }` still uses the module default name.
 					if orig == "default" && indexPath != "" {
-						reexports = append(reexports, facts.Relation{
-							Kind:       facts.RelCalls,
-							Target:     moduleDir + "." + fileSymbolName(indexPath),
-							TargetFile: indexPath,
-						})
+						target, file := bindImportedSymbol(moduleDir, indexPath, "default", resolved, true, ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, note)
+						reexports = append(reexports, facts.Relation{Kind: facts.RelCalls, Target: target, TargetFile: file})
 						continue
 					}
 					target, file := bindImportedSymbol(moduleDir, indexPath, orig, resolved, indexPath != "", ctx.readSrc, aliases, ctx.knownFiles, ctx.exportCache, func(f string) {
@@ -4070,13 +4110,11 @@ func isTSTestFile(relFile string) bool {
 // (collectTSFileRefs → resolveImportPath / resolveLocalOrImport / resolveJSXTag), so
 // every target is fully qualified ("<dir>.<name>") and orphans' lastSeg folding
 // stays a safety net rather than the primary match — emitting bare names instead
-// would rescue unrelated same-named symbols. knownFiles is left nil: the resolver
-// then degrades to short-name matching (its documented conservative bias — only
-// ever ADDS references), which is exactly how the dead-code detector matches. Path
-// aliases ARE reconstructed so "@/…"-imported helpers still resolve.
-// prodFiles is unused: knownFiles is deliberately left nil (see above), so this
-// pass has nothing to check a production file set against.
-func (e *TSExtractor) ExtractTestRefs(ctx context.Context, repoPath string, files, _ []string) ([]facts.Fact, error) {
+// would rescue unrelated same-named symbols. Path aliases ARE reconstructed so
+// "@/…"-imported helpers still resolve. prodFiles seeds knownFiles and on-demand
+// reads so a default import can bind the proven default export (gts/gjs included)
+// instead of the unresolved ".default" spelling.
+func (e *TSExtractor) ExtractTestRefs(ctx context.Context, repoPath string, files, prodFiles []string) ([]facts.Fact, error) {
 	inputScope := e.inputScope
 	var testFiles []string
 	for _, relFile := range files {
@@ -4096,6 +4134,24 @@ func (e *TSExtractor) ExtractTestRefs(ctx context.Context, repoPath string, file
 		aliasRoots = withNuxtAliasFallbacks(ctx, repoPath, aliasRoots, collectNuxtPackages(ctx, repoPath, inputScope), inputScope)
 	}
 
+	knownFiles := make(map[string]bool, len(prodFiles))
+	for _, f := range prodFiles {
+		if isTypeScriptFile(f) {
+			knownFiles[filepath.ToSlash(f)] = true
+		}
+	}
+	exportCache := newNamedExportCache()
+	readSrc := func(rel string) []byte {
+		if rel == "" {
+			return nil
+		}
+		b, err := inputScope.ReadFile(filepath.Join(repoPath, rel))
+		if err != nil {
+			return nil
+		}
+		return b
+	}
+
 	perFile := parallel.MapFiles(ctx, testFiles, func(relFile string) []facts.Fact {
 		src, err := inputScope.ReadFile(filepath.Join(repoPath, relFile))
 		if err != nil {
@@ -4105,7 +4161,7 @@ func (e *TSExtractor) ExtractTestRefs(ctx context.Context, repoPath string, file
 		if isMinifiedSource(src) {
 			return nil
 		}
-		return e.testRefsFromFile(src, relFile, aliasesForDir(aliasRoots, factpath.Dir(relFile)))
+		return e.testRefsFromFile(src, relFile, aliasesForDir(aliasRoots, factpath.Dir(relFile)), knownFiles, readSrc, exportCache)
 	})
 
 	var out []facts.Fact
@@ -4116,10 +4172,8 @@ func (e *TSExtractor) ExtractTestRefs(ctx context.Context, repoPath string, file
 }
 
 // testRefsFromFile parses one TS test file and returns its single KindTestRef fact
-// (or nil when it references nothing), reusing collectTSFileRefs' walk. Only the
-// fields collectTSFileRefs reads are populated on the ctx; knownFiles is left nil
-// (see ExtractTestRefs).
-func (e *TSExtractor) testRefsFromFile(src []byte, relFile string, aliases map[string]tsAlias) []facts.Fact {
+// (or nil when it references nothing), reusing collectTSFileRefs' walk.
+func (e *TSExtractor) testRefsFromFile(src []byte, relFile string, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, exportCache *namedExportCache) []facts.Fact {
 	isTSX := strings.HasSuffix(relFile, ".tsx") || strings.HasSuffix(relFile, ".jsx")
 	kinds := tsKindsFor(isTSX)
 
@@ -4137,10 +4191,14 @@ func (e *TSExtractor) testRefsFromFile(src []byte, relFile string, aliases map[s
 	defer tree.Close()
 
 	ctx := &extractCtx{
-		src:     src,
-		relFile: relFile,
-		dir:     factpath.Dir(relFile),
-		isTSX:   isTSX,
+		src:         src,
+		relFile:     relFile,
+		dir:         factpath.Dir(relFile),
+		isTSX:       isTSX,
+		aliases:     aliases,
+		knownFiles:  knownFiles,
+		readSrc:     readSrc,
+		exportCache: exportCache,
 	}
 	return e.collectTSFileRefs(kinds, tree.RootNode(), ctx, aliases, facts.KindTestRef)
 }
