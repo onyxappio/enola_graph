@@ -15,9 +15,10 @@ import (
 
 // namedExportCache holds one parsed export index per file for a session.
 type namedExportCache struct {
-	mu     sync.Mutex
-	byFile map[string]*namedExportEntry
-	scans  *atomic.Int32
+	mu      sync.Mutex
+	byFile  map[string]*namedExportEntry
+	scans   *atomic.Int32
+	derived *atomic.Int32
 }
 
 // namedExportEntry is one file's index, parsed once however many goroutines ask
@@ -38,7 +39,7 @@ type namedExportIndex struct {
 }
 
 func newNamedExportCache() *namedExportCache {
-	return &namedExportCache{byFile: map[string]*namedExportEntry{}, scans: &atomic.Int32{}}
+	return &namedExportCache{byFile: map[string]*namedExportEntry{}, scans: &atomic.Int32{}, derived: &atomic.Int32{}}
 }
 
 func (c *namedExportCache) summaryScans() int {
@@ -46,6 +47,51 @@ func (c *namedExportCache) summaryScans() int {
 		return 0
 	}
 	return int(c.scans.Load())
+}
+
+// derivedIndexes counts entries filled from a tree the extractor had already
+// parsed. Deliberately not folded into summaryScans: that number must stay a
+// count of real parses, so a file whose index cost nothing is visible as
+// nothing rather than as a scan that did not happen.
+func (c *namedExportCache) derivedIndexes() int {
+	if c == nil || c.derived == nil {
+		return 0
+	}
+	return int(c.derived.Load())
+}
+
+// adopt fills file's entry from an index built off an already-parsed tree.
+// It reports whether this call is the one that filled the entry; a later
+// index() for the same file then returns this object without parsing.
+//
+// Only context-free indexes may be adopted. An index that names a module -
+// anything reached through an `export ... from`, or an exported specifier that
+// came from the import map - depends on the alias map and known-file set of
+// whoever built it, and this session's cache is keyed by file alone. A
+// context-free index has no such dependency: the same bytes yield it under any
+// alias map, so sharing it cannot make a consumer see a different answer than
+// the parse it replaced. buildNamedExportIndex decides that, not the caller.
+func (c *namedExportCache) adopt(file string, idx *namedExportIndex) bool {
+	if c == nil || idx == nil {
+		return false
+	}
+	file = filepath.ToSlash(file)
+	c.mu.Lock()
+	entry, ok := c.byFile[file]
+	if !ok {
+		entry = &namedExportEntry{}
+		c.byFile[file] = entry
+	}
+	c.mu.Unlock()
+	filled := false
+	entry.once.Do(func() {
+		entry.idx = idx
+		filled = true
+		if c.derived != nil {
+			c.derived.Add(1)
+		}
+	})
+	return filled
 }
 
 func (c *namedExportCache) index(file string, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool) *namedExportIndex {
@@ -137,7 +183,35 @@ func parseNamedExportIndexBytes(file string, src []byte, aliases map[string]tsAl
 	}
 	tree := parser.Parse(src, nil)
 	defer tree.Close()
-	root := tree.RootNode()
+	idx, _ = buildNamedExportIndex(file, src, kinds, tree.RootNode(), aliases, knownFiles)
+	return idx
+}
+
+// buildNamedExportIndex reads one module's export surface off an already-parsed
+// root. It also reports whether the result is context-free, i.e. whether the
+// same bytes would have produced the same index under any alias map and
+// known-file set. Anything that consults a module specifier makes it false,
+// including a specifier that failed to resolve: a failed resolution silently
+// emits no entry, so an index that looks empty can still be one alias away from
+// naming a module.
+func buildNamedExportIndex(file string, src []byte, kinds *tsutil.KindTable, root *sitter.Node, aliases map[string]tsAlias, knownFiles map[string]bool) (*namedExportIndex, bool) {
+	idx := &namedExportIndex{local: map[string]bool{}, named: map[string][][2]string{}}
+	if root == nil {
+		idx.empty = true
+		return idx, false
+	}
+	// Empty bytes parse to a valid, childless root, so without this the index
+	// would come back not-empty while a scan of the same file returns the empty
+	// marker - and surface() reports that marker, so the two would disagree on
+	// a recorded ExportSurface. A scan short-circuits on length before it ever
+	// parses; match it exactly. The result is still context-free: no specifier
+	// was consulted, so it is safe to adopt and is byte-for-byte what a scan
+	// would have produced.
+	if len(src) == 0 {
+		idx.empty = true
+		return idx, true
+	}
+	contextFree := true
 	fileDir := factpath.Dir(file)
 	imported := map[string][2]string{}
 	localBind := map[string]bool{}
@@ -167,6 +241,7 @@ func parseNamedExportIndexBytes(file string, src []byte, aliases map[string]tsAl
 		}
 		source := child.ChildByFieldName("source")
 		if source != nil {
+			contextFree = false
 			importPath := strings.Trim(nodeText(source, src), `"'`)
 			resolved, external := resolveImportPath(importPath, fileDir, aliases)
 			if external {
@@ -213,6 +288,11 @@ func parseNamedExportIndexBytes(file string, src []byte, aliases map[string]tsAl
 					continue
 				}
 				if !localBind[local] {
+					// Whether this name is a re-export or a local one is decided
+					// by the import map, which resolution built; the outcome is
+					// context-dependent either way, so record that before the
+					// lookup rather than only on a hit.
+					contextFree = false
 					if bind, ok := imported[local]; ok {
 						idx.named[exported] = append(idx.named[exported], bind)
 						continue
@@ -222,7 +302,7 @@ func parseNamedExportIndexBytes(file string, src []byte, aliases map[string]tsAl
 			}
 		}
 	}
-	return idx
+	return idx, contextFree
 }
 
 func collectModuleBindings(kinds *tsutil.KindTable, root *sitter.Node, src []byte, fileDir string, aliases map[string]tsAlias, knownFiles map[string]bool, imported map[string][2]string, localBind map[string]bool) {

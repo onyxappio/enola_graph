@@ -53,7 +53,7 @@ type runtimeInputs struct {
 }
 
 func readRuntimeInputs(eng *engine.Engine, abs string, st *State, work *WorkCounters) (*runtimeInputs, error) {
-	tr := graphprofile.Start()
+	tr := graphprofile.StartNamed("inputs")
 	work.InventoryScans++
 	inv, err := eng.Inventory(abs)
 	if err != nil {
@@ -71,14 +71,18 @@ func readRuntimeInputs(eng *engine.Engine, abs string, st *State, work *WorkCoun
 		prev = st.Files
 	}
 	targets := filesToHash(eng, inv, prev, detected)
+	tr.Mark("select_hash_targets", fmt.Sprintf("targets=%d", len(targets)))
 	hashes := eng.FileHashes(abs, targets)
 	work.HashedFiles += len(targets)
+	tr.Mark("hash_content_inputs", fmt.Sprintf("targets=%d", len(targets)))
 	work.ContextScans++
+	// Extractor context capture is its own set of reads, not part of hashing;
+	// a delta that hashes a handful of files can still walk for contexts.
 	contexts := captureDeltaContexts(eng, abs, detected)
 	for k, v := range contexts {
 		hashes[k] = v
 	}
-	tr.Mark("hash_content_inputs", fmt.Sprintf("targets=%d", len(targets)))
+	tr.Mark("capture_contexts", fmt.Sprintf("contexts=%d", len(contexts)))
 	work.ConfigScans++
 	cfgHash, cfg, paths, err := analysisFingerprintInputs(abs, eng)
 	if err != nil {
@@ -91,17 +95,30 @@ func readRuntimeInputs(eng *engine.Engine, abs string, st *State, work *WorkCoun
 		}
 	}
 	tr.Mark("analysis_fingerprint", fmt.Sprintf("cfg_files=%d", len(cfg)))
-	result := &runtimeInputs{inventory: inv, detected: detected, hashes: hashes, contexts: contexts, configHash: cfgHash, config: cfg, angular: tsextractor.RepoUsesAngular(abs, eng.GraphScope()), configPaths: paths}
+	// Hoisted out of the struct literal so it can be timed: RepoUsesAngular is
+	// another repository probe, and it ran unattributed inside the composite.
+	usesAngular := tsextractor.RepoUsesAngular(abs, eng.GraphScope())
+	tr.Mark("angular_probe", fmt.Sprintf("angular=%v", usesAngular))
+	result := &runtimeInputs{inventory: inv, detected: detected, hashes: hashes, contexts: contexts, configHash: cfgHash, config: cfg, angular: usesAngular, configPaths: paths}
 	if scope := eng.GraphScope(); scope != nil {
 		result.policyIdentity = scope.Policy.Identity()
 		result.admissionIdentity = scope.Policy.AdmissionIdentity()
+		tr.Mark("policy_identity", "")
 		result.engineContextHash = engineContextFingerprint(eng)
+		tr.Mark("engine_context_fingerprint", "")
 		for _, ext := range eng.Extractors() {
 			if ts, ok := ext.(*tsextractor.TSExtractor); ok {
 				result.tsContext, result.tsFileContext = ts.SessionContext(abs, cfg, tsConfigPaths, inv.Files)
 			}
 		}
+		tr.Mark("ts_session_context", fmt.Sprintf("files=%d", len(result.tsFileContext)))
 	}
+	// Terminal mark: without it the tail after angular_probe - policy identity,
+	// engine context fingerprint and the TS SessionContext walk - falls outside
+	// every window and is invisible, which is exactly where repeated discovery
+	// work would hide. runtime_inputs_complete closes the inputs trace, so the
+	// sum of its marks is the whole of readRuntimeInputs.
+	tr.Mark("runtime_inputs_complete", "")
 	return result, nil
 }
 
@@ -181,6 +198,10 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 		}
 		r.state = st
 	}
+	// The work between entering a transaction and starting the session trace was
+	// outside every window: root measured it only as an untraced CLI residual.
+	rtr := graphprofile.StartNamed("reconcile")
+	rtr.Mark("transaction_enter", fmt.Sprintf("fast=%v failed=%v", fast, r.failed))
 	committedEngine := r.eng
 	promoteEngine := false
 	defer func() {
@@ -195,6 +216,7 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 		if captureErr != nil {
 			return nil, WorkCounters{}, captureErr
 		}
+		rtr.Mark("effective_config_before", fmt.Sprintf("files=%d", len(beforeRebuild)))
 	}
 	if !fast {
 		fresh, err := r.eng.RebuildGraphInputs()
@@ -202,6 +224,7 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 			return nil, WorkCounters{}, err
 		}
 		r.eng = fresh
+		rtr.Mark("rebuild_graph_inputs", "")
 	}
 	effective := map[string][]byte(nil)
 	var err error
@@ -213,6 +236,7 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 	if err != nil {
 		return nil, WorkCounters{}, err
 	}
+	rtr.Mark("effective_config", fmt.Sprintf("files=%d fast=%v", len(effective), fast))
 	if !fast && !sameConfig(beforeRebuild, effective) {
 		return nil, WorkCounters{}, fmt.Errorf("%w: config changed during graph policy construction", ErrInputsChanged)
 	}
@@ -238,8 +262,10 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 		if !sameConfig(beforeReload, effective) {
 			return nil, WorkCounters{}, fmt.Errorf("%w: config changed inside ReloadEngine", ErrInputsChanged)
 		}
+		rtr.Mark("reload_engine", "")
 	}
-	s := &session{eng: r.eng, abs: r.abs, opts: r.opts, sink: r.sink, state: r.state, journal: r.journal, prof: graphprofile.Start(), inputs: input, fast: fast}
+	rtr.Mark("reconcile_complete", fmt.Sprintf("reloaded=%v", reloaded))
+	s := &session{eng: r.eng, abs: r.abs, opts: r.opts, sink: r.sink, state: r.state, journal: r.journal, prof: graphprofile.StartNamed("session"), inputs: input, fast: fast}
 	if !fast && r.eng.GraphScope() != nil {
 		s.work.PolicyBuilds = 1
 	}

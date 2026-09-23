@@ -1,0 +1,652 @@
+{
+  "base_commit": "ee8f1b7b21c3c8e9a8242f3d0d1926d64b15f785",
+  "label": "Diagnostic evidence, not final performance acceptance",
+  "artifacts": {
+    "detailed_profile": {
+      "source": "/tmp/enola-small-delta-profile-detailed/result.json",
+      "sha256": "affdfa80c619c1ed1f58272a91a5d8aa4f7498463b11b234206bb96e8d1ee161",
+      "data": {
+        "binary": "/private/tmp/enola-instr-only/enola-root",
+        "binary_sha256": "48a4bb7845ac2d4d8a241574a97bddc7f2a159a8d40b5b92064b82b7decf4f21",
+        "repo": "/private/tmp/enola-scope-matched-v295-compare/baseline/live",
+        "parent": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+        "child": "07fb4a41ddaf",
+        "sink": "file",
+        "label": "single shared-host diagnostic; not broker acceptance",
+        "phases": {
+          "initial": {
+            "cli_wall_s": 36.22,
+            "summary": {
+              "exit": 0,
+              "wall_s": 36.22,
+              "sink": "file",
+              "parsed": 4012,
+              "cached": 0,
+              "files_read": 4064,
+              "generation": [
+                0,
+                1
+              ],
+              "owners_published": 4942,
+              "events": 2625,
+              "run_id": "product-scope-scope-bench-1-1790160620279106000",
+              "stderr_graph": "[graph] /private/tmp/enola-scope-matched-v295-compare/baseline/live: generation 0\u21921 parsed=4012 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+            },
+            "protocol": "pass",
+            "begin_owners": 8451,
+            "event_bytes": 80139602
+          },
+          "delta": {
+            "cli_wall_s": 5.589,
+            "summary": {
+              "exit": 0,
+              "wall_s": 5.589,
+              "sink": "file",
+              "parsed": 4,
+              "cached": 4060,
+              "files_read": 4,
+              "generation": [
+                1,
+                2
+              ],
+              "owners_published": 25,
+              "events": 9,
+              "run_id": "product-scope-scope-bench-2-1790160657809348000",
+              "stderr_graph": "[graph] /private/tmp/enola-scope-matched-v295-compare/baseline/live: generation 1\u21922 parsed=4 cached=4060 early_local=0 fallbacks=2\n[graph] fallback graph: changed files and reverse file dependents (frozen scope: reverse-close plus owners that reference added or removed fact names)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+            },
+            "protocol": "pass",
+            "begin_owners": 36,
+            "event_bytes": 167742
+          },
+          "cold": {
+            "cli_wall_s": 37.577,
+            "summary": {
+              "exit": 0,
+              "wall_s": 37.577,
+              "sink": "file",
+              "parsed": 4012,
+              "cached": 0,
+              "files_read": 4064,
+              "generation": [
+                0,
+                1
+              ],
+              "owners_published": 4942,
+              "events": 2625,
+              "run_id": "product-scope-scope-bench-1-1790160664215421000",
+              "stderr_graph": "[graph] /private/tmp/enola-scope-matched-v295-compare/baseline/live: generation 0\u21921 parsed=4012 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+            },
+            "protocol": "pass",
+            "begin_owners": 8451,
+            "event_bytes": 80141201
+          }
+        },
+        "applied_hash": "7f29a20304ec5db22d9ab5752231919e8449f9165a83412980968a77290e5a18",
+        "cold_hash": "7f29a20304ec5db22d9ab5752231919e8449f9165a83412980968a77290e5a18",
+        "exact_cold": true
+      }
+    },
+    "stages": {
+      "source": "/tmp/enola-small-delta-profile-detailed/stage-analysis.json",
+      "sha256": "7a761d59e03c135db83074c912fdd4dd90ef74bf173a783e5bb10409dae6eef2",
+      "data": {
+        "trace_instances": {
+          "cli": [
+            {
+              "marks": [
+                {
+                  "phase": "flags_parsed",
+                  "dt": 0.0,
+                  "total": 0.0
+                },
+                {
+                  "phase": "resolve_graph_target",
+                  "dt": 0.678,
+                  "total": 0.678
+                },
+                {
+                  "phase": "connect_sink",
+                  "dt": 0.0,
+                  "total": 0.678
+                },
+                {
+                  "phase": "session_options",
+                  "dt": 0.0,
+                  "total": 0.678
+                },
+                {
+                  "phase": "graph_session_run",
+                  "dt": 4.847,
+                  "total": 5.526
+                },
+                {
+                  "phase": "cli_complete",
+                  "dt": 0.005,
+                  "total": 5.531
+                }
+              ],
+              "total": 5.531
+            }
+          ],
+          "open": [
+            {
+              "marks": [
+                {
+                  "phase": "lock",
+                  "dt": 0.0,
+                  "total": 0.0
+                },
+                {
+                  "phase": "bind_identity",
+                  "dt": 0.0,
+                  "total": 0.0
+                },
+                {
+                  "phase": "open_journal",
+                  "dt": 0.0,
+                  "total": 0.0
+                },
+                {
+                  "phase": "replay_unacked",
+                  "dt": 0.0,
+                  "total": 0.0
+                },
+                {
+                  "phase": "load_state",
+                  "dt": 0.512,
+                  "total": 0.513
+                }
+              ],
+              "total": 0.513
+            }
+          ],
+          "reconcile": [
+            {
+              "marks": [
+                {
+                  "phase": "transaction_enter",
+                  "dt": 0.0,
+                  "total": 0.0
+                },
+                {
+                  "phase": "effective_config_before",
+                  "dt": 0.0,
+                  "total": 0.0
+                },
+                {
+                  "phase": "rebuild_graph_inputs",
+                  "dt": 0.652,
+                  "total": 0.652
+                },
+                {
+                  "phase": "effective_config",
+                  "dt": 0.0,
+                  "total": 0.653
+                },
+                {
+                  "phase": "reconcile_complete",
+                  "dt": 0.0,
+                  "total": 0.653
+                }
+              ],
+              "total": 0.653
+            }
+          ],
+          "inputs": [
+            {
+              "marks": [
+                {
+                  "phase": "inventory",
+                  "dt": 0.128,
+                  "total": 0.128
+                },
+                {
+                  "phase": "detect_extractors",
+                  "dt": 0.121,
+                  "total": 0.249
+                },
+                {
+                  "phase": "select_hash_targets",
+                  "dt": 0.016,
+                  "total": 0.265
+                },
+                {
+                  "phase": "hash_content_inputs",
+                  "dt": 0.175,
+                  "total": 0.44
+                },
+                {
+                  "phase": "capture_contexts",
+                  "dt": 0.076,
+                  "total": 0.516
+                },
+                {
+                  "phase": "analysis_fingerprint",
+                  "dt": 0.073,
+                  "total": 0.589
+                },
+                {
+                  "phase": "angular_probe",
+                  "dt": 0.003,
+                  "total": 0.592
+                },
+                {
+                  "phase": "policy_identity",
+                  "dt": 0.0,
+                  "total": 0.592
+                },
+                {
+                  "phase": "engine_context_fingerprint",
+                  "dt": 0.0,
+                  "total": 0.592
+                },
+                {
+                  "phase": "ts_session_context",
+                  "dt": 0.536,
+                  "total": 1.128
+                },
+                {
+                  "phase": "runtime_inputs_complete",
+                  "dt": 0.0,
+                  "total": 1.128
+                }
+              ],
+              "total": 1.128
+            }
+          ],
+          "session": [
+            {
+              "marks": [
+                {
+                  "phase": "extractor_need",
+                  "dt": 1.167,
+                  "total": 1.167
+                },
+                {
+                  "phase": "ts_frozen_preview",
+                  "dt": 0.933,
+                  "total": 2.1
+                },
+                {
+                  "phase": "invalidation_plan",
+                  "dt": 0.086,
+                  "total": 2.186
+                },
+                {
+                  "phase": "begin_publish",
+                  "dt": 0.101,
+                  "total": 2.287
+                },
+                {
+                  "phase": "ts_dirty_scope",
+                  "dt": 0.129,
+                  "total": 2.417
+                },
+                {
+                  "phase": "ts_extract_session",
+                  "dt": 0.0,
+                  "total": 2.417
+                },
+                {
+                  "phase": "assemble_new_files",
+                  "dt": 0.085,
+                  "total": 2.502
+                },
+                {
+                  "phase": "index_group_owners",
+                  "dt": 0.189,
+                  "total": 2.691
+                },
+                {
+                  "phase": "publish_scope",
+                  "dt": 0.0,
+                  "total": 2.691
+                },
+                {
+                  "phase": "encode_append_owners",
+                  "dt": 0.002,
+                  "total": 2.693
+                },
+                {
+                  "phase": "publish_resolved",
+                  "dt": 0.158,
+                  "total": 2.851
+                },
+                {
+                  "phase": "revalidate_ts_records",
+                  "dt": 0.148,
+                  "total": 2.999
+                },
+                {
+                  "phase": "write_pending_state",
+                  "dt": 0.396,
+                  "total": 3.395
+                },
+                {
+                  "phase": "end_flush_ack",
+                  "dt": 0.086,
+                  "total": 3.481
+                },
+                {
+                  "phase": "promote_compact_state",
+                  "dt": 0.201,
+                  "total": 3.682
+                }
+              ],
+              "total": 3.682
+            }
+          ],
+          "ts": [
+            {
+              "marks": [
+                {
+                  "phase": "ts_detect_frameworks",
+                  "dt": 0.238,
+                  "total": 0.238
+                },
+                {
+                  "phase": "ts_read_dirty",
+                  "dt": 0.061,
+                  "total": 0.299
+                },
+                {
+                  "phase": "ts_graphql_grpc_index",
+                  "dt": 0.001,
+                  "total": 0.3
+                },
+                {
+                  "phase": "ts_mapfiles_aggregate",
+                  "dt": 0.068,
+                  "total": 0.368
+                },
+                {
+                  "phase": "ts_compose_modules",
+                  "dt": 0.003,
+                  "total": 0.371
+                }
+              ],
+              "total": 0.371
+            },
+            {
+              "marks": [
+                {
+                  "phase": "ts_detect_frameworks",
+                  "dt": 0.232,
+                  "total": 0.232
+                },
+                {
+                  "phase": "ts_read_dirty",
+                  "dt": 0.059,
+                  "total": 0.291
+                },
+                {
+                  "phase": "ts_graphql_grpc_index",
+                  "dt": 0.0,
+                  "total": 0.291
+                },
+                {
+                  "phase": "ts_mapfiles_aggregate",
+                  "dt": 0.039,
+                  "total": 0.33
+                },
+                {
+                  "phase": "ts_compose_modules",
+                  "dt": 0.002,
+                  "total": 0.333
+                }
+              ],
+              "total": 0.333
+            }
+          ]
+        },
+        "accounting": "inputs and ts nested within session; open+reconcile+session partition graph_session_run; cli is outermost",
+        "outer_partition_s": {
+          "open": 0.513,
+          "reconcile": 0.653,
+          "session": 3.682,
+          "cli": 5.531
+        },
+        "nested_ts_totals_s": [
+          0.371,
+          0.333
+        ]
+      }
+    },
+    "noop": {
+      "source": "/tmp/enola-small-noop-profile-published-resolved/result.json",
+      "sha256": "609c1155b3beff8d78e502e38d62d0b0c83b04a17c27a0f292e7edc4ccf5aad4",
+      "data": {
+        "binary_sha256": "0821553a02795369a73dfdd01f0d5ae467b179c8ad5116f4e25e64a6f228990d",
+        "repo": "/private/tmp/enola-scope-matched-v295-compare/baseline/live",
+        "label": "fresh CLI, shared host diagnostic, file sink",
+        "before": {
+          "event_bytes": 80307344,
+          "state_sha256": "95af48f604f82725fca1a15c41f15519a4ef6d825c9bad986dcf2690a012941d"
+        },
+        "runs": [
+          {
+            "wall_s": 3.8251841669999997,
+            "exit": 0,
+            "event_bytes_added": 60066,
+            "state_identical": false,
+            "parsed": 0,
+            "generation": [
+              2,
+              3
+            ],
+            "owners_published": 21
+          },
+          {
+            "wall_s": 3.8931933750000005,
+            "exit": 0,
+            "event_bytes_added": 120132,
+            "state_identical": false,
+            "parsed": 0,
+            "generation": [
+              3,
+              4
+            ],
+            "owners_published": 21
+          },
+          {
+            "wall_s": 3.9317751670000005,
+            "exit": 0,
+            "event_bytes_added": 180198,
+            "state_identical": false,
+            "parsed": 0,
+            "generation": [
+              4,
+              5
+            ],
+            "owners_published": 21
+          }
+        ],
+        "noop_contract_pass": false
+      }
+    },
+    "noop_graphs": {
+      "source": "/tmp/enola-small-noop-profile-published-resolved/graph-equality.json",
+      "sha256": "58ef728bd9906e8a25197a4106b81c2093921ff1481e5da40fc4f6ced7d8a472",
+      "data": [
+        {
+          "run_id": "product-scope-scope-bench-1-1790159855294095000",
+          "graph_hash": "4433812f5d862bab9b7725acb4b16881127e8b3695a3eeef13776a9fb4ea79df"
+        },
+        {
+          "run_id": "product-scope-scope-bench-2-1790159888754568000",
+          "graph_hash": "7f29a20304ec5db22d9ab5752231919e8449f9165a83412980968a77290e5a18"
+        },
+        {
+          "run_id": "product-scope-scope-bench-3-1790160364593058000",
+          "graph_hash": "7f29a20304ec5db22d9ab5752231919e8449f9165a83412980968a77290e5a18"
+        },
+        {
+          "run_id": "product-scope-scope-bench-4-1790160368554221000",
+          "graph_hash": "7f29a20304ec5db22d9ab5752231919e8449f9165a83412980968a77290e5a18"
+        },
+        {
+          "run_id": "product-scope-scope-bench-5-1790160372551679000",
+          "graph_hash": "7f29a20304ec5db22d9ab5752231919e8449f9165a83412980968a77290e5a18"
+        }
+      ]
+    },
+    "manifest_mismatch": {
+      "source": "/tmp/enola-small-noop-profile-published-resolved/manifest-input-mismatch.json",
+      "sha256": "e4518730d8a677f530fa72938461eeac57568f4feda0f4e2c9742eb05f3ada70",
+      "data": [
+        {
+          "file": "packages/tracking-client/package.json",
+          "state_exists": true,
+          "extractor": "manifests",
+          "contrib_keys": [],
+          "seen": "dcbaa21030c3ac648d1a525752378952b184ae9a3cc2055da83b2901d82ed71e",
+          "hash": "83dff407d6199086f058b1ffff3c1b0f48203a8a31ea713439bbb0f95d0ab902"
+        }
+      ]
+    },
+    "minimal_repro": {
+      "source": "/tmp/enola-manifest-noop-repro/results.json",
+      "sha256": "b7dcd4c8a6d3266fde956b5b5bbdaa0d6e3c902125cb072faa0ddec01d7d912a",
+      "data": [
+        {
+          "step": 0,
+          "wall_s": 0.31207225,
+          "generation": [
+            0,
+            1
+          ],
+          "parsed": 1,
+          "owners": 2,
+          "event_bytes": 3126
+        },
+        {
+          "step": 1,
+          "wall_s": 0.28484525000000005,
+          "generation": [
+            1,
+            2
+          ],
+          "parsed": 0,
+          "owners": 1,
+          "event_bytes": 2404
+        },
+        {
+          "step": 2,
+          "wall_s": 0.268393875,
+          "generation": [
+            2,
+            3
+          ],
+          "parsed": 0,
+          "owners": 1,
+          "event_bytes": 2404
+        },
+        {
+          "step": 3,
+          "wall_s": 0.28244270799999993,
+          "generation": [
+            3,
+            4
+          ],
+          "parsed": 0,
+          "owners": 1,
+          "event_bytes": 2404
+        }
+      ]
+    },
+    "discriminator_matrix": {
+      "source": "/tmp/enola-manifest-noop-matrix/results.json",
+      "sha256": "18a00c272b7b5375fb2d56ff5568ff580f53f65bb0bc9cd1be721d308fc17fff",
+      "data": [
+        {
+          "step": 0,
+          "wall_s": 1.478763667,
+          "generation": [
+            0,
+            1
+          ],
+          "parsed": 1,
+          "owners": 2,
+          "event_bytes": 3142
+        },
+        {
+          "step": 1,
+          "wall_s": 1.15173775,
+          "generation": [
+            1,
+            2
+          ],
+          "parsed": 0,
+          "owners": 1,
+          "event_bytes": 2418
+        },
+        {
+          "step": 2,
+          "wall_s": 1.100467166,
+          "generation": [
+            2,
+            3
+          ],
+          "parsed": 0,
+          "owners": 1,
+          "event_bytes": 2418
+        },
+        {
+          "step": 3,
+          "wall_s": 1.030768708,
+          "generation": [
+            3,
+            4
+          ],
+          "parsed": 0,
+          "owners": 1,
+          "event_bytes": 2418
+        },
+        {
+          "step": 4,
+          "wall_s": 0.4352795829999998,
+          "generation": [
+            4,
+            4
+          ],
+          "parsed": 0,
+          "owners": 0,
+          "event_bytes": 0
+        },
+        {
+          "step": 5,
+          "wall_s": 1.2431226249999998,
+          "generation": [
+            4,
+            5
+          ],
+          "parsed": 0,
+          "owners": 1,
+          "event_bytes": 2418
+        },
+        {
+          "step": 6,
+          "wall_s": 0.7325127919999996,
+          "generation": [
+            5,
+            5
+          ],
+          "parsed": 0,
+          "owners": 0,
+          "event_bytes": 0
+        },
+        {
+          "step": 7,
+          "wall_s": 0.5791957500000002,
+          "generation": [
+            5,
+            5
+          ],
+          "parsed": 0,
+          "owners": 0,
+          "event_bytes": 0
+        }
+      ]
+    }
+  }
+}

@@ -177,37 +177,49 @@ func dropExtractorContribution(files map[string]*FileState, name string) {
 	if files == nil || name == "" {
 		return
 	}
-	for path, st := range files {
-		if st == nil || !extractorOwnsState(st, name) {
-			continue
-		}
-		st = cloneFileState(st)
-		if name == "typescript" {
-			st.TS = nil
-			st.Declared = nil
-			st.Referenced = nil
-			st.Imports = nil
-			st.Reexports = nil
-			if st.Extractor == name {
-				st.Extractor = ""
-			}
-			if len(st.Contrib) == 0 {
-				delete(files, path)
-				continue
-			}
-		}
-		if st.Contrib != nil {
-			delete(st.Contrib, name)
-		}
-		if st.ContribHash != nil {
-			delete(st.ContribHash, name)
-		}
-		if st.Extractor == name && st.TS == nil {
-			delete(files, path)
-			continue
-		}
-		files[path] = st
+	for path := range files {
+		dropExtractorContributionAt(files, path, name)
 	}
+}
+
+// dropExtractorContributionAt is dropExtractorContribution for one file. It
+// exists so a caller that knows exactly which file left the repository can
+// retire that entry without walking - and without retiring the extractor's
+// other files, which is what the whole-extractor form would do.
+func dropExtractorContributionAt(files map[string]*FileState, path, name string) {
+	if files == nil || name == "" {
+		return
+	}
+	st := files[path]
+	if st == nil || !extractorOwnsState(st, name) {
+		return
+	}
+	st = cloneFileState(st)
+	if name == "typescript" {
+		st.TS = nil
+		st.Declared = nil
+		st.Referenced = nil
+		st.Imports = nil
+		st.Reexports = nil
+		if st.Extractor == name {
+			st.Extractor = ""
+		}
+		if len(st.Contrib) == 0 {
+			delete(files, path)
+			return
+		}
+	}
+	if st.Contrib != nil {
+		delete(st.Contrib, name)
+	}
+	if st.ContribHash != nil {
+		delete(st.ContribHash, name)
+	}
+	if st.Extractor == name && st.TS == nil {
+		delete(files, path)
+		return
+	}
+	files[path] = st
 }
 
 func syntheticFactsFor(st *State, name string) []facts.Fact {

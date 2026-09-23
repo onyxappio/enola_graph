@@ -646,6 +646,21 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 	defer tree.Close()
 
 	root := tree.RootNode()
+	// This file's export index is derivable from the tree we just built: the
+	// summary scan parses the same bytes with the same grammar to answer a
+	// question this root already answers. Offer it to the session cache before
+	// anything asks, so the answer is ready without a second parse. Only a
+	// context-free index is offered (buildNamedExportIndex decides), and only
+	// for a file whose bytes are the ones on disk - an Ember template-tag file
+	// has had its <template> blocks blanked by now, so its tree is not a
+	// faithful stand-in for a scan of the file. Adoption never replaces an
+	// existing entry, so a scan that already ran still wins and nothing an
+	// earlier consumer saw can change underneath it.
+	if exportCache != nil && !isEmberFile {
+		if idx, contextFree := buildNamedExportIndex(relFile, src, kinds, root, aliases, knownFiles); contextFree {
+			exportCache.adopt(relFile, idx)
+		}
+	}
 	if !facts.IsTestPath(relFile) {
 		result = append(result, extractGraphQLTagFactsAST(src, relFile, kinds, isTSX, root)...)
 		text := string(src)

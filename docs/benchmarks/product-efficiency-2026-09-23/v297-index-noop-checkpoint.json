@@ -1,0 +1,408 @@
+{
+  "status": "validated intermediate checkpoint; performance objective remains open",
+  "base": "cc52e91",
+  "candidate_binary_sha256": "df41ec61b91e1354cb0b47d42478b58ee83553a4d1cf36d0bbc38c0e59bcff7b",
+  "artifacts": {
+    "product": {
+      "path": "/tmp/enola-product-derived-final/result.json",
+      "sha256": "50a09d89df7d5a58b49fefe4a9d5f909bd8ae02ec946472365104f63e12c0b5a",
+      "data": {
+        "binary": "/private/tmp/enola-index-noop-intermediate-review/enola",
+        "binary_sha256": "df41ec61b91e1354cb0b47d42478b58ee83553a4d1cf36d0bbc38c0e59bcff7b",
+        "repo": "/private/tmp/enola-scope-matched-v295-compare/baseline/live",
+        "parent": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+        "child": "07fb4a41ddaf",
+        "sink": "file",
+        "label": "single shared-host diagnostic; not broker acceptance",
+        "phases": {
+          "initial": {
+            "cli_wall_s": 36.767,
+            "summary": {
+              "exit": 0,
+              "wall_s": 36.767,
+              "sink": "file",
+              "parsed": 4012,
+              "cached": 0,
+              "files_read": 4064,
+              "generation": [
+                0,
+                1
+              ],
+              "owners_published": 4942,
+              "events": 2625,
+              "run_id": "product-scope-scope-bench-1-1790161798040635000",
+              "stderr_graph": "[graph] /private/tmp/enola-scope-matched-v295-compare/baseline/live: generation 0\u21921 parsed=4012 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+            },
+            "protocol": "pass",
+            "begin_owners": 8451,
+            "event_bytes": 80139602
+          },
+          "delta": {
+            "cli_wall_s": 6.284,
+            "summary": {
+              "exit": 0,
+              "wall_s": 6.284,
+              "sink": "file",
+              "parsed": 4,
+              "cached": 4060,
+              "files_read": 4,
+              "generation": [
+                1,
+                2
+              ],
+              "owners_published": 25,
+              "events": 9,
+              "run_id": "product-scope-scope-bench-2-1790161836774903000",
+              "stderr_graph": "[graph] /private/tmp/enola-scope-matched-v295-compare/baseline/live: generation 1\u21922 parsed=4 cached=4060 early_local=0 fallbacks=2\n[graph] fallback graph: changed files and reverse file dependents (frozen scope: reverse-close plus owners that reference added or removed fact names)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+            },
+            "protocol": "pass",
+            "begin_owners": 36,
+            "event_bytes": 167742
+          },
+          "cold": {
+            "cli_wall_s": 39.621,
+            "summary": {
+              "exit": 0,
+              "wall_s": 39.621,
+              "sink": "file",
+              "parsed": 4012,
+              "cached": 0,
+              "files_read": 4064,
+              "generation": [
+                0,
+                1
+              ],
+              "owners_published": 4942,
+              "events": 2625,
+              "run_id": "product-scope-scope-bench-1-1790161843145435000",
+              "stderr_graph": "[graph] /private/tmp/enola-scope-matched-v295-compare/baseline/live: generation 0\u21921 parsed=4012 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+            },
+            "protocol": "pass",
+            "begin_owners": 8451,
+            "event_bytes": 80141201
+          }
+        },
+        "applied_hash": "7f29a20304ec5db22d9ab5752231919e8449f9165a83412980968a77290e5a18",
+        "cold_hash": "7f29a20304ec5db22d9ab5752231919e8449f9165a83412980968a77290e5a18",
+        "exact_cold": true
+      }
+    },
+    "comparison": {
+      "path": "/tmp/enola-product-derived-final/comparison.json",
+      "sha256": "da29218dc3e92fa41b2324911d7172b40fd571e2e1bad7bb9f0c18f7a7634518",
+      "data": {
+        "label": "sequential shared-host diagnostics, no stable speed claim",
+        "exact_cold": true,
+        "cross_arm_graph_equal": true,
+        "phases": {
+          "initial": {
+            "control_s": 36.22,
+            "candidate_s": 36.767,
+            "control_stats": {
+              "files_read": 4064,
+              "files_parsed": 4012,
+              "cached_files": 0,
+              "graphql_parsed": 2,
+              "sfc_parsed": 17,
+              "summary_scans": 3004
+            },
+            "candidate_stats": {
+              "files_read": 4064,
+              "files_parsed": 4012,
+              "cached_files": 0,
+              "graphql_parsed": 2,
+              "sfc_parsed": 17,
+              "summary_scans": 1648,
+              "derived_indexes": 2318
+            }
+          },
+          "delta": {
+            "control_s": 5.589,
+            "candidate_s": 6.284,
+            "control_stats": {
+              "files_read": 4,
+              "files_parsed": 4,
+              "cached_files": 4060,
+              "graphql_parsed": 0,
+              "sfc_parsed": 0,
+              "summary_scans": 15
+            },
+            "candidate_stats": {
+              "files_read": 4,
+              "files_parsed": 4,
+              "cached_files": 4060,
+              "graphql_parsed": 0,
+              "sfc_parsed": 0,
+              "summary_scans": 15,
+              "derived_indexes": 2
+            }
+          },
+          "cold": {
+            "control_s": 37.577,
+            "candidate_s": 39.621,
+            "control_stats": {
+              "files_read": 4064,
+              "files_parsed": 4012,
+              "cached_files": 0,
+              "graphql_parsed": 2,
+              "sfc_parsed": 17,
+              "summary_scans": 3004
+            },
+            "candidate_stats": {
+              "files_read": 4064,
+              "files_parsed": 4012,
+              "cached_files": 0,
+              "graphql_parsed": 2,
+              "sfc_parsed": 17,
+              "summary_scans": 1635,
+              "derived_indexes": 2331
+            }
+          }
+        }
+      }
+    },
+    "noop_product": {
+      "path": "/tmp/enola-small-noop-profile-intermediate/result.json",
+      "sha256": "7d32c02c9265ddc8ffe684d5c9ed57108dc9dddb47e17c6b70ac2a808426b1cb",
+      "data": {
+        "binary_sha256": "934472d3dd725246112c12eb6d5a6754582d4c42b140aa34b58e469dd3900d2f",
+        "repo": "/private/tmp/enola-scope-matched-v295-compare/baseline/live",
+        "label": "fresh CLI, shared host diagnostic, file sink",
+        "before": {
+          "event_bytes": 80487542,
+          "state_sha256": "e78edd422753e3194b9df0545da649dc17ca8d06b9360b55b0121865749df51e"
+        },
+        "runs": [
+          {
+            "wall_s": 4.734789833,
+            "exit": 0,
+            "event_bytes_added": 60066,
+            "state_identical": false,
+            "event_bytes_this_run": 60066,
+            "parsed": 0,
+            "generation": [
+              5,
+              6
+            ],
+            "owners": 21
+          },
+          {
+            "wall_s": 3.2027114579999996,
+            "exit": 0,
+            "event_bytes_added": 60066,
+            "state_identical": false,
+            "event_bytes_this_run": 0,
+            "parsed": 0,
+            "generation": [
+              6,
+              6
+            ],
+            "owners": 0
+          },
+          {
+            "wall_s": 3.1055070419999993,
+            "exit": 0,
+            "event_bytes_added": 60066,
+            "state_identical": false,
+            "event_bytes_this_run": 0,
+            "parsed": 0,
+            "generation": [
+              6,
+              6
+            ],
+            "owners": 0
+          }
+        ],
+        "interpretation": "First run repairs stale observed input hash and still publishes; subsequent unchanged runs zeroevents but freshCLI3.1-3.2s, not accepted final latency."
+      }
+    },
+    "probe": {
+      "path": "/tmp/enola-candidate-freeze/probe/acceptance.json",
+      "sha256": "fb74ccf5800cf2b27d54e78b85b4a3b08508056568571f5298c30a53c31b5d0b",
+      "data": {
+        "pass": false,
+        "failures": [
+          {
+            "step": 1,
+            "reason": "unchanged graph published or generation advanced"
+          },
+          {
+            "step": 3,
+            "reason": "unchanged graph published or generation advanced"
+          }
+        ]
+      }
+    },
+    "source_manifest": {
+      "path": "/tmp/enola-candidate-freeze/manifest.json",
+      "sha256": "6eca44c57245565277c87e587ae0b132b7bbcd85ec629879fd2717f67d2641a8",
+      "data": {
+        "label": "index reuse + empty-byte fix + manifest no-op observed-hash fix, over checkpoint ee8f1b7",
+        "base_commit": "ee8f1b7",
+        "worker_checkout": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-perf-accuracy-integration",
+        "frozen_at_utc": "2026-09-23T11:08:06.556911Z",
+        "sources": {
+          "internal/extractors/tsextractor/reexport_resolve.go": {
+            "status": "MODIFIED",
+            "base_sha256": "905b902c8e45af60cb71e9425d0dacd1fc1b66dbd91a27ac09cf478a18375134",
+            "candidate_sha256": "2c9365a84a704d280fc1ae30baecffa25cf1cf857affd429b643d52f65583815"
+          },
+          "internal/extractors/tsextractor/reexport_scan_count_test.go": {
+            "status": "MODIFIED",
+            "base_sha256": "bc1e0bfa20f9bc74ad2a9cb5512a5b6e1c5172763f142256307c08a4a4f5041b",
+            "candidate_sha256": "0aad8e6e79357eab1388ac1affd60c6d20f8981d8326e85528c8975a0945c638"
+          },
+          "internal/extractors/tsextractor/session.go": {
+            "status": "MODIFIED",
+            "base_sha256": "de746f15aa925ff28f438528b14b0681c170cff05d27f338600cfd99cfa6458c",
+            "candidate_sha256": "20d2a3da0041917fa74a63066f13a4dc169415a38242a590e0c884f2d04d7117"
+          },
+          "internal/extractors/tsextractor/ts.go": {
+            "status": "MODIFIED",
+            "base_sha256": "110a50f27091536364edce2ab89f718dca8b040e33742ec1c36003afc9e1c426",
+            "candidate_sha256": "b6f3b2e01dc38e8da2f2ec78f93a5f71b181d957b4fb5ba5876a1a56429c88ce"
+          },
+          "internal/graphprofile/profile.go": {
+            "status": "MODIFIED",
+            "base_sha256": "ff361f10b75021944ced280ee171fa1104655677f7301a900ba29bd6dd313206",
+            "candidate_sha256": "0eb70c32f39775650bad3444b3beaf5bd086dc07246cc1d4b7fa8882bbfbc072"
+          },
+          "internal/graphsession/manifest_noop_regression_test.go": {
+            "status": "ADDED",
+            "base_sha256": null,
+            "candidate_sha256": "bd7c5862879e114687713df235e3c2854d1c2f4a419d5a6d2d4cf561946870eb"
+          },
+          "internal/graphsession/owner.go": {
+            "status": "MODIFIED",
+            "base_sha256": "4618bbad1ba67dce29e90ae901aa4a2035515222b283260028e42ad62124198a",
+            "candidate_sha256": "8f0234e9b19dec0d8871779307c1385e04ab6c3addbb9d786c57a04be4b26539"
+          },
+          "internal/graphsession/resident.go": {
+            "status": "MODIFIED",
+            "base_sha256": "c7c153d655c3b11d1880446ac5c28dc6cc3b9951fb2553f3c4d1dbac26d6a161",
+            "candidate_sha256": "fa9a3363df3d62784f1563f39a1f828902856cc0599c661005497e990725d076"
+          },
+          "internal/graphsession/session.go": {
+            "status": "MODIFIED",
+            "base_sha256": "d13bc1aa8ee277d81c1b0beea271df97ac1febb7f9b350081283faea03853ec2",
+            "candidate_sha256": "0b01f15e2742abfb9fce8608236d12739fb338bf7a75bb6481e074a004fb4d1e"
+          },
+          "internal/graphsession/state.go": {
+            "status": "MODIFIED",
+            "base_sha256": "75d64f97b2388c7964c6b74614fc85b9f42645953896b1f958f99cb0317551ce",
+            "candidate_sha256": "3cf1528bf09cc040d1e3c9d1fdf685cd765fabc36a6b1368d1def8773587be10"
+          },
+          "pkg/command/graph.go": {
+            "status": "MODIFIED",
+            "base_sha256": "bfaa7bc4e850900ac97b42f675c49c8eebed244c2c65733baae95c3ee01be12c",
+            "candidate_sha256": "a8ab1cc5bdecdbb360c627990d8a0dfc56d12c7082948a6b400dc01a092bd44e"
+          }
+        },
+        "source_count": 11,
+        "overlays": {
+          "worker": {
+            "path": "/tmp/enola-candidate-freeze/overlay.json",
+            "sha256": "1468006e751593c63e2a9bf05a22b72614f8c4c4bbc51f078f1d6f61774255dc",
+            "applies_to": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-perf-accuracy-integration"
+          },
+          "root": {
+            "path": "/tmp/enola-candidate-freeze/root-overlay.json",
+            "sha256": "93149ba46d6f9545a81dce62bd59f52cf563e331c527318d9baba75d40a7ead2",
+            "applies_to": "/Users/oleksandr.mykulych/orca/enola_graph"
+          }
+        },
+        "binaries": {
+          "worker_checkout_build": {
+            "path": "/tmp/enola-noop-candidate/enola",
+            "sha256": "2d9d07584827ec707931dbe858708c44d611581d3f814bec30445cf7266bd564",
+            "note": "binary deleted to free disk; rebuildable from the worker checkout or from src/ + overlay.json. sha256 above is the receipt."
+          },
+          "root_overlay_build": {
+            "path": "/tmp/enola-candidate-freeze/enola-root",
+            "sha256": "df41ec61b91e1354cb0b47d42478b58ee83553a4d1cf36d0bbc38c0e59bcff7b",
+            "command": "go build -overlay /tmp/enola-candidate-freeze/root-overlay.json -o /tmp/enola-candidate-freeze/enola-root ./cmd/enola",
+            "exit": 0
+          }
+        },
+        "toolchain": "/tmp/enola-toolchain/go/bin/go (go1.26.8 darwin/arm64)",
+        "suites": {
+          "command": "go test ./internal/extractors/tsextractor/... ./internal/graphsession/... ./internal/engine/... ./pkg/command/... -count=1",
+          "over_final_bytes": {
+            "log": "/tmp/enola-instr-suite6.log",
+            "go_exit": 1,
+            "note": "pkg/command FAIL, UNEXPLAINED and non-reproducing: the failing test name and error text were lost to a tail -40 window flooded by engine stderr, so no cause is established. An isolated ./pkg/command/... run passed exit 0 (5.735s) and TestSnapshotIsCurrent passed -count=5 exit 0. Not classified as environmental. Every package was then re-run green over the final bytes (see final_byte_coverage)."
+          },
+          "prior_clean_run": {
+            "log": "/tmp/enola-instr-suite5.log",
+            "go_exit": 0,
+            "note": "green, but predates the added-factless-file fix in internal/graphsession/owner.go"
+          },
+          "final_byte_coverage": {
+            "internal/graphsession": {
+              "log": "/tmp/enola-instr-suite7.log",
+              "full_output": "/tmp/enola-instr-suite7.full",
+              "go_exit": 0,
+              "result": "ok 186.281s"
+            },
+            "pkg/command": {
+              "log": "/tmp/enola-instr-suite7.log",
+              "full_output": "/tmp/enola-instr-suite7.full",
+              "go_exit": 0,
+              "result": "ok 7.529s"
+            },
+            "internal/extractors/tsextractor": {
+              "log": "/tmp/enola-instr-suite8.log",
+              "full_output": "/tmp/enola-instr-suite8.full",
+              "go_exit": 0,
+              "result": "ok 30.665s"
+            },
+            "internal/engine": {
+              "log": "/tmp/enola-instr-suite8.log",
+              "full_output": "/tmp/enola-instr-suite8.full",
+              "go_exit": 0,
+              "result": "ok 26.776s"
+            },
+            "note": "all four packages green over the frozen final bytes, each run with untruncated output and the real go exit preserved."
+          }
+        },
+        "acceptance_probe": {
+          "script": "docs/benchmarks/product-efficiency-2026-09-23/manifest_noop_probe.py (root-authored, unmodified)",
+          "root_overlay_build_out": "/tmp/enola-candidate-freeze/probe",
+          "exit": 1,
+          "failures": [
+            "step 1 graph-neutral version edit publishes",
+            "step 3 revert publishes"
+          ],
+          "passes": [
+            "steps 2,4,6,7 zero event bytes and no generation advance",
+            "steps 0 and 5 publish as expected",
+            "exact_cold and frozen protocol PASS at all 8 steps"
+          ],
+          "open_gap": "before-Begin neutral-output detection: the plan freezes and Begin publishes before extraction can prove the output identical. Not addressed by this checkpoint."
+        },
+        "regressions_added": {
+          "internal/graphsession/manifest_noop_regression_test.go": [
+            "TestManifestVersionOnlyEditSettlesToATrueNoOp",
+            "TestDeletedFactlessManifestSettlesToATrueNoOp",
+            "TestAddedFactlessManifestSettlesToATrueNoOp"
+          ],
+          "internal/extractors/tsextractor/reexport_scan_count_test.go": [
+            "TestEmptyDerivedIndexMatchesAScan",
+            "TestAdoptedEmptyIndexIsWhatConsumersSee",
+            "TestExtractSessionRecordsEmptyExportSurface",
+            "plus the four adoption tests"
+          ]
+        },
+        "reports": {
+          "index_reuse": "/tmp/enola-index-reuse-report.md",
+          "stage_timing_map": "/tmp/enola-stage-timing-map.md",
+          "instrumentation_only_overlay": "/tmp/enola-instr-only"
+        },
+        "notes": [
+          "gofmt: internal/extractors/tsextractor/ts.go is unformatted in base ee8f1b7 as well (repeatDepth field alignment); left untouched. All other changed files are gofmt clean.",
+          "internal/graphsession/body_scope_regression_test.go is untracked in the worker checkout but byte-identical to ee8f1b7, so it is not part of this candidate."
+        ]
+      }
+    }
+  }
+}
