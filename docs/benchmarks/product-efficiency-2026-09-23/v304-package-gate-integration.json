@@ -1,0 +1,19 @@
+{
+  "command": "go test ./...",
+  "session_id": 27403,
+  "exit_code": 0,
+  "log_sha256": "bdc81ef538f5ce93ac6a9b3e31dd2beeecec6554cd30a02032c69763a5e7a32d",
+  "source_hashes": {
+    "internal/extractors/tsextractor/context.go": "cdd65c6b372fb68cab1c13c076a5c47a8fecab0194f26dc5a06833702082c5bb",
+    "internal/extractors/tsextractor/packagegates.go": "9692e39679e8eddcc59093c92c792e74581939ecaa61fac0a78ab26563ef9152",
+    "internal/graphsession/config_scope.go": "87a3b308f6dd8fc45432a7370198e4d51b0d1f4eaba58c66180b16afc4d31bca",
+    "internal/graphsession/package_gate_scope_regression_test.go": "d747ccc658d34c8c6e79286eb9b1c14c765fb93ced7585233f5f79a280eed016",
+    "internal/extractors/tsextractor/packagegates_effective_test.go": "9ca67a963f0af369bb99126e47dc61a62565c8b567146671805e0f4324753624",
+    "pkg/bootstrap/independent_package_gates_test.go": "fbf1a3ffa15924e09542b4aeef69178f1ee65fb9faf41a485d23d82912c30360"
+  },
+  "package_lines": [
+    "ok  \tgithub.com/enola-labs/enola/internal/extractors/tsextractor\t43.255s",
+    "ok  \tgithub.com/enola-labs/enola/internal/graphsession\t553.797s",
+    "ok  \tgithub.com/enola-labs/enola/pkg/bootstrap\t230.359s"
+  ]
+}

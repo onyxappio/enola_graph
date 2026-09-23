@@ -44,12 +44,25 @@ func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, 
 		disc = e.newDiscovery(context.Background(), root, ov, len(raw))
 	}
 	tsRoot, found := disc.tsRoot, disc.tsRootFound
-	typeORM, drizzle, prisma := disc.typeORM, disc.drizzle, disc.prisma
 	out := map[string]string{
-		"version":                 "ts-effective-context-v3",
-		"selected root":           digest([]any{tsRoot, found}),
-		"framework and ORM gates": digest([]bool{disc.nextJS, disc.vue, disc.nuxt, disc.svelteKit, disc.ember, disc.reactNav, disc.angular, typeORM, drizzle, prisma}),
-		"owning package gates":    digest(disc.gates.activeGates()),
+		"version":       "ts-effective-context-v4",
+		"selected root": digest([]any{tsRoot, found}),
+		// These six are handed to every extractFile as they are, so a file cannot
+		// be excluded from a change to one of them: the run is a Next.js run or it
+		// is not. disc.vue, disc.typeORM, disc.drizzle and disc.prisma used to be
+		// hashed here alongside them and are deliberately not, because no reader
+		// consumes them - extraction asks packageGates.forFile for Vue and the
+		// ORMs and packageGates.anyPrisma for Prisma. Hashing them here invalidated
+		// every source in the repository over a dependency in the root package.json
+		// that only the files the root package owns can see.
+		"repository-wide frameworks": digest([]bool{disc.nextJS, disc.nuxt, disc.svelteKit, disc.ember, disc.reactNav, disc.angular}),
+		// anyPrisma is the one genuinely repository-wide half of the package gates:
+		// it decides whether the run reads schema.prisma at all, and no file owns
+		// that decision. The Vue/TypeORM/Drizzle half is selected per file by the
+		// nearest owning package, so it is projected per file below - hashing the
+		// whole byDir map here dirtied every source in the repository whenever one
+		// package.json gained a dependency that only its own files can see.
+		"any package prisma gate": digest(disc.gates.anyPrisma),
 		"nuxt packages":           digest(disc.nuxtPkgs),
 
 		"configured clients": e.ConfigKey(),
@@ -129,7 +142,14 @@ func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, 
 		for key, value := range mergePackageAliases(aliasesForDir(aliases, dir), pkgAliases) {
 			normalized[key] = aliasValue{value.replacement, value.suffix, value.exact}
 		}
-		perFile[file] = digest([]any{nearestPackageName(packages, dir), normalized})
+		// The same call the extraction makes, not a re-derivation of it: the
+		// nearest owning package's Vue and ORM declarations are what extractFile
+		// is handed for this file, so they are what this file's context has to
+		// carry. Prisma is deliberately absent - the per-file readers never ask
+		// for it, and including it here would dirty files over a fact none of
+		// them consume.
+		fileOrms, fileVue := disc.gates.forFile(packages, file)
+		perFile[file] = digest([]any{nearestPackageName(packages, dir), normalized, []bool{fileVue, fileOrms.typeORM, fileOrms.drizzle}})
 	}
 	return out, perFile, disc
 }

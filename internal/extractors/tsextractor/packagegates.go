@@ -80,32 +80,36 @@ func pkgHasDep(p map[string]any, name string) bool {
 	return false
 }
 
-func (g packageGates) activeGates() map[string]pkgGate {
-	out := map[string]pkgGate{}
-	for dir, gate := range g.byDir {
-		if gate.Vue || gate.TypeORM || gate.Drizzle || gate.Prisma {
-			out[dir] = gate
-		}
-	}
-	return out
-}
-
-func (g packageGates) forFile(_ map[string]string, relFile string) (orms ormFlags, isVue bool) {
+// effectiveFor selects the declaration an extraction will actually apply to
+// relFile: the gate of the nearest owning package directory, walking up to the
+// repository root. It reports the directory as well, so a caller that needs to
+// say which package answered can do so without repeating the search.
+//
+// forFile and the session-context projection both go through this. They have to:
+// a projection that re-derived the owning package on its own would be a second
+// implementation of the selection rule, and the two would answer differently the
+// first time one of them was changed.
+func (g packageGates) effectiveFor(relFile string) (pkgDir string, gate pkgGate, found bool) {
 	for d := filepath.ToSlash(factpath.Dir(relFile)); ; {
 		if gate, ok := g.byDir[d]; ok {
-			return ormFlags{typeORM: gate.TypeORM, drizzle: gate.Drizzle}, gate.Vue
+			return d, gate, true
 		}
 		i := strings.LastIndexByte(d, '/')
 		if i < 0 {
 			if d == "." {
 				if gate, ok := g.byDir[""]; ok {
-					return ormFlags{typeORM: gate.TypeORM, drizzle: gate.Drizzle}, gate.Vue
+					return "", gate, true
 				}
-				return ormFlags{}, false
+				return "", pkgGate{}, false
 			}
 			d = "."
 			continue
 		}
 		d = d[:i]
 	}
+}
+
+func (g packageGates) forFile(_ map[string]string, relFile string) (orms ormFlags, isVue bool) {
+	_, gate, _ := g.effectiveFor(relFile)
+	return ormFlags{typeORM: gate.TypeORM, drizzle: gate.Drizzle}, gate.Vue
 }
