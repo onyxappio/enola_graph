@@ -372,7 +372,7 @@ def build_observer_overlay(module_root: Path, dest_bin: Path) -> Path:
     shutil.copyfile(src_file, src / "main.go")
     nats_ver = nats_mod_version(module_root)
     (src / "go.mod").write_text(
-        "module benchobserveroverlay\n\n"
+        "module github.com/enola-labs/enola/benchobserveroverlay\n\n"
         "go 1.26\n\n"
         "require (\n"
         "\tgithub.com/enola-labs/enola v0.0.0\n"
@@ -381,7 +381,7 @@ def build_observer_overlay(module_root: Path, dest_bin: Path) -> Path:
         f"replace github.com/enola-labs/enola => {module_root}\n"
     )
     proc = subprocess.run(
-        [go_bin(), "build", "-o", str(dest_bin), "."],
+        [go_bin(), "build", "-mod=mod", "-o", str(dest_bin), "."],
         cwd=src,
         env=go_env(),
         capture_output=True,
