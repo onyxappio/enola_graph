@@ -1,0 +1,223 @@
+{
+  "candidate_manifest": {
+    "label": "stage 1: pre-Begin neutrality proof for non-TypeScript extractors (semantic-neutral manifest/config no-op fix)",
+    "base_commit": "ae8aa8097398875755c520e7d16adf2edb80c949",
+    "base_commit_subject": "Guard resident discovery across alias retarget and content edits",
+    "worker_checkout": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-perf-accuracy-integration",
+    "frozen_at_utc": "2026-09-23T12:08:21.093949+00:00",
+    "supersedes": "the withdrawn 8-file staging of this directory (14:51Z), which failed three md_scope tests",
+    "sources": {
+      "internal/graphsession/nonts_neutral.go": {
+        "status": "NEW",
+        "base_sha256": null,
+        "candidate_sha256": "af7b343c37fab38ea40529290d84715973cbbd0d15e126461bd4871d03724c73",
+        "bytes": 8905
+      },
+      "internal/graphsession/nonts_neutral_regression_test.go": {
+        "status": "NEW",
+        "base_sha256": null,
+        "candidate_sha256": "063f69741b029314e075060d995d201a43197bb427e17744b4efa2909405b680",
+        "bytes": 8871
+      },
+      "internal/graphsession/session.go": {
+        "status": "MODIFIED",
+        "base_sha256": "0b01f15e2742abfb9fce8608236d12739fb338bf7a75bb6481e074a004fb4d1e",
+        "candidate_sha256": "8edd130cea05a381bf7997874a0b0be81d67f1967889f39ecdf497b68d0134f8",
+        "bytes": 99660
+      },
+      "internal/graphsession/nonts_candidate_scope.go": {
+        "status": "MODIFIED",
+        "base_sha256": "ce58495d4b570edafca2dbc032fc1fa0dcfbe560b5947571fb6e1afa5ae00664",
+        "candidate_sha256": "17c255934f9d0e8abcd0d40f76b99b0a487249a3e1e1b47b7f15660f586cab42",
+        "bytes": 10508
+      },
+      "internal/graphsession/resident.go": {
+        "status": "MODIFIED",
+        "base_sha256": "fa9a3363df3d62784f1563f39a1f828902856cc0599c661005497e990725d076",
+        "candidate_sha256": "ad8212da1aa07a86f414153ff280df2c267a500479bc6cd675b41e6000dca2b0",
+        "bytes": 17964
+      },
+      "internal/graphsession/raw_config_scope_regression_test.go": {
+        "status": "MODIFIED",
+        "base_sha256": "aab4f3fae252be2e2e88eef2dafca3ab5b971a195ffe51b4724ec34098f462d7",
+        "candidate_sha256": "0f11900f753b89af75b310dfb8a6b4ab7427464337a015d2c046eaab3d7a9dd5",
+        "bytes": 23259
+      },
+      "internal/graphsession/manifest_noop_regression_test.go": {
+        "status": "MODIFIED",
+        "base_sha256": "bd7c5862879e114687713df235e3c2854d1c2f4a419d5a6d2d4cf561946870eb",
+        "candidate_sha256": "874cdd8218872ba146c7972f6330c77f184b3e84dd71c78aa5b556fc17f3d716",
+        "bytes": 7316
+      },
+      "internal/graphsession/manifest_failure_review_test.go": {
+        "status": "MODIFIED",
+        "base_sha256": "d78b09011ad1aa75775e5decd3e08ec44ad0ce07a752a981cc0b84646fd81894",
+        "candidate_sha256": "ef702288f04660deaac9c6f8b3fc10c746fa38154b0b628f4b34559798943fbe",
+        "bytes": 9114
+      },
+      "internal/graphsession/md_scope_regression_test.go": {
+        "status": "MODIFIED",
+        "base_sha256": "2e442d95956493a450186b294f73dfa1280a58493dd2fa54f35880097e336a93",
+        "candidate_sha256": "3387e8271957f6d1c01e48ed0bc7eb01e160cec94ddddcac9fe153523c222984",
+        "bytes": 28952
+      }
+    },
+    "build_receipt": {
+      "toolchain": "/tmp/enola-toolchain/go/bin/go (go1.26.8 darwin/arm64)",
+      "command": "go build -ldflags=\"-s -w\" -trimpath -o bin/enola ./cmd/enola",
+      "stripped": true,
+      "note": "-s -w because an unstripped link hit ENOSPC on this host; correctness artifact only, not a latency comparison build",
+      "path": "bin/enola",
+      "bytes": 53918578,
+      "sha256": "b636e930366436ac1c6edb30782a4ede51a325838d527997c12f290e6c206ac3",
+      "exit": 0
+    },
+    "tests": {
+      "logs/stage1-suite2.full": "go test ./internal/graphsession/ ./pkg/command/ -count=1 -> go_exit=0; graphsession ok 188.729s, pkg/command ok 6.052s",
+      "logs/stage1-targeted6.full": "-run 'Manifest|Factless|RawConfig|Independent|Discovery|Resident|Rediscovery|Neutral|Proven' -> exit 0, ok 56.665s",
+      "logs/stage1-md2.full": "-run TestMDScope -> exit 0, ok 7.006s",
+      "logs/stage1-md3.full": "-run 'Proven|Neutral|MDScope' -> exit 0, ok 10.819s",
+      "logs/stage1-rootprobe1.full": "coordinator probe TestIndependentNeutralCommitRejectsActualCaptureRace (test-only overlay, since restored) -> exit 0, both retry modes PASS"
+    },
+    "not_included": [
+      "coordinator capture-hook instrumentation (/tmp/enola-manifest-capture-hook.go) and probe file: applied temporarily, then restored; the candidate carries neither"
+    ]
+  },
+  "independent_race": {
+    "exit": 0,
+    "seconds": 11.51,
+    "tests": [
+      "TestIndependentNeutralCommitRejectsActualCaptureRace",
+      "TestIndependentMixedManifestHashRefreshFailedEndRollback",
+      "TestIndependentResidentDiscoveryRetargetSequence"
+    ]
+  },
+  "cli_acceptance": {
+    "pass": true,
+    "failures": []
+  },
+  "cli_results": [
+    {
+      "step": 0,
+      "wall_s": 1.05623175,
+      "generation": [
+        0,
+        1
+      ],
+      "parsed": 1,
+      "owners": 2,
+      "event_bytes": 3348,
+      "exact_cold": true,
+      "graph_hash": "2e0bea121bf9ee75cf83719a82b75cd06bf1c1df91ca7c2e10f918bf9cb45636",
+      "cold_hash": "2e0bea121bf9ee75cf83719a82b75cd06bf1c1df91ca7c2e10f918bf9cb45636",
+      "protocol": "pass"
+    },
+    {
+      "step": 1,
+      "wall_s": 0.11262612500000002,
+      "generation": [
+        1,
+        1
+      ],
+      "parsed": 0,
+      "owners": 0,
+      "event_bytes": 0,
+      "exact_cold": true,
+      "graph_hash": "2e0bea121bf9ee75cf83719a82b75cd06bf1c1df91ca7c2e10f918bf9cb45636",
+      "cold_hash": "2e0bea121bf9ee75cf83719a82b75cd06bf1c1df91ca7c2e10f918bf9cb45636",
+      "protocol": "pass"
+    },
+    {
+      "step": 2,
+      "wall_s": 0.11355870800000023,
+      "generation": [
+        1,
+        1
+      ],
+      "parsed": 0,
+      "owners": 0,
+      "event_bytes": 0,
+      "exact_cold": true,
+      "graph_hash": "2e0bea121bf9ee75cf83719a82b75cd06bf1c1df91ca7c2e10f918bf9cb45636",
+      "cold_hash": "2e0bea121bf9ee75cf83719a82b75cd06bf1c1df91ca7c2e10f918bf9cb45636",
+      "protocol": "pass"
+    },
+    {
+      "step": 3,
+      "wall_s": 0.12097970799999969,
+      "generation": [
+        1,
+        1
+      ],
+      "parsed": 0,
+      "owners": 0,
+      "event_bytes": 0,
+      "exact_cold": true,
+      "graph_hash": "2e0bea121bf9ee75cf83719a82b75cd06bf1c1df91ca7c2e10f918bf9cb45636",
+      "cold_hash": "2e0bea121bf9ee75cf83719a82b75cd06bf1c1df91ca7c2e10f918bf9cb45636",
+      "protocol": "pass"
+    },
+    {
+      "step": 4,
+      "wall_s": 0.09672287499999976,
+      "generation": [
+        1,
+        1
+      ],
+      "parsed": 0,
+      "owners": 0,
+      "event_bytes": 0,
+      "exact_cold": true,
+      "graph_hash": "2e0bea121bf9ee75cf83719a82b75cd06bf1c1df91ca7c2e10f918bf9cb45636",
+      "cold_hash": "2e0bea121bf9ee75cf83719a82b75cd06bf1c1df91ca7c2e10f918bf9cb45636",
+      "protocol": "pass"
+    },
+    {
+      "step": 5,
+      "wall_s": 0.2589800419999997,
+      "generation": [
+        1,
+        2
+      ],
+      "parsed": 0,
+      "owners": 1,
+      "event_bytes": 2596,
+      "exact_cold": true,
+      "graph_hash": "87c3f4be9883e1e23c005a0b9f25ce4d44421a90315e64fe1a81b2145fa45c37",
+      "cold_hash": "87c3f4be9883e1e23c005a0b9f25ce4d44421a90315e64fe1a81b2145fa45c37",
+      "protocol": "pass"
+    },
+    {
+      "step": 6,
+      "wall_s": 0.0899852499999998,
+      "generation": [
+        2,
+        2
+      ],
+      "parsed": 0,
+      "owners": 0,
+      "event_bytes": 0,
+      "exact_cold": true,
+      "graph_hash": "87c3f4be9883e1e23c005a0b9f25ce4d44421a90315e64fe1a81b2145fa45c37",
+      "cold_hash": "87c3f4be9883e1e23c005a0b9f25ce4d44421a90315e64fe1a81b2145fa45c37",
+      "protocol": "pass"
+    },
+    {
+      "step": 7,
+      "wall_s": 0.09115866600000011,
+      "generation": [
+        2,
+        2
+      ],
+      "parsed": 0,
+      "owners": 0,
+      "event_bytes": 0,
+      "exact_cold": true,
+      "graph_hash": "87c3f4be9883e1e23c005a0b9f25ce4d44421a90315e64fe1a81b2145fa45c37",
+      "cold_hash": "87c3f4be9883e1e23c005a0b9f25ce4d44421a90315e64fe1a81b2145fa45c37",
+      "protocol": "pass"
+    }
+  ],
+  "performance_claim": false,
+  "build_scope_checked": "All tracked Go files and go.mod/go.sum in worker matched base plus frozen sources before integration."
+}

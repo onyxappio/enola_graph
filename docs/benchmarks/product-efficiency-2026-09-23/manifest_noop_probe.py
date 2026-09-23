@@ -52,5 +52,7 @@ for row in rows:
  changed=row['step'] in expected_changes
  if changed and (row['event_bytes']==0 or row['generation'][1]!=row['generation'][0]+1):failures.append({'step':row['step'],'reason':'real graph change missing'})
  if not changed and (row['event_bytes']!=0 or row['generation'][0]!=row['generation'][1]):failures.append({'step':row['step'],'reason':'unchanged graph published or generation advanced'})
+ if not changed and row['parsed']!=0:failures.append({'step':row['step'],'reason':'unchanged graph reparsed source files'})
+ if row['step']>0 and ((row['graph_hash']!=rows[row['step']-1]['graph_hash'])!=changed):failures.append({'step':row['step'],'reason':'mutation did not produce the expected graph change'})
 (out/'acceptance.json').write_text(json.dumps({'pass':not failures,'failures':failures},indent=2))
 raise SystemExit(1 if failures else 0)

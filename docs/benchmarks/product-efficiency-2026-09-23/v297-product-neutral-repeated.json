@@ -1,0 +1,447 @@
+{
+  "label": "Product repeated fresh CLI neutral-manifest diagnostic on a74cd4f; stripped binary; no matched speedup or broker acceptance claim",
+  "binary_sha256": "b636e930366436ac1c6edb30782a4ede51a325838d527997c12f290e6c206ac3",
+  "source_revision": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+  "original_manifest_sha256": "83dff407d6199086f058b1ffff3c1b0f48203a8a31ea713439bbb0f95d0ab902",
+  "restored_manifest_sha256": "83dff407d6199086f058b1ffff3c1b0f48203a8a31ea713439bbb0f95d0ab902",
+  "rows": [
+    {
+      "label": "fork",
+      "seconds": 2.014687375,
+      "summary": null,
+      "event_bytes": 0
+    },
+    {
+      "label": "0_baseline",
+      "seconds": 2.90139325,
+      "summary": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        }
+      ],
+      "event_bytes": 0
+    },
+    {
+      "label": "0_version_edit",
+      "seconds": 3.9925865839999997,
+      "summary": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": true,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        }
+      ],
+      "event_bytes": 0
+    },
+    {
+      "label": "0_unchanged",
+      "seconds": 2.9457246670000004,
+      "summary": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        }
+      ],
+      "event_bytes": 0
+    },
+    {
+      "label": "0_revert",
+      "seconds": 4.088092249999999,
+      "summary": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": true,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        }
+      ],
+      "event_bytes": 0
+    },
+    {
+      "label": "1_baseline",
+      "seconds": 2.923261791999998,
+      "summary": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        }
+      ],
+      "event_bytes": 0
+    },
+    {
+      "label": "1_version_edit",
+      "seconds": 4.005165541,
+      "summary": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": true,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        }
+      ],
+      "event_bytes": 0
+    },
+    {
+      "label": "1_unchanged",
+      "seconds": 2.9263997920000016,
+      "summary": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        }
+      ],
+      "event_bytes": 0
+    },
+    {
+      "label": "1_revert",
+      "seconds": 3.9915843330000023,
+      "summary": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": true,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        }
+      ],
+      "event_bytes": 0
+    },
+    {
+      "label": "2_baseline",
+      "seconds": 2.9395211669999988,
+      "summary": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        }
+      ],
+      "event_bytes": 0
+    },
+    {
+      "label": "2_version_edit",
+      "seconds": 4.0434095839999955,
+      "summary": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": true,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        }
+      ],
+      "event_bytes": 0
+    },
+    {
+      "label": "2_unchanged",
+      "seconds": 2.932459584,
+      "summary": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        }
+      ],
+      "event_bytes": 0
+    },
+    {
+      "label": "2_revert",
+      "seconds": 4.016324834000002,
+      "summary": [
+        {
+          "Invalidation": {
+            "RawConfigChanged": true,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        }
+      ],
+      "event_bytes": 0
+    }
+  ]
+}
