@@ -970,11 +970,22 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 						prevRecs[path] = rec.TS
 					}
 				}
+				disc := s.tsRunDiscovery()
+				if disc == nil {
+					disc = ts.NewDiscovery(ctx, s.abs, s.capturedSources)
+				}
 				for _, f := range owned {
 					h, ok := lookupHash(hashes, f)
 					prev := lookupState(prevFiles, f)
 					if !ok || prev == nil || prev.Hash != h || prev.Unreadable || recMissing(prev) {
 						dirty[f] = true
+						continue
+					}
+					if prev.TS != nil && prev.TS.NuxtScope != "" {
+						if prev.TS.NuxtScope != tsextractor.FileNuxtScope(disc, f) {
+							dirty[f] = true
+							semanticDirty[f] = true
+						}
 					}
 				}
 				if s.eng.GraphScope() != nil {

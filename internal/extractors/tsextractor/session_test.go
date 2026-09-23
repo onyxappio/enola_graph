@@ -107,6 +107,49 @@ func TestExtractSession_ReusesUnchangedFiles(t *testing.T) {
 	}
 }
 
+func TestExtractSession_NestedNuxtConfigChangeRebindsPlugin(t *testing.T) {
+	dir := t.TempDir()
+	mustWrite := func(rel, body string) {
+		t.Helper()
+		p := filepath.Join(dir, rel)
+		if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(p, []byte(body), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	mustWrite("package.json", `{"name":"plain-root"}`+"\n")
+	mustWrite("playground/nuxt.config.ts", "export default defineNuxtConfig({})\n")
+	mustWrite("playground/plugins/entry.ts", "export default defineNuxtPlugin(() => ({}))\n")
+	mustWrite("plain/plugins/entry.ts", "export default defineNuxtPlugin(() => ({}))\n")
+	files := []string{"package.json", "playground/nuxt.config.ts", "playground/plugins/entry.ts", "plain/plugins/entry.ts"}
+	ext := New()
+	first, err := ext.ExtractSession(context.Background(), dir, files, nil, nil, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	plugin := first.Records["playground/plugins/entry.ts"]
+	if plugin == nil || plugin.NuxtScope != "playground" {
+		t.Fatalf("nuxt scope=%v", plugin)
+	}
+	if err := os.Remove(filepath.Join(dir, "playground/nuxt.config.ts")); err != nil {
+		t.Fatal(err)
+	}
+	rest := []string{"package.json", "playground/plugins/entry.ts", "plain/plugins/entry.ts"}
+	second, err := ext.ExtractSession(context.Background(), dir, rest, first.Records, map[string]bool{}, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if second.Stats.FilesParsed == 0 {
+		t.Fatal("deleting nested nuxt.config parsed no files")
+	}
+	updated := second.Records["playground/plugins/entry.ts"]
+	if updated == nil || updated.NuxtScope != "-" {
+		t.Fatalf("after delete nuxt scope=%v", updated)
+	}
+}
+
 func writeSessionFiles(t *testing.T, dir string, files map[string]string) []string {
 	t.Helper()
 	var names []string

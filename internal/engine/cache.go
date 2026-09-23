@@ -2585,7 +2585,11 @@ import (
 // that has its own manifest without Nuxt. Nested folders without a package.json
 // still belong to the containing Nuxt project. Explicit #imports/#app/nuxt/app
 // factory imports remain functions regardless of the Nuxt manifest.
-const cacheVersion = "v313"
+// v314: an explicit nested nuxt.config establishes a Nuxt application even when
+// the child directory has no package.json. Prefer the most specific matching
+// Nuxt root; reject only a more-specific plain package.json below that root.
+// A root Nuxt dependency still does not leak into an unrelated nested package.
+const cacheVersion = "v314"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

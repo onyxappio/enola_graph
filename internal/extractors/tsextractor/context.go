@@ -129,7 +129,8 @@ func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, 
 		for key, value := range mergePackageAliases(aliasesForDir(aliases, dir), pkgAliases) {
 			normalized[key] = aliasValue{value.replacement, value.suffix, value.exact}
 		}
-		perFile[file] = digest([]any{nearestPackageName(packages, dir), normalized})
+		pkg, inNuxt := nuxtPackageForFile(disc.nuxtPkgs, file, packageDirSet(disc.gates))
+		perFile[file] = digest([]any{nearestPackageName(packages, dir), normalized, nuxtScopeKey(pkg, inNuxt)})
 	}
 	return out, perFile, disc
 }

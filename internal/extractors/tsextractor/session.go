@@ -86,6 +86,10 @@ type FileRecord struct {
 	Router                *RouterDTO  `json:"router,omitempty"`
 	ParseKind             string      `json:"parse_kind,omitempty"`
 	AutoImportDirs        []string    `json:"auto_import_dirs,omitempty"`
+	// NuxtScope is the owning Nuxt application for this file: "-" when none,
+	// "." for a repo-root Nuxt app, otherwise the application directory.
+	// Empty means a record written before this field existed.
+	NuxtScope string `json:"nuxt_scope,omitempty"`
 }
 
 // BindsNoImports reports whether the file resolves no import or re-export of its
@@ -221,6 +225,10 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 				return true
 			}
 		}
+		pkg, inNuxt := nuxtPackageForFile(nuxtPkgs, rel, pkgDirSet)
+		if rec.NuxtScope == "" || rec.NuxtScope != nuxtScopeKey(pkg, inNuxt) {
+			return true
+		}
 		return false
 	}
 
@@ -333,6 +341,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		}
 		aliases := mergePackageAliases(aliasesForDir(aliasRoots, factpath.Dir(relFile)), pkgAliases)
 		fileNuxt, inNuxt := nuxtPackageForFile(nuxtPkgs, relFile, pkgDirSet)
+		rec.NuxtScope = nuxtScopeKey(fileNuxt, inNuxt)
 		var auto map[string]string
 		if inNuxt {
 			auto = nuxtAutoByPkg[fileNuxt]

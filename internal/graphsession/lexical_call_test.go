@@ -1084,6 +1084,165 @@ export default defineNuxtPlugin(() => ({}))
 	}
 }
 
+func nestedNuxtFixture() map[string]string {
+	return map[string]string{
+		"package.json": `{"name":"plain-root"}
+`,
+		"playground/nuxt.config.ts": `export default defineNuxtConfig({})
+`,
+		"playground/plugins/entry.ts": `export default defineNuxtPlugin(() => ({}))
+`,
+		"plain/plugins/entry.ts": `export default defineNuxtPlugin(() => ({}))
+`,
+	}
+}
+
+func assertNestedNuxtConfigKinds(t *testing.T, c *Consumer, playgroundFunc bool) {
+	t.Helper()
+	wantPlay := any(facts.SymbolVariable)
+	if playgroundFunc {
+		wantPlay = facts.SymbolFunc
+	}
+	want := map[string]struct {
+		file string
+		kind any
+	}{
+		"playground/plugins.Entry": {"playground/plugins/entry.ts", wantPlay},
+		"plain/plugins.Entry":      {"plain/plugins/entry.ts", facts.SymbolVariable},
+	}
+	found := map[string]bool{}
+	for _, nodes := range c.Owners {
+		for _, n := range nodes {
+			spec, ok := want[n.Name]
+			if !ok || n.Kind != facts.KindSymbol {
+				continue
+			}
+			if n.File != spec.file {
+				t.Fatalf("%s file=%s want %s", n.Name, n.File, spec.file)
+			}
+			if n.Props["symbol_kind"] != spec.kind {
+				t.Fatalf("%s kind=%v want %v", n.Name, n.Props["symbol_kind"], spec.kind)
+			}
+			found[n.Name] = true
+		}
+	}
+	for name := range want {
+		if !found[name] {
+			t.Fatalf("missing %s", name)
+		}
+	}
+}
+
+func TestPublishedWave10CachedUpgradeFromV313(t *testing.T) {
+	dir := setupTSRepo(t, nestedNuxtFixture())
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	assertNestedNuxtConfigKinds(t, applyGraph(t, first), true)
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("load state: %v %#v", err, st)
+	}
+	st.ExtractorVersion = "v313"
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	up := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, dir, up, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.ParsedFiles == 0 {
+		t.Fatal("v313 migration parsed no files")
+	}
+	c := applyGraph(t, first)
+	if err := c.ApplyRecords(up.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, coldSink))
+	assertNestedNuxtConfigKinds(t, c, true)
+	quiet := &graphstream.MemorySink{}
+	again, err := Run(context.Background(), eng, dir, quiet, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if again.ParsedFiles != 0 {
+		t.Fatalf("silent nochange parsed=%d", again.ParsedFiles)
+	}
+	if engine.ExtractorVersion() == "v313" {
+		t.Fatal("cached upgrade test requires cacheVersion newer than v313")
+	}
+}
+
+func TestPublishedWave10NestedNuxtConfigDeltaEqualsCold(t *testing.T) {
+	dir := setupTSRepo(t, nestedNuxtFixture())
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	c := applyGraph(t, first)
+	assertNestedNuxtConfigKinds(t, c, true)
+
+	runDelta := func(label string, playgroundFunc bool) {
+		t.Helper()
+		mut := &graphstream.MemorySink{}
+		if _, err := Run(context.Background(), eng, dir, mut, opts); err != nil {
+			t.Fatal(err)
+		}
+		if err := c.ApplyRecords(mut.CloneRecords()); err != nil {
+			t.Fatal(err)
+		}
+		cold := &graphstream.MemorySink{}
+		if _, err := Run(context.Background(), eng, dir, cold, Options{StateDir: filepath.Join(dir, ".enola", "cold-"+label), ForceInitial: true}); err != nil {
+			t.Fatal(err)
+		}
+		assertAppliedEqualsCold(t, c, applyGraph(t, cold))
+		assertNestedNuxtConfigKinds(t, c, playgroundFunc)
+		quiet := &graphstream.MemorySink{}
+		again, err := Run(context.Background(), eng, dir, quiet, opts)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if again.ParsedFiles != 0 {
+			t.Fatalf("%s silent nochange parsed=%d", label, again.ParsedFiles)
+		}
+	}
+
+	if err := os.Remove(filepath.Join(dir, "playground/nuxt.config.ts")); err != nil {
+		t.Fatal(err)
+	}
+	runDelta("delete-config", false)
+
+	if err := os.WriteFile(filepath.Join(dir, "playground/nuxt.config.ts"), []byte("export default defineNuxtConfig({})\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	runDelta("add-config", true)
+
+	if err := os.Rename(filepath.Join(dir, "playground/nuxt.config.ts"), filepath.Join(dir, "playground/nuxt.config.js")); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "playground/nuxt.config.js"), []byte("export default defineNuxtConfig({})\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	runDelta("rename-config", true)
+
+	if err := os.WriteFile(filepath.Join(dir, "playground/package.json"), []byte(`{"name":"playground"}`+"\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	runDelta("add-child-manifest", true)
+}
+
 func assertNuxtWorkspaceBoundaryKinds(t *testing.T, c *Consumer) {
 	t.Helper()
 	want := map[string]struct {

@@ -661,6 +661,52 @@ export default defineNuxtPlugin(() => ({}))
 	}
 }
 
+func TestExtract_Wave10NuxtNestedConfigWithoutChildManifest(t *testing.T) {
+	files := map[string]string{
+		"package.json": `{"name":"plain-root"}
+`,
+		"playground/nuxt.config.ts": `export default defineNuxtConfig({})
+`,
+		"playground/plugins/entry.ts": `export default defineNuxtPlugin(() => ({}))
+`,
+		"plain/plugins/entry.ts": `export default defineNuxtPlugin(() => ({}))
+`,
+	}
+	ff := extractAll(t, files, false)
+	plugin, ok := findFact(ff, "playground/plugins.Entry")
+	if !ok {
+		t.Fatal("missing playground/plugins.Entry")
+	}
+	if plugin.Props["symbol_kind"] != facts.SymbolFunc {
+		t.Fatalf("nested config plugin kind=%v want function", plugin.Props["symbol_kind"])
+	}
+	neighbor, ok := findFact(ff, "plain/plugins.Entry")
+	if !ok {
+		t.Fatal("missing plain/plugins.Entry")
+	}
+	if neighbor.Props["symbol_kind"] != facts.SymbolVariable {
+		t.Fatalf("neighbor plugin kind=%v want variable", neighbor.Props["symbol_kind"])
+	}
+
+	files["playground/package.json"] = `{"name":"playground"}
+`
+	withManifest := extractAll(t, files, false)
+	plugin, ok = findFact(withManifest, "playground/plugins.Entry")
+	if !ok {
+		t.Fatal("missing playground/plugins.Entry after child manifest")
+	}
+	if plugin.Props["symbol_kind"] != facts.SymbolFunc {
+		t.Fatalf("nested config with plain child manifest kind=%v want function", plugin.Props["symbol_kind"])
+	}
+	neighbor, ok = findFact(withManifest, "plain/plugins.Entry")
+	if !ok {
+		t.Fatal("missing plain/plugins.Entry after child manifest")
+	}
+	if neighbor.Props["symbol_kind"] != facts.SymbolVariable {
+		t.Fatalf("neighbor after child manifest kind=%v want variable", neighbor.Props["symbol_kind"])
+	}
+}
+
 func TestExtract_Wave10H3LazyEventHandlerKind(t *testing.T) {
 	ff := extractAll(t, map[string]string{
 		"packages/landings-module-image/src/runtime/images/ipxHandler.ts": `import { lazyEventHandler } from 'h3'

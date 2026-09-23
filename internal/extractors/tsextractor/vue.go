@@ -190,35 +190,86 @@ func nearestDeclaredPackageDir(pkgDirs map[string]bool, relFile string) (string,
 	}
 }
 
-// nuxtPackageForFile returns the nearest Nuxt package that owns relFile.
-// A root Nuxt declaration (empty prefix) does not cross a nested package.json
-// that does not itself declare Nuxt, so a workspace neighbor stays independent.
-// Nested folders without their own package.json still belong to the containing
-// Nuxt package.
-func nuxtPackageForFile(pkgs []string, relFile string, pkgDirs map[string]bool) (string, bool) {
-	if owner, ok := nearestDeclaredPackageDir(pkgDirs, relFile); ok {
-		for _, p := range pkgs {
-			if p == owner {
-				return p, true
-			}
-		}
-		return "", false
+func nuxtPkgSet(pkgs []string) map[string]bool {
+	if len(pkgs) == 0 {
+		return nil
 	}
+	out := make(map[string]bool, len(pkgs))
+	for _, p := range pkgs {
+		out[p] = true
+	}
+	return out
+}
+
+// moreSpecificPlainPackage reports a package.json that sits strictly below
+// nuxtRoot on the path to relFile and is not itself a Nuxt application.
+func moreSpecificPlainPackage(pkgDirs map[string]bool, nuxt map[string]bool, relFile, nuxtRoot string) bool {
+	owner, ok := nearestDeclaredPackageDir(pkgDirs, relFile)
+	if !ok {
+		return false
+	}
+	if owner == nuxtRoot {
+		return false
+	}
+	if nuxtRoot != "" {
+		if owner == "" || !(owner == nuxtRoot || strings.HasPrefix(owner, nuxtRoot+"/")) {
+			// Owner is an ancestor (or unrelated). Nested config may live
+			// inside a plain parent manifest.
+			return false
+		}
+	}
+	return !nuxt[owner]
+}
+
+// nuxtPackageForFile returns the most specific Nuxt application that owns relFile.
+// A detected nuxt.config (or Nuxt dependency) establishes that app even when the
+// nearest package.json is a plain parent. A more-specific package.json below the
+// candidate Nuxt root still blocks implicit inheritance unless that package is
+// itself a Nuxt application. Nested folders without their own package.json still
+// belong to the containing Nuxt package. A root Nuxt declaration does not leak
+// into an unrelated nested package that does not declare Nuxt.
+func nuxtPackageForFile(pkgs []string, relFile string, pkgDirs map[string]bool) (string, bool) {
 	file := filepath.ToSlash(relFile)
+	nuxt := nuxtPkgSet(pkgs)
 	for _, p := range pkgs {
 		if p == "" {
 			continue
 		}
 		if file == p || strings.HasPrefix(file, p+"/") {
+			if moreSpecificPlainPackage(pkgDirs, nuxt, file, p) {
+				return "", false
+			}
 			return p, true
 		}
 	}
 	for _, p := range pkgs {
 		if p == "" {
+			if moreSpecificPlainPackage(pkgDirs, nuxt, file, "") {
+				return "", false
+			}
 			return "", true
 		}
 	}
 	return "", false
+}
+
+func nuxtScopeKey(pkg string, inNuxt bool) string {
+	if !inNuxt {
+		return "-"
+	}
+	if pkg == "" {
+		return "."
+	}
+	return pkg
+}
+
+// FileNuxtScope is the durable Nuxt application key for relFile under disc.
+func FileNuxtScope(disc *Discovery, relFile string) string {
+	if disc == nil {
+		return ""
+	}
+	pkg, in := nuxtPackageForFile(disc.nuxtPkgs, relFile, packageDirSet(disc.gates))
+	return nuxtScopeKey(pkg, in)
 }
 
 func hasPkgDependency(ctx context.Context, dir, pkg string, inputScopes ...*inputscope.Scope) bool {
