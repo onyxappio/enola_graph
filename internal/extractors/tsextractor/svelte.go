@@ -2,6 +2,7 @@ package tsextractor
 
 import (
 	"bytes"
+	"context"
 	"github.com/enola-labs/enola/internal/extractors/tsutil"
 
 	"path/filepath"
@@ -70,26 +71,26 @@ func extractSvelteScriptBlocks(src []byte) []*svelteScriptBlock {
 	return blocks
 }
 
-func detectSvelte(repoPath string, inputScopes ...*inputscope.Scope) bool {
+func detectSvelte(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
-	tsRoot, _ := findTSRoot(repoPath, inputScope)
-	return hasPkgDependency(tsRoot, "svelte", inputScope) || (tsRoot != repoPath && hasPkgDependency(repoPath, "svelte", inputScope))
+	tsRoot, _ := findTSRoot(ctx, repoPath, inputScope)
+	return hasPkgDependency(ctx, tsRoot, "svelte", inputScope) || (tsRoot != repoPath && hasPkgDependency(ctx, repoPath, "svelte", inputScope))
 }
 
-func detectSvelteKit(repoPath string, inputScopes ...*inputscope.Scope) bool {
+func detectSvelteKit(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
-	tsRoot, _ := findTSRoot(repoPath, inputScope)
-	return detectSvelteKitAt(tsRoot, inputScope) || (tsRoot != repoPath && detectSvelteKitAt(repoPath, inputScope))
+	tsRoot, _ := findTSRoot(ctx, repoPath, inputScope)
+	return detectSvelteKitAt(ctx, tsRoot, inputScope) || (tsRoot != repoPath && detectSvelteKitAt(ctx, repoPath, inputScope))
 }
 
-func detectSvelteKitAt(dir string, inputScopes ...*inputscope.Scope) bool {
+func detectSvelteKitAt(ctx context.Context, dir string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
 	for _, name := range []string{"svelte.config.js", "svelte.config.ts", "svelte.config.mjs"} {
 		if _, err := inputScope.Stat(filepath.Join(dir, name)); err == nil {
 			return true
 		}
 	}
-	return hasPkgDependency(dir, "@sveltejs/kit", inputScope)
+	return hasPkgDependency(ctx, dir, "@sveltejs/kit", inputScope)
 }
 
 var svelteAliasEntryRe = regexp.MustCompile(`(?m)(?:["']([^"']+)["']|([A-Za-z_$][A-Za-z0-9_$@./-]*))\s*:\s*["']([^"']+)["']`)
@@ -179,7 +180,7 @@ func jsObjectPropertyBody(data []byte, prop string) []byte {
 // withSvelteKitAliasFallbacks overlays only aliases absent from the effective
 // tsconfig. That preserves the precedence contract: generated/inherited paths win,
 // static config literals fill gaps, and $lib is the final convention fallback.
-func withSvelteKitAliasFallbacks(repoPath string, roots []tsAliasRoot, inputScopes ...*inputscope.Scope) []tsAliasRoot {
+func withSvelteKitAliasFallbacks(ctx context.Context, repoPath string, roots []tsAliasRoot, inputScopes ...*inputscope.Scope) []tsAliasRoot {
 	inputScope := inputscope.First(inputScopes)
 	if len(roots) == 0 {
 		roots = []tsAliasRoot{{dir: "", aliases: map[string]tsAlias{}}}

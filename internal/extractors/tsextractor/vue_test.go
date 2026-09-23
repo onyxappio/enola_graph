@@ -145,7 +145,7 @@ func TestDetectVue(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "tsconfig.json"), []byte(`{}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if !detectVue(dir) {
+	if !detectVue(context.Background(), dir) {
 		t.Error("expected detectVue = true")
 	}
 }
@@ -158,7 +158,7 @@ func TestDetectNuxt_Config(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "tsconfig.json"), []byte(`{}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if !detectNuxt(dir) {
+	if !detectNuxt(context.Background(), dir) {
 		t.Error("expected detectNuxt = true")
 	}
 }
@@ -172,7 +172,7 @@ func TestDetectNuxt_PkgDep(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "tsconfig.json"), []byte(`{}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if !detectNuxt(dir) {
+	if !detectNuxt(context.Background(), dir) {
 		t.Error("expected detectNuxt = true")
 	}
 }
@@ -937,13 +937,13 @@ func TestExtract_NuxtAutoImportIgnoresUnrelatedPackageBasename(t *testing.T) {
 
 func TestExtract_NuxtAutoImportDoesNotBindSiblingVuePackage(t *testing.T) {
 	ff := extractAll(t, map[string]string{
-		"packages/a/package.json":                `{"name":"a","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
-		"packages/a/nuxt.config.ts":              `export default defineNuxtConfig({})`,
-		"packages/a/composables/setMetadata.ts":  `export function setMetadata() {}`,
-		"packages/a/app.vue":                     `<script setup lang="ts">setMetadata()</script><template><p /></template>`,
-		"packages/b/package.json":                `{"name":"b","dependencies":{"vue":"^3.0.0"}}`,
-		"packages/b/composables/setMetadata.ts":  `export function setMetadata() {}`,
-		"packages/b/app.vue":                     `<script setup lang="ts">setMetadata()</script><template><p /></template>`,
+		"packages/a/package.json":               `{"name":"a","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"packages/a/nuxt.config.ts":             `export default defineNuxtConfig({})`,
+		"packages/a/composables/setMetadata.ts": `export function setMetadata() {}`,
+		"packages/a/app.vue":                    `<script setup lang="ts">setMetadata()</script><template><p /></template>`,
+		"packages/b/package.json":               `{"name":"b","dependencies":{"vue":"^3.0.0"}}`,
+		"packages/b/composables/setMetadata.ts": `export function setMetadata() {}`,
+		"packages/b/app.vue":                    `<script setup lang="ts">setMetadata()</script><template><p /></template>`,
 	}, false)
 	a := fileRefTargets(ff, "packages/a/app.vue")
 	if !hasTarget(a, "packages/a/composables.setMetadata") {
@@ -1004,7 +1004,7 @@ func TestExtract_NuxtExplicitMissingImportNotOverriddenByAutoImport(t *testing.T
 
 func TestExtract_NuxtRegisteredModuleAutoImportsWhenModulePackageIsNuxt(t *testing.T) {
 	ff := extractAll(t, map[string]string{
-		"apps/landings/package.json":   `{"name":"landings","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0","landings-module":"workspace:*"}}`,
+		"apps/landings/package.json": `{"name":"landings","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0","landings-module":"workspace:*"}}`,
 		"apps/landings/nuxt.config.ts": `
 import landingModule from 'landings-module'
 export default defineNuxtConfig({ modules: [landingModule] })
@@ -1040,15 +1040,15 @@ export default function setup() {
 
 func TestExtract_NuxtRegisteredModuleAutoImportsDoNotLeakToUnrelatedApp(t *testing.T) {
 	ff := extractAll(t, map[string]string{
-		"apps/landings/package.json":   `{"name":"landings","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0","landings-module":"workspace:*"}}`,
+		"apps/landings/package.json": `{"name":"landings","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0","landings-module":"workspace:*"}}`,
 		"apps/landings/nuxt.config.ts": `
 import landingModule from 'landings-module'
 export default defineNuxtConfig({ modules: [landingModule] })
 `,
-		"apps/landings/pages/ThankYou.vue": `<script setup lang="ts">setLandPageMetadata({ page: 'thanks' })</script><template><p /></template>`,
-		"apps/other/package.json":          `{"name":"other","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
-		"apps/other/nuxt.config.ts":        `export default defineNuxtConfig({})`,
-		"apps/other/pages/index.vue":       `<script setup lang="ts">setLandPageMetadata({ page: 'x' })</script><template><p /></template>`,
+		"apps/landings/pages/ThankYou.vue":      `<script setup lang="ts">setLandPageMetadata({ page: 'thanks' })</script><template><p /></template>`,
+		"apps/other/package.json":               `{"name":"other","dependencies":{"nuxt":"^3.0.0","vue":"^3.0.0"}}`,
+		"apps/other/nuxt.config.ts":             `export default defineNuxtConfig({})`,
+		"apps/other/pages/index.vue":            `<script setup lang="ts">setLandPageMetadata({ page: 'x' })</script><template><p /></template>`,
 		"packages/landings-module/package.json": `{"name":"landings-module","dependencies":{"nuxt":"^3.0.0"}}`,
 		"packages/landings-module/src/module.ts": `
 export default function setup() {

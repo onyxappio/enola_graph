@@ -179,7 +179,7 @@ func TestHasTSMarkers_PlainJSFramework(t *testing.T) {
 		[]byte(`{"dependencies":{"vue":"^2.0.0"}}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if !hasTSMarkers(dir) {
+	if !hasTSMarkers(context.Background(), dir) {
 		t.Error("expected a plain-JS Vue project (no tsconfig, no typescript dep) to be detected")
 	}
 }
@@ -197,7 +197,7 @@ func TestHasTSMarkers_PlainJSNoFramework(t *testing.T) {
 		[]byte(`{"dependencies":{"express":"^4.0.0"}}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if !hasTSMarkers(dir) {
+	if !hasTSMarkers(context.Background(), dir) {
 		t.Error("expected a plain-JS Express project to be detected — its routes are the point")
 	}
 }
@@ -766,7 +766,7 @@ export const useUser = () => null`,
 }
 
 // extractAllSvelteKit is extractAll's SvelteKit counterpart: it drops a
-// svelte.config.js into the temp project so detectSvelteKit(dir) is true, then
+// svelte.config.js into the temp project so detectSvelteKit(context.Background(), dir) is true, then
 // extracts the given plain .ts files (route/hook files, not .svelte SFCs) through
 // the normal extractFile path.
 func extractAllSvelteKit(t *testing.T, files map[string]string) []facts.Fact {

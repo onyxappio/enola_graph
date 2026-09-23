@@ -36,6 +36,13 @@ type ExtractStats struct {
 	// real work, and this says how much of that drop was work moved rather than
 	// work skipped.
 	DerivedIndexes int `json:"derived_indexes"`
+	// DiscoveryPasses counts the repository-wide discovery snapshots this
+	// extraction had to build for itself. One means the caller threaded no
+	// snapshot, or threaded one taken under a different capture; zero means the
+	// run's single snapshot served this extraction. It is a count of newly
+	// introduced work, not of work avoided, so a run whose total rises has
+	// started re-reading the tree even if its wall time has not moved yet.
+	DiscoveryPasses int `json:"discovery_passes"`
 }
 
 // FileRecord is the immutable per-file contribution persisted between generations.
@@ -115,6 +122,12 @@ type SessionHooks struct {
 	// Sources, when set, are the exact bytes extraction must consume for those
 	// relative paths (source and config). Missing keys are read from disk.
 	Sources map[string][]byte
+	// Discovery is the run's repository-wide discovery snapshot. It is used
+	// only when it was taken over this repository, this policy scope and a
+	// capture agreeing byte for byte with Sources on every configuration file
+	// it read; otherwise this extraction builds its own and says so in
+	// Stats.DiscoveryPasses. Leaving it nil is the unshared behaviour.
+	Discovery *Discovery
 }
 
 // ExtractSession runs the TypeScript extractor with optional cached file
@@ -125,52 +138,35 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	if prev == nil {
 		prev = map[string]*FileRecord{}
 	}
-	ctx = withFileOverlay(ctx, newFileOverlay(repoPath, hooks.Sources))
+	ov := newFileOverlay(repoPath, hooks.Sources)
+	ctx = withFileOverlay(ctx, ov)
 	allDirty := dirty == nil
 	tr := graphprofile.StartNamed("ts")
 
-	// Each of these is an independent repository walk, and a delta that parses
-	// four files can still pay for all of them. One ts_detect_frameworks mark
-	// could not say which; timing them separately is what makes the discovery
-	// cost attributable before anything tries to share it. graphprofile.Since
-	// is a no-op unless ENOLA_GRAPH_PROFILE is set, so this is two clock reads
-	// per walk when profiling is off.
-	tDisc := time.Now()
-	isNextJS := detectNextJS(repoPath, inputScope)
-	graphprofile.Since("ts_disc_nextjs", tDisc, "")
-	tDisc = time.Now()
-	nuxtPkgs := collectNuxtPackages(ctx, repoPath, inputScope)
-	graphprofile.Since("ts_disc_nuxt_packages", tDisc, fmt.Sprintf("pkgs=%d", len(nuxtPkgs)))
-	isNuxt := len(nuxtPkgs) > 0
-	tDisc = time.Now()
-	isSvelteKit := detectSvelteKit(repoPath, inputScope)
-	graphprofile.Since("ts_disc_sveltekit", tDisc, "")
-	tDisc = time.Now()
-	isEmber := detectEmber(repoPath, inputScope)
-	graphprofile.Since("ts_disc_ember", tDisc, "")
-	tDisc = time.Now()
-	isReactNav := detectReactNavigation(repoPath, inputScope)
-	graphprofile.Since("ts_disc_react_navigation", tDisc, "")
-	tDisc = time.Now()
-	isAngular := detectAngular(repoPath, inputScope)
-	graphprofile.Since("ts_disc_angular", tDisc, "")
-	tDisc = time.Now()
-	pkgGates := collectPackageGates(ctx, repoPath, inputScope)
-	graphprofile.Since("ts_disc_package_gates", tDisc, "")
-	tDisc = time.Now()
-	pkgNamesEarly := collectPackageNames(repoPath, inputScope)
-	graphprofile.Since("ts_disc_package_names", tDisc, fmt.Sprintf("names=%d", len(pkgNamesEarly)))
+	// Discovery is a set of independent repository walks, and a delta that
+	// parses four files can still pay for all of them. A run that hands the
+	// same snapshot to every extraction pays for them once; a caller that hands
+	// none, or one taken under a different capture, gets a snapshot built right
+	// here from exactly the same readers, so nothing below depends on which of
+	// the two happened.
+	disc := hooks.Discovery
+	discoveryPasses := 0
+	if !disc.reusableFor(repoPath, inputScope, ov) {
+		disc = e.newDiscovery(ctx, repoPath, ov, len(hooks.Sources))
+		discoveryPasses = 1
+	}
+	isNextJS := disc.nextJS
+	nuxtPkgs := disc.nuxtPkgs
+	isNuxt := disc.nuxt
+	isSvelteKit := disc.svelteKit
+	isEmber := disc.ember
+	isReactNav := disc.reactNav
+	isAngular := disc.angular
+	pkgGates := disc.gates
+	pkgNamesEarly := disc.pkgNames
 	isPrisma := pkgGates.anyPrisma
-	tDisc = time.Now()
-	aliasRoots := collectTSAliasRoots(ctx, repoPath, inputScope)
-	graphprofile.Since("ts_disc_alias_roots", tDisc, fmt.Sprintf("roots=%d", len(aliasRoots)))
-	if isSvelteKit {
-		aliasRoots = withSvelteKitAliasFallbacks(repoPath, aliasRoots, inputScope)
-	}
-	if isNuxt {
-		aliasRoots = withNuxtAliasFallbacks(repoPath, aliasRoots, nuxtPkgs, inputScope)
-	}
-	tr.Mark("ts_detect_frameworks", fmt.Sprintf("files=%d", len(files)))
+	aliasRoots := disc.aliasRootsFor()
+	tr.Mark("ts_detect_frameworks", fmt.Sprintf("files=%d shared_discovery=%v", len(files), discoveryPasses == 0))
 
 	var tsFiles, htmlFiles []string
 	knownFiles := make(map[string]bool)
@@ -185,7 +181,11 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		}
 	}
 	tAliases := time.Now()
-	pkgAliases := collectPackageAliases(ctx, repoPath, knownFiles, inputScope)
+	// The walk behind this is shared; the resolution is not. A context
+	// fingerprint and an extraction genuinely present different known-file
+	// sets, and answering the second from the first would be an approximation
+	// of the reader rather than the reader.
+	pkgAliases := disc.packageAliasesFor(knownFiles)
 	graphprofile.Since("ts_disc_package_aliases", tAliases, fmt.Sprintf("aliases=%d", len(pkgAliases)))
 
 	need := func(rel string) bool {
@@ -460,7 +460,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 				extra = append(extra, d)
 			}
 		}
-		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, extra, sources, invertPackageNames(collectPackageNames(repoPath, inputScope)))
+		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, extra, sources, invertPackageNames(collectPackageNames(ctx, repoPath, inputScope)))
 	}
 	applyDirectIOContract(allFacts)
 
@@ -566,6 +566,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	if !hooks.SkipConfigPaths {
 		configPaths = tsConfigInputs(repoPath, inputScope)
 	}
+	stats.DiscoveryPasses += discoveryPasses
 	return &SessionResult{
 		Facts:       allFacts,
 		Records:     records,
@@ -749,7 +750,7 @@ func ConfigInputPathsFromNames(repoPath string, names []string, inputScopes ...*
 // RepoUsesAngular reports whether Angular project markers are present.
 func RepoUsesAngular(repoPath string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
-	return detectAngular(repoPath, inputScope)
+	return detectAngular(context.Background(), repoPath, inputScope)
 }
 
 // SessionFiles is the incremental TypeScript unit of reanalysis: source files
@@ -808,7 +809,7 @@ func tsConfigInputs(repoPath string, inputScopes ...*inputscope.Scope) []string 
 	}
 	// Framework detectors also inspect the selected TS root. Retain missing
 	// candidates so config additions enter the resident reconciliation path.
-	if tsRoot, found := findTSRoot(repoPath, inputScope); found {
+	if tsRoot, found := findTSRoot(context.Background(), repoPath, inputScope); found {
 		rel, err := filepath.Rel(repoPath, tsRoot)
 		rel = factpath.Slash(rel)
 		if err == nil {

@@ -16,21 +16,41 @@ import (
 // SessionContext projects the actual built-in package readers, not a JSON field
 // whitelist. Raw inputs remain separately captured and fenced by graphsession.
 // Unprojected configuration families deliberately retain byte-sensitive fallback.
-func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, files []string) (map[string]string, map[string]string) {
+// The returned snapshot is the one this projection was actually computed from,
+// which is not always the one that was handed in: a caller that keeps the
+// argument instead would let its planner previews run against a snapshot these
+// keys were never derived from, and would not count the build that happened
+// here.
+func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, files []string, disc *Discovery) (map[string]string, map[string]string, *Discovery) {
 	digest := func(v any) string {
 		b, _ := json.Marshal(v)
 		sum := sha256.Sum256(b)
 		return hex.EncodeToString(sum[:])
 	}
 	scope := e.inputScope
-	tsRoot, found := findTSRoot(root, scope)
-	typeORM, drizzle, prisma := detectORMs(root, scope)
+	// raw is the configuration this run has already captured and fenced, and it
+	// is what the projected keys below are computed from, so it is also what the
+	// readers behind them must see. Handing reusableFor a nil overlay claimed
+	// the opposite - that this fingerprint observes the live tree - and both
+	// rejected a snapshot taken under the capture and then rebuilt one that
+	// disagreed with the very bytes being projected.
+	//
+	// Without a snapshot this fingerprint walked the whole tree four times for
+	// Nuxt alone - detectNuxt is collectNuxtPackages, and the alias fallback
+	// below asks for both - on top of the gate, name, alias-root and export
+	// walks. The snapshot answers each of those once.
+	ov := newFileOverlay(root, raw)
+	if !disc.reusableFor(root, scope, ov) {
+		disc = e.newDiscovery(context.Background(), root, ov, len(raw))
+	}
+	tsRoot, found := disc.tsRoot, disc.tsRootFound
+	typeORM, drizzle, prisma := disc.typeORM, disc.drizzle, disc.prisma
 	out := map[string]string{
 		"version":                 "ts-effective-context-v3",
 		"selected root":           digest([]any{tsRoot, found}),
-		"framework and ORM gates": digest([]bool{detectNextJS(root, scope), detectVue(root, scope), detectNuxt(root, scope), detectSvelteKit(root, scope), detectEmber(root, scope), detectReactNavigation(root, scope), detectAngular(root, scope), typeORM, drizzle, prisma}),
-		"owning package gates":    digest(collectPackageGates(context.Background(), root, scope).activeGates()),
-		"nuxt packages":           digest(collectNuxtPackages(context.Background(), root, scope)),
+		"framework and ORM gates": digest([]bool{disc.nextJS, disc.vue, disc.nuxt, disc.svelteKit, disc.ember, disc.reactNav, disc.angular, typeORM, drizzle, prisma}),
+		"owning package gates":    digest(disc.gates.activeGates()),
+		"nuxt packages":           digest(disc.nuxtPkgs),
 
 		"configured clients": e.ConfigKey(),
 	}
@@ -86,26 +106,20 @@ func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, 
 		Replacement, Suffix string
 		Exact               bool
 	}
-	packages := collectPackageNames(root, scope)
+	packages := disc.pkgNames
 	known := map[string]bool{}
 	for _, file := range files {
 		known[filepath.ToSlash(file)] = true
 	}
-	pkgAliases := collectPackageAliases(context.Background(), root, known, scope)
+	pkgAliases := disc.packageAliasesFor(known)
 	exportedAliases := map[string]aliasValue{}
 	for key, value := range pkgAliases {
 		exportedAliases[key] = aliasValue{value.replacement, value.suffix, value.exact}
 	}
 	out["package export aliases"] = digest(exportedAliases)
-	aliases := collectTSAliasRoots(context.Background(), root, scope)
-	if detectSvelteKit(root, scope) {
-		aliases = withSvelteKitAliasFallbacks(root, aliases, scope)
-	}
-	if detectNuxt(root, scope) {
-		aliases = withNuxtAliasFallbacks(root, aliases, collectNuxtPackages(context.Background(), root, scope), scope)
-	}
+	aliases := disc.aliasRootsFor()
 	perFile := map[string]string{}
-	angular := detectAngular(root, scope)
+	angular := disc.angular
 	for _, file := range files {
 		if !IsSessionSource(file, angular) {
 			continue
@@ -117,7 +131,7 @@ func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, 
 		}
 		perFile[file] = digest([]any{nearestPackageName(packages, dir), normalized})
 	}
-	return out, perFile
+	return out, perFile, disc
 }
 
 // ContextDifference gives deterministic invalidation reasons for durable keys.

@@ -1,6 +1,6 @@
 # Shared discovery candidate: measured checkpoint
 
-The frozen stage2 candidate builds one TypeScript discovery snapshot per run and shares it between context projection and planner previews. On a graph-scoped fixture, initial and config reconciliation build one snapshot instead of three. A local content-only run still builds one; cross-run retention is a later change. Production changes are **not integrated in main** by this report.
+The frozen stage2 candidate builds one TypeScript discovery snapshot per run and shares it between context projection and planner previews. On a graph-scoped fixture, initial and config reconciliation build one snapshot instead of three. A local content-only run still builds one; cross-run retention is a later change. At the time of these measurements, production changes were **not integrated in main**. The later merge with accuracy v304 and its validation are recorded in [the integration report](V304_SHARED_DISCOVERY_INTEGRATION.md); the timings below belong to the original candidate binary.
 
 ## Correctness
 

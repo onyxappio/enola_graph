@@ -803,7 +803,7 @@ func TestReactNavDetect_MonorepoExampleApp(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "example", "package.json"), []byte(`{"dependencies":{"@react-navigation/native":"^6.0.0"}}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if !detectReactNavigation(dir) {
+	if !detectReactNavigation(context.Background(), dir) {
 		t.Error("a monorepo example app one level down must trigger detection")
 	}
 }

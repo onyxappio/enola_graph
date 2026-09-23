@@ -153,8 +153,8 @@ export function run() {
 
 func TestExtract_NamedReexportSubdirLeafName(t *testing.T) {
 	ff := extractAll(t, map[string]string{
-		"packages/shared/package.json": `{"name":"shared-lands-components","exports":{".":{"types":"./src/index.ts","import":"./src/index.ts"}}}`,
-		"packages/shared/src/index.ts": `export { useStep } from './Stepper/useStep'`,
+		"packages/shared/package.json":           `{"name":"shared-lands-components","exports":{".":{"types":"./src/index.ts","import":"./src/index.ts"}}}`,
+		"packages/shared/src/index.ts":           `export { useStep } from './Stepper/useStep'`,
 		"packages/shared/src/Stepper/useStep.ts": `export function useStep() { return 1 }`,
 		"packages/app/src/store.ts": `
 import { useStep } from 'shared-lands-components'
@@ -219,8 +219,8 @@ export class MachineDefinitionError extends Error {
 
 func TestExtract_NitroFileAndAddServerHandlerRoutes(t *testing.T) {
 	ff := extractAll(t, map[string]string{
-		"nuxt.config.ts": `export default {}`,
-		"pages/index.vue": `<template><div /></template>`,
+		"nuxt.config.ts":        `export default {}`,
+		"pages/index.vue":       `<template><div /></template>`,
 		"server/api/geo.get.ts": `export default defineEventHandler(() => ({}))`,
 		"src/registerServerProxy.ts": `
 import { addServerHandler, createResolver } from '@nuxt/kit'
@@ -232,9 +232,9 @@ export function registerServerProxy() {
   addServerHandler({ route: '/sw-web-push.js', handler: resolver.resolve('./runtime/server/webPushHandler') })
 }
 `,
-		"src/runtime/server/handler.ts": `export default function handler() {}`,
-		"src/runtime/server/mockHandler.ts": `export default function mockHandler() {}`,
-		"src/runtime/server/geo.get.ts": `export default function geo() {}`,
+		"src/runtime/server/handler.ts":        `export default function handler() {}`,
+		"src/runtime/server/mockHandler.ts":    `export default function mockHandler() {}`,
+		"src/runtime/server/geo.get.ts":        `export default function geo() {}`,
 		"src/runtime/server/webPushHandler.ts": `export default function webPushHandler() {}`,
 		"src/fake.ts": `
 function addServerHandler(opts: { route: string }) {}

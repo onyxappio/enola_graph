@@ -135,7 +135,7 @@ func TestDetectSvelte(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "tsconfig.json"), []byte(`{}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if !detectSvelte(dir) {
+	if !detectSvelte(context.Background(), dir) {
 		t.Error("expected detectSvelte = true")
 	}
 }
@@ -148,7 +148,7 @@ func TestDetectSvelteKit_Config(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "tsconfig.json"), []byte(`{}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if !detectSvelteKit(dir) {
+	if !detectSvelteKit(context.Background(), dir) {
 		t.Error("expected detectSvelteKit = true")
 	}
 }
@@ -162,7 +162,7 @@ func TestDetectSvelteKit_PkgDep(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "tsconfig.json"), []byte(`{}`), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if !detectSvelteKit(dir) {
+	if !detectSvelteKit(context.Background(), dir) {
 		t.Error("expected detectSvelteKit = true")
 	}
 }
@@ -205,7 +205,7 @@ func TestSvelteKitAliasFallbacks_TsconfigWins(t *testing.T) {
 	roots := []tsAliasRoot{{dir: "", aliases: map[string]tsAlias{
 		"src/": {replacement: "generated/src/"},
 	}}}
-	got := withSvelteKitAliasFallbacks(dir, roots)[0].aliases
+	got := withSvelteKitAliasFallbacks(context.Background(), dir, roots)[0].aliases
 	if got["src/"].replacement != "generated/src/" {
 		t.Fatalf("config overrode tsconfig: %+v", got["src/"])
 	}
