@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"hash"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"sort"
@@ -161,11 +162,32 @@ func gitInfo(repoPath, outputDir string) *facts.GitInfo {
 // runGit runs a git subcommand in repoPath and returns its trimmed stdout.
 func runGit(repoPath string, args ...string) (string, error) {
 	cmd := exec.Command("git", append([]string{"-C", repoPath}, args...)...)
+	cmd.Env = gitCommandEnv()
 	out, err := cmd.Output()
 	if err != nil {
 		return "", err
 	}
 	return strings.TrimSpace(string(out)), nil
+}
+
+// gitCommandEnv drops the process-wide git identity a hook or wrapping git
+// command exports (GIT_DIR, GIT_WORK_TREE, the index file, the common dir).
+// Those variables override `git -C repoPath` and make a fixture or temp
+// checkout look like the enclosing clone — every fact then inherits that
+// clone's remote name, and multi-repo HTTP edges collapse into one service.
+func gitCommandEnv() []string {
+	env := os.Environ()
+	out := make([]string, 0, len(env))
+	for _, v := range env {
+		key, _, _ := strings.Cut(v, "=")
+		switch key {
+		case "GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
+			"GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_COMMON_DIR", "GIT_NAMESPACE", "GIT_PREFIX":
+			continue
+		}
+		out = append(out, v)
+	}
+	return out
 }
 
 // coverageSummary rolls up the per-service edge_coverage counts the cross-repo
