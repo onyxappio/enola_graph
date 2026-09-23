@@ -243,7 +243,21 @@ func nuxtKitCreateResolverLocals(src []byte) map[string]bool {
 			}
 		}
 	}
+	code := nuxtCodeSlice(src)
+	for local := range locals {
+		if nuxtIdentHasAssignment(code, local) {
+			delete(locals, local)
+		}
+	}
 	return locals
+}
+
+func nuxtIdentHasAssignment(src []byte, ident string) bool {
+	if ident == "" {
+		return false
+	}
+	assign := regexp.MustCompile(`(?:^|[^A-Za-z0-9_$])` + regexp.QuoteMeta(ident) + `\s*=`)
+	return len(assign.FindAllIndex(src, -1)) > 0
 }
 
 func nuxtIdentAssignedOnceFrom(src []byte, ident string, from map[string]bool) bool {
@@ -272,7 +286,7 @@ func nuxtKitResolverIdents(src []byte) map[string]bool {
 	}
 	code := nuxtCodeSlice(src)
 	out := map[string]bool{}
-	decl := regexp.MustCompile(`(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*([A-Za-z_$][\w$]*)\s*\(`)
+	decl := regexp.MustCompile(`(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*([A-Za-z_$][\w$]*)\s*\(\s*import\s*\.\s*meta\s*\.\s*url\s*\)`)
 	for _, m := range decl.FindAllSubmatch(code, -1) {
 		ident := string(m[1])
 		callee := string(m[2])

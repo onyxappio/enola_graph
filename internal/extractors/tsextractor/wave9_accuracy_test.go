@@ -17,8 +17,12 @@ func fileRefFact(ff []facts.Fact, file string) facts.Fact {
 }
 
 func hasCallToFile(f facts.Fact, target, file string) bool {
+	return hasRelationToFile(f, facts.RelCalls, target, file)
+}
+
+func hasRelationToFile(f facts.Fact, kind, target, file string) bool {
 	for _, r := range f.Relations {
-		if r.Kind == facts.RelCalls && r.Target == target && r.TargetFile == file {
+		if r.Kind == kind && r.Target == target && r.TargetFile == file {
 			return true
 		}
 	}

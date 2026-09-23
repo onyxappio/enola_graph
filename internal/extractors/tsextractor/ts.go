@@ -4148,6 +4148,8 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 					// lexical binding: never fall back to sibling-file symbols
 				} else if ok {
 					add(t, file)
+				} else if ctx.localNames[name] {
+					add(ctx.dir+"."+name, ctx.relFile)
 				} else if !externalLocals[name] {
 					add(resolveLocalOrImport(name, ctx.dir, internal), callFile(name))
 				}
@@ -4160,6 +4162,8 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 							// lexical binding: never fall back to sibling-file symbols
 						} else if ok {
 							add(t, file)
+						} else if ctx.localNames[name] {
+							add(ctx.dir+"."+name, ctx.relFile)
 						} else if !externalLocals[name] {
 							add(resolveLocalOrImport(name, ctx.dir, internal), callFile(name))
 						}
@@ -4906,6 +4910,9 @@ func (w *tsBodyWalker) lookupImport(name string) (string, string, bool) {
 	}
 	if t, ok := w.importMap[name]; ok {
 		return t, w.importFiles[name], true
+	}
+	if w.localNames[name] {
+		return w.dir + "." + name, w.relFile, true
 	}
 	if w.ctx != nil && w.ctx.externalNames[name] {
 		return "", "", true

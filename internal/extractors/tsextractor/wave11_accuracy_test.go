@@ -742,4 +742,167 @@ export default function setup() {
 	if bound("import { createResolver } from '@nuxt/kit'\nexport default function setup() {\n  const resolver = createResolver(import.meta.url)\n  const runtimeDir = resolver.resolve('./runtime')\n  const s = \"nuxt.options.alias['#landings-runtime'] = runtimeDir\"\n}\n") {
 		t.Fatal("string-literal alias assignment must not bind")
 	}
+	if !bound(`import { createResolver as accuracyCreateResolver } from '@nuxt/kit'
+export default function setup() {
+  const resolver = accuracyCreateResolver(import.meta.url)
+  const runtimeDir = resolver.resolve('./runtime')
+  nuxt.options.alias['#landings-runtime'] = runtimeDir
+}
+`) {
+		t.Fatal("renamed kit createResolver must bind")
+	}
+	if bound(`import { createResolver } from '@nuxt/kit'
+export default function setup() {
+  const createResolver = (_url: string) => ({ resolve: (_path: string) => '/not-the-runtime' })
+  const resolver = createResolver(import.meta.url)
+  const runtimeDir = resolver.resolve('./runtime')
+  nuxt.options.alias['#landings-runtime'] = runtimeDir
+}
+`) {
+		t.Fatal("lexically shadowed createResolver must not bind")
+	}
+	if bound(`import { createResolver } from '@nuxt/kit'
+export default function setup() {
+  const resolver = createResolver('file:///not-this-repository/module.ts')
+  const runtimeDir = resolver.resolve('./runtime')
+  nuxt.options.alias['#landings-runtime'] = runtimeDir
+}
+`) {
+		t.Fatal("createResolver with non-import.meta.url base must not bind")
+	}
+}
+
+func TestExtract_Wave11CommonJSRequireBindingSameFile(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"p/a_cjs.js": `
+const { withDangerousMod, withXcodeProject: xcode } = require('@expo/config-plugins')
+const plain = require('ext-plain')
+const http = require('node:http')
+const { createRequire } = require('module')
+const localObj = { k: 1 }
+function use(m) { return m }
+function plugin(c) { return withDangerousMod(c, []) }
+function wrap(c) { return xcode(c, () => c) }
+function patch() { use(http); use(plain); use(localObj) }
+function load() { return createRequire(import.meta.url) }
+plain()
+`,
+		"p/t407CoverageCapture.ts": `
+const { SourceMapConsumer } = require('source-map') as { SourceMapConsumer: new (raw: object) => unknown }
+const { keep } = require('kept') satisfies { keep: new () => unknown }
+function mapOne() { return new SourceMapConsumer({}) }
+function keepOne() { return new keep() }
+`,
+		"p/b_sibling_private.js": `
+const withDangerousMod = (c) => c
+const extOnly = () => 0
+function own(c) { return withDangerousMod(c) }
+`,
+		"p/c_esm_consumer.mjs": `
+import { withDangerousMod, extOnly } from '@expo/config-plugins'
+export function f(c) { return withDangerousMod(c, []) + extOnly() }
+`,
+		"tools/compare-screenshots.mjs": `
+import pixelmatch from 'pixelmatch'
+pixelmatch(1, 2)
+`,
+		"tools/_t191-cursor1b-etalon-metrics.mjs": `const pixelmatch = () => 1
+`,
+	}, false)
+
+	plugin, ok := findFact(ff, "p.plugin")
+	if !ok {
+		t.Fatal("missing p.plugin")
+	}
+	if !hasCallToFile(plugin, "p.withDangerousMod", "p/a_cjs.js") {
+		t.Fatalf("same-file withDangerousMod lost: %+v", plugin.Relations)
+	}
+	wrap, ok := findFact(ff, "p.wrap")
+	if !ok {
+		t.Fatal("missing p.wrap")
+	}
+	if !hasCallToFile(wrap, "p.xcode", "p/a_cjs.js") {
+		t.Fatalf("aliased destructure xcode lost: %+v", wrap.Relations)
+	}
+	patch, ok := findFact(ff, "p.patch")
+	if !ok {
+		t.Fatal("missing p.patch")
+	}
+	refs := fileRefFact(ff, "p/a_cjs.js")
+	if !hasCallToFile(refs, "p.http", "p/a_cjs.js") && !hasCallToFile(patch, "p.http", "p/a_cjs.js") {
+		t.Fatalf("http argument ref lost: file_ref=%+v patch=%+v", refs.Relations, patch.Relations)
+	}
+	if !hasCallToFile(refs, "p.plain", "p/a_cjs.js") && !hasCallToFile(patch, "p.plain", "p/a_cjs.js") {
+		t.Fatalf("plain require call lost: file_ref=%+v patch=%+v", refs.Relations, patch.Relations)
+	}
+	load, ok := findFact(ff, "p.load")
+	if !ok {
+		t.Fatal("missing p.load")
+	}
+	if !hasCallToFile(load, "p.createRequire", "p/a_cjs.js") {
+		t.Fatalf("createRequire call lost: %+v", load.Relations)
+	}
+	mapOne, ok := findFact(ff, "p.mapOne")
+	if !ok {
+		t.Fatal("missing p.mapOne")
+	}
+	if !hasRelationToFile(mapOne, facts.RelInstantiates, "p.SourceMapConsumer", "p/t407CoverageCapture.ts") {
+		t.Fatalf("SourceMapConsumer instantiate lost: %+v", mapOne.Relations)
+	}
+	keepOne, ok := findFact(ff, "p.keepOne")
+	if !ok {
+		t.Fatal("missing p.keepOne")
+	}
+	if !hasRelationToFile(keepOne, facts.RelInstantiates, "p.keep", "p/t407CoverageCapture.ts") {
+		t.Fatalf("satisfies instantiate lost: %+v", keepOne.Relations)
+	}
+	own, ok := findFact(ff, "p.own")
+	if !ok {
+		t.Fatal("missing sibling own")
+	}
+	if !hasCallToFile(own, "p.withDangerousMod", "p/b_sibling_private.js") {
+		t.Fatalf("sibling own call retargeted: %+v", own.Relations)
+	}
+	esm := fileRefFact(ff, "p/c_esm_consumer.mjs")
+	for _, r := range esm.Relations {
+		if r.Kind == facts.RelCalls && r.TargetFile == "p/b_sibling_private.js" {
+			t.Fatalf("ESM external bound sibling: %+v", r)
+		}
+	}
+	f, ok := findFact(ff, "p.f")
+	if ok {
+		for _, r := range f.Relations {
+			if r.Kind == facts.RelCalls && r.TargetFile == "p/b_sibling_private.js" {
+				t.Fatalf("ESM function bound sibling: %+v", r)
+			}
+		}
+	}
+	cmp := fileRefFact(ff, "tools/compare-screenshots.mjs")
+	for _, r := range cmp.Relations {
+		if r.Kind == facts.RelCalls && r.TargetFile == "tools/_t191-cursor1b-etalon-metrics.mjs" {
+			t.Fatalf("pixelmatch sibling still bound: %+v", r)
+		}
+	}
+
+	shadow := extractAll(t, map[string]string{
+		"p/shadow.js": `
+const { withDangerousMod } = require('@expo/config-plugins')
+function run(withDangerousMod) { return withDangerousMod({}) }
+function plugin(c) { return withDangerousMod(c, []) }
+`,
+	}, false)
+	run, ok := findFact(shadow, "p.run")
+	if !ok {
+		t.Fatal("missing shadow run")
+	}
+	if hasCallToFile(run, "p.withDangerousMod", "p/shadow.js") {
+		t.Fatalf("lexical shadow still bound module require: %+v", run.Relations)
+	}
+	plugin2, ok := findFact(shadow, "p.plugin")
+	if !ok {
+		t.Fatal("missing shadow plugin")
+	}
+	if !hasCallToFile(plugin2, "p.withDangerousMod", "p/shadow.js") {
+		t.Fatalf("unshadowed same-file require lost: %+v", plugin2.Relations)
+	}
 }

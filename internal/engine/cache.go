@@ -2594,7 +2594,10 @@ import (
 // fetch aliases emit client routes; Nuxt auto-import follows unique re-export
 // origins in registered directories; external import calls do not bind private
 // same-directory siblings.
-const cacheVersion = "v315"
+// v316: same-file CommonJS require bindings keep calls/file-refs/instantiates to
+// the owner file's variable nodes; Nuxt kit createResolver aliases require an
+// unshadowed factory applied to import.meta.url.
+const cacheVersion = "v316"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //
