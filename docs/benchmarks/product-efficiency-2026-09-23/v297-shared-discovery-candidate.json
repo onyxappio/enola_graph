@@ -1,0 +1,1420 @@
+{
+  "status": "candidate measured, production change not integrated",
+  "verification": {
+    "base": "365d150",
+    "production_manifest_sha256": "d61d4c189983044ade8e4aae7b77873ad13c2c1078b9e6c6b0c2ba8b59c77aac",
+    "final_test_manifest_sha256": "a8be920c240d8f8ad734e3608b7826f323e840bd8ccc4e91c2c2858955ebbb5a",
+    "binary_sha256": "bc11268fd206986f2a34ff68cbead2bcd0af1983869b9778cc1543da5875688a",
+    "independent_log_sha256": "8aa93eb7c62bf68cae476e6734e135d3871339500290849282d825b8f2fa6582",
+    "independent_result": "PASS39.212s",
+    "limitation": "Final worker test-only state-oracle refinement postdates initial root overlay; production bytes unchanged. Product timing pending."
+  },
+  "watch": {
+    "rows": [
+      {
+        "label": "baseline",
+        "repeat": 1,
+        "initial_s": 11.461611000000001,
+        "watch_s": 6.630434,
+        "initial_hash": "04023e64814207f2b255c4ac797f4247de920267ae4b87a042041e3339d73806",
+        "final_hash": "04dd5d8335dcb53ea161e6c7b6befc72656363f348410f0c88b98c298d6ac41b",
+        "idle": 0,
+        "duplicates": 0,
+        "report": "/tmp/enola-discovery-watch-baseline-r1/watch.json",
+        "report_sha256": "14bb400a3ac28b8ef3bf9af3be1abd8a3bcb605140425085b62b9f686dc7c426"
+      },
+      {
+        "label": "baseline",
+        "repeat": 2,
+        "initial_s": 11.036451999999999,
+        "watch_s": 6.5823220000000005,
+        "initial_hash": "04023e64814207f2b255c4ac797f4247de920267ae4b87a042041e3339d73806",
+        "final_hash": "04dd5d8335dcb53ea161e6c7b6befc72656363f348410f0c88b98c298d6ac41b",
+        "idle": 0,
+        "duplicates": 0,
+        "report": "/tmp/enola-discovery-watch-baseline-r2/watch.json",
+        "report_sha256": "08e4e9d28fb5a2d467ec205bb0004486a6f8aa49b700375d0dfefbad6a85d3b1"
+      },
+      {
+        "label": "candidate",
+        "repeat": 1,
+        "initial_s": 14.556762,
+        "watch_s": 6.629872000000001,
+        "initial_hash": "04023e64814207f2b255c4ac797f4247de920267ae4b87a042041e3339d73806",
+        "final_hash": "04dd5d8335dcb53ea161e6c7b6befc72656363f348410f0c88b98c298d6ac41b",
+        "idle": 0,
+        "duplicates": 0,
+        "report": "/tmp/enola-discovery-watch-candidate-r1/watch.json",
+        "report_sha256": "98cc9818c79a68a8211abfbc93003d85ed84b3c1b900e554752267f1cb8f2356"
+      },
+      {
+        "label": "candidate",
+        "repeat": 2,
+        "initial_s": 10.800569,
+        "watch_s": 6.605892,
+        "initial_hash": "04023e64814207f2b255c4ac797f4247de920267ae4b87a042041e3339d73806",
+        "final_hash": "04dd5d8335dcb53ea161e6c7b6befc72656363f348410f0c88b98c298d6ac41b",
+        "idle": 0,
+        "duplicates": 0,
+        "report": "/tmp/enola-discovery-watch-candidate-r2/watch.json",
+        "report_sha256": "ca7cf87abca7d00affbe93c702b1383d2969aa993df0c4eaf0712469b555be0a"
+      }
+    ],
+    "limitation": "Two repeats each, shared host; no memory/long-run acceptance. Candidate initial varies 10.801-14.557s; insufficient evidence to label a run an outlier or claim stable speedup."
+  },
+  "fresh_cli_noop": {
+    "kind": "three alternating instrumented fresh CLI no-op runs per build; file sink; not resident or broker acceptance",
+    "binary_sha256": {
+      "baseline": "f19c13adb6de6be16636316b4638fbc30d03fd6e5f4cac66a95f06e465aaf12a",
+      "candidate": "bc11268fd206986f2a34ff68cbead2bcd0af1983869b9778cc1543da5875688a"
+    },
+    "source_revision": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+    "rows": [
+      {
+        "label": "baseline",
+        "iteration": 0,
+        "wall_s": 3.6137032090000005,
+        "summary": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        },
+        "stages_s": {
+          "flags_parsed": [
+            0.0
+          ],
+          "resolve_graph_target": [
+            0.579
+          ],
+          "connect_sink": [
+            0.001
+          ],
+          "session_options": [
+            0.0
+          ],
+          "lock": [
+            0.0
+          ],
+          "bind_identity": [
+            0.0
+          ],
+          "open_journal": [
+            0.0
+          ],
+          "replay_unacked": [
+            0.0
+          ],
+          "state_read_bytes": [
+            0.014
+          ],
+          "state_json_unmarshal": [
+            0.488
+          ],
+          "load_state": [
+            0.501
+          ],
+          "transaction_enter": [
+            0.0
+          ],
+          "effective_config_before": [
+            0.0
+          ],
+          "rebuild_graph_inputs": [
+            0.604
+          ],
+          "effective_config": [
+            0.0
+          ],
+          "reconcile_complete": [
+            0.0
+          ],
+          "engine_walk_repo": [
+            0.122
+          ],
+          "inventory": [
+            0.122
+          ],
+          "detect_go": [
+            0.0
+          ],
+          "detect_manifests": [
+            0.0
+          ],
+          "detect_mdintent": [
+            0.0
+          ],
+          "detect_dotnet": [
+            0.005
+          ],
+          "detect_cpp": [
+            0.005
+          ],
+          "detect_hcl": [
+            0.001
+          ],
+          "detect_ansible": [
+            0.001
+          ],
+          "detect_java": [
+            0.003
+          ],
+          "detect_kotlin": [
+            0.004
+          ],
+          "detect_php": [
+            0.0
+          ],
+          "detect_python": [
+            0.0
+          ],
+          "detect_typescript": [
+            0.002
+          ],
+          "detect_swift": [
+            0.001
+          ],
+          "detect_ruby": [
+            0.008
+          ],
+          "detect_rust": [
+            0.001
+          ],
+          "detect_scala": [
+            0.005
+          ],
+          "detect_dart": [
+            0.001
+          ],
+          "detect_grpc": [
+            0.066
+          ],
+          "detect_openapi": [
+            0.067
+          ],
+          "detect_asyncapi": [
+            0.229
+          ],
+          "detect_extractors": [
+            0.229
+          ],
+          "select_hash_targets": [
+            0.016
+          ],
+          "engine_hash_files": [
+            0.739
+          ],
+          "hash_content_inputs": [
+            0.739
+          ],
+          "capture_contexts": [
+            0.069
+          ],
+          "ts_config_inputs": [
+            0.063,
+            0.061
+          ],
+          "analysis_fingerprint": [
+            0.069
+          ],
+          "angular_probe": [
+            0.004
+          ],
+          "policy_identity": [
+            0.0
+          ],
+          "engine_context_fingerprint": [
+            0.0
+          ],
+          "ts_session_context": [
+            0.495
+          ],
+          "runtime_inputs_complete": [
+            0.0
+          ],
+          "clone_file_state_copy": [
+            0.0
+          ],
+          "extractor_need": [
+            1.78
+          ],
+          "changed_terms": [
+            0.007
+          ],
+          "ts_reuse_cache": [
+            0.048
+          ],
+          "assemble_new_files": [
+            0.009
+          ],
+          "skip_publish_return": [
+            0.063
+          ],
+          "graph_session_run": [
+            3.017
+          ],
+          "cli_complete": [
+            0.0
+          ]
+        },
+        "state_sha256": "5df25af2491a078199aae9c073330f17b225716dd72e14b75ea769aaccd4f512"
+      },
+      {
+        "label": "candidate",
+        "iteration": 0,
+        "wall_s": 2.798314917000001,
+        "summary": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0,
+            "discovery_passes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        },
+        "stages_s": {
+          "flags_parsed": [
+            0.0
+          ],
+          "resolve_graph_target": [
+            0.564
+          ],
+          "connect_sink": [
+            0.0
+          ],
+          "session_options": [
+            0.0
+          ],
+          "lock": [
+            0.0
+          ],
+          "bind_identity": [
+            0.0
+          ],
+          "open_journal": [
+            0.0
+          ],
+          "replay_unacked": [
+            0.0
+          ],
+          "state_read_bytes": [
+            0.009
+          ],
+          "state_json_unmarshal": [
+            0.486
+          ],
+          "load_state": [
+            0.495
+          ],
+          "transaction_enter": [
+            0.0
+          ],
+          "effective_config_before": [
+            0.0
+          ],
+          "rebuild_graph_inputs": [
+            0.627
+          ],
+          "effective_config": [
+            0.0
+          ],
+          "reconcile_complete": [
+            0.0
+          ],
+          "engine_walk_repo": [
+            0.132
+          ],
+          "inventory": [
+            0.132
+          ],
+          "detect_go": [
+            0.0
+          ],
+          "detect_manifests": [
+            0.0
+          ],
+          "detect_mdintent": [
+            0.0
+          ],
+          "detect_dotnet": [
+            0.005
+          ],
+          "detect_cpp": [
+            0.005
+          ],
+          "detect_hcl": [
+            0.001
+          ],
+          "detect_ansible": [
+            0.001
+          ],
+          "detect_java": [
+            0.003
+          ],
+          "detect_kotlin": [
+            0.004
+          ],
+          "detect_php": [
+            0.0
+          ],
+          "detect_python": [
+            0.0
+          ],
+          "detect_typescript": [
+            0.002
+          ],
+          "detect_swift": [
+            0.001
+          ],
+          "detect_ruby": [
+            0.002
+          ],
+          "detect_rust": [
+            0.001
+          ],
+          "detect_scala": [
+            0.005
+          ],
+          "detect_dart": [
+            0.001
+          ],
+          "detect_grpc": [
+            0.069
+          ],
+          "detect_openapi": [
+            0.071
+          ],
+          "detect_asyncapi": [
+            0.123
+          ],
+          "detect_extractors": [
+            0.123
+          ],
+          "select_hash_targets": [
+            0.019
+          ],
+          "engine_hash_files": [
+            0.188
+          ],
+          "hash_content_inputs": [
+            0.188
+          ],
+          "capture_contexts": [
+            0.073
+          ],
+          "ts_config_inputs": [
+            0.061,
+            0.061
+          ],
+          "analysis_fingerprint": [
+            0.068
+          ],
+          "angular_probe": [
+            0.003
+          ],
+          "policy_identity": [
+            0.0
+          ],
+          "engine_context_fingerprint": [
+            0.0
+          ],
+          "ts_disc_nuxt_packages": [
+            0.092
+          ],
+          "ts_disc_package_gates": [
+            0.058
+          ],
+          "ts_disc_package_names": [
+            0.054
+          ],
+          "ts_disc_alias_roots": [
+            0.003
+          ],
+          "ts_disc_package_exports": [
+            0.056
+          ],
+          "ts_discovery_build": [
+            0.274
+          ],
+          "ts_discovery": [
+            0.274
+          ],
+          "ts_session_context": [
+            0.039
+          ],
+          "runtime_inputs_complete": [
+            0.0
+          ],
+          "clone_file_state_copy": [
+            0.0
+          ],
+          "extractor_need": [
+            0.961
+          ],
+          "changed_terms": [
+            0.007
+          ],
+          "ts_reuse_cache": [
+            0.049
+          ],
+          "assemble_new_files": [
+            0.012
+          ],
+          "skip_publish_return": [
+            0.062
+          ],
+          "graph_session_run": [
+            2.217
+          ],
+          "cli_complete": [
+            0.0
+          ]
+        },
+        "state_sha256": "80f4a9ccafedb65b52cfd28620a2508c1faa56350e3809441465dffe7aff13ef"
+      },
+      {
+        "label": "candidate",
+        "iteration": 1,
+        "wall_s": 2.7789747499999997,
+        "summary": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0,
+            "discovery_passes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        },
+        "stages_s": {
+          "flags_parsed": [
+            0.0
+          ],
+          "resolve_graph_target": [
+            0.578
+          ],
+          "connect_sink": [
+            0.0
+          ],
+          "session_options": [
+            0.0
+          ],
+          "lock": [
+            0.0
+          ],
+          "bind_identity": [
+            0.0
+          ],
+          "open_journal": [
+            0.0
+          ],
+          "replay_unacked": [
+            0.0
+          ],
+          "state_read_bytes": [
+            0.013
+          ],
+          "state_json_unmarshal": [
+            0.486
+          ],
+          "load_state": [
+            0.499
+          ],
+          "transaction_enter": [
+            0.0
+          ],
+          "effective_config_before": [
+            0.0
+          ],
+          "rebuild_graph_inputs": [
+            0.613
+          ],
+          "effective_config": [
+            0.0
+          ],
+          "reconcile_complete": [
+            0.0
+          ],
+          "engine_walk_repo": [
+            0.127
+          ],
+          "inventory": [
+            0.128
+          ],
+          "detect_go": [
+            0.0
+          ],
+          "detect_manifests": [
+            0.0
+          ],
+          "detect_mdintent": [
+            0.0
+          ],
+          "detect_dotnet": [
+            0.005
+          ],
+          "detect_cpp": [
+            0.005
+          ],
+          "detect_hcl": [
+            0.001
+          ],
+          "detect_ansible": [
+            0.001
+          ],
+          "detect_java": [
+            0.003
+          ],
+          "detect_kotlin": [
+            0.004
+          ],
+          "detect_php": [
+            0.0
+          ],
+          "detect_python": [
+            0.0
+          ],
+          "detect_typescript": [
+            0.002
+          ],
+          "detect_swift": [
+            0.001
+          ],
+          "detect_ruby": [
+            0.003
+          ],
+          "detect_rust": [
+            0.001
+          ],
+          "detect_scala": [
+            0.005
+          ],
+          "detect_dart": [
+            0.001
+          ],
+          "detect_grpc": [
+            0.07
+          ],
+          "detect_openapi": [
+            0.071
+          ],
+          "detect_asyncapi": [
+            0.121
+          ],
+          "detect_extractors": [
+            0.121
+          ],
+          "select_hash_targets": [
+            0.016
+          ],
+          "engine_hash_files": [
+            0.177
+          ],
+          "hash_content_inputs": [
+            0.177
+          ],
+          "capture_contexts": [
+            0.07
+          ],
+          "ts_config_inputs": [
+            0.062,
+            0.059
+          ],
+          "analysis_fingerprint": [
+            0.068
+          ],
+          "angular_probe": [
+            0.004
+          ],
+          "policy_identity": [
+            0.0
+          ],
+          "engine_context_fingerprint": [
+            0.0
+          ],
+          "ts_disc_nuxt_packages": [
+            0.093
+          ],
+          "ts_disc_package_gates": [
+            0.061
+          ],
+          "ts_disc_package_names": [
+            0.058
+          ],
+          "ts_disc_alias_roots": [
+            0.003
+          ],
+          "ts_disc_package_exports": [
+            0.056
+          ],
+          "ts_discovery_build": [
+            0.283
+          ],
+          "ts_discovery": [
+            0.283
+          ],
+          "ts_session_context": [
+            0.037
+          ],
+          "runtime_inputs_complete": [
+            0.0
+          ],
+          "clone_file_state_copy": [
+            0.0
+          ],
+          "extractor_need": [
+            0.941
+          ],
+          "changed_terms": [
+            0.007
+          ],
+          "ts_reuse_cache": [
+            0.05
+          ],
+          "assemble_new_files": [
+            0.009
+          ],
+          "skip_publish_return": [
+            0.061
+          ],
+          "graph_session_run": [
+            2.184
+          ],
+          "cli_complete": [
+            0.0
+          ]
+        },
+        "state_sha256": "80f4a9ccafedb65b52cfd28620a2508c1faa56350e3809441465dffe7aff13ef"
+      },
+      {
+        "label": "baseline",
+        "iteration": 1,
+        "wall_s": 2.9129183330000004,
+        "summary": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        },
+        "stages_s": {
+          "flags_parsed": [
+            0.0
+          ],
+          "resolve_graph_target": [
+            0.555
+          ],
+          "connect_sink": [
+            0.0
+          ],
+          "session_options": [
+            0.0
+          ],
+          "lock": [
+            0.0
+          ],
+          "bind_identity": [
+            0.0
+          ],
+          "open_journal": [
+            0.0
+          ],
+          "replay_unacked": [
+            0.0
+          ],
+          "state_read_bytes": [
+            0.014
+          ],
+          "state_json_unmarshal": [
+            0.489
+          ],
+          "load_state": [
+            0.503
+          ],
+          "transaction_enter": [
+            0.0
+          ],
+          "effective_config_before": [
+            0.0
+          ],
+          "rebuild_graph_inputs": [
+            0.571
+          ],
+          "effective_config": [
+            0.0
+          ],
+          "reconcile_complete": [
+            0.0
+          ],
+          "engine_walk_repo": [
+            0.124
+          ],
+          "inventory": [
+            0.124
+          ],
+          "detect_go": [
+            0.0
+          ],
+          "detect_manifests": [
+            0.0
+          ],
+          "detect_mdintent": [
+            0.0
+          ],
+          "detect_dotnet": [
+            0.005
+          ],
+          "detect_cpp": [
+            0.006
+          ],
+          "detect_hcl": [
+            0.001
+          ],
+          "detect_ansible": [
+            0.001
+          ],
+          "detect_java": [
+            0.003
+          ],
+          "detect_kotlin": [
+            0.004
+          ],
+          "detect_php": [
+            0.0
+          ],
+          "detect_python": [
+            0.0
+          ],
+          "detect_typescript": [
+            0.002
+          ],
+          "detect_swift": [
+            0.001
+          ],
+          "detect_ruby": [
+            0.003
+          ],
+          "detect_rust": [
+            0.002
+          ],
+          "detect_scala": [
+            0.005
+          ],
+          "detect_dart": [
+            0.001
+          ],
+          "detect_grpc": [
+            0.071
+          ],
+          "detect_openapi": [
+            0.07
+          ],
+          "detect_asyncapi": [
+            0.125
+          ],
+          "detect_extractors": [
+            0.125
+          ],
+          "select_hash_targets": [
+            0.015
+          ],
+          "engine_hash_files": [
+            0.178
+          ],
+          "hash_content_inputs": [
+            0.178
+          ],
+          "capture_contexts": [
+            0.069
+          ],
+          "ts_config_inputs": [
+            0.066,
+            0.061
+          ],
+          "analysis_fingerprint": [
+            0.072
+          ],
+          "angular_probe": [
+            0.003
+          ],
+          "policy_identity": [
+            0.0
+          ],
+          "engine_context_fingerprint": [
+            0.0
+          ],
+          "ts_session_context": [
+            0.504
+          ],
+          "runtime_inputs_complete": [
+            0.0
+          ],
+          "clone_file_state_copy": [
+            0.0
+          ],
+          "extractor_need": [
+            1.133
+          ],
+          "changed_terms": [
+            0.007
+          ],
+          "ts_reuse_cache": [
+            0.049
+          ],
+          "assemble_new_files": [
+            0.009
+          ],
+          "skip_publish_return": [
+            0.063
+          ],
+          "graph_session_run": [
+            2.34
+          ],
+          "cli_complete": [
+            0.0
+          ]
+        },
+        "state_sha256": "5df25af2491a078199aae9c073330f17b225716dd72e14b75ea769aaccd4f512"
+      },
+      {
+        "label": "baseline",
+        "iteration": 2,
+        "wall_s": 2.8936082499999998,
+        "summary": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        },
+        "stages_s": {
+          "flags_parsed": [
+            0.0
+          ],
+          "resolve_graph_target": [
+            0.565
+          ],
+          "connect_sink": [
+            0.0
+          ],
+          "session_options": [
+            0.0
+          ],
+          "lock": [
+            0.0
+          ],
+          "bind_identity": [
+            0.0
+          ],
+          "open_journal": [
+            0.0
+          ],
+          "replay_unacked": [
+            0.0
+          ],
+          "state_read_bytes": [
+            0.013
+          ],
+          "state_json_unmarshal": [
+            0.487
+          ],
+          "load_state": [
+            0.5
+          ],
+          "transaction_enter": [
+            0.0
+          ],
+          "effective_config_before": [
+            0.0
+          ],
+          "rebuild_graph_inputs": [
+            0.577
+          ],
+          "effective_config": [
+            0.0
+          ],
+          "reconcile_complete": [
+            0.0
+          ],
+          "engine_walk_repo": [
+            0.122
+          ],
+          "inventory": [
+            0.122
+          ],
+          "detect_go": [
+            0.0
+          ],
+          "detect_manifests": [
+            0.0
+          ],
+          "detect_mdintent": [
+            0.0
+          ],
+          "detect_dotnet": [
+            0.005
+          ],
+          "detect_cpp": [
+            0.006
+          ],
+          "detect_hcl": [
+            0.001
+          ],
+          "detect_ansible": [
+            0.001
+          ],
+          "detect_java": [
+            0.003
+          ],
+          "detect_kotlin": [
+            0.004
+          ],
+          "detect_php": [
+            0.0
+          ],
+          "detect_python": [
+            0.0
+          ],
+          "detect_typescript": [
+            0.002
+          ],
+          "detect_swift": [
+            0.001
+          ],
+          "detect_ruby": [
+            0.002
+          ],
+          "detect_rust": [
+            0.001
+          ],
+          "detect_scala": [
+            0.005
+          ],
+          "detect_dart": [
+            0.001
+          ],
+          "detect_grpc": [
+            0.07
+          ],
+          "detect_openapi": [
+            0.072
+          ],
+          "detect_asyncapi": [
+            0.127
+          ],
+          "detect_extractors": [
+            0.127
+          ],
+          "select_hash_targets": [
+            0.017
+          ],
+          "engine_hash_files": [
+            0.172
+          ],
+          "hash_content_inputs": [
+            0.172
+          ],
+          "capture_contexts": [
+            0.071
+          ],
+          "ts_config_inputs": [
+            0.059,
+            0.059
+          ],
+          "analysis_fingerprint": [
+            0.065
+          ],
+          "angular_probe": [
+            0.003
+          ],
+          "policy_identity": [
+            0.0
+          ],
+          "engine_context_fingerprint": [
+            0.0
+          ],
+          "ts_session_context": [
+            0.488
+          ],
+          "runtime_inputs_complete": [
+            0.0
+          ],
+          "clone_file_state_copy": [
+            0.0
+          ],
+          "extractor_need": [
+            1.105
+          ],
+          "changed_terms": [
+            0.007
+          ],
+          "ts_reuse_cache": [
+            0.048
+          ],
+          "assemble_new_files": [
+            0.009
+          ],
+          "skip_publish_return": [
+            0.061
+          ],
+          "graph_session_run": [
+            2.311
+          ],
+          "cli_complete": [
+            0.0
+          ]
+        },
+        "state_sha256": "5df25af2491a078199aae9c073330f17b225716dd72e14b75ea769aaccd4f512"
+      },
+      {
+        "label": "candidate",
+        "iteration": 2,
+        "wall_s": 2.737270332999998,
+        "summary": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {}
+          },
+          "RunID": "",
+          "BaseGeneration": 2,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 0,
+            "files_parsed": 0,
+            "cached_files": 4064,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 0,
+            "discovery_passes": 0
+          },
+          "Fallbacks": null,
+          "Unreadable": null,
+          "OwnersPublished": 0,
+          "ParsedFiles": 0,
+          "EarlyLocal": 0,
+          "Facts": null
+        },
+        "stages_s": {
+          "flags_parsed": [
+            0.0
+          ],
+          "resolve_graph_target": [
+            0.582
+          ],
+          "connect_sink": [
+            0.0
+          ],
+          "session_options": [
+            0.0
+          ],
+          "lock": [
+            0.0
+          ],
+          "bind_identity": [
+            0.0
+          ],
+          "open_journal": [
+            0.0
+          ],
+          "replay_unacked": [
+            0.0
+          ],
+          "state_read_bytes": [
+            0.014
+          ],
+          "state_json_unmarshal": [
+            0.486
+          ],
+          "load_state": [
+            0.5
+          ],
+          "transaction_enter": [
+            0.0
+          ],
+          "effective_config_before": [
+            0.0
+          ],
+          "rebuild_graph_inputs": [
+            0.578
+          ],
+          "effective_config": [
+            0.0
+          ],
+          "reconcile_complete": [
+            0.0
+          ],
+          "engine_walk_repo": [
+            0.13
+          ],
+          "inventory": [
+            0.13
+          ],
+          "detect_go": [
+            0.0
+          ],
+          "detect_manifests": [
+            0.0
+          ],
+          "detect_mdintent": [
+            0.0
+          ],
+          "detect_dotnet": [
+            0.005
+          ],
+          "detect_cpp": [
+            0.005
+          ],
+          "detect_hcl": [
+            0.001
+          ],
+          "detect_ansible": [
+            0.001
+          ],
+          "detect_java": [
+            0.004
+          ],
+          "detect_kotlin": [
+            0.004
+          ],
+          "detect_php": [
+            0.0
+          ],
+          "detect_python": [
+            0.0
+          ],
+          "detect_typescript": [
+            0.002
+          ],
+          "detect_swift": [
+            0.001
+          ],
+          "detect_ruby": [
+            0.003
+          ],
+          "detect_rust": [
+            0.001
+          ],
+          "detect_scala": [
+            0.005
+          ],
+          "detect_dart": [
+            0.001
+          ],
+          "detect_grpc": [
+            0.069
+          ],
+          "detect_openapi": [
+            0.073
+          ],
+          "detect_asyncapi": [
+            0.126
+          ],
+          "detect_extractors": [
+            0.126
+          ],
+          "select_hash_targets": [
+            0.016
+          ],
+          "engine_hash_files": [
+            0.178
+          ],
+          "hash_content_inputs": [
+            0.178
+          ],
+          "capture_contexts": [
+            0.066
+          ],
+          "ts_config_inputs": [
+            0.058,
+            0.059
+          ],
+          "analysis_fingerprint": [
+            0.064
+          ],
+          "angular_probe": [
+            0.003
+          ],
+          "policy_identity": [
+            0.0
+          ],
+          "engine_context_fingerprint": [
+            0.0
+          ],
+          "ts_disc_nuxt_packages": [
+            0.087
+          ],
+          "ts_disc_package_gates": [
+            0.054
+          ],
+          "ts_disc_package_names": [
+            0.057
+          ],
+          "ts_disc_alias_roots": [
+            0.003
+          ],
+          "ts_disc_package_exports": [
+            0.054
+          ],
+          "ts_discovery_build": [
+            0.265
+          ],
+          "ts_discovery": [
+            0.265
+          ],
+          "ts_session_context": [
+            0.038
+          ],
+          "runtime_inputs_complete": [
+            0.0
+          ],
+          "clone_file_state_copy": [
+            0.0
+          ],
+          "extractor_need": [
+            0.926
+          ],
+          "changed_terms": [
+            0.007
+          ],
+          "ts_reuse_cache": [
+            0.048
+          ],
+          "assemble_new_files": [
+            0.009
+          ],
+          "skip_publish_return": [
+            0.061
+          ],
+          "graph_session_run": [
+            2.134
+          ],
+          "cli_complete": [
+            0.0
+          ]
+        },
+        "state_sha256": "80f4a9ccafedb65b52cfd28620a2508c1faa56350e3809441465dffe7aff13ef"
+      }
+    ]
+  },
+  "remaining": [
+    "Stable repeated initial improvement not proven",
+    "Resident cross-run retention not implemented in frozen candidate",
+    "CLI duplicate preparation unchanged",
+    "No memory or long-run recovery acceptance in these runs",
+    "Whole-goal Product history acceptance remains outstanding"
+  ]
+}
