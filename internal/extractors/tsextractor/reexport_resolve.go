@@ -479,7 +479,13 @@ func bindNamedImportFile(indexPath, exportName string, readSrc func(string) []by
 	start := filepath.ToSlash(indexPath)
 	chainNote := func(f string) {
 		f = filepath.ToSlash(f)
-		if f == "" || f == start || note == nil {
+		if f == "" || note == nil {
+			return
+		}
+		// Named follow already has start as a direct import. Default identity is
+		// a side-read of start's bytes even when the leaf is start itself
+		// (`export default round` vs `export default ceil`).
+		if f == start && exportName != "default" {
 			return
 		}
 		note(f)

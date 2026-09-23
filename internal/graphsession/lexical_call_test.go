@@ -877,6 +877,57 @@ export function missingValue() {
 	}
 }
 
+func TestPublishedWave10CachedUpgradeFromV309(t *testing.T) {
+	dir := setupTSRepo(t, map[string]string{
+		"src/a.ts":      "import { pick } from './barrel';\nexport function caller() { return pick(1); }\n",
+		"src/barrel.ts": "export { default as pick } from './origin';\n",
+		"src/origin.ts": "export function round(n: number) { return n + 1; }\nexport function ceil(n: number) { return n + 2; }\nround(1); ceil(1);\nexport default ceil;\n",
+	})
+	eng := testEngine(t, dir)
+	state := filepath.Join(dir, ".enola", "state")
+	opts := Options{StateDir: state}
+	first := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, first, opts); err != nil {
+		t.Fatal(err)
+	}
+	st, err := loadCommittedState(state)
+	if err != nil || st == nil {
+		t.Fatalf("load state: %v %#v", err, st)
+	}
+	st.ExtractorVersion = "v309"
+	if err := saveState(state, st); err != nil {
+		t.Fatal(err)
+	}
+	up := &graphstream.MemorySink{}
+	res, err := Run(context.Background(), eng, dir, up, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.ParsedFiles == 0 {
+		t.Fatal("v309 migration parsed no files")
+	}
+	c := applyGraph(t, first)
+	if err := c.ApplyRecords(up.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	coldSink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
+		t.Fatal(err)
+	}
+	assertAppliedEqualsCold(t, c, applyGraph(t, coldSink))
+	quiet := &graphstream.MemorySink{}
+	again, err := Run(context.Background(), eng, dir, quiet, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if again.ParsedFiles != 0 {
+		t.Fatalf("silent nochange parsed=%d", again.ParsedFiles)
+	}
+	if engine.ExtractorVersion() == "v309" {
+		t.Fatal("cached upgrade test requires cacheVersion newer than v309")
+	}
+}
+
 func TestPublishedWave10CachedUpgradeFromV308(t *testing.T) {
 	dir := setupTSRepo(t, map[string]string{
 		"app/components/stamp.gts": `import Component from '@glimmer/component';

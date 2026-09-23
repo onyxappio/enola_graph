@@ -2565,7 +2565,10 @@ import (
 // the same bind. ember-engines/routes buildRoutes returns its callback, so a
 // proven default/aliased/namespace import of that module keeps function kind;
 // local, member, type-only, and other-module shadows stay variables.
-const cacheVersion = "v309"
+// v310: `export { default as X } from` records a side-read of the origin whose
+// default identity was bound, so switching `export default round` to `ceil`
+// invalidates the barrel's file_ref call without a universal reparse.
+const cacheVersion = "v310"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

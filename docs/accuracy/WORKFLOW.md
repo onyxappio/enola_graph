@@ -58,3 +58,11 @@ state that they are explanations, not original repository comments. Keep source
 code otherwise faithful, mark omissions, use syntax-appropriate comments, and
 include annotations in the embedded Shiki highlighting. Keep each explanation
 short enough to read on a phone.
+
+## Highlighting update — 2026-09-23
+
+The user replaces Shiki with `@twinkleplop/typescript` and
+`@twinkleplop/theme-github`. This supersedes the Shiki instruction above.
+Embed generated markup and theme CSS; preserve offline viewing and exact annotated
+code. Use matching HTML/Markdown grammars. Unsupported Swift stays unhighlighted.
+Renderer and pinned dependencies: `docs/accuracy/tools/`.
