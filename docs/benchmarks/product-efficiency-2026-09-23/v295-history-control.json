@@ -1,0 +1,87 @@
+{
+  "binary": "/private/tmp/enola-scope-matched-v295-compare/enola-baseline-v295",
+  "binary_sha256": "ea733b898ad42b9763623bd1fb2324f307693044d5a8f711ca98f1c17c60715b",
+  "repo": "/private/tmp/enola-scope-matched-v295-compare/baseline/live",
+  "parent": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+  "child": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+  "sink": "file",
+  "label": "single shared-host diagnostic; not broker acceptance",
+  "phases": {
+    "initial": {
+      "cli_wall_s": 31.386,
+      "summary": {
+        "exit": 0,
+        "wall_s": 31.386,
+        "sink": "file",
+        "parsed": 4016,
+        "cached": 0,
+        "files_read": 4068,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4946,
+        "events": 2654,
+        "run_id": "product-scope-scope-bench-1-1790156597991806000",
+        "stderr_graph": "[graph] /private/tmp/enola-scope-matched-v295-compare/baseline/live: generation 0\u21921 parsed=4016 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "protocol": "pass",
+      "begin_owners": 8455,
+      "event_bytes": 80743444
+    },
+    "delta": {
+      "cli_wall_s": 17.574,
+      "summary": {
+        "exit": 0,
+        "wall_s": 17.574,
+        "sink": "file",
+        "parsed": 1601,
+        "cached": 2486,
+        "files_read": 1601,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 2295,
+        "events": 1379,
+        "run_id": "product-scope-scope-bench-2-1790156633893639000",
+        "stderr_graph": "[graph] /private/tmp/enola-scope-matched-v295-compare/baseline/live: generation 1\u21922 parsed=1601 cached=2486 early_local=0 fallbacks=2\n[graph] fallback graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "protocol": "pass",
+      "begin_owners": 2295,
+      "event_bytes": 43125563
+    },
+    "cold": {
+      "cli_wall_s": 31.424,
+      "summary": {
+        "exit": 0,
+        "wall_s": 31.424,
+        "sink": "file",
+        "parsed": 4018,
+        "cached": 0,
+        "files_read": 4070,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4949,
+        "events": 2656,
+        "run_id": "product-scope-scope-bench-1-1790156653137451000",
+        "stderr_graph": "[graph] /private/tmp/enola-scope-matched-v295-compare/baseline/live: generation 0\u21921 parsed=4018 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "protocol": "pass",
+      "begin_owners": 8458,
+      "event_bytes": 80789020
+    }
+  },
+  "applied_hash": "1142e5831b18d354066fec2b174dc95bf488f562d58f9303131a1f907c9dc695",
+  "cold_hash": "1142e5831b18d354066fec2b174dc95bf488f562d58f9303131a1f907c9dc695",
+  "exact_cold": true,
+  "host_activity_caveat": "Concurrent worker du scan and coordinator cleanup of completed cold source clones; diagnostic correctness and harness verification only, not isolated performance acceptance.",
+  "delta_to_initial_ratio": 0.5599311795067865,
+  "enola_commit": "340fb9e3e91d8707fa0757f142f9b8546094f86d",
+  "extractor_semantics": "v295",
+  "policy_sha256": "4fd513e2cddf987e9f0f9afbc51a6d39e388fae2111b24489cb418cadc786db6",
+  "raw_directory": "/tmp/enola-v295-control-checkpoint",
+  "exit": 0
+}
