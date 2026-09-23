@@ -414,7 +414,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	if isNuxt {
 		resolveNuxtAutoComposableCalls(allFacts, nuxtPkgs, nuxtExtraDirs, nuxtSources, nuxtPkgDirByName, pkgDirSet, knownFiles, func(rel string) []byte {
 			return nuxtSources[rel]
-		}, pkgAliases, exportCache)
+		}, pkgAliases, exportCache, nil, nil)
 	}
 	applyDirectIOContract(allFacts)
 

@@ -379,6 +379,9 @@ setLandPageMetadata({ page: 'x' })
 	}
 }
 
+// TestExtract_Wave11NuxtRegisterUnregisterRestore is a cold-extract control.
+// Incremental registration is covered by TestExtractSession_Wave11NuxtIncrementalRegisterConsumer
+// and graphsession TestPublishedWave11NuxtRegisterLifecycleV1AndV2.
 func TestExtract_Wave11NuxtRegisterUnregisterRestore(t *testing.T) {
 	registered := `export default function setup() {
   addImportsDir(resolver.resolve('./runtime/composables/'))
@@ -431,8 +434,8 @@ func TestNuxtOracleVisibleWithPartialSources(t *testing.T) {
 		"apps/landings/pages/CommunityProof.vue": bytesOf["apps/landings/pages/CommunityProof.vue"],
 	}
 	read := func(rel string) []byte { return bytesOf[rel] }
-	fullExtra := extraDirsByNuxtPackageRead(bytesOf, known, read, nuxtPkgs, pkgDirs)
-	partExtra := extraDirsByNuxtPackageRead(partial, known, read, nuxtPkgs, pkgDirs)
+	fullExtra := extraDirsByNuxtPackageRead(bytesOf, known, read, nuxtPkgs, pkgDirs, nil, nil)
+	partExtra := extraDirsByNuxtPackageRead(partial, known, read, nuxtPkgs, pkgDirs, nil, nil)
 	if len(fullExtra["packages/landings-module"]) == 0 || len(partExtra["packages/landings-module"]) == 0 {
 		t.Fatalf("extra dirs missing full=%v partial=%v", fullExtra, partExtra)
 	}

@@ -485,7 +485,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 				return nil
 			}
 			return raw
-		}, pkgAliases, exportCache)
+		}, pkgAliases, exportCache, records, dirty)
 	}
 	applyDirectIOContract(allFacts)
 
@@ -1044,26 +1044,28 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 		extraSeen[d] = true
 		extraDirs = append(extraDirs, d)
 	}
-	for rel, rec := range prev {
-		if rec == nil {
-			continue
+	if len(nuxtPkgs) > 0 {
+		for rel, rec := range prev {
+			if rec == nil {
+				continue
+			}
+			if dirty != nil && dirty[rel] {
+				continue
+			}
+			for _, d := range rec.AutoImportDirs {
+				addExtra(d)
+			}
 		}
-		if dirty != nil && dirty[rel] {
-			continue
-		}
-		for _, d := range rec.AutoImportDirs {
-			addExtra(d)
-		}
-	}
-	for rel, src := range sources {
-		if src == nil {
-			continue
-		}
-		if dirty != nil && !dirty[rel] && prev[rel] != nil {
-			continue
-		}
-		for _, d := range addImportsDirsFromFile(rel, src) {
-			addExtra(d)
+		for rel, src := range sources {
+			if src == nil {
+				continue
+			}
+			if dirty != nil && !dirty[rel] && prev[rel] != nil {
+				continue
+			}
+			for _, d := range addImportsDirsFromFile(rel, src) {
+				addExtra(d)
+			}
 		}
 	}
 	var auto []string
@@ -1125,8 +1127,12 @@ func CompositionSignature(repoPath string, files []string, prev map[string]*File
 		}
 	}
 	sort.Strings(auto)
-	visExtra := extraDirsByNuxtPackageRead(sources, known, readAuto, nuxtPkgs, pkgDirSet)
-	visCons := nuxtModuleConsumersRead(sources, known, readAuto, nuxtPkgs, invertPackageNames(collectPackageNames(ctx, repoPath, inputScope)), pkgDirSet)
+	var visExtra map[string][]string
+	var visCons map[string][]string
+	if len(nuxtPkgs) > 0 {
+		visExtra = extraDirsByNuxtPackageRead(sources, known, readAuto, nuxtPkgs, pkgDirSet, prev, dirty)
+		visCons = nuxtModuleConsumersRead(sources, known, readAuto, nuxtPkgs, invertPackageNames(collectPackageNames(ctx, repoPath, inputScope)), pkgDirSet)
+	}
 	var vis []string
 	for pkg, dirs := range visExtra {
 		cp := append([]string{}, dirs...)
