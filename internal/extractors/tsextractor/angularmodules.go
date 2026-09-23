@@ -16,6 +16,7 @@
 package tsextractor
 
 import (
+	"context"
 	"encoding/json"
 	"io/fs"
 
@@ -132,11 +133,11 @@ func angularMemberNames(kinds *tsutil.KindTable, member *sitter.Node, src []byte
 // from the files that state it: an Nx `project.json`, or the `projects` map of an
 // `angular.json`. Both are read because both are current — Nx generates the first,
 // the Angular CLI the second, and a workspace routinely has one of each.
-func angularProjectNames(repoPath string, inputScopes ...*inputscope.Scope) map[string]string {
+func angularProjectNames(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) map[string]string {
 	inputScope := inputscope.First(inputScopes)
 	out := map[string]string{}
 
-	_ = inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+	_ = overlayWalkDir(ctx, repoPath, inputScope, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return nil
 		}
@@ -152,13 +153,13 @@ func angularProjectNames(repoPath string, inputScopes ...*inputscope.Scope) map[
 			var p struct {
 				Name string `json:"name"`
 			}
-			if data, err := inputScope.ReadFile(path); err == nil && json.Unmarshal(data, &p) == nil && p.Name != "" {
+			if data, err := overlayReadFile(ctx, path, inputScope); err == nil && json.Unmarshal(data, &p) == nil && p.Name != "" {
 				if rel, err := filepath.Rel(repoPath, filepath.Dir(path)); err == nil { //factpath:host
 					out[factpath.Slash(rel)] = p.Name
 				}
 			}
 		case "angular.json":
-			for dir, name := range angularWorkspaceProjects(path, repoPath, inputScope) {
+			for dir, name := range angularWorkspaceProjects(ctx, path, repoPath, inputScope) {
 				out[dir] = name
 			}
 		}
@@ -170,9 +171,9 @@ func angularProjectNames(repoPath string, inputScopes ...*inputscope.Scope) map[
 // angularWorkspaceProjects reads an angular.json's projects map into directory →
 // project name. A project states its own root; one whose root is the workspace root
 // is skipped, since naming every directory after it says nothing.
-func angularWorkspaceProjects(path, repoPath string, inputScopes ...*inputscope.Scope) map[string]string {
+func angularWorkspaceProjects(ctx context.Context, path, repoPath string, inputScopes ...*inputscope.Scope) map[string]string {
 	inputScope := inputscope.First(inputScopes)
-	data, err := inputScope.ReadFile(path)
+	data, err := overlayReadFile(ctx, path, inputScope)
 	if err != nil {
 		return nil
 	}

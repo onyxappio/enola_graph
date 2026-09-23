@@ -86,7 +86,7 @@ func detectSvelteKit(ctx context.Context, repoPath string, inputScopes ...*input
 func detectSvelteKitAt(ctx context.Context, dir string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
 	for _, name := range []string{"svelte.config.js", "svelte.config.ts", "svelte.config.mjs"} {
-		if _, err := inputScope.Stat(filepath.Join(dir, name)); err == nil {
+		if _, err := overlayStat(ctx, filepath.Join(dir, name), inputScope); err == nil {
 			return true
 		}
 	}
@@ -106,9 +106,9 @@ func isSvelteKitVirtualImport(path string) bool {
 // config. Dynamic expressions, spreads, computed keys and imported constants are
 // deliberately skipped: deterministic partial coverage is safer than evaluating user
 // code during a snapshot or guessing what an expression returns.
-func staticSvelteKitAliases(path string, inputScopes ...*inputscope.Scope) map[string]string {
+func staticSvelteKitAliases(ctx context.Context, path string, inputScopes ...*inputscope.Scope) map[string]string {
 	inputScope := inputscope.First(inputScopes)
-	data, err := inputScope.ReadFile(path)
+	data, err := overlayReadFile(ctx, path, inputScope)
 	if err != nil {
 		return nil
 	}
@@ -191,7 +191,7 @@ func withSvelteKitAliasFallbacks(ctx context.Context, repoPath string, roots []t
 		}
 		configDir := filepath.Join(repoPath, filepath.FromSlash(roots[i].dir)) //factpath:host
 		for _, name := range []string{"svelte.config.js", "svelte.config.ts", "svelte.config.mjs"} {
-			for key, target := range staticSvelteKitAliases(filepath.Join(configDir, name), inputScope) {
+			for key, target := range staticSvelteKitAliases(ctx, filepath.Join(configDir, name), inputScope) {
 				addSvelteAlias(roots[i].aliases, roots[i].dir, key, target)
 			}
 		}

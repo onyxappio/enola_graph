@@ -98,6 +98,47 @@ type InvalidationStats struct {
 // policy scope and every configuration byte it read still match what this
 // extraction will observe, so a run whose capture disagrees simply reads the
 // tree as it did before.
+// keepProvenDiscovery records the snapshot an extraction actually proved, for a
+// run that had none of its own to offer. Without this a run whose offer was
+// refused - or that was never made one - would commit with nothing retained,
+// and every content edit after it would rebuild discovery again until some
+// reconciling run happened to restore it.
+func (s *session) keepProvenDiscovery(disc *tsextractor.Discovery) {
+	if s.inputs == nil || disc == nil || s.inputs.tsDiscovery != nil {
+		return
+	}
+	s.inputs.tsDiscovery = disc
+}
+
+// adoptRetainedDiscovery offers the resident's retained snapshot to a run that
+// is not re-reading the tree, and takes it only if it proves out against the
+// capture this run will extract under.
+func (s *session) adoptRetainedDiscovery(input *runtimeInputs) {
+	if input == nil || s.retained == nil {
+		return
+	}
+	scope := s.eng.GraphScope()
+	if scope == nil {
+		return
+	}
+	if s.retainedFor != (retainedDiscoveryIdentity{policy: input.policyIdentity, admission: input.admissionIdentity}) {
+		return
+	}
+	for _, ext := range s.eng.Extractors() {
+		ts, ok := ext.(*tsextractor.TSExtractor)
+		if !ok {
+			continue
+		}
+		reused, cost := ts.ReuseDiscovery(s.abs, input.config, s.retained)
+		s.work.TSDiscoveryRechecks = s.work.TSDiscoveryRechecks.Add(cost)
+		if reused != nil {
+			input.tsDiscovery = reused
+			s.work.TSDiscoveriesReused++
+		}
+		return
+	}
+}
+
 func (s *session) tsRunDiscovery() *tsextractor.Discovery {
 	if s.inputs == nil {
 		return nil
@@ -290,6 +331,11 @@ func identityOK(st *State, opts Options, abs string) error {
 }
 
 type session struct {
+	// retained is the snapshot the resident's last committed run proved, and
+	// retainedFor the policy identity it was proven under. Both are an offer,
+	// never an answer: nothing is used until this run proves it again.
+	retained          *tsextractor.Discovery
+	retainedFor       retainedDiscoveryIdentity
 	plan              *fileInvalidationPlan
 	extraFallbacks    []graphstream.Fallback
 	priorResolution   *idIndex
@@ -381,22 +427,33 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	s.neutralConfig = false
 	s.previewFences = nil
 	if s.inputs != nil {
-		// A discovery snapshot is one run's observation of the tree. A fast run
-		// reuses the previous run's inputs without looking at the tree again,
-		// so the snapshot hanging off them is not an observation this run made;
-		// retaining one across runs needs its own membership and configuration
-		// proof and does not get one by inheritance.
+		// A discovery snapshot is one run's observation of the tree, and a run
+		// does not inherit one. Whichever path below supplies this run's
+		// snapshot supplies it by proof.
 		s.inputs.tsDiscovery = nil
 	}
 	var err error
 	input := s.inputs
 	if !s.fast {
-		input, err = readRuntimeInputs(s.eng, s.abs, s.state, &s.work)
+		input, err = readRuntimeInputs(s.eng, s.abs, s.state, &s.work, s.retained, s.retainedFor)
 		if err != nil {
 			return nil, err
 		}
 	}
 	s.inputs = input
+	if s.fast {
+		// A fast run does not re-read the tree, so readRuntimeInputs never runs
+		// and there is no fresh capture for it to prove a snapshot against. The
+		// capture it is about to extract under is the previous run's, which is
+		// exactly the one a retained snapshot has to agree with, so the same
+		// proof is asked here - including the presence re-observation, because
+		// the tree can have moved since that capture was taken even though this
+		// run is not re-reading it.
+		//
+		// Unprovable leaves this nil and the run behaves as it did before, with
+		// whichever reader needs a discovery building its own.
+		s.adoptRetainedDiscovery(input)
+	}
 	inv, detectedExt, hashes := input.inventory, input.detected, input.hashes
 	contextInputs, cfgHash, capturedCfg := input.contexts, input.configHash, input.config
 	scanHash := inventoryDigest(inv.AllNames, hashes)
@@ -1153,6 +1210,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 					return nil, fmt.Errorf("typescript extract: %w", xerr)
 				}
 				s.work.TSDiscoveries += res.Stats.DiscoveryPasses
+				s.keepProvenDiscovery(res.Discovery)
 			}
 			tr.Mark("ts_extract_session", fmt.Sprintf("parsed=%d cached=%d facts=%d records=%d", res.Stats.FilesParsed, res.Stats.CachedFiles, len(res.Facts), len(res.Records)))
 			if err := s.fileLocalErr(); err != nil {
@@ -1270,6 +1328,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 						return nil, fmt.Errorf("typescript extract: %w", xerr)
 					}
 					s.work.TSDiscoveries += more.Stats.DiscoveryPasses
+					s.keepProvenDiscovery(more.Discovery)
 					if err := s.fileLocalErr(); err != nil {
 						return nil, err
 					}
@@ -2601,6 +2660,7 @@ func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*Fil
 			return nil, nil, err
 		}
 		s.work.TSDiscoveries += r.Stats.DiscoveryPasses
+		s.keepProvenDiscovery(r.Discovery)
 		stats.FilesRead += r.Stats.FilesRead
 		stats.FilesParsed += r.Stats.FilesParsed
 		stats.GraphQLParsed += r.Stats.GraphQLParsed

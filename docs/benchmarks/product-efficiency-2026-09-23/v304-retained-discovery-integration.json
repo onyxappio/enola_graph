@@ -1,0 +1,218 @@
+{
+  "stage": "retained discovery integration",
+  "source": {
+    "main": "a857bcf894038e1f781f4332a8bcbfccb2b0a344",
+    "files": [
+      {
+        "path": "internal/extractors/tsextractor/discovery.go",
+        "status": "candidate",
+        "sha256": "de46c3196095b5a2d60214848bc104c9c56808d1aa6ccfc697ab5db0fd27efdc"
+      },
+      {
+        "path": "internal/extractors/tsextractor/observe.go",
+        "status": "candidate",
+        "sha256": "cc77e3140ede99ced44c67627357c4ea8a0ec026a00599cda4bf67caafce97ae"
+      },
+      {
+        "path": "internal/extractors/tsextractor/overlay.go",
+        "status": "candidate",
+        "sha256": "f8a94739ad73f8142fe5b3dec9a97fc5561b82fd71fcbaf114ea1f90fd5f7026"
+      },
+      {
+        "path": "internal/extractors/tsextractor/storage.go",
+        "status": "candidate",
+        "sha256": "c667951f97dd19d21ce09862ce239925ad08183031907238ac14c60d0012fd80"
+      },
+      {
+        "path": "internal/extractors/tsextractor/svelte.go",
+        "status": "candidate",
+        "sha256": "b0ee90fdd7cec2f2b8fc095715b8a3ac933ec0accd55c333b20035ff59b3aaf0"
+      },
+      {
+        "path": "internal/extractors/tsextractor/vue.go",
+        "status": "candidate",
+        "sha256": "47707dace2f2f32e1fb63141cdd571d1a67a661c70f2882ecb30e5a4960cac47"
+      },
+      {
+        "path": "internal/extractors/tsextractor/ember.go",
+        "status": "candidate",
+        "sha256": "f79785dd3789084b9b873455abfce2a25832ffb01e2f279a32a952006a34c25b"
+      },
+      {
+        "path": "internal/extractors/tsextractor/reactnav.go",
+        "status": "candidate",
+        "sha256": "d0dd6278bd90c77b46dee9e275f67a6168da80130c9a1f1b5da81b37c630047d"
+      },
+      {
+        "path": "internal/extractors/tsextractor/packagegates.go",
+        "status": "candidate",
+        "sha256": "298b05e0e716e3aa43aa67c1e8ba88ab9d0ca4a50322f40273ef66d766637a21"
+      },
+      {
+        "path": "internal/extractors/tsextractor/ts.go",
+        "status": "merged-preserving-main",
+        "sha256": "1afad9827932eb4c1d8cb1d2413ff62af11c7aae86f5ba1f2a5342497d0d7253"
+      },
+      {
+        "path": "internal/extractors/tsextractor/nuxt_alias.go",
+        "status": "candidate",
+        "sha256": "3484ad9ddeed56376c641377d1bd89fdeec040dec72071829c67caa22b4c7233"
+      },
+      {
+        "path": "internal/extractors/tsextractor/angularmodules.go",
+        "status": "candidate",
+        "sha256": "234fb1c51260365faa0c9f9496803b246d0094adb45d2d0312fea3dbb6e6ef2d"
+      },
+      {
+        "path": "internal/extractors/tsextractor/session.go",
+        "status": "candidate",
+        "sha256": "0d68f93eed1dbaf45e1a866fbb181ee68874a0b02eb3f7309b6d369475dbf44c"
+      },
+      {
+        "path": "internal/graphsession/resident.go",
+        "status": "candidate",
+        "sha256": "01f1f06a4dcaf691bb52c7eb2ad74fa25fb5e1472b85a45f0c9b7835b1392e3c"
+      },
+      {
+        "path": "internal/graphsession/session.go",
+        "status": "candidate",
+        "sha256": "bcf4ce91b2e362fed05c7a9fcd7fa33244aa325c545430d9c1759976bcbd4127"
+      },
+      {
+        "path": "internal/extractors/tsextractor/svelte_test.go",
+        "status": "candidate",
+        "sha256": "cb99ce1bb3d503c58b5f783619280a095245611d34682ea9b973404c43d8618b"
+      },
+      {
+        "path": "internal/extractors/tsextractor/discovery_retention_test.go",
+        "status": "candidate",
+        "sha256": "0bafb3ece952a36896d8efe7a1db2f7816c392a21f839316f574eb8f8226a7f1"
+      },
+      {
+        "path": "internal/graphsession/discovery_retention_regression_test.go",
+        "status": "candidate",
+        "sha256": "62d8761d3265539a46b6cbb5490d8f1611ebff74ef59d3c36445bd2d04f054d1"
+      },
+      {
+        "path": "internal/graphsession/discovery_snapshot_regression_test.go",
+        "status": "candidate",
+        "sha256": "a37f386ac349c0a3e1b1951f3c08f7350e0370fcf8f96fb12d2e8dc9ad719df4"
+      }
+    ],
+    "stage2_manifest": "d61d4c189983044ade8e4aae7b77873ad13c2c1078b9e6c6b0c2ba8b59c77aac"
+  },
+  "validation": {
+    "full-tests": {
+      "command": "go test -overlay /tmp/enola-stage3-main-review/overlay.json ./...",
+      "exit_code": 1,
+      "wall_s": 255.431707542,
+      "log_sha256": "8a0c7811e5097f6b19e4ba8b452d584c6ccaa7d3db8990a92fd0f0d8e573e0dc"
+    },
+    "command-retry": {
+      "exit_code": 0,
+      "wall_s": 5.686282916000001,
+      "reason": "retry only package whose linker failed ENOSPC; unchanged candidate",
+      "log_sha256": "30fd6a2b9bc7acb2649852c75290d4f8273c96eb28e09e3f85a57b04a7670918"
+    },
+    "integrated-cli-tests": {
+      "command": [
+        "go",
+        "test",
+        "./internal/graphsession",
+        "./internal/extractors/tsextractor",
+        "-run",
+        "Test(CLI|Independent)",
+        "-count=1"
+      ],
+      "exit_code": 0,
+      "wall_s": 47.509680916,
+      "log_sha256": "92b68ce7628b8a9fe19ad5867db65d87328c08e9ca1c81a9ddc77fa82c698171"
+    }
+  },
+  "integrated_files": [
+    {
+      "path": "internal/extractors/tsextractor/discovery.go",
+      "sha256": "de46c3196095b5a2d60214848bc104c9c56808d1aa6ccfc697ab5db0fd27efdc"
+    },
+    {
+      "path": "internal/extractors/tsextractor/observe.go",
+      "sha256": "cc77e3140ede99ced44c67627357c4ea8a0ec026a00599cda4bf67caafce97ae"
+    },
+    {
+      "path": "internal/extractors/tsextractor/overlay.go",
+      "sha256": "f8a94739ad73f8142fe5b3dec9a97fc5561b82fd71fcbaf114ea1f90fd5f7026"
+    },
+    {
+      "path": "internal/extractors/tsextractor/storage.go",
+      "sha256": "c667951f97dd19d21ce09862ce239925ad08183031907238ac14c60d0012fd80"
+    },
+    {
+      "path": "internal/extractors/tsextractor/svelte.go",
+      "sha256": "b0ee90fdd7cec2f2b8fc095715b8a3ac933ec0accd55c333b20035ff59b3aaf0"
+    },
+    {
+      "path": "internal/extractors/tsextractor/vue.go",
+      "sha256": "47707dace2f2f32e1fb63141cdd571d1a67a661c70f2882ecb30e5a4960cac47"
+    },
+    {
+      "path": "internal/extractors/tsextractor/ember.go",
+      "sha256": "f79785dd3789084b9b873455abfce2a25832ffb01e2f279a32a952006a34c25b"
+    },
+    {
+      "path": "internal/extractors/tsextractor/reactnav.go",
+      "sha256": "d0dd6278bd90c77b46dee9e275f67a6168da80130c9a1f1b5da81b37c630047d"
+    },
+    {
+      "path": "internal/extractors/tsextractor/packagegates.go",
+      "sha256": "298b05e0e716e3aa43aa67c1e8ba88ab9d0ca4a50322f40273ef66d766637a21"
+    },
+    {
+      "path": "internal/extractors/tsextractor/ts.go",
+      "sha256": "1afad9827932eb4c1d8cb1d2413ff62af11c7aae86f5ba1f2a5342497d0d7253"
+    },
+    {
+      "path": "internal/extractors/tsextractor/nuxt_alias.go",
+      "sha256": "3484ad9ddeed56376c641377d1bd89fdeec040dec72071829c67caa22b4c7233"
+    },
+    {
+      "path": "internal/extractors/tsextractor/angularmodules.go",
+      "sha256": "234fb1c51260365faa0c9f9496803b246d0094adb45d2d0312fea3dbb6e6ef2d"
+    },
+    {
+      "path": "internal/extractors/tsextractor/session.go",
+      "sha256": "0d68f93eed1dbaf45e1a866fbb181ee68874a0b02eb3f7309b6d369475dbf44c"
+    },
+    {
+      "path": "internal/graphsession/resident.go",
+      "sha256": "01f1f06a4dcaf691bb52c7eb2ad74fa25fb5e1472b85a45f0c9b7835b1392e3c"
+    },
+    {
+      "path": "internal/graphsession/session.go",
+      "sha256": "bcf4ce91b2e362fed05c7a9fcd7fa33244aa325c545430d9c1759976bcbd4127"
+    },
+    {
+      "path": "internal/extractors/tsextractor/svelte_test.go",
+      "sha256": "cb99ce1bb3d503c58b5f783619280a095245611d34682ea9b973404c43d8618b"
+    },
+    {
+      "path": "internal/extractors/tsextractor/discovery_retention_test.go",
+      "sha256": "0bafb3ece952a36896d8efe7a1db2f7816c392a21f839316f574eb8f8226a7f1"
+    },
+    {
+      "path": "internal/graphsession/discovery_retention_regression_test.go",
+      "sha256": "62d8761d3265539a46b6cbb5490d8f1611ebff74ef59d3c36445bd2d04f054d1"
+    },
+    {
+      "path": "internal/graphsession/discovery_snapshot_regression_test.go",
+      "sha256": "a37f386ac349c0a3e1b1951f3c08f7350e0370fcf8f96fb12d2e8dc9ad719df4"
+    },
+    {
+      "path": "internal/extractors/tsextractor/independent_retention_live_test.go",
+      "sha256": "69c5b64e10db1eef3c0d0c62d8d1c2dd1493f3f8bb3fee90d63a12084362248e"
+    },
+    {
+      "path": "internal/extractors/tsextractor/independent_retention_kind_test.go",
+      "sha256": "8d12777e4b3e0c28f83763271f0dc419fe114d49e48aa9bfce964258adccf5b7"
+    }
+  ]
+}

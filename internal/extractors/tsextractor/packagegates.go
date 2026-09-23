@@ -27,7 +27,7 @@ type packageGates struct {
 func collectPackageGates(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) packageGates {
 	inputScope := inputscope.First(inputScopes)
 	g := packageGates{byDir: map[string]pkgGate{}}
-	_ = inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+	_ = overlayWalkDir(ctx, repoPath, inputScope, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return nil
 		}

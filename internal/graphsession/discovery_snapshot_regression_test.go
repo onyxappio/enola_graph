@@ -74,8 +74,11 @@ func TestResidentRunBuildsExactlyOneDiscovery(t *testing.T) {
 		t.Fatalf("a reconciling run built %d discovery snapshots, want 1", reconciled.Work.TSDiscoveries)
 	}
 
-	// Nothing retains a snapshot past its run: the next run observes the tree
-	// for itself rather than inheriting an observation it did not make.
+	// A later run either proves the snapshot the last committed run left and
+	// answers from it, or builds exactly one of its own. What it must never do
+	// is build more than one, which is the sharing this test is about and is
+	// independent of whether anything was retained. Retention itself is guarded
+	// in TestResidentContentEditReusesRetainedDiscovery.
 	writeFile(t, dir, "src/b.ts", "import { a } from '@lib/a'\nexport const b = a() + 1\n")
 	q.Add("src/b.ts")
 	if next := residentApply(t, r, q); next.Work.TSDiscoveries > 1 {

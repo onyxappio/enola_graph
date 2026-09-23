@@ -117,7 +117,7 @@ func isDeepNestedProject(ctx context.Context, repoPath string, inputScopes ...*i
 		"pyproject.toml", "setup.py", "setup.cfg", "requirements.txt",
 	}
 	for _, marker := range markers {
-		if _, err := inputScope.Stat(filepath.Join(repoPath, marker)); err == nil {
+		if _, err := overlayStat(ctx, filepath.Join(repoPath, marker), inputScope); err == nil {
 			return true
 		}
 	}
@@ -134,7 +134,7 @@ func searchTSRoot(ctx context.Context, dir string, depth, maxDepth int, inputSco
 	if depth >= maxDepth {
 		return "", false
 	}
-	entries, err := inputScope.ReadDir(dir)
+	entries, err := overlayReadDir(ctx, dir, inputScope)
 	if err != nil {
 		return "", false
 	}
@@ -165,7 +165,7 @@ func hasTSMarkers(ctx context.Context, dir string, inputScopes ...
 
 	for _, name := range []string{"tsconfig.json", "tsconfig.base.json",
 		"deno.json", "deno.jsonc", "import_map.json"} {
-		if _, err := inputScope.Stat(filepath.Join(dir, name)); err == nil {
+		if _, err := overlayStat(ctx, filepath.Join(dir, name), inputScope); err == nil {
 			return true
 		}
 	}
@@ -186,7 +186,7 @@ func hasTSMarkers(ctx context.Context, dir string, inputScopes ...
 	// every package.json rule above is blind to it — an importmap app's whole
 	// app/javascript tree (Stimulus controllers included) was claimed by this
 	// extractor and never parsed.
-	if _, err := inputScope.Stat(filepath.Join(dir, "config", "importmap.rb")); err == nil {
+	if _, err := overlayStat(ctx, filepath.Join(dir, "config", "importmap.rb"), inputScope); err == nil {
 		return true
 	}
 	// A dependency-free plain-JavaScript package is still a JavaScript project:
@@ -502,7 +502,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	// every reading that groups by unit was inferring the boundary from the path.
 	var projects map[string]string
 	if isAngular {
-		projects = angularProjectNames(repoPath, inputScope)
+		projects = angularProjectNames(ctx, repoPath, inputScope)
 	}
 	allFacts = appendTSDirectoryModules(allFacts, modules, pkgNames, projects)
 
@@ -1600,7 +1600,7 @@ func detectNextJS(ctx context.Context, repoPath string, inputScopes ...*inputsco
 func collectPackageNames(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) map[string]string {
 	inputScope := inputscope.First(inputScopes)
 	out := map[string]string{}
-	_ = inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+	_ = overlayWalkDir(ctx, repoPath, inputScope, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return nil // unreadable subtree: skip it rather than fail extraction
 		}
@@ -1666,7 +1666,7 @@ type packageExportSource struct {
 func collectPackageExportSources(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) []packageExportSource {
 	inputScope := inputscope.First(inputScopes)
 	var out []packageExportSource
-	_ = inputScope.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+	_ = overlayWalkDir(ctx, repoPath, inputScope, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return nil
 		}
@@ -1770,7 +1770,7 @@ func detectNextJSAt(ctx context.Context, dir string, inputScopes ...
 	inputScope := inputscope.First(inputScopes)
 
 	for _, name := range []string{"next.config.js", "next.config.mjs", "next.config.ts"} {
-		if _, err := inputScope.Stat(filepath.Join(dir, name)); err == nil {
+		if _, err := overlayStat(ctx, filepath.Join(dir, name), inputScope); err == nil {
 			return true
 		}
 	}
@@ -2582,7 +2582,7 @@ func walkTSAliasRoots(ctx context.Context, repoPath, dir string, depth, maxDepth
 	if depth >= maxDepth {
 		return
 	}
-	entries, err := inputScope.ReadDir(dir)
+	entries, err := overlayReadDir(ctx, dir, inputScope)
 	if err != nil {
 		return
 	}
