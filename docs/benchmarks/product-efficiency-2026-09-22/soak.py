@@ -757,6 +757,9 @@ def run_soak(args) -> int:
                     stdout=nats_log, stderr=subprocess.STDOUT, start_new_session=True,
                 )
                 eff.wait_port("127.0.0.1", port)
+                broker_ready_ns = time.time_ns()
+                # Watch-exit observation below is not broker downtime.
+                broker_restart_ms = round((broker_ready_ns - down) / 1e6, 3)
                 # Documented policy says broker errors terminate graph watch.
                 # Record what actually happened instead of asserting the policy.
                 settle = time.monotonic() + min(max(every_s, 2.0), 10.0)
@@ -767,8 +770,8 @@ def run_soak(args) -> int:
                         break
                     time.sleep(0.05)
                 events.append({
-                    "kind": "broker-restarted", "ns": time.time_ns(),
-                    "downtime_ms": round((time.time_ns() - down) / 1e6, 3),
+                    "kind": "broker-restarted", "ns": broker_ready_ns,
+                    "downtime_ms": broker_restart_ms,
                     "during_publish": bool(caught),
                     "watch_exited": exited is not None,
                     "watch_returncode": exited,
@@ -778,7 +781,8 @@ def run_soak(args) -> int:
                     "during_publish": bool(caught),
                     "open_begin_run_id": caught,
                     "requested_outage_s": outage_s,
-                    "measured_outage_ms": round((time.time_ns() - down) / 1e6, 3),
+                    "measured_outage_ms": broker_restart_ms,
+                    "outage_measurement_basis": "stop request to broker port ready; excludes subsequent watch-exit observation",
                     "watch_exited": exited is not None,
                     "watch_returncode": exited,
                 }

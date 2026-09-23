@@ -39,8 +39,10 @@ Watch spawn → initial consumer apply 13.634 s; harness-observed initial 13.937
 Setup before watch 43.235 s is separate. RSS sampled 170 times: median 988.844 MiB,
 maximum 1134.453 MiB; these samples alone establish no long-term leak verdict.
 
-Planned watch restart observed 40.52 ms process downtime. NATS bounce requested 3 s,
-observed 8.181 s; it missed the publication window, watch stayed alive and 24 later
+Planned watch restart observed 40.52 ms process downtime. NATS bounce requested 3 s. The historical field reports 8.181 s but includes
+the subsequent five-second watcher observation window; it is not actual broker
+unavailability. The harness now timestamps port readiness before that window.
+The bounce it missed the publication window, watch stayed alive and 24 later
 generations completed. **Recovery during publication remains untested.** A
 future fault run must interrupt an observed open transaction, not infer success
 from a broker bounce between generations.
