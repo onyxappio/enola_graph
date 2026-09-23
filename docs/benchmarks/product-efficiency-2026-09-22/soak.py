@@ -483,13 +483,16 @@ def outage_verdict(obs: dict, generations_after: int) -> str:
         return ("untested: the outage did not land during publication; a bounce "
                 "between publishes is not recovery acceptance")
     if not obs.get("watch_exited"):
-        return ("observed: watcher SURVIVED an outage during publication; the "
-                "documented terminate-on-broker-error path was not reproduced")
+        return ("observed: watcher survived the broker outage after an unmatched "
+                "Begin was observed; publication overlap requires timestamp audit; "
+                "the terminate-on-broker-error path was not reproduced")
     if generations_after > 0:
-        return ("observed: watch exited on broker error, was restarted, and "
-                "later generations completed")
-    return ("observed: watch exited on broker error and was restarted, but no "
-            "later generation completed, so replay was NOT observed")
+        return ("observed: watch exited during the outage observation window, "
+                "was restarted, and later generations completed; error cause and "
+                "publication overlap require log and timestamp audit")
+    return ("observed: watch exited during the outage observation window and was "
+            "restarted, but no later generation completed, so replay was NOT observed; "
+            "error cause and publication overlap require log and timestamp audit")
 
 
 # --------------------------------------------------------------------------
@@ -735,6 +738,7 @@ def run_soak(args) -> int:
             if restart_broker_at and now >= restart_broker_at:
                 restart_broker_at = None
                 caught = None
+                caught_begin = None
                 if args.outage_during_publish:
                     # Kill the broker WHILE a generation is publishing. A bounce
                     # landing between publishes never makes the watcher publish
@@ -746,6 +750,7 @@ def run_soak(args) -> int:
                         )
                         if pending:
                             caught = pending.get("run_id")
+                            caught_begin = pending
                             break
                         if watch_proc.poll() is not None:
                             break
@@ -759,6 +764,9 @@ def run_soak(args) -> int:
                     "requested_outage_s": outage_s,
                 })
                 eff.stop_process(nats_proc)
+                broker_stopped_ns = time.time_ns()
+                if nats_proc.poll() is None:
+                    raise RuntimeError("broker did not stop; refusing outage evidence")
                 if outage_s > 0:
                     time.sleep(outage_s)
                 nats_proc = subprocess.Popen(
@@ -791,6 +799,11 @@ def run_soak(args) -> int:
                     "open_begin_run_id": caught,
                     "requested_outage_s": outage_s,
                     "measured_outage_ms": broker_restart_ms,
+                    "broker_stop_request_ns": down,
+                    "broker_stopped_ns": broker_stopped_ns,
+                    "broker_ready_ns": broker_ready_ns,
+                    "open_begin_broker_ns": (caught_begin or {}).get("broker_ns"),
+                    "open_begin_observed_ns": (caught_begin or {}).get("observed_local_ns"),
                     "outage_measurement_basis": "stop request to broker port ready; excludes subsequent watch-exit observation",
                     "watch_exited": exited is not None,
                     "watch_returncode": exited,
@@ -1172,6 +1185,10 @@ def self_test() -> int:
           "later generations completed" in outage_verdict(exited, 2))
     check("exit without later generations is not replay",
           "replay was NOT observed" in outage_verdict(exited, 0))
+    check("unmatched Begin never proves publication overlap or exit cause",
+          all("audit" in outage_verdict(obs, count)
+              and "exited on broker error" not in outage_verdict(obs, count)
+              for obs, count in [(survived, 3), (exited, 2), (exited, 0)]))
     check("acceptance always deferred",
           "untested until observed in a Product run" in text)
     check("stops children", text.count("eff.stop_process") >= 4)
