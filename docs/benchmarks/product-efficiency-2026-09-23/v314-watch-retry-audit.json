@@ -1,0 +1,81 @@
+{
+  "stats": {
+    "delta_count": 20,
+    "delta_begin_end_ms_median": 1233.6535,
+    "delta_begin_end_ms_max": 1450.947,
+    "delta_parses_mean": 1.85,
+    "delta_scope_median": 619.0,
+    "delta_scope_max": 622,
+    "delta_payload_bytes": 97013111,
+    "delta_nodes_sent_mean": 5835.95,
+    "delta_edges_sent_mean": 6986.7,
+    "delta_end_interval_seconds_mean": 11.997788263157895
+  },
+  "integration": {
+    "base": "9785cf6",
+    "freeze": "/tmp/enola-stage8-freeze",
+    "manifest": {
+      "internal/graphsession/deletion_shape_regression_test.go": "30ec29e2ab7ce71625f847ad263d7a44342117a41e31d5a6b3676cf5c7883bfd",
+      "internal/graphsession/independent_authoritative_watch_retry_test.go": "2a7b2751afead08506e8c320adc9d2ad04e77b211851ad42d96b27feac458565",
+      "internal/graphsession/independent_deletion_mode_test.go": "ab68d8854fccfd3583bf20c1a0e198894afd82b54f7d4690367ecb28c61d8341",
+      "internal/graphsession/independent_deletion_retry_test.go": "feee43423831abec938bd0aa99c6c8a778baa8686ce908d9baef94e387674160",
+      "internal/graphsession/input_race_regression_test.go": "a1eb8fdfaa8c0f546b8e22bfa185bb2207541547d89ed177cd4c1a6e481403f8",
+      "internal/graphsession/input_race.go": "66cfc8964fbafdeb1890c6ece5b5d721de57f0043fd484aca0c99d2a6311fafc",
+      "internal/graphsession/session.go": "378579ba9b125823e425c5712be3ab70154d31caf345b10bcc8a615630164f4b"
+    },
+    "stress_snapshot_production_identical": true
+  },
+  "validation": [
+    {
+      "name": "build",
+      "cmd": [
+        "/opt/homebrew/bin/go",
+        "build",
+        "-trimpath",
+        "-o",
+        "/tmp/enola-stage8-main-review/enola",
+        "./cmd/enola"
+      ],
+      "seconds": 3.59990975,
+      "exit": 0
+    },
+    {
+      "name": "integrated-guards",
+      "cmd": [
+        "/opt/homebrew/bin/go",
+        "test",
+        "./internal/graphsession",
+        "-count=1",
+        "-run",
+        "TestInputRace|TestDeletionShapesConvergeToCold|TestIndependentDeletedCapturedSourceIsRetryable|TestIndependentDeletionColdSameProtocol|TestIndependentAuthoritativeWatchDeletionDuringDelta"
+      ],
+      "seconds": 20.735507709,
+      "exit": 0
+    }
+  ],
+  "snapshot": {
+    "base": "9785cf601859b43ceb0adb5c476fbaa6c4efa1dd",
+    "source_sha256": {
+      "internal/graphsession/session.go": "378579ba9b125823e425c5712be3ab70154d31caf345b10bcc8a615630164f4b",
+      "internal/graphsession/input_race.go": "66cfc8964fbafdeb1890c6ece5b5d721de57f0043fd484aca0c99d2a6311fafc"
+    },
+    "binary_sha256": "bbec425998ed3f4f55b765f29b97ec112478d23bbffb246924f7b463644aded8",
+    "build": "/opt/homebrew/bin/go build -trimpath -overlay snapshot/overlay.json ./cmd/enola",
+    "status": "exploratory two-file snapshot, not integrated"
+  },
+  "first_attempt": {
+    "work": "/tmp/enola-stage8-product-burst",
+    "exit": 1,
+    "reason": "harness demanded generation after final save; no-op tail can publish none",
+    "cold_oracle_reached": false,
+    "edits": 91,
+    "completed_generations": 23,
+    "acceptance": false
+  },
+  "harness_checks": {
+    "watch_self_test": 0,
+    "soak_self_test": 0,
+    "old_gate_negative_control_exit": 1
+  },
+  "same_mode_oracle_correction": "Synthetic module retirement claim withdrawn: legacy watch was compared to authoritative cold; independent same-mode guards pass both."
+}

@@ -1063,7 +1063,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 					s.mergeCaptured(captured)
 					sig, sigErr := tsextractor.CompositionSignature(s.abs, owned, prevRecs, dirty, s.capturedSources, s.eng.GraphScope())
 					if sigErr != nil {
-						return nil, fmt.Errorf("unreadable required input while computing composition context: %w", sigErr)
+						return nil, classifyVanished(sigErr, "composition context input for", "typescript", "refusing to plan from a partial capture")
 					}
 					s.frameworkSig = sig
 					if s.state != nil && s.state.FrameworkSig != "" && s.state.FrameworkSig != sig {
@@ -1870,7 +1870,10 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		s.work.VerifiedFiles++
 		disk, rerr := os.ReadFile(filepath.Join(s.abs, path))
 		if rerr != nil {
-			return nil, fmt.Errorf("source %s unreadable before EndReplace: %w", path, rerr)
+			// A source this run compiled from that is gone by the time the run
+			// re-proves it is the ordinary deletion race, not a fault: the
+			// attempt is refused without an End and the watch reconciles.
+			return nil, classifyVanished(rerr, "source", path, "refusing successful EndReplace")
 		}
 		sum := sha256.Sum256(disk)
 		if hex.EncodeToString(sum[:]) != rec.Hash {
@@ -2128,7 +2131,13 @@ func (s *session) revalidateCapturedInputs(refusing string) error {
 	for rel, src := range s.capturedSources {
 		s.work.CapturedReads++
 		disk, rerr := os.ReadFile(filepath.Join(s.abs, rel))
-		if rerr != nil || !bytes.Equal(disk, src) {
+		if rerr != nil {
+			// A captured input that vanished changed; one that is still there
+			// but unreadable is a fault the operator has to see, so it must not
+			// enter the watch retry path.
+			return classifyVanished(rerr, "captured source", rel, refusing)
+		}
+		if !bytes.Equal(disk, src) {
 			return fmt.Errorf("%w: source/config bytes changed during the run (%s); %s", ErrInputsChanged, rel, refusing)
 		}
 	}
@@ -2559,7 +2568,7 @@ func (s *session) frameworkDirtyRequiresFullScope(files []string, prevFiles map[
 	}
 	sig, err := tsextractor.CompositionSignature(s.abs, owned, prevRecs, dirty, captured, s.eng.GraphScope())
 	if err != nil {
-		return false, fmt.Errorf("unreadable required input while computing composition context: %w", err)
+		return false, classifyVanished(err, "composition context input for", "typescript", "refusing to plan from a partial capture")
 	}
 	s.frameworkSig = sig
 	return s.state.FrameworkSig != sig, nil
