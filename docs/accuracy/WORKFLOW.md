@@ -89,3 +89,14 @@ expected versus actual graph behavior, and concise explanation with approve/reje
 buttons. Independent verification still precedes candidate presentation. Other
 accuracy candidates retain the standing auto-approval policy. Research may proceed
 without implementation approval.
+
+### Clarified FSM feature scope — 2026-09-24
+
+The user explicitly intends **new semantic node and relation types describing
+finite-state machines**. Missing ordinary code-reference edges alone do not
+satisfy this feature. Research must propose a shared semantic graph model grounded
+in backend Effect and custom mobile implementations, with concrete source-to-graph
+examples, code-symbol bindings, identity/ownership and incremental behavior.
+Present the proposed schema for explicit user approval before implementation.
+Do not reject a valid FSM modeling proposal merely because the current schema
+cannot express it; extending that schema is the intended work.
