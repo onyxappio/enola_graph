@@ -769,6 +769,13 @@ func summarizeFacts(ff []facts.Fact, knownFiles map[string]bool) (specs, resolve
 			if replay := f.PropString(facts.PropImportSpec); replay != "" {
 				spec = replay
 			}
+			if src := f.PropString("source"); src != "external" && src != facts.DepSourceFramework {
+				if path, _, ok := splitViteVersionQuery(spec); ok && internalImportTarget(path) {
+					// FileRecord keeps a normalized source path for membership replay;
+					// the dependency fact itself still carries the original `?v=` query.
+					spec = path
+				}
+			}
 			if !seenSpec[spec] {
 				seenSpec[spec] = true
 				specs = append(specs, spec)

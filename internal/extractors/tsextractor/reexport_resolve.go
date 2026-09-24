@@ -136,7 +136,7 @@ func parseNamedExportIndex(file string, readSrc func(string) []byte, aliases map
 			if len(b.Content) == 0 {
 				continue
 			}
-			sub := parseNamedExportIndexBytes(file, b.Content, aliases, knownFiles)
+			sub := parseNamedExportIndexBytes(file, b.Content, aliases, knownFiles, sourceSyntaxForEmbeddedScript(b.Lang))
 			mergeNamedExportIndex(idx, sub)
 		}
 		return idx
@@ -154,7 +154,7 @@ func parseNamedExportIndex(file string, readSrc func(string) []byte, aliases map
 			if len(b.Content) == 0 {
 				continue
 			}
-			sub := parseNamedExportIndexBytes(file, b.Content, aliases, knownFiles)
+			sub := parseNamedExportIndexBytes(file, b.Content, aliases, knownFiles, sourceSyntaxForEmbeddedScript(b.Lang))
 			mergeNamedExportIndex(idx, sub)
 		}
 		return idx
@@ -166,7 +166,7 @@ func parseNamedExportIndex(file string, readSrc func(string) []byte, aliases map
 		idx.empty = true
 		return idx
 	}
-	return parseNamedExportIndexBytes(file, src, aliases, knownFiles)
+	return parseNamedExportIndexBytes(file, src, aliases, knownFiles, sourceSyntaxForFile(file))
 }
 
 func mergeNamedExportIndex(dst, src *namedExportIndex) {
@@ -188,7 +188,11 @@ func mergeNamedExportIndex(dst, src *namedExportIndex) {
 	}
 }
 
-func parseNamedExportIndexBytes(file string, src []byte, aliases map[string]tsAlias, knownFiles map[string]bool) *namedExportIndex {
+func parseNamedExportIndexBytes(file string, src []byte, aliases map[string]tsAlias, knownFiles map[string]bool, syntaxOverride ...parserSyntax) *namedExportIndex {
+	syntax := sourceSyntaxForFile(file)
+	if len(syntaxOverride) > 0 {
+		syntax = syntaxOverride[0]
+	}
 	idx := &namedExportIndex{local: map[string]bool{}, named: map[string][][2]string{}, unresolved: map[string]bool{}}
 	if len(src) == 0 {
 		idx.empty = true
@@ -206,7 +210,7 @@ func parseNamedExportIndexBytes(file string, src []byte, aliases map[string]tsAl
 		idx.empty = true
 		return idx
 	}
-	tree := parser.Parse(src, nil)
+	tree := parseSourceWithSyntax(parser, src, syntax)
 	defer tree.Close()
 	idx, _ = buildNamedExportIndex(file, src, kinds, tree.RootNode(), aliases, knownFiles)
 	return idx

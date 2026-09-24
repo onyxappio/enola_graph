@@ -556,6 +556,7 @@ type extractCtx struct {
 	externalNames map[string]bool     // locals bound to external (npm/node:) specifiers
 	virtualNames  map[string]bool     // locals bound to framework virtual modules (#imports/#app)
 	localNames    map[string]bool     // file-scope function/const names that may own a local call
+	commonJS      commonJSBindings    // module/exports are synthetic only when not rebound locally
 	imports       emberImportBindings // the file's import table, read for the module a superclass identifier came from
 	ioBindings    map[string]bool     // local names bound to imports from a network module (I/O sinks)
 	knownFiles    map[string]bool     // repo-relative (slash) paths of all indexed TS/JS files
@@ -657,7 +658,7 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 		return result, angularCounts{}, nil, nil, nil, nil
 	}
 
-	tree := parser.Parse(src, nil)
+	tree := parseSourceForFile(parser, src, relFile)
 	defer tree.Close()
 
 	root := tree.RootNode()
@@ -724,7 +725,7 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 	// A declaration may be exported via a separate `export { A, B }` clause or
 	// `export default Name` statement rather than an inline `export` keyword.
 	// Mark the corresponding symbols as exported.
-	if exported := collectExportedLocalNames(kinds, root, src); len(exported) > 0 {
+	if exported := collectExportedLocalNames(kinds, root, src, ctx.commonJS); len(exported) > 0 {
 		for i := range decls {
 			if decls[i].Kind != facts.KindSymbol {
 				continue
@@ -958,6 +959,7 @@ func dynamicImportSpecifier(kinds *tsutil.KindTable, n *sitter.Node, src []byte)
 }
 
 func (e *TSExtractor) extractDeclarations(kinds *tsutil.KindTable, root *sitter.Node, ctx *extractCtx) []facts.Fact {
+	ctx.commonJS = collectCommonJSModuleBindings(kinds, root, ctx.src)
 	var result []facts.Fact
 	for i := range root.ChildCount() {
 		result = append(result, e.extractNode(kinds, root.Child(i), ctx, false, "")...)
@@ -1236,7 +1238,12 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 		if assign == nil {
 			break
 		}
-		name := commonJSExportName(kinds, assign.ChildByFieldName("left"), src)
+		left := assign.ChildByFieldName("left")
+		binding := commonJSExportTargetBinding(kinds, left, src)
+		if binding == "" || ctx.commonJS.shadowed(binding) {
+			break
+		}
+		name := commonJSExportName(kinds, left, src)
 		if name == "" {
 			break
 		}
@@ -1528,6 +1535,54 @@ func collectImportOrigins(kinds *tsutil.KindTable, root *sitter.Node, src []byte
 		}
 	}
 	return named, ns
+}
+
+func collectTypeOnlyImportLocals(kinds *tsutil.KindTable, root *sitter.Node, src []byte) map[string]bool {
+	out := map[string]bool{}
+	if root == nil {
+		return out
+	}
+	for i := range root.ChildCount() {
+		stmt := root.Child(i)
+		if kindOf(kinds, stmt) != "import_statement" {
+			continue
+		}
+		statementTypeOnly := importStatementIsTypeOnly(kinds, stmt, src)
+		clause := findChildByKind(kinds, stmt, "import_clause")
+		if clause == nil {
+			continue
+		}
+		for j := range clause.ChildCount() {
+			child := clause.Child(j)
+			switch kindOf(kinds, child) {
+			case "identifier":
+				if statementTypeOnly {
+					out[nodeText(child, src)] = true
+				}
+			case "namespace_import":
+				if statementTypeOnly {
+					if id := findChildByKind(kinds, child, "identifier"); id != nil {
+						out[nodeText(id, src)] = true
+					}
+				}
+			case "named_imports":
+				for k := range child.ChildCount() {
+					spec := child.Child(k)
+					if kindOf(kinds, spec) != "import_specifier" || (!statementTypeOnly && !importSpecifierIsTypeOnly(kinds, spec, src)) {
+						continue
+					}
+					local := spec.ChildByFieldName("alias")
+					if local == nil {
+						local = spec.ChildByFieldName("name")
+					}
+					if local != nil {
+						out[nodeText(local, src)] = true
+					}
+				}
+			}
+		}
+	}
+	return out
 }
 
 func importStatementIsTypeOnly(kinds *tsutil.KindTable, stmt *sitter.Node, src []byte) bool {
@@ -2648,37 +2703,99 @@ func toPascal(s string) string {
 	return b.String()
 }
 
-// collectExportedLocalNames returns the set of locally-declared names that are
-// exported via a separate `export { A, B as C }` clause or `export default Name`
-// statement (where the declaration itself carries no inline export keyword).
-func collectExportedLocalNames(kinds *tsutil.KindTable, root *sitter.Node, src []byte) map[string]bool {
+// collectExportedLocalNames returns locally-declared names exported through
+// separate ESM clauses or unconditional CommonJS assignments. CommonJS locals
+// keep their source identity; only their exported visibility changes.
+func collectExportedLocalNames(kinds *tsutil.KindTable, root *sitter.Node, src []byte, commonJS commonJSBindings) map[string]bool {
 	out := make(map[string]bool)
 	for i := range root.ChildCount() {
 		child := root.Child(i)
-		if kindOf(kinds, child) != "export_statement" {
-			continue
-		}
-		// export { A, B as C }
-		if clause := findChildByKind(kinds, child, "export_clause"); clause != nil {
-			for j := range clause.ChildCount() {
-				spec := clause.Child(j)
-				if kindOf(kinds, spec) != "export_specifier" {
-					continue
+		switch kindOf(kinds, child) {
+		case "export_statement":
+			// export { A, B as C }
+			if clause := findChildByKind(kinds, child, "export_clause"); clause != nil {
+				for j := range clause.ChildCount() {
+					spec := clause.Child(j)
+					if kindOf(kinds, spec) != "export_specifier" {
+						continue
+					}
+					if n := spec.ChildByFieldName("name"); n != nil {
+						out[nodeText(n, src)] = true
+					}
 				}
-				if n := spec.ChildByFieldName("name"); n != nil {
-					out[nodeText(n, src)] = true
+				continue
+			}
+			// export default Name
+			if hasChildKind(kinds, child, "default") {
+				if id := findChildByKind(kinds, child, "identifier"); id != nil {
+					out[nodeText(id, src)] = true
 				}
 			}
-			continue
-		}
-		// export default Name
-		if hasChildKind(kinds, child, "default") {
-			if id := findChildByKind(kinds, child, "identifier"); id != nil {
-				out[nodeText(id, src)] = true
+		case "expression_statement":
+			// CommonJS exports can publish an existing local by assignment or as a
+			// value in an exported object. Only inspect module-scope expression
+			// statements; a nested function/conditional assignment is not treated as
+			// an unconditional module export.
+			assign := findChildByKind(kinds, child, "assignment_expression")
+			if assign == nil || !commonJSExportIsHostBinding(kinds, assign.ChildByFieldName("left"), src, commonJS) {
+				continue
 			}
+			collectCommonJSExportLocals(kinds, unwrapCommonJSExportValue(kinds, assign.ChildByFieldName("right")), src, out)
 		}
 	}
 	return out
+}
+
+func unwrapCommonJSExportValue(kinds *tsutil.KindTable, node *sitter.Node) *sitter.Node {
+	for node != nil {
+		kind := kindOf(kinds, node)
+		if kind != "parenthesized_expression" && kind != "as_expression" && kind != "satisfies_expression" && kind != "non_null_expression" {
+			break
+		}
+		if node.NamedChildCount() == 0 {
+			break
+		}
+		node = node.NamedChild(0)
+	}
+	return node
+}
+
+// collectCommonJSExportLocals records only values that directly become part of
+// the assigned export object. Object keys and method names are not declarations;
+// pair values, shorthand values, and nested object/array values are. The fact
+// schema represents export visibility as a boolean, so nested property names
+// stay in source and do not rename the local symbol.
+func collectCommonJSExportLocals(kinds *tsutil.KindTable, node *sitter.Node, src []byte, out map[string]bool) {
+	if node == nil {
+		return
+	}
+	node = unwrapCommonJSExportValue(kinds, node)
+	switch kindOf(kinds, node) {
+	case "identifier", "shorthand_property_identifier":
+		if name := strings.TrimSpace(nodeText(node, src)); name != "" {
+			out[name] = true
+		}
+	case "object", "array":
+		for i := range node.NamedChildCount() {
+			child := node.NamedChild(i)
+			switch kindOf(kinds, child) {
+			case "shorthand_property_identifier":
+				collectCommonJSExportLocals(kinds, child, src, out)
+			case "pair":
+				value := child.ChildByFieldName("value")
+				if value == nil && child.NamedChildCount() > 1 {
+					value = child.NamedChild(1)
+				}
+				collectCommonJSExportLocals(kinds, value, src, out)
+			case "object", "array":
+				collectCommonJSExportLocals(kinds, child, src, out)
+			case "spread_element":
+				if child.NamedChildCount() > 0 {
+					collectCommonJSExportLocals(kinds, child.NamedChild(0), src, out)
+				}
+			}
+		}
+	}
 }
 
 // reactHTTPMethods are the App Router route-handler export names.
@@ -2898,16 +3015,12 @@ type tsAliasRoot struct {
 // at the first match, this covers monorepos with one tsconfig per package.
 func collectTSAliasRoots(ctx context.Context, repoPath string, inputScopes ...*inputscope.Scope) []tsAliasRoot {
 	inputScope := inputscope.First(inputScopes)
-	maxDepth := 2
-	if isDeepNestedProject(ctx, repoPath, inputScope) {
-		maxDepth = 8
-	}
 	var roots []tsAliasRoot
-	walkTSAliasRoots(ctx, repoPath, repoPath, 0, maxDepth, &roots, inputScope)
+	walkTSAliasRoots(ctx, repoPath, repoPath, &roots, inputScope)
 	return roots
 }
 
-func walkTSAliasRoots(ctx context.Context, repoPath, dir string, depth, maxDepth int, out *[]tsAliasRoot, inputScopes ...*inputscope.Scope) {
+func walkTSAliasRoots(ctx context.Context, repoPath, dir string, out *[]tsAliasRoot, inputScopes ...*inputscope.Scope) {
 	inputScope := inputscope.First(inputScopes)
 	if aliases, ok := aliasesAtDir(ctx, dir, inputScope); ok {
 		rel, err := filepath.Rel(repoPath, dir)
@@ -2931,9 +3044,6 @@ func walkTSAliasRoots(ctx context.Context, repoPath, dir string, depth, maxDepth
 		}
 		*out = append(*out, tsAliasRoot{dir: rel, aliases: qualified})
 	}
-	if depth >= maxDepth {
-		return
-	}
 	entries, err := overlayReadDir(ctx, dir, inputScope)
 	if err != nil {
 		return
@@ -2942,7 +3052,7 @@ func walkTSAliasRoots(ctx context.Context, repoPath, dir string, depth, maxDepth
 		if !entry.IsDir() || strings.HasPrefix(entry.Name(), ".") || tsSkipDirs[entry.Name()] {
 			continue
 		}
-		walkTSAliasRoots(ctx, repoPath, filepath.Join(dir, entry.Name()), depth+1, maxDepth, out, inputScope)
+		walkTSAliasRoots(ctx, repoPath, filepath.Join(dir, entry.Name()), out, inputScope)
 	}
 }
 
@@ -3159,10 +3269,58 @@ func bindImportTarget(importPath, fileDir string, aliases map[string]tsAlias, kn
 	if external {
 		return resolved, "", resolved, true
 	}
-	if file, dir, ok := resolveModuleFile(resolved, knownFiles); ok {
-		return file, dir, resolved, false
+	replaySpec = resolved
+	if _, query, ok := viteVersionedRelativeSpecifier(importPath); ok {
+		// Preserve the authored Vite instance query in the graph fact while the
+		// source file path below is resolved without that runtime-instance suffix.
+		replaySpec += query
 	}
-	return resolved, "", resolved, false
+	if file, dir, ok := resolveModuleFile(resolved, knownFiles); ok {
+		return file, dir, replaySpec, false
+	}
+	return resolved, "", replaySpec, false
+}
+
+// viteVersionedRelativeSpecifier recognizes Vite's source-backed `?v=<id>`
+// module-instance query on relative imports. It deliberately leaves raw, url,
+// worker, package, virtual, hash-prefixed, and unknown queries untouched.
+func viteVersionedRelativeSpecifier(importPath string) (path, query string, ok bool) {
+	if !strings.HasPrefix(importPath, ".") {
+		return "", "", false
+	}
+	i := strings.IndexByte(importPath, '?')
+	if i < 0 {
+		return "", "", false
+	}
+	query = importPath[i:]
+	if !validViteVersionQuery(query) {
+		return "", "", false
+	}
+	return importPath[:i], query, true
+}
+
+func validViteVersionQuery(query string) bool {
+	if !strings.HasPrefix(query, "?v=") || len(query) == 3 {
+		return false
+	}
+	for _, c := range query[3:] {
+		if !(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '_' || c == '-' || c == '.') {
+			return false
+		}
+	}
+	return true
+}
+
+func splitViteVersionQuery(spec string) (path, query string, ok bool) {
+	i := strings.IndexByte(spec, '?')
+	if i < 0 {
+		return "", "", false
+	}
+	query = spec[i:]
+	if !validViteVersionQuery(query) {
+		return "", "", false
+	}
+	return spec[:i], query, true
 }
 
 // resolveImportPath normalizes a TypeScript import path to a filesystem-relative path.
@@ -3185,6 +3343,9 @@ func bindImportTarget(importPath, fileDir string, aliases map[string]tsAlias, kn
 // Ties are broken on the prefix string so the result is a total order, not merely a
 // less-arbitrary one.
 func resolveImportPath(importPath, fileDir string, aliases map[string]tsAlias) (string, bool) {
+	if path, _, ok := viteVersionedRelativeSpecifier(importPath); ok {
+		importPath = path
+	}
 	// An exact entry wins outright. tsconfig resolves most-specific-first and a pattern
 	// with no `*` matches the whole specifier and nothing else, so it cannot be ranked
 	// against prefixes by length — `@acme/common` (exact) and `@acme/` (prefix) both
@@ -3588,6 +3749,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 		}
 	}
 	externalLocals := map[string]bool{}
+	typeOnlyImportLocals := collectTypeOnlyImportLocals(kinds, root, src)
 	if ctx.externalNames != nil {
 		for n := range ctx.externalNames {
 			externalLocals[n] = true
@@ -4053,11 +4215,13 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 		switch kind {
 		case "import_statement":
 			return // binding sites, not uses
-		case "identifier", "type_identifier":
+		case "identifier", "type_identifier", "shorthand_property_identifier":
 			// type_identifier covers an imported type/interface used only as an
 			// annotation (`repo: Repo`), which is otherwise never an edge.
 			// Type aliases/interfaces occupy type space; they must not hide value
 			// identifiers such as an imported callable of the same name.
+			// A shorthand property is a value reference (`{ helper }`), but a
+			// type-only import is not a runtime value and must not be credited there.
 			if kind == "identifier" {
 				if p := n.Parent(); p != nil && kindOf(kinds, p) == "variable_declarator" {
 					if nameNode := p.ChildByFieldName("name"); nameNode != nil && nameNode.StartByte() == n.StartByte() && nameNode.EndByte() == n.EndByte() {
@@ -4066,6 +4230,9 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 				}
 			}
 			name := nodeText(n, src)
+			if kind == "shorthand_property_identifier" && typeOnlyImportLocals[name] {
+				return
+			}
 			typeSpace := kind == "type_identifier"
 			if t, file, ok, shadowed := frLookupNS(name, typeSpace); shadowed {
 				return
@@ -4360,7 +4527,7 @@ func (e *TSExtractor) testRefsFromFile(src []byte, relFile string, aliases map[s
 	if err := parser.SetLanguage(sitter.NewLanguage(lang)); err != nil {
 		return nil
 	}
-	tree := parser.Parse(src, nil)
+	tree := parseSourceForFile(parser, src, relFile)
 	defer tree.Close()
 
 	ctx := &extractCtx{
