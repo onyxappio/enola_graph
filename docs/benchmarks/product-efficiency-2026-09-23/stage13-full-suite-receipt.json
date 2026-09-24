@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "/opt/homebrew/bin/go",
+    "test",
+    "./...",
+    "-count=1",
+    "-timeout=20m"
+  ],
+  "wall_seconds": 498.543163167,
+  "exit_code": 0,
+  "source_before": {
+    "internal/extractors/tsextractor/session.go": "69cdd73c1a988fa689c3e122f8545024c12e75bf39d7e8b3aac49b7b3fbac53e",
+    "internal/extractors/tsextractor/composition_shared_walk_test.go": "a6ccfc03a63d870d80bf5e1fb686b33c0807f64d10daee13da51f6345ddd394a",
+    "internal/extractors/tsextractor/root_composition_walk_test.go": "1d2356253e03fff5b37da9a11248b47b56b86205f551a6d260b6cde4bf3eb0e1"
+  },
+  "source_after": {
+    "internal/extractors/tsextractor/session.go": "69cdd73c1a988fa689c3e122f8545024c12e75bf39d7e8b3aac49b7b3fbac53e",
+    "internal/extractors/tsextractor/composition_shared_walk_test.go": "a6ccfc03a63d870d80bf5e1fb686b33c0807f64d10daee13da51f6345ddd394a",
+    "internal/extractors/tsextractor/root_composition_walk_test.go": "1d2356253e03fff5b37da9a11248b47b56b86205f551a6d260b6cde4bf3eb0e1"
+  }
+}

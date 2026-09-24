@@ -1,0 +1,40 @@
+package tsextractor
+
+import (
+ "context"
+ "os"
+ "testing"
+ "time"
+ "reflect"
+ "github.com/enola-labs/enola/internal/graphinput"
+ "github.com/enola-labs/enola/internal/extractors/inputscope"
+)
+
+// Diagnostic only: package collectors, not end-to-end Product performance.
+func TestRootDiscoveryCost(t *testing.T) {
+ root := os.Getenv("ENOLA_COST_REPO")
+ if root == "" { t.Skip("set ENOLA_COST_REPO for diagnostic") }
+ policy, err := graphinput.Build(root, graphinput.Options{Exclude: []string{"apps/mobile/e2e/artifacts/**", "worker-reports/**"}})
+ if err != nil { t.Fatal(err) }
+ scope := &inputscope.Scope{Root:root, Policy:policy}
+ e := NewGraph(scope)
+ d := e.NewDiscovery(context.Background(), root, nil)
+ type result struct { Nuxt []string; Gates packageGates; Sources []packageExportSource }
+ collect := func(cached bool) result {
+  ctx := withFileOverlay(context.Background(), newFileOverlay(root,nil))
+  if cached { ctx = withDiscoveryWalkCache(ctx) }
+  return result{collectNuxtPackages(ctx, root, scope), collectPackageGates(ctx, root, scope), collectPackageExportSources(ctx, root, scope)}
+ }
+ reference := collect(false)
+ for i:=0; i<5; i++ {
+  for j:=0; j<2; j++ {
+   cached := (i+j)%2 == 0
+   start := time.Now(); got := collect(cached); elapsed := time.Since(start)
+   if !reflect.DeepEqual(reference,got) { t.Fatal("collectors differ") }
+   t.Logf("pair=%d cached=%v duration=%s",i,cached,elapsed)
+  }
+  start := time.Now(); cost, ok := d.reobserve(newFileOverlay(root,nil)); elapsed := time.Since(start)
+  if !ok { t.Fatal("discovery changed while measuring") }
+  t.Logf("pair=%d reobserve=%s cost=%+v",i,elapsed,cost)
+ }
+}
