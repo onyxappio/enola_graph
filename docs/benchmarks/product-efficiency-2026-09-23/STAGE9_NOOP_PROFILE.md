@@ -26,8 +26,10 @@ input collection and state loading. Preserve input-change fences and full
 state corruption validation when optimizing them. A resident session is a
 separate performance mode; its numbers must not be presented as fresh CLI time.
 
-The package-alias candidate is not accepted yet: an independent test finds
+At the time of this profile, the package-alias candidate was not accepted: an independent test found
 `missing frozen invalidation plan` on the immediate fresh no-op after adding
-a referenced package. Baseline main passes that same sequence. The candidate
-must preserve zero-parse, zero-publication and stable-generation no-op behavior
-without requiring a warm-up transaction.
+a referenced package. Baseline main passed that same sequence. Subsequent alias integration resolved
+this failure and was released as `8af2c7a`; see
+[the integration validation](stage9-alias-integration-validation.json). The required invariant
+remains zero-parse, zero-publication and stable-generation no-op behavior without
+a warm-up transaction.
