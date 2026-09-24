@@ -69,7 +69,7 @@ func (s *session) rawConfigScopeBounded(haveCache bool, input *runtimeInputs, de
 	if len(s.state.TSContext) == 0 {
 		return false, "no stored TypeScript session context to compare the configuration against"
 	}
-	if changes := tsextractor.ContextDifference(s.state.TSContext, input.tsContext); len(changes) > 0 {
+	if changes := tsextractor.ContextDifferenceDurable(s.state.TSContext, input.tsContext, s.aliasStateMode()); len(changes) > 0 {
 		return false, "configuration moved the TypeScript session context: " + strings.Join(changes, ", ")
 	}
 	for _, ext := range s.eng.Extractors() {

@@ -27,7 +27,21 @@ type State struct {
 	EngineContextHash string            `json:"engine_context_hash,omitempty"`
 	TSContext         map[string]string `json:"ts_context,omitempty"`
 	TSFileContext     map[string]string `json:"ts_file_context,omitempty"`
-	PolicyIdentity    string            `json:"policy_identity,omitempty"`
+	// TSFileBase is the part of each file's TypeScript context that does not
+	// depend on the alias declarations, which are answered per key instead. It
+	// is meaningful only alongside TSAliasMeta: an absent map is indistinguishable
+	// from a state that legitimately owns no files, so the marker, not the map,
+	// is what says the structured projection is in use.
+	TSFileBase map[string]string `json:"ts_file_base,omitempty"`
+	// TSAliasMeta is the version of the structured alias projection the state was
+	// written under. Empty means the state predates it and carries only the
+	// aggregate alias digest and the alias-inclusive per-file digests, which are
+	// still emitted and are what such a state is compared against - so an
+	// unchanged repository still reads as unchanged. An alias that actually moved
+	// is then answered by the aggregate key, conservatively, because there is
+	// nothing per key to answer it with.
+	TSAliasMeta    string `json:"ts_alias_meta,omitempty"`
+	PolicyIdentity string `json:"policy_identity,omitempty"`
 	// PolicyAdmissionIdentity fingerprints the admission rules the state was
 	// built under, as opposed to PolicyIdentity, which also moves when the Git
 	// index moves without any decision moving with it. Absent means the state

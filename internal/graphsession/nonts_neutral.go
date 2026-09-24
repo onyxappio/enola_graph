@@ -195,7 +195,7 @@ func scanChangeNeutral(st *State, semantic []string, hashes map[string]string, p
 // file under it. The plan block seeds exactly these files as dirty and reparses
 // them, so a run deciding it has nothing to do has to ask the same question
 // before it skips the plan entirely.
-func (s *session) tsFileContextMoved(current []string, prevFiles map[string]*FileState, next map[string]string) bool {
+func (s *session) tsFileContextMoved(current []string, prevFiles map[string]*FileState, input *runtimeInputs) bool {
 	if s.eng.GraphScope() == nil || s.state == nil {
 		return false
 	}
@@ -204,7 +204,7 @@ func (s *session) tsFileContextMoved(current []string, prevFiles map[string]*Fil
 		if st == nil || st.TS == nil {
 			continue
 		}
-		if s.state.TSFileContext[f] != next[f] {
+		if s.tsFileContextMovedFor(f, st.TS, input) {
 			return true
 		}
 	}

@@ -21,7 +21,7 @@ import (
 // argument instead would let its planner previews run against a snapshot these
 // keys were never derived from, and would not count the build that happened
 // here.
-func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, files []string, disc *Discovery) (map[string]string, map[string]string, *Discovery) {
+func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, files []string, disc *Discovery) (map[string]string, map[string]string, map[string]string, *Discovery) {
 	digest := func(v any) string {
 		b, _ := json.Marshal(v)
 		sum := sha256.Sum256(b)
@@ -129,9 +129,29 @@ func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, 
 	for key, value := range pkgAliases {
 		exportedAliases[key] = aliasValue{value.replacement, value.suffix, value.exact}
 	}
+	// The aggregate key and the alias-inclusive per-file digest below are kept
+	// exactly as they were, and are what a state written before the structured
+	// entries existed is compared against. Without them the first run on such a
+	// state cannot tell an unchanged repository from a changed one, and would
+	// have to republish the world to find out. A reader that has the structured
+	// entries ignores both; State.TSAliasMeta says which reader it is.
 	out["package export aliases"] = digest(exportedAliases)
 	aliases := disc.aliasRootsFor()
+	// One durable entry per declaration rather than one digest over all of them,
+	// so a reader can tell which alias moved and to where. Package `exports`
+	// aliases are keyed under the empty root because every file sees them;
+	// tsconfig aliases keep the root that declared them, so a nested config
+	// stays as scoped here as it is in resolution.
+	for key, value := range pkgAliases {
+		out[aliasContextKey(aliasKindPackage, "", key)] = encodeAliasEntry(AliasEntry{value.replacement, value.suffix, value.exact})
+	}
+	for _, root := range aliases {
+		for key, value := range root.aliases {
+			out[aliasContextKey(aliasKindTSConfig, root.dir, key)] = encodeAliasEntry(AliasEntry{value.replacement, value.suffix, value.exact})
+		}
+	}
 	perFile := map[string]string{}
+	perFileBase := map[string]string{}
 	angular := disc.angular
 	for _, file := range files {
 		if !IsSessionSource(file, angular) {
@@ -142,6 +162,17 @@ func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, 
 		for key, value := range mergePackageAliases(aliasesForDir(aliases, dir), pkgAliases) {
 			normalized[key] = aliasValue{value.replacement, value.suffix, value.exact}
 		}
+		// The alias set itself is not hashed into the structured base. It used to
+		// be, and that is
+		// what made one published package dirty every source in the repository:
+		// mergePackageAliases puts every package alias into every directory's
+		// map, so one new entry moved every file's digest even though no file's
+		// own resolution moved. What the file carries instead is which alias root
+		// it resolves against, which is the part of the alias projection that is
+		// genuinely per file; whether a moved declaration reaches this file is
+		// asked of its prior record at comparison time, where both sides of the
+		// comparison see the same record.
+		aliasRoot, hasAliasRoot := aliasRootDirFor(aliases, dir)
 		// The same call the extraction makes, not a re-derivation of it: the
 		// nearest owning package's Vue and ORM declarations are what extractFile
 		// is handed for this file, so they are what this file's context has to
@@ -151,21 +182,53 @@ func (e *TSExtractor) SessionContext(root string, raw map[string][]byte, paths, 
 		fileOrms, fileVue := disc.gates.forFile(packages, file)
 		pkg, inNuxt := nuxtPackageForFile(disc.nuxtPkgs, file, packageDirSet(disc.gates))
 		perFile[file] = digest([]any{nearestPackageName(packages, dir), normalized, nuxtScopeKey(pkg, inNuxt), []bool{fileVue, fileOrms.typeORM, fileOrms.drizzle}})
+		base := digest([]any{nearestPackageName(packages, dir), nuxtScopeKey(pkg, inNuxt), []bool{fileVue, fileOrms.typeORM, fileOrms.drizzle}})
+		perFileBase[file] = encodeFileContext(base, aliasRoot, hasAliasRoot)
 	}
-	return out, perFile, disc
+	return out, perFile, perFileBase, disc
+}
+
+// ContextDifferenceDurable is ContextDifference over the keys that justify a
+// whole-domain fallback on their own. Alias declarations are excluded: they are
+// projected per key precisely so that a file can be asked whether the one that
+// moved reaches it, and forcing every owned file here would discard that answer
+// before anything could use it. The per-file seed that replaces it is not weaker
+// - it dirties every file whose resolution the change can reach, and falls back
+// to affected for any file whose prior record cannot rule it out.
+func ContextDifferenceDurable(before, after map[string]string, mode AliasStateMode) []string {
+	return contextDifference(before, after, true, mode)
 }
 
 // ContextDifference gives deterministic invalidation reasons for durable keys.
 func ContextDifference(before, after map[string]string) []string {
+	return contextDifference(before, after, false, AliasStateLegacy)
+}
+
+func contextDifference(before, after map[string]string, durable bool, mode AliasStateMode) []string {
+	// The structured alias entries are always skipped by a durable reason: on a
+	// state that has them they are answered per file, and on one that does not
+	// they are additions with no counterpart, which would force a whole-domain
+	// fallback for no observed change. The aggregate key is skipped only once
+	// the structured entries are in use, because until then it is the only thing
+	// that can say an alias moved.
+	skip := func(k string) bool {
+		if !durable || mode == AliasStateUnsupported {
+			return false
+		}
+		if IsAliasContextKey(k) {
+			return true
+		}
+		return mode == AliasStateStructured && k == legacyAliasAggregateKey
+	}
 	var changed []string
 	seen := map[string]bool{}
 	for k, v := range before {
-		if after[k] != v {
+		if after[k] != v && !skip(k) {
 			seen[k] = true
 		}
 	}
 	for k, v := range after {
-		if before[k] != v {
+		if before[k] != v && !skip(k) {
 			seen[k] = true
 		}
 	}

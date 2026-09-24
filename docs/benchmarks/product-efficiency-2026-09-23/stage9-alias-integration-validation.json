@@ -1,0 +1,60 @@
+{
+  "revision": "8af2c7a",
+  "production_sha256": {
+    "internal/extractors/tsextractor/context.go": "b3ebfa252a637ff13195ea60e58fc4c68dea06d540cc326f178c0b1ee29cd0ff",
+    "internal/extractors/tsextractor/aliascontext.go": "3806a483b4f572daed8638983320339f4083f68e949a58e3301c8b7f07ddab2c",
+    "internal/graphsession/alias_scope.go": "5107dbcbc10ea391719e82bbd1efbe313dff453d9fad5120a2ace5c9fb17d0aa",
+    "internal/graphsession/config_scope.go": "30920fe7b10062c444fed839b4ec727f51c3f25cd28e75d799e49869d1445f84",
+    "internal/graphsession/nonts_neutral.go": "6cfc953f273cfad23f59785a7e042ab260c99bf7a28756f9f5b4b9e99c686345",
+    "internal/graphsession/session.go": "fab024e0b1900a5ea23bd628f0f583b26d60d8d851efcd7ce19c92ed8933309b",
+    "internal/graphsession/state.go": "4c43200871a1296de4d78d9cc9624bd4c0d70440c73d5656e1145c8d54bf1f94",
+    "internal/graphsession/resident.go": "bd59d747ab9ccc861abd7e807e93296326786f0e999deb4c929fd0acf65d81b0"
+  },
+  "validation": "Full suite snapshot production matches integration exactly. Only TestScopedNearestPackageAndAliases failed due prior 2-file expectation; updated nested/inherited importer counts both 1, all cold comparisons preserved. Whole bootstrap rerun and root integrated targeted tests pass. This is an intermediate optimization, not final performance acceptance.",
+  "logs": {
+    "/tmp/enola-stage9-logs9/suite-alias3-v2.log": {
+      "sha256": "67371146e624893f588f2a69e43719182250acb3ad4d9bceedcf57391b0d8ef9",
+      "bytes": 91446
+    },
+    "/tmp/enola-stage9-logs9/bootstrap-full-alias3.log": {
+      "sha256": "b2213f8567d3b2026d10a657cbde8cf1c0d5160e9c6b82051a46f103c676eab7",
+      "bytes": 56
+    },
+    "/tmp/enola-stage9-integrated-bootstrap2.log": {
+      "sha256": "56bdc50ff206f84ce527fc3c02a836badd57610d5a14235e29dc3a803d6990a3",
+      "bytes": 54
+    },
+    "/tmp/enola-stage9-integrated-alias-guards.log": {
+      "sha256": "d5277abf3af0ba20f1644526aaf71da80afd7597ce6322b20c6df39f39be8c2c",
+      "bytes": 135
+    },
+    "/tmp/enola-stage9-integrated-migration.log": {
+      "sha256": "fc6b0acff8ea3794fb1086448b43dc0e1925d02cd661b1543be99ecf04838a8d",
+      "bytes": 1523
+    }
+  },
+  "graphsession_full_seconds": 588.858,
+  "bootstrap_full_rerun_seconds": 131.556,
+  "integrated_bootstrap_targeted_seconds": 9.248,
+  "migration": {
+    "binary_sha256": "4258dd93ab3e7126a87e974c85f49f978309ae20b0f2c49ba51760aeda61c482",
+    "legacy_noop": {
+      "seconds": 0.927924667,
+      "log": "enola graph: config /tmp/enola-stage9-alias-migration/config.yaml\n[graph] /tmp/enola-stage9-alias-migration/repo: generation 1\u21921 parsed=0 cached=19 early_local=0 fallbacks=0\n"
+    },
+    "retarget": {
+      "seconds": 0.346161917,
+      "log": "enola graph: config /tmp/enola-stage9-alias-migration/config.yaml\n[graph] /tmp/enola-stage9-alias-migration/repo: generation 1\u21922 parsed=19 cached=0 early_local=0 fallbacks=2\n[graph] fallback typescript: all owned files (TS package export aliases changed)\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n"
+    },
+    "retarget_noop": {
+      "seconds": 0.09583437499999992,
+      "log": "enola graph: config /tmp/enola-stage9-alias-migration/config.yaml\n[graph] /tmp/enola-stage9-alias-migration/repo: generation 2\u21922 parsed=0 cached=19 early_local=0 fallbacks=0\n"
+    },
+    "cold": {
+      "seconds": 0.3855325409999999,
+      "log": "enola graph: config /tmp/enola-stage9-alias-migration/config.yaml\n[graph] /tmp/enola-stage9-alias-migration/repo: generation 0\u21921 parsed=19 cached=0 early_local=0 fallbacks=2\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n"
+    },
+    "graph_hash": "9e648d532155f6484c8b9d111a3dce7f019c58f48ffc0dba65e785b326877688",
+    "passed": true
+  }
+}

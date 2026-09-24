@@ -1,0 +1,448 @@
+{
+  "note": "Three alternating repeats per arm, fresh state/CLI, file sink, shared host; every graph matched independently validated cold oracle. Not NATS acceptance.",
+  "parent": "d0fbbf855af5f4a33c364885f85805d71f9fac7c",
+  "target": "a2ac71af8a22471c27059a9b318ef4880caa50cb",
+  "binary_sha256": {
+    "alias": "4258dd93ab3e7126a87e974c85f49f978309ae20b0f2c49ba51760aeda61c482",
+    "empty-domain": "ff19e3bff2f8d07647b289bd0021281057b12e71c88c7d05d7b69c4b07836285"
+  },
+  "rows": [
+    {
+      "arm": "alias",
+      "initial": {
+        "exit": 0,
+        "wall_s": 27.34,
+        "sink": "file",
+        "parsed": 3934,
+        "cached": 0,
+        "files_read": 3986,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4766,
+        "events": 2075,
+        "run_id": "product-scope-scope-bench-1-1790215566730870000",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 0\u21921 parsed=3934 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "delta": {
+        "exit": 0,
+        "wall_s": 27.397,
+        "sink": "file",
+        "parsed": 6,
+        "cached": 3934,
+        "files_read": 58,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 4773,
+        "events": 2077,
+        "run_id": "product-scope-scope-bench-2-1790215595610549000",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 1\u21922 parsed=6 cached=3934 early_local=0 fallbacks=4\n[graph] fallback python: all prior/current file owners (extractor contribution cannot be previewed before Begin; its candidate names cannot be bounded)\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "noop": {
+        "exit": 0,
+        "wall_s": 1.848,
+        "sink": "file",
+        "parsed": 0,
+        "cached": 3992,
+        "files_read": 0,
+        "generation": [
+          2,
+          2
+        ],
+        "owners_published": 0,
+        "events": 0,
+        "run_id": "",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 2\u21922 parsed=0 cached=3992 early_local=0 fallbacks=0"
+      },
+      "proof": [
+        {
+          "graph_hash": "3485766397a8d22cb0df544b72eb0404f852e55ee1601312537c619749ebceaa",
+          "scope": 8169,
+          "records": 2075,
+          "payload_bytes": 69441167
+        },
+        {
+          "graph_hash": "fa07149e9e1e24469574235f20670669bdb276bb4c5a4e50e03d55231a85f67a",
+          "scope": 8178,
+          "records": 2077,
+          "payload_bytes": 69503935
+        }
+      ]
+    },
+    {
+      "arm": "empty-domain",
+      "initial": {
+        "exit": 0,
+        "wall_s": 29.091,
+        "sink": "file",
+        "parsed": 3934,
+        "cached": 0,
+        "files_read": 3986,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4766,
+        "events": 2075,
+        "run_id": "product-scope-scope-bench-1-1790215632879836000",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 0\u21921 parsed=3934 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "delta": {
+        "exit": 0,
+        "wall_s": 4.451,
+        "sink": "file",
+        "parsed": 6,
+        "cached": 3934,
+        "files_read": 58,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 8,
+        "events": 4,
+        "run_id": "product-scope-scope-bench-2-1790215663342816000",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 1\u21922 parsed=6 cached=3934 early_local=0 fallbacks=2\n[graph] fallback graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "noop": {
+        "exit": 0,
+        "wall_s": 2.011,
+        "sink": "file",
+        "parsed": 0,
+        "cached": 3992,
+        "files_read": 0,
+        "generation": [
+          2,
+          2
+        ],
+        "owners_published": 0,
+        "events": 0,
+        "run_id": "",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 2\u21922 parsed=0 cached=3992 early_local=0 fallbacks=0"
+      },
+      "proof": [
+        {
+          "graph_hash": "3485766397a8d22cb0df544b72eb0404f852e55ee1601312537c619749ebceaa",
+          "scope": 8169,
+          "records": 2075,
+          "payload_bytes": 69441167
+        },
+        {
+          "graph_hash": "fa07149e9e1e24469574235f20670669bdb276bb4c5a4e50e03d55231a85f67a",
+          "scope": 60,
+          "records": 4,
+          "payload_bytes": 70500
+        }
+      ]
+    },
+    {
+      "arm": "empty-domain",
+      "initial": {
+        "exit": 0,
+        "wall_s": 28.613,
+        "sink": "file",
+        "parsed": 3934,
+        "cached": 0,
+        "files_read": 3986,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4766,
+        "events": 2075,
+        "run_id": "product-scope-scope-bench-1-1790215675171430000",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 0\u21921 parsed=3934 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "delta": {
+        "exit": 0,
+        "wall_s": 4.319,
+        "sink": "file",
+        "parsed": 6,
+        "cached": 3934,
+        "files_read": 58,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 8,
+        "events": 4,
+        "run_id": "product-scope-scope-bench-2-1790215705299067000",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 1\u21922 parsed=6 cached=3934 early_local=0 fallbacks=2\n[graph] fallback graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "noop": {
+        "exit": 0,
+        "wall_s": 1.819,
+        "sink": "file",
+        "parsed": 0,
+        "cached": 3992,
+        "files_read": 0,
+        "generation": [
+          2,
+          2
+        ],
+        "owners_published": 0,
+        "events": 0,
+        "run_id": "",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 2\u21922 parsed=0 cached=3992 early_local=0 fallbacks=0"
+      },
+      "proof": [
+        {
+          "graph_hash": "3485766397a8d22cb0df544b72eb0404f852e55ee1601312537c619749ebceaa",
+          "scope": 8169,
+          "records": 2075,
+          "payload_bytes": 69441167
+        },
+        {
+          "graph_hash": "fa07149e9e1e24469574235f20670669bdb276bb4c5a4e50e03d55231a85f67a",
+          "scope": 60,
+          "records": 4,
+          "payload_bytes": 70500
+        }
+      ]
+    },
+    {
+      "arm": "alias",
+      "initial": {
+        "exit": 0,
+        "wall_s": 28.686,
+        "sink": "file",
+        "parsed": 3934,
+        "cached": 0,
+        "files_read": 3986,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4766,
+        "events": 2075,
+        "run_id": "product-scope-scope-bench-1-1790215716654091000",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 0\u21921 parsed=3934 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "delta": {
+        "exit": 0,
+        "wall_s": 24.404,
+        "sink": "file",
+        "parsed": 6,
+        "cached": 3934,
+        "files_read": 58,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 4773,
+        "events": 2077,
+        "run_id": "product-scope-scope-bench-2-1790215746775980000",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 1\u21922 parsed=6 cached=3934 early_local=0 fallbacks=4\n[graph] fallback python: all prior/current file owners (extractor contribution cannot be previewed before Begin; its candidate names cannot be bounded)\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "noop": {
+        "exit": 0,
+        "wall_s": 1.805,
+        "sink": "file",
+        "parsed": 0,
+        "cached": 3992,
+        "files_read": 0,
+        "generation": [
+          2,
+          2
+        ],
+        "owners_published": 0,
+        "events": 0,
+        "run_id": "",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 2\u21922 parsed=0 cached=3992 early_local=0 fallbacks=0"
+      },
+      "proof": [
+        {
+          "graph_hash": "3485766397a8d22cb0df544b72eb0404f852e55ee1601312537c619749ebceaa",
+          "scope": 8169,
+          "records": 2075,
+          "payload_bytes": 69441167
+        },
+        {
+          "graph_hash": "fa07149e9e1e24469574235f20670669bdb276bb4c5a4e50e03d55231a85f67a",
+          "scope": 8178,
+          "records": 2077,
+          "payload_bytes": 69503935
+        }
+      ]
+    },
+    {
+      "arm": "alias",
+      "initial": {
+        "exit": 0,
+        "wall_s": 28.941,
+        "sink": "file",
+        "parsed": 3934,
+        "cached": 0,
+        "files_read": 3986,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4766,
+        "events": 2075,
+        "run_id": "product-scope-scope-bench-1-1790215781133274000",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 0\u21921 parsed=3934 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "delta": {
+        "exit": 0,
+        "wall_s": 24.667,
+        "sink": "file",
+        "parsed": 6,
+        "cached": 3934,
+        "files_read": 58,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 4773,
+        "events": 2077,
+        "run_id": "product-scope-scope-bench-2-1790215811566751000",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 1\u21922 parsed=6 cached=3934 early_local=0 fallbacks=4\n[graph] fallback python: all prior/current file owners (extractor contribution cannot be previewed before Begin; its candidate names cannot be bounded)\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "noop": {
+        "exit": 0,
+        "wall_s": 1.822,
+        "sink": "file",
+        "parsed": 0,
+        "cached": 3992,
+        "files_read": 0,
+        "generation": [
+          2,
+          2
+        ],
+        "owners_published": 0,
+        "events": 0,
+        "run_id": "",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 2\u21922 parsed=0 cached=3992 early_local=0 fallbacks=0"
+      },
+      "proof": [
+        {
+          "graph_hash": "3485766397a8d22cb0df544b72eb0404f852e55ee1601312537c619749ebceaa",
+          "scope": 8169,
+          "records": 2075,
+          "payload_bytes": 69441167
+        },
+        {
+          "graph_hash": "fa07149e9e1e24469574235f20670669bdb276bb4c5a4e50e03d55231a85f67a",
+          "scope": 8178,
+          "records": 2077,
+          "payload_bytes": 69503935
+        }
+      ]
+    },
+    {
+      "arm": "empty-domain",
+      "initial": {
+        "exit": 0,
+        "wall_s": 28.378,
+        "sink": "file",
+        "parsed": 3934,
+        "cached": 0,
+        "files_read": 3986,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4766,
+        "events": 2075,
+        "run_id": "product-scope-scope-bench-1-1790215845908069000",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 0\u21921 parsed=3934 cached=0 early_local=0 fallbacks=6\n[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)\n[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)\n[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "delta": {
+        "exit": 0,
+        "wall_s": 4.167,
+        "sink": "file",
+        "parsed": 6,
+        "cached": 3934,
+        "files_read": 58,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 8,
+        "events": 4,
+        "run_id": "product-scope-scope-bench-2-1790215875636451000",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 1\u21922 parsed=6 cached=3934 early_local=0 fallbacks=2\n[graph] fallback graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)\n[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+      },
+      "noop": {
+        "exit": 0,
+        "wall_s": 1.799,
+        "sink": "file",
+        "parsed": 0,
+        "cached": 3992,
+        "files_read": 0,
+        "generation": [
+          2,
+          2
+        ],
+        "owners_published": 0,
+        "events": 0,
+        "run_id": "",
+        "stderr_graph": "[graph] /tmp/enola-stage9-empty-domain-history/live: generation 2\u21922 parsed=0 cached=3992 early_local=0 fallbacks=0"
+      },
+      "proof": [
+        {
+          "graph_hash": "3485766397a8d22cb0df544b72eb0404f852e55ee1601312537c619749ebceaa",
+          "scope": 8169,
+          "records": 2075,
+          "payload_bytes": 69441167
+        },
+        {
+          "graph_hash": "fa07149e9e1e24469574235f20670669bdb276bb4c5a4e50e03d55231a85f67a",
+          "scope": 60,
+          "records": 4,
+          "payload_bytes": 70500
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "alias": {
+      "initial": {
+        "median": 28.686,
+        "min": 27.34,
+        "max": 28.941
+      },
+      "delta": {
+        "median": 24.667,
+        "min": 24.404,
+        "max": 27.397
+      },
+      "noop": {
+        "median": 1.822,
+        "min": 1.805,
+        "max": 1.848
+      }
+    },
+    "empty-domain": {
+      "initial": {
+        "median": 28.613,
+        "min": 28.378,
+        "max": 29.091
+      },
+      "delta": {
+        "median": 4.319,
+        "min": 4.167,
+        "max": 4.451
+      },
+      "noop": {
+        "median": 1.819,
+        "min": 1.799,
+        "max": 2.011
+      }
+    }
+  },
+  "harness_sha256": "90389bbd580409704a9c724dbc517f9efacc69e814f677b99cc1a5f865c0e67c",
+  "experimental_build": {
+    "kind": "experimental-go-overlay",
+    "base_revision": "a970a03",
+    "binary_sha256": "ff19e3bff2f8d07647b289bd0021281057b12e71c88c7d05d7b69c4b07836285",
+    "production_source_sha256": {
+      "internal/graphsession/owner.go": "0863d630da0ffb499cc81b7e8c95a69349c8ce08234c8fdd5609a2ac03a199f2",
+      "internal/graphsession/session.go": "921c38fb11819b16c45c93c943fac849ca77458209248c1abc3f545aca9c9209"
+    },
+    "warning": "Go VCS metadata identifies base checkout; this receipt identifies changed sources. Not final accepted candidate."
+  }
+}

@@ -494,12 +494,33 @@ func refreshExtractorObservedInputs(prev map[string]*FileState, owned []string, 
 	}
 }
 
-func nonTSExtractorNeed(owned []string, prevFiles map[string]*FileState, hashes map[string]string, extName, prevScan, scanHash string, forceAll, configChanged bool) bool {
+func nonTSExtractorNeed(ext plugin.Extractor, owned []string, prevFiles map[string]*FileState, hashes map[string]string, extName, prevScan, scanHash string, forceAll, configChanged bool) bool {
 	if forceAll || configChanged {
 		return true
 	}
 	if len(owned) == 0 {
-		if prevScan == "" || prevScan != scanHash {
+		// An extractor that owns nothing has no owned file to compare, so this
+		// branch used to fall back to the scan digest. That digest is one
+		// number over every semantic name and its bytes, so adding a
+		// TypeScript source moves it, and an extractor with an empty domain
+		// read that as its own reason to re-run: a whole-domain Begin bought
+		// by a file it does not own and cannot see.
+		//
+		// An extractor that declares its inputs can answer the question the
+		// scan digest cannot, and the declared comparison runs right after
+		// this one. Defer to it rather than pre-empting it. Nothing is skipped
+		// by deferring: retirement is caught below, by a path this extractor
+		// owned that the inventory no longer has, and the first new source to
+		// appear is owned and leaves this branch entirely.
+		//
+		// Only an extractor that declared its inputs is deferred. An opaque one
+		// currently reaches the same conservative answer either way, because
+		// extractorInputDigest hands it the scan digest to be compared against,
+		// but that is a property of the digest rather than of this branch, so
+		// the condition names the precondition it actually depends on.
+		// TestOpaqueExtractorInputDigestIsTheScanDigest pins the other half.
+		_, declaresInputs := ext.(plugin.DeltaInputs)
+		if prevScan == "" || (!declaresInputs && prevScan != scanHash) {
 			return true
 		}
 		for path, prev := range prevFiles {

@@ -131,8 +131,8 @@ func TestSessionContextFromSharedDiscoveryMatchesDirectReads(t *testing.T) {
 		raw[p] = b
 	}
 
-	direct, directPerFile, _ := ext.SessionContext(dir, raw, paths, files, nil)
-	shared, sharedPerFile, _ := ext.SessionContext(dir, raw, paths, files, ext.NewDiscovery(context.Background(), dir, nil))
+	direct, directPerFile, _, _ := ext.SessionContext(dir, raw, paths, files, nil)
+	shared, sharedPerFile, _, _ := ext.SessionContext(dir, raw, paths, files, ext.NewDiscovery(context.Background(), dir, nil))
 
 	if len(direct) == 0 || len(directPerFile) == 0 {
 		t.Fatal("the fixture projected no context at all")
