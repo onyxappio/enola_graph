@@ -193,6 +193,105 @@ func TestParseInputForTypeScriptProtectsLiteralsAndHandlesIncompleteInput(t *tes
 	if _, err := safeParseInputForTypeScript([]byte{'\'', 'a', '\\'}); err != nil {
 		t.Fatalf("incomplete editor input panicked: %v", err)
 	}
+	if _, err := safeParseInputForTypeScript([]byte("const value = `trailing\\")); err != nil {
+		t.Fatalf("incomplete template input panicked: %v", err)
+	}
+}
+
+func TestParseInputForTypeScriptVisitsInterpolationAfterTemplateEscape(t *testing.T) {
+	tests := []struct {
+		name          string
+		src           []byte
+		preserve      string
+		maskedImport  string
+		wantUnchanged bool
+	}{
+		{
+			name:         "escaped newline before interpolation",
+			src:          []byte("const value = `\\n${wrap<typeof import('./types').Options>()}`;"),
+			preserve:     "`\\n${",
+			maskedImport: "import('./types')",
+		},
+		{
+			name:         "escaped backtick before interpolation",
+			src:          []byte("const value = `\\`${wrap<typeof import('./backtick-types').Options>()}`;"),
+			preserve:     "`\\`${",
+			maskedImport: "import('./backtick-types')",
+		},
+		{
+			name:          "escaped interpolation marker stays literal",
+			src:           []byte("const value = `\\${wrap<typeof import('./literal-only').Options>()}`;"),
+			preserve:      "\\${wrap<typeof import('./literal-only').Options>()}",
+			wantUnchanged: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := parseInputForTypeScript(tt.src)
+			if len(got) != len(tt.src) {
+				t.Fatalf("parser repair changed byte length: got=%d want=%d", len(got), len(tt.src))
+			}
+			if !bytes.Contains(got, []byte(tt.preserve)) {
+				t.Fatalf("escaped template text changed; want %q in %s", tt.preserve, got)
+			}
+			if tt.maskedImport != "" && bytes.Contains(got, []byte(tt.maskedImport)) {
+				t.Fatalf("ImportType in real interpolation was not masked: %s", got)
+			}
+			if tt.wantUnchanged && !bytes.Equal(got, tt.src) {
+				t.Fatalf("escaped literal interpolation was rewritten: %s", got)
+			}
+		})
+	}
+
+	// A final backslash is incomplete template text. The lexer must stop exactly
+	// at EOF instead of returning an index past the input.
+	incomplete := []byte("`trailing\\")
+	var tokens []parserToken
+	if end := lexTemplateLiteral(incomplete, 0, &tokens); end != len(incomplete) {
+		t.Fatalf("incomplete template ended at %d, want EOF %d", end, len(incomplete))
+	}
+}
+
+func TestExtract_Wave13TemplateEscapesDoNotEmitTypeImportsAsRuntimeDependencies(t *testing.T) {
+	for _, tc := range []struct {
+		name           string
+		templateEscape string
+	}{
+		{name: "plain interpolation"},
+		{name: "escaped newline before interpolation", templateEscape: `\n`},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			consumer := "import { wrap } from './provider'\n" +
+				fmt.Sprintf("export const value = `%s${wrap<typeof import('./types').Options>()}`\n", tc.templateEscape) +
+				"export const escapedInterpolation = `\\${wrap<typeof import('./literal-only').Options>()}`\n" +
+				"export function afterTemplate() { return wrap<string>() }\n"
+			ff := extractAll(t, map[string]string{
+				"src/consumer.ts": consumer,
+				"src/provider.ts": `export function wrap<T>() { return 'ok' }`,
+				"src/types.ts":    `export interface Options { value: string }`,
+			}, false)
+
+			var dependencies []facts.Fact
+			for _, fact := range ff {
+				if fact.Kind == facts.KindDependency && fact.File == "src/consumer.ts" {
+					dependencies = append(dependencies, fact)
+				}
+			}
+			if len(dependencies) != 1 {
+				t.Fatalf("consumer dependencies=%+v, want only its static provider import", dependencies)
+			}
+			provider := dependencies[0]
+			if provider.PropString(facts.PropImportSpec) != "src/provider" || provider.PropString(facts.PropTargetFile) != "src/provider.ts" {
+				t.Errorf("provider dependency changed: %+v", provider)
+			}
+			if provider.Props["dynamic"] == true {
+				t.Errorf("static provider import was marked dynamic: %+v", provider)
+			}
+			if _, ok := findFact(ff, "src.afterTemplate"); !ok {
+				t.Errorf("declaration after escaped templates is missing: facts=%v", factNames(ff))
+			}
+		})
+	}
 }
 
 func safeParseInputForTypeScript(src []byte) (out []byte, err error) {

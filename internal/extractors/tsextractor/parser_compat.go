@@ -284,6 +284,7 @@ func lexTemplateLiteral(src []byte, start int, out *[]parserToken) int {
 			} else {
 				i++
 			}
+			continue
 		case '`':
 			return i + 1
 		case '$':
