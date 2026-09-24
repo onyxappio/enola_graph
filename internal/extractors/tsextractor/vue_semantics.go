@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/enola-labs/enola/internal/extractors/tsutil"
@@ -187,6 +188,7 @@ func balancedEnd(s string, start int, open, close byte) int {
 
 // vueTopLevelKeys extracts keys from the outermost object/type literal only.
 func vueTopLevelKeys(shape string) []string {
+	shape = vueMaskTypeComments(shape)
 	start := strings.IndexByte(shape, '{')
 	if start < 0 {
 		return nil
@@ -207,6 +209,39 @@ func vueTopLevelKeys(shape string) []string {
 			continue
 		}
 		if c == '\'' || c == '"' || c == '`' {
+			if depth == 1 && memberStart && c != '`' {
+				startKey := i
+				i++
+				for i < len(shape) {
+					if shape[i] == '\\' {
+						i += 2
+						continue
+					}
+					if shape[i] == c {
+						i++
+						break
+					}
+					i++
+				}
+				key := shape[startKey:i]
+				for i < len(shape) && (shape[i] == ' ' || shape[i] == '\t' || shape[i] == '\r' || shape[i] == '\n') {
+					i++
+				}
+				if i < len(shape) && (shape[i] == '?' || shape[i] == '!') {
+					i++
+					for i < len(shape) && (shape[i] == ' ' || shape[i] == '\t' || shape[i] == '\r' || shape[i] == '\n') {
+						i++
+					}
+				}
+				if i < len(shape) && shape[i] == ':' {
+					if unquoted, ok := vueUnquotePropertyKey(key); ok {
+						seen[unquoted] = true
+					}
+					memberStart = false
+				}
+				i--
+				continue
+			}
 			quote = c
 			continue
 		}
@@ -222,6 +257,10 @@ func vueTopLevelKeys(shape string) []string {
 			continue
 		}
 		if depth == 1 && (c == ',' || c == ';') {
+			memberStart = true
+			continue
+		}
+		if depth == 1 && c == '\n' && !memberStart && vueLooksLikeMemberStart(shape, i+1) {
 			memberStart = true
 			continue
 		}
@@ -249,6 +288,128 @@ func vueTopLevelKeys(shape string) []string {
 	}
 	sort.Strings(out)
 	return out
+}
+
+func vueUnquotePropertyKey(key string) (string, bool) {
+	if len(key) >= 2 && key[0] == '\'' && key[len(key)-1] == '\'' {
+		inner := strings.ReplaceAll(key[1:len(key)-1], `\'`, `'`)
+		inner = strings.ReplaceAll(inner, `\\`, `\`)
+		return inner, true
+	}
+	value, err := strconv.Unquote(key)
+	return value, err == nil
+}
+
+// vueMaskTypeComments removes TypeScript comments without moving line breaks, so
+// comments cannot be mistaken for member names and newline separators remain
+// available to the member scanner.
+func vueMaskTypeComments(shape string) string {
+	b := []byte(shape)
+	var quote byte
+	lineComment, blockComment := false, false
+	for i := 0; i < len(b); i++ {
+		c := b[i]
+		if quote != 0 {
+			if c == '\\' {
+				i++
+				continue
+			}
+			if c == quote {
+				quote = 0
+			}
+			continue
+		}
+		if lineComment {
+			if c == '\n' {
+				lineComment = false
+			} else if c != '\r' {
+				b[i] = ' '
+			}
+			continue
+		}
+		if blockComment {
+			if c == '*' && i+1 < len(b) && b[i+1] == '/' {
+				b[i], b[i+1] = ' ', ' '
+				i++
+				blockComment = false
+				continue
+			}
+			if c != '\n' && c != '\r' {
+				b[i] = ' '
+			}
+			continue
+		}
+		if c == '\'' || c == '"' || c == '`' {
+			quote = c
+			continue
+		}
+		if c == '/' && i+1 < len(b) {
+			switch b[i+1] {
+			case '/':
+				b[i], b[i+1] = ' ', ' '
+				i++
+				lineComment = true
+			case '*':
+				b[i], b[i+1] = ' ', ' '
+				i++
+				blockComment = true
+			}
+		}
+	}
+	return string(b)
+}
+
+// vueLooksLikeMemberStart checks the next significant token at an outer type
+// level. A union/intersection continuation (| or &) must not re-arm the key
+// scanner, while a property or method signature after a newline should.
+func vueLooksLikeMemberStart(shape string, start int) bool {
+	i := start
+	for i < len(shape) && (shape[i] == ' ' || shape[i] == '\t' || shape[i] == '\r' || shape[i] == '\n') {
+		i++
+	}
+	wordStart := i
+	for i < len(shape) && (shape[i] == '_' || shape[i] == '$' || shape[i] >= 'A' && shape[i] <= 'Z' || shape[i] >= 'a' && shape[i] <= 'z') {
+		i++
+	}
+	if wordStart == i {
+		if i >= len(shape) || shape[i] != '\'' && shape[i] != '"' {
+			return false
+		}
+		quote := shape[i]
+		i++
+		for i < len(shape) {
+			if shape[i] == '\\' {
+				i += 2
+				continue
+			}
+			if shape[i] == quote {
+				i++
+				break
+			}
+			i++
+		}
+	} else if shape[wordStart:i] == "readonly" || shape[wordStart:i] == "get" || shape[wordStart:i] == "set" {
+		for i < len(shape) && (shape[i] == ' ' || shape[i] == '\t') {
+			i++
+		}
+		if i >= len(shape) || shape[i] == ':' || shape[i] == '(' {
+			return shape[wordStart:i] == "readonly" && i < len(shape) && shape[i] == ':'
+		}
+		wordStart = i
+		for i < len(shape) && (shape[i] == '_' || shape[i] == '$' || shape[i] >= 'A' && shape[i] <= 'Z' || shape[i] >= 'a' && shape[i] <= 'z') {
+			i++
+		}
+	}
+	for i < len(shape) && (shape[i] == ' ' || shape[i] == '\t' || shape[i] == '\r' || shape[i] == '\n') {
+		i++
+	}
+	if i < len(shape) && (shape[i] == '?' || shape[i] == '!') {
+		i++
+		for i < len(shape) && (shape[i] == ' ' || shape[i] == '\t' || shape[i] == '\r' || shape[i] == '\n') {
+			i++
+		}
+	}
+	return i < len(shape) && (shape[i] == ':' || shape[i] == '(')
 }
 
 // extractVueRouterRoutes reads literal Vue Router route records from createRouter.
@@ -777,7 +938,13 @@ func resolveNuxtAutoComposableCalls(all []facts.Fact, nuxtPkgs, extraDirs []stri
 		}
 		for j := range all[i].Relations {
 			r := &all[i].Relations[j]
-			if r.Kind != facts.RelCalls || exists[r.Target] || r.TargetFile != "" {
+			// The TypeScript reference pass keeps unresolved module names attached to
+			// their source file so ordinary same-directory exports cannot bind them.
+			// Nuxt's configured auto-import oracle is an explicit exception: allow it
+			// to reconsider that unresolved same-file candidate, while preserving
+			// imported or other-file targets. Existing local symbols are excluded by
+			// exists above.
+			if r.Kind != facts.RelCalls || exists[r.Target] || (r.TargetFile != "" && r.TargetFile != all[i].File) {
 				continue
 			}
 			short := r.Target[strings.LastIndexByte(r.Target, '.')+1:]

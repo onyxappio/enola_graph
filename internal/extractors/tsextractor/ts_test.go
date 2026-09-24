@@ -1120,6 +1120,7 @@ func TestExtract_FileRef_SameModuleUsePositions(t *testing.T) {
 	ff := extractAll(t, map[string]string{
 		"client/index.jsx": `function startSession() {}` + "\n" +
 			`function mapStateToProps() {}` + "\n" +
+			`function App() {}` + "\n" +
 			`startSession()` + "\n" +
 			`export default connect(mapStateToProps)(App)`,
 	}, false)

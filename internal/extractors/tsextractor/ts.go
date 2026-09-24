@@ -9,6 +9,7 @@ import (
 
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/enola-labs/enola/internal/clientspec"
@@ -538,32 +539,36 @@ func appendTSDirectoryModules(allFacts []facts.Fact, dirs map[string]bool, pkgNa
 // extractCtx bundles the per-file state threaded through declaration extraction
 // so symbols can be enriched with React/Next.js semantic classification.
 type extractCtx struct {
-	src           []byte
-	relFile       string
-	dir           string
-	isTSX         bool
-	isNextJS      bool
-	isVue         bool
-	isNuxt        bool
-	isSvelteKit   bool
-	orms          ormFlags
-	importMap     map[string]string
-	importFiles   map[string]string // local import name → known source file of that specifier
-	nsDirs        map[string]string // `import * as ns` local → module directory
-	nsIndex       map[string]string // `import * as ns` local → resolved module file
-	namedImports  map[string]namedImportOrigin
-	nsImports     map[string]string   // `import * as ns` local → original specifier
-	externalNames map[string]bool     // locals bound to external (npm/node:) specifiers
-	virtualNames  map[string]bool     // locals bound to framework virtual modules (#imports/#app)
-	localNames    map[string]bool     // file-scope function/const names that may own a local call
-	commonJS      commonJSBindings    // module/exports are synthetic only when not rebound locally
-	imports       emberImportBindings // the file's import table, read for the module a superclass identifier came from
-	ioBindings    map[string]bool     // local names bound to imports from a network module (I/O sinks)
-	knownFiles    map[string]bool     // repo-relative (slash) paths of all indexed TS/JS files
-	aliases       map[string]tsAlias  // this directory's tsconfig path aliases, for resolving an import written as a bare specifier
-	readSrc       func(string) []byte // known file bytes for following named re-exports
-	exportCache   *namedExportCache
-	sideReads     map[string]bool
+	src               []byte
+	relFile           string
+	dir               string
+	isTSX             bool
+	isNextJS          bool
+	isVue             bool
+	isNuxt            bool
+	isSvelteKit       bool
+	orms              ormFlags
+	importMap         map[string]string
+	importFiles       map[string]string // local import name → known source file of that specifier
+	nsDirs            map[string]string // `import * as ns` local → module directory
+	nsIndex           map[string]string // `import * as ns` local → resolved module file
+	namedImports      map[string]namedImportOrigin
+	nsImports         map[string]string   // `import * as ns` local → original specifier
+	externalNames     map[string]bool     // locals bound to external (npm/node:) specifiers
+	virtualNames      map[string]bool     // locals bound to framework virtual modules (#imports/#app)
+	localNames        map[string]bool     // file-scope function/const names that may own a local call
+	localTargets      map[string]string   // lexical module-block names to their file-owned symbol identity
+	symbolScope       string              // stable lexical scope segment for declarations inside module blocks
+	scopedSymbolNames map[string]bool     // emitted module-block symbols are never module exports
+	scriptMode        bool                // true for TypeScript/JavaScript files with shared script globals
+	commonJS          commonJSBindings    // module/exports are synthetic only when not rebound locally
+	imports           emberImportBindings // the file's import table, read for the module a superclass identifier came from
+	ioBindings        map[string]bool     // local names bound to imports from a network module (I/O sinks)
+	knownFiles        map[string]bool     // repo-relative (slash) paths of all indexed TS/JS files
+	aliases           map[string]tsAlias  // this directory's tsconfig path aliases, for resolving an import written as a bare specifier
+	readSrc           func(string) []byte // known file bytes for following named re-exports
+	exportCache       *namedExportCache
+	sideReads         map[string]bool
 }
 
 func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, isNuxt, isSvelteKit, isEmber, isReactNav, isAngular bool, graphqlServer graphqlServerContext, orms ormFlags, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, nuxtAutoComponents map[string]string, grpcStubs *grpcStubIndex, exportCache *namedExportCache, sideReads, resolutionSpecs map[string]bool) ([]facts.Fact, angularCounts, *angularRouterFile, map[string]*angularTemplate, *angularHTTPFile, clientCounts) {
@@ -720,6 +725,7 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 	ctx.namedImports, ctx.nsImports = collectImportOrigins(kinds, root, src)
 	ctx.externalNames, ctx.virtualNames = collectImportNameClasses(kinds, root, src, relFile, aliases)
 	ctx.localNames = collectFileScopeCallNames(kinds, root, src)
+	ctx.scriptMode = isTSScriptMode(kinds, root, relFile, src)
 	decls := e.extractDeclarations(kinds, root, ctx)
 
 	// A declaration may be exported via a separate `export { A, B }` clause or
@@ -731,7 +737,7 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 				continue
 			}
 			local := decls[i].Name[strings.LastIndexByte(decls[i].Name, '.')+1:]
-			if exported[local] {
+			if exported[local] && !ctx.scopedSymbolNames[decls[i].Name] {
 				decls[i].Props["exported"] = true
 			}
 		}
@@ -960,11 +966,183 @@ func dynamicImportSpecifier(kinds *tsutil.KindTable, n *sitter.Node, src []byte)
 
 func (e *TSExtractor) extractDeclarations(kinds *tsutil.KindTable, root *sitter.Node, ctx *extractCtx) []facts.Fact {
 	ctx.commonJS = collectCommonJSModuleBindings(kinds, root, ctx.src)
+	if ctx.scopedSymbolNames == nil {
+		ctx.scopedSymbolNames = make(map[string]bool)
+	}
 	var result []facts.Fact
 	for i := range root.ChildCount() {
 		result = append(result, e.extractNode(kinds, root.Child(i), ctx, false, "")...)
 	}
+	for _, scope := range collectTSModuleBlockScopes(kinds, root, ctx.src, ctx.dir) {
+		scoped := *ctx
+		scoped.symbolScope = scope.id
+		scoped.localNames = copyTSNameSet(ctx.localNames)
+		scoped.localTargets = copyTSNameTargets(scope.inheritedTargets)
+		for name, target := range scope.targets {
+			scoped.localTargets[name] = target
+		}
+		for name := range scoped.localTargets {
+			scoped.localNames[name] = true
+		}
+		for _, decl := range scope.declarations {
+			factsForDecl := e.extractNode(kinds, decl, &scoped, false, "")
+			for _, f := range factsForDecl {
+				if f.Kind == facts.KindSymbol {
+					ctx.scopedSymbolNames[f.Name] = true
+				}
+			}
+			result = append(result, factsForDecl...)
+		}
+	}
 	return result
+}
+
+type tsModuleBlockScope struct {
+	node             *sitter.Node
+	id               string
+	declarations     []*sitter.Node
+	targets          map[string]string
+	inheritedTargets map[string]string
+}
+
+func copyTSNameSet(in map[string]bool) map[string]bool {
+	out := make(map[string]bool, len(in))
+	for name, present := range in {
+		out[name] = present
+	}
+	return out
+}
+
+func copyTSNameTargets(in map[string]string) map[string]string {
+	out := make(map[string]string, len(in))
+	for name, target := range in {
+		out[name] = target
+	}
+	return out
+}
+
+func tsSymbolIdentity(ctx *extractCtx, name string) string {
+	if ctx != nil && ctx.symbolScope != "" {
+		return ctx.dir + "." + ctx.symbolScope + "." + name
+	}
+	if ctx == nil {
+		return name
+	}
+	return ctx.dir + "." + name
+}
+
+func tsModuleBlockDeclaration(kinds *tsutil.KindTable, n *sitter.Node) bool {
+	if n == nil {
+		return false
+	}
+	switch kindOf(kinds, n) {
+	case "function_declaration", "generator_function_declaration", "class_declaration", "abstract_class_declaration",
+		"lexical_declaration", "interface_declaration", "type_alias_declaration", "enum_declaration", "internal_module", "module":
+		return true
+	default:
+		return false
+	}
+}
+
+func tsModuleBlockDeclarations(kinds *tsutil.KindTable, n *sitter.Node) []*sitter.Node {
+	var out []*sitter.Node
+	if n == nil {
+		return out
+	}
+	for i := range n.NamedChildCount() {
+		child := n.NamedChild(i)
+		if tsModuleBlockDeclaration(kinds, child) {
+			out = append(out, child)
+			continue
+		}
+		// A switch has one lexical scope shared by its cases. Case labels are
+		// containers, not independent scopes, so collect their direct declarations
+		// into the switch body owner.
+		if kindOf(kinds, n) == "switch_body" && (kindOf(kinds, child) == "switch_case" || kindOf(kinds, child) == "switch_default") {
+			for j := range child.NamedChildCount() {
+				stmt := child.NamedChild(j)
+				if tsModuleBlockDeclaration(kinds, stmt) {
+					out = append(out, stmt)
+				}
+			}
+		}
+	}
+	return out
+}
+
+func tsModuleBlockNames(kinds *tsutil.KindTable, decl *sitter.Node, src []byte) []string {
+	seen := make(map[string]bool)
+	var names []string
+	for _, name := range append(tsDeclLexicalNames(kinds, decl, src), tsDeclTypeNames(kinds, decl, src)...) {
+		if name != "" && !seen[name] {
+			seen[name] = true
+			names = append(names, name)
+		}
+	}
+	return names
+}
+
+// collectTSModuleBlockScopes finds declarations in control-flow blocks directly
+// owned by the module. It deliberately stops at function-like nodes: function-nested
+// declaration policy is separate, and sibling lexical blocks receive separate symbol
+// identities and bindings.
+func collectTSModuleBlockScopes(kinds *tsutil.KindTable, root *sitter.Node, src []byte, dir string) []tsModuleBlockScope {
+	var scopes []tsModuleBlockScope
+	if root == nil {
+		return scopes
+	}
+	var walkControl func(*sitter.Node, map[string]string)
+	var visitBlock func(*sitter.Node, map[string]string)
+	visitBlock = func(block *sitter.Node, inherited map[string]string) {
+		if block == nil || tsIsFunctionLike(kindOf(kinds, block)) {
+			return
+		}
+		id := "block_" + strconv.FormatUint(uint64(block.StartByte()), 10)
+		decls := tsModuleBlockDeclarations(kinds, block)
+		targets := make(map[string]string)
+		for _, decl := range decls {
+			for _, name := range tsModuleBlockNames(kinds, decl, src) {
+				targets[name] = dir + "." + id + "." + name
+			}
+		}
+		scopes = append(scopes, tsModuleBlockScope{
+			node: block, id: id, declarations: decls, targets: targets,
+			inheritedTargets: copyTSNameTargets(inherited),
+		})
+		visible := copyTSNameTargets(inherited)
+		for name, target := range targets {
+			visible[name] = target
+		}
+		for i := range block.NamedChildCount() {
+			child := block.NamedChild(i)
+			if !tsModuleBlockDeclaration(kinds, child) {
+				walkControl(child, visible)
+			}
+		}
+	}
+	walkControl = func(n *sitter.Node, inherited map[string]string) {
+		if n == nil || tsIsFunctionLike(kindOf(kinds, n)) {
+			return
+		}
+		switch kindOf(kinds, n) {
+		case "statement_block", "switch_body":
+			visitBlock(n, inherited)
+		case "if_statement", "else_clause", "try_statement", "catch_clause", "finally_clause",
+			"for_statement", "for_in_statement", "while_statement", "do_statement", "switch_statement", "labeled_statement", "with_statement":
+			for i := range n.NamedChildCount() {
+				child := n.NamedChild(i)
+				k := kindOf(kinds, child)
+				if k == "statement_block" || k == "switch_body" || k == "else_clause" || k == "catch_clause" || k == "finally_clause" || k == "if_statement" || k == "try_statement" || k == "for_statement" || k == "for_in_statement" || k == "while_statement" || k == "do_statement" || k == "switch_statement" || k == "labeled_statement" || k == "with_statement" {
+					walkControl(child, inherited)
+				}
+			}
+		}
+	}
+	for i := range root.NamedChildCount() {
+		child := root.NamedChild(i)
+		walkControl(child, nil)
+	}
+	return scopes
 }
 
 // extractNode emits facts for a single declaration node. fallbackName supplies a
@@ -988,7 +1166,7 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 		}
 		// Anonymous default export of a value: name it after the file.
 		if isDefault {
-			for _, k := range []string{"function_expression", "generator_function", "class", "arrow_function", "call_expression", "object", "array", "parenthesized_expression"} {
+			for _, k := range []string{"as_expression", "satisfies_expression", "non_null_expression", "parenthesized_expression", "function_expression", "generator_function", "class", "arrow_function", "call_expression", "object", "array"} {
 				if c := findChildByKind(kinds, node, k); c != nil {
 					return e.extractNode(kinds, c, ctx, true, fb)
 				}
@@ -1014,6 +1192,14 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 	case "parenthesized_expression":
 		if inner := node.NamedChild(0); inner != nil && fallbackName != "" {
 			return e.extractNode(kinds, inner, ctx, isExported, fallbackName)
+		}
+
+	case "as_expression", "satisfies_expression", "non_null_expression":
+		if value := node.ChildByFieldName("expression"); value != nil && fallbackName != "" {
+			return e.extractNode(kinds, value, ctx, isExported, fallbackName)
+		}
+		if value := node.NamedChild(0); value != nil && fallbackName != "" {
+			return e.extractNode(kinds, value, ctx, isExported, fallbackName)
 		}
 
 	case "object", "array":
@@ -1042,7 +1228,7 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 		}
 		f := facts.Fact{
 			Kind: facts.KindSymbol,
-			Name: dir + "." + symbolName,
+			Name: tsSymbolIdentity(ctx, symbolName),
 			File: relFile,
 			Line: int(node.StartPosition().Row) + 1,
 			Props: map[string]any{
@@ -1097,6 +1283,7 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 		}
 
 		classBody := findChildByKind(kinds, node, "class_body")
+		classIdentity := tsSymbolIdentity(ctx, symbolName)
 		classifySymbol(kinds, &f, symbolName, classBody, ctx, facts.SymbolClass)
 		if names := classDecoratorNames(kinds, node, src); names != "" {
 			f.Props["decorators"] = names
@@ -1175,9 +1362,9 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 				dataField := kindOf(kinds, member) == "public_field_definition" && !classFieldIsFunctionValued(kinds, member)
 				mRels := []facts.Relation{
 					{Kind: facts.RelDeclares, Target: dir},
-					{Kind: facts.RelDeclares, Target: dir + "." + symbolName, TargetFile: relFile},
+					{Kind: facts.RelDeclares, Target: classIdentity, TargetFile: relFile},
 				}
-				callRels, m := collectCallsWithMetrics(kinds, member, src, dir, symbolName, ctx, dir+"."+symbolName+"."+mName, mName)
+				callRels, m := collectCallsWithMetrics(kinds, member, src, dir, symbolName, ctx, classIdentity+"."+mName, mName)
 				mRels = append(mRels, callRels...)
 				kind := facts.SymbolMethod
 				if dataField {
@@ -1215,14 +1402,14 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 				seenMembers[mName] = true
 				result = append(result, facts.Fact{
 					Kind:      facts.KindSymbol,
-					Name:      dir + "." + symbolName + "." + mName,
+					Name:      classIdentity + "." + mName,
 					File:      relFile,
 					Line:      int(member.StartPosition().Row) + 1,
 					Props:     mProps,
 					Relations: mRels,
 				})
 			}
-			result = append(result, constructorParameterPropertyFacts(kinds, classBody, src, dir, symbolName, relFile, isExported, seenMembers)...)
+			result = append(result, constructorParameterPropertyFacts(kinds, classBody, src, dir, symbolName, classIdentity, relFile, isExported, seenMembers)...)
 		}
 
 	case "expression_statement":
@@ -1303,7 +1490,7 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 					}
 					result = append(result, facts.Fact{
 						Kind: facts.KindSymbol,
-						Name: dir + "." + symbolName,
+						Name: tsSymbolIdentity(ctx, symbolName),
 						File: relFile,
 						Line: int(node.StartPosition().Row) + 1,
 						Props: map[string]any{
@@ -1335,13 +1522,13 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 			vRels := []facts.Relation{{Kind: facts.RelDeclares, Target: dir}}
 			var vMetrics *tsBodyMetrics
 			if body != nil {
-				callRels, m := collectCallsWithMetrics(kinds, body, src, dir, "", ctx, dir+"."+symbolName, symbolName)
+				callRels, m := collectCallsWithMetrics(kinds, body, src, dir, "", ctx, tsSymbolIdentity(ctx, symbolName), symbolName)
 				vRels = append(vRels, callRels...)
 				vMetrics = m
 			}
 			f := facts.Fact{
 				Kind: facts.KindSymbol,
-				Name: dir + "." + symbolName,
+				Name: tsSymbolIdentity(ctx, symbolName),
 				File: relFile,
 				Line: int(node.StartPosition().Row) + 1,
 				Props: map[string]any{
@@ -1447,11 +1634,11 @@ func commonJSExportName(kinds *tsutil.KindTable, left *sitter.Node, src []byte) 
 
 func (e *TSExtractor) valueSymbol(kinds *tsutil.KindTable, declNode, body *sitter.Node, ctx *extractCtx, name string, exported bool) facts.Fact {
 	rels := []facts.Relation{{Kind: facts.RelDeclares, Target: ctx.dir}}
-	callRels, _ := collectCallsWithMetrics(kinds, body, ctx.src, ctx.dir, "", ctx, ctx.dir+"."+name, name)
+	callRels, _ := collectCallsWithMetrics(kinds, body, ctx.src, ctx.dir, "", ctx, tsSymbolIdentity(ctx, name), name)
 	rels = append(rels, callRels...)
 	f := facts.Fact{
 		Kind: facts.KindSymbol,
-		Name: ctx.dir + "." + name,
+		Name: tsSymbolIdentity(ctx, name),
 		File: ctx.relFile,
 		Line: int(declNode.StartPosition().Row) + 1,
 		Props: map[string]any{
@@ -1727,11 +1914,11 @@ func isKnownFunctionValueCall(kinds *tsutil.KindTable, call *sitter.Node, src []
 
 func (e *TSExtractor) funcSymbol(kinds *tsutil.KindTable, declNode, body *sitter.Node, ctx *extractCtx, name string, exported bool) facts.Fact {
 	rels := []facts.Relation{{Kind: facts.RelDeclares, Target: ctx.dir}}
-	callRels, m := collectCallsWithMetrics(kinds, body, ctx.src, ctx.dir, "", ctx, ctx.dir+"."+name, name)
+	callRels, m := collectCallsWithMetrics(kinds, body, ctx.src, ctx.dir, "", ctx, tsSymbolIdentity(ctx, name), name)
 	rels = append(rels, callRels...)
 	f := facts.Fact{
 		Kind: facts.KindSymbol,
-		Name: ctx.dir + "." + name,
+		Name: tsSymbolIdentity(ctx, name),
 		File: ctx.relFile,
 		Line: int(declNode.StartPosition().Row) + 1,
 		Props: map[string]any{
@@ -1752,7 +1939,7 @@ func (e *TSExtractor) funcSymbol(kinds *tsutil.KindTable, declNode, body *sitter
 // constructorParameterPropertyFacts emits instance members created by TypeScript
 // constructor parameter properties (`constructor(private readonly max: number)`).
 // A plain parameter with no accessibility or readonly modifier is not a field.
-func constructorParameterPropertyFacts(kinds *tsutil.KindTable, classBody *sitter.Node, src []byte, dir, className, relFile string, classExported bool, seen map[string]bool) []facts.Fact {
+func constructorParameterPropertyFacts(kinds *tsutil.KindTable, classBody *sitter.Node, src []byte, dir, className, classIdentity, relFile string, classExported bool, seen map[string]bool) []facts.Fact {
 	if classBody == nil {
 		return nil
 	}
@@ -1793,7 +1980,7 @@ func constructorParameterPropertyFacts(kinds *tsutil.KindTable, classBody *sitte
 			}
 			out = append(out, facts.Fact{
 				Kind: facts.KindSymbol,
-				Name: dir + "." + className + "." + name,
+				Name: classIdentity + "." + name,
 				File: relFile,
 				Line: int(p.StartPosition().Row) + 1,
 				Props: map[string]any{
@@ -1804,7 +1991,7 @@ func constructorParameterPropertyFacts(kinds *tsutil.KindTable, classBody *sitte
 				},
 				Relations: []facts.Relation{
 					{Kind: facts.RelDeclares, Target: dir},
-					{Kind: facts.RelDeclares, Target: dir + "." + className, TargetFile: relFile},
+					{Kind: facts.RelDeclares, Target: classIdentity, TargetFile: relFile},
 				},
 			})
 		}
@@ -1863,7 +2050,7 @@ func classFieldIsFunctionValued(kinds *tsutil.KindTable, member *sitter.Node) bo
 func (e *TSExtractor) simpleSymbol(node *sitter.Node, ctx *extractCtx, name, kind string, exported bool) facts.Fact {
 	f := facts.Fact{
 		Kind: facts.KindSymbol,
-		Name: ctx.dir + "." + name,
+		Name: tsSymbolIdentity(ctx, name),
 		File: ctx.relFile,
 		Line: int(node.StartPosition().Row) + 1,
 		Props: map[string]any{
@@ -3708,6 +3895,59 @@ func collectFileScopeCallNames(kinds *tsutil.KindTable, root *sitter.Node, src [
 	return out
 }
 
+// isTSScriptMode preserves TypeScript's shared-global behavior for classic script
+// files. ES modules and CommonJS files have file-private scope even when a name is
+// not imported; a directory match alone must not bind an unbound module name.
+func isTSScriptMode(kinds *tsutil.KindTable, root *sitter.Node, relFile string, src []byte) bool {
+	ext := strings.ToLower(filepath.Ext(relFile))
+	if ext == ".cjs" || ext == ".mjs" || ext == ".cts" || ext == ".mts" {
+		return false
+	}
+	if root == nil {
+		return true
+	}
+	for i := range root.ChildCount() {
+		switch kindOf(kinds, root.Child(i)) {
+		case "import_statement", "import_alias", "import_equals_declaration", "export_statement":
+			return false
+		}
+	}
+	commonJS := false
+	var scan func(*sitter.Node)
+	scan = func(n *sitter.Node) {
+		if n == nil || commonJS {
+			return
+		}
+		if kindOf(kinds, n) == "call_expression" {
+			fn := n.ChildByFieldName("function")
+			if fn != nil && kindOf(kinds, fn) == "identifier" && nodeText(fn, src) == "require" {
+				commonJS = true
+				return
+			}
+		}
+		if kindOf(kinds, n) == "member_expression" {
+			obj, prop := n.ChildByFieldName("object"), n.ChildByFieldName("property")
+			if obj != nil && prop != nil && kindOf(kinds, obj) == "identifier" &&
+				((nodeText(obj, src) == "module" && nodeText(prop, src) == "exports") || nodeText(obj, src) == "exports") {
+				commonJS = true
+				return
+			}
+		}
+		if kindOf(kinds, n) == "meta_property" && nodeText(n, src) == "import.meta" {
+			commonJS = true
+			return
+		}
+		for i := range n.ChildCount() {
+			scan(n.Child(i))
+		}
+	}
+	scan(root)
+	if commonJS {
+		return false
+	}
+	return true
+}
+
 // collectTSFileRefs performs a whole-file reference pass for the dead-code detector.
 //
 // The per-function call walk (collectCallsWithMetrics) only records call_expression
@@ -3973,11 +4213,16 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 	var frImpF []map[string]string
 	var frNS []map[string]string
 	var frNSF []map[string]string
+	var frLocalTargets []map[string]string
 	var frPreImp []map[string]string
 	var frPreImpF []map[string]string
 	var frPreNS []map[string]string
 	var frPreNSF []map[string]string
 	frFnNesting := 0
+	moduleBlockTargets := make(map[uint]map[string]string)
+	for _, scope := range collectTSModuleBlockScopes(kinds, root, src, ctx.dir) {
+		moduleBlockTargets[scope.node.StartByte()] = scope.targets
+	}
 	frPush := func(names ...string) {
 		s := map[string]bool{}
 		for _, name := range names {
@@ -3991,6 +4236,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 		frImpF = append(frImpF, map[string]string{})
 		frNS = append(frNS, map[string]string{})
 		frNSF = append(frNSF, map[string]string{})
+		frLocalTargets = append(frLocalTargets, map[string]string{})
 		frPreImp = append(frPreImp, map[string]string{})
 		frPreImpF = append(frPreImpF, map[string]string{})
 		frPreNS = append(frPreNS, map[string]string{})
@@ -4006,6 +4252,7 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 		frImpF = frImpF[:len(frImpF)-1]
 		frNS = frNS[:len(frNS)-1]
 		frNSF = frNSF[:len(frNSF)-1]
+		frLocalTargets = frLocalTargets[:len(frLocalTargets)-1]
 		frPreImp = frPreImp[:len(frPreImp)-1]
 		frPreImpF = frPreImpF[:len(frPreImpF)-1]
 		frPreNS = frPreNS[:len(frPreNS)-1]
@@ -4025,6 +4272,9 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 	frLookupNS := func(name string, typeSpace bool) (target, file string, ok, shadowed bool) {
 		nested := frFnNesting > 0
 		for i := len(frImp) - 1; i >= 0; i-- {
+			if t, found := frLocalTargets[i][name]; found {
+				return t, ctx.relFile, true, false
+			}
 			if t, found := frImp[i][name]; found {
 				return t, frImpF[i][name], true, false
 			}
@@ -4167,8 +4417,15 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 			frPop()
 			return
 		}
-		if kind == "statement_block" {
-			frPush(tsBlockLexicalNames(kinds, n, src)...)
+		if kind == "statement_block" || kind == "switch_body" {
+			scopeNames := tsBlockLexicalNames(kinds, n, src)
+			for name := range moduleBlockTargets[n.StartByte()] {
+				scopeNames = append(scopeNames, name)
+			}
+			frPush(scopeNames...)
+			if targets := moduleBlockTargets[n.StartByte()]; targets != nil {
+				frLocalTargets[len(frLocalTargets)-1] = targets
+			}
 			if len(frTypeShadows) > 0 {
 				for _, name := range tsBlockTypeNames(kinds, n, src) {
 					if name != "" {
@@ -4314,6 +4571,20 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 				walk(n.Child(i))
 			}
 			return
+		case "new_expression":
+			ctor := n.ChildByFieldName("constructor")
+			if ctor != nil && kindOf(kinds, ctor) == "identifier" {
+				name := nodeText(ctor, src)
+				if target, file, ok, shadowed := frLookup(name); shadowed {
+					// A lexical binding that is not an import blocks any outer lookup.
+				} else if ok {
+					add(target, file)
+				} else if target := ctx.localTargets[name]; target != "" {
+					add(target, ctx.relFile)
+				} else if ctx.localNames[name] {
+					add(ctx.dir+"."+name, ctx.relFile)
+				}
+			}
 		case "call_expression":
 			// A bare callee and identifier arguments are USE positions (never
 			// declarations), so it is safe to resolve them same-module as well as via
@@ -4327,9 +4598,19 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 					// lexical binding: never fall back to sibling-file symbols
 				} else if ok {
 					add(t, file)
+				} else if target := ctx.localTargets[name]; target != "" {
+					add(target, ctx.relFile)
 				} else if ctx.localNames[name] {
 					add(ctx.dir+"."+name, ctx.relFile)
-				} else if !externalLocals[name] {
+				} else if ctx.virtualNames[name] {
+					add(ctx.dir+"."+name, "")
+				} else if ctx.isNuxt && !externalLocals[name] {
+					// Retain an unresolved Nuxt call as an auto-import candidate. The
+					// configured Nuxt oracle later binds only unique exports from visible
+					// composables/utils directories; ordinary module names still do not
+					// fall back to arbitrary same-directory declarations.
+					add(ctx.dir+"."+name, "")
+				} else if ctx.scriptMode && !externalLocals[name] {
 					add(resolveLocalOrImport(name, ctx.dir, internal), callFile(name))
 				}
 			}
@@ -4341,9 +4622,15 @@ func (e *TSExtractor) collectTSFileRefs(kinds *tsutil.KindTable, root *sitter.No
 							// lexical binding: never fall back to sibling-file symbols
 						} else if ok {
 							add(t, file)
+						} else if target := ctx.localTargets[name]; target != "" {
+							add(target, ctx.relFile)
 						} else if ctx.localNames[name] {
 							add(ctx.dir+"."+name, ctx.relFile)
-						} else if !externalLocals[name] {
+						} else if ctx.virtualNames[name] {
+							add(ctx.dir+"."+name, "")
+						} else if ctx.isNuxt && !externalLocals[name] {
+							add(ctx.dir+"."+name, "")
+						} else if ctx.scriptMode && !externalLocals[name] {
 							add(resolveLocalOrImport(name, ctx.dir, internal), callFile(name))
 						}
 					}
@@ -5089,6 +5376,9 @@ func (w *tsBodyWalker) lookupImport(name string) (string, string, bool) {
 	}
 	if t, ok := w.importMap[name]; ok {
 		return t, w.importFiles[name], true
+	}
+	if w.ctx != nil && w.ctx.localTargets[name] != "" {
+		return w.ctx.localTargets[name], w.relFile, true
 	}
 	if w.localNames[name] {
 		return w.dir + "." + name, w.relFile, true
@@ -6043,7 +6333,16 @@ func resolveTSCall(kinds *tsutil.KindTable, call *sitter.Node, src []byte, dir, 
 		if ctx != nil && ctx.externalNames[name] {
 			return "", ""
 		}
-		return dir + "." + name, ""
+		if ctx != nil && ctx.virtualNames[name] {
+			return dir + "." + name, ""
+		}
+		if ctx != nil && ctx.scriptMode {
+			return dir + "." + name, ""
+		}
+		// Keep an unresolved call attached to its own file for metrics and future
+		// local declaration matching. The exact TargetFile prevents a sibling module
+		// with the same short name from satisfying this reference.
+		return dir + "." + name, relFile
 	case "member_expression":
 		object := fn.ChildByFieldName("object")
 		property := fn.ChildByFieldName("property")

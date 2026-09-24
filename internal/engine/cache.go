@@ -2606,7 +2606,12 @@ import (
 // object exports carry exported=true; relative Vite ?v= imports bind source while
 // retaining the query; imported object shorthand becomes a file reference; nested
 // tsconfig paths participate at any depth and invalidate their scoped consumers.
-const cacheVersion = "v318"
+// v319: TypeScript module references no longer bind unimported sibling declarations;
+// declarations in module control-flow blocks retain lexical identities and direct
+// calls; Vue macro member names include newline/comment-separated signatures; wrapped
+// anonymous defaults keep their value entities; file-scope new references bind local
+// classes without inventing instantiates relations.
+const cacheVersion = "v319"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //
