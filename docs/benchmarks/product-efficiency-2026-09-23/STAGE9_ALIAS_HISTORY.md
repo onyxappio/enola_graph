@@ -54,6 +54,28 @@ contribution even when a manifest keeps the extractor detected.
 
 The next production change must preserve that retirement behavior while reusing
 a proven unchanged empty domain. Unknown ownership or unsupported metadata must
-remain conservative. Exact alias metadata-version handling and the full suite
-are still integration gates for this experimental candidate. Repeated history
-and production watch/NATS measurements remain required afterward.
+remain conservative. A subsequent smaller repro also triggers the fallback with
+source addition alone, without editing tsconfig; configuration change is not
+necessary to reproduce it.
+
+## Integration checkpoint
+
+The alias change was integrated and pushed as `8af2c7a`, including exact supported
+metadata-version recognition and conservative reconciliation of unsupported
+metadata. The measurement above remains attributed to its earlier experimental
+binary; it is not relabelled as a measurement of the integrated binary.
+
+The full suite snapshot has exactly the integrated production hashes.
+`graphsession` passed in 588.858 seconds. Its sole failing test was the bootstrap
+alias scope test retaining old parsed-file expectations. Both direct and inherited
+retargets now reparse the single importer rather than unused descendants; every
+cold graph comparison was retained. The entire bootstrap package passed after
+that test adaptation (131.556 seconds), as did independent integrated alias,
+legacy migration and unsupported-metadata guards. A clean integrated binary also
+passed the genuine released-state migration harness. Source and log hashes are
+recorded in [the integration receipt](stage9-alias-integration-validation.json).
+
+This remains an intermediate optimization. Empty-domain scope narrowing,
+repeated history measurements and final production watch/NATS acceptance remain
+open. The separate [released-version watch control](STAGE9_PRODUCT_WATCH_CONTROL.md)
+does not establish performance for this alias change.
