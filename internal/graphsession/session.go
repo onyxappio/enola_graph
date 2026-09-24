@@ -122,23 +122,55 @@ func (s *session) keepProvenDiscovery(disc *tsextractor.Discovery) {
 }
 
 // parsedPreviewRecords is what a refused attempt hands the retry that follows
-// it: one record per file its planner preview actually parsed. The records the
-// preview adopted unchanged are left out, because the retry would adopt those
-// from the committed state anyway and carrying them would only make the offer
-// look larger than the work it saves.
+// it: one record per file its planner preview read for itself, plus the records
+// it took from the previous offer and re-proved here. Both are work the retry
+// would otherwise repeat, and a refusal late in a chain often has only the
+// second kind - it re-proved a tree that did not move and parsed nothing new -
+// so an offer built from fresh parses alone empties out after the first
+// refusal. The records the preview adopted unchanged are still left out,
+// because the retry would adopt those from the committed state anyway and
+// carrying them would only make the offer look larger than the work it saves.
 func (s *session) parsedPreviewRecords() map[string]*tsextractor.FileRecord {
-	if s.preparedTS == nil || len(s.preparedParses) == 0 {
+	if s.preparedTS == nil || (len(s.preparedParses) == 0 && len(s.preparedReused) == 0) {
 		return nil
 	}
-	out := make(map[string]*tsextractor.FileRecord, len(s.preparedParses))
-	for _, p := range s.preparedParses {
-		if rec := s.preparedTS.Records[p.path]; rec != nil && rec.Hash != "" && !rec.Unreadable {
-			out[p.path] = rec
+	out := make(map[string]*tsextractor.FileRecord, len(s.preparedParses)+len(s.preparedReused))
+	add := func(path string) {
+		if rec := s.preparedTS.Records[path]; rec != nil && rec.Hash != "" && !rec.Unreadable {
+			out[path] = rec
 		}
+	}
+	for _, p := range s.preparedParses {
+		add(p.path)
+	}
+	// A record this attempt took from the previous offer was re-proven here -
+	// same run identity, same per-file context, same bytes, same side reads -
+	// and then never parsed, so it reaches no OnBeforeParse and appears in no
+	// preparedParse. Dropping it would hand the next attempt only whatever
+	// happened to be parsed fresh, which for a chain of refusals over a tree
+	// that mostly did not move is close to nothing. It is taken from the final
+	// preparedTS like every other path, so a file retired, deleted or found
+	// unreadable during this attempt has no record here and is not carried.
+	for _, path := range s.preparedReused {
+		add(path)
 	}
 	if len(out) == 0 {
 		return nil
 	}
+	return out
+}
+
+// sortedKeys is the deterministic reading of a path set, so what one attempt
+// offers the next does not depend on map iteration order.
+func sortedKeys(set map[string]bool) []string {
+	if len(set) == 0 {
+		return nil
+	}
+	out := make([]string, 0, len(set))
+	for k := range set {
+		out = append(out, k)
+	}
+	sort.Strings(out)
 	return out
 }
 
@@ -508,6 +540,12 @@ type session struct {
 	// adopts the preview, so a parse is classified and reported to
 	// OnBeforeParse exactly once whichever of the two sites read the file.
 	preparedParses []preparedParse
+	// preparedReused are the files this attempt took from the previous refused
+	// attempt's offer instead of reading. They are not parses this run
+	// performed, so they are kept apart from preparedParses: only the offer a
+	// refusal hands forward unions the two, and the announce-time fence over
+	// this run's own reads deliberately does not.
+	preparedReused []string
 	// preparedMD is the mdintent extraction this run made before Begin to plan
 	// the manifest with; see prepareMDScope.
 	preparedMD *preparedMD
@@ -1405,6 +1443,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			s.preparedTS = nil
 			s.preparedDirty = nil
 			s.preparedParses = nil
+			s.preparedReused = nil
 			if res == nil {
 				var xerr error
 				res, xerr = ts.ExtractSession(ctx, s.abs, owned, prevRecs, dirtyArg, hooks)
@@ -3001,6 +3040,13 @@ func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*Fil
 	}
 	var parseMu sync.Mutex
 	var parses []preparedParse
+	// reused are the paths taken from the previous refused attempt's offer.
+	// The reuse site sits inside the hop loop below and can take a path on one
+	// hop that it does not re-offer on the next, so this accumulates across
+	// hops rather than holding the last hop's set. It is written only there,
+	// on this goroutine and before the assignment at the end of this function,
+	// so unlike the parse hook it needs no lock.
+	reused := map[string]bool{}
 	hooks := tsextractor.SessionHooks{
 		SkipConfigPaths: true,
 		Sources:         s.capturedSources,
@@ -3049,6 +3095,7 @@ func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*Fil
 			for f, rec := range reuse {
 				work[f] = rec
 				delete(extractDirty, f)
+				reused[f] = true
 				s.work.RetryParsesReused++
 			}
 		}
@@ -3160,6 +3207,7 @@ func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*Fil
 	s.preparedTS = res
 	s.preparedDirty = dirty
 	s.preparedParses = parses
+	s.preparedReused = sortedKeys(reused)
 	added, removed := declaredNameDelta(prevRecs, work, retired)
 	proof := &frozenPreview{
 		closed:          make(map[string]bool, len(dirty)),

@@ -1,0 +1,122 @@
+[
+  {
+    "arm": "baseline",
+    "repeat": 1,
+    "marks": [
+      "[graph-profile] revalidate_before_begin            0.001s  n=59 superseded=false",
+      "[graph-profile] ts_mapfiles_aggregate              3.797s  total= 4.236s  trace=ts  parsed=4035 facts=58910 routers=0 scans=1678 derived=2316",
+      "[graph-profile] ts_mapfiles_aggregate              0.105s  total= 0.206s  trace=ts  parsed=4 facts=58913 routers=0 scans=77 derived=4",
+      "[graph-profile] ts_mapfiles_aggregate              0.312s  total= 0.420s  trace=ts  parsed=29 facts=58913 routers=0 scans=218 derived=21",
+      "[graph-profile] revalidate_before_begin            0.001s  n=62 superseded=true",
+      "[graph-profile] ts_mapfiles_aggregate              0.046s  total= 0.147s  trace=ts  parsed=1 facts=58914 routers=0 scans=0 derived=1",
+      "[graph-profile] ts_mapfiles_aggregate              0.277s  total= 0.382s  trace=ts  parsed=11 facts=58914 routers=0 scans=117 derived=7",
+      "[graph-profile] revalidate_before_begin            0.002s  n=85 superseded=true",
+      "[graph-profile] ts_mapfiles_aggregate              0.110s  total= 0.211s  trace=ts  parsed=4 facts=58915 routers=0 scans=77 derived=4",
+      "[graph-profile] ts_mapfiles_aggregate              0.311s  total= 0.419s  trace=ts  parsed=29 facts=58915 routers=0 scans=218 derived=21",
+      "[graph-profile] revalidate_before_begin            0.002s  n=93 superseded=false"
+    ],
+    "initial_parses": 4035,
+    "post_initial_parse_operations": 78,
+    "note": "sum of extraction-wave parsed counters across refused and successful attempts; not distinct file count"
+  },
+  {
+    "arm": "baseline",
+    "repeat": 2,
+    "marks": [
+      "[graph-profile] revalidate_before_begin            0.001s  n=59 superseded=false",
+      "[graph-profile] ts_mapfiles_aggregate              3.814s  total= 4.239s  trace=ts  parsed=4035 facts=58910 routers=0 scans=1697 derived=2297",
+      "[graph-profile] ts_mapfiles_aggregate              0.107s  total= 0.209s  trace=ts  parsed=4 facts=58913 routers=0 scans=77 derived=4",
+      "[graph-profile] ts_mapfiles_aggregate              0.330s  total= 0.437s  trace=ts  parsed=29 facts=58913 routers=0 scans=218 derived=21",
+      "[graph-profile] revalidate_before_begin            0.001s  n=38 superseded=true",
+      "[graph-profile] ts_mapfiles_aggregate              0.045s  total= 0.146s  trace=ts  parsed=1 facts=58914 routers=0 scans=0 derived=1",
+      "[graph-profile] ts_mapfiles_aggregate              0.282s  total= 0.387s  trace=ts  parsed=11 facts=58914 routers=0 scans=117 derived=7",
+      "[graph-profile] revalidate_before_begin            0.002s  n=93 superseded=true",
+      "[graph-profile] ts_mapfiles_aggregate              0.112s  total= 0.224s  trace=ts  parsed=4 facts=58915 routers=0 scans=77 derived=4",
+      "[graph-profile] ts_mapfiles_aggregate              0.339s  total= 0.450s  trace=ts  parsed=29 facts=58915 routers=0 scans=218 derived=21",
+      "[graph-profile] revalidate_before_begin            0.003s  n=93 superseded=false"
+    ],
+    "initial_parses": 4035,
+    "post_initial_parse_operations": 78,
+    "note": "sum of extraction-wave parsed counters across refused and successful attempts; not distinct file count"
+  },
+  {
+    "arm": "baseline",
+    "repeat": 3,
+    "marks": [
+      "[graph-profile] revalidate_before_begin            0.002s  n=59 superseded=false",
+      "[graph-profile] ts_mapfiles_aggregate              3.779s  total= 4.343s  trace=ts  parsed=4035 facts=58910 routers=0 scans=1670 derived=2324",
+      "[graph-profile] ts_mapfiles_aggregate              0.110s  total= 0.212s  trace=ts  parsed=4 facts=58913 routers=0 scans=77 derived=4",
+      "[graph-profile] ts_mapfiles_aggregate              0.322s  total= 0.430s  trace=ts  parsed=29 facts=58913 routers=0 scans=218 derived=21",
+      "[graph-profile] revalidate_before_begin            0.001s  n=46 superseded=true",
+      "[graph-profile] ts_mapfiles_aggregate              0.047s  total= 0.148s  trace=ts  parsed=1 facts=58914 routers=0 scans=0 derived=1",
+      "[graph-profile] ts_mapfiles_aggregate              0.291s  total= 0.397s  trace=ts  parsed=11 facts=58914 routers=0 scans=117 derived=7",
+      "[graph-profile] revalidate_before_begin            0.000s  n=10 superseded=true",
+      "[graph-profile] ts_mapfiles_aggregate              0.206s  total= 0.310s  trace=ts  parsed=4 facts=58915 routers=0 scans=77 derived=4",
+      "[graph-profile] ts_mapfiles_aggregate              0.338s  total= 0.448s  trace=ts  parsed=29 facts=58915 routers=0 scans=218 derived=21",
+      "[graph-profile] revalidate_before_begin            0.002s  n=93 superseded=false"
+    ],
+    "initial_parses": 4035,
+    "post_initial_parse_operations": 78,
+    "note": "sum of extraction-wave parsed counters across refused and successful attempts; not distinct file count"
+  },
+  {
+    "arm": "candidate",
+    "repeat": 1,
+    "marks": [
+      "[graph-profile] revalidate_before_begin            0.001s  n=59 superseded=false",
+      "[graph-profile] ts_mapfiles_aggregate              3.775s  total= 4.202s  trace=ts  parsed=4035 facts=58910 routers=0 scans=1691 derived=2303",
+      "[graph-profile] ts_mapfiles_aggregate              0.038s  total= 0.145s  trace=ts  parsed=1 facts=58910 routers=0 scans=0 derived=1",
+      "[graph-profile] ts_mapfiles_aggregate              0.282s  total= 0.395s  trace=ts  parsed=10 facts=58910 routers=0 scans=117 derived=7",
+      "[graph-profile] revalidate_before_begin            0.000s  n=5 superseded=true",
+      "[graph-profile] ts_mapfiles_aggregate              0.116s  total= 0.220s  trace=ts  parsed=4 facts=58914 routers=0 scans=77 derived=4",
+      "[graph-profile] ts_mapfiles_aggregate              0.311s  total= 0.418s  trace=ts  parsed=30 facts=58914 routers=0 scans=218 derived=21",
+      "[graph-profile] revalidate_before_begin            0.001s  n=57 superseded=true",
+      "[graph-profile] ts_mapfiles_aggregate              0.043s  total= 0.145s  trace=ts  parsed=1 facts=58915 routers=0 scans=0 derived=1",
+      "[graph-profile] ts_mapfiles_aggregate              0.283s  total= 0.392s  trace=ts  parsed=10 facts=58915 routers=0 scans=117 derived=7",
+      "[graph-profile] revalidate_before_begin            0.002s  n=93 superseded=false"
+    ],
+    "initial_parses": 4035,
+    "post_initial_parse_operations": 56,
+    "note": "sum of extraction-wave parsed counters across refused and successful attempts; not distinct file count"
+  },
+  {
+    "arm": "candidate",
+    "repeat": 2,
+    "marks": [
+      "[graph-profile] revalidate_before_begin            0.001s  n=59 superseded=false",
+      "[graph-profile] ts_mapfiles_aggregate              3.758s  total= 4.194s  trace=ts  parsed=4035 facts=58910 routers=0 scans=1674 derived=2320",
+      "[graph-profile] ts_mapfiles_aggregate              0.105s  total= 0.216s  trace=ts  parsed=4 facts=58913 routers=0 scans=77 derived=4",
+      "[graph-profile] ts_mapfiles_aggregate              0.336s  total= 0.449s  trace=ts  parsed=29 facts=58913 routers=0 scans=218 derived=21",
+      "[graph-profile] revalidate_before_begin            0.002s  n=70 superseded=true",
+      "[graph-profile] ts_mapfiles_aggregate              0.036s  total= 0.137s  trace=ts  parsed=1 facts=58914 routers=0 scans=0 derived=1",
+      "[graph-profile] ts_mapfiles_aggregate              0.272s  total= 0.378s  trace=ts  parsed=11 facts=58914 routers=0 scans=117 derived=7",
+      "[graph-profile] revalidate_before_begin            0.001s  n=27 superseded=true",
+      "[graph-profile] ts_mapfiles_aggregate              0.037s  total= 0.137s  trace=ts  parsed=1 facts=58915 routers=0 scans=0 derived=1",
+      "[graph-profile] ts_mapfiles_aggregate              0.270s  total= 0.376s  trace=ts  parsed=10 facts=58915 routers=0 scans=117 derived=7",
+      "[graph-profile] revalidate_before_begin            0.002s  n=93 superseded=false"
+    ],
+    "initial_parses": 4035,
+    "post_initial_parse_operations": 56,
+    "note": "sum of extraction-wave parsed counters across refused and successful attempts; not distinct file count"
+  },
+  {
+    "arm": "candidate",
+    "repeat": 3,
+    "marks": [
+      "[graph-profile] revalidate_before_begin            0.001s  n=59 superseded=false",
+      "[graph-profile] ts_mapfiles_aggregate              3.863s  total= 4.290s  trace=ts  parsed=4035 facts=58910 routers=0 scans=1687 derived=2307",
+      "[graph-profile] ts_mapfiles_aggregate              0.114s  total= 0.215s  trace=ts  parsed=4 facts=58913 routers=0 scans=77 derived=4",
+      "[graph-profile] ts_mapfiles_aggregate              0.337s  total= 0.449s  trace=ts  parsed=29 facts=58913 routers=0 scans=218 derived=21",
+      "[graph-profile] revalidate_before_begin            0.002s  n=89 superseded=true",
+      "[graph-profile] ts_mapfiles_aggregate              0.037s  total= 0.137s  trace=ts  parsed=1 facts=58914 routers=0 scans=0 derived=1",
+      "[graph-profile] ts_mapfiles_aggregate              0.273s  total= 0.379s  trace=ts  parsed=11 facts=58914 routers=0 scans=117 derived=7",
+      "[graph-profile] revalidate_before_begin            0.000s  n=13 superseded=true",
+      "[graph-profile] ts_mapfiles_aggregate              0.037s  total= 0.140s  trace=ts  parsed=1 facts=58915 routers=0 scans=0 derived=1",
+      "[graph-profile] ts_mapfiles_aggregate              0.282s  total= 0.394s  trace=ts  parsed=10 facts=58915 routers=0 scans=117 derived=7",
+      "[graph-profile] revalidate_before_begin            0.002s  n=93 superseded=false"
+    ],
+    "initial_parses": 4035,
+    "post_initial_parse_operations": 56,
+    "note": "sum of extraction-wave parsed counters across refused and successful attempts; not distinct file count"
+  }
+]

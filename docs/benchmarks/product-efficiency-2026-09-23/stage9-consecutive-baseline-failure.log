@@ -1,0 +1,5 @@
+--- FAIL: TestIndependentConsecutiveRefusalsPreserveReusableParses (0.98s)
+    independent_consecutive_test.go:70: correct graph, but consecutive refusal discarded reusable parses: got 0 want 9
+FAIL
+FAIL	github.com/enola-labs/enola/internal/graphsession	3.782s
+FAIL

@@ -1,0 +1,34 @@
+{
+  "base": "ba5497a",
+  "independent_focused": {
+    "exit_code": 0,
+    "package_s": 13.396,
+    "production_sha256": "59b4b944453b9ea877ce3956f02f42f17991792b96c24e1480bb4778640e269f",
+    "argv": [
+      "/opt/homebrew/bin/go",
+      "test",
+      "-overlay",
+      "/tmp/enola-stage9-consecutive-retry-review/candidate-v2-overlay.json",
+      "./internal/graphsession",
+      "-run",
+      "TestIndependentConsecutive|TestRetry|TestIndependentRetry",
+      "-count=1"
+    ]
+  },
+  "integrated_source_sha256": "a1b75c39e5228f53b282853c48b653130e4b4467393c16405d54ae78af988ae0",
+  "v2_to_integrated_difference": "parsedPreviewRecords doc comment only; reviewed diff",
+  "full_graphsession": {
+    "argv": [
+      "/opt/homebrew/bin/go",
+      "test",
+      "./internal/graphsession",
+      "-count=1",
+      "-timeout=20m"
+    ],
+    "exit_code": 0,
+    "wall_s": 516.007674959,
+    "base": "ba5497a",
+    "production_session_sha256": "a1b75c39e5228f53b282853c48b653130e4b4467393c16405d54ae78af988ae0"
+  },
+  "discarded_run": "Initial paired run stopped during Product copy because worker suite overlapped; excluded from all six clean samples."
+}
