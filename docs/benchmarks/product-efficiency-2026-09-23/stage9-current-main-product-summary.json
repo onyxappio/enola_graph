@@ -1,0 +1,191 @@
+{
+  "completed": 9,
+  "planned": 9,
+  "arms": {
+    "control": {
+      "repeat_count": 3,
+      "convergence_seconds": [
+        5.334747999999999,
+        5.328227,
+        5.230033000000001
+      ],
+      "median_seconds": 5.328227,
+      "min_seconds": 5.230033000000001,
+      "max_seconds": 5.334747999999999,
+      "initial_seconds": [
+        9.926145,
+        8.884497,
+        8.781827
+      ],
+      "initial_median_seconds": 8.884497,
+      "scope_counts": [
+        [
+          34
+        ],
+        [
+          34
+        ],
+        [
+          34
+        ]
+      ],
+      "delta_parses": [
+        [
+          34
+        ],
+        [
+          34
+        ],
+        [
+          34
+        ]
+      ],
+      "abandoned_begins": [
+        1,
+        1,
+        1
+      ],
+      "checks": [
+        true,
+        true,
+        true
+      ],
+      "state_profile_markers": [
+        [],
+        [],
+        []
+      ]
+    },
+    "candidate": {
+      "repeat_count": 3,
+      "convergence_seconds": [
+        4.489596,
+        4.376627,
+        4.5308980000000005
+      ],
+      "median_seconds": 4.489596,
+      "min_seconds": 4.376627,
+      "max_seconds": 4.5308980000000005,
+      "initial_seconds": [
+        10.292588,
+        8.960464,
+        8.987675999999999
+      ],
+      "initial_median_seconds": 8.987675999999999,
+      "scope_counts": [
+        [
+          34
+        ],
+        [
+          34
+        ],
+        [
+          34
+        ]
+      ],
+      "delta_parses": [
+        [
+          12
+        ],
+        [
+          12
+        ],
+        [
+          12
+        ]
+      ],
+      "abandoned_begins": [
+        0,
+        0,
+        0
+      ],
+      "checks": [
+        true,
+        true,
+        true
+      ],
+      "state_profile_markers": [
+        [],
+        [],
+        []
+      ]
+    },
+    "checkpoint": {
+      "repeat_count": 3,
+      "convergence_seconds": [
+        4.272794,
+        4.2904219999999995,
+        4.253074
+      ],
+      "median_seconds": 4.272794,
+      "min_seconds": 4.253074,
+      "max_seconds": 4.2904219999999995,
+      "initial_seconds": [
+        10.389865,
+        8.926442,
+        9.148764
+      ],
+      "initial_median_seconds": 9.148764,
+      "scope_counts": [
+        [
+          34
+        ],
+        [
+          34
+        ],
+        [
+          34
+        ]
+      ],
+      "delta_parses": [
+        [
+          12
+        ],
+        [
+          12
+        ],
+        [
+          12
+        ]
+      ],
+      "abandoned_begins": [
+        0,
+        0,
+        0
+      ],
+      "checks": [
+        true,
+        true,
+        true
+      ],
+      "state_profile_markers": [
+        [
+          "[graph-profile] state_fingerprint                  0.025s  write bytes=55498765",
+          "[graph-profile] state_fingerprint                  0.028s  bytes=55498765",
+          "[graph-profile] state_decode_reused                0.000s  files=4087 bytes=55498765",
+          "[graph-profile] state_fingerprint                  0.024s  write bytes=55500559"
+        ],
+        [
+          "[graph-profile] state_fingerprint                  0.023s  write bytes=55498765",
+          "[graph-profile] state_fingerprint                  0.028s  bytes=55498765",
+          "[graph-profile] state_decode_reused                0.000s  files=4087 bytes=55498765",
+          "[graph-profile] state_fingerprint                  0.023s  write bytes=55500559"
+        ],
+        [
+          "[graph-profile] state_fingerprint                  0.024s  write bytes=55498765",
+          "[graph-profile] state_fingerprint                  0.023s  bytes=55498765",
+          "[graph-profile] state_decode_reused                0.000s  files=4087 bytes=55498765",
+          "[graph-profile] state_fingerprint                  0.024s  write bytes=55500559"
+        ]
+      ]
+    }
+  },
+  "all_checks_pass": true,
+  "initial_hashes": [
+    "9ca758833417d246baa5205457555efd06ec7cad88ae05ac9d610210c49a07a5"
+  ],
+  "final_hashes": [
+    "e300529796ddb3e7b35e21715d25d2c1776a0502b478bd3f8dc877ebfb413700"
+  ],
+  "same_initial_and_final_graphs": true
+}

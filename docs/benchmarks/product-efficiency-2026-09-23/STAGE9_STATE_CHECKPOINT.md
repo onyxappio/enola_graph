@@ -39,3 +39,12 @@ Worker microbenchmarks estimate about 23 ms per 55.7 MB digest on this host;
 the estimate of roughly 237 ms saved against an earlier retry decode trace is an
 extrapolation, not a measured Product speedup. A three-arm Product comparison is
 pending to measure the net effect alongside early refusal and parse reuse.
+
+## Product result
+
+The [three-arm report](STAGE9_EARLY_SUPERSESSION.md#three-arm-product-comparison-on-current-accuracy-main)
+now measures the combined change on Product. With three repeats per arm, adding
+state reuse reduces median controlled retry convergence from 4.490 s to 4.273 s.
+All nine runs pass cold equality and protocol/no-op checks, with identical graph
+hashes. Each checkpoint run logs a successful decoded-state reuse. Initial
+performance did not improve; see the report for timings and limitations.

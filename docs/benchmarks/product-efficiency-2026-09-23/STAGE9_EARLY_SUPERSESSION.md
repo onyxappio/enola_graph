@@ -179,3 +179,36 @@ working tree match the tested source hashes exactly.
 [full suite output](stage9-retry-current-main-full-suite.log) preserve that evidence.
 Product comparisons on this base are still pending. The separate committed-state
 decode-reuse draft is not part of this full-suite result or these binaries.
+
+## Three-arm Product comparison on current accuracy main
+
+[All nine receipts](stage9-current-main-product-results.json) and
+[summary with state trace marks](stage9-current-main-product-summary.json) compare
+the same Product input and base `6a8581f`, with three alternating repeats per arm,
+profiling enabled and a 500 ms watch window. This is the controlled disjoint retry
+scenario described above, not a natural editing or fresh CLI benchmark.
+
+| Measurement | Control | Early refusal + parse reuse | Plus state decode reuse |
+|---|---:|---:|---:|
+| Retry median, s | 5.328 | 4.490 | 4.273 |
+| Retry minimum, s | 5.230 | 4.377 | 4.253 |
+| Retry maximum, s | 5.335 | 4.531 | 4.290 |
+| Initial consumer-applied median, s | 8.884 | 8.988 | 9.149 |
+| Successful retry parses, every run | 34 | 12 | 12 |
+| Frozen Begin owners, every run | 34 | 34 | 34 |
+| Abandoned Begins, every run | 1 | 0 | 0 |
+
+The complete candidate reduces median retry convergence by 19.81%. Adding
+state decode reuse to early refusal and parse reuse saves a further 0.217 s
+in this scenario. Every run passes exact cold equality, protocol checks, input
+stability, idle silence and identical-save silence. Initial and final graph
+hashes match across all arms. The checkpoint trace confirms actual decode reuse
+in all three checkpoint runs.
+
+Initial medians increased from 8.884 s to 8.988 s and 9.149 s; ranges overlap
+(8.782–9.926, 8.960–10.293, 8.926–10.390 s). This series establishes no initial
+speedup. State hashing adds real work on reads and writes, and this small series
+does not isolate its contribution to the initial difference. The host is shared.
+The measured improvement is scoped to one controlled refusal with independent
+parses available for reuse; repeated consecutive refusals and general fresh CLI
+no-op latency remain separate work.
