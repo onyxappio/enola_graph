@@ -1,0 +1,28 @@
+[3345] 2026/09/24 22:47:02.656322 [INF] Starting nats-server
+[3345] 2026/09/24 22:47:02.656429 [INF]   Version:  2.11.9
+[3345] 2026/09/24 22:47:02.656439 [INF]   Git:      [not set]
+[3345] 2026/09/24 22:47:02.656446 [INF]   Name:     NDJFRNLHNMAE4UJWHBEGJLA6GYLHTIA2RHDRZPMUWRXM75WLVJ6ZZ737
+[3345] 2026/09/24 22:47:02.656456 [INF]   Node:     hZXL3pTX
+[3345] 2026/09/24 22:47:02.656459 [INF]   ID:       NDJFRNLHNMAE4UJWHBEGJLA6GYLHTIA2RHDRZPMUWRXM75WLVJ6ZZ737
+[3345] 2026/09/24 22:47:02.656470 [INF] Using configuration file: /private/tmp/enola-stage15-profile-plan/candidate-2/nats.conf (sha256:004d512b3e8870918a4e9c0c0102760d61cd177cae8da871f7d2c3e2d6875a8b)
+[3345] 2026/09/24 22:47:02.656628 [INF] Starting JetStream
+[3345] 2026/09/24 22:47:02.656902 [INF]     _ ___ _____ ___ _____ ___ ___   _   __  __
+[3345] 2026/09/24 22:47:02.656908 [INF]  _ | | __|_   _/ __|_   _| _ \ __| /_\ |  \/  |
+[3345] 2026/09/24 22:47:02.656911 [INF] | || | _|  | | \__ \ | | |   / _| / _ \| |\/| |
+[3345] 2026/09/24 22:47:02.656914 [INF]  \__/|___| |_| |___/ |_| |_|_\___/_/ \_\_|  |_|
+[3345] 2026/09/24 22:47:02.656917 [INF] 
+[3345] 2026/09/24 22:47:02.656922 [INF]          https://docs.nats.io/jetstream
+[3345] 2026/09/24 22:47:02.656925 [INF] 
+[3345] 2026/09/24 22:47:02.656929 [INF] ---------------- JETSTREAM ----------------
+[3345] 2026/09/24 22:47:02.656932 [INF]   Max Memory:      24.00 GB
+[3345] 2026/09/24 22:47:02.656935 [INF]   Max Storage:     216.28 GB
+[3345] 2026/09/24 22:47:02.656938 [INF]   Store Directory: "/private/tmp/enola-stage15-profile-plan/candidate-2/nats-store/jetstream"
+[3345] 2026/09/24 22:47:02.656943 [INF]   API Level:       1
+[3345] 2026/09/24 22:47:02.656946 [INF] -------------------------------------------
+[3345] 2026/09/24 22:47:02.657232 [INF] Listening for client connections on 127.0.0.1:54026
+[3345] 2026/09/24 22:47:02.657240 [INF] Server is ready
+[3345] 2026/09/24 22:47:16.546593 [INF] Trapped "terminated" signal
+[3345] 2026/09/24 22:47:16.598904 [INF] Initiating Shutdown...
+[3345] 2026/09/24 22:47:16.598952 [INF] Initiating JetStream Shutdown...
+[3345] 2026/09/24 22:47:16.602684 [INF] JetStream Shutdown
+[3345] 2026/09/24 22:47:16.602748 [INF] Server Exiting..

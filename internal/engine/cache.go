@@ -2614,7 +2614,11 @@ import (
 // v320: TypeScript session records retain the selected local default export identity
 // when imported files cannot store a complete export surface, so default-binding
 // swaps invalidate importers even when the exported-name set is unchanged.
-const cacheVersion = "v320"
+// v321: a TypeScript file whose export index names no module records that
+// surface and the proof that it is context-free, so a consumer that binds a
+// name inside it is no longer rebound when only that file's own imports move;
+// an index merged from a block nobody could read carries no such proof.
+const cacheVersion = "v321"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

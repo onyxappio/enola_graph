@@ -1,0 +1,11 @@
+{
+  "product_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "observer": "/tmp/enola-stage9-product-watch-control/bin/benchobserver",
+  "observer_sha256": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+  "binary": "/tmp/enola-stage15-independent/enola-stage15-wave14-candidate",
+  "binary_sha256": "320d12a90c39eaa34e97fb1edbad6e4d4890746bd9156a557a007f43cc058bb6",
+  "profile": "ts",
+  "config": "repo: /private/tmp/enola-stage15-cli-pairs/candidate-3/product\nextractors: [typescript]\nexplainers: []\nrenderers: []\n\n# Overlay without repo. Paths are relative to the Product checkout.\ngraph_inputs:\n  exclude:\n    - \"apps/mobile/e2e/artifacts/**\"\n    - \"worker-reports/**\"\n",
+  "started_ns": 1790269049814314000,
+  "original_file_sha256": "b940122ddebf67b8f46073ba98a5bb3e1c82d80a9a28ac1a48cc680b5c0f80c3"
+}

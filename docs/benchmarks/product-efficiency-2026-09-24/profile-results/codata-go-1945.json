@@ -1,0 +1,40 @@
+{
+  "id": "67b2c7d8-7241-432b-ab60-5ed71fe0b011",
+  "ok": true,
+  "result": {
+    "terminal": {
+      "handle": "term_c5d53058-84a5-442a-8253-4eb2c7bb3dbe",
+      "status": "running",
+      "tail": [
+        "      470 +    // `run` is the auto-commit path of the post-delete GC sync (FREE MEMORY).",
+        "      471 +    const observed = (lose: boolean) => ({ run: (q: string) => session.run(q), executeWrite: async (work: any) => {",
+        "      472        call++",
+        "      473        const result = await session.executeWrite(tx => work({ run: (q: string, p: any) => { statements.push({ call, query: q, params: p }); return tx.run",
+        "           (q, p) } }))",
+        "      474        if (lose) throw new Error('lost cleanup acknowledgement')",
+        "  ⎿  (timeout 30s)",
+        "⏺ I sent GO for 19:45–19:50 UTC at 19:41:08, before the 19:43 deadline. It covers me and both Codata workers.",
+        "  - Coder: confirmed itself at 19:40, quoted in my reply: \"HOLD-1945 OK. The integration run has finished. I'll only read and edit code until 19:51 UTC.\"",
+        "  - Reviewer: idle with no review pending, and told to hold until 19:51 as well.",
+        "  - Preflight at 19:41: no Codata benchmark, Enola, CLI or test processes running; every Codata container under 3% CPU.",
+        "  Codata resumes at 19:51, and the coder continues fix round 8 (crash stress test, then a Product run). The watcher for its report is still running.",
+        "✻ Sautéed for 2m 34s · done 10:41 PM · 1 shell still running",
+        "                                                                                                                                  ✔ Update installed · Restart to update",
+        "──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────",
+        "❯",
+        "──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────",
+        "  ⏵⏵ bypass permissions on · 1 shell · ← for agents"
+      ],
+      "truncated": false,
+      "limited": true,
+      "oldestCursor": "0",
+      "nextCursor": "23",
+      "latestCursor": "23",
+      "returnedLineCount": 18,
+      "source": "screen"
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}

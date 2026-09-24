@@ -28,6 +28,11 @@ type namedExportCache struct {
 type namedExportEntry struct {
 	once sync.Once
 	idx  *namedExportIndex
+	// ready publishes the filled index to readers that must not join the
+	// single flight. peek is the only such reader: recording a proof may
+	// never trigger the scan it is trying to avoid, and reading idx without
+	// calling once.Do would race with the goroutine filling it.
+	ready atomic.Pointer[namedExportIndex]
 }
 
 type namedExportIndex struct {
@@ -37,6 +42,12 @@ type namedExportIndex struct {
 	stars       []string
 	defaultName string // proven default export symbol; empty if the file has none
 	empty       bool
+	// contextFree is what buildNamedExportIndex reported for this object, kept
+	// on the object so a holder cannot lose it. An index reached through any
+	// module specifier is false; see buildNamedExportIndex. Conservatively
+	// false whenever it was not computed, so an unknown provenance proves
+	// nothing.
+	contextFree bool
 }
 
 func newNamedExportCache() *namedExportCache {
@@ -87,6 +98,7 @@ func (c *namedExportCache) adopt(file string, idx *namedExportIndex) bool {
 	filled := false
 	entry.once.Do(func() {
 		entry.idx = idx
+		entry.ready.Store(idx)
 		filled = true
 		if c.derived != nil {
 			c.derived.Add(1)
@@ -109,11 +121,40 @@ func (c *namedExportCache) index(file string, readSrc func(string) []byte, alias
 	c.mu.Unlock()
 	entry.once.Do(func() {
 		entry.idx = parseNamedExportIndex(file, readSrc, aliases, knownFiles)
+		entry.ready.Store(entry.idx)
 		if c.scans != nil {
 			c.scans.Add(1)
 		}
 	})
 	return entry.idx
+}
+
+// peek returns this file's index only if one is already in hand, and never
+// causes one to be built. It exists so a record can note a proof the session
+// already paid for - the index ts.go adopted off the tree it parsed anyway -
+// without turning every recorded file into a summary scan. A miss is not an
+// answer of "no index" but of "none yet", and every caller must treat it as
+// unknown.
+func (c *namedExportCache) peek(file string) *namedExportIndex {
+	if c == nil {
+		return nil
+	}
+	c.mu.Lock()
+	entry := c.byFile[filepath.ToSlash(file)]
+	c.mu.Unlock()
+	return entry.readyIndex()
+}
+
+// isContextFree is nil-safe so callers can chain it onto a peek that missed.
+func (i *namedExportIndex) isContextFree() bool {
+	return i != nil && i.contextFree
+}
+
+func (e *namedExportEntry) readyIndex() *namedExportIndex {
+	if e == nil {
+		return nil
+	}
+	return e.ready.Load()
 }
 
 func parseNamedExportIndex(file string, readSrc func(string) []byte, aliases map[string]tsAlias, knownFiles map[string]bool) *namedExportIndex {
@@ -122,6 +163,10 @@ func parseNamedExportIndex(file string, readSrc func(string) []byte, aliases map
 		idx.empty = true
 		return idx
 	}
+	// Single-file-origin paths below return an index built elsewhere, which
+	// carries its own provenance; the block-merging paths start from this
+	// object, so it starts context-free and mergeNamedExportIndex narrows it.
+	idx.contextFree = true
 	src := readSrc(file)
 	if isVueFile(file) {
 		idx.defaultName = fileSymbolName(file)
@@ -170,6 +215,17 @@ func parseNamedExportIndex(file string, readSrc func(string) []byte, aliases map
 }
 
 func mergeNamedExportIndex(dst, src *namedExportIndex) {
+	// One block that consulted a specifier makes the merged answer context
+	// dependent, whatever the others did - and so does one block nobody could
+	// read. A missing block, or an empty one that carries no proof of its own
+	// (a nil root, a parser that would not take the language), is unknown
+	// rather than known-empty: it may name a module the merged index does not
+	// show. Only a block proven empty - zero bytes, no specifier consulted -
+	// leaves the proof standing. This narrowing happens before the early
+	// return so an unknown block cannot pass through unaccounted.
+	if src == nil || !src.contextFree {
+		dst.contextFree = false
+	}
 	if src == nil || src.empty {
 		return
 	}
@@ -196,6 +252,7 @@ func parseNamedExportIndexBytes(file string, src []byte, aliases map[string]tsAl
 	idx := &namedExportIndex{local: map[string]bool{}, named: map[string][][2]string{}, unresolved: map[string]bool{}}
 	if len(src) == 0 {
 		idx.empty = true
+		idx.contextFree = true
 		return idx
 	}
 	isTSX := strings.HasSuffix(file, ".tsx") || strings.HasSuffix(file, ".jsx")
@@ -238,6 +295,7 @@ func buildNamedExportIndex(file string, src []byte, kinds *tsutil.KindTable, roo
 	// would have produced.
 	if len(src) == 0 {
 		idx.empty = true
+		idx.contextFree = true
 		return idx, true
 	}
 	contextFree := true
@@ -336,6 +394,7 @@ func buildNamedExportIndex(file string, src []byte, kinds *tsutil.KindTable, roo
 			}
 		}
 	}
+	idx.contextFree = contextFree
 	return idx, contextFree
 }
 

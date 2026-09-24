@@ -1,0 +1,18 @@
+{
+  "checked_at": "2026-09-24T11:09:18.626460+00:00",
+  "base_sha256": "629fae95963c62b83df4acdc2ea5d6438dd114d67bbca2425b96416eda7538cb",
+  "candidate_sha256": "dfe4002f487d778ca88b5d95b49baa6114240daba558679f4f67b71ffce3dc36",
+  "driver_sha256": "3b838436ba698b87776ae50902e7e9dca4324447cc07a0a1a78e0b212924bbd3",
+  "self_test": "PASS",
+  "self_test_wall_s": 0.291355333,
+  "mutation_guard_checks": [
+    "exact unique replacement",
+    "reject stale hash",
+    "reject path traversal",
+    "reject empty variants",
+    "reject missing snippet",
+    "source unchanged"
+  ],
+  "performance_run": false,
+  "purpose": "Separate body-only regression control from targeted import-change Product scenario; selected mutation pending review."
+}

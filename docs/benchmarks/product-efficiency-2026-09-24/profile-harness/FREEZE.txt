@@ -1,0 +1,21 @@
+Stage15 profile harness - FROZEN, never run against a workload.
+
+Scripts are chmod a-w. The directory stays writable so a granted run can create
+its own work dirs; nothing in a run rewrites these four files.
+
+sha256:
+a29c4de3b52cc3107c2deb91ab6bee8a464bd47c5f5824513ef2607b3bf68807  PLAN.md
+f97b1e2eca97bc7dc32c34972d7123f22fe9845e07741c309200582047d16961  run-profile-arm.py
+a569d3120e5ca17470dfeb1977f908924052e73780f00fedf599dde6ed4a587a  summarize.py
+97aa7a7d4393eec8ea53e189509686786c3275db754c6728791ae23ead749fe8  gate-tests.py
+
+Verification at freeze time, no workload:
+  python3 -m py_compile on all three scripts: exit 0
+  python3 -B gate-tests.py: 54 passed, 0 failed, exit 0
+  selftest/baseline-8 and selftest/baseline-9: gate refusals with exit 1, kept as evidence
+Pins asserted at run time: baseline 5f5850da..., candidate 320d12a9...,
+observer 9d4322e7..., fixture product_sha a609c19f..., control file both revisions.
+PLAN.md interpretation records that the four state marks omit the write path IO
+(persist.go writePendingStateFP lines 20 to 45 carry no mark), so a small mark gap
+must never be reported as excluding state persistence.
+No run has been started.

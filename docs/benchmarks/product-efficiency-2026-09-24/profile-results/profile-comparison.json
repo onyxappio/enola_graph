@@ -1,0 +1,4446 @@
+{
+  "runs": {
+    "baseline-1": {
+      "arm": "baseline",
+      "repeat": 1,
+      "quiet_message_id": "msg_184bbab78c71",
+      "completed_sequence": true,
+      "required_checks_present": true,
+      "all_checks_pass": true,
+      "timing_eligible": true,
+      "body_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+      "oracle_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+      "binary_sha256": "5f5850dab6131aef717bf0f4439efb063201365d8b894858796c0d3913239801",
+      "competing_samples": []
+    },
+    "baseline-2": {
+      "arm": "baseline",
+      "repeat": 2,
+      "quiet_message_id": "msg_184bbab78c71",
+      "completed_sequence": true,
+      "required_checks_present": true,
+      "all_checks_pass": true,
+      "timing_eligible": true,
+      "body_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+      "oracle_hash": null,
+      "binary_sha256": "5f5850dab6131aef717bf0f4439efb063201365d8b894858796c0d3913239801",
+      "competing_samples": []
+    },
+    "baseline-3": {
+      "arm": "baseline",
+      "repeat": 3,
+      "quiet_message_id": "msg_184bbab78c71",
+      "completed_sequence": true,
+      "required_checks_present": true,
+      "all_checks_pass": true,
+      "timing_eligible": true,
+      "body_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+      "oracle_hash": null,
+      "binary_sha256": "5f5850dab6131aef717bf0f4439efb063201365d8b894858796c0d3913239801",
+      "competing_samples": []
+    },
+    "candidate-1": {
+      "arm": "candidate",
+      "repeat": 1,
+      "quiet_message_id": "msg_184bbab78c71",
+      "completed_sequence": true,
+      "required_checks_present": true,
+      "all_checks_pass": true,
+      "timing_eligible": true,
+      "body_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+      "oracle_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+      "binary_sha256": "320d12a90c39eaa34e97fb1edbad6e4d4890746bd9156a557a007f43cc058bb6",
+      "competing_samples": []
+    },
+    "candidate-2": {
+      "arm": "candidate",
+      "repeat": 2,
+      "quiet_message_id": "msg_184bbab78c71",
+      "completed_sequence": true,
+      "required_checks_present": true,
+      "all_checks_pass": true,
+      "timing_eligible": true,
+      "body_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+      "oracle_hash": null,
+      "binary_sha256": "320d12a90c39eaa34e97fb1edbad6e4d4890746bd9156a557a007f43cc058bb6",
+      "competing_samples": []
+    },
+    "candidate-3": {
+      "arm": "candidate",
+      "repeat": 3,
+      "quiet_message_id": "msg_184bbab78c71",
+      "completed_sequence": true,
+      "required_checks_present": true,
+      "all_checks_pass": true,
+      "timing_eligible": true,
+      "body_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+      "oracle_hash": null,
+      "binary_sha256": "320d12a90c39eaa34e97fb1edbad6e4d4890746bd9156a557a007f43cc058bb6",
+      "competing_samples": []
+    }
+  },
+  "ineligible_runs": {},
+  "expected_runs": [
+    "baseline-1",
+    "baseline-2",
+    "baseline-3",
+    "candidate-1",
+    "candidate-2",
+    "candidate-3"
+  ],
+  "note": "instrumented timings; per-mark differences only, never summed into an attribution",
+  "series_problems": [],
+  "series_complete": true,
+  "body_hash_shared": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+  "noop": {
+    "arms": {
+      "baseline": {
+        "per_run": {
+          "baseline-1": {
+            "wall_s": 1.6614426659652963,
+            "user_s": 1.34,
+            "sys_s": 0.47,
+            "state_final_bytes": 55860508,
+            "rss_bytes": 287686656.0
+          },
+          "baseline-2": {
+            "wall_s": 1.6439616249408573,
+            "user_s": 1.34,
+            "sys_s": 0.46,
+            "state_final_bytes": 55860508,
+            "rss_bytes": 295190528.0
+          },
+          "baseline-3": {
+            "wall_s": 1.6989982089726254,
+            "user_s": 1.34,
+            "sys_s": 0.5,
+            "state_final_bytes": 55860507,
+            "rss_bytes": 281395200.0
+          }
+        },
+        "wall_s": {
+          "n": 3,
+          "min": 1.6439616249408573,
+          "max": 1.6989982089726254,
+          "median": 1.661443,
+          "range": 0.055037
+        },
+        "user_s": {
+          "n": 3,
+          "min": 1.34,
+          "max": 1.34,
+          "median": 1.34,
+          "range": 0.0
+        },
+        "sys_s": {
+          "n": 3,
+          "min": 0.46,
+          "max": 0.5,
+          "median": 0.47,
+          "range": 0.04
+        },
+        "state_final_bytes": {
+          "n": 3,
+          "min": 55860507,
+          "max": 55860508,
+          "median": 55860508,
+          "range": 1
+        },
+        "marks_differenceable": [
+          "analysis_fingerprint",
+          "angular_probe",
+          "assemble_new_files",
+          "bind_identity",
+          "capture_contexts",
+          "changed_terms",
+          "check_ignore_run",
+          "check_ignore_setup",
+          "cli_complete",
+          "clone_file_state_copy",
+          "compute_identities",
+          "config_load",
+          "config_recheck",
+          "connect_sink",
+          "declare_config_deps",
+          "declare_git_control",
+          "declare_ignore_files",
+          "detect_extractors",
+          "detect_typescript",
+          "discover_git",
+          "effective_config",
+          "effective_config_before",
+          "engine_context_fingerprint",
+          "engine_hash_files",
+          "engine_new",
+          "engine_walk_repo",
+          "extractor_need",
+          "flags_parsed",
+          "git_ls_files",
+          "graph_inputs_proven",
+          "graph_session_run",
+          "graphinput_build",
+          "hash_content_inputs",
+          "inventory",
+          "load_state",
+          "lock",
+          "open_journal",
+          "policy_identity",
+          "reconcile_complete",
+          "register_plugins",
+          "replay_unacked",
+          "resolve_graph_target",
+          "runtime_inputs_complete",
+          "select_hash_targets",
+          "session_options",
+          "skip_publish_return",
+          "state_fingerprint",
+          "state_json_unmarshal",
+          "state_read_bytes",
+          "transaction_enter",
+          "ts_disc_alias_roots",
+          "ts_disc_nuxt_packages",
+          "ts_disc_package_exports",
+          "ts_disc_package_gates",
+          "ts_disc_package_names",
+          "ts_discovery",
+          "ts_discovery_build",
+          "ts_reuse_cache",
+          "ts_session_context",
+          "walk_tree"
+        ],
+        "marks_repeated_raw": {
+          "ts_config_inputs": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 39,
+                  "seconds": 0.141,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                },
+                {
+                  "index": 58,
+                  "seconds": 0.137,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                }
+              ],
+              [
+                {
+                  "index": 39,
+                  "seconds": 0.137,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                },
+                {
+                  "index": 58,
+                  "seconds": 0.134,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                }
+              ],
+              [
+                {
+                  "index": 39,
+                  "seconds": 0.141,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                },
+                {
+                  "index": 58,
+                  "seconds": 0.141,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                }
+              ]
+            ]
+          }
+        },
+        "marks_partial_raw": {},
+        "mark_spread": {
+          "analysis_fingerprint": {
+            "n": 3,
+            "min": 0.139,
+            "max": 0.143,
+            "median": 0.142,
+            "range": 0.004
+          },
+          "angular_probe": {
+            "n": 3,
+            "min": 0.003,
+            "max": 0.003,
+            "median": 0.003,
+            "range": 0.0
+          },
+          "assemble_new_files": {
+            "n": 3,
+            "min": 0.002,
+            "max": 0.002,
+            "median": 0.002,
+            "range": 0.0
+          },
+          "bind_identity": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "capture_contexts": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "changed_terms": {
+            "n": 3,
+            "min": 0.007,
+            "max": 0.008,
+            "median": 0.007,
+            "range": 0.001
+          },
+          "check_ignore_run": {
+            "n": 3,
+            "min": 0.056,
+            "max": 0.06,
+            "median": 0.059,
+            "range": 0.004
+          },
+          "check_ignore_setup": {
+            "n": 3,
+            "min": 0.017,
+            "max": 0.017,
+            "median": 0.017,
+            "range": 0.0
+          },
+          "cli_complete": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "clone_file_state_copy": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "compute_identities": {
+            "n": 3,
+            "min": 0.035,
+            "max": 0.036,
+            "median": 0.035,
+            "range": 0.001
+          },
+          "config_load": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "config_recheck": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "connect_sink": {
+            "n": 3,
+            "min": 0.001,
+            "max": 0.002,
+            "median": 0.001,
+            "range": 0.001
+          },
+          "declare_config_deps": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "declare_git_control": {
+            "n": 3,
+            "min": 0.005,
+            "max": 0.006,
+            "median": 0.005,
+            "range": 0.001
+          },
+          "declare_ignore_files": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "detect_extractors": {
+            "n": 3,
+            "min": 0.001,
+            "max": 0.001,
+            "median": 0.001,
+            "range": 0.0
+          },
+          "detect_typescript": {
+            "n": 3,
+            "min": 0.001,
+            "max": 0.001,
+            "median": 0.001,
+            "range": 0.0
+          },
+          "discover_git": {
+            "n": 3,
+            "min": 0.041,
+            "max": 0.043,
+            "median": 0.043,
+            "range": 0.002
+          },
+          "effective_config": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "effective_config_before": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "engine_context_fingerprint": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "engine_hash_files": {
+            "n": 3,
+            "min": 0.152,
+            "max": 0.158,
+            "median": 0.154,
+            "range": 0.006
+          },
+          "engine_new": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "engine_walk_repo": {
+            "n": 3,
+            "min": 0.113,
+            "max": 0.12,
+            "median": 0.115,
+            "range": 0.007
+          },
+          "extractor_need": {
+            "n": 3,
+            "min": 0.718,
+            "max": 0.743,
+            "median": 0.726,
+            "range": 0.025
+          },
+          "flags_parsed": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "git_ls_files": {
+            "n": 3,
+            "min": 0.057,
+            "max": 0.059,
+            "median": 0.059,
+            "range": 0.002
+          },
+          "graph_inputs_proven": {
+            "n": 3,
+            "min": 0.094,
+            "max": 0.1,
+            "median": 0.097,
+            "range": 0.006
+          },
+          "graph_session_run": {
+            "n": 3,
+            "min": 1.288,
+            "max": 1.332,
+            "median": 1.295,
+            "range": 0.044
+          },
+          "graphinput_build": {
+            "n": 3,
+            "min": 0.327,
+            "max": 0.34,
+            "median": 0.339,
+            "range": 0.013
+          },
+          "hash_content_inputs": {
+            "n": 3,
+            "min": 0.152,
+            "max": 0.158,
+            "median": 0.154,
+            "range": 0.006
+          },
+          "inventory": {
+            "n": 3,
+            "min": 0.113,
+            "max": 0.12,
+            "median": 0.115,
+            "range": 0.007
+          },
+          "load_state": {
+            "n": 3,
+            "min": 0.281,
+            "max": 0.285,
+            "median": 0.281,
+            "range": 0.004
+          },
+          "lock": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "open_journal": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "policy_identity": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "reconcile_complete": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "register_plugins": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "replay_unacked": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "resolve_graph_target": {
+            "n": 3,
+            "min": 0.327,
+            "max": 0.34,
+            "median": 0.339,
+            "range": 0.013
+          },
+          "runtime_inputs_complete": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "select_hash_targets": {
+            "n": 3,
+            "min": 0.009,
+            "max": 0.009,
+            "median": 0.009,
+            "range": 0.0
+          },
+          "session_options": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "skip_publish_return": {
+            "n": 3,
+            "min": 0.136,
+            "max": 0.143,
+            "median": 0.138,
+            "range": 0.007
+          },
+          "state_fingerprint": {
+            "n": 3,
+            "min": 0.024,
+            "max": 0.024,
+            "median": 0.024,
+            "range": 0.0
+          },
+          "state_json_unmarshal": {
+            "n": 3,
+            "min": 0.244,
+            "max": 0.249,
+            "median": 0.245,
+            "range": 0.005
+          },
+          "state_read_bytes": {
+            "n": 3,
+            "min": 0.012,
+            "max": 0.012,
+            "median": 0.012,
+            "range": 0.0
+          },
+          "transaction_enter": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "ts_disc_alias_roots": {
+            "n": 3,
+            "min": 0.079,
+            "max": 0.088,
+            "median": 0.08,
+            "range": 0.009
+          },
+          "ts_disc_nuxt_packages": {
+            "n": 3,
+            "min": 0.116,
+            "max": 0.122,
+            "median": 0.12,
+            "range": 0.006
+          },
+          "ts_disc_package_exports": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "ts_disc_package_gates": {
+            "n": 3,
+            "min": 0.001,
+            "max": 0.001,
+            "median": 0.001,
+            "range": 0.0
+          },
+          "ts_disc_package_names": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "ts_discovery": {
+            "n": 3,
+            "min": 0.207,
+            "max": 0.222,
+            "median": 0.211,
+            "range": 0.015
+          },
+          "ts_discovery_build": {
+            "n": 3,
+            "min": 0.207,
+            "max": 0.222,
+            "median": 0.211,
+            "range": 0.015
+          },
+          "ts_reuse_cache": {
+            "n": 3,
+            "min": 0.04,
+            "max": 0.045,
+            "median": 0.041,
+            "range": 0.005
+          },
+          "ts_session_context": {
+            "n": 3,
+            "min": 0.057,
+            "max": 0.057,
+            "median": 0.057,
+            "range": 0.0
+          },
+          "walk_tree": {
+            "n": 3,
+            "min": 0.114,
+            "max": 0.118,
+            "median": 0.118,
+            "range": 0.004
+          }
+        },
+        "mark_traces": {
+          "analysis_fingerprint": [
+            "inputs"
+          ],
+          "angular_probe": [
+            "inputs"
+          ],
+          "assemble_new_files": [
+            "session"
+          ],
+          "bind_identity": [
+            "open"
+          ],
+          "capture_contexts": [
+            "inputs"
+          ],
+          "changed_terms": [
+            "session"
+          ],
+          "check_ignore_run": [
+            "graphinput_build"
+          ],
+          "check_ignore_setup": [
+            "graphinput_build"
+          ],
+          "cli_complete": [
+            "cli"
+          ],
+          "clone_file_state_copy": [],
+          "compute_identities": [
+            "graphinput_build"
+          ],
+          "config_load": [
+            "graph_engine"
+          ],
+          "config_recheck": [
+            "graph_engine"
+          ],
+          "connect_sink": [
+            "cli"
+          ],
+          "declare_config_deps": [
+            "graphinput_build"
+          ],
+          "declare_git_control": [
+            "graphinput_build"
+          ],
+          "declare_ignore_files": [
+            "graphinput_build"
+          ],
+          "detect_extractors": [
+            "inputs"
+          ],
+          "detect_typescript": [],
+          "discover_git": [
+            "graphinput_build"
+          ],
+          "effective_config": [
+            "reconcile"
+          ],
+          "effective_config_before": [
+            "reconcile"
+          ],
+          "engine_context_fingerprint": [
+            "inputs"
+          ],
+          "engine_hash_files": [],
+          "engine_new": [
+            "graph_engine"
+          ],
+          "engine_walk_repo": [],
+          "extractor_need": [
+            "session"
+          ],
+          "flags_parsed": [
+            "cli"
+          ],
+          "git_ls_files": [
+            "graphinput_build"
+          ],
+          "graph_inputs_proven": [
+            "reconcile"
+          ],
+          "graph_session_run": [
+            "cli"
+          ],
+          "graphinput_build": [
+            "graph_engine"
+          ],
+          "hash_content_inputs": [
+            "inputs"
+          ],
+          "inventory": [
+            "inputs"
+          ],
+          "load_state": [
+            "open"
+          ],
+          "lock": [
+            "open"
+          ],
+          "open_journal": [
+            "open"
+          ],
+          "policy_identity": [
+            "inputs"
+          ],
+          "reconcile_complete": [
+            "reconcile"
+          ],
+          "register_plugins": [
+            "graph_engine"
+          ],
+          "replay_unacked": [
+            "open"
+          ],
+          "resolve_graph_target": [
+            "cli"
+          ],
+          "runtime_inputs_complete": [
+            "inputs"
+          ],
+          "select_hash_targets": [
+            "inputs"
+          ],
+          "session_options": [
+            "cli"
+          ],
+          "skip_publish_return": [
+            "session"
+          ],
+          "state_fingerprint": [],
+          "state_json_unmarshal": [],
+          "state_read_bytes": [],
+          "transaction_enter": [
+            "reconcile"
+          ],
+          "ts_disc_alias_roots": [],
+          "ts_disc_nuxt_packages": [],
+          "ts_disc_package_exports": [],
+          "ts_disc_package_gates": [],
+          "ts_disc_package_names": [],
+          "ts_discovery": [
+            "inputs"
+          ],
+          "ts_discovery_build": [],
+          "ts_reuse_cache": [
+            "session"
+          ],
+          "ts_session_context": [
+            "inputs"
+          ],
+          "walk_tree": [
+            "graphinput_build"
+          ]
+        }
+      },
+      "candidate": {
+        "per_run": {
+          "candidate-1": {
+            "wall_s": 1.6618628340074793,
+            "user_s": 1.35,
+            "sys_s": 0.49,
+            "state_final_bytes": 56635330,
+            "rss_bytes": 290832384.0
+          },
+          "candidate-2": {
+            "wall_s": 1.6469994579674676,
+            "user_s": 1.34,
+            "sys_s": 0.47,
+            "state_final_bytes": 56635330,
+            "rss_bytes": 293421056.0
+          },
+          "candidate-3": {
+            "wall_s": 1.6721464999718592,
+            "user_s": 1.35,
+            "sys_s": 0.48,
+            "state_final_bytes": 56635004,
+            "rss_bytes": 296681472.0
+          }
+        },
+        "wall_s": {
+          "n": 3,
+          "min": 1.6469994579674676,
+          "max": 1.6721464999718592,
+          "median": 1.661863,
+          "range": 0.025147
+        },
+        "user_s": {
+          "n": 3,
+          "min": 1.34,
+          "max": 1.35,
+          "median": 1.35,
+          "range": 0.01
+        },
+        "sys_s": {
+          "n": 3,
+          "min": 0.47,
+          "max": 0.49,
+          "median": 0.48,
+          "range": 0.02
+        },
+        "state_final_bytes": {
+          "n": 3,
+          "min": 56635004,
+          "max": 56635330,
+          "median": 56635330,
+          "range": 326
+        },
+        "marks_differenceable": [
+          "analysis_fingerprint",
+          "angular_probe",
+          "assemble_new_files",
+          "bind_identity",
+          "capture_contexts",
+          "changed_terms",
+          "check_ignore_run",
+          "check_ignore_setup",
+          "cli_complete",
+          "clone_file_state_copy",
+          "compute_identities",
+          "config_load",
+          "config_recheck",
+          "connect_sink",
+          "declare_config_deps",
+          "declare_git_control",
+          "declare_ignore_files",
+          "detect_extractors",
+          "detect_typescript",
+          "discover_git",
+          "effective_config",
+          "effective_config_before",
+          "engine_context_fingerprint",
+          "engine_hash_files",
+          "engine_new",
+          "engine_walk_repo",
+          "extractor_need",
+          "flags_parsed",
+          "git_ls_files",
+          "graph_inputs_proven",
+          "graph_session_run",
+          "graphinput_build",
+          "hash_content_inputs",
+          "inventory",
+          "load_state",
+          "lock",
+          "open_journal",
+          "policy_identity",
+          "reconcile_complete",
+          "register_plugins",
+          "replay_unacked",
+          "resolve_graph_target",
+          "runtime_inputs_complete",
+          "select_hash_targets",
+          "session_options",
+          "skip_publish_return",
+          "state_fingerprint",
+          "state_json_unmarshal",
+          "state_read_bytes",
+          "transaction_enter",
+          "ts_disc_alias_roots",
+          "ts_disc_nuxt_packages",
+          "ts_disc_package_exports",
+          "ts_disc_package_gates",
+          "ts_disc_package_names",
+          "ts_discovery",
+          "ts_discovery_build",
+          "ts_reuse_cache",
+          "ts_session_context",
+          "walk_tree"
+        ],
+        "marks_repeated_raw": {
+          "ts_config_inputs": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 39,
+                  "seconds": 0.137,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                },
+                {
+                  "index": 58,
+                  "seconds": 0.134,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                }
+              ],
+              [
+                {
+                  "index": 39,
+                  "seconds": 0.138,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                },
+                {
+                  "index": 58,
+                  "seconds": 0.138,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                }
+              ],
+              [
+                {
+                  "index": 39,
+                  "seconds": 0.142,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                },
+                {
+                  "index": 58,
+                  "seconds": 0.137,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                }
+              ]
+            ]
+          }
+        },
+        "marks_partial_raw": {},
+        "mark_spread": {
+          "analysis_fingerprint": {
+            "n": 3,
+            "min": 0.139,
+            "max": 0.145,
+            "median": 0.14,
+            "range": 0.006
+          },
+          "angular_probe": {
+            "n": 3,
+            "min": 0.003,
+            "max": 0.003,
+            "median": 0.003,
+            "range": 0.0
+          },
+          "assemble_new_files": {
+            "n": 3,
+            "min": 0.002,
+            "max": 0.002,
+            "median": 0.002,
+            "range": 0.0
+          },
+          "bind_identity": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "capture_contexts": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "changed_terms": {
+            "n": 3,
+            "min": 0.007,
+            "max": 0.007,
+            "median": 0.007,
+            "range": 0.0
+          },
+          "check_ignore_run": {
+            "n": 3,
+            "min": 0.056,
+            "max": 0.069,
+            "median": 0.059,
+            "range": 0.013
+          },
+          "check_ignore_setup": {
+            "n": 3,
+            "min": 0.017,
+            "max": 0.019,
+            "median": 0.019,
+            "range": 0.002
+          },
+          "cli_complete": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "clone_file_state_copy": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "compute_identities": {
+            "n": 3,
+            "min": 0.033,
+            "max": 0.036,
+            "median": 0.035,
+            "range": 0.003
+          },
+          "config_load": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "config_recheck": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "connect_sink": {
+            "n": 3,
+            "min": 0.001,
+            "max": 0.002,
+            "median": 0.002,
+            "range": 0.001
+          },
+          "declare_config_deps": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "declare_git_control": {
+            "n": 3,
+            "min": 0.005,
+            "max": 0.005,
+            "median": 0.005,
+            "range": 0.0
+          },
+          "declare_ignore_files": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "detect_extractors": {
+            "n": 3,
+            "min": 0.001,
+            "max": 0.001,
+            "median": 0.001,
+            "range": 0.0
+          },
+          "detect_typescript": {
+            "n": 3,
+            "min": 0.001,
+            "max": 0.001,
+            "median": 0.001,
+            "range": 0.0
+          },
+          "discover_git": {
+            "n": 3,
+            "min": 0.041,
+            "max": 0.043,
+            "median": 0.043,
+            "range": 0.002
+          },
+          "effective_config": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "effective_config_before": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "engine_context_fingerprint": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "engine_hash_files": {
+            "n": 3,
+            "min": 0.15,
+            "max": 0.152,
+            "median": 0.151,
+            "range": 0.002
+          },
+          "engine_new": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "engine_walk_repo": {
+            "n": 3,
+            "min": 0.114,
+            "max": 0.116,
+            "median": 0.115,
+            "range": 0.002
+          },
+          "extractor_need": {
+            "n": 3,
+            "min": 0.715,
+            "max": 0.729,
+            "median": 0.719,
+            "range": 0.014
+          },
+          "flags_parsed": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "git_ls_files": {
+            "n": 3,
+            "min": 0.056,
+            "max": 0.059,
+            "median": 0.056,
+            "range": 0.003
+          },
+          "graph_inputs_proven": {
+            "n": 3,
+            "min": 0.096,
+            "max": 0.099,
+            "median": 0.098,
+            "range": 0.003
+          },
+          "graph_session_run": {
+            "n": 3,
+            "min": 1.287,
+            "max": 1.304,
+            "median": 1.288,
+            "range": 0.017
+          },
+          "graphinput_build": {
+            "n": 3,
+            "min": 0.33,
+            "max": 0.345,
+            "median": 0.338,
+            "range": 0.015
+          },
+          "hash_content_inputs": {
+            "n": 3,
+            "min": 0.15,
+            "max": 0.152,
+            "median": 0.151,
+            "range": 0.002
+          },
+          "inventory": {
+            "n": 3,
+            "min": 0.114,
+            "max": 0.116,
+            "median": 0.115,
+            "range": 0.002
+          },
+          "load_state": {
+            "n": 3,
+            "min": 0.281,
+            "max": 0.282,
+            "median": 0.282,
+            "range": 0.001
+          },
+          "lock": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "open_journal": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "policy_identity": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "reconcile_complete": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "register_plugins": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "replay_unacked": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "resolve_graph_target": {
+            "n": 3,
+            "min": 0.33,
+            "max": 0.345,
+            "median": 0.339,
+            "range": 0.015
+          },
+          "runtime_inputs_complete": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "select_hash_targets": {
+            "n": 3,
+            "min": 0.009,
+            "max": 0.009,
+            "median": 0.009,
+            "range": 0.0
+          },
+          "session_options": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "skip_publish_return": {
+            "n": 3,
+            "min": 0.135,
+            "max": 0.139,
+            "median": 0.138,
+            "range": 0.004
+          },
+          "state_fingerprint": {
+            "n": 3,
+            "min": 0.023,
+            "max": 0.026,
+            "median": 0.024,
+            "range": 0.003
+          },
+          "state_json_unmarshal": {
+            "n": 3,
+            "min": 0.245,
+            "max": 0.246,
+            "median": 0.245,
+            "range": 0.001
+          },
+          "state_read_bytes": {
+            "n": 3,
+            "min": 0.009,
+            "max": 0.013,
+            "median": 0.012,
+            "range": 0.004
+          },
+          "transaction_enter": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "ts_disc_alias_roots": {
+            "n": 3,
+            "min": 0.08,
+            "max": 0.082,
+            "median": 0.081,
+            "range": 0.002
+          },
+          "ts_disc_nuxt_packages": {
+            "n": 3,
+            "min": 0.117,
+            "max": 0.122,
+            "median": 0.117,
+            "range": 0.005
+          },
+          "ts_disc_package_exports": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "ts_disc_package_gates": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.001,
+            "median": 0.0,
+            "range": 0.001
+          },
+          "ts_disc_package_names": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "ts_discovery": {
+            "n": 3,
+            "min": 0.208,
+            "max": 0.214,
+            "median": 0.21,
+            "range": 0.006
+          },
+          "ts_discovery_build": {
+            "n": 3,
+            "min": 0.208,
+            "max": 0.214,
+            "median": 0.21,
+            "range": 0.006
+          },
+          "ts_reuse_cache": {
+            "n": 3,
+            "min": 0.04,
+            "max": 0.042,
+            "median": 0.04,
+            "range": 0.002
+          },
+          "ts_session_context": {
+            "n": 3,
+            "min": 0.056,
+            "max": 0.057,
+            "median": 0.057,
+            "range": 0.001
+          },
+          "walk_tree": {
+            "n": 3,
+            "min": 0.115,
+            "max": 0.121,
+            "median": 0.116,
+            "range": 0.006
+          }
+        },
+        "mark_traces": {
+          "analysis_fingerprint": [
+            "inputs"
+          ],
+          "angular_probe": [
+            "inputs"
+          ],
+          "assemble_new_files": [
+            "session"
+          ],
+          "bind_identity": [
+            "open"
+          ],
+          "capture_contexts": [
+            "inputs"
+          ],
+          "changed_terms": [
+            "session"
+          ],
+          "check_ignore_run": [
+            "graphinput_build"
+          ],
+          "check_ignore_setup": [
+            "graphinput_build"
+          ],
+          "cli_complete": [
+            "cli"
+          ],
+          "clone_file_state_copy": [],
+          "compute_identities": [
+            "graphinput_build"
+          ],
+          "config_load": [
+            "graph_engine"
+          ],
+          "config_recheck": [
+            "graph_engine"
+          ],
+          "connect_sink": [
+            "cli"
+          ],
+          "declare_config_deps": [
+            "graphinput_build"
+          ],
+          "declare_git_control": [
+            "graphinput_build"
+          ],
+          "declare_ignore_files": [
+            "graphinput_build"
+          ],
+          "detect_extractors": [
+            "inputs"
+          ],
+          "detect_typescript": [],
+          "discover_git": [
+            "graphinput_build"
+          ],
+          "effective_config": [
+            "reconcile"
+          ],
+          "effective_config_before": [
+            "reconcile"
+          ],
+          "engine_context_fingerprint": [
+            "inputs"
+          ],
+          "engine_hash_files": [],
+          "engine_new": [
+            "graph_engine"
+          ],
+          "engine_walk_repo": [],
+          "extractor_need": [
+            "session"
+          ],
+          "flags_parsed": [
+            "cli"
+          ],
+          "git_ls_files": [
+            "graphinput_build"
+          ],
+          "graph_inputs_proven": [
+            "reconcile"
+          ],
+          "graph_session_run": [
+            "cli"
+          ],
+          "graphinput_build": [
+            "graph_engine"
+          ],
+          "hash_content_inputs": [
+            "inputs"
+          ],
+          "inventory": [
+            "inputs"
+          ],
+          "load_state": [
+            "open"
+          ],
+          "lock": [
+            "open"
+          ],
+          "open_journal": [
+            "open"
+          ],
+          "policy_identity": [
+            "inputs"
+          ],
+          "reconcile_complete": [
+            "reconcile"
+          ],
+          "register_plugins": [
+            "graph_engine"
+          ],
+          "replay_unacked": [
+            "open"
+          ],
+          "resolve_graph_target": [
+            "cli"
+          ],
+          "runtime_inputs_complete": [
+            "inputs"
+          ],
+          "select_hash_targets": [
+            "inputs"
+          ],
+          "session_options": [
+            "cli"
+          ],
+          "skip_publish_return": [
+            "session"
+          ],
+          "state_fingerprint": [],
+          "state_json_unmarshal": [],
+          "state_read_bytes": [],
+          "transaction_enter": [
+            "reconcile"
+          ],
+          "ts_disc_alias_roots": [],
+          "ts_disc_nuxt_packages": [],
+          "ts_disc_package_exports": [],
+          "ts_disc_package_gates": [],
+          "ts_disc_package_names": [],
+          "ts_discovery": [
+            "inputs"
+          ],
+          "ts_discovery_build": [],
+          "ts_reuse_cache": [
+            "session"
+          ],
+          "ts_session_context": [
+            "inputs"
+          ],
+          "walk_tree": [
+            "graphinput_build"
+          ]
+        }
+      }
+    },
+    "wall_gap_s": 0.00042,
+    "wall_ranges_overlap": true,
+    "state_bytes_gap": 774822,
+    "mark_delta_candidate_minus_baseline": {
+      "analysis_fingerprint": -0.002,
+      "angular_probe": 0.0,
+      "assemble_new_files": 0.0,
+      "bind_identity": 0.0,
+      "capture_contexts": 0.0,
+      "changed_terms": 0.0,
+      "check_ignore_run": 0.0,
+      "check_ignore_setup": 0.002,
+      "cli_complete": 0.0,
+      "clone_file_state_copy": 0.0,
+      "compute_identities": 0.0,
+      "config_load": 0.0,
+      "config_recheck": 0.0,
+      "connect_sink": 0.001,
+      "declare_config_deps": 0.0,
+      "declare_git_control": 0.0,
+      "declare_ignore_files": 0.0,
+      "detect_extractors": 0.0,
+      "detect_typescript": 0.0,
+      "discover_git": 0.0,
+      "effective_config": 0.0,
+      "effective_config_before": 0.0,
+      "engine_context_fingerprint": 0.0,
+      "engine_hash_files": -0.003,
+      "engine_new": 0.0,
+      "engine_walk_repo": 0.0,
+      "extractor_need": -0.007,
+      "flags_parsed": 0.0,
+      "git_ls_files": -0.003,
+      "graph_inputs_proven": 0.001,
+      "graph_session_run": -0.007,
+      "graphinput_build": -0.001,
+      "hash_content_inputs": -0.003,
+      "inventory": 0.0,
+      "load_state": 0.001,
+      "lock": 0.0,
+      "open_journal": 0.0,
+      "policy_identity": 0.0,
+      "reconcile_complete": 0.0,
+      "register_plugins": 0.0,
+      "replay_unacked": 0.0,
+      "resolve_graph_target": 0.0,
+      "runtime_inputs_complete": 0.0,
+      "select_hash_targets": 0.0,
+      "session_options": 0.0,
+      "skip_publish_return": 0.0,
+      "state_fingerprint": 0.0,
+      "state_json_unmarshal": 0.0,
+      "state_read_bytes": 0.0,
+      "transaction_enter": 0.0,
+      "ts_disc_alias_roots": 0.001,
+      "ts_disc_nuxt_packages": -0.003,
+      "ts_disc_package_exports": 0.0,
+      "ts_disc_package_gates": -0.001,
+      "ts_disc_package_names": 0.0,
+      "ts_discovery": -0.001,
+      "ts_discovery_build": -0.001,
+      "ts_reuse_cache": -0.001,
+      "ts_session_context": 0.0,
+      "walk_tree": -0.002
+    },
+    "state_mark_deltas": {
+      "state_read_bytes": 0.0,
+      "state_fingerprint": 0.0,
+      "state_json_unmarshal": 0.0
+    },
+    "state_marks_absent_from_delta": [
+      "state_json_marshal"
+    ],
+    "marks_not_differenced": [
+      "ts_config_inputs"
+    ],
+    "largest_mark_gaps": [
+      [
+        "extractor_need",
+        -0.007
+      ],
+      [
+        "graph_session_run",
+        -0.007
+      ],
+      [
+        "engine_hash_files",
+        -0.003
+      ],
+      [
+        "git_ls_files",
+        -0.003
+      ],
+      [
+        "hash_content_inputs",
+        -0.003
+      ],
+      [
+        "ts_disc_nuxt_packages",
+        -0.003
+      ],
+      [
+        "analysis_fingerprint",
+        -0.002
+      ],
+      [
+        "check_ignore_setup",
+        0.002
+      ],
+      [
+        "walk_tree",
+        -0.002
+      ],
+      [
+        "connect_sink",
+        0.001
+      ],
+      [
+        "graph_inputs_proven",
+        0.001
+      ],
+      [
+        "graphinput_build",
+        -0.001
+      ]
+    ],
+    "summing_note": "per-mark medians are differenced individually; nesting between marks is not reported by graph-profile, so these differences are not summed and no single number here attributes the wall gap"
+  },
+  "body": {
+    "arms": {
+      "baseline": {
+        "per_run": {
+          "baseline-1": {
+            "wall_s": 3.389857666916214,
+            "user_s": 3.91,
+            "sys_s": 0.76,
+            "state_final_bytes": 55860579,
+            "rss_bytes": 679444480.0
+          },
+          "baseline-2": {
+            "wall_s": 3.4397287080064416,
+            "user_s": 3.91,
+            "sys_s": 0.78,
+            "state_final_bytes": 55860580,
+            "rss_bytes": 670351360.0
+          },
+          "baseline-3": {
+            "wall_s": 3.472488541970961,
+            "user_s": 3.83,
+            "sys_s": 0.81,
+            "state_final_bytes": 55860580,
+            "rss_bytes": 658358272.0
+          }
+        },
+        "wall_s": {
+          "n": 3,
+          "min": 3.389857666916214,
+          "max": 3.472488541970961,
+          "median": 3.439729,
+          "range": 0.082631
+        },
+        "user_s": {
+          "n": 3,
+          "min": 3.83,
+          "max": 3.91,
+          "median": 3.91,
+          "range": 0.08
+        },
+        "sys_s": {
+          "n": 3,
+          "min": 0.76,
+          "max": 0.81,
+          "median": 0.78,
+          "range": 0.05
+        },
+        "state_final_bytes": {
+          "n": 3,
+          "min": 55860579,
+          "max": 55860580,
+          "median": 55860580,
+          "range": 1
+        },
+        "marks_differenceable": [
+          "analysis_fingerprint",
+          "angular_probe",
+          "assemble_new_files",
+          "begin_publish",
+          "bind_identity",
+          "capture_contexts",
+          "changed_terms",
+          "check_ignore_run",
+          "check_ignore_setup",
+          "cli_complete",
+          "clone_file_state_copy",
+          "compute_identities",
+          "config_load",
+          "config_recheck",
+          "connect_sink",
+          "declare_config_deps",
+          "declare_git_control",
+          "declare_ignore_files",
+          "detect_extractors",
+          "detect_typescript",
+          "discover_git",
+          "effective_config",
+          "effective_config_before",
+          "encode_append_owners",
+          "end_flush_ack",
+          "engine_context_fingerprint",
+          "engine_hash_files",
+          "engine_new",
+          "engine_walk_repo",
+          "extractor_need",
+          "flags_parsed",
+          "git_ls_files",
+          "graph_inputs_proven",
+          "graph_session_run",
+          "graphinput_build",
+          "hash_content_inputs",
+          "index_group_owners",
+          "invalidation_plan",
+          "inventory",
+          "load_state",
+          "lock",
+          "open_journal",
+          "policy_identity",
+          "promote_compact_state",
+          "publish_resolved",
+          "publish_scope",
+          "reconcile_complete",
+          "register_plugins",
+          "replay_unacked",
+          "resolve_graph_target",
+          "revalidate_before_begin",
+          "revalidate_ts_records",
+          "runtime_inputs_complete",
+          "select_hash_targets",
+          "session_options",
+          "state_json_marshal",
+          "state_json_unmarshal",
+          "state_read_bytes",
+          "transaction_enter",
+          "ts_dirty_scope",
+          "ts_disc_alias_roots",
+          "ts_disc_nuxt_packages",
+          "ts_disc_package_exports",
+          "ts_disc_package_gates",
+          "ts_disc_package_names",
+          "ts_discovery",
+          "ts_discovery_build",
+          "ts_extract_session",
+          "ts_frozen_preview",
+          "ts_session_context",
+          "walk_tree",
+          "write_pending_state"
+        ],
+        "marks_repeated_raw": {
+          "state_fingerprint": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 23,
+                  "seconds": 0.024,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "bytes=55859980"
+                },
+                {
+                  "index": 82,
+                  "seconds": 0.024,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "write bytes=55859980"
+                }
+              ],
+              [
+                {
+                  "index": 23,
+                  "seconds": 0.023,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "bytes=55859980"
+                },
+                {
+                  "index": 82,
+                  "seconds": 0.024,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "write bytes=55859980"
+                }
+              ],
+              [
+                {
+                  "index": 23,
+                  "seconds": 0.023,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "bytes=55859980"
+                },
+                {
+                  "index": 82,
+                  "seconds": 0.023,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "write bytes=55859980"
+                }
+              ]
+            ]
+          },
+          "ts_compose_modules": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 61,
+                  "seconds": 0.002,
+                  "total_seconds": 0.148,
+                  "trace": "ts",
+                  "detail": "facts=59663 records=4087 unread=0"
+                },
+                {
+                  "index": 67,
+                  "seconds": 0.003,
+                  "total_seconds": 0.399,
+                  "trace": "ts",
+                  "detail": "facts=59663 records=4087 unread=0"
+                }
+              ],
+              [
+                {
+                  "index": 61,
+                  "seconds": 0.003,
+                  "total_seconds": 0.146,
+                  "trace": "ts",
+                  "detail": "facts=59663 records=4087 unread=0"
+                },
+                {
+                  "index": 67,
+                  "seconds": 0.002,
+                  "total_seconds": 0.408,
+                  "trace": "ts",
+                  "detail": "facts=59663 records=4087 unread=0"
+                }
+              ],
+              [
+                {
+                  "index": 61,
+                  "seconds": 0.003,
+                  "total_seconds": 0.153,
+                  "trace": "ts",
+                  "detail": "facts=59663 records=4087 unread=0"
+                },
+                {
+                  "index": 67,
+                  "seconds": 0.003,
+                  "total_seconds": 0.402,
+                  "trace": "ts",
+                  "detail": "facts=59663 records=4087 unread=0"
+                }
+              ]
+            ]
+          },
+          "ts_config_inputs": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 39,
+                  "seconds": 0.136,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                },
+                {
+                  "index": 80,
+                  "seconds": 0.137,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                }
+              ],
+              [
+                {
+                  "index": 39,
+                  "seconds": 0.138,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                },
+                {
+                  "index": 80,
+                  "seconds": 0.141,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                }
+              ],
+              [
+                {
+                  "index": 39,
+                  "seconds": 0.138,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                },
+                {
+                  "index": 80,
+                  "seconds": 0.134,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                }
+              ]
+            ]
+          },
+          "ts_detect_frameworks": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 56,
+                  "seconds": 0.0,
+                  "total_seconds": 0.0,
+                  "trace": "ts",
+                  "detail": "files=4087 shared_discovery=true"
+                },
+                {
+                  "index": 62,
+                  "seconds": 0.0,
+                  "total_seconds": 0.0,
+                  "trace": "ts",
+                  "detail": "files=4087 shared_discovery=true"
+                }
+              ],
+              [
+                {
+                  "index": 56,
+                  "seconds": 0.0,
+                  "total_seconds": 0.0,
+                  "trace": "ts",
+                  "detail": "files=4087 shared_discovery=true"
+                },
+                {
+                  "index": 62,
+                  "seconds": 0.0,
+                  "total_seconds": 0.0,
+                  "trace": "ts",
+                  "detail": "files=4087 shared_discovery=true"
+                }
+              ],
+              [
+                {
+                  "index": 56,
+                  "seconds": 0.0,
+                  "total_seconds": 0.0,
+                  "trace": "ts",
+                  "detail": "files=4087 shared_discovery=true"
+                },
+                {
+                  "index": 62,
+                  "seconds": 0.0,
+                  "total_seconds": 0.0,
+                  "trace": "ts",
+                  "detail": "files=4087 shared_discovery=true"
+                }
+              ]
+            ]
+          },
+          "ts_disc_package_aliases": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 57,
+                  "seconds": 0.0,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "aliases=21"
+                },
+                {
+                  "index": 63,
+                  "seconds": 0.0,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "aliases=21"
+                }
+              ],
+              [
+                {
+                  "index": 57,
+                  "seconds": 0.0,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "aliases=21"
+                },
+                {
+                  "index": 63,
+                  "seconds": 0.0,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "aliases=21"
+                }
+              ],
+              [
+                {
+                  "index": 57,
+                  "seconds": 0.0,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "aliases=21"
+                },
+                {
+                  "index": 63,
+                  "seconds": 0.0,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "aliases=21"
+                }
+              ]
+            ]
+          },
+          "ts_graphql_grpc_index": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 59,
+                  "seconds": 0.097,
+                  "total_seconds": 0.103,
+                  "trace": "ts",
+                  "detail": "ts_files=4087"
+                },
+                {
+                  "index": 65,
+                  "seconds": 0.101,
+                  "total_seconds": 0.107,
+                  "trace": "ts",
+                  "detail": "ts_files=4087"
+                }
+              ],
+              [
+                {
+                  "index": 59,
+                  "seconds": 0.097,
+                  "total_seconds": 0.102,
+                  "trace": "ts",
+                  "detail": "ts_files=4087"
+                },
+                {
+                  "index": 65,
+                  "seconds": 0.104,
+                  "total_seconds": 0.11,
+                  "trace": "ts",
+                  "detail": "ts_files=4087"
+                }
+              ],
+              [
+                {
+                  "index": 59,
+                  "seconds": 0.098,
+                  "total_seconds": 0.108,
+                  "trace": "ts",
+                  "detail": "ts_files=4087"
+                },
+                {
+                  "index": 65,
+                  "seconds": 0.102,
+                  "total_seconds": 0.112,
+                  "trace": "ts",
+                  "detail": "ts_files=4087"
+                }
+              ]
+            ]
+          },
+          "ts_mapfiles_aggregate": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 60,
+                  "seconds": 0.043,
+                  "total_seconds": 0.145,
+                  "trace": "ts",
+                  "detail": "parsed=1 facts=59226 routers=0 scans=0 derived=1"
+                },
+                {
+                  "index": 66,
+                  "seconds": 0.29,
+                  "total_seconds": 0.397,
+                  "trace": "ts",
+                  "detail": "parsed=10 facts=59226 routers=0 scans=117 derived=7"
+                }
+              ],
+              [
+                {
+                  "index": 60,
+                  "seconds": 0.041,
+                  "total_seconds": 0.143,
+                  "trace": "ts",
+                  "detail": "parsed=1 facts=59226 routers=0 scans=0 derived=1"
+                },
+                {
+                  "index": 66,
+                  "seconds": 0.295,
+                  "total_seconds": 0.405,
+                  "trace": "ts",
+                  "detail": "parsed=10 facts=59226 routers=0 scans=117 derived=7"
+                }
+              ],
+              [
+                {
+                  "index": 60,
+                  "seconds": 0.043,
+                  "total_seconds": 0.151,
+                  "trace": "ts",
+                  "detail": "parsed=1 facts=59226 routers=0 scans=0 derived=1"
+                },
+                {
+                  "index": 66,
+                  "seconds": 0.288,
+                  "total_seconds": 0.4,
+                  "trace": "ts",
+                  "detail": "parsed=10 facts=59226 routers=0 scans=117 derived=7"
+                }
+              ]
+            ]
+          },
+          "ts_read_dirty": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 58,
+                  "seconds": 0.005,
+                  "total_seconds": 0.006,
+                  "trace": "ts",
+                  "detail": "to_read=53 cached=4034"
+                },
+                {
+                  "index": 64,
+                  "seconds": 0.005,
+                  "total_seconds": 0.005,
+                  "trace": "ts",
+                  "detail": "to_read=62 cached=4025"
+                }
+              ],
+              [
+                {
+                  "index": 58,
+                  "seconds": 0.005,
+                  "total_seconds": 0.005,
+                  "trace": "ts",
+                  "detail": "to_read=53 cached=4034"
+                },
+                {
+                  "index": 64,
+                  "seconds": 0.006,
+                  "total_seconds": 0.006,
+                  "trace": "ts",
+                  "detail": "to_read=62 cached=4025"
+                }
+              ],
+              [
+                {
+                  "index": 58,
+                  "seconds": 0.01,
+                  "total_seconds": 0.01,
+                  "trace": "ts",
+                  "detail": "to_read=53 cached=4034"
+                },
+                {
+                  "index": 64,
+                  "seconds": 0.01,
+                  "total_seconds": 0.01,
+                  "trace": "ts",
+                  "detail": "to_read=62 cached=4025"
+                }
+              ]
+            ]
+          }
+        },
+        "marks_partial_raw": {},
+        "mark_spread": {
+          "analysis_fingerprint": {
+            "n": 3,
+            "min": 0.138,
+            "max": 0.14,
+            "median": 0.14,
+            "range": 0.002
+          },
+          "angular_probe": {
+            "n": 3,
+            "min": 0.003,
+            "max": 0.003,
+            "median": 0.003,
+            "range": 0.0
+          },
+          "assemble_new_files": {
+            "n": 3,
+            "min": 0.157,
+            "max": 0.17,
+            "median": 0.16,
+            "range": 0.013
+          },
+          "begin_publish": {
+            "n": 3,
+            "min": 0.035,
+            "max": 0.058,
+            "median": 0.035,
+            "range": 0.023
+          },
+          "bind_identity": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "capture_contexts": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "changed_terms": {
+            "n": 3,
+            "min": 0.015,
+            "max": 0.017,
+            "median": 0.015,
+            "range": 0.002
+          },
+          "check_ignore_run": {
+            "n": 3,
+            "min": 0.059,
+            "max": 0.061,
+            "median": 0.06,
+            "range": 0.002
+          },
+          "check_ignore_setup": {
+            "n": 3,
+            "min": 0.018,
+            "max": 0.019,
+            "median": 0.019,
+            "range": 0.001
+          },
+          "cli_complete": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "clone_file_state_copy": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "compute_identities": {
+            "n": 3,
+            "min": 0.032,
+            "max": 0.034,
+            "median": 0.034,
+            "range": 0.002
+          },
+          "config_load": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "config_recheck": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "connect_sink": {
+            "n": 3,
+            "min": 0.001,
+            "max": 0.001,
+            "median": 0.001,
+            "range": 0.0
+          },
+          "declare_config_deps": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "declare_git_control": {
+            "n": 3,
+            "min": 0.005,
+            "max": 0.005,
+            "median": 0.005,
+            "range": 0.0
+          },
+          "declare_ignore_files": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "detect_extractors": {
+            "n": 3,
+            "min": 0.001,
+            "max": 0.001,
+            "median": 0.001,
+            "range": 0.0
+          },
+          "detect_typescript": {
+            "n": 3,
+            "min": 0.001,
+            "max": 0.001,
+            "median": 0.001,
+            "range": 0.0
+          },
+          "discover_git": {
+            "n": 3,
+            "min": 0.039,
+            "max": 0.052,
+            "median": 0.042,
+            "range": 0.013
+          },
+          "effective_config": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "effective_config_before": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "encode_append_owners": {
+            "n": 3,
+            "min": 0.004,
+            "max": 0.004,
+            "median": 0.004,
+            "range": 0.0
+          },
+          "end_flush_ack": {
+            "n": 3,
+            "min": 0.029,
+            "max": 0.029,
+            "median": 0.029,
+            "range": 0.0
+          },
+          "engine_context_fingerprint": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "engine_hash_files": {
+            "n": 3,
+            "min": 0.151,
+            "max": 0.154,
+            "median": 0.151,
+            "range": 0.003
+          },
+          "engine_new": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "engine_walk_repo": {
+            "n": 3,
+            "min": 0.115,
+            "max": 0.121,
+            "median": 0.116,
+            "range": 0.006
+          },
+          "extractor_need": {
+            "n": 3,
+            "min": 0.72,
+            "max": 0.724,
+            "median": 0.722,
+            "range": 0.004
+          },
+          "flags_parsed": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "git_ls_files": {
+            "n": 3,
+            "min": 0.057,
+            "max": 0.059,
+            "median": 0.057,
+            "range": 0.002
+          },
+          "graph_inputs_proven": {
+            "n": 3,
+            "min": 0.098,
+            "max": 0.101,
+            "median": 0.1,
+            "range": 0.003
+          },
+          "graph_session_run": {
+            "n": 3,
+            "min": 3.028,
+            "max": 3.098,
+            "median": 3.085,
+            "range": 0.07
+          },
+          "graphinput_build": {
+            "n": 3,
+            "min": 0.328,
+            "max": 0.349,
+            "median": 0.337,
+            "range": 0.021
+          },
+          "hash_content_inputs": {
+            "n": 3,
+            "min": 0.151,
+            "max": 0.154,
+            "median": 0.152,
+            "range": 0.003
+          },
+          "index_group_owners": {
+            "n": 3,
+            "min": 0.157,
+            "max": 0.166,
+            "median": 0.163,
+            "range": 0.009
+          },
+          "invalidation_plan": {
+            "n": 3,
+            "min": 0.155,
+            "max": 0.171,
+            "median": 0.165,
+            "range": 0.016
+          },
+          "inventory": {
+            "n": 3,
+            "min": 0.115,
+            "max": 0.121,
+            "median": 0.116,
+            "range": 0.006
+          },
+          "load_state": {
+            "n": 3,
+            "min": 0.275,
+            "max": 0.28,
+            "median": 0.276,
+            "range": 0.005
+          },
+          "lock": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "open_journal": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "policy_identity": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "promote_compact_state": {
+            "n": 3,
+            "min": 0.056,
+            "max": 0.066,
+            "median": 0.064,
+            "range": 0.01
+          },
+          "publish_resolved": {
+            "n": 3,
+            "min": 0.041,
+            "max": 0.047,
+            "median": 0.042,
+            "range": 0.006
+          },
+          "publish_scope": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "reconcile_complete": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "register_plugins": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "replay_unacked": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "resolve_graph_target": {
+            "n": 3,
+            "min": 0.329,
+            "max": 0.349,
+            "median": 0.337,
+            "range": 0.02
+          },
+          "revalidate_before_begin": {
+            "n": 3,
+            "min": 0.002,
+            "max": 0.002,
+            "median": 0.002,
+            "range": 0.0
+          },
+          "revalidate_ts_records": {
+            "n": 3,
+            "min": 0.109,
+            "max": 0.142,
+            "median": 0.117,
+            "range": 0.033
+          },
+          "runtime_inputs_complete": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "select_hash_targets": {
+            "n": 3,
+            "min": 0.008,
+            "max": 0.009,
+            "median": 0.009,
+            "range": 0.001
+          },
+          "session_options": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "state_json_marshal": {
+            "n": 3,
+            "min": 0.171,
+            "max": 0.177,
+            "median": 0.174,
+            "range": 0.006
+          },
+          "state_json_unmarshal": {
+            "n": 3,
+            "min": 0.24,
+            "max": 0.244,
+            "median": 0.241,
+            "range": 0.004
+          },
+          "state_read_bytes": {
+            "n": 3,
+            "min": 0.012,
+            "max": 0.012,
+            "median": 0.012,
+            "range": 0.0
+          },
+          "transaction_enter": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "ts_dirty_scope": {
+            "n": 3,
+            "min": 0.102,
+            "max": 0.112,
+            "median": 0.109,
+            "range": 0.01
+          },
+          "ts_disc_alias_roots": {
+            "n": 3,
+            "min": 0.08,
+            "max": 0.083,
+            "median": 0.081,
+            "range": 0.003
+          },
+          "ts_disc_nuxt_packages": {
+            "n": 3,
+            "min": 0.118,
+            "max": 0.119,
+            "median": 0.119,
+            "range": 0.001
+          },
+          "ts_disc_package_exports": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "ts_disc_package_gates": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.001,
+            "median": 0.001,
+            "range": 0.001
+          },
+          "ts_disc_package_names": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "ts_discovery": {
+            "n": 3,
+            "min": 0.208,
+            "max": 0.214,
+            "median": 0.212,
+            "range": 0.006
+          },
+          "ts_discovery_build": {
+            "n": 3,
+            "min": 0.208,
+            "max": 0.214,
+            "median": 0.212,
+            "range": 0.006
+          },
+          "ts_extract_session": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "ts_frozen_preview": {
+            "n": 3,
+            "min": 0.687,
+            "max": 0.691,
+            "median": 0.69,
+            "range": 0.004
+          },
+          "ts_session_context": {
+            "n": 3,
+            "min": 0.056,
+            "max": 0.057,
+            "median": 0.056,
+            "range": 0.001
+          },
+          "walk_tree": {
+            "n": 3,
+            "min": 0.114,
+            "max": 0.12,
+            "median": 0.119,
+            "range": 0.006
+          },
+          "write_pending_state": {
+            "n": 3,
+            "min": 0.357,
+            "max": 0.372,
+            "median": 0.365,
+            "range": 0.015
+          }
+        },
+        "mark_traces": {
+          "analysis_fingerprint": [
+            "inputs"
+          ],
+          "angular_probe": [
+            "inputs"
+          ],
+          "assemble_new_files": [
+            "session"
+          ],
+          "begin_publish": [
+            "session"
+          ],
+          "bind_identity": [
+            "open"
+          ],
+          "capture_contexts": [
+            "inputs"
+          ],
+          "changed_terms": [
+            "session"
+          ],
+          "check_ignore_run": [
+            "graphinput_build"
+          ],
+          "check_ignore_setup": [
+            "graphinput_build"
+          ],
+          "cli_complete": [
+            "cli"
+          ],
+          "clone_file_state_copy": [],
+          "compute_identities": [
+            "graphinput_build"
+          ],
+          "config_load": [
+            "graph_engine"
+          ],
+          "config_recheck": [
+            "graph_engine"
+          ],
+          "connect_sink": [
+            "cli"
+          ],
+          "declare_config_deps": [
+            "graphinput_build"
+          ],
+          "declare_git_control": [
+            "graphinput_build"
+          ],
+          "declare_ignore_files": [
+            "graphinput_build"
+          ],
+          "detect_extractors": [
+            "inputs"
+          ],
+          "detect_typescript": [],
+          "discover_git": [
+            "graphinput_build"
+          ],
+          "effective_config": [
+            "reconcile"
+          ],
+          "effective_config_before": [
+            "reconcile"
+          ],
+          "encode_append_owners": [
+            "session"
+          ],
+          "end_flush_ack": [
+            "session"
+          ],
+          "engine_context_fingerprint": [
+            "inputs"
+          ],
+          "engine_hash_files": [],
+          "engine_new": [
+            "graph_engine"
+          ],
+          "engine_walk_repo": [],
+          "extractor_need": [
+            "session"
+          ],
+          "flags_parsed": [
+            "cli"
+          ],
+          "git_ls_files": [
+            "graphinput_build"
+          ],
+          "graph_inputs_proven": [
+            "reconcile"
+          ],
+          "graph_session_run": [
+            "cli"
+          ],
+          "graphinput_build": [
+            "graph_engine"
+          ],
+          "hash_content_inputs": [
+            "inputs"
+          ],
+          "index_group_owners": [
+            "session"
+          ],
+          "invalidation_plan": [
+            "session"
+          ],
+          "inventory": [
+            "inputs"
+          ],
+          "load_state": [
+            "open"
+          ],
+          "lock": [
+            "open"
+          ],
+          "open_journal": [
+            "open"
+          ],
+          "policy_identity": [
+            "inputs"
+          ],
+          "promote_compact_state": [
+            "session"
+          ],
+          "publish_resolved": [
+            "session"
+          ],
+          "publish_scope": [
+            "session"
+          ],
+          "reconcile_complete": [
+            "reconcile"
+          ],
+          "register_plugins": [
+            "graph_engine"
+          ],
+          "replay_unacked": [
+            "open"
+          ],
+          "resolve_graph_target": [
+            "cli"
+          ],
+          "revalidate_before_begin": [],
+          "revalidate_ts_records": [
+            "session"
+          ],
+          "runtime_inputs_complete": [
+            "inputs"
+          ],
+          "select_hash_targets": [
+            "inputs"
+          ],
+          "session_options": [
+            "cli"
+          ],
+          "state_json_marshal": [],
+          "state_json_unmarshal": [],
+          "state_read_bytes": [],
+          "transaction_enter": [
+            "reconcile"
+          ],
+          "ts_dirty_scope": [
+            "session"
+          ],
+          "ts_disc_alias_roots": [],
+          "ts_disc_nuxt_packages": [],
+          "ts_disc_package_exports": [],
+          "ts_disc_package_gates": [],
+          "ts_disc_package_names": [],
+          "ts_discovery": [
+            "inputs"
+          ],
+          "ts_discovery_build": [],
+          "ts_extract_session": [
+            "session"
+          ],
+          "ts_frozen_preview": [
+            "session"
+          ],
+          "ts_session_context": [
+            "inputs"
+          ],
+          "walk_tree": [
+            "graphinput_build"
+          ],
+          "write_pending_state": [
+            "session"
+          ]
+        }
+      },
+      "candidate": {
+        "per_run": {
+          "candidate-1": {
+            "wall_s": 3.4335626249667257,
+            "user_s": 3.89,
+            "sys_s": 0.75,
+            "state_final_bytes": 56635404,
+            "rss_bytes": 676495360.0
+          },
+          "candidate-2": {
+            "wall_s": 3.4139480410376564,
+            "user_s": 3.92,
+            "sys_s": 0.77,
+            "state_final_bytes": 56635404,
+            "rss_bytes": 654016512.0
+          },
+          "candidate-3": {
+            "wall_s": 3.445414417074062,
+            "user_s": 3.89,
+            "sys_s": 0.77,
+            "state_final_bytes": 56635076,
+            "rss_bytes": 645545984.0
+          }
+        },
+        "wall_s": {
+          "n": 3,
+          "min": 3.4139480410376564,
+          "max": 3.445414417074062,
+          "median": 3.433563,
+          "range": 0.031466
+        },
+        "user_s": {
+          "n": 3,
+          "min": 3.89,
+          "max": 3.92,
+          "median": 3.89,
+          "range": 0.03
+        },
+        "sys_s": {
+          "n": 3,
+          "min": 0.75,
+          "max": 0.77,
+          "median": 0.77,
+          "range": 0.02
+        },
+        "state_final_bytes": {
+          "n": 3,
+          "min": 56635076,
+          "max": 56635404,
+          "median": 56635404,
+          "range": 328
+        },
+        "marks_differenceable": [
+          "analysis_fingerprint",
+          "angular_probe",
+          "assemble_new_files",
+          "begin_publish",
+          "bind_identity",
+          "capture_contexts",
+          "changed_terms",
+          "check_ignore_run",
+          "check_ignore_setup",
+          "cli_complete",
+          "clone_file_state_copy",
+          "compute_identities",
+          "config_load",
+          "config_recheck",
+          "connect_sink",
+          "declare_config_deps",
+          "declare_git_control",
+          "declare_ignore_files",
+          "detect_extractors",
+          "detect_typescript",
+          "discover_git",
+          "effective_config",
+          "effective_config_before",
+          "encode_append_owners",
+          "end_flush_ack",
+          "engine_context_fingerprint",
+          "engine_hash_files",
+          "engine_new",
+          "engine_walk_repo",
+          "extractor_need",
+          "flags_parsed",
+          "git_ls_files",
+          "graph_inputs_proven",
+          "graph_session_run",
+          "graphinput_build",
+          "hash_content_inputs",
+          "index_group_owners",
+          "invalidation_plan",
+          "inventory",
+          "load_state",
+          "lock",
+          "open_journal",
+          "policy_identity",
+          "promote_compact_state",
+          "publish_resolved",
+          "publish_scope",
+          "reconcile_complete",
+          "register_plugins",
+          "replay_unacked",
+          "resolve_graph_target",
+          "revalidate_before_begin",
+          "revalidate_ts_records",
+          "runtime_inputs_complete",
+          "select_hash_targets",
+          "session_options",
+          "state_json_marshal",
+          "state_json_unmarshal",
+          "state_read_bytes",
+          "transaction_enter",
+          "ts_dirty_scope",
+          "ts_disc_alias_roots",
+          "ts_disc_nuxt_packages",
+          "ts_disc_package_exports",
+          "ts_disc_package_gates",
+          "ts_disc_package_names",
+          "ts_discovery",
+          "ts_discovery_build",
+          "ts_extract_session",
+          "ts_frozen_preview",
+          "ts_session_context",
+          "walk_tree",
+          "write_pending_state"
+        ],
+        "marks_repeated_raw": {
+          "state_fingerprint": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 23,
+                  "seconds": 0.024,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "bytes=56634800"
+                },
+                {
+                  "index": 82,
+                  "seconds": 0.026,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "write bytes=56634800"
+                }
+              ],
+              [
+                {
+                  "index": 23,
+                  "seconds": 0.024,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "bytes=56634800"
+                },
+                {
+                  "index": 82,
+                  "seconds": 0.024,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "write bytes=56634800"
+                }
+              ],
+              [
+                {
+                  "index": 23,
+                  "seconds": 0.025,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "bytes=56634473"
+                },
+                {
+                  "index": 82,
+                  "seconds": 0.024,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "write bytes=56634473"
+                }
+              ]
+            ]
+          },
+          "ts_compose_modules": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 61,
+                  "seconds": 0.003,
+                  "total_seconds": 0.151,
+                  "trace": "ts",
+                  "detail": "facts=59663 records=4087 unread=0"
+                },
+                {
+                  "index": 67,
+                  "seconds": 0.002,
+                  "total_seconds": 0.408,
+                  "trace": "ts",
+                  "detail": "facts=59663 records=4087 unread=0"
+                }
+              ],
+              [
+                {
+                  "index": 61,
+                  "seconds": 0.002,
+                  "total_seconds": 0.145,
+                  "trace": "ts",
+                  "detail": "facts=59663 records=4087 unread=0"
+                },
+                {
+                  "index": 67,
+                  "seconds": 0.003,
+                  "total_seconds": 0.397,
+                  "trace": "ts",
+                  "detail": "facts=59663 records=4087 unread=0"
+                }
+              ],
+              [
+                {
+                  "index": 61,
+                  "seconds": 0.003,
+                  "total_seconds": 0.145,
+                  "trace": "ts",
+                  "detail": "facts=59663 records=4087 unread=0"
+                },
+                {
+                  "index": 67,
+                  "seconds": 0.002,
+                  "total_seconds": 0.396,
+                  "trace": "ts",
+                  "detail": "facts=59663 records=4087 unread=0"
+                }
+              ]
+            ]
+          },
+          "ts_config_inputs": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 39,
+                  "seconds": 0.136,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                },
+                {
+                  "index": 80,
+                  "seconds": 0.133,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                }
+              ],
+              [
+                {
+                  "index": 39,
+                  "seconds": 0.137,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                },
+                {
+                  "index": 80,
+                  "seconds": 0.14,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                }
+              ],
+              [
+                {
+                  "index": 39,
+                  "seconds": 0.14,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                },
+                {
+                  "index": 80,
+                  "seconds": 0.135,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "n=83"
+                }
+              ]
+            ]
+          },
+          "ts_detect_frameworks": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 56,
+                  "seconds": 0.0,
+                  "total_seconds": 0.0,
+                  "trace": "ts",
+                  "detail": "files=4087 shared_discovery=true"
+                },
+                {
+                  "index": 62,
+                  "seconds": 0.0,
+                  "total_seconds": 0.0,
+                  "trace": "ts",
+                  "detail": "files=4087 shared_discovery=true"
+                }
+              ],
+              [
+                {
+                  "index": 56,
+                  "seconds": 0.0,
+                  "total_seconds": 0.0,
+                  "trace": "ts",
+                  "detail": "files=4087 shared_discovery=true"
+                },
+                {
+                  "index": 62,
+                  "seconds": 0.0,
+                  "total_seconds": 0.0,
+                  "trace": "ts",
+                  "detail": "files=4087 shared_discovery=true"
+                }
+              ],
+              [
+                {
+                  "index": 56,
+                  "seconds": 0.0,
+                  "total_seconds": 0.0,
+                  "trace": "ts",
+                  "detail": "files=4087 shared_discovery=true"
+                },
+                {
+                  "index": 62,
+                  "seconds": 0.0,
+                  "total_seconds": 0.0,
+                  "trace": "ts",
+                  "detail": "files=4087 shared_discovery=true"
+                }
+              ]
+            ]
+          },
+          "ts_disc_package_aliases": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 57,
+                  "seconds": 0.0,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "aliases=21"
+                },
+                {
+                  "index": 63,
+                  "seconds": 0.0,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "aliases=21"
+                }
+              ],
+              [
+                {
+                  "index": 57,
+                  "seconds": 0.0,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "aliases=21"
+                },
+                {
+                  "index": 63,
+                  "seconds": 0.0,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "aliases=21"
+                }
+              ],
+              [
+                {
+                  "index": 57,
+                  "seconds": 0.0,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "aliases=21"
+                },
+                {
+                  "index": 63,
+                  "seconds": 0.0,
+                  "total_seconds": null,
+                  "trace": null,
+                  "detail": "aliases=21"
+                }
+              ]
+            ]
+          },
+          "ts_graphql_grpc_index": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 59,
+                  "seconds": 0.097,
+                  "total_seconds": 0.107,
+                  "trace": "ts",
+                  "detail": "ts_files=4087"
+                },
+                {
+                  "index": 65,
+                  "seconds": 0.103,
+                  "total_seconds": 0.109,
+                  "trace": "ts",
+                  "detail": "ts_files=4087"
+                }
+              ],
+              [
+                {
+                  "index": 59,
+                  "seconds": 0.097,
+                  "total_seconds": 0.102,
+                  "trace": "ts",
+                  "detail": "ts_files=4087"
+                },
+                {
+                  "index": 65,
+                  "seconds": 0.101,
+                  "total_seconds": 0.107,
+                  "trace": "ts",
+                  "detail": "ts_files=4087"
+                }
+              ],
+              [
+                {
+                  "index": 59,
+                  "seconds": 0.098,
+                  "total_seconds": 0.104,
+                  "trace": "ts",
+                  "detail": "ts_files=4087"
+                },
+                {
+                  "index": 65,
+                  "seconds": 0.103,
+                  "total_seconds": 0.109,
+                  "trace": "ts",
+                  "detail": "ts_files=4087"
+                }
+              ]
+            ]
+          },
+          "ts_mapfiles_aggregate": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 60,
+                  "seconds": 0.041,
+                  "total_seconds": 0.148,
+                  "trace": "ts",
+                  "detail": "parsed=1 facts=59226 routers=0 scans=0 derived=1"
+                },
+                {
+                  "index": 66,
+                  "seconds": 0.297,
+                  "total_seconds": 0.406,
+                  "trace": "ts",
+                  "detail": "parsed=10 facts=59226 routers=0 scans=117 derived=7"
+                }
+              ],
+              [
+                {
+                  "index": 60,
+                  "seconds": 0.04,
+                  "total_seconds": 0.143,
+                  "trace": "ts",
+                  "detail": "parsed=1 facts=59226 routers=0 scans=0 derived=1"
+                },
+                {
+                  "index": 66,
+                  "seconds": 0.288,
+                  "total_seconds": 0.395,
+                  "trace": "ts",
+                  "detail": "parsed=10 facts=59226 routers=0 scans=117 derived=7"
+                }
+              ],
+              [
+                {
+                  "index": 60,
+                  "seconds": 0.039,
+                  "total_seconds": 0.143,
+                  "trace": "ts",
+                  "detail": "parsed=1 facts=59226 routers=0 scans=0 derived=1"
+                },
+                {
+                  "index": 66,
+                  "seconds": 0.285,
+                  "total_seconds": 0.393,
+                  "trace": "ts",
+                  "detail": "parsed=10 facts=59226 routers=0 scans=117 derived=7"
+                }
+              ]
+            ]
+          },
+          "ts_read_dirty": {
+            "occurrences_per_run": [
+              2,
+              2,
+              2
+            ],
+            "raw": [
+              [
+                {
+                  "index": 58,
+                  "seconds": 0.01,
+                  "total_seconds": 0.01,
+                  "trace": "ts",
+                  "detail": "to_read=53 cached=4034"
+                },
+                {
+                  "index": 64,
+                  "seconds": 0.005,
+                  "total_seconds": 0.006,
+                  "trace": "ts",
+                  "detail": "to_read=62 cached=4025"
+                }
+              ],
+              [
+                {
+                  "index": 58,
+                  "seconds": 0.005,
+                  "total_seconds": 0.005,
+                  "trace": "ts",
+                  "detail": "to_read=53 cached=4034"
+                },
+                {
+                  "index": 64,
+                  "seconds": 0.005,
+                  "total_seconds": 0.005,
+                  "trace": "ts",
+                  "detail": "to_read=62 cached=4025"
+                }
+              ],
+              [
+                {
+                  "index": 58,
+                  "seconds": 0.006,
+                  "total_seconds": 0.006,
+                  "trace": "ts",
+                  "detail": "to_read=53 cached=4034"
+                },
+                {
+                  "index": 64,
+                  "seconds": 0.005,
+                  "total_seconds": 0.006,
+                  "trace": "ts",
+                  "detail": "to_read=62 cached=4025"
+                }
+              ]
+            ]
+          }
+        },
+        "marks_partial_raw": {},
+        "mark_spread": {
+          "analysis_fingerprint": {
+            "n": 3,
+            "min": 0.137,
+            "max": 0.142,
+            "median": 0.139,
+            "range": 0.005
+          },
+          "angular_probe": {
+            "n": 3,
+            "min": 0.003,
+            "max": 0.003,
+            "median": 0.003,
+            "range": 0.0
+          },
+          "assemble_new_files": {
+            "n": 3,
+            "min": 0.166,
+            "max": 0.176,
+            "median": 0.171,
+            "range": 0.01
+          },
+          "begin_publish": {
+            "n": 3,
+            "min": 0.033,
+            "max": 0.055,
+            "median": 0.036,
+            "range": 0.022
+          },
+          "bind_identity": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "capture_contexts": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "changed_terms": {
+            "n": 3,
+            "min": 0.016,
+            "max": 0.017,
+            "median": 0.016,
+            "range": 0.001
+          },
+          "check_ignore_run": {
+            "n": 3,
+            "min": 0.056,
+            "max": 0.057,
+            "median": 0.056,
+            "range": 0.001
+          },
+          "check_ignore_setup": {
+            "n": 3,
+            "min": 0.017,
+            "max": 0.018,
+            "median": 0.018,
+            "range": 0.001
+          },
+          "cli_complete": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "clone_file_state_copy": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "compute_identities": {
+            "n": 3,
+            "min": 0.034,
+            "max": 0.035,
+            "median": 0.035,
+            "range": 0.001
+          },
+          "config_load": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "config_recheck": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "connect_sink": {
+            "n": 3,
+            "min": 0.001,
+            "max": 0.001,
+            "median": 0.001,
+            "range": 0.0
+          },
+          "declare_config_deps": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "declare_git_control": {
+            "n": 3,
+            "min": 0.005,
+            "max": 0.005,
+            "median": 0.005,
+            "range": 0.0
+          },
+          "declare_ignore_files": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.001,
+            "median": 0.0,
+            "range": 0.001
+          },
+          "detect_extractors": {
+            "n": 3,
+            "min": 0.001,
+            "max": 0.001,
+            "median": 0.001,
+            "range": 0.0
+          },
+          "detect_typescript": {
+            "n": 3,
+            "min": 0.001,
+            "max": 0.001,
+            "median": 0.001,
+            "range": 0.0
+          },
+          "discover_git": {
+            "n": 3,
+            "min": 0.04,
+            "max": 0.043,
+            "median": 0.041,
+            "range": 0.003
+          },
+          "effective_config": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "effective_config_before": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "encode_append_owners": {
+            "n": 3,
+            "min": 0.004,
+            "max": 0.004,
+            "median": 0.004,
+            "range": 0.0
+          },
+          "end_flush_ack": {
+            "n": 3,
+            "min": 0.027,
+            "max": 0.034,
+            "median": 0.03,
+            "range": 0.007
+          },
+          "engine_context_fingerprint": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "engine_hash_files": {
+            "n": 3,
+            "min": 0.151,
+            "max": 0.157,
+            "median": 0.154,
+            "range": 0.006
+          },
+          "engine_new": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "engine_walk_repo": {
+            "n": 3,
+            "min": 0.113,
+            "max": 0.115,
+            "median": 0.114,
+            "range": 0.002
+          },
+          "extractor_need": {
+            "n": 3,
+            "min": 0.714,
+            "max": 0.724,
+            "median": 0.722,
+            "range": 0.01
+          },
+          "flags_parsed": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "git_ls_files": {
+            "n": 3,
+            "min": 0.056,
+            "max": 0.057,
+            "median": 0.057,
+            "range": 0.001
+          },
+          "graph_inputs_proven": {
+            "n": 3,
+            "min": 0.097,
+            "max": 0.101,
+            "median": 0.099,
+            "range": 0.004
+          },
+          "graph_session_run": {
+            "n": 3,
+            "min": 3.055,
+            "max": 3.087,
+            "median": 3.082,
+            "range": 0.032
+          },
+          "graphinput_build": {
+            "n": 3,
+            "min": 0.325,
+            "max": 0.334,
+            "median": 0.331,
+            "range": 0.009
+          },
+          "hash_content_inputs": {
+            "n": 3,
+            "min": 0.151,
+            "max": 0.157,
+            "median": 0.154,
+            "range": 0.006
+          },
+          "index_group_owners": {
+            "n": 3,
+            "min": 0.16,
+            "max": 0.166,
+            "median": 0.164,
+            "range": 0.006
+          },
+          "invalidation_plan": {
+            "n": 3,
+            "min": 0.154,
+            "max": 0.163,
+            "median": 0.16,
+            "range": 0.009
+          },
+          "inventory": {
+            "n": 3,
+            "min": 0.113,
+            "max": 0.115,
+            "median": 0.114,
+            "range": 0.002
+          },
+          "load_state": {
+            "n": 3,
+            "min": 0.28,
+            "max": 0.282,
+            "median": 0.281,
+            "range": 0.002
+          },
+          "lock": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "open_journal": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "policy_identity": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "promote_compact_state": {
+            "n": 3,
+            "min": 0.056,
+            "max": 0.065,
+            "median": 0.064,
+            "range": 0.009
+          },
+          "publish_resolved": {
+            "n": 3,
+            "min": 0.043,
+            "max": 0.044,
+            "median": 0.043,
+            "range": 0.001
+          },
+          "publish_scope": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "reconcile_complete": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "register_plugins": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "replay_unacked": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "resolve_graph_target": {
+            "n": 3,
+            "min": 0.326,
+            "max": 0.334,
+            "median": 0.332,
+            "range": 0.008
+          },
+          "revalidate_before_begin": {
+            "n": 3,
+            "min": 0.002,
+            "max": 0.002,
+            "median": 0.002,
+            "range": 0.0
+          },
+          "revalidate_ts_records": {
+            "n": 3,
+            "min": 0.111,
+            "max": 0.118,
+            "median": 0.116,
+            "range": 0.007
+          },
+          "runtime_inputs_complete": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "select_hash_targets": {
+            "n": 3,
+            "min": 0.008,
+            "max": 0.009,
+            "median": 0.009,
+            "range": 0.001
+          },
+          "session_options": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "state_json_marshal": {
+            "n": 3,
+            "min": 0.172,
+            "max": 0.177,
+            "median": 0.174,
+            "range": 0.005
+          },
+          "state_json_unmarshal": {
+            "n": 3,
+            "min": 0.245,
+            "max": 0.246,
+            "median": 0.245,
+            "range": 0.001
+          },
+          "state_read_bytes": {
+            "n": 3,
+            "min": 0.008,
+            "max": 0.013,
+            "median": 0.012,
+            "range": 0.005
+          },
+          "transaction_enter": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "ts_dirty_scope": {
+            "n": 3,
+            "min": 0.101,
+            "max": 0.109,
+            "median": 0.106,
+            "range": 0.008
+          },
+          "ts_disc_alias_roots": {
+            "n": 3,
+            "min": 0.08,
+            "max": 0.081,
+            "median": 0.081,
+            "range": 0.001
+          },
+          "ts_disc_nuxt_packages": {
+            "n": 3,
+            "min": 0.118,
+            "max": 0.119,
+            "median": 0.119,
+            "range": 0.001
+          },
+          "ts_disc_package_exports": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "ts_disc_package_gates": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.001,
+            "median": 0.001,
+            "range": 0.001
+          },
+          "ts_disc_package_names": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "ts_discovery": {
+            "n": 3,
+            "min": 0.21,
+            "max": 0.212,
+            "median": 0.212,
+            "range": 0.002
+          },
+          "ts_discovery_build": {
+            "n": 3,
+            "min": 0.21,
+            "max": 0.212,
+            "median": 0.212,
+            "range": 0.002
+          },
+          "ts_extract_session": {
+            "n": 3,
+            "min": 0.0,
+            "max": 0.0,
+            "median": 0.0,
+            "range": 0.0
+          },
+          "ts_frozen_preview": {
+            "n": 3,
+            "min": 0.691,
+            "max": 0.71,
+            "median": 0.702,
+            "range": 0.019
+          },
+          "ts_session_context": {
+            "n": 3,
+            "min": 0.054,
+            "max": 0.056,
+            "median": 0.056,
+            "range": 0.002
+          },
+          "walk_tree": {
+            "n": 3,
+            "min": 0.115,
+            "max": 0.118,
+            "median": 0.118,
+            "range": 0.003
+          },
+          "write_pending_state": {
+            "n": 3,
+            "min": 0.358,
+            "max": 0.367,
+            "median": 0.361,
+            "range": 0.009
+          }
+        },
+        "mark_traces": {
+          "analysis_fingerprint": [
+            "inputs"
+          ],
+          "angular_probe": [
+            "inputs"
+          ],
+          "assemble_new_files": [
+            "session"
+          ],
+          "begin_publish": [
+            "session"
+          ],
+          "bind_identity": [
+            "open"
+          ],
+          "capture_contexts": [
+            "inputs"
+          ],
+          "changed_terms": [
+            "session"
+          ],
+          "check_ignore_run": [
+            "graphinput_build"
+          ],
+          "check_ignore_setup": [
+            "graphinput_build"
+          ],
+          "cli_complete": [
+            "cli"
+          ],
+          "clone_file_state_copy": [],
+          "compute_identities": [
+            "graphinput_build"
+          ],
+          "config_load": [
+            "graph_engine"
+          ],
+          "config_recheck": [
+            "graph_engine"
+          ],
+          "connect_sink": [
+            "cli"
+          ],
+          "declare_config_deps": [
+            "graphinput_build"
+          ],
+          "declare_git_control": [
+            "graphinput_build"
+          ],
+          "declare_ignore_files": [
+            "graphinput_build"
+          ],
+          "detect_extractors": [
+            "inputs"
+          ],
+          "detect_typescript": [],
+          "discover_git": [
+            "graphinput_build"
+          ],
+          "effective_config": [
+            "reconcile"
+          ],
+          "effective_config_before": [
+            "reconcile"
+          ],
+          "encode_append_owners": [
+            "session"
+          ],
+          "end_flush_ack": [
+            "session"
+          ],
+          "engine_context_fingerprint": [
+            "inputs"
+          ],
+          "engine_hash_files": [],
+          "engine_new": [
+            "graph_engine"
+          ],
+          "engine_walk_repo": [],
+          "extractor_need": [
+            "session"
+          ],
+          "flags_parsed": [
+            "cli"
+          ],
+          "git_ls_files": [
+            "graphinput_build"
+          ],
+          "graph_inputs_proven": [
+            "reconcile"
+          ],
+          "graph_session_run": [
+            "cli"
+          ],
+          "graphinput_build": [
+            "graph_engine"
+          ],
+          "hash_content_inputs": [
+            "inputs"
+          ],
+          "index_group_owners": [
+            "session"
+          ],
+          "invalidation_plan": [
+            "session"
+          ],
+          "inventory": [
+            "inputs"
+          ],
+          "load_state": [
+            "open"
+          ],
+          "lock": [
+            "open"
+          ],
+          "open_journal": [
+            "open"
+          ],
+          "policy_identity": [
+            "inputs"
+          ],
+          "promote_compact_state": [
+            "session"
+          ],
+          "publish_resolved": [
+            "session"
+          ],
+          "publish_scope": [
+            "session"
+          ],
+          "reconcile_complete": [
+            "reconcile"
+          ],
+          "register_plugins": [
+            "graph_engine"
+          ],
+          "replay_unacked": [
+            "open"
+          ],
+          "resolve_graph_target": [
+            "cli"
+          ],
+          "revalidate_before_begin": [],
+          "revalidate_ts_records": [
+            "session"
+          ],
+          "runtime_inputs_complete": [
+            "inputs"
+          ],
+          "select_hash_targets": [
+            "inputs"
+          ],
+          "session_options": [
+            "cli"
+          ],
+          "state_json_marshal": [],
+          "state_json_unmarshal": [],
+          "state_read_bytes": [],
+          "transaction_enter": [
+            "reconcile"
+          ],
+          "ts_dirty_scope": [
+            "session"
+          ],
+          "ts_disc_alias_roots": [],
+          "ts_disc_nuxt_packages": [],
+          "ts_disc_package_exports": [],
+          "ts_disc_package_gates": [],
+          "ts_disc_package_names": [],
+          "ts_discovery": [
+            "inputs"
+          ],
+          "ts_discovery_build": [],
+          "ts_extract_session": [
+            "session"
+          ],
+          "ts_frozen_preview": [
+            "session"
+          ],
+          "ts_session_context": [
+            "inputs"
+          ],
+          "walk_tree": [
+            "graphinput_build"
+          ],
+          "write_pending_state": [
+            "session"
+          ]
+        }
+      }
+    },
+    "wall_gap_s": -0.006166,
+    "wall_ranges_overlap": true,
+    "state_bytes_gap": 774824,
+    "mark_delta_candidate_minus_baseline": {
+      "analysis_fingerprint": -0.001,
+      "angular_probe": 0.0,
+      "assemble_new_files": 0.011,
+      "begin_publish": 0.001,
+      "bind_identity": 0.0,
+      "capture_contexts": 0.0,
+      "changed_terms": 0.001,
+      "check_ignore_run": -0.004,
+      "check_ignore_setup": -0.001,
+      "cli_complete": 0.0,
+      "clone_file_state_copy": 0.0,
+      "compute_identities": 0.001,
+      "config_load": 0.0,
+      "config_recheck": 0.0,
+      "connect_sink": 0.0,
+      "declare_config_deps": 0.0,
+      "declare_git_control": 0.0,
+      "declare_ignore_files": 0.0,
+      "detect_extractors": 0.0,
+      "detect_typescript": 0.0,
+      "discover_git": -0.001,
+      "effective_config": 0.0,
+      "effective_config_before": 0.0,
+      "encode_append_owners": 0.0,
+      "end_flush_ack": 0.001,
+      "engine_context_fingerprint": 0.0,
+      "engine_hash_files": 0.003,
+      "engine_new": 0.0,
+      "engine_walk_repo": -0.002,
+      "extractor_need": 0.0,
+      "flags_parsed": 0.0,
+      "git_ls_files": 0.0,
+      "graph_inputs_proven": -0.001,
+      "graph_session_run": -0.003,
+      "graphinput_build": -0.006,
+      "hash_content_inputs": 0.002,
+      "index_group_owners": 0.001,
+      "invalidation_plan": -0.005,
+      "inventory": -0.002,
+      "load_state": 0.005,
+      "lock": 0.0,
+      "open_journal": 0.0,
+      "policy_identity": 0.0,
+      "promote_compact_state": 0.0,
+      "publish_resolved": 0.001,
+      "publish_scope": 0.0,
+      "reconcile_complete": 0.0,
+      "register_plugins": 0.0,
+      "replay_unacked": 0.0,
+      "resolve_graph_target": -0.005,
+      "revalidate_before_begin": 0.0,
+      "revalidate_ts_records": -0.001,
+      "runtime_inputs_complete": 0.0,
+      "select_hash_targets": 0.0,
+      "session_options": 0.0,
+      "state_json_marshal": 0.0,
+      "state_json_unmarshal": 0.004,
+      "state_read_bytes": 0.0,
+      "transaction_enter": 0.0,
+      "ts_dirty_scope": -0.003,
+      "ts_disc_alias_roots": 0.0,
+      "ts_disc_nuxt_packages": 0.0,
+      "ts_disc_package_exports": 0.0,
+      "ts_disc_package_gates": 0.0,
+      "ts_disc_package_names": 0.0,
+      "ts_discovery": 0.0,
+      "ts_discovery_build": 0.0,
+      "ts_extract_session": 0.0,
+      "ts_frozen_preview": 0.012,
+      "ts_session_context": 0.0,
+      "walk_tree": -0.001,
+      "write_pending_state": -0.004
+    },
+    "state_mark_deltas": {
+      "state_read_bytes": 0.0,
+      "state_json_unmarshal": 0.004,
+      "state_json_marshal": 0.0
+    },
+    "state_marks_absent_from_delta": [
+      "state_fingerprint"
+    ],
+    "marks_not_differenced": [
+      "state_fingerprint",
+      "ts_compose_modules",
+      "ts_config_inputs",
+      "ts_detect_frameworks",
+      "ts_disc_package_aliases",
+      "ts_graphql_grpc_index",
+      "ts_mapfiles_aggregate",
+      "ts_read_dirty"
+    ],
+    "largest_mark_gaps": [
+      [
+        "ts_frozen_preview",
+        0.012
+      ],
+      [
+        "assemble_new_files",
+        0.011
+      ],
+      [
+        "graphinput_build",
+        -0.006
+      ],
+      [
+        "invalidation_plan",
+        -0.005
+      ],
+      [
+        "load_state",
+        0.005
+      ],
+      [
+        "resolve_graph_target",
+        -0.005
+      ],
+      [
+        "check_ignore_run",
+        -0.004
+      ],
+      [
+        "state_json_unmarshal",
+        0.004
+      ],
+      [
+        "write_pending_state",
+        -0.004
+      ],
+      [
+        "engine_hash_files",
+        0.003
+      ],
+      [
+        "graph_session_run",
+        -0.003
+      ],
+      [
+        "ts_dirty_scope",
+        -0.003
+      ]
+    ],
+    "summing_note": "per-mark medians are differenced individually; nesting between marks is not reported by graph-profile, so these differences are not summed and no single number here attributes the wall gap"
+  }
+}

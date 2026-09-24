@@ -194,10 +194,18 @@ func TestExtractSession_DefaultSelectionSwapWithUnchangedExportSetEqualsCold(t *
 	if err != nil {
 		t.Fatal(err)
 	}
-	if first.Records["src/value.ts"].ExportSurfaceRecorded {
+	// A provider that binds imports of its own now also carries a context-free
+	// export surface, which is a stronger proof than the selected default alone.
+	// The DefaultExportName fallback exists for records written before that
+	// surface was recorded, so every session below is fed records that read the
+	// way such an older record reads: default identity kept, surface absent.
+	// TestStage15RecordedImportedSurfaceFeedsAccuracyComparison covers this same
+	// fixture through the recorded surface instead.
+	legacy := withoutRecordedSurface(first.Records)
+	if legacy["src/value.ts"].ExportSurfaceRecorded {
 		t.Fatal("fixture must exercise a provider without a recorded full export surface")
 	}
-	if rec := first.Records["src/value.ts"]; !rec.DefaultExportRecorded || rec.DefaultExportName != "A" {
+	if rec := legacy["src/value.ts"]; !rec.DefaultExportRecorded || rec.DefaultExportName != "A" {
 		t.Fatalf("initial selected default proof = (%q, %v), want (A, true)", rec.DefaultExportName, rec.DefaultExportRecorded)
 	}
 	assertSelected := func(result *SessionResult, want string) {
@@ -239,10 +247,10 @@ func TestExtractSession_DefaultSelectionSwapWithUnchangedExportSetEqualsCold(t *
 		assertSelected(unchanged, want)
 	}
 	assertSelected(first, "A")
-	assertNoChange(first.Records, "A")
+	assertNoChange(legacy, "A")
 
 	write("src/value.ts", provider("B"))
-	swapped, err := ext.ExtractSession(context.Background(), root, files, first.Records, map[string]bool{"src/value.ts": true}, SessionHooks{})
+	swapped, err := ext.ExtractSession(context.Background(), root, files, legacy, map[string]bool{"src/value.ts": true}, SessionHooks{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -254,10 +262,11 @@ func TestExtractSession_DefaultSelectionSwapWithUnchangedExportSetEqualsCold(t *
 	}
 	assertSelected(swapped, "B")
 	assertCold(swapped)
-	assertNoChange(swapped.Records, "B")
+	swappedLegacy := withoutRecordedSurface(swapped.Records)
+	assertNoChange(swappedLegacy, "B")
 
 	write("src/value.ts", provider("A"))
-	restored, err := ext.ExtractSession(context.Background(), root, files, swapped.Records, map[string]bool{"src/value.ts": true}, SessionHooks{})
+	restored, err := ext.ExtractSession(context.Background(), root, files, swappedLegacy, map[string]bool{"src/value.ts": true}, SessionHooks{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -266,7 +275,7 @@ func TestExtractSession_DefaultSelectionSwapWithUnchangedExportSetEqualsCold(t *
 	}
 	assertSelected(restored, "A")
 	assertCold(restored)
-	assertNoChange(restored.Records, "A")
+	assertNoChange(withoutRecordedSurface(restored.Records), "A")
 }
 
 func TestExtractSession_NestedNuxtConfigChangeRebindsPlugin(t *testing.T) {

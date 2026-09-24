@@ -85,6 +85,18 @@ type FileRecord struct {
 	// existed reads as unknown instead of as a file that exports nothing.
 	ExportSurface         []string `json:"export_surface,omitempty"`
 	ExportSurfaceRecorded bool     `json:"export_surface_recorded,omitempty"`
+	// ExportSurfaceContextFree says the recorded surface came from an index that
+	// names no module - no `export ... from`, and no exported specifier resolved
+	// through the import map. Such a surface is what the binder sees for this
+	// file under ANY alias map, so two equal context-free surfaces prove that
+	// every name a consumer binds directly from this file still resolves to the
+	// same place, however far this file's own imports moved. It is deliberately
+	// separate from ExportSurfaceRecorded and from BindsNoImports: a context-free
+	// file may still be someone's re-export chain link through its OWN imports,
+	// so sideReadProven must keep the strict gate and read only the latter.
+	// Absent on records written before this field existed, which reads as
+	// unproven and narrows nothing.
+	ExportSurfaceContextFree bool `json:"export_surface_context_free,omitempty"`
 	// DefaultExportName preserves the selected local identity of `export default
 	// Name` even when the full export surface cannot be cached for this file.
 	// The recorded bit also proves the known absence of a default export.
@@ -563,18 +575,38 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		}
 		fillRecord(rec, res, knownFiles, freshGQL[relFile], freshGRPC[relFile], statsKind)
 		// After fillRecord, because eligibility is read off the finished record.
-		// A surface is only ever consulted for a file that binds nothing - one
-		// that cannot be a link in anyone's re-export chain - so indexing the rest
-		// would buy nothing and cost a scan each; they keep an unrecorded surface,
-		// which reads as unknown and never proves anything. Through exportCache
-		// rather than around it: the index recorded here is the same object the
-		// binder consults for this file, so a record cannot describe a surface the
-		// binder did not use, and the scan is counted in SummaryScans like every
-		// other. Indexing independently would have hidden both - a second full
-		// parse per file, uncounted, and a second answer nothing reconciles.
+		// Two arms, and only the first may pay for a scan. A file that binds
+		// nothing cannot be a link in anyone's re-export chain, so its surface is
+		// the one a chain walk consults and is indexed on demand as before - on
+		// the paths where the observed-surface pre-pass above already indexed it,
+		// that call is the cache hit it left behind. A file that does bind imports
+		// is never walked through, but its surface still answers a narrower
+		// question - whether its own rebinding can move what a consumer bound - so
+		// it is recorded when, and only when, an index for it already exists.
+		// Anything else keeps an unrecorded surface, which reads as unknown and
+		// never proves anything. Through exportCache rather than around it: the
+		// index recorded here is the same object the binder consults for this
+		// file, so a record cannot describe a surface the binder did not use, and
+		// any scan is counted in SummaryScans like every other. Indexing
+		// independently would have hidden both - a second full parse per file,
+		// uncounted, and a second answer nothing reconciles.
 		if rec.BindsNoImports() {
 			rec.ExportSurface = exportCache.index(relFile, readSrc, aliases, knownFiles).surface()
 			rec.ExportSurfaceRecorded = true
+			rec.ExportSurfaceContextFree = exportCache.peek(relFile).isContextFree()
+		} else if idx := exportCache.peek(relFile); idx.isContextFree() {
+			// A file that binds imports of its own is still worth a recorded
+			// surface when its export index names no module: every name a
+			// consumer takes from it resolves inside it, so where its own
+			// bindings point cannot move what a consumer bound. peek, never
+			// index: this records a proof the session already paid for at
+			// ts.go, where the index was derived from the tree this file was
+			// parsed with, and buys nothing at the price of a scan. A file
+			// whose index nobody derived or scanned stays unrecorded, which
+			// reads as unknown and proves nothing.
+			rec.ExportSurface = idx.surface()
+			rec.ExportSurfaceRecorded = true
+			rec.ExportSurfaceContextFree = true
 		}
 		if hooks.OnFileLocal != nil {
 			hooks.OnFileLocal(rec)

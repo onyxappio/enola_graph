@@ -279,6 +279,26 @@ func replayableDependent(rec *tsextractor.FileRecord) bool {
 // rather than by reachability. Iterating terminates because have only grows.
 func surfaceDependents(have, changed map[string]bool, recs, prev map[string]*tsextractor.FileRecord, broad bool) map[string]bool {
 	importers := map[string][]string{}
+	// importers deliberately merges resolved edges and side reads, because every
+	// rule but one treats them alike. takeLocalExportProven does not: a side read
+	// is the record of a binding that left the dependency, which is exactly what
+	// a proven-local surface does not describe. Keep the distinction separately
+	// rather than splitting importers, so no existing rule changes. Both record
+	// maps are consulted: a side read either parse recorded is an obligation.
+	sideReaders := map[string]map[string]bool{}
+	noteSideReads := func(path string, rec *tsextractor.FileRecord) {
+		if rec == nil {
+			return
+		}
+		from := filepath.ToSlash(path)
+		for _, dep := range rec.SideReads {
+			dep = filepath.ToSlash(dep)
+			if sideReaders[dep] == nil {
+				sideReaders[dep] = map[string]bool{}
+			}
+			sideReaders[dep][from] = true
+		}
+	}
 	for path, rec := range recs {
 		if rec == nil {
 			continue
@@ -292,6 +312,10 @@ func surfaceDependents(have, changed map[string]bool, recs, prev map[string]*tse
 			dep = filepath.ToSlash(dep)
 			importers[dep] = append(importers[dep], from)
 		}
+		noteSideReads(path, rec)
+	}
+	for path, rec := range prev {
+		noteSideReads(path, rec)
 	}
 	out := map[string]bool{}
 	take := func(dep string, rule takeRule) {
@@ -306,6 +330,14 @@ func surfaceDependents(have, changed map[string]bool, recs, prev map[string]*tse
 				}
 			case takeNameScoped:
 				if !nameScopedDependent(prev[user]) {
+					out[user] = true
+				}
+			case takeLocalExportProven:
+				// A side-read owner is taken whatever the surface proves: it
+				// recorded that its binding left this file. That is also what
+				// keeps default imports conservative, since the chain note is
+				// never suppressed for a default.
+				if sideReaders[dep][user] || !locallyBoundConsumer(prev[user]) {
 					out[user] = true
 				}
 			default:
@@ -328,8 +360,14 @@ func surfaceDependents(have, changed map[string]bool, recs, prev map[string]*tse
 		}
 		id := filepath.ToSlash(f)
 		rule := takeEveryDependent
-		if !broad && nameOnlySurfaceShift(recordFor(prev, id), recordFor(recs, id)) {
-			rule = takeNameScoped
+		if !broad {
+			old, neu := recordFor(prev, id), recordFor(recs, id)
+			switch {
+			case nameOnlySurfaceShift(old, neu):
+				rule = takeNameScoped
+			case outgoingOnlySurfaceShift(old, neu):
+				rule = takeLocalExportProven
+			}
 		}
 		take(id, rule)
 	}

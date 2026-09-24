@@ -1,0 +1,191 @@
+[
+  {
+    "label": "initial",
+    "profiled": false,
+    "seconds": 8.400967124965973,
+    "exit": 0,
+    "state_final_bytes": 56635330,
+    "process_real_s": 8.39,
+    "rss_bytes": 930414592.0,
+    "user_s": 33.15,
+    "sys_s": 1.48,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4035
+        }
+      },
+      "RunID": "stage15-cli-product-candidate-1-main-1-1790279179179581000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4087,
+        "files_parsed": 4035,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 1723,
+        "derived_indexes": 2271,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "all prior/current file owners",
+          "reason": "frozen scope: global name-resolution domain"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 4035,
+      "ParsedFiles": 4035,
+      "EarlyLocal": 0
+    },
+    "graph_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00"
+  },
+  {
+    "label": "noop",
+    "profiled": true,
+    "seconds": 1.6618628340074793,
+    "exit": 0,
+    "state_final_bytes": 56635330,
+    "process_real_s": 1.65,
+    "rss_bytes": 290832384.0,
+    "user_s": 1.35,
+    "sys_s": 0.49,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {}
+      },
+      "RunID": "",
+      "BaseGeneration": 1,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 0,
+        "files_parsed": 0,
+        "cached_files": 4087,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 0,
+        "derived_indexes": 0,
+        "discovery_passes": 0
+      },
+      "Fallbacks": null,
+      "Unreadable": null,
+      "OwnersPublished": 0,
+      "ParsedFiles": 0,
+      "EarlyLocal": 0
+    },
+    "noop_wire_messages": 0
+  },
+  {
+    "label": "body",
+    "profiled": true,
+    "seconds": 3.4335626249667257,
+    "exit": 0,
+    "state_final_bytes": 56635404,
+    "process_real_s": 3.43,
+    "rss_bytes": 676495360.0,
+    "user_s": 3.89,
+    "sys_s": 0.75,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "resolution": 10,
+          "source content": 1
+        }
+      },
+      "RunID": "stage15-cli-product-candidate-1-main-2-1790279189688515000",
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "Stats": {
+        "files_read": 115,
+        "files_parsed": 11,
+        "cached_files": 4024,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 117,
+        "derived_indexes": 8,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "changed files and reverse file dependents",
+          "reason": "frozen scope: prior file-to-file dependency closure"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 11,
+      "ParsedFiles": 11,
+      "EarlyLocal": 0
+    },
+    "graph_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00"
+  },
+  {
+    "label": "cold-body",
+    "profiled": false,
+    "seconds": 8.439318333985284,
+    "exit": 0,
+    "state_final_bytes": 56635462,
+    "process_real_s": 8.43,
+    "rss_bytes": 909246464.0,
+    "user_s": 33.08,
+    "sys_s": 1.42,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4035
+        }
+      },
+      "RunID": "stage15-cli-product-candidate-1-cold-body-1-1790279192960437000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4087,
+        "files_parsed": 4035,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 1699,
+        "derived_indexes": 2295,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "all prior/current file owners",
+          "reason": "frozen scope: global name-resolution domain"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 4035,
+      "ParsedFiles": 4035,
+      "EarlyLocal": 0
+    },
+    "graph_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00"
+  }
+]

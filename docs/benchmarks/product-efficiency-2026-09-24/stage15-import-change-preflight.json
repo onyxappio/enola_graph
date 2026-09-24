@@ -1,0 +1,38 @@
+{
+  "observed_at": "2026-09-24T11:12:37.357350+00:00",
+  "source_state": "/tmp/enola-stage15-wave14-history10-retry1/state-live/state.json",
+  "state_sha256": "d8f5b27e3ddd418705f287b2660ac901e93f81d73d3ee59b7d95ae5231968307",
+  "file": "apps/mobile/src/stories/figma-catalog/figmaCatalogStoryShared.tsx",
+  "stored_file_hash": "f21f41d5758705ebb90d913891e0f46e4533582fa931e0423233584ddb9fe667",
+  "scenario_source_sha256": "f21f41d5758705ebb90d913891e0f46e4533582fa931e0423233584ddb9fe667",
+  "historical_live_source_sha256": "f21f41d5758705ebb90d913891e0f46e4533582fa931e0423233584ddb9fe667",
+  "scenario_source_matches_historical_live": true,
+  "provider_proof": {
+    "export_surface_recorded": true,
+    "export_surface_context_free": true,
+    "parse_kind": "ts",
+    "resolved_files": [
+      "apps/mobile/src/stories/CatalogPaintRendererStrip.tsx",
+      "apps/mobile/src/stories/catalogPaintProfile.ts",
+      "apps/mobile/src/stories/componentComparisonReviewHost.tsx",
+      "apps/mobile/src/stories/figmaComponentStoryMetadataFactory.ts",
+      "apps/mobile/src/stories/figmaComponentStorySpec.ts",
+      "apps/mobile/src/stories/rawComponentFrameGeometry.ts",
+      "apps/mobile/src/stories/storyFixtureCapability.tsx",
+      "apps/mobile/src/stories/storybookCaptureMode.ts"
+    ],
+    "side_reads": null,
+    "router": null,
+    "nuxt_scope": "-"
+  },
+  "direct_consumer_count": 406,
+  "note": "Existing pre-mutation Stage15 record only. Post-mutation proof, exact saved parses and timing remain unmeasured.",
+  "baseline_provider": {
+    "source_state": "/tmp/enola-wave14-history10-baseline/state-live/state.json",
+    "state_sha256": "c4708640ac6776d3c8ec43ee8131b481954770c7c0b3478e0d820d44afbd270e",
+    "stored_file_hash": "f21f41d5758705ebb90d913891e0f46e4533582fa931e0423233584ddb9fe667",
+    "same_source_hash": true,
+    "export_surface_recorded": false,
+    "export_surface_context_free": false
+  }
+}

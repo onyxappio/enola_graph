@@ -1,0 +1,152 @@
+{
+  "timing_eligible": false,
+  "cross_build_graph_equality": true,
+  "checks_per_arm": 4,
+  "arms": {
+    "baseline": {
+      "r1-new-initial": {
+        "parsed": 4035,
+        "owners": 4035,
+        "generation": [
+          0,
+          1
+        ],
+        "graph_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+        "exit": 0
+      },
+      "r1-new-noop": {
+        "parsed": 0,
+        "owners": 0,
+        "generation": [
+          1,
+          1
+        ],
+        "graph_hash": null,
+        "exit": 0
+      },
+      "r1-new-body": {
+        "parsed": 11,
+        "owners": 11,
+        "generation": [
+          1,
+          2
+        ],
+        "graph_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+        "exit": 0
+      },
+      "r1-new-structural": {
+        "parsed": 12,
+        "owners": 12,
+        "generation": [
+          2,
+          3
+        ],
+        "graph_hash": "d6eaddf0434963ca37843464e9c031cb0e96e0310b83333ba6240fb8f3eed3be",
+        "exit": 0
+      },
+      "cold-structural": {
+        "parsed": 4035,
+        "owners": 4035,
+        "generation": [
+          0,
+          1
+        ],
+        "graph_hash": "d6eaddf0434963ca37843464e9c031cb0e96e0310b83333ba6240fb8f3eed3be",
+        "exit": 0
+      },
+      "cold-body": {
+        "parsed": 4035,
+        "owners": 4035,
+        "generation": [
+          0,
+          1
+        ],
+        "graph_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+        "exit": 0
+      },
+      "cold-original": {
+        "parsed": 4035,
+        "owners": 4035,
+        "generation": [
+          0,
+          1
+        ],
+        "graph_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+        "exit": 0
+      }
+    },
+    "candidate": {
+      "r1-new-initial": {
+        "parsed": 4035,
+        "owners": 4035,
+        "generation": [
+          0,
+          1
+        ],
+        "graph_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+        "exit": 0
+      },
+      "r1-new-noop": {
+        "parsed": 0,
+        "owners": 0,
+        "generation": [
+          1,
+          1
+        ],
+        "graph_hash": null,
+        "exit": 0
+      },
+      "r1-new-body": {
+        "parsed": 11,
+        "owners": 11,
+        "generation": [
+          1,
+          2
+        ],
+        "graph_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+        "exit": 0
+      },
+      "r1-new-structural": {
+        "parsed": 12,
+        "owners": 12,
+        "generation": [
+          2,
+          3
+        ],
+        "graph_hash": "d6eaddf0434963ca37843464e9c031cb0e96e0310b83333ba6240fb8f3eed3be",
+        "exit": 0
+      },
+      "cold-structural": {
+        "parsed": 4035,
+        "owners": 4035,
+        "generation": [
+          0,
+          1
+        ],
+        "graph_hash": "d6eaddf0434963ca37843464e9c031cb0e96e0310b83333ba6240fb8f3eed3be",
+        "exit": 0
+      },
+      "cold-body": {
+        "parsed": 4035,
+        "owners": 4035,
+        "generation": [
+          0,
+          1
+        ],
+        "graph_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+        "exit": 0
+      },
+      "cold-original": {
+        "parsed": 4035,
+        "owners": 4035,
+        "generation": [
+          0,
+          1
+        ],
+        "graph_hash": "607ce1d09f95bbfcf4cbf9002dae0df21083def1fc38f1f880516968db4c3d00",
+        "exit": 0
+      }
+    }
+  },
+  "note": "One correctness preflight per build; timings excluded. CLI body/structural cases differ from targeted import-change watch case."
+}

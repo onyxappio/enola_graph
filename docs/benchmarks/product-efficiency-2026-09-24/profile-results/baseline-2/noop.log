@@ -1,0 +1,82 @@
+[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=delta
+[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml
+[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2
+[graph-profile] discover_git                       0.041s  total= 0.042s  trace=graphinput_build  repo=true dirs=2
+[graph-profile] declare_git_control                0.005s  total= 0.047s  trace=graphinput_build  deps=6
+[graph-profile] git_ls_files                       0.057s  total= 0.104s  trace=graphinput_build  tracked=45105 dirs=5818
+[graph-profile] walk_tree                          0.114s  total= 0.218s  trace=graphinput_build  names=11637 ignorefiles=4
+[graph-profile] check_ignore_setup                 0.017s  total= 0.235s  trace=graphinput_build
+[graph-profile] check_ignore_run                   0.056s  total= 0.291s  trace=graphinput_build  names=11637 ignored=0
+[graph-profile] declare_ignore_files               0.000s  total= 0.291s  trace=graphinput_build  deps=9
+[graph-profile] compute_identities                 0.035s  total= 0.326s  trace=graphinput_build  deps=9 entries=11637
+[graph-profile] graphinput_build                   0.327s  total= 0.327s  trace=graph_engine  configpaths=2
+[graph-profile] engine_new                         0.000s  total= 0.327s  trace=graph_engine
+[graph-profile] register_plugins                   0.000s  total= 0.327s  trace=graph_engine
+[graph-profile] config_recheck                     0.000s  total= 0.327s  trace=graph_engine
+[graph-profile] resolve_graph_target               0.327s  total= 0.327s  trace=cli  repos=1
+enola graph: config /private/tmp/enola-stage15-profile-plan/baseline-2/config.yaml
+[graph-profile] connect_sink                       0.002s  total= 0.329s  trace=cli  nats=true
+[graph-profile] session_options                    0.000s  total= 0.329s  trace=cli  repo=/private/tmp/enola-stage15-profile-plan/baseline-2/product
+[graph-profile] lock                               0.000s  total= 0.000s  trace=open
+[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open
+[graph-profile] open_journal                       0.000s  total= 0.001s  trace=open
+[graph-profile] replay_unacked                     0.000s  total= 0.001s  trace=open
+[graph-profile] state_read_bytes                   0.012s  state.json bytes=55859980
+[graph-profile] state_fingerprint                  0.024s  bytes=55859980
+[graph-profile] state_json_unmarshal               0.245s  files=4087
+[graph-profile] load_state                         0.281s  total= 0.282s  trace=open  files=4087
+[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false
+[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2
+[graph-profile] graph_inputs_proven                0.097s  total= 0.097s  trace=reconcile
+[graph-profile] effective_config                   0.000s  total= 0.097s  trace=reconcile  files=2 fast=false
+[graph-profile] reconcile_complete                 0.000s  total= 0.097s  trace=reconcile  reloaded=false
+[graph-profile] engine_walk_repo                   0.115s  files=10967 tests=0 all_names=10967
+[graph-profile] inventory                          0.115s  total= 0.115s  trace=inputs  files=10967 all_names=10967
+[graph-profile] detect_typescript                  0.001s
+[graph-profile] detect_extractors                  0.001s  total= 0.116s  trace=inputs  detected=1
+[graph-profile] select_hash_targets                0.009s  total= 0.125s  trace=inputs  targets=4106
+[graph-profile] engine_hash_files                  0.152s  n=4106 hashed=4106 bytes=45822355
+[graph-profile] hash_content_inputs                0.152s  total= 0.277s  trace=inputs  targets=4106
+[graph-profile] capture_contexts                   0.000s  total= 0.277s  trace=inputs  contexts=0
+[graph-profile] ts_config_inputs                   0.137s  n=83
+[graph-profile] analysis_fingerprint               0.139s  total= 0.417s  trace=inputs  cfg_files=59
+[graph-profile] angular_probe                      0.003s  total= 0.420s  trace=inputs  angular=false
+[graph-profile] policy_identity                    0.000s  total= 0.420s  trace=inputs
+[graph-profile] engine_context_fingerprint         0.000s  total= 0.420s  trace=inputs
+[graph-profile] ts_disc_nuxt_packages              0.116s  pkgs=0
+[graph-profile] ts_disc_package_gates              0.001s
+[graph-profile] ts_disc_package_names              0.000s  names=30
+[graph-profile] ts_disc_alias_roots                0.080s  roots=1
+[graph-profile] ts_disc_package_exports            0.000s  packages=30
+[graph-profile] ts_discovery_build                 0.207s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59
+[graph-profile] ts_discovery                       0.207s  total= 0.627s  trace=inputs  names=0 bytes=0 dirs=0
+[graph-profile] ts_session_context                 0.057s  total= 0.684s  trace=inputs  files=4087
+[graph-profile] runtime_inputs_complete            0.000s  total= 0.684s  trace=inputs
+[graph-profile] clone_file_state_copy              0.000s  n=4087
+[graph-profile] extractor_need                     0.718s  total= 0.718s  trace=session  non_ts_need=false detected=1 neutral=0
+[graph-profile] changed_terms                      0.007s  total= 0.724s  trace=session  initial=false force=false non_ts=false scan=false raw_cfg=false policy=false neutral_scan=false neutral_cfg=false
+[graph-profile] ts_reuse_cache                     0.041s  total= 0.766s  trace=session  owned=4087 facts=59663
+[graph-profile] assemble_new_files                 0.002s  total= 0.767s  trace=session  new=4087 ts_noop=true non_ts_need=false skip=true facts=59663
+[graph-profile] ts_config_inputs                   0.134s  n=83
+[graph-profile] skip_publish_return                0.136s  total= 0.903s  trace=session
+[graph-profile] graph_session_run                  1.288s  total= 1.616s  trace=cli  repo=/private/tmp/enola-stage15-profile-plan/baseline-2/product parsed=0
+[graph] /private/tmp/enola-stage15-profile-plan/baseline-2/product: generation 1→1 parsed=0 cached=4087 early_local=0 fallbacks=0
+[graph-profile] cli_complete                       0.000s  total= 1.616s  trace=cli  results=1
+        1.63 real         1.34 user         0.46 sys
+           295190528  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               41548  page reclaims
+                 419  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   4  messages sent
+                   3  messages received
+                 236  signals received
+                  74  voluntary context switches
+                3340  involuntary context switches
+         18341637501  instructions retired
+          5115138895  cycles elapsed
+           257902912  peak memory footprint

@@ -1,0 +1,64 @@
+--- stage14/watch.py
++++ stage15/watch.py
+@@ -31,6 +31,28 @@
+ REPO_ID = "watch-bench"
+ WATCH_CTX = "watch-bench"
+ COLD_CTX = "watch-cold"
++
++
++def product_mutation(repo, spec_path):
++    raw = Path(spec_path).read_bytes()
++    spec = json.loads(raw)
++    rel = Path(spec["path"])
++    if rel.is_absolute() or ".." in rel.parts:
++        raise ValueError("mutation path must stay inside Product")
++    path = (repo / rel).resolve()
++    path.relative_to(repo.resolve())
++    original = path.read_text()
++    if hashlib.sha256(path.read_bytes()).hexdigest() != spec["original_sha256"]:
++        raise ValueError("mutation source hash mismatch")
++    variants = []
++    for replacement in spec["variants"]:
++        before, after = replacement["before"], replacement["after"]
++        if not before or original.count(before) != 1 or before == after:
++            raise ValueError("mutation must replace exactly one unique snippet")
++        variants.append(original.replace(before, after, 1))
++    if not variants:
++        raise ValueError("mutation needs at least one edit")
++    return path, original, variants, hashlib.sha256(raw).hexdigest()
+ 
+ 
+ def parse_every(text: str) -> float:
+@@ -1016,6 +1038,7 @@
+         )
+         eff.wait_observer_ready(ready_file, obs_err_path, obs_proc)
+ 
++        mutation_sha256 = None
+         use_product = bool(args.source) and Path(args.source).is_dir() and not args.force_tiny
+         if use_product:
+             repo = isolate_product(Path(args.source), work / "product-live", Path(args.scope_config))
+@@ -1032,6 +1055,8 @@
+                 mutated.replace("currentScryptParameters(); return email", "resolveScryptCost(); return email"),
+                 mutated.replace("currentScryptParameters(); return email", "currentScryptParameters(); resolveScryptCost(); return email"),
+             ]
++            if args.mutation_spec:
++                edit_path, original, burst_texts, mutation_sha256 = product_mutation(repo, args.mutation_spec)
+             fixture = "product"
+         else:
+             repo = make_tiny_repo(work)
+@@ -1196,6 +1221,7 @@
+             "not_request_driven_resident": True,
+             "not_product_acceptance": True,
+             "fixture": fixture,
++            "mutation_spec_sha256": mutation_sha256,
+             "watch_every": every,
+             "watch_every_s": every_s,
+             "work": str(work),
+@@ -1822,6 +1848,7 @@
+     p.add_argument("--observer", default="")
+     p.add_argument("--snapshot", default="")
+     p.add_argument("--work", default="")
++    p.add_argument("--mutation-spec", default="", help="pinned Product mutation JSON; default uses existing body-only control")
+     p.add_argument("--source", default="", help="optional Product checkout; isolated clone only")
+     p.add_argument("--scope-config", default=str(HERE / "product-graph-scope.yaml"))
+     args = p.parse_args()
