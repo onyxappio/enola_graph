@@ -1493,6 +1493,10 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				for path, rec := range prevRecs {
 					prevSlash[filepath.ToSlash(path)] = rec
 				}
+				ownedSet := make(map[string]bool, len(owned))
+				for _, path := range owned {
+					ownedSet[filepath.ToSlash(path)] = true
+				}
 				seen := map[string]bool{}
 				for p, d := range dirty {
 					if d {
@@ -1533,6 +1537,25 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 					proven = provenSideReadSources(seen, prevSlash, workRecs)
 					for f := range sideReadDependents(seen, proven, prevSlash, hashes, angular) {
 						extra[f] = true
+					}
+					// A newly proven FSM call can add a read edge to a callee whose
+					// file did not appear in the previous graph. That callee owns the
+					// returned-event construction contribution, so close over current
+					// FSM reads before publication in the legacy v1 path too.
+					for file := range seen {
+						rec := workRecs[filepath.ToSlash(file)]
+						if rec == nil {
+							rec = workRecs[file]
+						}
+						if rec == nil {
+							continue
+						}
+						for _, dep := range rec.FSMReads {
+							dep = filepath.ToSlash(dep)
+							if ownedSet[dep] && !seen[dep] {
+								extra[dep] = true
+							}
+						}
 					}
 					need := map[string]bool{}
 					for p, d := range extra {
@@ -3140,6 +3163,25 @@ func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*Fil
 		}
 		for f := range sideReadDependents(dirty, provenSideReadSources(parsed, prevRecs, work), prevRecs, hashes, angular) {
 			next[f] = true
+		}
+		// A changed FSM caller can prove a cross-file construction use that did
+		// not exist in the prior graph. The callee owns those construction facts,
+		// so follow newly observed FSM reads during the pre-Begin closure as well.
+		// This also covers first-time proof after an earlier no-proof state.
+		for file := range pending {
+			rec := work[filepath.ToSlash(file)]
+			if rec == nil {
+				rec = work[file]
+			}
+			if rec == nil {
+				continue
+			}
+			for _, dep := range rec.FSMReads {
+				dep = filepath.ToSlash(dep)
+				if ownedSet[dep] && !dirty[dep] {
+					next[dep] = true
+				}
+			}
 		}
 		// A candidate is provisional until the closure settles. Dirt a later hop
 		// adds can reach an edge it held, and a later hop can take it for a
