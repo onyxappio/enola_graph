@@ -413,7 +413,7 @@ func OpenSession(ctx context.Context, eng *engine.Engine, repoPath string, sink 
 		return nil, fmt.Errorf("replay journal: %w", err)
 	}
 	tr.Mark("replay_unacked", "")
-	st, err := recoverAcknowledgedPending(opts.StateDir, journal, opts, abs)
+	st, stFP, err := recoverAcknowledgedPendingFP(opts.StateDir, journal, opts, abs, stateCheckpoint{}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -426,7 +426,7 @@ func OpenSession(ctx context.Context, eng *engine.Engine, repoPath string, sink 
 	}
 	tr.Mark("load_state", fmt.Sprintf("files=%d", nfiles))
 	opened = true
-	return &Resident{eng: eng, abs: abs, opts: opts, sink: sink, state: st, journal: journal, lock: lock, engineUnused: opts.FreshEngine}, nil
+	return &Resident{eng: eng, abs: abs, opts: opts, sink: sink, state: st, journal: journal, lock: lock, engineUnused: opts.FreshEngine, ck: newStateCheckpoint(st, stFP)}, nil
 }
 
 func identityOK(st *State, opts Options, abs string) error {
@@ -473,6 +473,7 @@ type session struct {
 	opts              Options
 	sink              graphstream.Sink
 	state             *State
+	stateFP           stateFingerprint
 	journal           *graphstream.Journal
 	pub               *graphstream.Publisher
 	seq               int
@@ -1883,10 +1884,12 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 					st.ExtractorInputHash[name] = pv.input
 				}
 			}
-			if err := saveState(s.opts.StateDir, st); err != nil {
+			fp, err := saveStateFP(s.opts.StateDir, st)
+			if err != nil {
 				return nil, err
 			}
 			s.state = st
+			s.stateFP = fp
 		}
 		return &Result{
 			Invalidation:     invalidation,
@@ -2066,7 +2069,8 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		}
 	}
 	s.work.Checkpoints++
-	if err := writePendingState(s.opts.StateDir, next); err != nil {
+	pendingFP, err := writePendingStateFP(s.opts.StateDir, next)
+	if err != nil {
 		return nil, err
 	}
 	if st, err := os.Stat(pendingStatePath(s.opts.StateDir)); err == nil {
@@ -2099,6 +2103,8 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	}
 	_ = os.Remove(filepath.Join(s.opts.StateDir, "pending.json"))
 	s.state = next
+	// promotePendingState renamed exactly these bytes over state.json.
+	s.stateFP = pendingFP
 	tr.Mark("promote_compact_state", fmt.Sprintf("parsed=%d published=%d", stats.FilesParsed, published))
 
 	classified := 0

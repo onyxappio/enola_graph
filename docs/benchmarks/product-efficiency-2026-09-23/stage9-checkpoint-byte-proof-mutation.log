@@ -1,0 +1,5 @@
+--- FAIL: TestIndependentRetryRejectsSameMetadataCorruptCheckpoint (0.94s)
+    independent_retry_checkpoint_bytes_test.go:68: corrupt checkpoint was not rejected: <nil>
+FAIL
+FAIL	github.com/enola-labs/enola/internal/graphsession	1.430s
+FAIL

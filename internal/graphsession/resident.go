@@ -75,6 +75,25 @@ type WorkCounters struct {
 	// re-enumerated. This is work this change introduces, not work it avoids,
 	// and it is counted separately so it cannot hide inside a win.
 	TSDiscoveryRechecks tsextractor.DiscoveryRecheck
+	// StateDecodes counts the state files a transaction read and decoded at a
+	// recovery barrier; StateDecodesProven counts the ones it read and did not
+	// have to decode, because the bytes digested identical to the ones the
+	// state it already held came from. The read is counted on both sides: this
+	// proof avoids a decode, never a read, and the pair is what says so rather
+	// than letting a skipped decode read as a skipped load.
+	StateDecodes, StateDecodesProven int
+	// StateFingerprints and StateFingerprintBytes are what that proof costs -
+	// whole-file digests over state bytes that were previously only parsed.
+	// This is work this change introduces, not work it avoids, so it is
+	// counted separately and cannot hide inside the win.
+	//
+	// The scope is the state reads a run's recovery barrier performed, and
+	// nothing else. Digests taken when a checkpoint is written, and the one a
+	// fresh OpenSession takes before any run exists, have no counters to report
+	// into and appear only as state_fingerprint trace marks. These counters are
+	// therefore not the total digest cost of the process.
+	StateFingerprints     int
+	StateFingerprintBytes int64
 }
 
 type runtimeInputs struct {
@@ -332,6 +351,12 @@ type Resident struct {
 	// and the window a declared-input recheck would have to cover is no longer
 	// bounded by anything.
 	engineUnused bool
+	// ck is the committed state this resident holds and the proof of which
+	// bytes on disk produced it. The recovery barrier a refused transaction
+	// walks through re-reads state.json to answer a question this process
+	// already has the answer to; the checkpoint lets that read skip the decode
+	// when, and only when, the bytes are shown to be the same ones.
+	ck stateCheckpoint
 }
 
 type OnlineResult struct {
@@ -379,16 +404,23 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 	if r.closed {
 		return nil, WorkCounters{}, fmt.Errorf("graphsession: session closed")
 	}
+	// recoveryWork is what the barrier below cost. It is folded into the run's
+	// counters once the session exists, so a recovery that skipped a decode
+	// reports it on the same receipt as the run that followed it.
+	var recoveryWork stateReadWork
 	if r.failed {
 		p := &graphstream.Publisher{Sink: r.sink, Journal: r.journal}
 		if err := p.ReplayUnacked(ctx); err != nil {
 			return nil, WorkCounters{}, err
 		}
-		st, err := recoverAcknowledgedPending(r.opts.StateDir, r.journal, r.opts, r.abs)
+		st, fp, err := recoverAcknowledgedPendingFP(r.opts.StateDir, r.journal, r.opts, r.abs, r.ck, &recoveryWork)
 		if err != nil {
-			return nil, WorkCounters{}, err
+			var work WorkCounters
+			recoveryWork.fold(&work)
+			return nil, work, err
 		}
 		r.state = st
+		r.ck = newStateCheckpoint(st, fp)
 	}
 	// The work between entering a transaction and starting the session trace was
 	// outside every window: root measured it only as an untraced CLI residual.
@@ -493,7 +525,7 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 		rtr.Mark("reload_engine", "")
 	}
 	rtr.Mark("reconcile_complete", fmt.Sprintf("reloaded=%v", reloaded))
-	s := &session{eng: r.eng, abs: r.abs, opts: r.opts, sink: r.sink, state: r.state, journal: r.journal, prof: graphprofile.StartNamed("session"), inputs: input, fast: fast}
+	s := &session{eng: r.eng, abs: r.abs, opts: r.opts, sink: r.sink, state: r.state, stateFP: r.ck.fp, journal: r.journal, prof: graphprofile.StartNamed("session"), inputs: input, fast: fast}
 	s.retained, s.retainedFor = r.tsDiscovery, r.tsDiscoveryFor
 	s.retryRecords, s.retryFor = r.retryRecords, r.retryFor
 	s.retryFileContext, s.retryFileBase = r.retryFileContext, r.retryFileBase
@@ -530,6 +562,7 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 	}
 	have := r.state != nil && r.state.LastComplete && r.state.ExtractorVersion == engine.ExtractorVersion() && r.state.Schema == stateSchema
 	res, err := s.run(ctx, r.opts.ForceInitial || !have)
+	recoveryWork.fold(&s.work)
 	if err == nil && s.began {
 		s.work.PublishedEvents = s.seq + 2
 	}
@@ -557,6 +590,7 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 	promoteEngine = true
 	r.failed = false
 	r.state = s.state
+	r.ck = newStateCheckpoint(s.state, s.stateFP)
 	if !fast {
 		r.coverageVersion++
 		s.inputs.coverageVersion = r.coverageVersion

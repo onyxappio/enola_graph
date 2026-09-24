@@ -1,0 +1,59 @@
+{
+  "kind": "committed-state decode reuse combined with early supersession and retry parse reuse",
+  "base": "873385c",
+  "full_graphsession": {
+    "exit_code": 0,
+    "elapsed_seconds": 426.241591875,
+    "argv": [
+      "/opt/homebrew/bin/go",
+      "test",
+      "-overlay=/tmp/enola-stage9-checkpoint-combined-review/overlay.json",
+      "-count=1",
+      "-timeout=20m",
+      "./internal/graphsession"
+    ],
+    "root_commit": "873385c"
+  },
+  "final_focused": {
+    "argv": [
+      "/opt/homebrew/bin/go",
+      "test",
+      "-overlay=/tmp/enola-stage9-checkpoint-combined-review/final-overlay.json",
+      "-count=1",
+      "-timeout=5m",
+      "./internal/graphsession",
+      "-run",
+      "Test(Recovery|Refused|IndependentRetryRejectsSameMetadataCorruptCheckpoint|ResidentFailurePreservesCommittedCachesAndRecovers)"
+    ],
+    "exit_code": 0,
+    "elapsed_seconds": 8.8878685
+  },
+  "independent_mutation": {
+    "exit_code": 1,
+    "elapsed_seconds": 4.404153416,
+    "expected_failure": "corrupt checkpoint was not rejected",
+    "caught": true
+  },
+  "final_build": {
+    "exit_code": 0,
+    "binary": "/tmp/enola-stage9-main-retry-review/enola-checkpoint-6a8581f",
+    "sha256": "0162eb584ca7acf17d0b56a4aaf7d082933e652309169fbfb589128b5b80d787",
+    "overlay": "/tmp/enola-stage9-checkpoint-combined-review/final-overlay.json",
+    "source_hashes": {
+      "persist.go": "3755a59028ed8028a6f8fc86279c83bd4cd60c495e0747f7901afa418eda8e07",
+      "resident.go": "2b19f2ca2d0235e9866ad86913c06ac17948f445b5c2825000e27ed8ddf68401",
+      "session.go": "ef806c4f722ff3a667fb2557acef9e4cb68af0e273c8d348f4b9310af8f6f3f4",
+      "state_checkpoint.go": "92c3fe9766efb3f8eee893cdfe5156aa913837c194e891d54b507c54120b8b59",
+      "zz_state_checkpoint_test.go": "fc1d1158b50dd9a89346ebf50a2e7f4363894e37f29249d012235f1593237a47"
+    },
+    "qualification": "Full graphsession suite runs prior snapshot. Final delta is profile mark, counter-scope comments, and additional test assertions; final focused run recorded separately."
+  },
+  "frozen_composition": {
+    "all_five_match": true,
+    "worker_manifest": "/tmp/enola-recovery-checkpoint-patch/MANIFEST.sha256",
+    "root_base": "873385c",
+    "patch_sha256": "c802f4620dffc8841395874a83f89063d928f2395024cbb0d0f539618557a665"
+  },
+  "product": "pending three-arm repeated comparison",
+  "qualification": "Full package compiled prior to final profile mark, comments, and extra pairing assertions. Final focused test covered those changes; no repeat full suite for trace/comment-only production delta."
+}

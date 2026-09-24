@@ -75,15 +75,37 @@ func loadPendingState(dir string) (*State, error) {
 }
 
 func readStateFile(path string) (*State, error) {
+	st, _, err := readStateFileFP(path, nil)
+	return st, err
+}
+
+// readStateFileFP also reports which bytes the returned State was decoded
+// from, so a caller that keeps the value can later prove the file still holds
+// them. The digest is taken over the bytes already in hand; nothing is
+// retained beyond the fingerprint itself.
+func readStateFileFP(path string, w *stateReadWork) (*State, stateFingerprint, error) {
 	tRead := time.Now()
 	b, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, nil
+			return nil, stateFingerprint{}, nil
 		}
-		return nil, err
+		return nil, stateFingerprint{}, err
 	}
 	graphprofile.Since("state_read_bytes", tRead, fmt.Sprintf("%s bytes=%d", filepath.Base(path), len(b)))
+	tFP := time.Now()
+	fp := fingerprintStateBytes(b)
+	w.digested(len(b))
+	graphprofile.Since("state_fingerprint", tFP, fmt.Sprintf("bytes=%d", len(b)))
+	st, err := decodeStateBytes(path, b)
+	if err != nil {
+		return nil, stateFingerprint{}, err
+	}
+	w.decoded()
+	return st, fp, nil
+}
+
+func decodeStateBytes(path string, b []byte) (*State, error) {
 	tJSON := time.Now()
 	var st State
 	if err := json.Unmarshal(b, &st); err != nil {
@@ -111,25 +133,36 @@ func readStateFile(path string) (*State, error) {
 // before End leaves prior messages acked with no End, and must not
 // install the unacknowledged generation.
 func recoverAcknowledgedPending(dir string, journal *graphstream.Journal, opts Options, abs string) (*State, error) {
-	pending, err := loadPendingState(dir)
+	st, _, err := recoverAcknowledgedPendingFP(dir, journal, opts, abs, stateCheckpoint{}, nil)
+	return st, err
+}
+
+// recoverAcknowledgedPendingFP is the same barrier, reporting the fingerprint
+// of whichever state it installed and accepting a resident's checkpoint. The
+// checkpoint is consulted on the committed-state fallbacks only, never on the
+// promotion path: a generation that is promoted here is one this process has
+// not decoded, and must be read from disk. A zero checkpoint - a fresh process
+// - validates the disk exactly as before.
+func recoverAcknowledgedPendingFP(dir string, journal *graphstream.Journal, opts Options, abs string, ck stateCheckpoint, w *stateReadWork) (*State, stateFingerprint, error) {
+	pending, pendingFP, err := readStateFileFP(pendingStatePath(dir), w)
 	if err != nil {
-		return nil, err
+		return nil, stateFingerprint{}, err
 	}
 	if pending == nil || !pending.LastComplete || pending.LastRunID == "" {
-		return loadCommittedState(dir)
+		return reuseCommittedState(dir, ck, w)
 	}
 	if err := identityOK(pending, opts, abs); err != nil {
 		// Pending belongs to a different repo/context/sink; leave it in place
 		// and use the committed checkpoint.
-		return loadCommittedState(dir)
+		return reuseCommittedState(dir, ck, w)
 	}
 	if !journalHasAckedEnd(journal, pending.LastRunID) {
-		return loadCommittedState(dir)
+		return reuseCommittedState(dir, ck, w)
 	}
 	if err := promotePendingState(dir); err != nil {
-		return nil, err
+		return nil, stateFingerprint{}, err
 	}
-	return pending, nil
+	return pending, pendingFP, nil
 }
 
 // journalHasAckedEnd uses metadata decoded when the journal was appended or opened.
@@ -139,8 +172,16 @@ func journalHasAckedEnd(j *graphstream.Journal, runID string) bool {
 }
 
 func writePendingState(dir string, st *State) error {
+	_, err := writePendingStateFP(dir, st)
+	return err
+}
+
+// writePendingStateFP reports the fingerprint of the bytes it wrote. Those are
+// the bytes promotePendingState renames into place, so a caller that promotes
+// them knows the committed file's fingerprint without reading it back.
+func writePendingStateFP(dir string, st *State) (stateFingerprint, error) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
-		return err
+		return stateFingerprint{}, err
 	}
 	if st.Synthetic == nil {
 		st.Synthetic = map[string][]facts.Fact{}
@@ -154,33 +195,42 @@ func writePendingState(dir string, st *State) error {
 	tJSON := time.Now()
 	b, err := json.Marshal(st)
 	if err != nil {
-		return err
+		return stateFingerprint{}, err
 	}
 	graphprofile.Since("state_json_marshal", tJSON, fmt.Sprintf("bytes=%d files=%d", len(b), len(st.Files)))
 	path := pendingStatePath(dir)
 	tmp := path + ".tmp"
 	f, err := os.Create(tmp)
 	if err != nil {
-		return err
+		return stateFingerprint{}, err
 	}
 	if _, err := f.Write(b); err != nil {
 		f.Close()
 		os.Remove(tmp)
-		return err
+		return stateFingerprint{}, err
 	}
 	if err := f.Sync(); err != nil {
 		f.Close()
 		os.Remove(tmp)
-		return err
+		return stateFingerprint{}, err
 	}
 	if err := f.Close(); err != nil {
 		os.Remove(tmp)
-		return err
+		return stateFingerprint{}, err
 	}
 	if err := os.Rename(tmp, path); err != nil {
-		return err
+		return stateFingerprint{}, err
 	}
-	return fsyncDir(dir)
+	if err := fsyncDir(dir); err != nil {
+		return stateFingerprint{}, err
+	}
+	// The write path digests too, and pays for it. It has no WorkCounters to
+	// report into - a checkpoint is written from places that do not own a run's
+	// counters - so the cost is left as a trace mark rather than going unrecorded.
+	tFP := time.Now()
+	fp := fingerprintStateBytes(b)
+	graphprofile.Since("state_fingerprint", tFP, fmt.Sprintf("write bytes=%d", len(b)))
+	return fp, nil
 }
 
 func promotePendingState(dir string) error {
@@ -207,8 +257,18 @@ func fsyncDir(dir string) error {
 }
 
 func saveState(dir string, st *State) error {
-	if err := writePendingState(dir, st); err != nil {
-		return err
+	_, err := saveStateFP(dir, st)
+	return err
+}
+
+// saveStateFP reports the fingerprint of the committed file it just installed.
+func saveStateFP(dir string, st *State) (stateFingerprint, error) {
+	fp, err := writePendingStateFP(dir, st)
+	if err != nil {
+		return stateFingerprint{}, err
 	}
-	return promotePendingState(dir)
+	if err := promotePendingState(dir); err != nil {
+		return stateFingerprint{}, err
+	}
+	return fp, nil
 }
