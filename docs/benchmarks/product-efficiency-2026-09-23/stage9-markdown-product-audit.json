@@ -103,7 +103,7 @@
       "hash": "0ac6ae9f73f5f53fc4c173eeee2059a69ee539e1471f32a5fa95b16ea7cb01e1"
     }
   ],
-  "current_main_attribution": "Build metadata and patched source identity verified independently; worker run-to-binary receipt pending.",
+  "current_main_attribution": "Worker receipt msg_063d4580b372 maps mcand/mcold to the independently checked candidate SHA; mcontrol uses clean50b64fd. All integrated source files independently matched.",
   "current_main_candidate": {
     "base": "8704d6175ca6f0c5a955b9ed1a69f5f92a1f0530",
     "sha256": "8270c2316015ac8b199f8587c92aae625899b2fbf293a1a855364a173382d497",
@@ -116,5 +116,9 @@
       "internal/graphsession/owner.go": "590728e00a4812863f03406e506a273db5f0d9fddb5d1a2d0952be8ff4842074",
       "internal/graphsession/session.go": "9649433f1e29b91e966fa0abbcba074dcb6ce9506bf76165c4e177c8e7985436"
     }
+  },
+  "current_main_control": {
+    "base": "50b64fd9890a642e7a3c72fad6f928ab1076fd86",
+    "sha256": "e5b35bbbe08b16b2202b172a14021dcb3d6d3f47ef7cdcd6df25e9c8c57fb358"
   }
 }
