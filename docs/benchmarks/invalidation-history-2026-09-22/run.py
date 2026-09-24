@@ -413,6 +413,35 @@ def assert_not_tracked_output(output: Path) -> None:
         raise SystemExit(f"refusing to overwrite tracked {resolved}; use --output under --work")
 
 
+def persistent_hashes(root: Path) -> dict:
+    result = {}
+    for path in sorted(root.rglob("*")):
+        if not path.is_file() or path.name == "session.lock":
+            continue
+        digest = hashlib.sha256()
+        with path.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+        result[str(path.relative_to(root))] = digest.hexdigest()
+    return result
+
+
+def verify_transition_noop(binary, live, state, events, summary, completed) -> dict:
+    before = persistent_hashes(state)
+    offset = events.stat().st_size
+    info = scope.enola(binary, "delta", live, state, events, summary)
+    pairs = scope.parse_event_records(events, offset)
+    info["events"] = len(pairs)
+    validate_publishing_or_noop([rec for rec, _ in pairs], pairs, info, completed, [])
+    if info["parsed"] != 0 or pairs or events.stat().st_size != offset:
+        raise RuntimeError("post-transition no-op parsed files or modified the event stream")
+    after = persistent_hashes(state)
+    if before != after:
+        raise RuntimeError("post-transition no-op mutated persistent state")
+    return {"run": info, "state_unchanged": True, "state_hashes": after,
+            "completed_generation": completed, "event_bytes_unchanged": offset}
+
+
 def run_history(args) -> dict:
     source = Path(args.source)
     work = Path(args.work)
@@ -452,6 +481,7 @@ def run_history(args) -> dict:
         "ref_sha": tip,
         "first_parent_shas": shas,
         "selected_transitions": [case_id(p, c) for p, c in transitions],
+        "verify_noop_after_each_transition": getattr(args, "verify_noop", False),
         "enola": ident,
         "binary": bin_prov,
         "input_policy": {
@@ -529,6 +559,10 @@ def run_history(args) -> dict:
             # replacement is published. They do not prove that facts changed:
             # graph-neutral edits may correctly publish nothing at all.
             validate_cold_transition(applied, expected, required, begin_scope, bool(delta_records))
+            noop = None
+            if getattr(args, "verify_noop", False):
+                noop = verify_transition_noop(binary, live, state_live, events,
+                                              case / "summary-noop.json", completed)
             graph_equal = True
             nec = scope.necessary_from_consumers(prior, expected)
             extra_begin = sorted(begin_scope - set(nec))
@@ -553,6 +587,8 @@ def run_history(args) -> dict:
                 "sink": "file",
                 "blocker": None,
             }
+            if noop is not None:
+                row["post_transition_noop"] = noop
         except Exception as exc:
             row = {
                 "id": ident_case,
@@ -778,6 +814,31 @@ def self_test() -> int:
         )
         check("stop after first failure", [r["id"] for r in walked] == ["00", "01"], str(walked))
 
+        noop_state = root / "noop-state"
+        noop_state.mkdir()
+        noop_events = root / "noop-events.jsonl"
+        noop_events.write_bytes(b"")
+        original_enola = scope.enola
+        try:
+            for mutate in (False, True):
+                (noop_state / "state.json").write_text("original")
+
+                def fake_noop(*args):
+                    if mutate:
+                        (noop_state / "state.json").write_text("unexpected write")
+                    return {"parsed": 0, "generation": [3, 3], "owners_published": 0}
+
+                scope.enola = fake_noop
+                rejected = False
+                try:
+                    verify_transition_noop(root / "binary", root, noop_state,
+                                           noop_events, root / "summary.json", 3)
+                except RuntimeError:
+                    rejected = True
+                check(f"post-transition state mutation={mutate}", rejected == mutate)
+        finally:
+            scope.enola = original_enola
+
         existing = root / "existing-work"
         existing.mkdir()
         raised = False
@@ -872,6 +933,8 @@ def main():
     parser.add_argument("--count", type=int, default=10)
     parser.add_argument("--only", default="")
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--verify-noop", action="store_true",
+                        help="after each cold-equal transition, verify zero-work/no-write fresh CLI no-op")
     args = parser.parse_args()
     if args.self_test:
         return self_test()
