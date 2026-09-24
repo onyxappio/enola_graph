@@ -132,3 +132,36 @@ in 0.159 s; pending state write cost 0.325 s including a 0.202 s marshal of
 55.7 MB. Nested timings must not be added twice. Wall-clock observation was
 sampled every 10 ms and is approximate. This identifies a retry mechanism;
 it does not prove a speedup against an equally timed control retry.
+
+## Disjoint multi-file retry: measured benefit
+
+The [controlled harness](controlled_retry_watch.py) changes three independent
+Product sources plus password.ts, then supersedes password.ts once after the
+first post-edit frozen-preview trace. Both arms use the production CLI and NATS,
+with profiling enabled and a 500 ms collection window. Timing is deliberate;
+this is mechanism validation rather than natural editor latency.
+
+[All six receipts](stage9-disjoint-retry-watch.json) retain injection timestamps
+and binary provenance. Three alternating repeats per arm gave:
+
+| Measurement | Main 6090161 | Combined candidate |
+|---|---:|---:|
+| Retry convergence median | 4.380 s | 3.774 s |
+| Min–max | 4.369–4.392 s | 3.757–3.787 s |
+| Successful retry parsed files, every run | 34 | 12 |
+| Frozen owner scope, every run | 34 | 34 |
+| Abandoned Begins per run | 1 | 0 |
+
+Median latency fell 13.83% for this scenario. All runs passed exact cold equality,
+protocol checks and idle/identical-save silence; initial and final graph hashes
+also match across arms. The candidate combines early refusal and parse reuse, so
+the wall-time saving cannot be attributed entirely to either mechanism.
+
+The original one-file burst cannot preserve these independent parses: its changed
+password.ts invalidates its own record and the side-read hashes of all ten
+dependents. This distinction explains why the earlier series did not show the
+same benefit.
+
+These binaries predate concurrent accuracy main 96e4416. Production integration
+requires composing the patches with those accuracy changes and validating the
+new combination; these receipts do not establish that acceptance.
