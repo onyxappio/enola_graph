@@ -1,0 +1,20 @@
+{
+  "validation_error": null,
+  "all_checks_validated": true,
+  "arm": "candidate",
+  "repeat": 1,
+  "quiet_ack_message_id": null,
+  "exit": 0,
+  "competing_samples": [
+    [
+      "1982 /Users/oleksandr.mykulych/orca/workspaces/codata/t001-diagnose-unresolved-enola-edges-in-codata-watch-3/.cache/enola-graph/e85c8d6181d7/enola graph analyze --nats nats://127.0.0.1:14222 --stream ENOLA_GRAPH_CODATA_1790289593831 --subject codata.enola.1790289593831.> --repo-id codata-fixture --context main --state-dir /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/codata-enola-nats-integration-eHjt67/state --summary-json /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/codata-enola-nats-integration-eHjt67/repository"
+    ],
+    [
+      "2171 /Users/oleksandr.mykulych/orca/workspaces/codata/t001-diagnose-unresolved-enola-edges-in-codata-watch-3/.cache/enola-graph/e85c8d6181d7/enola graph delta --nats nats://127.0.0.1:14222 --stream ENOLA_GRAPH_CODATA_1790289593831 --subject codata.enola.1790289593831.> --repo-id codata-fixture --context main --state-dir /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/codata-enola-nats-integration-eHjt67/state --summary-json /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/codata-enola-nats-integration-eHjt67/repository"
+    ]
+  ],
+  "correctness_only": true,
+  "run_succeeded": true,
+  "timing_eligible": false,
+  "binary_sha256": "04a8afffb1cda9105aa7e0322cdee6e00376e568b811821a93a97d71577af5b6"
+}

@@ -1,0 +1,288 @@
+{
+  "r1-new-noop.log": [
+    {
+      "trace": "since",
+      "phase": "state_json_unmarshal",
+      "baseline_alloc_since_previous_mark": 234050544,
+      "candidate_alloc_since_previous_mark": 234076576,
+      "baseline_gc": 8,
+      "candidate_gc": 8
+    },
+    {
+      "trace": "open",
+      "phase": "load_state",
+      "baseline_alloc_since_previous_mark": 720,
+      "candidate_alloc_since_previous_mark": 560,
+      "baseline_gc": 8,
+      "candidate_gc": 8
+    },
+    {
+      "trace": "inputs",
+      "phase": "inventory",
+      "baseline_alloc_since_previous_mark": 23032416,
+      "candidate_alloc_since_previous_mark": 23058496,
+      "baseline_gc": 8,
+      "candidate_gc": 8
+    },
+    {
+      "trace": "since",
+      "phase": "ts_config_inputs",
+      "baseline_alloc_since_previous_mark": 65598216,
+      "candidate_alloc_since_previous_mark": 61692888,
+      "baseline_gc": 9,
+      "candidate_gc": 9
+    },
+    {
+      "trace": "session",
+      "phase": "ts_reuse_cache",
+      "baseline_alloc_since_previous_mark": 183334648,
+      "candidate_alloc_since_previous_mark": 180148368,
+      "baseline_gc": 11,
+      "candidate_gc": 11
+    },
+    {
+      "trace": "session",
+      "phase": "assemble_new_files",
+      "baseline_alloc_since_previous_mark": 1221848,
+      "candidate_alloc_since_previous_mark": 1221848,
+      "baseline_gc": 11,
+      "candidate_gc": 11
+    },
+    {
+      "trace": "since",
+      "phase": "ts_config_inputs",
+      "baseline_alloc_since_previous_mark": 13260120,
+      "candidate_alloc_since_previous_mark": 9348632,
+      "baseline_gc": 11,
+      "candidate_gc": 11
+    },
+    {
+      "trace": "cli",
+      "phase": "graph_session_run",
+      "baseline_alloc_since_previous_mark": 7910672,
+      "candidate_alloc_since_previous_mark": 7909608,
+      "baseline_gc": 11,
+      "candidate_gc": 11
+    },
+    {
+      "trace": "cli",
+      "phase": "cli_complete",
+      "baseline_alloc_since_previous_mark": 23328,
+      "candidate_alloc_since_previous_mark": 22864,
+      "baseline_gc": 11,
+      "candidate_gc": 11
+    }
+  ],
+  "r1-new-body.log": [
+    {
+      "trace": "since",
+      "phase": "state_json_unmarshal",
+      "baseline_alloc_since_previous_mark": 234049280,
+      "candidate_alloc_since_previous_mark": 234068560,
+      "baseline_gc": 8,
+      "candidate_gc": 8
+    },
+    {
+      "trace": "open",
+      "phase": "load_state",
+      "baseline_alloc_since_previous_mark": 720,
+      "candidate_alloc_since_previous_mark": 720,
+      "baseline_gc": 8,
+      "candidate_gc": 8
+    },
+    {
+      "trace": "inputs",
+      "phase": "inventory",
+      "baseline_alloc_since_previous_mark": 23032048,
+      "candidate_alloc_since_previous_mark": 23057920,
+      "baseline_gc": 8,
+      "candidate_gc": 8
+    },
+    {
+      "trace": "since",
+      "phase": "ts_config_inputs",
+      "baseline_alloc_since_previous_mark": 65603256,
+      "candidate_alloc_since_previous_mark": 61700808,
+      "baseline_gc": 9,
+      "candidate_gc": 9
+    },
+    {
+      "trace": "session",
+      "phase": "ts_extract_session",
+      "baseline_alloc_since_previous_mark": 651267672,
+      "candidate_alloc_since_previous_mark": 648963560,
+      "baseline_gc": 15,
+      "candidate_gc": 15
+    },
+    {
+      "trace": "session",
+      "phase": "assemble_new_files",
+      "baseline_alloc_since_previous_mark": 188469248,
+      "candidate_alloc_since_previous_mark": 190597072,
+      "baseline_gc": 16,
+      "candidate_gc": 16
+    },
+    {
+      "trace": "session",
+      "phase": "index_group_owners",
+      "baseline_alloc_since_previous_mark": 261971792,
+      "candidate_alloc_since_previous_mark": 264083712,
+      "baseline_gc": 18,
+      "candidate_gc": 18
+    },
+    {
+      "trace": "since",
+      "phase": "ts_config_inputs",
+      "baseline_alloc_since_previous_mark": 69103128,
+      "candidate_alloc_since_previous_mark": 65202432,
+      "baseline_gc": 19,
+      "candidate_gc": 19
+    },
+    {
+      "trace": "session",
+      "phase": "write_pending_state",
+      "baseline_alloc_since_previous_mark": 389841688,
+      "candidate_alloc_since_previous_mark": 389860264,
+      "baseline_gc": 21,
+      "candidate_gc": 21
+    },
+    {
+      "trace": "session",
+      "phase": "end_flush_ack",
+      "baseline_alloc_since_previous_mark": 40992,
+      "candidate_alloc_since_previous_mark": 33840,
+      "baseline_gc": 21,
+      "candidate_gc": 21
+    },
+    {
+      "trace": "session",
+      "phase": "promote_compact_state",
+      "baseline_alloc_since_previous_mark": 814304,
+      "candidate_alloc_since_previous_mark": 814536,
+      "baseline_gc": 21,
+      "candidate_gc": 21
+    },
+    {
+      "trace": "cli",
+      "phase": "graph_session_run",
+      "baseline_alloc_since_previous_mark": 512,
+      "candidate_alloc_since_previous_mark": 512,
+      "baseline_gc": 21,
+      "candidate_gc": 21
+    },
+    {
+      "trace": "cli",
+      "phase": "cli_complete",
+      "baseline_alloc_since_previous_mark": 22712,
+      "candidate_alloc_since_previous_mark": 22552,
+      "baseline_gc": 21,
+      "candidate_gc": 21
+    }
+  ],
+  "r1-new-structural.log": [
+    {
+      "trace": "since",
+      "phase": "state_json_unmarshal",
+      "baseline_alloc_since_previous_mark": 234058368,
+      "candidate_alloc_since_previous_mark": 234071408,
+      "baseline_gc": 8,
+      "candidate_gc": 8
+    },
+    {
+      "trace": "open",
+      "phase": "load_state",
+      "baseline_alloc_since_previous_mark": 720,
+      "candidate_alloc_since_previous_mark": 720,
+      "baseline_gc": 8,
+      "candidate_gc": 8
+    },
+    {
+      "trace": "inputs",
+      "phase": "inventory",
+      "baseline_alloc_since_previous_mark": 23030928,
+      "candidate_alloc_since_previous_mark": 23060304,
+      "baseline_gc": 8,
+      "candidate_gc": 8
+    },
+    {
+      "trace": "since",
+      "phase": "ts_config_inputs",
+      "baseline_alloc_since_previous_mark": 65610664,
+      "candidate_alloc_since_previous_mark": 61713080,
+      "baseline_gc": 9,
+      "candidate_gc": 9
+    },
+    {
+      "trace": "session",
+      "phase": "ts_extract_session",
+      "baseline_alloc_since_previous_mark": 661670456,
+      "candidate_alloc_since_previous_mark": 660048824,
+      "baseline_gc": 15,
+      "candidate_gc": 15
+    },
+    {
+      "trace": "session",
+      "phase": "assemble_new_files",
+      "baseline_alloc_since_previous_mark": 185687112,
+      "candidate_alloc_since_previous_mark": 191037152,
+      "baseline_gc": 17,
+      "candidate_gc": 16
+    },
+    {
+      "trace": "session",
+      "phase": "index_group_owners",
+      "baseline_alloc_since_previous_mark": 261967592,
+      "candidate_alloc_since_previous_mark": 264088680,
+      "baseline_gc": 19,
+      "candidate_gc": 18
+    },
+    {
+      "trace": "since",
+      "phase": "ts_config_inputs",
+      "baseline_alloc_since_previous_mark": 69472752,
+      "candidate_alloc_since_previous_mark": 65464688,
+      "baseline_gc": 19,
+      "candidate_gc": 19
+    },
+    {
+      "trace": "session",
+      "phase": "write_pending_state",
+      "baseline_alloc_since_previous_mark": 389735216,
+      "candidate_alloc_since_previous_mark": 389854576,
+      "baseline_gc": 21,
+      "candidate_gc": 21
+    },
+    {
+      "trace": "session",
+      "phase": "end_flush_ack",
+      "baseline_alloc_since_previous_mark": 40640,
+      "candidate_alloc_since_previous_mark": 34448,
+      "baseline_gc": 21,
+      "candidate_gc": 21
+    },
+    {
+      "trace": "session",
+      "phase": "promote_compact_state",
+      "baseline_alloc_since_previous_mark": 814432,
+      "candidate_alloc_since_previous_mark": 815568,
+      "baseline_gc": 21,
+      "candidate_gc": 21
+    },
+    {
+      "trace": "cli",
+      "phase": "graph_session_run",
+      "baseline_alloc_since_previous_mark": 512,
+      "candidate_alloc_since_previous_mark": 800,
+      "baseline_gc": 21,
+      "candidate_gc": 21
+    },
+    {
+      "trace": "cli",
+      "phase": "cli_complete",
+      "baseline_alloc_since_previous_mark": 22392,
+      "candidate_alloc_since_previous_mark": 24136,
+      "baseline_gc": 21,
+      "candidate_gc": 21
+    }
+  ]
+}

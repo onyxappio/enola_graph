@@ -1,0 +1,101 @@
+[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=delta
+[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml
+[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2
+[graph-profile] discover_git                       0.046s  total= 0.046s  trace=graphinput_build  repo=true dirs=2
+[graph-profile] declare_git_control                0.008s  total= 0.054s  trace=graphinput_build  deps=6
+[graph-profile] git_ls_files                       0.063s  total= 0.117s  trace=graphinput_build  tracked=45105 dirs=5818
+[graph-profile] walk_tree                          0.129s  total= 0.246s  trace=graphinput_build  names=11635 ignorefiles=4
+[graph-profile] check_ignore_setup                 0.034s  total= 0.280s  trace=graphinput_build
+[graph-profile] check_ignore_run                   0.064s  total= 0.344s  trace=graphinput_build  names=11635 ignored=0
+[graph-profile] declare_ignore_files               0.001s  total= 0.345s  trace=graphinput_build  deps=9
+[graph-profile] compute_identities                 0.037s  total= 0.382s  trace=graphinput_build  deps=9 entries=11635
+[graph-profile] graphinput_build                   0.387s  total= 0.387s  trace=graph_engine  configpaths=2
+[graph-profile] engine_new                         0.000s  total= 0.387s  trace=graph_engine
+[graph-profile] register_plugins                   0.000s  total= 0.387s  trace=graph_engine
+[graph-profile] config_recheck                     0.000s  total= 0.387s  trace=graph_engine
+[graph-profile] resolve_graph_target               0.387s  total= 0.387s  trace=cli  repos=1
+[graph-profile] connect_sink                       0.001s  total= 0.388s  trace=cli  nats=true
+[graph-profile] session_options                    0.002s  total= 0.390s  trace=cli  repo=/private/tmp/enola-stage16-phase-memory/cli-pairs/correctness-baseline-1/product
+[graph-profile] lock                               0.000s  total= 0.000s  trace=open
+[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open
+[graph-profile] open_journal                       0.000s  total= 0.000s  trace=open
+[graph-profile] replay_unacked                     0.000s  total= 0.001s  trace=open
+[graph-profile] state_read_bytes                   0.008s  state.json bytes=56633538
+[graph-profile] state_fingerprint                  0.025s  bytes=56633538
+[memory-phase] trace=since phase=state_json_unmarshal total_alloc=234049280 heap_alloc=159908128 heap_sys=171245568 heap_idle=6037504 heap_released=6037504 mallocs=1725850 num_gc=8
+[graph-profile] state_json_unmarshal               0.251s  files=4086
+[memory-phase] trace=open phase=load_state total_alloc=234050000 heap_alloc=159908848 heap_sys=171245568 heap_idle=6037504 heap_released=6037504 mallocs=1725869 num_gc=8
+[graph-profile] load_state                         0.290s  total= 0.290s  trace=open  files=4086
+[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false
+[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2
+[graph-profile] graph_inputs_proven                0.107s  total= 0.107s  trace=reconcile
+[graph-profile] effective_config                   0.003s  total= 0.110s  trace=reconcile  files=2 fast=false
+[graph-profile] reconcile_complete                 0.000s  total= 0.110s  trace=reconcile  reloaded=false
+[graph-profile] engine_walk_repo                   0.127s  files=10965 tests=0 all_names=10965
+[memory-phase] trace=inputs phase=inventory total_alloc=257082048 heap_alloc=182940896 heap_sys=192217088 heap_idle=4333568 heap_released=4300800 mallocs=1851099 num_gc=8
+[graph-profile] inventory                          0.127s  total= 0.127s  trace=inputs  files=10965 all_names=10965
+[graph-profile] detect_typescript                  0.001s
+[graph-profile] detect_extractors                  0.001s  total= 0.128s  trace=inputs  detected=1
+[graph-profile] select_hash_targets                0.010s  total= 0.138s  trace=inputs  targets=4105
+[graph-profile] engine_hash_files                  0.172s  n=4105 hashed=4105 bytes=45822335
+[graph-profile] hash_content_inputs                0.175s  total= 0.313s  trace=inputs  targets=4105
+[graph-profile] capture_contexts                   0.000s  total= 0.313s  trace=inputs  contexts=0
+[memory-phase] trace=since phase=ts_config_inputs total_alloc=322685304 heap_alloc=120102376 heap_sys=234160128 heap_idle=98312192 heap_released=6643712 mallocs=2013933 num_gc=9
+[graph-profile] ts_config_inputs                   0.165s  n=83
+[graph-profile] analysis_fingerprint               0.170s  total= 0.483s  trace=inputs  cfg_files=59
+[graph-profile] angular_probe                      0.005s  total= 0.489s  trace=inputs  angular=false
+[graph-profile] policy_identity                    0.000s  total= 0.489s  trace=inputs
+[graph-profile] engine_context_fingerprint         0.000s  total= 0.489s  trace=inputs
+[graph-profile] ts_disc_nuxt_packages              0.135s  pkgs=0
+[graph-profile] ts_disc_package_gates              0.001s
+[graph-profile] ts_disc_package_names              0.000s  names=30
+[graph-profile] ts_disc_alias_roots                0.099s  roots=1
+[graph-profile] ts_disc_package_exports            0.000s  packages=30
+[graph-profile] ts_discovery_build                 0.249s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59
+[graph-profile] ts_discovery                       0.249s  total= 0.738s  trace=inputs  names=0 bytes=0 dirs=0
+[graph-profile] ts_session_context                 0.059s  total= 0.797s  trace=inputs  files=4086
+[graph-profile] runtime_inputs_complete            0.001s  total= 0.798s  trace=inputs
+[graph-profile] clone_file_state_copy              0.000s  n=4086
+[graph-profile] extractor_need                     0.834s  total= 0.834s  trace=session  non_ts_need=false detected=1 neutral=0
+[graph-profile] changed_terms                      0.018s  total= 0.852s  trace=session  initial=false force=false non_ts=false scan=true raw_cfg=false policy=false neutral_scan=false neutral_cfg=false
+[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true
+[graph-profile] ts_disc_package_aliases            0.000s  aliases=21
+[graph-profile] ts_read_dirty                      0.008s  total= 0.008s  trace=ts  to_read=53 cached=4033
+[graph-profile] ts_graphql_grpc_index              0.101s  total= 0.109s  trace=ts  ts_files=4086
+[graph-profile] ts_mapfiles_aggregate              0.050s  total= 0.159s  trace=ts  parsed=1 facts=59224 routers=0 scans=0 derived=1
+[graph-profile] ts_compose_modules                 0.005s  total= 0.164s  trace=ts  facts=59661 records=4086 unread=0
+[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true
+[graph-profile] ts_disc_package_aliases            0.000s  aliases=21
+[graph-profile] ts_read_dirty                      0.008s  total= 0.008s  trace=ts  to_read=62 cached=4024
+[graph-profile] ts_graphql_grpc_index              0.107s  total= 0.114s  trace=ts  ts_files=4086
+[graph-profile] ts_mapfiles_aggregate              0.305s  total= 0.419s  trace=ts  parsed=10 facts=59224 routers=0 scans=117 derived=7
+[graph-profile] ts_compose_modules                 0.003s  total= 0.422s  trace=ts  facts=59661 records=4086 unread=0
+[graph-profile] ts_frozen_preview                  0.762s  total= 1.614s  trace=session  dirty=11 err=false
+[graph-profile] invalidation_plan                  0.189s  total= 1.803s  trace=session  reason=frozen scope: prior file-to-file dependency closure whole=false extra=0
+[graph-profile] revalidate_before_begin            0.003s  n=70 superseded=false
+[graph-profile] begin_publish                      0.040s  total= 1.843s  trace=session  scope=11
+[graph-profile] ts_dirty_scope                     0.126s  total= 1.969s  trace=session  dirty=11 scope=11 force=false
+[memory-phase] trace=session phase=ts_extract_session total_alloc=973952976 heap_alloc=276264336 heap_sys=334528512 heap_idle=45850624 heap_released=8863744 mallocs=4817119 num_gc=15
+[graph-profile] ts_extract_session                 0.002s  total= 1.971s  trace=session  parsed=11 cached=4023 facts=59661 records=4086
+[memory-phase] trace=session phase=assemble_new_files total_alloc=1162422224 heap_alloc=277183192 heap_sys=372310016 heap_idle=76136448 heap_released=6602752 mallocs=5303299 num_gc=16
+[graph-profile] assemble_new_files                 0.195s  total= 2.166s  trace=session  new=4086 ts_noop=false non_ts_need=false skip=false facts=59661
+[memory-phase] trace=session phase=index_group_owners total_alloc=1424394016 heap_alloc=321481200 heap_sys=372277248 heap_idle=35553280 heap_released=17997824 mallocs=6795462 num_gc=18
+[graph-profile] index_group_owners                 0.170s  total= 2.336s  trace=session  facts=59224 owners=4034
+[graph-profile] publish_scope                      0.001s  total= 2.337s  trace=session  scope=11
+[graph-profile] encode_append_owners               0.005s  total= 2.342s  trace=session  published=11
+[graph-profile] publish_resolved                   0.052s  total= 2.394s  trace=session  owners=11
+[graph-profile] revalidate_ts_records              0.156s  total= 2.550s  trace=session  n=4086
+[memory-phase] trace=since phase=ts_config_inputs total_alloc=1493497144 heap_alloc=257583736 heap_sys=372047872 heap_idle=95051776 heap_released=17719296 mallocs=6975035 num_gc=19
+[graph-profile] ts_config_inputs                   0.165s  n=83
+[graph-profile] state_json_marshal                 0.180s  bytes=56633538 files=4086
+[graph-profile] state_fingerprint                  0.024s  write bytes=56633538
+[memory-phase] trace=session phase=write_pending_state total_alloc=1883338832 heap_alloc=361587920 heap_sys=636452864 heap_idle=254722048 heap_released=85106688 mallocs=7629785 num_gc=21
+[graph-profile] write_pending_state                0.423s  total= 2.972s  trace=session
+[memory-phase] trace=session phase=end_flush_ack total_alloc=1883379824 heap_alloc=361628912 heap_sys=636387328 heap_idle=254640128 heap_released=85106688 mallocs=7630125 num_gc=21
+[graph-profile] end_flush_ack                      0.067s  total= 3.040s  trace=session
+[memory-phase] trace=session phase=promote_compact_state total_alloc=1884194128 heap_alloc=362443216 heap_sys=636387328 heap_idle=253845504 heap_released=85106688 mallocs=7630404 num_gc=21
+[graph-profile] promote_compact_state              0.123s  total= 3.162s  trace=session  parsed=11 published=11
+[memory-phase] trace=cli phase=graph_session_run total_alloc=1884194640 heap_alloc=362443728 heap_sys=636583936 heap_idle=254042112 heap_released=85106688 mallocs=7630420 num_gc=21
+[graph-profile] graph_session_run                  3.563s  total= 3.953s  trace=cli  repo=/private/tmp/enola-stage16-phase-memory/cli-pairs/correctness-baseline-1/product parsed=11
+[memory-phase] trace=cli phase=cli_complete total_alloc=1884217352 heap_alloc=362466440 heap_sys=636583936 heap_idle=254042112 heap_released=85106688 mallocs=7630669 num_gc=21
+[graph-profile] cli_complete                       0.000s  total= 3.953s  trace=cli  results=1

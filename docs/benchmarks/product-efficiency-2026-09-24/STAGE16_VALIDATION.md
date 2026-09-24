@@ -90,3 +90,26 @@ justify dismissing it. Stage16's memory acceptance remains open and the candidat
 is not in main. See [final audit](stage16-rss-final/rss-final-audit.json),
 which keeps original, later complete and unpaired observations distinct, and
 adjacent per-arm metrics/checks/receipts. No combined Stage16+Stage17 claim is made.
+
+
+## Matched-phase allocation diagnostic
+
+A subsequent diagnostic pair adds memory counters at identical selected phase
+boundaries, with no forced GC or heap-profile writer. Both arms pass all
+correctness checks; all seven graph states match across arms and no-op remains
+silent with stable state bytes. These runs had concurrent worker tests and are
+explicitly timing-ineligible.
+
+At Run completion, cumulative allocation changes from 528.41 to 517.46 MB for
+no-op (-2.07%), 1884.19 to 1878.38 MB for body delta (-0.31%), and 1892.09 to
+1890.19 MB for structural delta (-0.10%). These are allocated bytes over time,
+not peak memory. Intermediate GC counts differ despite equal final counts, so
+collection scheduling/lifetime remains a hypothesis to investigate. This single
+instrumented pair does not explain or dismiss the uninstrumented RSS increase.
+
+The interval after the second config-input check through pending-state writing
+allocates approximately 390 MB in each structural arm. That interval contains
+multiple operations; it does not isolate serialization alone. It identifies a
+further allocation investigation target while the memory gate stays open. See
+[diagnostic evidence](stage16-phase-memory/README.md) and
+[phase findings](stage16-phase-memory/FINDINGS.md).

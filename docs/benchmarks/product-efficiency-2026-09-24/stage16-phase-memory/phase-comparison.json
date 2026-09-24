@@ -1,0 +1,1873 @@
+{
+  "diagnostic_only": true,
+  "timing_acceptance": false,
+  "caveat": "Single instrumented run per arm under concurrent load; phase counters are not retained heap or a causal explanation of RSS. No forced GC.",
+  "arms": {
+    "baseline": {
+      "binary_sha256": "23ac45922c1cc49d5053b5fa2efbc17b076239ed39649e1e5861ebe82657c0f4",
+      "competing_sample_count": 66,
+      "logs": {
+        "cold-body.log": [
+          {
+            "trace": "open",
+            "phase": "load_state",
+            "total_alloc": 67021592,
+            "heap_alloc": 19869512,
+            "heap_sys": 37060608,
+            "heap_idle": 14319616,
+            "heap_released": 9609216,
+            "mallocs": 165985,
+            "num_gc": 6
+          },
+          {
+            "trace": "inputs",
+            "phase": "inventory",
+            "total_alloc": 90053024,
+            "heap_alloc": 34904920,
+            "heap_sys": 45416448,
+            "heap_idle": 8306688,
+            "heap_released": 8192000,
+            "mallocs": 291212,
+            "num_gc": 7
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 155659368,
+            "heap_alloc": 19803624,
+            "heap_sys": 45416448,
+            "heap_idle": 23347200,
+            "heap_released": 14147584,
+            "mallocs": 454070,
+            "num_gc": 12
+          },
+          {
+            "trace": "session",
+            "phase": "ts_extract_session",
+            "total_alloc": 3455454992,
+            "heap_alloc": 285657552,
+            "heap_sys": 418381824,
+            "heap_idle": 76046336,
+            "heap_released": 7192576,
+            "mallocs": 52523679,
+            "num_gc": 51
+          },
+          {
+            "trace": "session",
+            "phase": "assemble_new_files",
+            "total_alloc": 3555347704,
+            "heap_alloc": 193139440,
+            "heap_sys": 464519168,
+            "heap_idle": 209526784,
+            "heap_released": 76513280,
+            "mallocs": 52804081,
+            "num_gc": 52
+          },
+          {
+            "trace": "session",
+            "phase": "index_group_owners",
+            "total_alloc": 3608771160,
+            "heap_alloc": 246562896,
+            "heap_sys": 464519168,
+            "heap_idle": 163389440,
+            "heap_released": 76513280,
+            "mallocs": 52939234,
+            "num_gc": 52
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 4224427568,
+            "heap_alloc": 369252032,
+            "heap_sys": 468451328,
+            "heap_idle": 18055168,
+            "heap_released": 4251648,
+            "mallocs": 54598225,
+            "num_gc": 56
+          },
+          {
+            "trace": "session",
+            "phase": "write_pending_state",
+            "total_alloc": 4614171840,
+            "heap_alloc": 430103400,
+            "heap_sys": 720306176,
+            "heap_idle": 192561152,
+            "heap_released": 17514496,
+            "mallocs": 55289241,
+            "num_gc": 58
+          },
+          {
+            "trace": "session",
+            "phase": "end_flush_ack",
+            "total_alloc": 4616119616,
+            "heap_alloc": 432051176,
+            "heap_sys": 720240640,
+            "heap_idle": 191905792,
+            "heap_released": 17514496,
+            "mallocs": 55306158,
+            "num_gc": 58
+          },
+          {
+            "trace": "session",
+            "phase": "promote_compact_state",
+            "total_alloc": 4617010696,
+            "heap_alloc": 432942256,
+            "heap_sys": 720207872,
+            "heap_idle": 191078400,
+            "heap_released": 17514496,
+            "mallocs": 55307827,
+            "num_gc": 58
+          },
+          {
+            "trace": "cli",
+            "phase": "graph_session_run",
+            "total_alloc": 4617011240,
+            "heap_alloc": 432942800,
+            "heap_sys": 720371712,
+            "heap_idle": 191242240,
+            "heap_released": 17514496,
+            "mallocs": 55307844,
+            "num_gc": 58
+          },
+          {
+            "trace": "cli",
+            "phase": "cli_complete",
+            "total_alloc": 4617031408,
+            "heap_alloc": 432962968,
+            "heap_sys": 720371712,
+            "heap_idle": 191242240,
+            "heap_released": 17514496,
+            "mallocs": 55308088,
+            "num_gc": 58
+          }
+        ],
+        "cold-original.log": [
+          {
+            "trace": "open",
+            "phase": "load_state",
+            "total_alloc": 67025608,
+            "heap_alloc": 19787288,
+            "heap_sys": 37027840,
+            "heap_idle": 14319616,
+            "heap_released": 8126464,
+            "mallocs": 165983,
+            "num_gc": 6
+          },
+          {
+            "trace": "inputs",
+            "phase": "inventory",
+            "total_alloc": 90058912,
+            "heap_alloc": 34911048,
+            "heap_sys": 45416448,
+            "heap_idle": 8454144,
+            "heap_released": 7708672,
+            "mallocs": 291210,
+            "num_gc": 7
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 155666768,
+            "heap_alloc": 24217376,
+            "heap_sys": 45416448,
+            "heap_idle": 18972672,
+            "heap_released": 13598720,
+            "mallocs": 454076,
+            "num_gc": 12
+          },
+          {
+            "trace": "session",
+            "phase": "ts_extract_session",
+            "total_alloc": 3451063016,
+            "heap_alloc": 247766256,
+            "heap_sys": 405831680,
+            "heap_idle": 75456512,
+            "heap_released": 14229504,
+            "mallocs": 52515489,
+            "num_gc": 51
+          },
+          {
+            "trace": "session",
+            "phase": "assemble_new_files",
+            "total_alloc": 3550541456,
+            "heap_alloc": 185870400,
+            "heap_sys": 460357632,
+            "heap_idle": 191528960,
+            "heap_released": 34701312,
+            "mallocs": 52795893,
+            "num_gc": 52
+          },
+          {
+            "trace": "session",
+            "phase": "index_group_owners",
+            "total_alloc": 3603964912,
+            "heap_alloc": 239293856,
+            "heap_sys": 460357632,
+            "heap_idle": 145555456,
+            "heap_released": 32456704,
+            "mallocs": 52931046,
+            "num_gc": 52
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 4216880536,
+            "heap_alloc": 296242232,
+            "heap_sys": 510427136,
+            "heap_idle": 110829568,
+            "heap_released": 3710976,
+            "mallocs": 54590205,
+            "num_gc": 56
+          },
+          {
+            "trace": "session",
+            "phase": "write_pending_state",
+            "total_alloc": 4606611888,
+            "heap_alloc": 491984288,
+            "heap_sys": 816775168,
+            "heap_idle": 218423296,
+            "heap_released": 23683072,
+            "mallocs": 55281183,
+            "num_gc": 57
+          },
+          {
+            "trace": "session",
+            "phase": "end_flush_ack",
+            "total_alloc": 4608543560,
+            "heap_alloc": 493915960,
+            "heap_sys": 816709632,
+            "heap_idle": 217800704,
+            "heap_released": 23683072,
+            "mallocs": 55298057,
+            "num_gc": 57
+          },
+          {
+            "trace": "session",
+            "phase": "promote_compact_state",
+            "total_alloc": 4609435064,
+            "heap_alloc": 494807464,
+            "heap_sys": 816676864,
+            "heap_idle": 216965120,
+            "heap_released": 23683072,
+            "mallocs": 55299722,
+            "num_gc": 57
+          },
+          {
+            "trace": "cli",
+            "phase": "graph_session_run",
+            "total_alloc": 4609435608,
+            "heap_alloc": 494808008,
+            "heap_sys": 816873472,
+            "heap_idle": 217153536,
+            "heap_released": 23683072,
+            "mallocs": 55299739,
+            "num_gc": 57
+          },
+          {
+            "trace": "cli",
+            "phase": "cli_complete",
+            "total_alloc": 4609459312,
+            "heap_alloc": 494831712,
+            "heap_sys": 816873472,
+            "heap_idle": 217153536,
+            "heap_released": 23683072,
+            "mallocs": 55299995,
+            "num_gc": 57
+          }
+        ],
+        "cold-structural.log": [
+          {
+            "trace": "open",
+            "phase": "load_state",
+            "total_alloc": 67021040,
+            "heap_alloc": 20280056,
+            "heap_sys": 37060608,
+            "heap_idle": 13852672,
+            "heap_released": 8945664,
+            "mallocs": 165981,
+            "num_gc": 6
+          },
+          {
+            "trace": "inputs",
+            "phase": "inventory",
+            "total_alloc": 90052104,
+            "heap_alloc": 34903192,
+            "heap_sys": 45449216,
+            "heap_idle": 8331264,
+            "heap_released": 7356416,
+            "mallocs": 291208,
+            "num_gc": 7
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 155654896,
+            "heap_alloc": 19465072,
+            "heap_sys": 45449216,
+            "heap_idle": 23453696,
+            "heap_released": 13500416,
+            "mallocs": 454055,
+            "num_gc": 12
+          },
+          {
+            "trace": "session",
+            "phase": "ts_extract_session",
+            "total_alloc": 3453732944,
+            "heap_alloc": 296114128,
+            "heap_sys": 410025984,
+            "heap_idle": 57573376,
+            "heap_released": 11517952,
+            "mallocs": 52516814,
+            "num_gc": 50
+          },
+          {
+            "trace": "session",
+            "phase": "assemble_new_files",
+            "total_alloc": 3553209384,
+            "heap_alloc": 203291808,
+            "heap_sys": 464551936,
+            "heap_idle": 198418432,
+            "heap_released": 72597504,
+            "mallocs": 52797221,
+            "num_gc": 51
+          },
+          {
+            "trace": "session",
+            "phase": "index_group_owners",
+            "total_alloc": 3606633016,
+            "heap_alloc": 256715440,
+            "heap_sys": 464551936,
+            "heap_idle": 152076288,
+            "heap_released": 72597504,
+            "mallocs": 52932376,
+            "num_gc": 51
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 4220427128,
+            "heap_alloc": 291159160,
+            "heap_sys": 493617152,
+            "heap_idle": 99860480,
+            "heap_released": 4456448,
+            "mallocs": 54591516,
+            "num_gc": 56
+          },
+          {
+            "trace": "session",
+            "phase": "write_pending_state",
+            "total_alloc": 4610158272,
+            "heap_alloc": 491288152,
+            "heap_sys": 799965184,
+            "heap_idle": 204472320,
+            "heap_released": 24436736,
+            "mallocs": 55282516,
+            "num_gc": 57
+          },
+          {
+            "trace": "session",
+            "phase": "end_flush_ack",
+            "total_alloc": 4612090648,
+            "heap_alloc": 493220528,
+            "heap_sys": 799899648,
+            "heap_idle": 203849728,
+            "heap_released": 24436736,
+            "mallocs": 55299393,
+            "num_gc": 57
+          },
+          {
+            "trace": "session",
+            "phase": "promote_compact_state",
+            "total_alloc": 4612981336,
+            "heap_alloc": 494111216,
+            "heap_sys": 799866880,
+            "heap_idle": 203005952,
+            "heap_released": 24436736,
+            "mallocs": 55301053,
+            "num_gc": 57
+          },
+          {
+            "trace": "cli",
+            "phase": "graph_session_run",
+            "total_alloc": 4612981880,
+            "heap_alloc": 494111760,
+            "heap_sys": 800063488,
+            "heap_idle": 203202560,
+            "heap_released": 24436736,
+            "mallocs": 55301070,
+            "num_gc": 57
+          },
+          {
+            "trace": "cli",
+            "phase": "cli_complete",
+            "total_alloc": 4613004352,
+            "heap_alloc": 494134232,
+            "heap_sys": 800063488,
+            "heap_idle": 203202560,
+            "heap_released": 24436736,
+            "mallocs": 55301316,
+            "num_gc": 57
+          }
+        ],
+        "r1-new-body.log": [
+          {
+            "trace": "since",
+            "phase": "state_json_unmarshal",
+            "total_alloc": 234049280,
+            "heap_alloc": 159908128,
+            "heap_sys": 171245568,
+            "heap_idle": 6037504,
+            "heap_released": 6037504,
+            "mallocs": 1725850,
+            "num_gc": 8
+          },
+          {
+            "trace": "open",
+            "phase": "load_state",
+            "total_alloc": 234050000,
+            "heap_alloc": 159908848,
+            "heap_sys": 171245568,
+            "heap_idle": 6037504,
+            "heap_released": 6037504,
+            "mallocs": 1725869,
+            "num_gc": 8
+          },
+          {
+            "trace": "inputs",
+            "phase": "inventory",
+            "total_alloc": 257082048,
+            "heap_alloc": 182940896,
+            "heap_sys": 192217088,
+            "heap_idle": 4333568,
+            "heap_released": 4300800,
+            "mallocs": 1851099,
+            "num_gc": 8
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 322685304,
+            "heap_alloc": 120102376,
+            "heap_sys": 234160128,
+            "heap_idle": 98312192,
+            "heap_released": 6643712,
+            "mallocs": 2013933,
+            "num_gc": 9
+          },
+          {
+            "trace": "session",
+            "phase": "ts_extract_session",
+            "total_alloc": 973952976,
+            "heap_alloc": 276264336,
+            "heap_sys": 334528512,
+            "heap_idle": 45850624,
+            "heap_released": 8863744,
+            "mallocs": 4817119,
+            "num_gc": 15
+          },
+          {
+            "trace": "session",
+            "phase": "assemble_new_files",
+            "total_alloc": 1162422224,
+            "heap_alloc": 277183192,
+            "heap_sys": 372310016,
+            "heap_idle": 76136448,
+            "heap_released": 6602752,
+            "mallocs": 5303299,
+            "num_gc": 16
+          },
+          {
+            "trace": "session",
+            "phase": "index_group_owners",
+            "total_alloc": 1424394016,
+            "heap_alloc": 321481200,
+            "heap_sys": 372277248,
+            "heap_idle": 35553280,
+            "heap_released": 17997824,
+            "mallocs": 6795462,
+            "num_gc": 18
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 1493497144,
+            "heap_alloc": 257583736,
+            "heap_sys": 372047872,
+            "heap_idle": 95051776,
+            "heap_released": 17719296,
+            "mallocs": 6975035,
+            "num_gc": 19
+          },
+          {
+            "trace": "session",
+            "phase": "write_pending_state",
+            "total_alloc": 1883338832,
+            "heap_alloc": 361587920,
+            "heap_sys": 636452864,
+            "heap_idle": 254722048,
+            "heap_released": 85106688,
+            "mallocs": 7629785,
+            "num_gc": 21
+          },
+          {
+            "trace": "session",
+            "phase": "end_flush_ack",
+            "total_alloc": 1883379824,
+            "heap_alloc": 361628912,
+            "heap_sys": 636387328,
+            "heap_idle": 254640128,
+            "heap_released": 85106688,
+            "mallocs": 7630125,
+            "num_gc": 21
+          },
+          {
+            "trace": "session",
+            "phase": "promote_compact_state",
+            "total_alloc": 1884194128,
+            "heap_alloc": 362443216,
+            "heap_sys": 636387328,
+            "heap_idle": 253845504,
+            "heap_released": 85106688,
+            "mallocs": 7630404,
+            "num_gc": 21
+          },
+          {
+            "trace": "cli",
+            "phase": "graph_session_run",
+            "total_alloc": 1884194640,
+            "heap_alloc": 362443728,
+            "heap_sys": 636583936,
+            "heap_idle": 254042112,
+            "heap_released": 85106688,
+            "mallocs": 7630420,
+            "num_gc": 21
+          },
+          {
+            "trace": "cli",
+            "phase": "cli_complete",
+            "total_alloc": 1884217352,
+            "heap_alloc": 362466440,
+            "heap_sys": 636583936,
+            "heap_idle": 254042112,
+            "heap_released": 85106688,
+            "mallocs": 7630669,
+            "num_gc": 21
+          }
+        ],
+        "r1-new-initial.log": [
+          {
+            "trace": "open",
+            "phase": "load_state",
+            "total_alloc": 67015640,
+            "heap_alloc": 20040056,
+            "heap_sys": 32866304,
+            "heap_idle": 9977856,
+            "heap_released": 5210112,
+            "mallocs": 165965,
+            "num_gc": 6
+          },
+          {
+            "trace": "inputs",
+            "phase": "inventory",
+            "total_alloc": 90049920,
+            "heap_alloc": 34902248,
+            "heap_sys": 41254912,
+            "heap_idle": 4243456,
+            "heap_released": 3358720,
+            "mallocs": 291203,
+            "num_gc": 7
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 155657128,
+            "heap_alloc": 19941448,
+            "heap_sys": 45449216,
+            "heap_idle": 23207936,
+            "heap_released": 14147584,
+            "mallocs": 454073,
+            "num_gc": 12
+          },
+          {
+            "trace": "session",
+            "phase": "ts_extract_session",
+            "total_alloc": 3447021512,
+            "heap_alloc": 246185808,
+            "heap_sys": 426803200,
+            "heap_idle": 95862784,
+            "heap_released": 8331264,
+            "mallocs": 52489671,
+            "num_gc": 51
+          },
+          {
+            "trace": "session",
+            "phase": "assemble_new_files",
+            "total_alloc": 3543707352,
+            "heap_alloc": 342871648,
+            "heap_sys": 468615168,
+            "heap_idle": 50487296,
+            "heap_released": 4472832,
+            "mallocs": 52770070,
+            "num_gc": 51
+          },
+          {
+            "trace": "session",
+            "phase": "index_group_owners",
+            "total_alloc": 3597130840,
+            "heap_alloc": 173471840,
+            "heap_sys": 477134848,
+            "heap_idle": 218701824,
+            "heap_released": 25403392,
+            "mallocs": 52905226,
+            "num_gc": 52
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 4211461640,
+            "heap_alloc": 368479552,
+            "heap_sys": 476872704,
+            "heap_idle": 26828800,
+            "heap_released": 16080896,
+            "mallocs": 54563809,
+            "num_gc": 56
+          },
+          {
+            "trace": "session",
+            "phase": "write_pending_state",
+            "total_alloc": 4601205632,
+            "heap_alloc": 431300256,
+            "heap_sys": 724533248,
+            "heap_idle": 195108864,
+            "heap_released": 25624576,
+            "mallocs": 55254815,
+            "num_gc": 58
+          },
+          {
+            "trace": "session",
+            "phase": "end_flush_ack",
+            "total_alloc": 4603149200,
+            "heap_alloc": 433243824,
+            "heap_sys": 724467712,
+            "heap_idle": 194486272,
+            "heap_released": 25624576,
+            "mallocs": 55271717,
+            "num_gc": 58
+          },
+          {
+            "trace": "session",
+            "phase": "promote_compact_state",
+            "total_alloc": 4604031992,
+            "heap_alloc": 434126616,
+            "heap_sys": 724434944,
+            "heap_idle": 193642496,
+            "heap_released": 25624576,
+            "mallocs": 55273385,
+            "num_gc": 58
+          },
+          {
+            "trace": "cli",
+            "phase": "graph_session_run",
+            "total_alloc": 4604032536,
+            "heap_alloc": 434127160,
+            "heap_sys": 724598784,
+            "heap_idle": 193798144,
+            "heap_released": 25624576,
+            "mallocs": 55273402,
+            "num_gc": 58
+          },
+          {
+            "trace": "cli",
+            "phase": "cli_complete",
+            "total_alloc": 4604052704,
+            "heap_alloc": 434147328,
+            "heap_sys": 724598784,
+            "heap_idle": 193798144,
+            "heap_released": 25624576,
+            "mallocs": 55273646,
+            "num_gc": 58
+          }
+        ],
+        "r1-new-noop.log": [
+          {
+            "trace": "since",
+            "phase": "state_json_unmarshal",
+            "total_alloc": 234050544,
+            "heap_alloc": 159913488,
+            "heap_sys": 171212800,
+            "heap_idle": 5906432,
+            "heap_released": 5906432,
+            "mallocs": 1725860,
+            "num_gc": 8
+          },
+          {
+            "trace": "open",
+            "phase": "load_state",
+            "total_alloc": 234051264,
+            "heap_alloc": 159914208,
+            "heap_sys": 171212800,
+            "heap_idle": 5906432,
+            "heap_released": 5906432,
+            "mallocs": 1725879,
+            "num_gc": 8
+          },
+          {
+            "trace": "inputs",
+            "phase": "inventory",
+            "total_alloc": 257083680,
+            "heap_alloc": 182946624,
+            "heap_sys": 192184320,
+            "heap_idle": 4014080,
+            "heap_released": 4014080,
+            "mallocs": 1851109,
+            "num_gc": 8
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 322681896,
+            "heap_alloc": 128374824,
+            "heap_sys": 225738752,
+            "heap_idle": 81584128,
+            "heap_released": 5718016,
+            "mallocs": 2013933,
+            "num_gc": 9
+          },
+          {
+            "trace": "session",
+            "phase": "ts_reuse_cache",
+            "total_alloc": 506016544,
+            "heap_alloc": 171888400,
+            "heap_sys": 255033344,
+            "heap_idle": 63160320,
+            "heap_released": 19578880,
+            "mallocs": 2766493,
+            "num_gc": 11
+          },
+          {
+            "trace": "session",
+            "phase": "assemble_new_files",
+            "total_alloc": 507238392,
+            "heap_alloc": 173110248,
+            "heap_sys": 255033344,
+            "heap_idle": 62259200,
+            "heap_released": 19578880,
+            "mallocs": 2770646,
+            "num_gc": 11
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 520498512,
+            "heap_alloc": 186370368,
+            "heap_sys": 255033344,
+            "heap_idle": 54460416,
+            "heap_released": 19578880,
+            "mallocs": 2896876,
+            "num_gc": 11
+          },
+          {
+            "trace": "cli",
+            "phase": "graph_session_run",
+            "total_alloc": 528409184,
+            "heap_alloc": 194281040,
+            "heap_sys": 263389184,
+            "heap_idle": 54976512,
+            "heap_released": 20234240,
+            "mallocs": 2897748,
+            "num_gc": 11
+          },
+          {
+            "trace": "cli",
+            "phase": "cli_complete",
+            "total_alloc": 528432512,
+            "heap_alloc": 194304368,
+            "heap_sys": 263389184,
+            "heap_idle": 54951936,
+            "heap_released": 20234240,
+            "mallocs": 2898013,
+            "num_gc": 11
+          }
+        ],
+        "r1-new-structural.log": [
+          {
+            "trace": "since",
+            "phase": "state_json_unmarshal",
+            "total_alloc": 234058368,
+            "heap_alloc": 159899712,
+            "heap_sys": 171278336,
+            "heap_idle": 6234112,
+            "heap_released": 6234112,
+            "mallocs": 1725893,
+            "num_gc": 8
+          },
+          {
+            "trace": "open",
+            "phase": "load_state",
+            "total_alloc": 234059088,
+            "heap_alloc": 159900432,
+            "heap_sys": 171278336,
+            "heap_idle": 6234112,
+            "heap_released": 6234112,
+            "mallocs": 1725912,
+            "num_gc": 8
+          },
+          {
+            "trace": "inputs",
+            "phase": "inventory",
+            "total_alloc": 257090016,
+            "heap_alloc": 182931360,
+            "heap_sys": 192249856,
+            "heap_idle": 4653056,
+            "heap_released": 4620288,
+            "mallocs": 1851135,
+            "num_gc": 8
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 322700680,
+            "heap_alloc": 123018600,
+            "heap_sys": 229998592,
+            "heap_idle": 90832896,
+            "heap_released": 3825664,
+            "mallocs": 2013980,
+            "num_gc": 9
+          },
+          {
+            "trace": "session",
+            "phase": "ts_extract_session",
+            "total_alloc": 984371136,
+            "heap_alloc": 299075352,
+            "heap_sys": 317849600,
+            "heap_idle": 6209536,
+            "heap_released": 2072576,
+            "mallocs": 4844793,
+            "num_gc": 15
+          },
+          {
+            "trace": "session",
+            "phase": "assemble_new_files",
+            "total_alloc": 1170058248,
+            "heap_alloc": 139867544,
+            "heap_sys": 376602624,
+            "heap_idle": 214056960,
+            "heap_released": 77864960,
+            "mallocs": 5331060,
+            "num_gc": 17
+          },
+          {
+            "trace": "session",
+            "phase": "index_group_owners",
+            "total_alloc": 1432025840,
+            "heap_alloc": 204909496,
+            "heap_sys": 376635392,
+            "heap_idle": 147767296,
+            "heap_released": 21012480,
+            "mallocs": 6823232,
+            "num_gc": 19
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 1501498592,
+            "heap_alloc": 274382248,
+            "heap_sys": 376340480,
+            "heap_idle": 82984960,
+            "heap_released": 21012480,
+            "mallocs": 7003206,
+            "num_gc": 19
+          },
+          {
+            "trace": "session",
+            "phase": "write_pending_state",
+            "total_alloc": 1891233808,
+            "heap_alloc": 395277808,
+            "heap_sys": 640745472,
+            "heap_idle": 224927744,
+            "heap_released": 45187072,
+            "mallocs": 7657964,
+            "num_gc": 21
+          },
+          {
+            "trace": "session",
+            "phase": "end_flush_ack",
+            "total_alloc": 1891274448,
+            "heap_alloc": 395318448,
+            "heap_sys": 640679936,
+            "heap_idle": 224854016,
+            "heap_released": 45187072,
+            "mallocs": 7658300,
+            "num_gc": 21
+          },
+          {
+            "trace": "session",
+            "phase": "promote_compact_state",
+            "total_alloc": 1892088880,
+            "heap_alloc": 396132880,
+            "heap_sys": 640679936,
+            "heap_idle": 224059392,
+            "heap_released": 45187072,
+            "mallocs": 7658582,
+            "num_gc": 21
+          },
+          {
+            "trace": "cli",
+            "phase": "graph_session_run",
+            "total_alloc": 1892089392,
+            "heap_alloc": 396133392,
+            "heap_sys": 640876544,
+            "heap_idle": 224256000,
+            "heap_released": 45187072,
+            "mallocs": 7658598,
+            "num_gc": 21
+          },
+          {
+            "trace": "cli",
+            "phase": "cli_complete",
+            "total_alloc": 1892111784,
+            "heap_alloc": 396155784,
+            "heap_sys": 640876544,
+            "heap_idle": 224256000,
+            "heap_released": 45187072,
+            "mallocs": 7658845,
+            "num_gc": 21
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "binary_sha256": "04a8afffb1cda9105aa7e0322cdee6e00376e568b811821a93a97d71577af5b6",
+      "competing_sample_count": 2,
+      "logs": {
+        "cold-body.log": [
+          {
+            "trace": "open",
+            "phase": "load_state",
+            "total_alloc": 67049856,
+            "heap_alloc": 19792280,
+            "heap_sys": 37027840,
+            "heap_idle": 14442496,
+            "heap_released": 7446528,
+            "mallocs": 166012,
+            "num_gc": 6
+          },
+          {
+            "trace": "inputs",
+            "phase": "inventory",
+            "total_alloc": 90112480,
+            "heap_alloc": 16782288,
+            "heap_sys": 45416448,
+            "heap_idle": 26394624,
+            "heap_released": 17661952,
+            "mallocs": 291249,
+            "num_gc": 8
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 151815528,
+            "heap_alloc": 19142624,
+            "heap_sys": 45383680,
+            "heap_idle": 23994368,
+            "heap_released": 13213696,
+            "mallocs": 409862,
+            "num_gc": 13
+          },
+          {
+            "trace": "session",
+            "phase": "ts_extract_session",
+            "total_alloc": 3444650640,
+            "heap_alloc": 315763680,
+            "heap_sys": 414220288,
+            "heap_idle": 53075968,
+            "heap_released": 8142848,
+            "mallocs": 52457539,
+            "num_gc": 51
+          },
+          {
+            "trace": "session",
+            "phase": "assemble_new_files",
+            "total_alloc": 3544146776,
+            "heap_alloc": 203640880,
+            "heap_sys": 447774720,
+            "heap_idle": 182763520,
+            "heap_released": 65888256,
+            "mallocs": 52737940,
+            "num_gc": 52
+          },
+          {
+            "trace": "session",
+            "phase": "index_group_owners",
+            "total_alloc": 3597571888,
+            "heap_alloc": 257065992,
+            "heap_sys": 447610880,
+            "heap_idle": 135987200,
+            "heap_released": 65888256,
+            "mallocs": 52873099,
+            "num_gc": 52
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 4203383536,
+            "heap_alloc": 362174776,
+            "heap_sys": 460095488,
+            "heap_idle": 15933440,
+            "heap_released": 2605056,
+            "mallocs": 54486353,
+            "num_gc": 56
+          },
+          {
+            "trace": "session",
+            "phase": "write_pending_state",
+            "total_alloc": 4593128440,
+            "heap_alloc": 430948248,
+            "heap_sys": 707723264,
+            "heap_idle": 179863552,
+            "heap_released": 18071552,
+            "mallocs": 55177365,
+            "num_gc": 58
+          },
+          {
+            "trace": "session",
+            "phase": "end_flush_ack",
+            "total_alloc": 4595072168,
+            "heap_alloc": 432891976,
+            "heap_sys": 707657728,
+            "heap_idle": 179240960,
+            "heap_released": 18071552,
+            "mallocs": 55194267,
+            "num_gc": 58
+          },
+          {
+            "trace": "session",
+            "phase": "promote_compact_state",
+            "total_alloc": 4595962864,
+            "heap_alloc": 433782672,
+            "heap_sys": 707624960,
+            "heap_idle": 178405376,
+            "heap_released": 18071552,
+            "mallocs": 55195929,
+            "num_gc": 58
+          },
+          {
+            "trace": "cli",
+            "phase": "graph_session_run",
+            "total_alloc": 4595963408,
+            "heap_alloc": 433783216,
+            "heap_sys": 707821568,
+            "heap_idle": 178601984,
+            "heap_released": 18071552,
+            "mallocs": 55195946,
+            "num_gc": 58
+          },
+          {
+            "trace": "cli",
+            "phase": "cli_complete",
+            "total_alloc": 4595986200,
+            "heap_alloc": 433806008,
+            "heap_sys": 707821568,
+            "heap_idle": 178601984,
+            "heap_released": 18071552,
+            "mallocs": 55196194,
+            "num_gc": 58
+          }
+        ],
+        "cold-original.log": [
+          {
+            "trace": "open",
+            "phase": "load_state",
+            "total_alloc": 67035448,
+            "heap_alloc": 19510312,
+            "heap_sys": 37027840,
+            "heap_idle": 15007744,
+            "heap_released": 7348224,
+            "mallocs": 165978,
+            "num_gc": 6
+          },
+          {
+            "trace": "inputs",
+            "phase": "inventory",
+            "total_alloc": 90104272,
+            "heap_alloc": 16020808,
+            "heap_sys": 45383680,
+            "heap_idle": 26951680,
+            "heap_released": 18243584,
+            "mallocs": 291226,
+            "num_gc": 8
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 151813584,
+            "heap_alloc": 18776600,
+            "heap_sys": 45383680,
+            "heap_idle": 24412160,
+            "heap_released": 13754368,
+            "mallocs": 409853,
+            "num_gc": 13
+          },
+          {
+            "trace": "session",
+            "phase": "ts_extract_session",
+            "total_alloc": 3448631432,
+            "heap_alloc": 325441480,
+            "heap_sys": 418185216,
+            "heap_idle": 56164352,
+            "heap_released": 14876672,
+            "mallocs": 52470566,
+            "num_gc": 51
+          },
+          {
+            "trace": "session",
+            "phase": "assemble_new_files",
+            "total_alloc": 3550670888,
+            "heap_alloc": 312445408,
+            "heap_sys": 439353344,
+            "heap_idle": 52920320,
+            "heap_released": 11198464,
+            "mallocs": 52750968,
+            "num_gc": 52
+          },
+          {
+            "trace": "session",
+            "phase": "index_group_owners",
+            "total_alloc": 3604094344,
+            "heap_alloc": 365868864,
+            "heap_sys": 439353344,
+            "heap_idle": 4210688,
+            "heap_released": 2695168,
+            "mallocs": 52886121,
+            "num_gc": 52
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 4209325176,
+            "heap_alloc": 250797776,
+            "heap_sys": 506331136,
+            "heap_idle": 157057024,
+            "heap_released": 4562944,
+            "mallocs": 54499334,
+            "num_gc": 56
+          },
+          {
+            "trace": "session",
+            "phase": "write_pending_state",
+            "total_alloc": 4599058656,
+            "heap_alloc": 463397552,
+            "heap_sys": 774766592,
+            "heap_idle": 207396864,
+            "heap_released": 21897216,
+            "mallocs": 55190327,
+            "num_gc": 57
+          },
+          {
+            "trace": "session",
+            "phase": "end_flush_ack",
+            "total_alloc": 4600995728,
+            "heap_alloc": 465334624,
+            "heap_sys": 774701056,
+            "heap_idle": 206774272,
+            "heap_released": 21897216,
+            "mallocs": 55207213,
+            "num_gc": 57
+          },
+          {
+            "trace": "session",
+            "phase": "promote_compact_state",
+            "total_alloc": 4601887232,
+            "heap_alloc": 466226128,
+            "heap_sys": 774668288,
+            "heap_idle": 205930496,
+            "heap_released": 21897216,
+            "mallocs": 55208878,
+            "num_gc": 57
+          },
+          {
+            "trace": "cli",
+            "phase": "graph_session_run",
+            "total_alloc": 4601887776,
+            "heap_alloc": 466226672,
+            "heap_sys": 774864896,
+            "heap_idle": 206127104,
+            "heap_released": 21897216,
+            "mallocs": 55208895,
+            "num_gc": 57
+          },
+          {
+            "trace": "cli",
+            "phase": "cli_complete",
+            "total_alloc": 4601910248,
+            "heap_alloc": 466249144,
+            "heap_sys": 774864896,
+            "heap_idle": 206127104,
+            "heap_released": 21897216,
+            "mallocs": 55209141,
+            "num_gc": 57
+          }
+        ],
+        "cold-structural.log": [
+          {
+            "trace": "open",
+            "phase": "load_state",
+            "total_alloc": 67044992,
+            "heap_alloc": 19803392,
+            "heap_sys": 37027840,
+            "heap_idle": 14401536,
+            "heap_released": 7774208,
+            "mallocs": 166000,
+            "num_gc": 6
+          },
+          {
+            "trace": "inputs",
+            "phase": "inventory",
+            "total_alloc": 90107144,
+            "heap_alloc": 34954136,
+            "heap_sys": 45416448,
+            "heap_idle": 8388608,
+            "heap_released": 7815168,
+            "mallocs": 291228,
+            "num_gc": 7
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 151812712,
+            "heap_alloc": 21336768,
+            "heap_sys": 45416448,
+            "heap_idle": 21954560,
+            "heap_released": 14835712,
+            "mallocs": 409853,
+            "num_gc": 12
+          },
+          {
+            "trace": "session",
+            "phase": "ts_extract_session",
+            "total_alloc": 3444848648,
+            "heap_alloc": 341546808,
+            "heap_sys": 409993216,
+            "heap_idle": 38739968,
+            "heap_released": 8740864,
+            "mallocs": 52450966,
+            "num_gc": 50
+          },
+          {
+            "trace": "session",
+            "phase": "assemble_new_files",
+            "total_alloc": 3541553016,
+            "heap_alloc": 307073712,
+            "heap_sys": 426835968,
+            "heap_idle": 43638784,
+            "heap_released": 9576448,
+            "mallocs": 52731371,
+            "num_gc": 51
+          },
+          {
+            "trace": "session",
+            "phase": "index_group_owners",
+            "total_alloc": 3594976648,
+            "heap_alloc": 360497344,
+            "heap_sys": 439418880,
+            "heap_idle": 7413760,
+            "heap_released": 7356416,
+            "mallocs": 52866526,
+            "num_gc": 51
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 4199157712,
+            "heap_alloc": 310551568,
+            "heap_sys": 493649920,
+            "heap_idle": 86171648,
+            "heap_released": 4120576,
+            "mallocs": 54479897,
+            "num_gc": 55
+          },
+          {
+            "trace": "session",
+            "phase": "write_pending_state",
+            "total_alloc": 4588885816,
+            "heap_alloc": 512996168,
+            "heap_sys": 825163776,
+            "heap_idle": 207396864,
+            "heap_released": 31096832,
+            "mallocs": 55170893,
+            "num_gc": 56
+          },
+          {
+            "trace": "session",
+            "phase": "end_flush_ack",
+            "total_alloc": 4590827104,
+            "heap_alloc": 280322360,
+            "heap_sys": 825098240,
+            "heap_idle": 438730752,
+            "heap_released": 57901056,
+            "mallocs": 55187785,
+            "num_gc": 57
+          },
+          {
+            "trace": "session",
+            "phase": "promote_compact_state",
+            "total_alloc": 4591718448,
+            "heap_alloc": 281213704,
+            "heap_sys": 825065472,
+            "heap_idle": 437903360,
+            "heap_released": 101548032,
+            "mallocs": 55189449,
+            "num_gc": 57
+          },
+          {
+            "trace": "cli",
+            "phase": "graph_session_run",
+            "total_alloc": 4591719456,
+            "heap_alloc": 281214712,
+            "heap_sys": 825262080,
+            "heap_idle": 438099968,
+            "heap_released": 101548032,
+            "mallocs": 55189470,
+            "num_gc": 57
+          },
+          {
+            "trace": "cli",
+            "phase": "cli_complete",
+            "total_alloc": 4591743064,
+            "heap_alloc": 281238320,
+            "heap_sys": 825262080,
+            "heap_idle": 438099968,
+            "heap_released": 101548032,
+            "mallocs": 55189725,
+            "num_gc": 57
+          }
+        ],
+        "r1-new-body.log": [
+          {
+            "trace": "since",
+            "phase": "state_json_unmarshal",
+            "total_alloc": 234068560,
+            "heap_alloc": 159996032,
+            "heap_sys": 171212800,
+            "heap_idle": 5931008,
+            "heap_released": 5562368,
+            "mallocs": 1725847,
+            "num_gc": 8
+          },
+          {
+            "trace": "open",
+            "phase": "load_state",
+            "total_alloc": 234069280,
+            "heap_alloc": 159996752,
+            "heap_sys": 171212800,
+            "heap_idle": 5931008,
+            "heap_released": 5562368,
+            "mallocs": 1725866,
+            "num_gc": 8
+          },
+          {
+            "trace": "inputs",
+            "phase": "inventory",
+            "total_alloc": 257127200,
+            "heap_alloc": 183054672,
+            "heap_sys": 192184320,
+            "heap_idle": 4112384,
+            "heap_released": 3678208,
+            "mallocs": 1851092,
+            "num_gc": 8
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 318828008,
+            "heap_alloc": 117127064,
+            "heap_sys": 234127360,
+            "heap_idle": 100089856,
+            "heap_released": 5054464,
+            "mallocs": 1969690,
+            "num_gc": 9
+          },
+          {
+            "trace": "session",
+            "phase": "ts_extract_session",
+            "total_alloc": 967791568,
+            "heap_alloc": 163646904,
+            "heap_sys": 330301440,
+            "heap_idle": 150593536,
+            "heap_released": 23232512,
+            "mallocs": 4772288,
+            "num_gc": 15
+          },
+          {
+            "trace": "session",
+            "phase": "assemble_new_files",
+            "total_alloc": 1158388640,
+            "heap_alloc": 279708136,
+            "heap_sys": 330334208,
+            "heap_idle": 31203328,
+            "heap_released": 14376960,
+            "mallocs": 5258386,
+            "num_gc": 16
+          },
+          {
+            "trace": "session",
+            "phase": "index_group_owners",
+            "total_alloc": 1422472352,
+            "heap_alloc": 260645824,
+            "heap_sys": 359727104,
+            "heap_idle": 83755008,
+            "heap_released": 5038080,
+            "mallocs": 6750546,
+            "num_gc": 18
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 1487674784,
+            "heap_alloc": 173212848,
+            "heap_sys": 359596032,
+            "heap_idle": 168738816,
+            "heap_released": 60399616,
+            "mallocs": 6885881,
+            "num_gc": 19
+          },
+          {
+            "trace": "session",
+            "phase": "write_pending_state",
+            "total_alloc": 1877535048,
+            "heap_alloc": 361637184,
+            "heap_sys": 594608128,
+            "heap_idle": 212271104,
+            "heap_released": 40075264,
+            "mallocs": 7540652,
+            "num_gc": 21
+          },
+          {
+            "trace": "session",
+            "phase": "end_flush_ack",
+            "total_alloc": 1877568888,
+            "heap_alloc": 361671024,
+            "heap_sys": 594542592,
+            "heap_idle": 212205568,
+            "heap_released": 40075264,
+            "mallocs": 7540971,
+            "num_gc": 21
+          },
+          {
+            "trace": "session",
+            "phase": "promote_compact_state",
+            "total_alloc": 1878383424,
+            "heap_alloc": 362485560,
+            "heap_sys": 594542592,
+            "heap_idle": 211410944,
+            "heap_released": 40075264,
+            "mallocs": 7541246,
+            "num_gc": 21
+          },
+          {
+            "trace": "cli",
+            "phase": "graph_session_run",
+            "total_alloc": 1878383936,
+            "heap_alloc": 362486072,
+            "heap_sys": 594608128,
+            "heap_idle": 211476480,
+            "heap_released": 40075264,
+            "mallocs": 7541262,
+            "num_gc": 21
+          },
+          {
+            "trace": "cli",
+            "phase": "cli_complete",
+            "total_alloc": 1878406488,
+            "heap_alloc": 362508624,
+            "heap_sys": 594608128,
+            "heap_idle": 211476480,
+            "heap_released": 40075264,
+            "mallocs": 7541510,
+            "num_gc": 21
+          }
+        ],
+        "r1-new-initial.log": [
+          {
+            "trace": "open",
+            "phase": "load_state",
+            "total_alloc": 67032584,
+            "heap_alloc": 19795448,
+            "heap_sys": 32833536,
+            "heap_idle": 10231808,
+            "heap_released": 5136384,
+            "mallocs": 165968,
+            "num_gc": 6
+          },
+          {
+            "trace": "inputs",
+            "phase": "inventory",
+            "total_alloc": 90094416,
+            "heap_alloc": 34943896,
+            "heap_sys": 41222144,
+            "heap_idle": 4177920,
+            "heap_released": 4120576,
+            "mallocs": 291200,
+            "num_gc": 7
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 151798816,
+            "heap_alloc": 21513288,
+            "heap_sys": 45416448,
+            "heap_idle": 21766144,
+            "heap_released": 14458880,
+            "mallocs": 409831,
+            "num_gc": 12
+          },
+          {
+            "trace": "session",
+            "phase": "ts_extract_session",
+            "total_alloc": 3444681208,
+            "heap_alloc": 330514928,
+            "heap_sys": 430997504,
+            "heap_idle": 57909248,
+            "heap_released": 8306688,
+            "mallocs": 52459739,
+            "num_gc": 50
+          },
+          {
+            "trace": "session",
+            "phase": "assemble_new_files",
+            "total_alloc": 3541394080,
+            "heap_alloc": 211783496,
+            "heap_sys": 451969024,
+            "heap_idle": 176742400,
+            "heap_released": 65142784,
+            "mallocs": 52740220,
+            "num_gc": 51
+          },
+          {
+            "trace": "session",
+            "phase": "index_group_owners",
+            "total_alloc": 3594819192,
+            "heap_alloc": 191421360,
+            "heap_sys": 451870720,
+            "heap_idle": 198688768,
+            "heap_released": 65142784,
+            "mallocs": 52875379,
+            "num_gc": 52
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 4203719384,
+            "heap_alloc": 268669448,
+            "heap_sys": 489586688,
+            "heap_idle": 123142144,
+            "heap_released": 1835008,
+            "mallocs": 54488963,
+            "num_gc": 56
+          },
+          {
+            "trace": "session",
+            "phase": "write_pending_state",
+            "total_alloc": 4593445664,
+            "heap_alloc": 512665024,
+            "heap_sys": 820969472,
+            "heap_idle": 203522048,
+            "heap_released": 29368320,
+            "mallocs": 55179946,
+            "num_gc": 57
+          },
+          {
+            "trace": "session",
+            "phase": "end_flush_ack",
+            "total_alloc": 4595391824,
+            "heap_alloc": 514611184,
+            "heap_sys": 820903936,
+            "heap_idle": 202883072,
+            "heap_released": 29368320,
+            "mallocs": 55196851,
+            "num_gc": 57
+          },
+          {
+            "trace": "session",
+            "phase": "promote_compact_state",
+            "total_alloc": 4596275144,
+            "heap_alloc": 515494504,
+            "heap_sys": 820871168,
+            "heap_idle": 202047488,
+            "heap_released": 29368320,
+            "mallocs": 55198518,
+            "num_gc": 57
+          },
+          {
+            "trace": "cli",
+            "phase": "graph_session_run",
+            "total_alloc": 4596275688,
+            "heap_alloc": 515495048,
+            "heap_sys": 821035008,
+            "heap_idle": 202203136,
+            "heap_released": 29368320,
+            "mallocs": 55198535,
+            "num_gc": 57
+          },
+          {
+            "trace": "cli",
+            "phase": "cli_complete",
+            "total_alloc": 4596295696,
+            "heap_alloc": 515515056,
+            "heap_sys": 821035008,
+            "heap_idle": 202203136,
+            "heap_released": 29368320,
+            "mallocs": 55198778,
+            "num_gc": 57
+          }
+        ],
+        "r1-new-noop.log": [
+          {
+            "trace": "since",
+            "phase": "state_json_unmarshal",
+            "total_alloc": 234076576,
+            "heap_alloc": 159939040,
+            "heap_sys": 167051264,
+            "heap_idle": 2088960,
+            "heap_released": 2088960,
+            "mallocs": 1725869,
+            "num_gc": 8
+          },
+          {
+            "trace": "open",
+            "phase": "load_state",
+            "total_alloc": 234077136,
+            "heap_alloc": 159939600,
+            "heap_sys": 167051264,
+            "heap_idle": 2088960,
+            "heap_released": 2088960,
+            "mallocs": 1725885,
+            "num_gc": 8
+          },
+          {
+            "trace": "inputs",
+            "phase": "inventory",
+            "total_alloc": 257135632,
+            "heap_alloc": 182998096,
+            "heap_sys": 192184320,
+            "heap_idle": 4317184,
+            "heap_released": 4284416,
+            "mallocs": 1851111,
+            "num_gc": 8
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 318828520,
+            "heap_alloc": 116852520,
+            "heap_sys": 234127360,
+            "heap_idle": 100769792,
+            "heap_released": 5799936,
+            "mallocs": 1969621,
+            "num_gc": 9
+          },
+          {
+            "trace": "session",
+            "phase": "ts_reuse_cache",
+            "total_alloc": 498976888,
+            "heap_alloc": 147285296,
+            "heap_sys": 255066112,
+            "heap_idle": 86827008,
+            "heap_released": 32620544,
+            "mallocs": 2721597,
+            "num_gc": 11
+          },
+          {
+            "trace": "session",
+            "phase": "assemble_new_files",
+            "total_alloc": 500198736,
+            "heap_alloc": 148507144,
+            "heap_sys": 255066112,
+            "heap_idle": 85917696,
+            "heap_released": 32620544,
+            "mallocs": 2725750,
+            "num_gc": 11
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 509547368,
+            "heap_alloc": 157855776,
+            "heap_sys": 255066112,
+            "heap_idle": 81240064,
+            "heap_released": 32620544,
+            "mallocs": 2807740,
+            "num_gc": 11
+          },
+          {
+            "trace": "cli",
+            "phase": "graph_session_run",
+            "total_alloc": 517456976,
+            "heap_alloc": 165765384,
+            "heap_sys": 263487488,
+            "heap_idle": 81772544,
+            "heap_released": 33275904,
+            "mallocs": 2808610,
+            "num_gc": 11
+          },
+          {
+            "trace": "cli",
+            "phase": "cli_complete",
+            "total_alloc": 517479840,
+            "heap_alloc": 165788248,
+            "heap_sys": 263487488,
+            "heap_idle": 81772544,
+            "heap_released": 33275904,
+            "mallocs": 2808872,
+            "num_gc": 11
+          }
+        ],
+        "r1-new-structural.log": [
+          {
+            "trace": "since",
+            "phase": "state_json_unmarshal",
+            "total_alloc": 234071408,
+            "heap_alloc": 159925784,
+            "heap_sys": 171212800,
+            "heap_idle": 6217728,
+            "heap_released": 6176768,
+            "mallocs": 1725861,
+            "num_gc": 8
+          },
+          {
+            "trace": "open",
+            "phase": "load_state",
+            "total_alloc": 234072128,
+            "heap_alloc": 159926504,
+            "heap_sys": 171212800,
+            "heap_idle": 6217728,
+            "heap_released": 6176768,
+            "mallocs": 1725880,
+            "num_gc": 8
+          },
+          {
+            "trace": "inputs",
+            "phase": "inventory",
+            "total_alloc": 257132432,
+            "heap_alloc": 182986808,
+            "heap_sys": 192184320,
+            "heap_idle": 4186112,
+            "heap_released": 4186112,
+            "mallocs": 1851111,
+            "num_gc": 8
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 318845512,
+            "heap_alloc": 119285584,
+            "heap_sys": 234094592,
+            "heap_idle": 98254848,
+            "heap_released": 5013504,
+            "mallocs": 1969727,
+            "num_gc": 9
+          },
+          {
+            "trace": "session",
+            "phase": "ts_extract_session",
+            "total_alloc": 978894336,
+            "heap_alloc": 173354208,
+            "heap_sys": 321945600,
+            "heap_idle": 135348224,
+            "heap_released": 17588224,
+            "mallocs": 4799962,
+            "num_gc": 15
+          },
+          {
+            "trace": "session",
+            "phase": "assemble_new_files",
+            "total_alloc": 1169931488,
+            "heap_alloc": 278122592,
+            "heap_sys": 321978368,
+            "heap_idle": 24952832,
+            "heap_released": 6987776,
+            "mallocs": 5286151,
+            "num_gc": 16
+          },
+          {
+            "trace": "session",
+            "phase": "index_group_owners",
+            "total_alloc": 1434020168,
+            "heap_alloc": 308861584,
+            "heap_sys": 330399744,
+            "heap_idle": 6864896,
+            "heap_released": 6602752,
+            "mallocs": 6778324,
+            "num_gc": 18
+          },
+          {
+            "trace": "since",
+            "phase": "ts_config_inputs",
+            "total_alloc": 1499484856,
+            "heap_alloc": 182543208,
+            "heap_sys": 363823104,
+            "heap_idle": 163962880,
+            "heap_released": 5693440,
+            "mallocs": 6914059,
+            "num_gc": 19
+          },
+          {
+            "trace": "session",
+            "phase": "write_pending_state",
+            "total_alloc": 1889339432,
+            "heap_alloc": 319235296,
+            "heap_sys": 582057984,
+            "heap_idle": 241623040,
+            "heap_released": 19521536,
+            "mallocs": 7568830,
+            "num_gc": 21
+          },
+          {
+            "trace": "session",
+            "phase": "end_flush_ack",
+            "total_alloc": 1889373880,
+            "heap_alloc": 319269744,
+            "heap_sys": 581992448,
+            "heap_idle": 241549312,
+            "heap_released": 19521536,
+            "mallocs": 7569153,
+            "num_gc": 21
+          },
+          {
+            "trace": "session",
+            "phase": "promote_compact_state",
+            "total_alloc": 1890189448,
+            "heap_alloc": 320085312,
+            "heap_sys": 581992448,
+            "heap_idle": 240754688,
+            "heap_released": 19521536,
+            "mallocs": 7569445,
+            "num_gc": 21
+          },
+          {
+            "trace": "cli",
+            "phase": "graph_session_run",
+            "total_alloc": 1890190248,
+            "heap_alloc": 320086112,
+            "heap_sys": 582057984,
+            "heap_idle": 240820224,
+            "heap_released": 19521536,
+            "mallocs": 7569464,
+            "num_gc": 21
+          },
+          {
+            "trace": "cli",
+            "phase": "cli_complete",
+            "total_alloc": 1890214384,
+            "heap_alloc": 320110248,
+            "heap_sys": 582057984,
+            "heap_idle": 240820224,
+            "heap_released": 19521536,
+            "mallocs": 7569724,
+            "num_gc": 21
+          }
+        ]
+      }
+    }
+  }
+}

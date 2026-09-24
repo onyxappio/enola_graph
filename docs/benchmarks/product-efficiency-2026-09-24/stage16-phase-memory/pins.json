@@ -1,0 +1,26 @@
+{
+  "product_path": "/tmp/enola-stage16-root-review/product-source",
+  "product_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "files": {
+    "/tmp/enola-stage16-phase-memory/cli-pairs/cli.py": "94cb4e07996ab45f1a804a260ec6c3f1686f34d78718d9ece2d32466f41826f3",
+    "/tmp/enola-stage16-phase-memory/cli-pairs/harness_support.py": "95d70a9e3e3a0986fd8a1684524a8c9f2205df5529786979d08376abb46e4cac",
+    "/tmp/enola-stage14-watch-pairs/watch.py": "629fae95963c62b83df4acdc2ea5d6438dd114d67bbca2425b96416eda7538cb",
+    "/tmp/enola-stage9-product-watch-control/bin/benchobserver": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+    "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/run.py": "94caf3654e6283630dca8fbaa558c447d2cb1aade55f7b1bfc406cfba9d14c79",
+    "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/product-graph-scope.yaml": "b81b19598dd74c63084ae11488cb7f4fa7df783b0887d2c42dcf61dc67890bf7",
+    "/tmp/enola-toolchain/bin/nats-server": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af",
+    "/tmp/enola-stage16-phase-memory/cli-pairs/validate_results.py": "7e4846646167653d6d3de7d3d5d805a02aa889dfe09e4d0b42a61d19173e7b02",
+    "/tmp/enola-stage16-phase-memory/cli-pairs/run-arm.py": "1e19107fb31a608464aa8e33b905fecb6527e19ca877ddaa6539a4301c8e189e"
+  },
+  "binaries": {
+    "baseline": {
+      "path": "/tmp/enola-stage16-phase-memory/enola-baseline",
+      "sha256": "23ac45922c1cc49d5053b5fa2efbc17b076239ed39649e1e5861ebe82657c0f4"
+    },
+    "candidate": {
+      "path": "/tmp/enola-stage16-phase-memory/enola-candidate",
+      "sha256": "04a8afffb1cda9105aa7e0322cdee6e00376e568b811821a93a97d71577af5b6"
+    }
+  },
+  "diagnostic_only": true
+}

@@ -1,0 +1,42 @@
+{
+  "base": "49b486b4a43bc5e6ec1679db0dd947b66bbbf223",
+  "overlay_sha256": "6362e4cd81c6572af9bcc1032c8254cdaa7decbb10bee87bb0c5846c3a9597ab",
+  "builds": [
+    {
+      "arm": "baseline",
+      "command": [
+        "/opt/homebrew/bin/go",
+        "build",
+        "-trimpath",
+        "-overlay",
+        "/tmp/enola-stage16-phase-memory/baseline-overlay.json",
+        "-o",
+        "/tmp/enola-stage16-phase-memory/enola-baseline",
+        "./cmd/enola"
+      ],
+      "exit": 0,
+      "operational_seconds": 5.994503541965969,
+      "diagnostic_only": true,
+      "compiled_marker_present": true,
+      "binary_sha256": "23ac45922c1cc49d5053b5fa2efbc17b076239ed39649e1e5861ebe82657c0f4"
+    },
+    {
+      "arm": "candidate",
+      "command": [
+        "/opt/homebrew/bin/go",
+        "build",
+        "-trimpath",
+        "-overlay",
+        "/tmp/enola-stage16-phase-memory/candidate-overlay.json",
+        "-o",
+        "/tmp/enola-stage16-phase-memory/enola-candidate",
+        "./cmd/enola"
+      ],
+      "exit": 0,
+      "operational_seconds": 5.811266792006791,
+      "diagnostic_only": true,
+      "compiled_marker_present": true,
+      "binary_sha256": "04a8afffb1cda9105aa7e0322cdee6e00376e568b811821a93a97d71577af5b6"
+    }
+  ]
+}
