@@ -23,6 +23,14 @@ type factFileOwner interface {
 	OwnsFactFile(relFile string) bool
 }
 
+// moduleCandidateOwner is a narrower question than ownership: not "do you read
+// this file" but "can this file carry a module of your language". An extractor
+// implements it only when its owner domain is deliberately wider than its module
+// domain, and callers that are reasoning about module identity should prefer it.
+type moduleCandidateOwner interface {
+	OwnsModuleCandidate(relFile string) bool
+}
+
 // declaresFileOwnership reports whether an extractor names the files it owns.
 // ownedFiles returns nil both for an extractor that owns nothing in this
 // inventory and for one that cannot answer the question at all; only the latter
@@ -61,6 +69,38 @@ func ownedFiles(ext plugin.Extractor, files []string) []string {
 	default:
 		return nil
 	}
+}
+
+// extractorClaimedFiles reports which of files some active extractor could carry
+// a module for, and whether every active extractor could answer. A file no
+// extractor claims emits no facts at all, so it can carry no module fact of any
+// kind. An extractor whose owner domain is wider than its module domain narrows
+// itself through moduleCandidateOwner; one that declares no owner domain at all
+// leaves the set unbounded, and callers must not narrow with it - the same
+// reserve the non-TypeScript seed keeps for such an extractor.
+func extractorClaimedFiles(eng *engine.Engine, detected map[string]bool, files []string) (map[string]bool, bool) {
+	if eng == nil {
+		return nil, false
+	}
+	claimed := make(map[string]bool, len(files))
+	bounded := true
+	for _, ext := range eng.Extractors() {
+		if !detected[ext.Name()] {
+			continue
+		}
+		if !declaresFileOwnership(ext) {
+			bounded = false
+			continue
+		}
+		narrower, _ := ext.(moduleCandidateOwner)
+		for _, f := range ownedFiles(ext, files) {
+			if narrower != nil && !narrower.OwnsModuleCandidate(f) {
+				continue
+			}
+			claimed[f] = true
+		}
+	}
+	return claimed, bounded
 }
 
 func extractorContrib(st *FileState, name string) []facts.Fact {

@@ -188,10 +188,17 @@ func authoritativeFilePlan(previous, current []string, prevFiles map[string]*Fil
 }
 
 // directoryModuleSiblings lists markdown owners that share a directory with a
-// file that entered or left the published set. Directory module identity is
-// shared across those pages, so a last-owner or sibling TS change must
-// republish their declares edges.
-func directoryModuleSiblings(previous, current []string, prevFiles map[string]*FileState) []string {
+// file that entered or left the published set. Every extractor that emits a
+// directory-shaped module names it after the directory it sits in - mdintent at
+// document.go:143, tsextractor at ts.go:512, pythonextractor at python.go:196,
+// hclextractor at hcl.go:138, swiftextractor at swift.go:277 - so a sibling in
+// any of those languages appearing or leaving can move that module's identity
+// while the markdown pages themselves are untouched, and their declares edges
+// have to be republished.
+//
+// claimed is the set of current files an active extractor owns and bounded says
+// every active extractor could answer; both come from extractorClaimedFiles.
+func directoryModuleSiblings(previous, current []string, prevFiles map[string]*FileState, claimed map[string]bool, bounded bool) []string {
 	prevSet := map[string]bool{}
 	for _, f := range previous {
 		prevSet[filepath.ToSlash(f)] = true
@@ -201,17 +208,39 @@ func directoryModuleSiblings(previous, current []string, prevFiles map[string]*F
 		currSet[filepath.ToSlash(f)] = true
 	}
 	dirs := map[string]bool{}
-	mark := func(f string, in map[string]bool) {
-		if in[f] {
-			return
-		}
+	markDir := func(f string) {
 		dirs[filepath.ToSlash(filepath.Dir(f))] = true
 	}
+	// A prior owner absent from the current semantic set really did leave it:
+	// prevSet is the published owner set, so this direction is exact.
 	for f := range prevSet {
-		mark(f, currSet)
+		if !currSet[f] {
+			markDir(f)
+		}
 	}
+	// The other direction is not symmetric, for the reason membershipScopeWithProof
+	// records below: prevSet is a contribution map, not the prior input inventory,
+	// so a file that existed but never emitted a fact is absent from it and "not
+	// previously an owner" reads as "new" on nearly every delta. current is the
+	// semantic name set, which admits files no extractor claims at all; those
+	// produce no facts, so they carry no directory module and can move none.
+	// Marking their directories seeds every markdown page under them into the
+	// frozen manifest, and on this path the owning extractor does not rerun, so
+	// each one is republished from cache byte for byte unchanged.
+	//
+	// A file an extractor does claim is a real module candidate whatever its
+	// language, so it still marks: this is not a TypeScript-only test, and a new
+	// python, swift or hcl sibling reaches the same directory module the markdown
+	// page declares. When an extractor cannot declare its owner domain, claimed
+	// is not a bound and nothing is narrowed here.
 	for f := range currSet {
-		mark(f, prevSet)
+		if prevSet[f] {
+			continue
+		}
+		if bounded && !claimed[f] {
+			continue
+		}
+		markDir(f)
 	}
 	if len(dirs) == 0 {
 		return nil

@@ -2272,6 +2272,18 @@ func (e *TSExtractor) OwnsFile(relFile string) bool {
 	return isTypeScriptFile(relFile) || isAngularTemplateFile(relFile)
 }
 
+// OwnsModuleCandidate answers the narrower question behind OwnsFile's superset:
+// which files can carry a TypeScript module. Only parsed sources can. Every
+// directory module this extractor emits is seeded from a parsed source - from
+// tsFiles at ts.go:397, or from the File of a composed router, route or request
+// fact, which is itself a parsed source - and a template contributes to none of
+// them: it is read at ts.go:351 only to attach members to a component the
+// TypeScript already declared. A template therefore moves this extractor's cache
+// key, which is why OwnsFile claims it, without being able to move any module.
+func (e *TSExtractor) OwnsModuleCandidate(relFile string) bool {
+	return isTypeScriptFile(relFile)
+}
+
 // ContentInput implements plugin.DeltaInputs. Nested tsconfig/package inputs are
 // hashed separately by ConfigInputPaths' own traversal.
 func (e *TSExtractor) ContentInput(rel string) bool { return e.OwnsFile(rel) }
