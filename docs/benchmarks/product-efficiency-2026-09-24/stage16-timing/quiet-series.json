@@ -1,0 +1,166 @@
+{
+  "hold": {
+    "start_utc": "2026-09-24T20:48:00+00:00",
+    "end_utc": "2026-09-24T21:03:00+00:00",
+    "codata_evidence": "/tmp/enola-stage16-root-review/codata-quiet-transcript.json",
+    "fsm_evidence": "/tmp/enola-stage16-root-review/fsm-quiet-transcript.json",
+    "codata": "Coordinator explicitly GO, coder held, reviewer exited",
+    "fsm": "No active FSM processes; no heavy work20:48-21:03, awaiting root START/END",
+    "ambient": "ClickHouse background merges20-27%CPU; other containers idle. Not a zero-load host. Paired order alternates; disclose ambient contention."
+  },
+  "runs": [
+    {
+      "label": "cli-baseline-1",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage16-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "joint-transcript-20260924T2048"
+      ],
+      "started_utc": "2026-09-24T20:48:36.722790+00:00",
+      "exit": 0,
+      "finished_utc": "2026-09-24T20:49:39.972801+00:00"
+    },
+    {
+      "label": "cli-candidate-1",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage16-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "joint-transcript-20260924T2048"
+      ],
+      "started_utc": "2026-09-24T20:49:39.973227+00:00",
+      "exit": 0,
+      "finished_utc": "2026-09-24T20:50:41.988365+00:00"
+    },
+    {
+      "label": "cli-candidate-2",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage16-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "2",
+        "--quiet-message-id",
+        "joint-transcript-20260924T2048"
+      ],
+      "started_utc": "2026-09-24T20:50:41.988756+00:00",
+      "exit": 0,
+      "finished_utc": "2026-09-24T20:51:44.615879+00:00"
+    },
+    {
+      "label": "cli-baseline-2",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage16-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "2",
+        "--quiet-message-id",
+        "joint-transcript-20260924T2048"
+      ],
+      "started_utc": "2026-09-24T20:51:44.616282+00:00",
+      "exit": 0,
+      "finished_utc": "2026-09-24T20:52:47.919813+00:00"
+    },
+    {
+      "label": "cli-baseline-3",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage16-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "3",
+        "--quiet-message-id",
+        "joint-transcript-20260924T2048"
+      ],
+      "started_utc": "2026-09-24T20:52:47.920369+00:00",
+      "exit": 0,
+      "finished_utc": "2026-09-24T20:53:51.724512+00:00"
+    },
+    {
+      "label": "cli-candidate-3",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage16-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "3",
+        "--quiet-message-id",
+        "joint-transcript-20260924T2048"
+      ],
+      "started_utc": "2026-09-24T20:53:51.724917+00:00",
+      "exit": 0,
+      "finished_utc": "2026-09-24T20:54:53.421658+00:00"
+    },
+    {
+      "label": "watch-pair-1",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage16-root-review/watch-pairs/run-pair.py",
+        "--scenario",
+        "ordinary",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "joint-transcript-20260924T2048"
+      ],
+      "started_utc": "2026-09-24T20:54:53.422102+00:00",
+      "exit": 0,
+      "finished_utc": "2026-09-24T20:56:29.962212+00:00"
+    },
+    {
+      "label": "watch-pair-2",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage16-root-review/watch-pairs/run-pair.py",
+        "--scenario",
+        "ordinary",
+        "--repeat",
+        "2",
+        "--quiet-message-id",
+        "joint-transcript-20260924T2048"
+      ],
+      "started_utc": "2026-09-24T20:56:29.962665+00:00",
+      "exit": 0,
+      "finished_utc": "2026-09-24T20:58:06.301832+00:00"
+    },
+    {
+      "label": "watch-pair-3",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage16-root-review/watch-pairs/run-pair.py",
+        "--scenario",
+        "ordinary",
+        "--repeat",
+        "3",
+        "--quiet-message-id",
+        "joint-transcript-20260924T2048"
+      ],
+      "started_utc": "2026-09-24T20:58:06.302320+00:00",
+      "exit": 0,
+      "finished_utc": "2026-09-24T20:59:41.508614+00:00"
+    }
+  ]
+}

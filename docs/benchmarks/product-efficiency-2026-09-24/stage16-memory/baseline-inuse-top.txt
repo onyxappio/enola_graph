@@ -1,0 +1,37 @@
+File: enola-baseline
+Type: inuse_space
+Time: 2026-09-25 00:03:31 EEST
+Showing nodes accounting for 144.81MB, 95.27% of 151.99MB total
+Dropped 72 nodes (cum <= 0.76MB)
+Showing top 30 nodes out of 93
+      flat  flat%   sum%        cum   cum%
+   29.02MB 19.09% 19.09%    29.02MB 19.09%  github.com/enola-labs/enola/internal/extractors/tsextractor.cloneFact (inline)
+   28.56MB 18.79% 37.88%    28.56MB 18.79%  reflect.growslice
+      20MB 13.16% 51.04%       20MB 13.16%  encoding/json/v2.makeString
+   19.56MB 12.87% 63.91%    19.56MB 12.87%  reflect.mapassign_faststr0
+    9.67MB  6.36% 70.27%     9.67MB  6.36%  github.com/enola-labs/enola/internal/graphsession.buildIndex
+    7.80MB  5.13% 75.40%    59.47MB 39.13%  github.com/enola-labs/enola/internal/graphsession.(*session).run
+    6.84MB  4.50% 79.90%     6.84MB  4.50%  github.com/enola-labs/enola/internal/graphinput.indexNames
+    6.50MB  4.28% 84.18%     6.50MB  4.28%  reflect.unsafe_New
+    4.79MB  3.15% 87.33%     4.79MB  3.15%  os.readFileContents
+       4MB  2.63% 89.96%        4MB  2.63%  internal/bytealg.MakeNoZero
+       2MB  1.32% 91.28%        2MB  1.32%  runtime.mallocgc
+       2MB  1.32% 92.60%        2MB  1.32%  reflect.makemap
+    1.02MB  0.67% 93.27%     1.02MB  0.67%  github.com/enola-labs/enola/internal/extractors/tsextractor.overlayWalkDir.func1
+    1.02MB  0.67% 93.94%     1.02MB  0.67%  github.com/enola-labs/enola/internal/graphstream.(*Publisher).enqueue
+       1MB  0.66% 94.60%        1MB  0.66%  github.com/enola-labs/enola/internal/extractors/tsextractor.encodeFileContext (inline)
+    0.51MB  0.34% 94.94%    30.03MB 19.76%  github.com/enola-labs/enola/internal/extractors/tsextractor.(*TSExtractor).ExtractSession
+    0.51MB  0.34% 95.27%    29.53MB 19.43%  github.com/enola-labs/enola/internal/extractors/tsextractor.cloneFactSlice
+         0     0% 95.27%    76.62MB 50.41%  encoding/json.Unmarshal
+         0     0% 95.27%    76.62MB 50.41%  encoding/json/v2.Unmarshal
+         0     0% 95.27%     4.50MB  2.96%  encoding/json/v2.makeInterfaceArshaler.func2
+         0     0% 95.27%    76.62MB 50.41%  encoding/json/v2.makeMapArshaler.func3
+         0     0% 95.27%    72.58MB 47.75%  encoding/json/v2.makePointerArshaler.func3
+         0     0% 95.27%    64.06MB 42.15%  encoding/json/v2.makeSliceArshaler.func3
+         0     0% 95.27%       20MB 13.16%  encoding/json/v2.makeStringArshaler.func2
+         0     0% 95.27%    76.62MB 50.41%  encoding/json/v2.makeStructArshaler.func3
+         0     0% 95.27%    76.62MB 50.41%  encoding/json/v2.unmarshalDecode
+         0     0% 95.27%     2.09MB  1.38%  github.com/enola-labs/enola/internal/engine.(*Engine).Inventory
+         0     0% 95.27%     2.09MB  1.38%  github.com/enola-labs/enola/internal/engine.(*Engine).walkRepo
+         0     0% 95.27%     1.02MB  0.67%  github.com/enola-labs/enola/internal/extractors/inputscope.(*Scope).WalkDir (inline)
+         0     0% 95.27%     1.02MB  0.67%  github.com/enola-labs/enola/internal/extractors/inputscope.(*Scope).WalkDir.func1

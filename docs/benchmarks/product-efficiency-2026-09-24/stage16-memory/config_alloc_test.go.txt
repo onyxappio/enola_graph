@@ -1,0 +1,22 @@
+package tsextractor
+import (
+ "context"
+ "reflect"
+ "testing"
+ "github.com/enola-labs/enola/internal/graphinput"
+ "github.com/enola-labs/enola/internal/extractors/inputscope"
+)
+func BenchmarkStage16ConfigAlloc(b *testing.B) {
+ root := "/tmp/enola-stage16-root-review/product-source"
+ policy,err:=graphinput.Build(root,graphinput.Options{Exclude:[]string{"apps/mobile/e2e/artifacts/**","worker-reports/**"}})
+ if err!=nil { b.Fatal(err) }
+ scope:= &inputscope.Scope{Root:root,Policy:policy}
+ ctx:=context.Background()
+ if !reflect.DeepEqual(oracleTSConfigInputs(ctx,root,scope),tsConfigInputs(ctx,root,scope)) { b.Fatal("oracle differs") }
+ for _,name:=range []string{"oracle","fused"} {
+ b.Run(name,func(b *testing.B) {
+ b.ReportAllocs()
+ for i:=0;i<b.N;i++ { var out []string; if name=="oracle" { out=oracleTSConfigInputs(ctx,root,scope) } else { out=tsConfigInputs(ctx,root,scope) }; if len(out)==0 {b.Fatal("empty") } }
+ })
+ }
+}

@@ -1,0 +1,80 @@
+{
+  "correctness_only": true,
+  "cross_build_equal": true,
+  "arms": {
+    "baseline": {
+      "r1-new-initial": {
+        "hash": "4a2e710c21fa46061e1db4b6e5d4bc32a969af5f62cff616224eba847133223b",
+        "parsed": 4034,
+        "state_equal": null
+      },
+      "r1-new-noop": {
+        "hash": "4a2e710c21fa46061e1db4b6e5d4bc32a969af5f62cff616224eba847133223b",
+        "parsed": 0,
+        "state_equal": true
+      },
+      "r1-new-body": {
+        "hash": "4a2e710c21fa46061e1db4b6e5d4bc32a969af5f62cff616224eba847133223b",
+        "parsed": 11,
+        "state_equal": null
+      },
+      "r1-new-structural": {
+        "hash": "85e6655e2a8ebd8cd7b72977c99485a502f8ad34a720ceb2b7ad5b5ed9edd39e",
+        "parsed": 12,
+        "state_equal": null
+      },
+      "cold-structural": {
+        "hash": "85e6655e2a8ebd8cd7b72977c99485a502f8ad34a720ceb2b7ad5b5ed9edd39e",
+        "parsed": 4034,
+        "state_equal": null
+      },
+      "cold-body": {
+        "hash": "4a2e710c21fa46061e1db4b6e5d4bc32a969af5f62cff616224eba847133223b",
+        "parsed": 4034,
+        "state_equal": null
+      },
+      "cold-original": {
+        "hash": "4a2e710c21fa46061e1db4b6e5d4bc32a969af5f62cff616224eba847133223b",
+        "parsed": 4034,
+        "state_equal": null
+      }
+    },
+    "candidate": {
+      "r1-new-initial": {
+        "hash": "4a2e710c21fa46061e1db4b6e5d4bc32a969af5f62cff616224eba847133223b",
+        "parsed": 4034,
+        "state_equal": null
+      },
+      "r1-new-noop": {
+        "hash": "4a2e710c21fa46061e1db4b6e5d4bc32a969af5f62cff616224eba847133223b",
+        "parsed": 0,
+        "state_equal": true
+      },
+      "r1-new-body": {
+        "hash": "4a2e710c21fa46061e1db4b6e5d4bc32a969af5f62cff616224eba847133223b",
+        "parsed": 11,
+        "state_equal": null
+      },
+      "r1-new-structural": {
+        "hash": "85e6655e2a8ebd8cd7b72977c99485a502f8ad34a720ceb2b7ad5b5ed9edd39e",
+        "parsed": 12,
+        "state_equal": null
+      },
+      "cold-structural": {
+        "hash": "85e6655e2a8ebd8cd7b72977c99485a502f8ad34a720ceb2b7ad5b5ed9edd39e",
+        "parsed": 4034,
+        "state_equal": null
+      },
+      "cold-body": {
+        "hash": "4a2e710c21fa46061e1db4b6e5d4bc32a969af5f62cff616224eba847133223b",
+        "parsed": 4034,
+        "state_equal": null
+      },
+      "cold-original": {
+        "hash": "4a2e710c21fa46061e1db4b6e5d4bc32a969af5f62cff616224eba847133223b",
+        "parsed": 4034,
+        "state_equal": null
+      }
+    }
+  }
+}
