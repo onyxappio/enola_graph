@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/enola-labs/enola/internal/facts"
 )
 
 func TestExtractSession_ResultDoesNotMutateCachedRecords(t *testing.T) {
@@ -163,6 +165,108 @@ func TestExtractSession_ReusesBodyImportersButRefreshesWrappedDefaultBinding(t *
 		t.Fatalf("wrapped default rename parsed %d files, want src/value.ts and its importer", renameDelta.Stats.FilesParsed)
 	}
 	assertCold(renameDelta)
+}
+
+func TestExtractSession_DefaultSelectionSwapWithUnchangedExportSetEqualsCold(t *testing.T) {
+	root := t.TempDir()
+	write := func(rel, body string) {
+		t.Helper()
+		path := filepath.Join(root, filepath.FromSlash(rel))
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	provider := func(defaultName string) string {
+		return "import { util } from './util';\n" +
+			"export const A = util;\n" +
+			"export const B = 2;\n" +
+			"export default " + defaultName + ";\n"
+	}
+	write("src/util.ts", "export const util = 1;\n")
+	write("src/value.ts", provider("A"))
+	write("src/use.ts", "import selected from './value';\nexport const result = selected;\n")
+	files := []string{"src/util.ts", "src/value.ts", "src/use.ts"}
+	ext := New()
+	first, err := ext.ExtractSession(context.Background(), root, files, nil, nil, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if first.Records["src/value.ts"].ExportSurfaceRecorded {
+		t.Fatal("fixture must exercise a provider without a recorded full export surface")
+	}
+	if rec := first.Records["src/value.ts"]; !rec.DefaultExportRecorded || rec.DefaultExportName != "A" {
+		t.Fatalf("initial selected default proof = (%q, %v), want (A, true)", rec.DefaultExportName, rec.DefaultExportRecorded)
+	}
+	assertSelected := func(result *SessionResult, want string) {
+		t.Helper()
+		for _, fact := range result.Facts {
+			if fact.Kind != facts.KindFileRef || fact.File != "src/use.ts" {
+				continue
+			}
+			for _, rel := range fact.Relations {
+				if rel.Kind == facts.RelCalls && rel.TargetFile == "src/value.ts" {
+					if rel.Target != "src."+want {
+						t.Fatalf("default import resolved to %s, want src.%s", rel.Target, want)
+					}
+					return
+				}
+			}
+		}
+		t.Fatalf("no resolved default import to src.%s in %+v", want, result.Facts)
+	}
+	assertCold := func(result *SessionResult) {
+		t.Helper()
+		cold, coldErr := ext.ExtractSession(context.Background(), root, files, nil, nil, SessionHooks{})
+		if coldErr != nil {
+			t.Fatal(coldErr)
+		}
+		if !reflect.DeepEqual(result.Facts, cold.Facts) {
+			t.Fatal("delta facts differ from a fresh cold extraction")
+		}
+	}
+	assertNoChange := func(records map[string]*FileRecord, want string) {
+		t.Helper()
+		unchanged, unchangedErr := ext.ExtractSession(context.Background(), root, files, records, map[string]bool{}, SessionHooks{})
+		if unchangedErr != nil {
+			t.Fatal(unchangedErr)
+		}
+		if unchanged.Stats.FilesParsed != 0 {
+			t.Fatalf("unchanged session parsed %d files, want 0", unchanged.Stats.FilesParsed)
+		}
+		assertSelected(unchanged, want)
+	}
+	assertSelected(first, "A")
+	assertNoChange(first.Records, "A")
+
+	write("src/value.ts", provider("B"))
+	swapped, err := ext.ExtractSession(context.Background(), root, files, first.Records, map[string]bool{"src/value.ts": true}, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if swapped.Stats.FilesParsed != 2 {
+		t.Fatalf("default A-to-B swap parsed %d files, want provider and importer", swapped.Stats.FilesParsed)
+	}
+	if rec := swapped.Records["src/value.ts"]; !rec.DefaultExportRecorded || rec.DefaultExportName != "B" {
+		t.Fatalf("swapped selected default proof = (%q, %v), want (B, true)", rec.DefaultExportName, rec.DefaultExportRecorded)
+	}
+	assertSelected(swapped, "B")
+	assertCold(swapped)
+	assertNoChange(swapped.Records, "B")
+
+	write("src/value.ts", provider("A"))
+	restored, err := ext.ExtractSession(context.Background(), root, files, swapped.Records, map[string]bool{"src/value.ts": true}, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if restored.Stats.FilesParsed != 2 {
+		t.Fatalf("default B-to-A restore parsed %d files, want provider and importer", restored.Stats.FilesParsed)
+	}
+	assertSelected(restored, "A")
+	assertCold(restored)
+	assertNoChange(restored.Records, "A")
 }
 
 func TestExtractSession_NestedNuxtConfigChangeRebindsPlugin(t *testing.T) {

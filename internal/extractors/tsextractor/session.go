@@ -83,8 +83,13 @@ type FileRecord struct {
 	// that name stop resolving. ExportSurfaceRecorded says the surface was
 	// computed rather than merely empty, so a record written before this field
 	// existed reads as unknown instead of as a file that exports nothing.
-	ExportSurface         []string    `json:"export_surface,omitempty"`
-	ExportSurfaceRecorded bool        `json:"export_surface_recorded,omitempty"`
+	ExportSurface         []string `json:"export_surface,omitempty"`
+	ExportSurfaceRecorded bool     `json:"export_surface_recorded,omitempty"`
+	// DefaultExportName preserves the selected local identity of `export default
+	// Name` even when the full export surface cannot be cached for this file.
+	// The recorded bit also proves the known absence of a default export.
+	DefaultExportName     string      `json:"default_export_name,omitempty"`
+	DefaultExportRecorded bool        `json:"default_export_recorded,omitempty"`
 	GraphQLServer         bool        `json:"graphql_server,omitempty"`
 	GraphQLSDL            []string    `json:"graphql_sdl,omitempty"`
 	GraphQLParsed         bool        `json:"graphql_parsed,omitempty"`
@@ -525,7 +530,10 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			return raw
 		}
 		fileOrms, fileVue := pkgGates.forFile(pkgNamesEarly, relFile)
-		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, fileVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, fileOrms, aliases, knownFiles, readSrc, auto, grpcIdx, exportCache, sideReads, resolutionSpecs)
+		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, fileVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, fileOrms, aliases, knownFiles, readSrc, auto, grpcIdx, exportCache, func(name string) {
+			rec.DefaultExportName = name
+			rec.DefaultExportRecorded = true
+		}, sideReads, resolutionSpecs)
 		if len(resolutionSpecs) > 0 {
 			rec.ResolutionSpecs = make([]string, 0, len(resolutionSpecs))
 			for spec := range resolutionSpecs {
@@ -869,11 +877,20 @@ func compareRecordExportSurface(rec *FileRecord, current []string) (changed bool
 	default:
 		return true, nil, false
 	}
+	if !rec.DefaultExportRecorded {
+		// Without the old selected-default identity, an equal set of exported
+		// names cannot prove that a default importer still targets the same local.
+		return true, nil, false
+	}
 	oldNames := exportedFactNames(rec.Facts)
 	newNames := map[string]bool{}
+	currentDefault := ""
 	for _, item := range current {
 		if item == "empty" {
 			continue
+		}
+		if strings.HasPrefix(item, "default:") {
+			currentDefault = strings.TrimPrefix(item, "default:")
 		}
 		name, ok := exportedSurfaceName(item)
 		if !ok {
@@ -891,6 +908,16 @@ func compareRecordExportSurface(rec *FileRecord, current []string) (changed bool
 		if !oldNames[name] {
 			names = ensureStringSet(names)
 			names[name] = true
+		}
+	}
+	if rec.DefaultExportName != currentDefault {
+		if rec.DefaultExportName != "" {
+			names = ensureStringSet(names)
+			names[rec.DefaultExportName] = true
+		}
+		if currentDefault != "" {
+			names = ensureStringSet(names)
+			names[currentDefault] = true
 		}
 	}
 	return len(names) > 0, names, true

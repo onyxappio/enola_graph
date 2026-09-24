@@ -2611,7 +2611,10 @@ import (
 // calls; Vue macro member names include newline/comment-separated signatures; wrapped
 // anonymous defaults keep their value entities; file-scope new references bind local
 // classes without inventing instantiates relations.
-const cacheVersion = "v319"
+// v320: TypeScript session records retain the selected local default export identity
+// when imported files cannot store a complete export surface, so default-binding
+// swaps invalidate importers even when the exported-name set is unchanged.
+const cacheVersion = "v320"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

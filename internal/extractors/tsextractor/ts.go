@@ -331,7 +331,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 		var res tsFileResult
 		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, fileVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, fileOrms, aliases, knownFiles, func(rel string) []byte {
 			return sources[rel]
-		}, auto, grpcStubs, exportCache, nil, nil)
+		}, auto, grpcStubs, exportCache, nil, nil, nil)
 		// Routers, mounts and held-back routes for the repo-wide mount pass below.
 		// Collected here because resolving an import needs this file's path aliases,
 		// which are in scope only during the per-file walk. Same test-path gate as
@@ -571,7 +571,7 @@ type extractCtx struct {
 	sideReads         map[string]bool
 }
 
-func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, isNuxt, isSvelteKit, isEmber, isReactNav, isAngular bool, graphqlServer graphqlServerContext, orms ormFlags, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, nuxtAutoComponents map[string]string, grpcStubs *grpcStubIndex, exportCache *namedExportCache, sideReads, resolutionSpecs map[string]bool) ([]facts.Fact, angularCounts, *angularRouterFile, map[string]*angularTemplate, *angularHTTPFile, clientCounts) {
+func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, isNuxt, isSvelteKit, isEmber, isReactNav, isAngular bool, graphqlServer graphqlServerContext, orms ormFlags, aliases map[string]tsAlias, knownFiles map[string]bool, readSrc func(string) []byte, nuxtAutoComponents map[string]string, grpcStubs *grpcStubIndex, exportCache *namedExportCache, onDefaultExport func(string), sideReads, resolutionSpecs map[string]bool) ([]facts.Fact, angularCounts, *angularRouterFile, map[string]*angularTemplate, *angularHTTPFile, clientCounts) {
 	// The grammar is chosen here, so the kind table is too: TypeScript and TSX assign
 	// different meanings to the same symbol ids, and everything below reads node kinds
 	// through this table. See kinds.go.
@@ -678,8 +678,13 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 	// entry, so a scan that already ran still wins and nothing an earlier
 	// consumer saw can change underneath it.
 	if exportCache != nil {
-		if idx, contextFree := buildNamedExportIndex(relFile, src, kinds, root, aliases, knownFiles); contextFree {
-			exportCache.adopt(relFile, idx)
+		if idx, contextFree := buildNamedExportIndex(relFile, src, kinds, root, aliases, knownFiles); idx != nil {
+			if onDefaultExport != nil {
+				onDefaultExport(idx.defaultName)
+			}
+			if contextFree {
+				exportCache.adopt(relFile, idx)
+			}
 		}
 	}
 	if !facts.IsTestPath(relFile) {
