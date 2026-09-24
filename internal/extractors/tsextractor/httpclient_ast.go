@@ -79,7 +79,7 @@ func parseHTTPClientTree(src []byte, relFile string) (*sitter.Parser, *sitter.Tr
 		parser.Close()
 		return nil, nil, nil
 	}
-	tree := parser.Parse(src, nil)
+	tree := parseTypeScript(parser, src)
 	return parser, tree, tsKindsFor(isTSX)
 }
 

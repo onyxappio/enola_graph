@@ -2601,7 +2601,12 @@ import (
 // a default import re-exported through a local barrel follows its source SFC;
 // Nuxt route registrations retain proven default handlers and resolver candidate
 // membership, and canonical framework signatures settle after extracted records.
-const cacheVersion = "v317"
+// v318: TypeScript import types inside generic calls no longer corrupt following
+// declarations; existing locals published by top-level CommonJS assignments and
+// object exports carry exported=true; relative Vite ?v= imports bind source while
+// retaining the query; imported object shorthand becomes a file reference; nested
+// tsconfig paths participate at any depth and invalidate their scoped consumers.
+const cacheVersion = "v318"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

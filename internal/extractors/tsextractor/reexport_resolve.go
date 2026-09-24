@@ -206,7 +206,7 @@ func parseNamedExportIndexBytes(file string, src []byte, aliases map[string]tsAl
 		idx.empty = true
 		return idx
 	}
-	tree := parser.Parse(src, nil)
+	tree := parseTypeScript(parser, src)
 	defer tree.Close()
 	idx, _ = buildNamedExportIndex(file, src, kinds, tree.RootNode(), aliases, knownFiles)
 	return idx

@@ -1197,7 +1197,7 @@ func (e *TSExtractor) extractVueScriptBlock(kinds *tsutil.KindTable, block *vueS
 		return nil, emberImportBindings{}, nil, nil, nil
 	}
 
-	tree := parser.Parse(block.Content, nil)
+	tree := parseTypeScript(parser, block.Content)
 	defer tree.Close()
 
 	root := tree.RootNode()

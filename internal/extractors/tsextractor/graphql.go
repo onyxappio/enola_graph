@@ -621,7 +621,7 @@ func extractGraphQLCodeFirst(src []byte, relFile string) []facts.Fact {
 	if err := parser.SetLanguage(sitter.NewLanguage(lang)); err != nil {
 		return nil
 	}
-	tree := parser.Parse(src, nil)
+	tree := parseTypeScript(parser, src)
 	defer tree.Close()
 	kinds := tsKindsFor(strings.HasSuffix(relFile, ".tsx") || strings.HasSuffix(relFile, ".jsx"))
 	root := tree.RootNode()
@@ -925,7 +925,7 @@ func graphQLServerASTSignals(src []byte, relFile string) (bool, []string) {
 	if err := parser.SetLanguage(sitter.NewLanguage(lang)); err != nil {
 		return false, nil
 	}
-	tree := parser.Parse(src, nil)
+	tree := parseTypeScript(parser, src)
 	defer tree.Close()
 	kinds := tsKindsFor(strings.HasSuffix(relFile, ".tsx") || strings.HasSuffix(relFile, ".jsx"))
 	root := tree.RootNode()
@@ -1091,7 +1091,7 @@ func blankTSComments(src []byte, relFile string) []byte {
 	if err := parser.SetLanguage(sitter.NewLanguage(lang)); err != nil {
 		return src
 	}
-	tree := parser.Parse(src, nil)
+	tree := parseTypeScript(parser, src)
 	defer tree.Close()
 	out := append([]byte(nil), src...)
 	var walk func(*sitter.Node)
@@ -1616,7 +1616,7 @@ func extractGraphQLClientCallFacts(src []byte, relFile string) []facts.Fact {
 	if err := parser.SetLanguage(sitter.NewLanguage(lang)); err != nil {
 		return nil
 	}
-	tree := parser.Parse(src, nil)
+	tree := parseTypeScript(parser, src)
 	defer tree.Close()
 	kinds := tsKindsFor(strings.HasSuffix(relFile, ".tsx") || strings.HasSuffix(relFile, ".jsx"))
 	root := tree.RootNode()
