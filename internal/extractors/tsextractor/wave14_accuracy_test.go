@@ -517,6 +517,110 @@ state`,
 	}
 }
 
+func TestExtractSession_Wave14BlockIdentityIgnoresTriviaAndRemovesRenamedTargets(t *testing.T) {
+	const file = "src/blocks.ts"
+	const source = `export {}
+if (ready) {
+  function helper() { return 1 }
+  function entry() { return helper() }
+  entry()
+} else {
+  function helper() { return 2 }
+  function entry() { return helper() }
+  entry()
+}
+`
+	root := t.TempDir()
+	write := func(body string) {
+		t.Helper()
+		path := filepath.Join(root, filepath.FromSlash(file))
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	files := []string{file}
+	write(source)
+	state := wave14AssertSessionColdParity(t, root, files, nil, nil)
+
+	blockIdentities := func(result *SessionResult) map[string]string {
+		t.Helper()
+		identities := make(map[string]string)
+		for _, f := range result.Facts {
+			if f.Kind == facts.KindSymbol && f.File == file && strings.Contains(f.Name, ".block_") {
+				identities[f.Name] = f.Identity()
+			}
+		}
+		if len(identities) != 4 {
+			t.Fatalf("found %d block symbol identities, want 4: %v", len(identities), identities)
+		}
+		return identities
+	}
+	assertScopesAndCalls := func(result *SessionResult) []facts.Fact {
+		t.Helper()
+		helpers := wave14Symbols(result.Facts, file, "helper")
+		entries := wave14Symbols(result.Facts, file, "entry")
+		if len(helpers) != 2 || len(entries) != 2 {
+			t.Fatalf("block helpers=%v entries=%v, want two distinct sibling declarations each", helpers, entries)
+		}
+		if helpers[0].Name == helpers[1].Name || entries[0].Name == entries[1].Name {
+			t.Fatalf("sibling scopes shared names: helpers=%v entries=%v", helpers, entries)
+		}
+		for i := range entries {
+			if !wave14HasCall(&entries[i], helpers[i].Name, file) {
+				t.Fatalf("same-file entry %s lost its exact scoped helper target %s: %+v", entries[i].Name, helpers[i].Name, entries[i].Relations)
+			}
+		}
+		return helpers
+	}
+
+	baselineIDs := blockIdentities(state)
+	assertScopesAndCalls(state)
+	write("// inert leading comment\n" + source)
+	state = wave14AssertSessionColdParity(t, root, files, state.Records, map[string]bool{file: true})
+	if got := blockIdentities(state); !reflect.DeepEqual(got, baselineIDs) {
+		t.Fatalf("inert comment changed block names or IDs: before=%v after=%v", baselineIDs, got)
+	}
+	assertScopesAndCalls(state)
+
+	formatted := strings.ReplaceAll(source, "  ", "    ")
+	write("// inert leading comment\n" + formatted)
+	state = wave14AssertSessionColdParity(t, root, files, state.Records, map[string]bool{file: true})
+	if got := blockIdentities(state); !reflect.DeepEqual(got, baselineIDs) {
+		t.Fatalf("formatting changed block names or IDs: before=%v after=%v", baselineIDs, got)
+	}
+	oldHelpers := assertScopesAndCalls(state)
+	oldName, oldID := oldHelpers[0].Name, oldHelpers[0].Identity()
+
+	first, rest, found := strings.Cut(formatted, "} else {")
+	if !found {
+		t.Fatal("test fixture lost its sibling else scope")
+	}
+	first = strings.ReplaceAll(first, "helper", "renamedHelper")
+	write("// inert leading comment\n" + first + "} else {" + rest)
+	state = wave14AssertSessionColdParity(t, root, files, state.Records, map[string]bool{file: true})
+	newHelpers := wave14Symbols(state.Facts, file, "renamedHelper")
+	if len(newHelpers) != 1 || newHelpers[0].Name == oldName {
+		t.Fatalf("renamed helper fact missing or reused stale identity: old=%s new=%v", oldName, newHelpers)
+	}
+	for _, f := range state.Facts {
+		if f.Identity() == oldID {
+			t.Fatalf("stale helper fact survived rename: %+v", f)
+		}
+		for _, rel := range f.Relations {
+			if rel.Target == oldName && rel.TargetFile == file {
+				t.Fatalf("stale relation target survived rename: source=%s relation=%+v", f.Name, rel)
+			}
+		}
+	}
+	entries := wave14Symbols(state.Facts, file, "entry")
+	if len(entries) != 2 || !wave14HasCall(&entries[0], newHelpers[0].Name, file) {
+		t.Fatalf("renamed scoped target did not retain its same-file call: entries=%v target=%v", entries, newHelpers)
+	}
+}
+
 func TestExtract_Wave14WrappedAnonymousDefaultsKeepEntities(t *testing.T) {
 	imagePath := "apps/landings/land-test9/assets/imageMap.ts"
 	files := map[string]string{

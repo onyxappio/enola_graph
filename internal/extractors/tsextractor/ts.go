@@ -558,7 +558,7 @@ type extractCtx struct {
 	virtualNames      map[string]bool     // locals bound to framework virtual modules (#imports/#app)
 	localNames        map[string]bool     // file-scope function/const names that may own a local call
 	localTargets      map[string]string   // lexical module-block names to their file-owned symbol identity
-	symbolScope       string              // stable lexical scope segment for declarations inside module blocks
+	symbolScope       string              // structural ordinal path for declarations inside module blocks
 	scopedSymbolNames map[string]bool     // emitted module-block symbols are never module exports
 	scriptMode        bool                // true for TypeScript/JavaScript files with shared script globals
 	commonJS          commonJSBindings    // module/exports are synthetic only when not rebound locally
@@ -1091,56 +1091,69 @@ func collectTSModuleBlockScopes(kinds *tsutil.KindTable, root *sitter.Node, src 
 	if root == nil {
 		return scopes
 	}
-	var walkControl func(*sitter.Node, map[string]string)
-	var visitBlock func(*sitter.Node, map[string]string)
-	visitBlock = func(block *sitter.Node, inherited map[string]string) {
+	var walkControl func(*sitter.Node, map[string]string, []int, *int)
+	var visitBlock func(*sitter.Node, map[string]string, []int)
+	visitBlock = func(block *sitter.Node, inherited map[string]string, path []int) {
 		if block == nil || tsIsFunctionLike(kindOf(kinds, block)) {
 			return
 		}
-		id := "block_" + strconv.FormatUint(uint64(block.StartByte()), 10)
+		// The path counts only extracted lexical blocks. It is unaffected by
+		// comments, whitespace, or ordinary statements. Adding or reordering
+		// sibling scope-bearing blocks can still change their ordinal identities.
+		var id strings.Builder
+		id.WriteString("block")
+		for _, ordinal := range path {
+			id.WriteByte('_')
+			id.WriteString(strconv.Itoa(ordinal))
+		}
+		scopeID := id.String()
 		decls := tsModuleBlockDeclarations(kinds, block)
 		targets := make(map[string]string)
 		for _, decl := range decls {
 			for _, name := range tsModuleBlockNames(kinds, decl, src) {
-				targets[name] = dir + "." + id + "." + name
+				targets[name] = dir + "." + scopeID + "." + name
 			}
 		}
 		scopes = append(scopes, tsModuleBlockScope{
-			node: block, id: id, declarations: decls, targets: targets,
+			node: block, id: scopeID, declarations: decls, targets: targets,
 			inheritedTargets: copyTSNameTargets(inherited),
 		})
 		visible := copyTSNameTargets(inherited)
 		for name, target := range targets {
 			visible[name] = target
 		}
+		childOrdinal := 0
 		for i := range block.NamedChildCount() {
 			child := block.NamedChild(i)
 			if !tsModuleBlockDeclaration(kinds, child) {
-				walkControl(child, visible)
+				walkControl(child, visible, path, &childOrdinal)
 			}
 		}
 	}
-	walkControl = func(n *sitter.Node, inherited map[string]string) {
+	walkControl = func(n *sitter.Node, inherited map[string]string, parentPath []int, nextOrdinal *int) {
 		if n == nil || tsIsFunctionLike(kindOf(kinds, n)) {
 			return
 		}
 		switch kindOf(kinds, n) {
 		case "statement_block", "switch_body":
-			visitBlock(n, inherited)
+			path := append(append([]int(nil), parentPath...), *nextOrdinal)
+			(*nextOrdinal)++
+			visitBlock(n, inherited, path)
 		case "if_statement", "else_clause", "try_statement", "catch_clause", "finally_clause",
 			"for_statement", "for_in_statement", "while_statement", "do_statement", "switch_statement", "labeled_statement", "with_statement":
 			for i := range n.NamedChildCount() {
 				child := n.NamedChild(i)
 				k := kindOf(kinds, child)
 				if k == "statement_block" || k == "switch_body" || k == "else_clause" || k == "catch_clause" || k == "finally_clause" || k == "if_statement" || k == "try_statement" || k == "for_statement" || k == "for_in_statement" || k == "while_statement" || k == "do_statement" || k == "switch_statement" || k == "labeled_statement" || k == "with_statement" {
-					walkControl(child, inherited)
+					walkControl(child, inherited, parentPath, nextOrdinal)
 				}
 			}
 		}
 	}
+	topLevelOrdinal := 0
 	for i := range root.NamedChildCount() {
 		child := root.NamedChild(i)
-		walkControl(child, nil)
+		walkControl(child, nil, nil, &topLevelOrdinal)
 	}
 	return scopes
 }
