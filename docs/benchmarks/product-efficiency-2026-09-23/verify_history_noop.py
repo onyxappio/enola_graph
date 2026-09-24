@@ -25,7 +25,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--work', type=Path, required=True)
     parser.add_argument('--binary', type=Path, required=True)
+    parser.add_argument('--output', type=Path,
+                        help='Separate receipt path when checking a different binary against the same state')
     args = parser.parse_args()
+    output = args.output or args.work / 'final-noop-result.json'
+    output.parent.mkdir(parents=True, exist_ok=True)
+    summary = (output.with_name(output.stem + '-summary.json') if args.output
+               else args.work / 'summary-final-noop.json')
     module = Path(__file__).resolve().parents[1] / 'invalidation-history-2026-09-22/run.py'
     spec = importlib.util.spec_from_file_location('history_noop_source', module)
     history = importlib.util.module_from_spec(spec)
@@ -45,7 +51,7 @@ def main():
     before_state = hashes(state)
     before_size = events.stat().st_size
     info = history.scope.enola(args.binary, 'delta', args.work / 'live', state, events,
-                               args.work / 'summary-final-noop.json')
+                               summary)
     pairs = history.scope.parse_event_records(events, before_size)
     info['events'] = len(pairs)
     assert info['parsed'] == 0, info
@@ -54,11 +60,13 @@ def main():
     after_state = hashes(state)
     assert before_state == after_state, 'No-op mutated persistent state'
     result = {'kind': validated['kind'], 'run': info, 'completed_generation': previous,
+              'binary': {'path': str(args.binary),
+                         'sha256': hashlib.sha256(args.binary.read_bytes()).hexdigest()},
               'state_unchanged': True, 'state_hashes': after_state,
               'event_bytes_unchanged': before_size,
               'coverage': 'Final history state only; not each intermediate transition',
               'sink': 'file', 'timing': 'Single diagnostic fresh CLI run on shared host'}
-    (args.work / 'final-noop-result.json').write_text(json.dumps(result, indent=2) + '\n')
+    output.write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result))
 
 

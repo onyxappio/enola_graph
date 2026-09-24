@@ -646,7 +646,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			continue
 		}
 		owned := ownedFiles(ext, inv.Files)
-		need := nonTSExtractorNeed(owned, prevFiles, hashes, ext.Name(), prevScan, scanHash, nonTSForceAll, nonTSConfigChanged)
+		need := nonTSExtractorNeed(ext, owned, prevFiles, hashes, ext.Name(), prevScan, scanHash, nonTSForceAll, nonTSConfigChanged)
 		if !need {
 			need = ownedExtractorContextNeed(owned, s.state, ext, inv.Files, inv.AllNames, hashes, fileSetHash, prevScan, scanHash)
 		}
@@ -1451,7 +1451,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				proven = true
 			}
 			if !need && !s.fast && !proven {
-				need = nonTSExtractorNeed(owned, prevFiles, hashes, ext.Name(), prevScan, scanHash, nonTSForceAll, nonTSConfigChanged)
+				need = nonTSExtractorNeed(ext, owned, prevFiles, hashes, ext.Name(), prevScan, scanHash, nonTSForceAll, nonTSConfigChanged)
 				if !need {
 					need = ownedExtractorContextNeed(owned, s.state, ext, inv.Files, inv.AllNames, hashes, fileSetHash, prevScan, scanHash)
 				}
