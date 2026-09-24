@@ -220,6 +220,16 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		if rec == nil {
 			return true
 		}
+		// A cached importer's local facts contain the resolved identity and owner
+		// of each imported symbol. If one of those files changes, recompute the
+		// importer so renamed/deleted exports cannot leave stale file_ref edges.
+		// This is a direct dependency invalidation; it does not walk callers of
+		// the importer or propagate local attributes transitively.
+		for _, resolved := range rec.ResolvedFiles {
+			if dirty[filepath.ToSlash(resolved)] {
+				return true
+			}
+		}
 		for _, f := range rec.ResolvedFiles {
 			if !knownFiles[filepath.ToSlash(f)] {
 				return true

@@ -261,8 +261,8 @@ func buildNamedExportIndex(file string, src []byte, kinds *tsutil.KindTable, roo
 					}
 				}
 				if idx.defaultName == "" {
-					if id := findChildByKind(kinds, child, "identifier"); id != nil {
-						idx.defaultName = nodeText(id, src)
+					if name := defaultExportLocalName(kinds, child, src); name != "" {
+						idx.defaultName = name
 					} else {
 						idx.defaultName = fileSymbolName(file)
 					}
