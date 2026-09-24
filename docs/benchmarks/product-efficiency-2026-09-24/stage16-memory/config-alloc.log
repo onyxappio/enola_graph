@@ -1,0 +1,12 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/enola-labs/enola/internal/extractors/tsextractor
+cpu: Apple M1 Pro
+BenchmarkStage16ConfigAlloc/oracle-10         	       5	 111674192 ns/op	10904100 B/op	  112915 allocs/op
+BenchmarkStage16ConfigAlloc/oracle-10         	       5	 111398700 ns/op	10907675 B/op	  112935 allocs/op
+BenchmarkStage16ConfigAlloc/oracle-10         	       5	 113461150 ns/op	10903046 B/op	  112914 allocs/op
+BenchmarkStage16ConfigAlloc/fused-10          	       5	  68280267 ns/op	 7896462 B/op	   76688 allocs/op
+BenchmarkStage16ConfigAlloc/fused-10          	       5	  67624258 ns/op	 7895996 B/op	   76673 allocs/op
+BenchmarkStage16ConfigAlloc/fused-10          	       5	  66215250 ns/op	 7894400 B/op	   76654 allocs/op
+PASS
+ok  	github.com/enola-labs/enola/internal/extractors/tsextractor	4.126s

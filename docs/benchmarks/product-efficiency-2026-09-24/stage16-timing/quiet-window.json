@@ -1,0 +1,9 @@
+{
+  "start_utc": "2026-09-24T20:48:00+00:00",
+  "end_utc": "2026-09-24T21:03:00+00:00",
+  "codata_evidence": "/tmp/enola-stage16-root-review/codata-quiet-transcript.json",
+  "fsm_evidence": "/tmp/enola-stage16-root-review/fsm-quiet-transcript.json",
+  "codata": "Coordinator explicitly GO, coder held, reviewer exited",
+  "fsm": "No active FSM processes; no heavy work20:48-21:03, awaiting root START/END",
+  "ambient": "ClickHouse background merges20-27%CPU; other containers idle. Not a zero-load host. Paired order alternates; disclose ambient contention."
+}

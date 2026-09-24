@@ -1,0 +1,42 @@
+[
+  {
+    "pair": 1,
+    "arm": "baseline",
+    "save_to_first_event_ms": 1453.284,
+    "first_event_to_first_batch_ms": 474.08,
+    "first_batch_to_broker_end_ms": 350.626,
+    "broker_end_to_consumer_ms": 4.941,
+    "total_ms": 2282.931,
+    "note": "Observed timestamps; pre-first-event mixes scheduling, detection and preparation. Not profiler attribution or publisher-ack latency."
+  },
+  {
+    "pair": 1,
+    "arm": "candidate",
+    "save_to_first_event_ms": 1154.808,
+    "first_event_to_first_batch_ms": 482.048,
+    "first_batch_to_broker_end_ms": 273.908,
+    "broker_end_to_consumer_ms": 0.232,
+    "total_ms": 1910.996,
+    "note": "Observed timestamps; pre-first-event mixes scheduling, detection and preparation. Not profiler attribution or publisher-ack latency."
+  },
+  {
+    "pair": 2,
+    "arm": "candidate",
+    "save_to_first_event_ms": 1161.783,
+    "first_event_to_first_batch_ms": 495.401,
+    "first_batch_to_broker_end_ms": 275.294,
+    "broker_end_to_consumer_ms": 0.259,
+    "total_ms": 1932.737,
+    "note": "Observed timestamps; pre-first-event mixes scheduling, detection and preparation. Not profiler attribution or publisher-ack latency."
+  },
+  {
+    "pair": 2,
+    "arm": "baseline",
+    "save_to_first_event_ms": 1468.641,
+    "first_event_to_first_batch_ms": 507.087,
+    "first_batch_to_broker_end_ms": 376.91,
+    "broker_end_to_consumer_ms": 4.957,
+    "total_ms": 2357.595,
+    "note": "Observed timestamps; pre-first-event mixes scheduling, detection and preparation. Not profiler attribution or publisher-ack latency."
+  }
+]

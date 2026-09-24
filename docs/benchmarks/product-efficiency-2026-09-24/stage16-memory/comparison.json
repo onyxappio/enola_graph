@@ -1,0 +1,16 @@
+{
+  "baseline": {
+    "rss_bytes": 653770752.0,
+    "peak_footprint_bytes": 633719936,
+    "gc_cycles": 23,
+    "last_gc": "gc 23 @3.389s 0%: 0.062+13+0.020 ms clock, 0.62+11/20/32+0.20 ms cpu, 384->384->249 MB, 384 MB goal, 0 MB stacks, 0 MB globals, 10 P",
+    "timing_eligible": false
+  },
+  "candidate": {
+    "rss_bytes": 661651456.0,
+    "peak_footprint_bytes": 612535488,
+    "gc_cycles": 24,
+    "last_gc": "gc 24 @3.207s 1%: 0.059+12+0.012 ms clock, 0.59+0/26/39+0.12 ms cpu, 296->297->210 MB, 329 MB goal, 0 MB stacks, 0 MB globals, 10 P",
+    "timing_eligible": false
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "baseline": {
+    "n": 5,
+    "median_s": 1.9328701660269871,
+    "min_s": 1.891654207953252,
+    "max_s": 2.8455167500069365
+  },
+  "candidate": {
+    "n": 5,
+    "median_s": 1.977435375098139,
+    "min_s": 1.9090334579814225,
+    "max_s": 2.9025112920207903
+  },
+  "candidate_median_change_pct": 2.305649383722219,
+  "all_eligible": true,
+  "scope": "Repeated fresh CLI file-sink no-op; warm filesystem; not NATS acceptance or cold OS cache."
+}

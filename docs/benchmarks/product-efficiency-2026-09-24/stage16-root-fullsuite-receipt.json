@@ -1,0 +1,9 @@
+{
+  "command": "GOMAXPROCS=2 /opt/homebrew/bin/go test -p 2 ./... -count=1",
+  "cwd": "/tmp/enola-stage16-root-review/source",
+  "session_id": 74180,
+  "exit_code": 0,
+  "log_sha256": "d4a003179db21f499552fc33743f2c5fca84c977ad44ebd0eae294663992de5f",
+  "timing_eligible": false,
+  "note": "Operational correctness test; concurrent workloads present."
+}

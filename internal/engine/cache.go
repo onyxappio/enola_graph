@@ -2614,10 +2614,13 @@ import (
 // v320: TypeScript session records retain the selected local default export identity
 // when imported files cannot store a complete export surface, so default-binding
 // swaps invalidate importers even when the exported-name set is unchanged.
-// v321: repository-configured TypeScript FSM machines, declaration/transition facts,
-// and their direct source read dependencies are recorded with the extractor cache.
-// v322: FSM returned-value/type dependencies, file-owned coverage, canonical source
-// binding and relation-kind constrained endpoint provenance change cached facts.
+// v321: a TypeScript file whose export index names no module records that
+// surface and the proof that it is context-free, so a consumer that binds a
+// name inside it is no longer rebound when only that file's own imports move;
+// an index merged from a block nobody could read carries no such proof.
+// v322: repository-configured TypeScript FSM machines, transitions, returned-value
+// and type dependencies, file-owned coverage, canonical source bindings and
+// relation-kind constrained endpoint provenance change cached facts.
 const cacheVersion = "v322"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.

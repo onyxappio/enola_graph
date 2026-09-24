@@ -1,0 +1,97 @@
+{
+  "hold": {
+    "start_utc": "2026-09-24T21:12:00+00:00",
+    "end_utc": "2026-09-24T21:20:00+00:00",
+    "fsm_message": "msg_8ee871e18675",
+    "codata_evidence": "/tmp/enola-stage16-root-review/codata-rss-transcript.json",
+    "reviewer_ack": "/tmp/enola-stage16-root-review/codata-reviewer-rss-hold.json",
+    "note": "Codata primary GO, coder idle held, reviewer explicitly acknowledged no workloads. Ambient containers sampled."
+  },
+  "runs": [
+    {
+      "label": "cli-candidate-4",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage16-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "4",
+        "--quiet-message-id",
+        "joint-rss-followup"
+      ],
+      "started_utc": "2026-09-24T21:13:25.370763+00:00",
+      "exit": 0,
+      "finished_utc": "2026-09-24T21:14:28.416264+00:00"
+    },
+    {
+      "label": "cli-baseline-4",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage16-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "4",
+        "--quiet-message-id",
+        "joint-rss-followup"
+      ],
+      "started_utc": "2026-09-24T21:14:28.416707+00:00",
+      "exit": 0,
+      "finished_utc": "2026-09-24T21:15:31.414527+00:00"
+    },
+    {
+      "label": "cli-baseline-5",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage16-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "5",
+        "--quiet-message-id",
+        "joint-rss-followup"
+      ],
+      "started_utc": "2026-09-24T21:15:31.415032+00:00",
+      "exit": 0,
+      "finished_utc": "2026-09-24T21:16:34.095671+00:00"
+    },
+    {
+      "label": "cli-candidate-5",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage16-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "5",
+        "--quiet-message-id",
+        "joint-rss-followup"
+      ],
+      "started_utc": "2026-09-24T21:16:34.096194+00:00",
+      "exit": 0,
+      "finished_utc": "2026-09-24T21:17:35.874532+00:00"
+    },
+    {
+      "label": "cli-candidate-6",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage16-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "6",
+        "--quiet-message-id",
+        "joint-rss-followup"
+      ],
+      "started_utc": "2026-09-24T21:17:35.875049+00:00",
+      "exit": 0,
+      "finished_utc": "2026-09-24T21:18:39.250602+00:00"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "timing_eligible": false,
+  "validation": "Both builds cold-equal; identical initial/final graphs across builds; idle and duplicate silent; no abandoned Begin; stable input checks PASS.",
+  "mutation_spec_sha256": "0f3170184bbc5bab7f7ad564bc511d4b583c6c5a8de70751a25c12a352eb7a9b",
+  "initial_hash": "c6268b2834451da3bafe596dd929cbcf6063bc737f1b6240ae9ff742d80d94a2",
+  "final_hash": "57e716f7a834bdd8a114a3052e88d59abc6347fbd1716f334be711d6e458f03d",
+  "work_counts": {
+    "baseline": {
+      "owner_scope_count": 407,
+      "completeness_parsed_files": 407,
+      "batches_observed": 102,
+      "payload_bytes_total": 5012623,
+      "node_records_sent": 4248,
+      "edge_records_sent": 6492,
+      "report_sha256": "08017a457413e27edebde450900b89637df53860156e625118fec3e6819add2e"
+    },
+    "candidate": {
+      "owner_scope_count": 1,
+      "completeness_parsed_files": 1,
+      "batches_observed": 2,
+      "payload_bytes_total": 34227,
+      "node_records_sent": 28,
+      "edge_records_sent": 66,
+      "report_sha256": "b84c11287222cd5c723627f7325237b2bfb7ff36ba98107c3c02667674a022a1"
+    }
+  },
+  "limitations": "One synthetic edit in real Product. Work and traffic reduction proven for this case; repeated quiet performance measurements remain pending."
+}

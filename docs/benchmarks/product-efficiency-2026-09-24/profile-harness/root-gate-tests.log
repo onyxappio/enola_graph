@@ -1,0 +1,63 @@
+== run-profile-arm.py required marks, per label
+PASS  complete labels have no missing marks
+PASS  noop does not require state_json_marshal
+PASS  body requires state_json_marshal
+PASS  a missing state mark on body is reported
+PASS  empty marks report every required mark for the label
+== run-profile-arm.py eligibility arithmetic
+PASS  complete green run is eligible
+PASS  truncated gate list is not eligible
+PASS  truncated gate list names the absent gates
+PASS  sequence not completed is not eligible
+PASS  competing samples are not eligible
+PASS  unrestored control file is not eligible
+PASS  one failing gate is not eligible
+PASS  no gates at all is not eligible
+== summarize.py accepts a complete synthetic series
+PASS  exit 0
+PASS  no series problems
+PASS  per-run state bytes are reported for every run
+PASS  state byte spread is reported
+PASS  state marks are differenced individually
+PASS  no summed state gap field exists
+PASS  noop delta omits state_json_marshal
+PASS  noop reports the absent state mark
+== summarize.py refuses an incomplete or contaminated series
+PASS  missing: exit 1
+PASS  missing: problem reported
+PASS  missing: no aggregate written
+PASS  ineligible: exit 1
+PASS  ineligible: problem reported
+PASS  ineligible: no aggregate written
+PASS  nullhash: exit 1
+PASS  nullhash: problem reported
+PASS  nullhash: no aggregate written
+PASS  shorthash: exit 1
+PASS  shorthash: problem reported
+PASS  shorthash: no aggregate written
+PASS  mismatch: exit 1
+PASS  mismatch: problem reported
+PASS  mismatch: no aggregate written
+PASS  quiet: exit 1
+PASS  quiet: problem reported
+PASS  quiet: no aggregate written
+PASS  extra run dir: exit 1
+PASS  extra run dir: reported
+PASS  missing cold oracle: exit 1
+PASS  missing cold oracle: hash reported
+PASS  missing cold oracle: gate reported
+== summarize.py preserves repeated marks instead of collapsing them
+PASS  repeated mark: exit 0
+PASS  repeated mark is excluded from the difference
+PASS  repeated mark is listed as not differenced
+PASS  repeated mark is listed as an absent state delta
+PASS  repeated mark keeps its occurrence counts
+PASS  repeated mark keeps both durations raw
+PASS  repeated mark keeps distinct traces
+PASS  other marks are still differenced
+== summarize.py refuses a run whose body lost a required mark
+PASS  dropped required mark: nonzero exit
+PASS  dropped required mark: named in the error
+
+removed 11 synthetic tree(s); pass --keep to inspect them
+all gate tests passed; no workload was run

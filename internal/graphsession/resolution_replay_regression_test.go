@@ -147,18 +147,24 @@ func TestResolutionReplayNamedReexportChainRebinds(t *testing.T) {
 	}
 }
 
-// A dependency that gains an import of its own moved its bindings, not just its
-// names, so the old rule stands for every importer.
-func TestResolutionReplayMovedBindingStillTakesImporters(t *testing.T) {
+// A dependency that gains an import of its own moved where its own names come
+// from, but not which names it exports: a still binds a locally, and the
+// importer bound it there. The edited file is parsed; the importer is not, and
+// its edge to a is unchanged. run compares the applied graph against a cold one
+// before any count is read, so a skip that moved an edge fails there first.
+func TestResolutionReplayPrivateImportSparesImporters(t *testing.T) {
 	dir, _, _, _, run := replayRepo(t, map[string]string{
 		"src/dep.ts": "export function dep() { return 7; }\n",
 	})
 
 	writeFile(t, dir, "src/a.ts", "import { dep } from './dep';\nexport function a() { return dep(); }\n")
-	res, _ := run(t)
+	res, cons := run(t)
 
-	if got := res.Invalidation.ParsedByReason["resolution"]; got == 0 {
-		t.Fatalf("a moved binding surface skipped its importers: %+v", res.Invalidation)
+	if res.ParsedFiles != 1 {
+		t.Fatalf("only the edited dependency should have been parsed, got %d: %+v", res.ParsedFiles, res.Invalidation)
+	}
+	if targets := resolvedTargetFiles(cons, "src/b.ts"); !targets["src/a.ts"] {
+		t.Fatalf("importer lost its edge to the dependency: %v", targets)
 	}
 }
 

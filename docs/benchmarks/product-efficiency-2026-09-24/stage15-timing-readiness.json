@@ -1,0 +1,20 @@
+{
+  "checked_at": "2026-09-24T11:04:30.041633+00:00",
+  "timing_started": false,
+  "quiet_granted": false,
+  "accuracy_status_message": "msg_e8c804e2e3d3",
+  "cleanup_request_message": "msg_1e271aea6184",
+  "source_worker_quiet_message": "msg_29ffb4607365",
+  "keep_file": "/Users/oleksandr.mykulych/.local/share/tmp-cleanup/keep/term_023590d8-e212-427c-8aa7-27984832fd33.txt",
+  "harness_and_dependency_hashes": {
+    "/private/tmp/enola-stage15-noop-pairs/run.py": "de5a2698edea10a760ec20f47f0eb420adf3180d9ccdc8b5d1cc692a2798a125",
+    "/private/tmp/enola-stage15-watch-pairs/run-pair.py": "dee769b4ed9162b4080a4f5a62f66ecf9e5dc299fb6b9631ed638aba1c70f388",
+    "/private/tmp/enola-stage15-cli-pairs/run-arm.py": "e281808ac4d2ce18c6fcb228f442ddf9b6528fc4d1f2b9263c1df8ec82d457bc",
+    "/private/tmp/enola-toolchain/bin/nats-server": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af"
+  },
+  "noop_harness_changes": [
+    "Reject missing or non-integer generation counters",
+    "Record explicit timing_eligible flag",
+    "Sample known temporary-directory cleanup commands; sampling is not comprehensive"
+  ]
+}

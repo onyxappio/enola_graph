@@ -18,9 +18,105 @@ const (
 	// not by edge, so a dependent that proves its bindings and forwards no
 	// names of its own is left to nameDependents.
 	takeNameScoped
+	// takeLocalExportProven is the rule for a dependency whose reparse moved
+	// only where its OWN bindings point, while the export surface a consumer
+	// binds through came back identical and context-free on both sides. A
+	// dependent that binds every such name directly - not through a re-export
+	// chain it recorded as a side read - and that binds by import rather than
+	// by framework convention is left alone.
+	takeLocalExportProven
 	// takeEveryDependent is the old reachability rule.
 	takeEveryDependent
 )
+
+// outgoingOnlySurfaceShift reports whether a reparse moved only where this
+// file's own bindings point, leaving the surface consumers bind THROUGH it
+// provably identical.
+//
+// It is the complement of nameOnlySurfaceShift on the same five fields, and the
+// proof it needs is one nameOnlySurfaceShift does not: equality of the outgoing
+// fields is visible on the record, while equality of the export surface is not.
+// Declared cannot stand in for it. Declared holds every declaration whether
+// exported or not, and an exported name need not be declared here at all, so a
+// file can keep Declared and Reexports byte-identical while an exported name
+// stops resolving locally and starts forwarding through one of the very imports
+// that moved: `function work` plus `export { work }` becomes `function work`
+// plus `import { work as w } from './late'` plus `export { w as work }`. A bare
+// export clause records no Reexports entry, because only an export statement
+// WITH a source emits the dependency fact that fills it. That transition moves
+// the consumer's bound target from this file to './late', and nothing on either
+// record says so.
+//
+// ExportSurfaceContextFree is what closes it. A context-free index names no
+// module: every exported name resolved inside the file, under any alias map. So
+// two equal context-free surfaces say every name a consumer can bind directly
+// from this file still resolves to the same declaration in this file, whatever
+// happened to the file's own imports. The forwarding transition above is refused
+// because the new index is not context-free - an export specifier that is not
+// locally bound sets that false before the import map is even consulted - and an
+// unrecorded surface on either side is refused as unknown.
+//
+// Everything nameOnlySurfaceShift refuses is refused here for the same reasons,
+// plus Declared itself: a name that appeared or vanished is a global-index
+// question that declaredNameDelta and nameDependents own, and this rule must not
+// answer it. ResolutionSpecs are refused too, because a framework resolver path
+// is composed outside the import graph that this proof reasons about.
+func outgoingOnlySurfaceShift(old, neu *tsextractor.FileRecord) bool {
+	if old == nil || neu == nil {
+		return false
+	}
+	if !replayableDependent(old) || !replayableDependent(neu) {
+		return false
+	}
+	if old.Router != nil || neu.Router != nil {
+		return false
+	}
+	if old.NuxtScope != neu.NuxtScope {
+		return false
+	}
+	if !exportSurfaceProvenLocal(old) || !exportSurfaceProvenLocal(neu) {
+		return false
+	}
+	if !eqStrings(old.ExportSurface, neu.ExportSurface) {
+		return false
+	}
+	return eqStrings(old.Declared, neu.Declared) &&
+		eqStrings(old.Reexports, neu.Reexports) &&
+		eqStrings(old.ResolutionSpecs, neu.ResolutionSpecs) &&
+		eqStrings(old.AutoImportDirs, neu.AutoImportDirs) &&
+		eqStrings(old.NuxtAliases, neu.NuxtAliases)
+}
+
+// exportSurfaceProvenLocal reports whether this record carries a surface that
+// was computed AND proven to name no module. Both bits are required: the first
+// separates "exports nothing" from "was never indexed", the second separates a
+// surface that holds under any alias map from one that does not.
+func exportSurfaceProvenLocal(rec *tsextractor.FileRecord) bool {
+	return rec != nil && rec.ExportSurfaceRecorded && rec.ExportSurfaceContextFree
+}
+
+// locallyBoundConsumer reports whether a dependent binds what it takes from a
+// dependency through ordinary import resolution, so that a proven-local export
+// surface on that dependency is the whole story for it.
+//
+// replayableDependent says the record's cross-file reads are recorded at all.
+// The rest are refusals of every way a name can arrive without an import
+// statement, because the export index says nothing about those: Nuxt
+// auto-imports and module aliases, a Nuxt application scope at all, an assembled
+// Router, and any parse kind but ts - a Vue or Svelte template binds components
+// by convention, which is composition this proof does not cover.
+func locallyBoundConsumer(rec *tsextractor.FileRecord) bool {
+	if !replayableDependent(rec) {
+		return false
+	}
+	if rec.ParseKind != "ts" || rec.Router != nil {
+		return false
+	}
+	if rec.NuxtScope != "-" {
+		return false
+	}
+	return len(rec.AutoImportDirs) == 0 && len(rec.NuxtAliases) == 0
+}
 
 // nameScopedDependent reports whether a dependent's rebinding under a
 // name-only surface shift is fully described by the declared-name delta.

@@ -1,0 +1,144 @@
+{
+  "note": "Read-only source audit, independent of run success. Manifest cases include declared dependency changes; no tsconfig changes in this chain.",
+  "transitions": [
+    {
+      "base": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+      "target": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+      "changed_paths": 6,
+      "extensions": {
+        ".json": 1,
+        ".ts": 5
+      },
+      "config_paths": [
+        "packages/tracking-client/package.json"
+      ],
+      "config_diff": "diff --git a/packages/tracking-client/package.json b/packages/tracking-client/package.json\nindex d81fd65621..12833e1785 100644\n--- a/packages/tracking-client/package.json\n+++ b/packages/tracking-client/package.json\n@@ -1,6 +1,6 @@\n {\n   \"name\": \"@onyxappio/tracking-client\",\n-  \"version\": \"0.7.1\",\n+  \"version\": \"0.7.2\",\n   \"private\": false,\n   \"type\": \"module\",\n   \"main\": \"./dist/index.js\",\n"
+    },
+    {
+      "base": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+      "target": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+      "changed_paths": 9345,
+      "extensions": {
+        ".json": 8778,
+        ".png": 284,
+        ".md": 71,
+        ".ts": 158,
+        ".tsx": 54
+      },
+      "config_paths": [],
+      "config_diff": ""
+    },
+    {
+      "base": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+      "target": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+      "changed_paths": 8125,
+      "extensions": {
+        ".json": 7997,
+        ".png": 93,
+        ".ts": 30,
+        ".tsx": 4,
+        ".md": 1
+      },
+      "config_paths": [],
+      "config_diff": ""
+    },
+    {
+      "base": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+      "target": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+      "changed_paths": 70,
+      "extensions": {
+        ".yml": 4,
+        ".md": 4,
+        ".ts": 48,
+        ".sql": 1,
+        ".json": 3,
+        ".mjs": 10
+      },
+      "config_paths": [],
+      "config_diff": ""
+    },
+    {
+      "base": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+      "target": "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+      "changed_paths": 15,
+      "extensions": {
+        ".md": 2,
+        ".ts": 11,
+        ".mjs": 2
+      },
+      "config_paths": [],
+      "config_diff": ""
+    },
+    {
+      "base": "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+      "target": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "changed_paths": 60,
+      "extensions": {
+        ".yml": 4,
+        ".md": 7,
+        ".ts": 30,
+        ".json": 7,
+        ".sql": 1,
+        ".mts": 1,
+        ".mjs": 9,
+        ".yaml": 1
+      },
+      "config_paths": [
+        "packages/database/package.json"
+      ],
+      "config_diff": "diff --git a/packages/database/package.json b/packages/database/package.json\nindex fb3f1ae56e..cda2f79b04 100644\n--- a/packages/database/package.json\n+++ b/packages/database/package.json\n@@ -10,9 +10,11 @@\n     \"test\": \"vitest run\",\n     \"db:generate\": \"drizzle-kit generate --config drizzle.config.ts\",\n     \"db:migrate\": \"tsx src/migrate-cli.ts\",\n+    \"db:sync-payment-offers\": \"tsx src/paymentOfferSyncCli.ts\",\n     \"db:product-core-cdc\": \"tsx src/productCoreCdcCli.ts\"\n   },\n   \"dependencies\": {\n+    \"@onyx/contracts\": \"workspace:*\",\n     \"drizzle-orm\": \"catalog:\",\n     \"postgres\": \"catalog:\"\n   },\n"
+    },
+    {
+      "base": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "target": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "changed_paths": 15,
+      "extensions": {
+        ".md": 1,
+        ".json": 1,
+        ".ts": 12,
+        ".yaml": 1
+      },
+      "config_paths": [
+        "packages/clickhouse/package.json"
+      ],
+      "config_diff": "diff --git a/packages/clickhouse/package.json b/packages/clickhouse/package.json\nindex 236038b89b..2eb47754c4 100644\n--- a/packages/clickhouse/package.json\n+++ b/packages/clickhouse/package.json\n@@ -16,6 +16,7 @@\n   },\n   \"devDependencies\": {\n     \"@types/node\": \"catalog:\",\n+    \"drizzle-orm\": \"catalog:\",\n     \"tsx\": \"catalog:\",\n     \"typescript\": \"catalog:\",\n     \"vitest\": \"catalog:\"\n"
+    },
+    {
+      "base": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "target": "a6f1f3a91a36ea3dead786560412a4944a009694",
+      "changed_paths": 5,
+      "extensions": {
+        ".ts": 5
+      },
+      "config_paths": [],
+      "config_diff": ""
+    },
+    {
+      "base": "a6f1f3a91a36ea3dead786560412a4944a009694",
+      "target": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "changed_paths": 15,
+      "extensions": {
+        ".yml": 2,
+        ".md": 1,
+        ".ts": 4,
+        ".mjs": 8
+      },
+      "config_paths": [],
+      "config_diff": ""
+    },
+    {
+      "base": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "target": "a609c19f3861971930fae7b33dcb2950598953c5",
+      "changed_paths": 19,
+      "extensions": {
+        ".yml": 3,
+        ".md": 1,
+        ".ts": 10,
+        ".json": 1,
+        ".mjs": 4
+      },
+      "config_paths": [],
+      "config_diff": ""
+    }
+  ]
+}

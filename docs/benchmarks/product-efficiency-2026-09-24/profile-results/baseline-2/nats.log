@@ -1,0 +1,28 @@
+[4440] 2026/09/24 22:47:38.745590 [INF] Starting nats-server
+[4440] 2026/09/24 22:47:38.745700 [INF]   Version:  2.11.9
+[4440] 2026/09/24 22:47:38.745707 [INF]   Git:      [not set]
+[4440] 2026/09/24 22:47:38.745712 [INF]   Name:     NAM5MIX4577N2ZRWY6UBSVDGGFDOJ2CTXF6725UUFETDAMPLIGHQBJOO
+[4440] 2026/09/24 22:47:38.745716 [INF]   Node:     Woajxov3
+[4440] 2026/09/24 22:47:38.745720 [INF]   ID:       NAM5MIX4577N2ZRWY6UBSVDGGFDOJ2CTXF6725UUFETDAMPLIGHQBJOO
+[4440] 2026/09/24 22:47:38.745728 [INF] Using configuration file: /private/tmp/enola-stage15-profile-plan/baseline-2/nats.conf (sha256:bf7e9a58ca99fd9fe12f9621af296a3e0c4b45b6c56abe7b3bdcbe733e100c25)
+[4440] 2026/09/24 22:47:38.745870 [INF] Starting JetStream
+[4440] 2026/09/24 22:47:38.746134 [INF]     _ ___ _____ ___ _____ ___ ___   _   __  __
+[4440] 2026/09/24 22:47:38.746139 [INF]  _ | | __|_   _/ __|_   _| _ \ __| /_\ |  \/  |
+[4440] 2026/09/24 22:47:38.746143 [INF] | || | _|  | | \__ \ | | |   / _| / _ \| |\/| |
+[4440] 2026/09/24 22:47:38.746146 [INF]  \__/|___| |_| |___/ |_| |_|_\___/_/ \_\_|  |_|
+[4440] 2026/09/24 22:47:38.746149 [INF] 
+[4440] 2026/09/24 22:47:38.746152 [INF]          https://docs.nats.io/jetstream
+[4440] 2026/09/24 22:47:38.746155 [INF] 
+[4440] 2026/09/24 22:47:38.746157 [INF] ---------------- JETSTREAM ----------------
+[4440] 2026/09/24 22:47:38.746161 [INF]   Max Memory:      24.00 GB
+[4440] 2026/09/24 22:47:38.746164 [INF]   Max Storage:     216.23 GB
+[4440] 2026/09/24 22:47:38.746167 [INF]   Store Directory: "/private/tmp/enola-stage15-profile-plan/baseline-2/nats-store/jetstream"
+[4440] 2026/09/24 22:47:38.746171 [INF]   API Level:       1
+[4440] 2026/09/24 22:47:38.746174 [INF] -------------------------------------------
+[4440] 2026/09/24 22:47:38.746470 [INF] Listening for client connections on 127.0.0.1:54189
+[4440] 2026/09/24 22:47:38.746479 [INF] Server is ready
+[4440] 2026/09/24 22:47:52.783504 [INF] Trapped "terminated" signal
+[4440] 2026/09/24 22:47:52.835580 [INF] Initiating Shutdown...
+[4440] 2026/09/24 22:47:52.835617 [INF] Initiating JetStream Shutdown...
+[4440] 2026/09/24 22:47:52.836370 [INF] JetStream Shutdown
+[4440] 2026/09/24 22:47:52.836418 [INF] Server Exiting..
