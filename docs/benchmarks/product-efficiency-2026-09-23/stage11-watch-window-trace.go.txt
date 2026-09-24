@@ -1,0 +1,14 @@
+package graphsession
+
+import (
+	"fmt"
+	"github.com/enola-labs/enola/internal/graphprofile"
+	"os"
+	"time"
+)
+
+func diagnosticWatchMark(phase, extra string) {
+	if graphprofile.Enabled() {
+		fmt.Fprintf(os.Stderr, "[watch-diagnostic] unix_ns=%d phase=%s %s\n", time.Now().UnixNano(), phase, extra)
+	}
+}

@@ -1,0 +1,15 @@
+{
+  "base_commit": "48fbc69b00828a1c351b0ee386edd8aa78219aa9",
+  "go": "go version go1.27.1 darwin/arm64",
+  "flags": [
+    "-trimpath"
+  ],
+  "changed_existing_go_files": [
+    "internal/extractors/tsextractor/session.go"
+  ],
+  "candidate_session_sha256": "0fc91bbd8ccd3407098faf865e4953a621a32ee0b01508398c813c8f3a76bbfe",
+  "binaries": {
+    "baseline": "88d8313a4c1cfd5b66e28c591f170fb142c268dbe92c207acb30e4fa4cc57e05",
+    "candidate": "a1d9ee11eddc69289050b6d3b5329e0b00e247862b98e3294f5460085033a93d"
+  }
+}

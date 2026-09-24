@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "docs/benchmarks/product-efficiency-2026-09-22/watch.py",
+    "--binary",
+    "/tmp/enola-stage10-watch-attribution/enola-trace",
+    "--observer",
+    "/tmp/enola-stage9-product-watch-control/bin/benchobserver",
+    "--source",
+    "/tmp/enola-stage9-md-timing/product",
+    "--work",
+    "/tmp/enola-stage10-watch-attribution/product-diagnostic-1",
+    "--watch-every",
+    "500ms"
+  ],
+  "exit_code": 0,
+  "wall_s": 56.0981745,
+  "kind": "trace-only diagnostic on accuracy012dd29 plus measured prefix executable, not a performance comparison"
+}

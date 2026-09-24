@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "/opt/homebrew/bin/go",
+    "test",
+    "-trimpath",
+    "-overlay",
+    "/tmp/enola-stage10-prefix-review/mutant-overlay.json",
+    "./internal/facts",
+    "-run",
+    "^TestIndependentGlobBooleanPreservesCompiledSemantics$",
+    "-count=1"
+  ],
+  "exit_code": 1,
+  "wall_s": 0.9022755,
+  "expected_failure": true
+}

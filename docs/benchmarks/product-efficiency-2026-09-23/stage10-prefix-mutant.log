@@ -1,0 +1,5 @@
+--- FAIL: TestIndependentGlobBooleanPreservesCompiledSemantics (0.00s)
+    diagnostic_glob_oracle_test.go:70: trial=0 patterns=["foo/**/**" "foo/**" "../**" "./foo/**" "./**" "café/**"] path="foobar/x" boolean=true want=false
+FAIL
+FAIL	github.com/enola-labs/enola/internal/facts	0.417s
+FAIL

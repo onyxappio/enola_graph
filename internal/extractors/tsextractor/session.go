@@ -1038,11 +1038,28 @@ func followTSConfigExtends(repoPath, tsconfigPath string, add func(string), inpu
 // change extraction of otherwise-unchanged files. Dirty files are re-read so
 // a context change is visible before BeginReplace.
 func CompositionSignature(repoPath string, files []string, prev map[string]*FileRecord, dirty map[string]bool, sources map[string][]byte, inputScopes ...*inputscope.Scope) (string, error) {
-	inputScope := inputscope.First(inputScopes)
+	// One enumeration for the package-shaped collectors below, exactly as a
+	// discovery build scopes one. This signature reaches four of them -
+	// collectNuxtPackages, collectPackageGates, collectPackageExportSources
+	// behind collectPackageAliases, and collectPackageNames on the Nuxt branch -
+	// and without a cache in the context each walked the whole tree for itself.
+	// The cache lives and dies with this call, so it borrows no observation from
+	// any other one: each call enumerates the tree afresh, and on stable inputs
+	// returns what the separate walks returned. What is removed is the repetition
+	// WITHIN a call - three or five traversals of the same tree collapse to one.
+	// That is not a claim that a concurrently mutating tree is observed the same
+	// number of times, and nothing here should be read as one.
+	ctx := withDiscoveryWalkCache(withFileOverlay(context.Background(), newFileOverlay(repoPath, sources)))
+	return compositionSignatureOn(ctx, repoPath, files, prev, dirty, sources, inputscope.First(inputScopes))
+}
+
+// compositionSignatureOn is CompositionSignature with the context supplied, so a
+// caller - or a test proving the shared walk changes no signature - decides
+// whether the collectors share one enumeration.
+func compositionSignatureOn(ctx context.Context, repoPath string, files []string, prev map[string]*FileRecord, dirty map[string]bool, sources map[string][]byte, inputScope *inputscope.Scope) (string, error) {
 	if prev == nil {
 		prev = map[string]*FileRecord{}
 	}
-	ctx := withFileOverlay(context.Background(), newFileOverlay(repoPath, sources))
 	allDirty := dirty == nil
 	known := map[string]bool{}
 	gql := graphqlServerContext{sdlDocuments: map[string]bool{}}

@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "/opt/homebrew/bin/go",
+    "test",
+    "./...",
+    "-count=1",
+    "-timeout=20m"
+  ],
+  "cwd": "/Users/oleksandr.mykulych/orca/enola_graph",
+  "head": "012dd2959169671799315664d2d2566c2fca7f34",
+  "go_version": "go version go1.27.1 darwin/arm64",
+  "exit_code": 0,
+  "wall_s": 422.51304,
+  "log": "/tmp/enola-stage10-prefix-integration/full-suite.log",
+  "verified_source_sha256": {
+    "internal/facts/pathglob_set.go": "5d560530fb3d14d5e2a8e8a517c2ae951b0f90379cc10930a08730e7cbb45ff4",
+    "internal/facts/pathglob_set_prefix_test.go": "26e6a240e7916260314545515e70faa04f315037b395dee223230e7fed112ab9"
+  },
+  "ok_packages": 110
+}

@@ -1,0 +1,16 @@
+{
+  "base_commit": "ec43523f8e3536578b3271524f5948aa5602a3de",
+  "changed_tracked_files": [
+    "internal/graphsession/changes.go",
+    "internal/graphsession/resident.go"
+  ],
+  "source_hashes": {
+    "internal/graphsession/changes.go": "5734e4df9562170302a7852d09d5f4fc89ea81e821e05073ee996becfa1fd144",
+    "internal/graphsession/resident.go": "0209890136b2ec8a7f0fcd3a3947da47a0adf979d06bf5081df78047aeab3653"
+  },
+  "binary_sha256": "8f097ed45f0deea79e4a931419eaa09ac13e18d8818cfb16c5fee58e293b0efd",
+  "go": "go version go1.27.1 darwin/arm64",
+  "build_flags": [
+    "-trimpath"
+  ]
+}

@@ -1,0 +1,18 @@
+=== RUN   TestRootDiscoveryCost
+    root_discovery_cost_test.go:34: pair=0 cached=true duration=64.610833ms
+    root_discovery_cost_test.go:34: pair=0 cached=false duration=157.980709ms
+    root_discovery_cost_test.go:38: pair=0 reobserve=67.519625ms cost=names=1977 bytes=1965 dirs=655
+    root_discovery_cost_test.go:34: pair=1 cached=false duration=154.329083ms
+    root_discovery_cost_test.go:34: pair=1 cached=true duration=65.15125ms
+    root_discovery_cost_test.go:38: pair=1 reobserve=69.077458ms cost=names=1977 bytes=1965 dirs=655
+    root_discovery_cost_test.go:34: pair=2 cached=true duration=63.718625ms
+    root_discovery_cost_test.go:34: pair=2 cached=false duration=154.739959ms
+    root_discovery_cost_test.go:38: pair=2 reobserve=69.764042ms cost=names=1977 bytes=1965 dirs=655
+    root_discovery_cost_test.go:34: pair=3 cached=false duration=156.128958ms
+    root_discovery_cost_test.go:34: pair=3 cached=true duration=63.588166ms
+    root_discovery_cost_test.go:38: pair=3 reobserve=66.901208ms cost=names=1977 bytes=1965 dirs=655
+    root_discovery_cost_test.go:34: pair=4 cached=true duration=63.512541ms
+    root_discovery_cost_test.go:34: pair=4 cached=false duration=156.097ms
+    root_discovery_cost_test.go:38: pair=4 reobserve=67.821917ms cost=names=1977 bytes=1965 dirs=655
+--- PASS: TestRootDiscoveryCost (2.08s)
+PASS

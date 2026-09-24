@@ -1,0 +1,56 @@
+package bootstrap
+
+import (
+	"encoding/json"
+	"github.com/enola-labs/enola/internal/config"
+	"os"
+	"runtime/pprof"
+	"testing"
+	"time"
+)
+
+// Diagnostic only: repeated immutable policy construction on an isolated Product
+// checkout. This does not measure graph analysis or end-to-end watch latency.
+func TestDiagnosticProductPolicyCPU(t *testing.T) {
+	root, config, profile := os.Getenv("ENOLA_DIAGNOSTIC_REPO"), os.Getenv("ENOLA_DIAGNOSTIC_CONFIG"), os.Getenv("ENOLA_DIAGNOSTIC_CPU")
+	if root == "" || config == "" || profile == "" {
+		t.Skip("explicit diagnostic inputs required")
+	}
+	f, err := os.Create(profile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	if err := pprof.StartCPUProfile(f); err != nil {
+		t.Fatal(err)
+	}
+	defer pprof.StopCPUProfile()
+	for i := 0; i < 20; i++ {
+		started := time.Now()
+		_, err := NewGraphEngine(GraphOptions{Repo: root, ConfigPath: config})
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Logf("construction=%d wall=%s", i, time.Since(started))
+	}
+}
+
+func TestDiagnosticProductPolicyOptions(t *testing.T) {
+	path, output := os.Getenv("ENOLA_DIAGNOSTIC_CONFIG"), os.Getenv("ENOLA_DIAGNOSTIC_OPTIONS")
+	if path == "" || output == "" {
+		t.Skip("explicit diagnostic inputs required")
+	}
+	cfg, err := config.Load(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	opts := cfg.GraphInputOptions()
+	opts.ConfigPaths = append(opts.ConfigPaths, path)
+	data, err := json.MarshalIndent(opts, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(output, data, 0600); err != nil {
+		t.Fatal(err)
+	}
+}

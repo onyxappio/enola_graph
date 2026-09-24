@@ -1,0 +1,17 @@
+{
+  "base": "012dd2959169671799315664d2d2566c2fca7f34",
+  "compiler": "go version go1.27.1 darwin/arm64",
+  "flags": [
+    "-trimpath",
+    "-overlay",
+    "/tmp/enola-stage10-watch-attribution/overlay.json"
+  ],
+  "sha256": {
+    "/Users/oleksandr.mykulych/orca/enola_graph/internal/facts/pathglob_set.go": "5d560530fb3d14d5e2a8e8a517c2ae951b0f90379cc10930a08730e7cbb45ff4",
+    "/tmp/enola-stage10-watch-attribution/changes.go": "aed9ed23a6f9c47fe97f120ae15da2c69d291232ebfae9da911565f81151fcfd",
+    "/tmp/enola-stage10-watch-attribution/trace.go": "8031a0840cb4b6bb11d4955715772c141101d3701a1104d3abff26cf8dd4256c",
+    "/tmp/enola-stage10-watch-attribution/enola-trace": "79c9a5141b089ef7516e1d0a68c8cf0f8a4791ba26763797341c43623666dffd"
+  },
+  "purpose": "diagnostic watch phase attribution, not production candidate or comparative speed claim",
+  "executed": false
+}

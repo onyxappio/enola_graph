@@ -1,0 +1,75 @@
+package graphinput
+
+import (
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"sort"
+	"testing"
+)
+
+// Diagnostic snapshots compare the old and candidate decision functions over
+// the same Product tree, including both interpretations of every known path.
+func TestDiagnosticProductPolicySnapshot(t *testing.T) {
+	root, config, output := os.Getenv("ENOLA_DIAGNOSTIC_REPO"), os.Getenv("ENOLA_DIAGNOSTIC_CONFIG"), os.Getenv("ENOLA_DIAGNOSTIC_SNAPSHOT")
+	if root == "" || config == "" || output == "" {
+		t.Skip("explicit Product diagnostic inputs required")
+	}
+	var opts Options
+	raw, err := os.ReadFile(os.Getenv("ENOLA_DIAGNOSTIC_OPTIONS"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := json.Unmarshal(raw, &opts); err != nil {
+		t.Fatal(err)
+	}
+	p, err := Build(root, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	names := map[string]bool{}
+	for n := range p.tracked {
+		names[n] = true
+	}
+	for n := range p.entries {
+		names[n] = true
+	}
+	for n := range names {
+		for dir := filepath.ToSlash(filepath.Dir(n)); dir != "."; dir = filepath.ToSlash(filepath.Dir(dir)) {
+			names[dir] = true
+		}
+	}
+	keys := make([]string, 0, len(names))
+	for n := range names {
+		keys = append(keys, n)
+	}
+	sort.Strings(keys)
+	h := sha256.New()
+	enc := json.NewEncoder(h)
+	for _, n := range keys {
+		for _, directory := range []bool{false, true} {
+			row := struct {
+				Name      string
+				Directory bool
+				Decision  Decision
+			}{n, directory, p.Classify(n, directory)}
+			if err := enc.Encode(row); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+	result := struct {
+		Identity, Admission, DecisionsSHA256 string
+		Names, Tracked, Entries              int
+	}{p.Identity(), p.AdmissionIdentity(), hex.EncodeToString(h.Sum(nil)), len(keys), len(p.tracked), len(p.entries)}
+	data, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(output, append(data, '\n'), 0600); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("names=%d tracked=%d entries=%d decisions=%s", len(keys), len(p.tracked), len(p.entries), result.DecisionsSHA256)
+}

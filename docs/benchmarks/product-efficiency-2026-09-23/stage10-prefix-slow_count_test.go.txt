@@ -1,0 +1,38 @@
+package graphinput
+
+import (
+	"encoding/json"
+	"github.com/enola-labs/enola/internal/facts"
+	"os"
+	"testing"
+)
+
+var diagnosticMatchCalls int
+
+func diagnosticMatch(g *facts.GlobSet, name string) bool {
+	diagnosticMatchCalls++
+	return g.MatchAny(name)
+}
+func TestDiagnosticIdentityMatcherWork(t *testing.T) {
+	var opts Options
+	raw, err := os.ReadFile(os.Getenv("ENOLA_DIAGNOSTIC_OPTIONS"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = json.Unmarshal(raw, &opts); err != nil {
+		t.Fatal(err)
+	}
+	p, err := Build(os.Getenv("ENOLA_DIAGNOSTIC_REPO"), opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	beforeID, beforeAdmission := p.Identity(), p.AdmissionIdentity()
+	facts.DiagnosticSlowMatches = 0
+	if err = p.computeIdentities(); err != nil {
+		t.Fatal(err)
+	}
+	if p.Identity() != beforeID || p.AdmissionIdentity() != beforeAdmission {
+		t.Fatal("identity changed")
+	}
+	t.Logf("matcher_calls=%d tracked=%d entries=%d", facts.DiagnosticSlowMatches, len(p.tracked), len(p.entries))
+}

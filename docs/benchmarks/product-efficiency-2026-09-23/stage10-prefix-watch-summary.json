@@ -1,0 +1,70 @@
+{
+  "accepted_runs": 6,
+  "excluded_runs": 1,
+  "baseline": {
+    "initial_s": {
+      "values": [
+        17.477524000000003,
+        9.117968000000001,
+        8.761368000000001
+      ],
+      "median": 9.117968000000001,
+      "range": [
+        8.761368000000001,
+        17.477524000000003
+      ]
+    },
+    "delta_s": {
+      "values": [
+        2.876187,
+        2.624628,
+        2.710592
+      ],
+      "median": 2.710592,
+      "range": [
+        2.624628,
+        2.876187
+      ]
+    },
+    "parses": [
+      11,
+      11,
+      11
+    ]
+  },
+  "candidate": {
+    "initial_s": {
+      "values": [
+        10.666824,
+        8.835246999999999,
+        8.724415
+      ],
+      "median": 8.835246999999999,
+      "range": [
+        8.724415,
+        10.666824
+      ]
+    },
+    "delta_s": {
+      "values": [
+        5.074238,
+        2.608969,
+        2.687389
+      ],
+      "median": 2.687389,
+      "range": [
+        2.608969,
+        5.074238
+      ]
+    },
+    "parses": [
+      11,
+      11,
+      11
+    ]
+  },
+  "all_cold_equal": true,
+  "initial_graph_hash_count": 1,
+  "final_graph_hash_count": 1,
+  "limits": "Three paired runs on base5b0934c, scripted ordinary password.ts burst,500ms collection window. Not long-running agent acceptance. One measured outlier in candidate retained; separate baseline run excluded because concurrent pre-push tests detected. No general end-to-end speedup established."
+}

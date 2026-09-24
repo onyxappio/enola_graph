@@ -1,0 +1,11 @@
+{
+  "base_commit": "ec43523f8e3536578b3271524f5948aa5602a3de",
+  "original": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/watch.py",
+  "original_sha256": "3ddd3f11758faf262ccd88f647927e1b9b29797c550f290164319965979e7dc4",
+  "experimental_sha256": "629fae95963c62b83df4acdc2ea5d6438dd114d67bbca2425b96416eda7538cb",
+  "changes": [
+    "explicit original helper directory",
+    "optional duplicate-to-burst pause; default preserves original schedule"
+  ],
+  "limitation": "schedule relative to save, not proof of native Ready arrival; report all tails"
+}

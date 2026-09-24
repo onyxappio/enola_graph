@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"sort"
 	"sync"
+	"time"
 
 	"github.com/enola-labs/enola/internal/engine"
 	"github.com/enola-labs/enola/internal/extractors/swiftextractor"
@@ -673,9 +674,14 @@ func (r *Resident) changeReason(batch *ChangeBatch) string {
 // taken inside it, which is the order CoverSessionInputs already establishes.
 // Any drift leaves queue and watermark untouched and the caller falls through
 // to the ordinary timer and Drain.
-func (r *Resident) discardUnchanged(ctx context.Context, source peekableSource) (bool, error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
+func (r *Resident) discardUnchanged(ctx context.Context, source peekableSource) (discarded bool, err error) {
+ probeStarted := time.Now()
+ r.mu.Lock()
+ defer r.mu.Unlock()
+ beforeProbeWork := r.probeWork
+ defer func() {
+  graphprofile.Since("watch_unchanged_probe", probeStarted, fmt.Sprintf("elapsed_ns=%d discarded=%v reads=%d bytes=%d", time.Since(probeStarted).Nanoseconds(), discarded, r.probeWork.EarlyProbeReads-beforeProbeWork.EarlyProbeReads, r.probeWork.EarlyProbeBytes-beforeProbeWork.EarlyProbeBytes))
+ }()
 	if r.closed {
 		return false, nil
 	}
