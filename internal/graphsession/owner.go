@@ -826,7 +826,7 @@ func (idx *idIndex) resolveRel(fromRepo, fromKind, relKind, target string) (id, 
 	return idx.resolveRelConstrained(fromRepo, fromKind, relKind, target, false, "")
 }
 
-func (idx *idIndex) resolveRelConstrained(fromRepo, fromKind, relKind, target string, requirePreferred bool, fromFile string) (id, status string) {
+func (idx *idIndex) resolveRelConstrained(fromRepo, fromKind, relKind, target string, requirePreferred bool, targetFile string) (id, status string) {
 	cands := idx.byName[target]
 	if len(cands) == 0 {
 		return "", graphstream.ResUnresolved
@@ -836,14 +836,16 @@ func (idx *idIndex) resolveRelConstrained(fromRepo, fromKind, relKind, target st
 			return pickModuleIdentity(mods)
 		}
 	}
-	// RelCalls may carry extractor-proven TargetFile. That is lexical evidence
-	// for the callee's file (imported specifier or a locally declared name).
-	// The caller's file is not evidence: an import from a sibling can share
-	// the same "<dir>.<name>" as a local of the same spelling.
-	if relKind == facts.RelCalls && fromFile != "" {
+	// Calls and instantiations may carry extractor-proven TargetFile. That is
+	// evidence for the referenced symbol's file (an imported specifier or a
+	// locally declared name). The source fact's file is not evidence: a
+	// reference can share the same "<dir>.<name>" with a sibling declaration.
+	// If the proven file has no candidate, fail closed instead of falling back
+	// to a same-name symbol in another file.
+	if (relKind == facts.RelCalls || relKind == facts.RelInstantiates) && targetFile != "" {
 		var local []facts.Fact
 		for _, f := range cands {
-			if f.Kind == facts.KindSymbol && f.File == fromFile {
+			if f.Kind == facts.KindSymbol && f.File == targetFile {
 				if fromRepo != "" && f.Repo != fromRepo {
 					continue
 				}
