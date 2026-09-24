@@ -2,6 +2,12 @@
 
 Base: `2ef91a45a5e18102849dd6b5f4e2408bfe14a4a3` (cache v320). Experimental Stage15 uses cache v321. Final patch SHA256: `247ed1a5d57ba0ec26df7b3e155c45519fd33cbde87c7471c1395fba42dc1eb3`. This report supports integrating a targeted optimization, not completion of the broader performance goal. Publication is established by the containing main commit, not by the historical experiment receipts.
 
+## Timing fixture provenance correction
+
+A subsequent Stage16 preflight found that the retained timing source checkout at Product `a609c19f3861971930fae7b33dcb2950598953c5` also contains the untracked source `apps/mobile/src/deeplinks/deepLinkDiagnostics.ts` (SHA256 `6e2ad9963ce7d1c6f3234b3e778ace09fffcb4833561f5c748b79622aed53d71`), generated `.enola` artifacts and `mcp-arch.yaml`. The extra TS file is present with exactly the same bytes in all six archived CLI timing copies and all twelve archived paired watch copies. See [CLI copy audit](prior-input-audit.json), [watch copy audit](prior-watch-input-audit.json), and [retained source untracked manifest](prior-source-untracked.json).
+
+Therefore the paired timing results below describe this Product fixture with additional untracked inputs, **not a clean checkout of the pinned revision alone**. This finding does not show differing TS input between the paired arms and does not erase their recorded graph-equality results; it does weaken clean-revision provenance. The generated files and local config are recorded here without asserting their semantic impact. Fresh Stage16 acceptance will rebuild both arms from a verified clean checkout. This audit does not establish the input provenance of separate history/no-op/profile runs beyond their retained receipts.
+
 ## Completed validation
 
 - Full combined suite passed (`go test ./... -count=1`); log: [full suite](stage15-combined-fullsuite.log). After the test-only fixture strengthening, the extractor package and cache coverage passed again.
