@@ -1,0 +1,42 @@
+[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml
+[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2
+[graph-profile] discover_git                       0.039s  total= 0.039s  trace=graphinput_build  repo=true dirs=2
+[graph-profile] declare_git_control                0.012s  total= 0.051s  trace=graphinput_build  deps=10
+[graph-profile] git_ls_files                       0.053s  total= 0.103s  trace=graphinput_build  tracked=45105 dirs=5818
+[graph-profile] walk_tree                          0.115s  total= 0.218s  trace=graphinput_build  names=11637 ignorefiles=4
+[graph-profile] check_ignore_setup                 0.015s  total= 0.233s  trace=graphinput_build
+[graph-profile] check_ignore_run                   0.066s  total= 0.299s  trace=graphinput_build  names=11637 ignored=0
+[graph-profile] declare_ignore_files               0.000s  total= 0.299s  trace=graphinput_build  deps=13
+[graph-profile] compute_identities                 0.148s  total= 0.447s  trace=graphinput_build  deps=13 entries=11637
+[graph-profile] graphinput_build                   0.448s  total= 0.448s  trace=graph_engine  configpaths=2
+[graph-profile] engine_new                         0.000s  total= 0.448s  trace=graph_engine
+[graph-profile] register_plugins                   0.000s  total= 0.449s  trace=graph_engine
+[graph-profile] config_recheck                     0.000s  total= 0.449s  trace=graph_engine
+[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml
+[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2
+[graph-profile] discover_git                       0.069s  total= 0.069s  trace=graphinput_build  repo=true dirs=2
+[graph-profile] declare_git_control                0.010s  total= 0.080s  trace=graphinput_build  deps=10
+[graph-profile] git_ls_files                       0.072s  total= 0.152s  trace=graphinput_build  tracked=45105 dirs=5818
+[graph-profile] walk_tree                          0.113s  total= 0.265s  trace=graphinput_build  names=11637 ignorefiles=4
+[graph-profile] check_ignore_setup                 0.020s  total= 0.285s  trace=graphinput_build
+[graph-profile] check_ignore_run                   0.058s  total= 0.343s  trace=graphinput_build  names=11637 ignored=0
+[graph-profile] declare_ignore_files               0.000s  total= 0.343s  trace=graphinput_build  deps=13
+[graph-profile] compute_identities                 0.148s  total= 0.492s  trace=graphinput_build  deps=13 entries=11637
+[graph-profile] graphinput_build                   0.493s  total= 0.493s  trace=graph_engine  configpaths=2
+[graph-profile] engine_new                         0.000s  total= 0.493s  trace=graph_engine
+[graph-profile] register_plugins                   0.000s  total= 0.493s  trace=graph_engine
+[graph-profile] config_recheck                     0.000s  total= 0.493s  trace=graph_engine
+[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml
+[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2
+[graph-profile] discover_git                       0.047s  total= 0.047s  trace=graphinput_build  repo=true dirs=2
+[graph-profile] declare_git_control                0.010s  total= 0.057s  trace=graphinput_build  deps=10
+[graph-profile] git_ls_files                       0.067s  total= 0.124s  trace=graphinput_build  tracked=45105 dirs=5818
+[graph-profile] walk_tree                          0.112s  total= 0.236s  trace=graphinput_build  names=11637 ignorefiles=4
+[graph-profile] check_ignore_setup                 0.018s  total= 0.254s  trace=graphinput_build
+[graph-profile] check_ignore_run                   0.058s  total= 0.312s  trace=graphinput_build  names=11637 ignored=0
+[graph-profile] declare_ignore_files               0.000s  total= 0.312s  trace=graphinput_build  deps=13
+[graph-profile] compute_identities                 0.147s  total= 0.460s  trace=graphinput_build  deps=13 entries=11637
+[graph-profile] graphinput_build                   0.461s  total= 0.461s  trace=graph_engine  configpaths=2
+[graph-profile] engine_new                         0.000s  total= 0.461s  trace=graph_engine
+[graph-profile] register_plugins                   0.000s  total= 0.461s  trace=graph_engine
+[graph-profile] config_recheck                     0.000s  total= 0.461s  trace=graph_engine

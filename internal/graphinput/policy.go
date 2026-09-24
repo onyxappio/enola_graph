@@ -18,6 +18,7 @@ import (
 	"strings"
 
 	"github.com/enola-labs/enola/internal/facts"
+	"github.com/enola-labs/enola/internal/graphprofile"
 )
 
 type Kind uint8
@@ -459,6 +460,11 @@ func indexNames(root string) (tracked, dirs map[string]bool, err error) {
 }
 
 func Build(root string, options Options) (*Policy, error) {
+	// One trace per Build. Its Marks partition this call from here on, so the
+	// setup below - Abs, the Policy literal, the state directory loop - is
+	// inside the first span rather than before it. The caller runs its own
+	// trace around this one, so the two nest and must not be added together.
+	btr := graphprofile.StartNamed("graphinput_build")
 	root, err := filepath.Abs(root)
 	if err != nil {
 		return nil, err
@@ -515,6 +521,7 @@ func Build(root string, options Options) (*Policy, error) {
 			return nil, err
 		}
 	}
+	btr.Mark("declare_config_deps", fmt.Sprintf("deps=%d", len(p.deps)))
 	// Still declared though the identities no longer hash them: declaring is what
 	// registers the watch and what the run's input fence re-reads.
 	st, dirs, err := discoverGit(root)
@@ -522,6 +529,7 @@ func Build(root string, options Options) (*Policy, error) {
 		return nil, err
 	}
 	p.git, p.gitDirs = st, dirs
+	btr.Mark("discover_git", fmt.Sprintf("repo=%v dirs=%d", st.Repository, len(dirs)))
 	if st.Repository {
 		for _, dir := range dirs {
 			for _, n := range gitControlNames {
@@ -530,11 +538,13 @@ func Build(root string, options Options) (*Policy, error) {
 				}
 			}
 		}
+		btr.Mark("declare_git_control", fmt.Sprintf("deps=%d", len(p.deps)))
 		tracked, trackedDirs, e := indexNames(root)
 		if e != nil {
 			return nil, e
 		}
 		p.tracked, p.trackedDirs = tracked, trackedDirs
+		btr.Mark("git_ls_files", fmt.Sprintf("tracked=%d dirs=%d", len(tracked), len(trackedDirs)))
 	}
 	var names []string
 	var ignoreFiles []string
@@ -562,6 +572,10 @@ func Build(root string, options Options) (*Policy, error) {
 	if err != nil {
 		return nil, err
 	}
+	btr.Mark("walk_tree", fmt.Sprintf("names=%d ignorefiles=%d", len(names), len(ignoreFiles)))
+	// The temp repository is torn down by the deferred RemoveAll once Build has
+	// returned, so its removal is after this trace's last Mark and inside the
+	// caller's graphinput_build span.
 	temp, err := os.MkdirTemp("", "enola-graph-ignore-")
 	if err != nil {
 		return nil, err
@@ -570,6 +584,7 @@ func Build(root string, options Options) (*Policy, error) {
 	if _, err := runGit(root, "", nil, "init", "--bare", "--quiet", "--template=", temp); err != nil {
 		return nil, err
 	}
+	btr.Mark("check_ignore_setup", "")
 	if len(names) > 0 {
 		out, err := runGit(root, temp, []byte(strings.Join(names, "\x00")+"\x00"), "check-ignore", "--no-index", "-z", "--stdin")
 		if err != nil {
@@ -583,6 +598,7 @@ func Build(root string, options Options) (*Policy, error) {
 			}
 		}
 	}
+	btr.Mark("check_ignore_run", fmt.Sprintf("names=%d ignored=%d", len(names), len(p.ignored)))
 	p.walkIgnoreFiles = append([]string(nil), ignoreFiles...)
 	for _, name := range ignoreFiles {
 		if !p.gitIgnored(filepath.ToSlash(filepath.Dir(name))) {
@@ -592,10 +608,12 @@ func Build(root string, options Options) (*Policy, error) {
 		}
 	}
 	sort.Slice(p.deps, func(i, j int) bool { return p.deps[i].Path < p.deps[j].Path })
+	btr.Mark("declare_ignore_files", fmt.Sprintf("deps=%d", len(p.deps)))
 	p.options = options
 	if err := p.computeIdentities(); err != nil {
 		return nil, err
 	}
+	btr.Mark("compute_identities", fmt.Sprintf("deps=%d entries=%d", len(p.deps), len(p.entries)))
 	return p, nil
 }
 

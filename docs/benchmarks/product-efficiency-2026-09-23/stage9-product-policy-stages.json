@@ -1,0 +1,261 @@
+{
+  "kind": "single instrumented Product diagnostic; not repeated performance acceptance",
+  "base": "ad7bfb0",
+  "binary_sha256": "cf2a963c5bb7a1470091836f57ffc6af81dada1eb1b151bd092fdee64222d17d",
+  "nested_spans_are_not_additive": true,
+  "source_log_sha256": "17a8a787052d9ef602b0c8e6747e5f9b4a4d0da6afc837016eff7d638e2122e8",
+  "stages": [
+    {
+      "stage": "config_load",
+      "seconds": 0.0,
+      "total_seconds": 0.0,
+      "trace": "graph_engine"
+    },
+    {
+      "stage": "declare_config_deps",
+      "seconds": 0.0,
+      "total_seconds": 0.0,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "discover_git",
+      "seconds": 0.039,
+      "total_seconds": 0.039,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "declare_git_control",
+      "seconds": 0.012,
+      "total_seconds": 0.051,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "git_ls_files",
+      "seconds": 0.053,
+      "total_seconds": 0.103,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "walk_tree",
+      "seconds": 0.115,
+      "total_seconds": 0.218,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "check_ignore_setup",
+      "seconds": 0.015,
+      "total_seconds": 0.233,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "check_ignore_run",
+      "seconds": 0.066,
+      "total_seconds": 0.299,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "declare_ignore_files",
+      "seconds": 0.0,
+      "total_seconds": 0.299,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "compute_identities",
+      "seconds": 0.148,
+      "total_seconds": 0.447,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "graphinput_build",
+      "seconds": 0.448,
+      "total_seconds": 0.448,
+      "trace": "graph_engine"
+    },
+    {
+      "stage": "engine_new",
+      "seconds": 0.0,
+      "total_seconds": 0.448,
+      "trace": "graph_engine"
+    },
+    {
+      "stage": "register_plugins",
+      "seconds": 0.0,
+      "total_seconds": 0.449,
+      "trace": "graph_engine"
+    },
+    {
+      "stage": "config_recheck",
+      "seconds": 0.0,
+      "total_seconds": 0.449,
+      "trace": "graph_engine"
+    },
+    {
+      "stage": "config_load",
+      "seconds": 0.0,
+      "total_seconds": 0.0,
+      "trace": "graph_engine"
+    },
+    {
+      "stage": "declare_config_deps",
+      "seconds": 0.0,
+      "total_seconds": 0.0,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "discover_git",
+      "seconds": 0.069,
+      "total_seconds": 0.069,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "declare_git_control",
+      "seconds": 0.01,
+      "total_seconds": 0.08,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "git_ls_files",
+      "seconds": 0.072,
+      "total_seconds": 0.152,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "walk_tree",
+      "seconds": 0.113,
+      "total_seconds": 0.265,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "check_ignore_setup",
+      "seconds": 0.02,
+      "total_seconds": 0.285,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "check_ignore_run",
+      "seconds": 0.058,
+      "total_seconds": 0.343,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "declare_ignore_files",
+      "seconds": 0.0,
+      "total_seconds": 0.343,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "compute_identities",
+      "seconds": 0.148,
+      "total_seconds": 0.492,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "graphinput_build",
+      "seconds": 0.493,
+      "total_seconds": 0.493,
+      "trace": "graph_engine"
+    },
+    {
+      "stage": "engine_new",
+      "seconds": 0.0,
+      "total_seconds": 0.493,
+      "trace": "graph_engine"
+    },
+    {
+      "stage": "register_plugins",
+      "seconds": 0.0,
+      "total_seconds": 0.493,
+      "trace": "graph_engine"
+    },
+    {
+      "stage": "config_recheck",
+      "seconds": 0.0,
+      "total_seconds": 0.493,
+      "trace": "graph_engine"
+    },
+    {
+      "stage": "config_load",
+      "seconds": 0.0,
+      "total_seconds": 0.0,
+      "trace": "graph_engine"
+    },
+    {
+      "stage": "declare_config_deps",
+      "seconds": 0.0,
+      "total_seconds": 0.0,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "discover_git",
+      "seconds": 0.047,
+      "total_seconds": 0.047,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "declare_git_control",
+      "seconds": 0.01,
+      "total_seconds": 0.057,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "git_ls_files",
+      "seconds": 0.067,
+      "total_seconds": 0.124,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "walk_tree",
+      "seconds": 0.112,
+      "total_seconds": 0.236,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "check_ignore_setup",
+      "seconds": 0.018,
+      "total_seconds": 0.254,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "check_ignore_run",
+      "seconds": 0.058,
+      "total_seconds": 0.312,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "declare_ignore_files",
+      "seconds": 0.0,
+      "total_seconds": 0.312,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "compute_identities",
+      "seconds": 0.147,
+      "total_seconds": 0.46,
+      "trace": "graphinput_build"
+    },
+    {
+      "stage": "graphinput_build",
+      "seconds": 0.461,
+      "total_seconds": 0.461,
+      "trace": "graph_engine"
+    },
+    {
+      "stage": "engine_new",
+      "seconds": 0.0,
+      "total_seconds": 0.461,
+      "trace": "graph_engine"
+    },
+    {
+      "stage": "register_plugins",
+      "seconds": 0.0,
+      "total_seconds": 0.461,
+      "trace": "graph_engine"
+    },
+    {
+      "stage": "config_recheck",
+      "seconds": 0.0,
+      "total_seconds": 0.461,
+      "trace": "graph_engine"
+    }
+  ]
+}

@@ -177,8 +177,9 @@ working tree match the tested source hashes exactly.
 
 [Validation receipt](stage9-retry-current-main-validation.json) and
 [full suite output](stage9-retry-current-main-full-suite.log) preserve that evidence.
-Product comparisons on this base are still pending. The separate committed-state
-decode-reuse draft is not part of this full-suite result or these binaries.
+The completed Product comparisons on this base are reported below. The separate
+committed-state decode-reuse change is not part of this full-suite result or
+these two binaries; its validation is reported separately.
 
 ## Three-arm Product comparison on current accuracy main
 

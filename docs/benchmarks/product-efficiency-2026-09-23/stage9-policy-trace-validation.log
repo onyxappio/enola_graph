@@ -1,0 +1,31 @@
+SCOPE LABEL: everything in this file is TRACE-MARK VALIDATION ON AN ENOLA CLONE.
+It is NOT the Product controlled retry diagnostic and cannot attribute the
+Product 0.49s rebuild_graph_inputs cost. The Product diagnostic is recorded
+separately under /tmp/enola-stage9-rebuild-trace-product/.
+
+toolchain: /opt/homebrew/bin/go, go1.27.1 darwin/arm64
+base:      ad7bfb0 (production-identical to main 4224bfe; that commit is docs and
+           benchmark JSON only)
+
+build:  go build ./...                                          exit 0
+vet:    go vet ./internal/graphinput/ ./pkg/bootstrap/           exit 0
+tests:  go test -count=1 ./internal/graphinput/ ./pkg/bootstrap/ exit 0
+        graphinput 7.792s, bootstrap 68.797s (after attribution corrections)
+        earlier pass, before corrections: 11.258s, 65.784s
+
+nesting_validation.log
+  pkg/bootstrap TestGraphFactoryConfigOverrideAndUnsupported, ENOLA_GRAPH_PROFILE=1.
+  Purpose: show that rebuild_graph_inputs contains the nested graph_engine and
+  graphinput_build traces rather than being additional to them. Tiny fixture,
+  2 and 4 entries, not a git repository, so declare_git_control and git_ls_files
+  do not fire.
+
+real_repo_single.log, real_repo_rep_1..5.log
+  Target /tmp/enola-trace-target, a git clone --local of enola_graph:
+  2296 tracked files, 5392 files on disk, 985 walked entries.
+  Target config MODIFIED BY ME: appended "extractors: [typescript]" because cpp
+  and go are refused in graph mode as having unaudited side inputs. That
+  narrowing affects register_plugins only, measured 0.000s.
+  5 x "graph analyze", all exit 0. Stage medians in msg_f8cd91c146f2.
+  These numbers are Enola-clone scale. They do not explain the Product figure
+  and were not used to size any proposed fix. No further clone repetitions.

@@ -37,8 +37,8 @@ WorkCounters count recovery-read digests only; startup and write costs appear in
 
 Worker microbenchmarks estimate about 23 ms per 55.7 MB digest on this host;
 the estimate of roughly 237 ms saved against an earlier retry decode trace is an
-extrapolation, not a measured Product speedup. A three-arm Product comparison is
-pending to measure the net effect alongside early refusal and parse reuse.
+extrapolation, not a measured Product speedup. The three-arm Product comparison
+below measures the net effect alongside early refusal and parse reuse.
 
 ## Product result
 
