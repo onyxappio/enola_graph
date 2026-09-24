@@ -1,6 +1,6 @@
 # Stage 13: share discovery walks within each composition signature
 
-Status: integrated locally after paired Product watch, focused race and graphsession regression checks passed; full suite passed; ready for normal push checks.
+Status: integrated locally after paired Product watch, focused race and graphsession regression checks passed; full suite and normal push checks passed; shipped as eb73b66.
 
 CompositionSignature previously enumerated the same repository separately for Nuxt packages, package gates and package export sources, plus package-name collectors on Nuxt branches. Each call now shares one discovery walk. The cache is created inside the call; the next call observes the tree afresh. Source contributions, captured input handling, alias resolution, signature hashing and Begin/End decisions are unchanged. This does not claim identical observation timing on a concurrently mutating tree.
 
@@ -35,4 +35,4 @@ Worker signature/shared-walk focused tests pass (package 0.576s), including orde
 
 ## Outstanding
 
-This optimization does not complete the larger performance goal. Fresh CLI no-op, remaining watch overhead, final historical coverage and broader performance acceptance remain open. The full repository suite passed in 498.543s (`go test ./... -count=1 -timeout=20m`, Go 1.27.1); production and test source hashes were unchanged. Normal push checks follow. Raw paired receipts, exact harness/driver, build hashes and diagnostic source/logs are archived as `stage13-*` alongside this report. Original scratch paths are preserved; adapt those paths to reproduce.
+This optimization does not complete the larger performance goal. Fresh CLI no-op, remaining watch overhead and broader performance acceptance remain open. The current ten-transition history and per-transition no-op checks subsequently passed; see [STAGE13_MAIN_HISTORY.md](STAGE13_MAIN_HISTORY.md). The full repository suite passed in 498.543s (`go test ./... -count=1 -timeout=20m`, Go 1.27.1); production and test source hashes were unchanged. Normal push checks passed and eb73b66 is in origin/main. Raw paired receipts, exact harness/driver, build hashes and diagnostic source/logs are archived as `stage13-*` alongside this report. Original scratch paths are preserved; adapt those paths to reproduce.

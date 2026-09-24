@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "/tmp/enola-stage13-watch-pairs/enola-candidate",
+    "graph",
+    "delta",
+    "--authoritative-scope",
+    "--max-begin-bytes",
+    "1048576",
+    "--events",
+    "/tmp/enola-stage9-main-history10/events-live.jsonl",
+    "--state-dir",
+    "/tmp/enola-stage9-main-history10/state-live",
+    "--context",
+    "scope-bench",
+    "--repo-id",
+    "product-scope",
+    "--summary-json",
+    "/tmp/enola-stage9-main-history10/live"
+  ],
+  "wall_s": 1.825440583,
+  "exit_code": 0,
+  "binary_sha256": "a1d9ee11eddc69289050b6d3b5329e0b00e247862b98e3294f5460085033a93d",
+  "state_unchanged": true,
+  "events_unchanged": true,
+  "kind": "single instrumented fresh CLI diagnostic, file sink, existing completed history state; not paired performance acceptance"
+}

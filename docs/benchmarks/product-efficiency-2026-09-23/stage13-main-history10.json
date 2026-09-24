@@ -1,0 +1,1705 @@
+{
+  "provenance": {
+    "note": "first-parent history; persistent delta state; cold oracle per commit; file-sink --events JSONL timings, not NATS JetStream",
+    "sink": "file",
+    "source_tree": "/tmp/enola-product-history-source",
+    "source_dirty_untracked": "?? .enola/\n?? mcp-arch.yaml",
+    "fetch_clone": "/tmp/enola-stage13-main-history10/product-fetch",
+    "ref": "a609c19f3861971930fae7b33dcb2950598953c5",
+    "ref_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+    "first_parent_shas": [
+      "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+      "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+      "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+      "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+      "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+      "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+      "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "a6f1f3a91a36ea3dead786560412a4944a009694",
+      "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "a609c19f3861971930fae7b33dcb2950598953c5"
+    ],
+    "selected_transitions": [
+      "4d104e600f89..07fb4a41ddaf",
+      "07fb4a41ddaf..fec1eac346c4",
+      "fec1eac346c4..9fc7ae5b4c3f",
+      "9fc7ae5b4c3f..1c2607479b6d",
+      "1c2607479b6d..599575d0aa39",
+      "599575d0aa39..ae233c5f5695",
+      "ae233c5f5695..4168360e2e7f",
+      "4168360e2e7f..a6f1f3a91a36",
+      "a6f1f3a91a36..5dfb2c8f276d",
+      "5dfb2c8f276d..a609c19f3861"
+    ],
+    "verify_noop_after_each_transition": true,
+    "enola": {
+      "revision": "eb73b664b652833639128eb2d19e1b2f1b030253",
+      "dirty": false,
+      "status_porcelain": "",
+      "diff_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+      "untracked_names_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "binary": {
+      "path": "/tmp/enola-stage13-watch-pairs/enola-candidate",
+      "sha256": "a1d9ee11eddc69289050b6d3b5329e0b00e247862b98e3294f5460085033a93d",
+      "go_version_m": "/tmp/enola-stage13-watch-pairs/enola-candidate: go1.27.1\n\tpath\tgithub.com/enola-labs/enola/cmd/enola\n\tmod\tgithub.com/enola-labs/enola\t(devel)\t\n\tdep\tgithub.com/ebitengine/purego\tv0.10.2\th1:W809HbnvzAxgdm+aOvlSekrM16wGCdT/e76+9tS7gzE=\n\tdep\tgithub.com/fsnotify/fsnotify\tv1.9.0\th1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=\n\tdep\tgithub.com/google/jsonschema-go\tv0.4.3\th1:/DBOLZTfDow7pe2GmaJNhltueGTtDKICi8V8p+DQPd0=\n\tdep\tgithub.com/klauspost/compress\tv1.18.0\th1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=\n\tdep\tgithub.com/mattn/go-pointer\tv0.0.1\th1:n+XhsuGeVO6MEAp7xyEukFINEa+Quek5psIR/ylA6o0=\n\tdep\tgithub.com/modelcontextprotocol/go-sdk\tv1.8.0\th1:KIvahhYqwtbeniWVPs3TcXEA7b8jEtwfBpOTAI+Urx4=\n\tdep\tgithub.com/nats-io/nats.go\tv1.47.0\th1:YQdADw6J/UfGUd2Oy6tn4Hq6YHxCaJrVKayxxFqYrgM=\n\tdep\tgithub.com/nats-io/nkeys\tv0.4.11\th1:q44qGV008kYd9W1b1nEBkNzvnWxtRSQ7A8BoqRrcfa0=\n\tdep\tgithub.com/nats-io/nuid\tv1.0.1\th1:5iA8DT8V7q8WK2EScv2padNa/rTESc1KdnPw4TC2paw=\n\tdep\tgithub.com/pbnjay/memory\tv0.0.0-20210728143218-7b4eea64cf58\th1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=\n\tdep\tgithub.com/segmentio/asm\tv1.1.3\th1:WM03sfUOENvvKexOLp+pCqgb/WDjsi7EK8gIsICtzhc=\n\tdep\tgithub.com/segmentio/encoding\tv0.5.4\th1:OW1VRern8Nw6ITAtwSZ7Idrl3MXCFwXHPgqESYfvNt0=\n\tdep\tgithub.com/tree-sitter-grammars/tree-sitter-kotlin\tv1.1.0\th1:SWIUDASa+WPhDDem1U5IJpYwQEezkqXrUI61OcnORzM=\n\tdep\tgithub.com/tree-sitter/go-tree-sitter\tv0.24.0\th1:kRZb6aBNfcI/u0Qh8XEt3zjNVnmxTisDBN+kXK0xRYQ=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c\tv0.23.6\th1:aHcghKEBgyUDUcCKFT5fELp26UBU7RBltj5MkRYxyy8=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c-sharp\tv0.23.1\th1:ddG6osP34sMieVNN6lu5ZG/3N8Wn+67+43BmipqidyM=\n\tdep\tgithub.com/tree-sitter/tree-sitter-cpp\tv0.23.4\th1:LaWZsiqQKvR65yHgKmnaqA+uz6tlDJTJFCyFIeZU/8w=\n\tdep\tgithub.com/tree-sitter/tree-sitter-java\tv0.23.5\th1:J9YeMGMwXYlKSP3K4Us8CitC6hjtMjqpeOf2GGo6tig=\n\tdep\tgithub.com/tree-sitter/tree-sitter-php\tv0.23.12\th1:zgnxrV5RUEbK9d3jm9R8CjR3uSA1pBPbvq7Tbjg8j0k=\n\tdep\tgithub.com/tree-sitter/tree-sitter-python\tv0.23.6\th1:qHnWFR5WhtMQpxBZRwiaU5Hk/29vGju6CVtmvu5Haas=\n\tdep\tgithub.com/tree-sitter/tree-sitter-ruby\tv0.23.1\th1:T/NKHUA+iVbHM440hFx+lzVOzS4dV6z8Qw8ai+72bYo=\n\tdep\tgithub.com/tree-sitter/tree-sitter-rust\tv0.23.3\th1:v41N2Dx5ZEzouqeQJ0IIH2cUwVw/iepwrUoE9D56IL4=\n\tdep\tgithub.com/tree-sitter/tree-sitter-scala\tv0.24.1\th1:jO4zDfb3vQWmqCDpLfhENVtP3RvOSLYNR69m0R/T6wY=\n\tdep\tgithub.com/tree-sitter/tree-sitter-typescript\tv0.23.2\th1:/Odvphn18PniVixb9e97X0DbNVsU6Qocv9mfkyzdXwU=\n\tdep\tgithub.com/yosida95/uritemplate/v3\tv3.0.2\th1:Ed3Oyj9yrmi9087+NczuL5BwkIc4wvTb5zIM+UJPGz4=\n\tdep\tgolang.org/x/crypto\tv0.37.0\th1:kJNSjF/Xp7kU0iB2Z+9viTPMW4EqqsrywMXLJOOsXSE=\n\tdep\tgolang.org/x/oauth2\tv0.35.0\th1:Mv2mzuHuZuY2+bkyWXIHMfhNdJAdwW3FuWeCPYN5GVQ=\n\tdep\tgolang.org/x/sync\tv0.20.0\th1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=\n\tdep\tgolang.org/x/sys\tv0.48.0\th1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=\n\tdep\tgolang.org/x/time\tv0.15.0\th1:bbrp8t3bGUeFOx08pvsMYRTCVSMk89u4tKbNOZbp88U=\n\tdep\tgopkg.in/yaml.v3\tv3.0.1\th1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tDefaultGODEBUG=tracebacklabels=0,x509sslcertoverrideplatform=0\n\tbuild\tCGO_ENABLED=1\n\tbuild\tGOARCH=arm64\n\tbuild\tGOOS=darwin\n\tbuild\tGOARM64=v8.0\n",
+      "go_version_m_sha256": "e11ec073267ee83d4a305a9bd9110a3122971854861036f77b9ce493e073873b",
+      "go_version": "/tmp/enola-stage13-watch-pairs/enola-candidate: go1.27.1",
+      "vcs_revision": "",
+      "vcs_modified": ""
+    },
+    "input_policy": {
+      "pinned_source": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-delta-2026-09-21/product-mcp-arch.yaml",
+      "pinned_sha256": "4fd513e2cddf987e9f0f9afbc51a6d39e388fae2111b24489cb418cadc786db6",
+      "source_mcp_arch": "/tmp/enola-product-history-source/mcp-arch.yaml",
+      "source_mcp_arch_sha256": "4fd513e2cddf987e9f0f9afbc51a6d39e388fae2111b24489cb418cadc786db6",
+      "source_matches_pin": true,
+      "note": "pinned overlay applied only when the SHA has no tracked mcp-arch.yaml; historical tracked config is left in place",
+      "lockfiles_excluded_from_required_owners": true
+    },
+    "baseline": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/invalidation-history-2026-09-22/results.baseline-invalid-chronology.json"
+  },
+  "initial_sha": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+  "transitions": [
+    {
+      "id": "00-4d104e600f89..07fb4a41ddaf",
+      "index": 0,
+      "parent": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+      "child": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+      "changed_file_count": 6,
+      "required_owner_count": 2,
+      "required_owners_sample": [
+        "file:packages/tracking-client/src/core/tracker.ts",
+        "file:packages/tracking-client/src/web/beacon.ts"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 3.725,
+        "sink": "file",
+        "parsed": 6,
+        "cached": 4006,
+        "files_read": 110,
+        "generation": [
+          1,
+          2
+        ],
+        "owners_published": 6,
+        "events": 7,
+        "run_id": "product-scope-scope-bench-2-1790237099941654000",
+        "manifest": {
+          "begin_count": 7,
+          "begin_digest": "762dd9ea582633cc481ba0c3f2cad0a15dca08fb9b2c8f71b488b7d4ae3a0c35",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            1,
+            2
+          ],
+          "end_batch_count": 5,
+          "end_batch_digest": "ecaafeaa7073f6824616ba84868968726956674ec902a7e3c27e465e6df3ad74",
+          "end_owner_scope_len": 7,
+          "end_owner_scope_digest": "762dd9ea582633cc481ba0c3f2cad0a15dca08fb9b2c8f71b488b7d4ae3a0c35",
+          "batch_seq_count": 5,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 26.55,
+        "sink": "file",
+        "parsed": 4012,
+        "cached": 0,
+        "files_read": 4064,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4942,
+        "events": 2160,
+        "run_id": "product-scope-scope-bench-1-1790237134190233000",
+        "manifest": {
+          "begin_count": 8451,
+          "begin_digest": "c60faa6ff0d05e11f8db6f5a92d2435ed00056eba1a86385622507ab8999dcb8",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2158,
+          "end_batch_digest": "14077779e8a478c5e22283c620b270049c14d2f74363058e694fa55073d117ca",
+          "end_owner_scope_len": 8451,
+          "end_owner_scope_digest": "c60faa6ff0d05e11f8db6f5a92d2435ed00056eba1a86385622507ab8999dcb8",
+          "batch_seq_count": 2158,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 7,
+      "necessary_owner_count": 2,
+      "necessary_owners_sample": [
+        "file:packages/tracking-client/src/core/tracker.ts",
+        "file:packages/tracking-client/src/web/beacon.ts"
+      ],
+      "extra_begin_owner_count": 5,
+      "extra_begin_owners_sample": [
+        "file:apps/mobile/src/analytics/trackerRuntimeDeps.ts",
+        "file:apps/mobile/src/analytics/trackerRuntimeDeps.web.ts",
+        "file:packages/tracking-client/package.json",
+        "file:packages/tracking-client/src/index.ts",
+        "file:packages/tracking-client/src/web/index.ts"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 2,
+      "sink": "file",
+      "blocker": null,
+      "post_transition_noop": {
+        "run": {
+          "exit": 0,
+          "wall_s": 3.773,
+          "sink": "file",
+          "parsed": 0,
+          "cached": 4064,
+          "files_read": 0,
+          "generation": [
+            2,
+            2
+          ],
+          "owners_published": 0,
+          "events": 0,
+          "run_id": "",
+          "stderr_graph": "[graph] /tmp/enola-stage13-main-history10/live: generation 2\u21922 parsed=0 cached=4064 early_local=0 fallbacks=0"
+        },
+        "state_unchanged": true,
+        "state_hashes": {
+          "acks.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "commit.json": "1303930c13242bf91eb1d9d92a1783e84bcb2de886df8061684d65cc0991c5f4",
+          "fences.jsonl": "ae099d6eba232c2ed3ec66d584f852eeb73a18bbc15774f663d59d9d2fe75b00",
+          "identity.json": "e9c20050958407eca1641a207f9f5f5f967a2e342417c6ad8ea9a764b4386266",
+          "payloads.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "protocol": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+          "state.json": "16e0957cf0850e34a0454a6893ecc2372819c5dfcef66191c54b0a041c03cabf",
+          "tombstones.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "completed_generation": 2,
+        "event_bytes_unchanged": 72873508
+      }
+    },
+    {
+      "id": "01-07fb4a41ddaf..fec1eac346c4",
+      "index": 1,
+      "parent": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+      "child": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+      "changed_file_count": 9345,
+      "required_owner_count": 96,
+      "required_owners_sample": [
+        "file:apps/mobile/scripts/gate-shard-ci.ts",
+        "file:apps/mobile/src/appSurfaces/protect/protectSteadyStateAppSurface.tsx",
+        "file:apps/mobile/src/appSurfaces/visualCaptureAppSurface.tsx",
+        "file:apps/mobile/src/components/figma/FigmaIcon.tsx",
+        "file:apps/mobile/src/components/figma/bottomSheet/BottomSheet.tsx",
+        "file:apps/mobile/src/components/figma/buttons/Button.tsx",
+        "file:apps/mobile/src/components/figma/cards/CourseCardCertificatePreview.tsx",
+        "file:apps/mobile/src/components/figma/cards/CourseCardPreview.tsx",
+        "file:apps/mobile/src/components/figma/cards/FeatureCard.tsx",
+        "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingBrowsing.tsx",
+        "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingWelcome.tsx",
+        "file:apps/mobile/src/components/figma/cards/SettingsListCard.tsx",
+        "file:apps/mobile/src/components/figma/cards/SubscriptionInfoCard.tsx",
+        "file:apps/mobile/src/components/figma/cards/featureCardBorderInset.ts",
+        "file:apps/mobile/src/components/figma/coursePath/CoursePathCertificateSkiaCanvas.tsx",
+        "file:apps/mobile/src/components/figma/coursePath/CoursePathNodeSkiaCanvas.tsx",
+        "file:apps/mobile/src/components/figma/device/PointRowAction.tsx",
+        "file:apps/mobile/src/components/figma/device/PointsCard.tsx",
+        "file:apps/mobile/src/components/figma/device/pointsCardRowSeparator.ts",
+        "file:apps/mobile/src/components/figma/icons/GlassIconLock.tsx",
+        "file:apps/mobile/src/components/figma/icons/GlassIconPhone.tsx",
+        "file:apps/mobile/src/components/figma/icons/GlassIconShield.tsx",
+        "file:apps/mobile/src/components/figma/icons/GlassIconUser.tsx",
+        "file:apps/mobile/src/components/figma/icons/glass/GlassIcon.tsx",
+        "file:apps/mobile/src/components/figma/navigation/FilterGroup.tsx"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 14.332,
+        "sink": "file",
+        "parsed": 591,
+        "cached": 3425,
+        "files_read": 695,
+        "generation": [
+          2,
+          3
+        ],
+        "owners_published": 1168,
+        "events": 839,
+        "run_id": "product-scope-scope-bench-3-1790237184895784000",
+        "manifest": {
+          "begin_count": 1168,
+          "begin_digest": "4cfbc12c94b1a12de9f280ec27250edb7b6954aa0922fe5c93da1b8a934f04d8",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            2,
+            3
+          ],
+          "end_batch_count": 837,
+          "end_batch_digest": "06c4c8f78c92f73a6381c20df237f15e8c8138e18b97dd1c5580553159084e5d",
+          "end_owner_scope_len": 1168,
+          "end_owner_scope_digest": "4cfbc12c94b1a12de9f280ec27250edb7b6954aa0922fe5c93da1b8a934f04d8",
+          "batch_seq_count": 837,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 25.109,
+        "sink": "file",
+        "parsed": 4016,
+        "cached": 0,
+        "files_read": 4068,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4946,
+        "events": 2165,
+        "run_id": "product-scope-scope-bench-1-1790237248852261000",
+        "manifest": {
+          "begin_count": 8455,
+          "begin_digest": "5e5d1628462771234f5a777025a89f55b47c89cc123579d9e0dd0e096d92a12e",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2163,
+          "end_batch_digest": "eb64537a8d82c4823b04e5b522796b40793e334ca5e789a04edeea964c4aaa62",
+          "end_owner_scope_len": 8455,
+          "end_owner_scope_digest": "5e5d1628462771234f5a777025a89f55b47c89cc123579d9e0dd0e096d92a12e",
+          "batch_seq_count": 2163,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 1168,
+      "necessary_owner_count": 83,
+      "necessary_owners_sample": [
+        "file:apps/mobile/scripts/gate-shard-ci.ts",
+        "file:apps/mobile/src/appSurfaces/protect/protectSteadyStateAppSurface.tsx",
+        "file:apps/mobile/src/appSurfaces/visualCaptureAppSurface.tsx",
+        "file:apps/mobile/src/components/figma/FigmaIcon.tsx",
+        "file:apps/mobile/src/components/figma/buttons/Button.tsx",
+        "file:apps/mobile/src/components/figma/cards/CourseCardCertificatePreview.tsx",
+        "file:apps/mobile/src/components/figma/cards/CourseCardPreview.tsx",
+        "file:apps/mobile/src/components/figma/cards/FeatureCard.tsx",
+        "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingBrowsing.tsx",
+        "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingWelcome.tsx",
+        "file:apps/mobile/src/components/figma/cards/SettingsListCard.tsx",
+        "file:apps/mobile/src/components/figma/cards/SubscriptionInfoCard.tsx",
+        "file:apps/mobile/src/components/figma/cards/featureCardBorderInset.ts",
+        "file:apps/mobile/src/components/figma/coursePath/CoursePathCertificateSkiaCanvas.tsx",
+        "file:apps/mobile/src/components/figma/coursePath/CoursePathNodeSkiaCanvas.tsx",
+        "file:apps/mobile/src/components/figma/device/PointRowAction.tsx",
+        "file:apps/mobile/src/components/figma/device/PointsCard.tsx",
+        "file:apps/mobile/src/components/figma/device/pointsCardRowSeparator.ts",
+        "file:apps/mobile/src/components/figma/icons/GlassIconLock.tsx",
+        "file:apps/mobile/src/components/figma/icons/GlassIconPhone.tsx",
+        "file:apps/mobile/src/components/figma/icons/GlassIconShield.tsx",
+        "file:apps/mobile/src/components/figma/icons/GlassIconUser.tsx",
+        "file:apps/mobile/src/components/figma/icons/glass/GlassIcon.tsx",
+        "file:apps/mobile/src/components/figma/navigation/FilterGroup.tsx",
+        "file:apps/mobile/src/components/figma/navigation/IconButton.tsx"
+      ],
+      "extra_begin_owner_count": 1085,
+      "extra_begin_owners_sample": [
+        "file:apps/marketing-web/src/api.ts",
+        "file:apps/marketing-web/src/main.ts",
+        "file:apps/marketing-web/src/paymentForm.ts",
+        "file:apps/mobile/.storybook/captureSourceAttestationPlugin.ts",
+        "file:apps/mobile/.storybook/component-context-local-indexer.ts",
+        "file:apps/mobile/.storybook/figma-catalog-indexer.ts",
+        "file:apps/mobile/.storybook/gatesControlPlugin.ts",
+        "file:apps/mobile/.storybook/index.ts",
+        "file:apps/mobile/.storybook/journeyLabScenarioServer.ts",
+        "file:apps/mobile/.storybook/main.ts",
+        "file:apps/mobile/.storybook/plugins/componentContextToolbar/ComponentContextToolbarView.tsx",
+        "file:apps/mobile/.storybook/plugins/componentContextToolbar/componentContextToolbarSelection.ts",
+        "file:apps/mobile/.storybook/plugins/componentContextToolbar/manager.js",
+        "file:apps/mobile/.storybook/plugins/componentContextToolbar/manager.tsx",
+        "file:apps/mobile/.storybook/preview.ts",
+        "file:apps/mobile/.storybook/storybook.requires.ts",
+        "file:apps/mobile/index.ts",
+        "file:apps/mobile/scripts/benchmark-affected-scenario-journeys-phase3.ts",
+        "file:apps/mobile/scripts/benchmark-affected-scenario-journeys-phase4.ts",
+        "file:apps/mobile/scripts/benchmark-affected-scenario-journeys-phase5.ts",
+        "file:apps/mobile/scripts/benchmark-affected-scenario-journeys-phase7.ts",
+        "file:apps/mobile/scripts/benchmark-affected-scenario-journeys.ts",
+        "file:apps/mobile/scripts/benchmark-storybook-capture.ts",
+        "file:apps/mobile/scripts/build-attested-storybook.ts",
+        "file:apps/mobile/scripts/build-screen-visual-report.ts"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 3,
+      "sink": "file",
+      "blocker": null,
+      "post_transition_noop": {
+        "run": {
+          "exit": 0,
+          "wall_s": 1.985,
+          "sink": "file",
+          "parsed": 0,
+          "cached": 4068,
+          "files_read": 0,
+          "generation": [
+            3,
+            3
+          ],
+          "owners_published": 0,
+          "events": 0,
+          "run_id": "",
+          "stderr_graph": "[graph] /tmp/enola-stage13-main-history10/live: generation 3\u21923 parsed=0 cached=4068 early_local=0 fallbacks=0"
+        },
+        "state_unchanged": true,
+        "state_hashes": {
+          "acks.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "commit.json": "7fd5ca518763225f8baade0a0d3072731c717c28606f693f1f2722afe4ccebda",
+          "fences.jsonl": "ef4ad3c470d9ba9b65cd537ec571225cc7d978e5283e22c0dc980256fe0a30a0",
+          "identity.json": "e9c20050958407eca1641a207f9f5f5f967a2e342417c6ad8ea9a764b4386266",
+          "payloads.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "protocol": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+          "state.json": "8e3b716f9b0d0176c1f63b8b6070492574743672d90ac3b014b1ecaf4beb0ffe",
+          "tombstones.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "completed_generation": 3,
+        "event_bytes_unchanged": 100147658
+      }
+    },
+    {
+      "id": "02-fec1eac346c4..9fc7ae5b4c3f",
+      "index": 2,
+      "parent": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+      "child": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+      "changed_file_count": 8125,
+      "required_owner_count": 17,
+      "required_owners_sample": [
+        "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingWelcome.tsx",
+        "file:apps/mobile/src/components/figma/cards/ListCardHeader.tsx",
+        "file:apps/mobile/src/components/figma/device/PointRowAction.tsx",
+        "file:apps/mobile/src/screens/train/TrainRuntimeScreen.tsx",
+        "file:apps/mobile/src/visual-diff/collapsedComponentVisibleText.ts",
+        "file:apps/mobile/src/visual-diff/componentActualBoundsDiff.ts",
+        "file:apps/mobile/src/visual-diff/componentLayoutMaskDiff.ts",
+        "file:apps/mobile/src/visual-diff/componentSlotOwnership.ts",
+        "file:apps/mobile/src/visual-diff/figmaMarkerManifest.ts",
+        "file:apps/mobile/src/visual-diff/figmaMarkerOwnership.ts",
+        "file:apps/mobile/src/visual-diff/gateEvaluatorOwnership.ts",
+        "file:apps/mobile/src/visual-diff/gateInputsHash.ts",
+        "file:apps/mobile/src/visual-diff/gateSourceClosure.ts",
+        "file:apps/mobile/src/visual-diff/gateStructureEval.ts",
+        "file:apps/mobile/src/visual-diff/screenComponentGateClosure.ts",
+        "file:apps/mobile/src/visual-diff/screenGateWaivers.ts",
+        "file:docs/engineering/sot-conflicts/2026-09-19-train-intentional-runtime-divergences.md"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 12.645,
+        "sink": "file",
+        "parsed": 62,
+        "cached": 3956,
+        "files_read": 166,
+        "generation": [
+          3,
+          4
+        ],
+        "owners_published": 1655,
+        "events": 977,
+        "run_id": "product-scope-scope-bench-4-1790237287509739000",
+        "manifest": {
+          "begin_count": 1655,
+          "begin_digest": "fc0d93b559396c6242834fcea736e890082cfccc09bf7382cfd808236dd53050",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            3,
+            4
+          ],
+          "end_batch_count": 975,
+          "end_batch_digest": "01acfb8c13f181190c868947835b83baa0dc2ea50d7772b70e7a658bd52e9d34",
+          "end_owner_scope_len": 1655,
+          "end_owner_scope_digest": "fc0d93b559396c6242834fcea736e890082cfccc09bf7382cfd808236dd53050",
+          "batch_seq_count": 975,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 26.176,
+        "sink": "file",
+        "parsed": 4018,
+        "cached": 0,
+        "files_read": 4070,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4949,
+        "events": 2166,
+        "run_id": "product-scope-scope-bench-1-1790237359519765000",
+        "manifest": {
+          "begin_count": 8458,
+          "begin_digest": "8edc48d5e5a73e35b2f43046b511bd0fa07fde0afb3dbcd05bb2cc550788273d",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2164,
+          "end_batch_digest": "09e9499a23e0f39367119b14974f6343f15c41ce79bf1e894a91b52305adb19d",
+          "end_owner_scope_len": 8458,
+          "end_owner_scope_digest": "8edc48d5e5a73e35b2f43046b511bd0fa07fde0afb3dbcd05bb2cc550788273d",
+          "batch_seq_count": 2164,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 1655,
+      "necessary_owner_count": 17,
+      "necessary_owners_sample": [
+        "file:apps/mobile/src/components/figma/cards/IllustrationOnboardingWelcome.tsx",
+        "file:apps/mobile/src/components/figma/cards/ListCardHeader.tsx",
+        "file:apps/mobile/src/components/figma/device/PointRowAction.tsx",
+        "file:apps/mobile/src/screens/train/TrainRuntimeScreen.tsx",
+        "file:apps/mobile/src/visual-diff/collapsedComponentVisibleText.ts",
+        "file:apps/mobile/src/visual-diff/componentActualBoundsDiff.ts",
+        "file:apps/mobile/src/visual-diff/componentLayoutMaskDiff.ts",
+        "file:apps/mobile/src/visual-diff/componentSlotOwnership.ts",
+        "file:apps/mobile/src/visual-diff/figmaMarkerManifest.ts",
+        "file:apps/mobile/src/visual-diff/figmaMarkerOwnership.ts",
+        "file:apps/mobile/src/visual-diff/gateEvaluatorOwnership.ts",
+        "file:apps/mobile/src/visual-diff/gateInputsHash.ts",
+        "file:apps/mobile/src/visual-diff/gateSourceClosure.ts",
+        "file:apps/mobile/src/visual-diff/gateStructureEval.ts",
+        "file:apps/mobile/src/visual-diff/screenComponentGateClosure.ts",
+        "file:apps/mobile/src/visual-diff/screenGateWaivers.ts",
+        "file:docs/engineering/sot-conflicts/2026-09-19-train-intentional-runtime-divergences.md"
+      ],
+      "extra_begin_owner_count": 1638,
+      "extra_begin_owners_sample": [
+        "file:apps/mobile/.storybook/component-context-local-indexer.ts",
+        "file:apps/mobile/.storybook/gatesControlInventoryServer.ts",
+        "file:apps/mobile/.storybook/gatesControlPlugin.ts",
+        "file:apps/mobile/.storybook/gatesControlRollupServer.ts",
+        "file:apps/mobile/.storybook/index.ts",
+        "file:apps/mobile/.storybook/journeyLabScenarioServer.ts",
+        "file:apps/mobile/.storybook/main.ts",
+        "file:apps/mobile/.storybook/plugins/componentContextLocalStoriesPlugin.ts",
+        "file:apps/mobile/.storybook/plugins/componentContextToolbar/ComponentContextToolbarView.tsx",
+        "file:apps/mobile/.storybook/plugins/componentContextToolbar/componentContextToolbarSelection.ts",
+        "file:apps/mobile/.storybook/plugins/componentContextToolbar/manager.js",
+        "file:apps/mobile/.storybook/plugins/componentContextToolbar/manager.tsx",
+        "file:apps/mobile/.storybook/preview.ts",
+        "file:apps/mobile/.storybook/storybook.requires.ts",
+        "file:apps/mobile/.storybook/textFidelityLabEvaluate.ts",
+        "file:apps/mobile/index.ts",
+        "file:apps/mobile/scripts/backfill-figma-structure-source-hash.ts",
+        "file:apps/mobile/scripts/benchmark-affected-scenario-journeys-phase3.ts",
+        "file:apps/mobile/scripts/benchmark-affected-scenario-journeys-phase4.ts",
+        "file:apps/mobile/scripts/benchmark-affected-scenario-journeys-phase5.ts",
+        "file:apps/mobile/scripts/benchmark-affected-scenario-journeys-phase7.ts",
+        "file:apps/mobile/scripts/benchmark-affected-scenario-journeys.ts",
+        "file:apps/mobile/scripts/benchmark-affected-visual-gates.ts",
+        "file:apps/mobile/scripts/benchmark-storybook-capture.ts",
+        "file:apps/mobile/scripts/build-attested-storybook.ts"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 4,
+      "sink": "file",
+      "blocker": null,
+      "post_transition_noop": {
+        "run": {
+          "exit": 0,
+          "wall_s": 2.537,
+          "sink": "file",
+          "parsed": 0,
+          "cached": 4070,
+          "files_read": 0,
+          "generation": [
+            4,
+            4
+          ],
+          "owners_published": 0,
+          "events": 0,
+          "run_id": "",
+          "stderr_graph": "[graph] /tmp/enola-stage13-main-history10/live: generation 4\u21924 parsed=0 cached=4070 early_local=0 fallbacks=0"
+        },
+        "state_unchanged": true,
+        "state_hashes": {
+          "acks.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "commit.json": "14452fcfd45e15f908ebb3c3617730f9bd1e3e2bd00de4f44ae78fc0c145a3b7",
+          "fences.jsonl": "28e999ed7489459739dbcf7eb9e351edb04b12a48d7bff1009cbf7e7186cf637",
+          "identity.json": "e9c20050958407eca1641a207f9f5f5f967a2e342417c6ad8ea9a764b4386266",
+          "payloads.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "protocol": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+          "state.json": "5ceee4e59b7dc18c445877230b417003f6d5a74291e66dd77d1ff3db5d6ab5a4",
+          "tombstones.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "completed_generation": 4,
+        "event_bytes_unchanged": 132469479
+      }
+    },
+    {
+      "id": "03-9fc7ae5b4c3f..1c2607479b6d",
+      "index": 3,
+      "parent": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+      "child": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+      "changed_file_count": 70,
+      "required_owner_count": 35,
+      "required_owners_sample": [
+        "file:docs/reports/T-578-managed-hosted-checkout-implementation.md",
+        "file:docs/reports/T-578-prod-stripe-managed-offers-unavailable.md",
+        "file:infra/pulumi/README.md",
+        "file:infra/pulumi/config/payment-seed-offers/README.md",
+        "file:infra/pulumi/src/environmentProfile.ts",
+        "file:infra/pulumi/src/gcp/cloudRun.ts",
+        "file:infra/pulumi/src/onyxEnvironment.ts",
+        "file:packages/checkout-vue/src/api.ts",
+        "file:packages/checkout-vue/src/paymentForm.ts",
+        "file:packages/checkout-vue/src/types.ts",
+        "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+        "file:packages/clickhouse/src/productCoreClickPipes.ts",
+        "file:packages/contracts/src/payment/checkoutAuthorization.ts",
+        "file:packages/contracts/src/payment/funnel.ts",
+        "file:packages/contracts/src/payment/paymentMode.ts",
+        "file:packages/database/src/productCoreCdcColumns.ts",
+        "file:packages/database/src/schema.ts",
+        "file:scripts/deploy/configure-pulumi-stack.mjs",
+        "file:scripts/deploy/pr-demo-fingerprint.mjs",
+        "file:scripts/deploy/product-core-clickpipes-test-image-provenance.mjs",
+        "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+        "file:services/payment-api/src/checkoutAuthorization.ts",
+        "file:services/payment-api/src/checkoutReturn.ts",
+        "file:services/payment-api/src/config.ts",
+        "file:services/payment-api/src/domain.ts"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 11.305,
+        "sink": "file",
+        "parsed": 432,
+        "cached": 3588,
+        "files_read": 588,
+        "generation": [
+          4,
+          5
+        ],
+        "owners_published": 554,
+        "events": 526,
+        "run_id": "product-scope-scope-bench-5-1790237399620930000",
+        "manifest": {
+          "begin_count": 554,
+          "begin_digest": "0ac3272ad9b1dbb5c189aa5f289faf945f42754696036e26893adbe768ce05c0",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            4,
+            5
+          ],
+          "end_batch_count": 524,
+          "end_batch_digest": "ade80e21acd97c75ddcfbd36be3f35ea0d09a60d20e3d3513daa41185aa39964",
+          "end_owner_scope_len": 554,
+          "end_owner_scope_digest": "0ac3272ad9b1dbb5c189aa5f289faf945f42754696036e26893adbe768ce05c0",
+          "batch_seq_count": 524,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 23.055,
+        "sink": "file",
+        "parsed": 4020,
+        "cached": 0,
+        "files_read": 4072,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4953,
+        "events": 2169,
+        "run_id": "product-scope-scope-bench-1-1790237450731714000",
+        "manifest": {
+          "begin_count": 8464,
+          "begin_digest": "784389653d8093cc8e12badaae84b3a8dfd197040baa020e3d912a5322ecc198",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2167,
+          "end_batch_digest": "5513461020e34a10f26f8037759472c0842b82bda24275ffdeb97f85057ee91a",
+          "end_owner_scope_len": 8464,
+          "end_owner_scope_digest": "784389653d8093cc8e12badaae84b3a8dfd197040baa020e3d912a5322ecc198",
+          "batch_seq_count": 2167,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 554,
+      "necessary_owner_count": 32,
+      "necessary_owners_sample": [
+        "file:docs/reports/T-578-managed-hosted-checkout-implementation.md",
+        "file:docs/reports/T-578-prod-stripe-managed-offers-unavailable.md",
+        "file:infra/pulumi/README.md",
+        "file:infra/pulumi/src/environmentProfile.ts",
+        "file:infra/pulumi/src/gcp/cloudRun.ts",
+        "file:packages/checkout-vue/src/api.ts",
+        "file:packages/checkout-vue/src/paymentForm.ts",
+        "file:packages/checkout-vue/src/types.ts",
+        "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+        "file:packages/clickhouse/src/productCoreClickPipes.ts",
+        "file:packages/contracts/src/payment/checkoutAuthorization.ts",
+        "file:packages/contracts/src/payment/funnel.ts",
+        "file:packages/database/src/productCoreCdcColumns.ts",
+        "file:packages/database/src/schema.ts",
+        "file:scripts/deploy/configure-pulumi-stack.mjs",
+        "file:scripts/deploy/pr-demo-fingerprint.mjs",
+        "file:scripts/deploy/product-core-clickpipes-test-image-provenance.mjs",
+        "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+        "file:services/payment-api/src/checkoutAuthorization.ts",
+        "file:services/payment-api/src/checkoutReturn.ts",
+        "file:services/payment-api/src/config.ts",
+        "file:services/payment-api/src/domain.ts",
+        "file:services/payment-api/src/paymentOperationTelemetry.ts",
+        "file:services/payment-api/src/providers/stripe.ts",
+        "file:services/payment-api/src/providers/stripeEvents.ts"
+      ],
+      "extra_begin_owner_count": 522,
+      "extra_begin_owners_sample": [
+        "file:apps/marketing-web/src/api.ts",
+        "file:apps/marketing-web/src/main.ts",
+        "file:apps/marketing-web/src/paymentForm.ts",
+        "file:apps/mobile/scripts/extract-figma-prototype-links.ts",
+        "file:apps/mobile/scripts/screen-grouping-evidence.ts",
+        "file:apps/mobile/src/App.tsx",
+        "file:apps/mobile/src/analytics/tracker.ts",
+        "file:apps/mobile/src/api.ts",
+        "file:apps/mobile/src/behavior/deviceScanBehaviorModel.ts",
+        "file:apps/mobile/src/behavior/draftBehaviorGraph.ts",
+        "file:apps/mobile/src/behavior/draftBehaviorModelHelpers.ts",
+        "file:apps/mobile/src/behavior/forgotPasswordBehaviorModel.ts",
+        "file:apps/mobile/src/behavior/getStartedBehaviorModel.ts",
+        "file:apps/mobile/src/behavior/mobileAppBehaviorModel.ts",
+        "file:apps/mobile/src/behavior/mobileAppInterpreter.ts",
+        "file:apps/mobile/src/behavior/onboardingFirstSessionBehaviorModel.ts",
+        "file:apps/mobile/src/behavior/protectRiskModel.ts",
+        "file:apps/mobile/src/behavior/protectSteadyStateBehaviorModel.ts",
+        "file:apps/mobile/src/components/figma/bottomSheet/ExtensionSetupVideo.tsx",
+        "file:apps/mobile/src/components/figma/buttons/Button.tsx",
+        "file:apps/mobile/src/components/figma/cards/BrowserActivityCard.tsx",
+        "file:apps/mobile/src/components/figma/cards/BulletPointGroup.tsx",
+        "file:apps/mobile/src/components/figma/cards/CertificateArtwork.tsx",
+        "file:apps/mobile/src/components/figma/cards/CertificatePaper.tsx",
+        "file:apps/mobile/src/components/figma/cards/CertificateStripCard.tsx"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 5,
+      "sink": "file",
+      "blocker": null,
+      "post_transition_noop": {
+        "run": {
+          "exit": 0,
+          "wall_s": 1.929,
+          "sink": "file",
+          "parsed": 0,
+          "cached": 4072,
+          "files_read": 0,
+          "generation": [
+            5,
+            5
+          ],
+          "owners_published": 0,
+          "events": 0,
+          "run_id": "",
+          "stderr_graph": "[graph] /tmp/enola-stage13-main-history10/live: generation 5\u21925 parsed=0 cached=4072 early_local=0 fallbacks=0"
+        },
+        "state_unchanged": true,
+        "state_hashes": {
+          "acks.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "commit.json": "da5d65745886ce7968e5d844152ef3b2a59d3c8f1f817d5697f2841df172c4a1",
+          "fences.jsonl": "102530946b206f4ae935f315bb3c05fb5ee4eddd370bc3f973c2737bda1f7448",
+          "identity.json": "e9c20050958407eca1641a207f9f5f5f967a2e342417c6ad8ea9a764b4386266",
+          "payloads.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "protocol": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+          "state.json": "7fc0e873b550ce34bd57eff0b38f6252d1e473a9bfcc67b992f08a6a1f8cb2c4",
+          "tombstones.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "completed_generation": 5,
+        "event_bytes_unchanged": 147609796
+      }
+    },
+    {
+      "id": "04-1c2607479b6d..599575d0aa39",
+      "index": 4,
+      "parent": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+      "child": "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+      "changed_file_count": 15,
+      "required_owner_count": 9,
+      "required_owners_sample": [
+        "file:docs/reports/T-578-managed-hosted-checkout-implementation.md",
+        "file:infra/pulumi/README.md",
+        "file:infra/pulumi/src/environmentProfile.ts",
+        "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+        "file:services/payment-api/src/checkoutReturn.ts",
+        "file:services/payment-api/src/config.ts",
+        "file:services/payment-api/src/providers/stripe.ts",
+        "file:services/payment-api/src/providers/types.ts",
+        "file:services/payment-api/src/routes/funnel.ts"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 3.854,
+        "sink": "file",
+        "parsed": 7,
+        "cached": 4013,
+        "files_read": 59,
+        "generation": [
+          5,
+          6
+        ],
+        "owners_published": 9,
+        "events": 17,
+        "run_id": "product-scope-scope-bench-6-1790237485143155000",
+        "manifest": {
+          "begin_count": 9,
+          "begin_digest": "9533493254545da4d6b299f59f289adeae9dc6922cf3f02e9d9663e65cc8a4ef",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            5,
+            6
+          ],
+          "end_batch_count": 15,
+          "end_batch_digest": "af10f3156b2b22956aefe5f5415dc36447c0334cd3cddb8b31f1cce7010d6d79",
+          "end_owner_scope_len": 9,
+          "end_owner_scope_digest": "9533493254545da4d6b299f59f289adeae9dc6922cf3f02e9d9663e65cc8a4ef",
+          "batch_seq_count": 15,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 22.172,
+        "sink": "file",
+        "parsed": 4020,
+        "cached": 0,
+        "files_read": 4072,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4953,
+        "events": 2169,
+        "run_id": "product-scope-scope-bench-1-1790237520375759000",
+        "manifest": {
+          "begin_count": 8464,
+          "begin_digest": "784389653d8093cc8e12badaae84b3a8dfd197040baa020e3d912a5322ecc198",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2167,
+          "end_batch_digest": "c0e8b337ac7237a8ac41cfbac2155fd966c0413eaedae4a067448a4d0f3bdcbe",
+          "end_owner_scope_len": 8464,
+          "end_owner_scope_digest": "784389653d8093cc8e12badaae84b3a8dfd197040baa020e3d912a5322ecc198",
+          "batch_seq_count": 2167,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 9,
+      "necessary_owner_count": 6,
+      "necessary_owners_sample": [
+        "file:infra/pulumi/src/environmentProfile.ts",
+        "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+        "file:services/payment-api/src/checkoutReturn.ts",
+        "file:services/payment-api/src/config.ts",
+        "file:services/payment-api/src/providers/stripe.ts",
+        "file:services/payment-api/src/routes/funnel.ts"
+      ],
+      "extra_begin_owner_count": 3,
+      "extra_begin_owners_sample": [
+        "file:docs/reports/T-578-managed-hosted-checkout-implementation.md",
+        "file:infra/pulumi/README.md",
+        "file:services/payment-api/src/providers/types.ts"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 6,
+      "sink": "file",
+      "blocker": null,
+      "post_transition_noop": {
+        "run": {
+          "exit": 0,
+          "wall_s": 1.99,
+          "sink": "file",
+          "parsed": 0,
+          "cached": 4072,
+          "files_read": 0,
+          "generation": [
+            6,
+            6
+          ],
+          "owners_published": 0,
+          "events": 0,
+          "run_id": "",
+          "stderr_graph": "[graph] /tmp/enola-stage13-main-history10/live: generation 6\u21926 parsed=0 cached=4072 early_local=0 fallbacks=0"
+        },
+        "state_unchanged": true,
+        "state_hashes": {
+          "acks.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "commit.json": "3e40336324e2c684de2510e8e37e2ea03f995dee43d21a2481591f7c230c0866",
+          "fences.jsonl": "1496d362b2d920c63b69296d4ee75e5c999654c4faa2a0f3b0a6c59a554d49fb",
+          "identity.json": "e9c20050958407eca1641a207f9f5f5f967a2e342417c6ad8ea9a764b4386266",
+          "payloads.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "protocol": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+          "state.json": "83dcc945cd94566e92e4570e49ce971f11194ab374eef81088f0ba85a72fa3e7",
+          "tombstones.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "completed_generation": 6,
+        "event_bytes_unchanged": 147999994
+      }
+    },
+    {
+      "id": "05-599575d0aa39..ae233c5f5695",
+      "index": 5,
+      "parent": "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+      "child": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "changed_file_count": 60,
+      "required_owner_count": 28,
+      "required_owners_sample": [
+        "file:docs/plans/2026-09-19-t578-payment-offer-catalog-sync.md",
+        "file:docs/qa/mb-2-payment-api-test-offers.md",
+        "file:docs/reports/T-578-prod-stripe-managed-offers-unavailable.md",
+        "file:docs/specs/2026-09-19-t578-payment-offer-catalog-sync.md",
+        "file:infra/pulumi/README.md",
+        "file:infra/pulumi/config/payment-seed-offers/README.md",
+        "file:infra/pulumi/src/environmentProfile.ts",
+        "file:infra/pulumi/src/gcp/cloudRun.ts",
+        "file:infra/pulumi/src/onyxEnvironment.ts",
+        "file:packages/database/catalogs/payment-offers/README.md",
+        "file:packages/database/package.json",
+        "file:packages/database/src/index.ts",
+        "file:packages/database/src/paymentDemoRuntime.d.mts",
+        "file:packages/database/src/paymentDemoRuntime.mjs",
+        "file:packages/database/src/paymentOfferCatalog.ts",
+        "file:packages/database/src/paymentOfferSeed.ts",
+        "file:packages/database/src/paymentOfferSync.ts",
+        "file:packages/database/src/paymentOfferSyncCli.ts",
+        "file:packages/database/src/schema.ts",
+        "file:scripts/deploy/configure-pulumi-stack.mjs",
+        "file:scripts/deploy/pr-demo-fingerprint.mjs",
+        "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+        "file:scripts/ops/create-stripe-gbp-catalog.mjs",
+        "file:services/payment-api/src/config.ts",
+        "file:services/payment-api/src/databaseBootstrap.ts"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 6.325,
+        "sink": "file",
+        "parsed": 99,
+        "cached": 3928,
+        "files_read": 203,
+        "generation": [
+          6,
+          7
+        ],
+        "owners_published": 343,
+        "events": 256,
+        "run_id": "product-scope-scope-bench-7-1790237553672538000",
+        "manifest": {
+          "begin_count": 344,
+          "begin_digest": "5f86fe468d61948a46ca55b240b2547241f136efa1c11d1387e8e6c58b1cb9f8",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            6,
+            7
+          ],
+          "end_batch_count": 254,
+          "end_batch_digest": "e2afdefe1c2cd47e8189d3171c6ec645711912720f2e8c691a7b17ef4d4ce652",
+          "end_owner_scope_len": 344,
+          "end_owner_scope_digest": "5f86fe468d61948a46ca55b240b2547241f136efa1c11d1387e8e6c58b1cb9f8",
+          "batch_seq_count": 254,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 23.485,
+        "sink": "file",
+        "parsed": 4027,
+        "cached": 0,
+        "files_read": 4079,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4962,
+        "events": 2171,
+        "run_id": "product-scope-scope-bench-1-1790237592171996000",
+        "manifest": {
+          "begin_count": 8476,
+          "begin_digest": "26ac7c37e49b1805d27eb1117a0c64e1df163ea5026fd057c1428dbb6b97405e",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2169,
+          "end_batch_digest": "897bb5dcf4bd99eb496976d29326eba17b5830942c98547e2033b1724e9eff15",
+          "end_owner_scope_len": 8476,
+          "end_owner_scope_digest": "26ac7c37e49b1805d27eb1117a0c64e1df163ea5026fd057c1428dbb6b97405e",
+          "batch_seq_count": 2169,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 344,
+      "necessary_owner_count": 25,
+      "necessary_owners_sample": [
+        "file:docs/plans/2026-09-19-t578-payment-offer-catalog-sync.md",
+        "file:docs/qa/mb-2-payment-api-test-offers.md",
+        "file:docs/reports/T-578-prod-stripe-managed-offers-unavailable.md",
+        "file:docs/specs/2026-09-19-t578-payment-offer-catalog-sync.md",
+        "file:infra/pulumi/README.md",
+        "file:infra/pulumi/config/payment-seed-offers/README.md",
+        "file:infra/pulumi/src/environmentProfile.ts",
+        "file:infra/pulumi/src/gcp/cloudRun.ts",
+        "file:packages/database/catalogs/payment-offers/README.md",
+        "file:packages/database/src/index.ts",
+        "file:packages/database/src/paymentDemoRuntime.d.mts",
+        "file:packages/database/src/paymentDemoRuntime.mjs",
+        "file:packages/database/src/paymentOfferCatalog.ts",
+        "file:packages/database/src/paymentOfferSeed.ts",
+        "file:packages/database/src/paymentOfferSync.ts",
+        "file:packages/database/src/paymentOfferSyncCli.ts",
+        "file:packages/database/src/schema.ts",
+        "file:scripts/deploy/configure-pulumi-stack.mjs",
+        "file:scripts/deploy/pr-demo-fingerprint.mjs",
+        "file:scripts/deploy/stripe-checkout-runtime-config.mjs",
+        "file:services/payment-api/src/config.ts",
+        "file:services/payment-api/src/databaseBootstrap.ts",
+        "file:services/payment-api/src/demoFixtures.ts",
+        "file:services/payment-api/src/repository.ts",
+        "file:services/payment-api/src/server.ts"
+      ],
+      "extra_begin_owner_count": 319,
+      "extra_begin_owners_sample": [
+        "file:.deepsec/data/product/INFO.md",
+        "file:docs/plans/2026-05-11-onyx-backend-platform-foundation-design.md",
+        "file:docs/plans/2026-05-11-onyx-backend-platform-foundation-implementation.md",
+        "file:docs/plans/2026-05-11-onyx-marketing-api-deployable-slice-design.md",
+        "file:docs/plans/2026-05-11-onyx-monorepo-design.md",
+        "file:docs/plans/2026-05-11-onyx-monorepo-implementation.md",
+        "file:docs/plans/2026-05-12-onyx-cloudflare-api-routing-design.md",
+        "file:docs/plans/2026-05-12-onyx-cloudflare-api-routing-implementation.md",
+        "file:docs/plans/2026-05-12-onyx-gcp-clickstack-design.md",
+        "file:docs/plans/2026-05-12-onyx-gcp-clickstack-implementation.md",
+        "file:docs/plans/2026-05-12-onyx-marketing-api-deployable-slice-implementation.md",
+        "file:docs/plans/2026-05-12-onyx-marketing-api-observability-implementation.md",
+        "file:docs/plans/2026-05-12-onyx-observability-retrospective.md",
+        "file:docs/plans/2026-05-12-onyx-real-scan-pipeline-implementation.md",
+        "file:docs/plans/2026-07-12-task-console-runs.md",
+        "file:docs/plans/2026-07-23-t175-implementation-report.md",
+        "file:docs/plans/2026-07-23-t175-live-validation.md",
+        "file:docs/plans/2026-07-23-t175-pr-demo-critical-path-adr.md",
+        "file:docs/plans/2026-07-24-t177-parallel-figma-refresh.md",
+        "file:docs/plans/2026-07-24-t177-r0-p0-pin-safety-report.md",
+        "file:docs/plans/2026-07-28-text-fidelity-hybrid-segmentation.md",
+        "file:docs/plans/2026-07-30-T-188-keyboard-tap-outside-dismiss-clearance.md",
+        "file:docs/plans/2026-07-30-T-191-illustrations-figma-fidelity.md",
+        "file:docs/plans/2026-07-30-t195-component-screen-map.md",
+        "file:docs/plans/2026-07-30-t195-evidence.md"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 7,
+      "sink": "file",
+      "blocker": null,
+      "post_transition_noop": {
+        "run": {
+          "exit": 0,
+          "wall_s": 2.137,
+          "sink": "file",
+          "parsed": 0,
+          "cached": 4079,
+          "files_read": 0,
+          "generation": [
+            7,
+            7
+          ],
+          "owners_published": 0,
+          "events": 0,
+          "run_id": "",
+          "stderr_graph": "[graph] /tmp/enola-stage13-main-history10/live: generation 7\u21927 parsed=0 cached=4079 early_local=0 fallbacks=0"
+        },
+        "state_unchanged": true,
+        "state_hashes": {
+          "acks.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "commit.json": "050837f29ff071d3e589cead1b517ae1913d3071391ad316299dcd9adb21b445",
+          "fences.jsonl": "84df314830ddca4f37161555a7d55f61c92da9370fcba73482121c4a8714a0ce",
+          "identity.json": "e9c20050958407eca1641a207f9f5f5f967a2e342417c6ad8ea9a764b4386266",
+          "payloads.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "protocol": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+          "state.json": "d867b4fbccab7a18324865e3969a591acf2f49a9932d698b1e39629daeb40c84",
+          "tombstones.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "completed_generation": 7,
+        "event_bytes_unchanged": 155650356
+      }
+    },
+    {
+      "id": "06-ae233c5f5695..4168360e2e7f",
+      "index": 6,
+      "parent": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "child": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "changed_file_count": 15,
+      "required_owner_count": 10,
+      "required_owners_sample": [
+        "file:docs/analytics/product-core-bronze.md",
+        "file:packages/clickhouse/package.json",
+        "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+        "file:packages/clickhouse/src/productCoreBronze/schemaVerifier.ts",
+        "file:packages/clickhouse/src/productCoreClickPipes.ts",
+        "file:packages/database/src/productCoreCdcCli.ts",
+        "file:packages/database/src/productCoreCdcExpansion.ts",
+        "file:packages/database/src/productCoreCdcPostgres.ts",
+        "file:packages/database/src/productCoreCdcProjection.ts",
+        "file:packages/database/src/productCoreCdcTypes.ts"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 5.445,
+        "sink": "file",
+        "parsed": 111,
+        "cached": 3917,
+        "files_read": 267,
+        "generation": [
+          7,
+          8
+        ],
+        "owners_published": 150,
+        "events": 108,
+        "run_id": "product-scope-scope-bench-8-1790237627593262000",
+        "manifest": {
+          "begin_count": 161,
+          "begin_digest": "d0f7ba367d089beaded087c3715b8f37e5ab37996e40430ae208652dbeafc1dc",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            7,
+            8
+          ],
+          "end_batch_count": 106,
+          "end_batch_digest": "20caadb0789b49ed8cc2bb3b9fa80a4fed94c28b1a7e69494112efda09ada8b8",
+          "end_owner_scope_len": 161,
+          "end_owner_scope_digest": "d0f7ba367d089beaded087c3715b8f37e5ab37996e40430ae208652dbeafc1dc",
+          "batch_seq_count": 106,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 22.029,
+        "sink": "file",
+        "parsed": 4028,
+        "cached": 0,
+        "files_read": 4080,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4963,
+        "events": 2172,
+        "run_id": "product-scope-scope-bench-1-1790237664174571000",
+        "manifest": {
+          "begin_count": 8477,
+          "begin_digest": "136220bb0b70f2fc7e580b8bcfb44f2005c59068621a0f50e01b523774eeacb2",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2170,
+          "end_batch_digest": "a74d39300ebcc1541096243cd28bdb7e7a218ff832f90a536d304068eefc08c0",
+          "end_owner_scope_len": 8477,
+          "end_owner_scope_digest": "136220bb0b70f2fc7e580b8bcfb44f2005c59068621a0f50e01b523774eeacb2",
+          "batch_seq_count": 2170,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 161,
+      "necessary_owner_count": 10,
+      "necessary_owners_sample": [
+        "file:docs/analytics/product-core-bronze.md",
+        "file:packages/clickhouse/package.json",
+        "file:packages/clickhouse/src/productCoreBronze/schemaVerifier.ts",
+        "file:packages/clickhouse/src/productCoreClickPipes.ts",
+        "file:packages/database/package.json",
+        "file:packages/database/src/productCoreCdcCli.ts",
+        "file:packages/database/src/productCoreCdcExpansion.ts",
+        "file:packages/database/src/productCoreCdcPostgres.ts",
+        "file:packages/database/src/productCoreCdcProjection.ts",
+        "file:packages/database/src/productCoreCdcTypes.ts"
+      ],
+      "extra_begin_owner_count": 151,
+      "extra_begin_owners_sample": [
+        "file:.deepsec/package.json",
+        "file:analytics/dbt/pyproject.toml",
+        "file:apps/architect-console/package.json",
+        "file:apps/behavior-visualizer/package.json",
+        "file:apps/marketing-web/package.json",
+        "file:apps/mobile/modules/onyx-scroll-edge/package.json",
+        "file:apps/mobile/package.json",
+        "file:apps/safari-extension/package.json",
+        "file:infra/pulumi/package.json",
+        "file:package.json",
+        "file:packages/checkout-vue/package.json",
+        "file:packages/clickhouse/src/clickPipesApi.ts",
+        "file:packages/clickhouse/src/client.ts",
+        "file:packages/clickhouse/src/index.ts",
+        "file:packages/clickhouse/src/migrate-cli.ts",
+        "file:packages/clickhouse/src/migrations.ts",
+        "file:packages/clickhouse/src/otelReadModel.ts",
+        "file:packages/clickhouse/src/productCoreBronze/canonical.ts",
+        "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+        "file:packages/clickhouse/src/productCoreBronze/currentState.ts",
+        "file:packages/clickhouse/src/productCoreBronze/digestQuery.ts",
+        "file:packages/clickhouse/src/productCoreBronze/identifiers.ts",
+        "file:packages/clickhouse/src/productCoreBronze/index.ts",
+        "file:packages/clickhouse/src/productCoreBronze/inspect.ts",
+        "file:packages/clickhouse/src/productCoreBronze/parityWindow.ts"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 8,
+      "sink": "file",
+      "blocker": null,
+      "post_transition_noop": {
+        "run": {
+          "exit": 0,
+          "wall_s": 2.01,
+          "sink": "file",
+          "parsed": 0,
+          "cached": 4080,
+          "files_read": 0,
+          "generation": [
+            8,
+            8
+          ],
+          "owners_published": 0,
+          "events": 0,
+          "run_id": "",
+          "stderr_graph": "[graph] /tmp/enola-stage13-main-history10/live: generation 8\u21928 parsed=0 cached=4080 early_local=0 fallbacks=0"
+        },
+        "state_unchanged": true,
+        "state_hashes": {
+          "acks.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "commit.json": "3f4f120362dfadfca40ac99434b7e76a6a646b525649e92f2eb17812100823f1",
+          "fences.jsonl": "edbf4409be2285f3880e015903059aaca71a8dc7a9c5b92170d51a913856b565",
+          "identity.json": "e9c20050958407eca1641a207f9f5f5f967a2e342417c6ad8ea9a764b4386266",
+          "payloads.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "protocol": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+          "state.json": "933fb9fbf5a1cd7b98b886779f3a004bda0e3b1103ff56dbf517d16f70379fe0",
+          "tombstones.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "completed_generation": 8,
+        "event_bytes_unchanged": 158717343
+      }
+    },
+    {
+      "id": "07-4168360e2e7f..a6f1f3a91a36",
+      "index": 7,
+      "parent": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "child": "a6f1f3a91a36ea3dead786560412a4944a009694",
+      "changed_file_count": 5,
+      "required_owner_count": 4,
+      "required_owners_sample": [
+        "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+        "file:packages/clickhouse/src/productCoreClickPipes.ts",
+        "file:packages/database/src/productCoreCdc.ts",
+        "file:packages/database/src/productCoreCdcColumns.ts"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 4.553,
+        "sink": "file",
+        "parsed": 80,
+        "cached": 3948,
+        "files_read": 236,
+        "generation": [
+          8,
+          9
+        ],
+        "owners_published": 80,
+        "events": 79,
+        "run_id": "product-scope-scope-bench-9-1790237698137595000",
+        "manifest": {
+          "begin_count": 80,
+          "begin_digest": "b06029dddbef10235d0873f67d79730506c67eb06655ea2e1a5e3731c86351bf",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            8,
+            9
+          ],
+          "end_batch_count": 77,
+          "end_batch_digest": "0a2839c4693f969b816a9c8db42f9f07b1a9f72db070bb3d6d8ebb1ca7d94906",
+          "end_owner_scope_len": 80,
+          "end_owner_scope_digest": "b06029dddbef10235d0873f67d79730506c67eb06655ea2e1a5e3731c86351bf",
+          "batch_seq_count": 77,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 21.726,
+        "sink": "file",
+        "parsed": 4028,
+        "cached": 0,
+        "files_read": 4080,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4963,
+        "events": 2172,
+        "run_id": "product-scope-scope-bench-1-1790237734852013000",
+        "manifest": {
+          "begin_count": 8477,
+          "begin_digest": "136220bb0b70f2fc7e580b8bcfb44f2005c59068621a0f50e01b523774eeacb2",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2170,
+          "end_batch_digest": "b876966c7724e4c827d7232893659396192bebaa27b1353fd0791de7fad84783",
+          "end_owner_scope_len": 8477,
+          "end_owner_scope_digest": "136220bb0b70f2fc7e580b8bcfb44f2005c59068621a0f50e01b523774eeacb2",
+          "batch_seq_count": 2170,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 80,
+      "necessary_owner_count": 4,
+      "necessary_owners_sample": [
+        "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+        "file:packages/clickhouse/src/productCoreClickPipes.ts",
+        "file:packages/database/src/productCoreCdc.ts",
+        "file:packages/database/src/productCoreCdcColumns.ts"
+      ],
+      "extra_begin_owner_count": 76,
+      "extra_begin_owners_sample": [
+        "file:packages/scan-engine/src/providerJobRepository.ts",
+        "file:packages/scan-engine/src/repository.ts",
+        "file:scripts/clickhouse/bootstrap-tasks-sync.ts",
+        "file:scripts/clickhouse/bootstrap.ts",
+        "file:scripts/clickhouse/cleanup-ci-databases.ts",
+        "file:scripts/clickhouse/replay-quarantine.ts",
+        "file:scripts/clickhouse/verify-deploy.ts",
+        "file:scripts/clickhouse/verify-isolation.ts",
+        "file:scripts/clickhouse/verify-tasks-sync-isolation.ts",
+        "file:services/admin-api/src/operations/drizzleStore.ts",
+        "file:services/admin-api/src/repositories/adminScans.ts",
+        "file:services/admin-api/src/server.ts",
+        "file:services/marketing-api/src/repositories/scans.ts",
+        "file:services/marketing-api/src/repositories/waitlist.ts",
+        "file:services/marketing-api/src/server.ts",
+        "file:services/memory-provider/src/analytics.ts",
+        "file:services/memory-provider/src/app.ts",
+        "file:services/memory-provider/src/config.ts",
+        "file:services/memory-provider/src/server.ts",
+        "file:services/payment-api/src/billingJurisdiction.ts",
+        "file:services/payment-api/src/checkoutSelection.ts",
+        "file:services/payment-api/src/demoFixtures.ts",
+        "file:services/payment-api/src/providers/types.ts",
+        "file:services/payment-api/src/repository.ts",
+        "file:services/payment-api/src/routes/funnel.ts"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 9,
+      "sink": "file",
+      "blocker": null,
+      "post_transition_noop": {
+        "run": {
+          "exit": 0,
+          "wall_s": 2.696,
+          "sink": "file",
+          "parsed": 0,
+          "cached": 4080,
+          "files_read": 0,
+          "generation": [
+            9,
+            9
+          ],
+          "owners_published": 0,
+          "events": 0,
+          "run_id": "",
+          "stderr_graph": "[graph] /tmp/enola-stage13-main-history10/live: generation 9\u21929 parsed=0 cached=4080 early_local=0 fallbacks=0"
+        },
+        "state_unchanged": true,
+        "state_hashes": {
+          "acks.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "commit.json": "4dd59b8a4c8231ccedde67089c303e28a854d229f33a1ed95a71e9119414c032",
+          "fences.jsonl": "4963e9bdca3b91b38324cb0944695a14751719a6f9bf2ef9049eb6b92beb58e2",
+          "identity.json": "e9c20050958407eca1641a207f9f5f5f967a2e342417c6ad8ea9a764b4386266",
+          "payloads.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "protocol": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+          "state.json": "cf3f3c718b1c210eabf0c262e9ad7fca59e80303fa025a5d9ab0273062550e8c",
+          "tombstones.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "completed_generation": 9,
+        "event_bytes_unchanged": 160933608
+      }
+    },
+    {
+      "id": "08-a6f1f3a91a36..5dfb2c8f276d",
+      "index": 8,
+      "parent": "a6f1f3a91a36ea3dead786560412a4944a009694",
+      "child": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "changed_file_count": 15,
+      "required_owner_count": 6,
+      "required_owners_sample": [
+        "file:docs/analytics/product-core-bronze.md",
+        "file:packages/clickhouse/src/productCoreBronze/index.ts",
+        "file:packages/clickhouse/src/productCoreBronze/prepareDestination.ts",
+        "file:scripts/deploy/product-core-bronze-containment-decision.mjs",
+        "file:scripts/deploy/product-core-bronze-pending-only.mjs",
+        "file:scripts/deploy/product-core-clickpipes-evidence.mjs"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 4.994,
+        "sink": "file",
+        "parsed": 43,
+        "cached": 3988,
+        "files_read": 251,
+        "generation": [
+          9,
+          10
+        ],
+        "owners_published": 126,
+        "events": 144,
+        "run_id": "product-scope-scope-bench-10-1790237769516635000",
+        "manifest": {
+          "begin_count": 126,
+          "begin_digest": "b003c61a3909946622907ebe0b2d7cd3bd95b52adfb52161cc326eca176be259",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            9,
+            10
+          ],
+          "end_batch_count": 142,
+          "end_batch_digest": "135f639a247ffaafc33763aa1bd3a164c0be2c538dbaaefbd3a4e977a6ae374e",
+          "end_owner_scope_len": 126,
+          "end_owner_scope_digest": "b003c61a3909946622907ebe0b2d7cd3bd95b52adfb52161cc326eca176be259",
+          "batch_seq_count": 142,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 22.326,
+        "sink": "file",
+        "parsed": 4031,
+        "cached": 0,
+        "files_read": 4083,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4966,
+        "events": 2173,
+        "run_id": "product-scope-scope-bench-1-1790237808362728000",
+        "manifest": {
+          "begin_count": 8480,
+          "begin_digest": "6c922e34724d1011324da30197f79aaa3563192db3f28ec9887ac0ef15184945",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2171,
+          "end_batch_digest": "0e2cd659e7f1959cbafcde343f9fb274815ad15009332fb1c0ceb0307dbc4e83",
+          "end_owner_scope_len": 8480,
+          "end_owner_scope_digest": "6c922e34724d1011324da30197f79aaa3563192db3f28ec9887ac0ef15184945",
+          "batch_seq_count": 2171,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 126,
+      "necessary_owner_count": 5,
+      "necessary_owners_sample": [
+        "file:packages/clickhouse/src/productCoreBronze/index.ts",
+        "file:packages/clickhouse/src/productCoreBronze/prepareDestination.ts",
+        "file:scripts/deploy/product-core-bronze-containment-decision.mjs",
+        "file:scripts/deploy/product-core-bronze-pending-only.mjs",
+        "file:scripts/deploy/product-core-clickpipes-evidence.mjs"
+      ],
+      "extra_begin_owner_count": 121,
+      "extra_begin_owners_sample": [
+        "file:docs/analytics/product-core-bronze.md",
+        "file:packages/clickhouse/src/index.ts",
+        "file:packages/clickhouse/src/productCoreBronze/canonical.ts",
+        "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+        "file:packages/clickhouse/src/productCoreBronze/currentState.ts",
+        "file:packages/clickhouse/src/productCoreBronze/digestQuery.ts",
+        "file:packages/clickhouse/src/productCoreBronze/inspect.ts",
+        "file:packages/clickhouse/src/productCoreBronze/query.ts",
+        "file:packages/clickhouse/src/productCoreBronze/schemaVerifier.ts",
+        "file:scripts/clickhouse/bootstrap-tasks-sync.ts",
+        "file:scripts/clickhouse/bootstrap.ts",
+        "file:scripts/clickhouse/cleanup-ci-databases.ts",
+        "file:scripts/clickhouse/replay-quarantine.ts",
+        "file:scripts/clickhouse/verify-deploy.ts",
+        "file:scripts/clickhouse/verify-isolation.ts",
+        "file:scripts/clickhouse/verify-tasks-sync-isolation.ts",
+        "file:scripts/deploy/assert-test-pulumi-plan-no-destructive.mjs",
+        "file:scripts/deploy/bootstrap-t013-gcp-deny-adapter.mjs",
+        "file:scripts/deploy/bootstrap-t013-pulumi-handoff-identity.mjs",
+        "file:scripts/deploy/bootstrap-t013-pulumi-handoff-operator.mjs",
+        "file:scripts/deploy/bootstrap-tasks-sync-rotator-role.mjs",
+        "file:scripts/deploy/capture-cloud-run-startup-failure.mjs",
+        "file:scripts/deploy/cloudflare-access-proof-token.mjs",
+        "file:scripts/deploy/collect-release-evidence.mjs",
+        "file:scripts/deploy/configure-cloudflare-pages-domain.mjs"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 10,
+      "sink": "file",
+      "blocker": null,
+      "post_transition_noop": {
+        "run": {
+          "exit": 0,
+          "wall_s": 1.981,
+          "sink": "file",
+          "parsed": 0,
+          "cached": 4083,
+          "files_read": 0,
+          "generation": [
+            10,
+            10
+          ],
+          "owners_published": 0,
+          "events": 0,
+          "run_id": "",
+          "stderr_graph": "[graph] /tmp/enola-stage13-main-history10/live: generation 10\u219210 parsed=0 cached=4083 early_local=0 fallbacks=0"
+        },
+        "state_unchanged": true,
+        "state_hashes": {
+          "acks.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "commit.json": "83c708fc6c72c68e694aa034bd53430932f5d93ec93866ba9249902c4878880c",
+          "fences.jsonl": "54d867ce3ee51d34555282b3532ddcb2b6f89002f16065289ec84a864667c7f3",
+          "identity.json": "e9c20050958407eca1641a207f9f5f5f967a2e342417c6ad8ea9a764b4386266",
+          "payloads.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "protocol": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+          "state.json": "afdae6ed2f3c680dadd74a7e7205f2210c7c53e35141e721fbda036d678f8ca7",
+          "tombstones.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "completed_generation": 10,
+        "event_bytes_unchanged": 164637667
+      }
+    },
+    {
+      "id": "09-5dfb2c8f276d..a609c19f3861",
+      "index": 9,
+      "parent": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "child": "a609c19f3861971930fae7b33dcb2950598953c5",
+      "changed_file_count": 19,
+      "required_owner_count": 8,
+      "required_owners_sample": [
+        "file:docs/analytics/product-core-bronze.md",
+        "file:infra/pulumi/src/gcp/productCoreClickPipes.ts",
+        "file:infra/pulumi/src/index.ts",
+        "file:infra/pulumi/src/onyxEnvironment.ts",
+        "file:packages/clickhouse/scripts/clickhouse/print-product-core-contract-digest.ts",
+        "file:packages/clickhouse/src/productCoreBronze/contractDigest.ts",
+        "file:packages/clickhouse/src/productCoreBronze/index.ts",
+        "file:scripts/clickhouse/print-product-core-contract-digest.ts"
+      ],
+      "delta": {
+        "exit": 0,
+        "wall_s": 4.695,
+        "sink": "file",
+        "parsed": 37,
+        "cached": 3997,
+        "files_read": 193,
+        "generation": [
+          10,
+          11
+        ],
+        "owners_published": 46,
+        "events": 32,
+        "run_id": "product-scope-scope-bench-11-1790237842389017000",
+        "manifest": {
+          "begin_count": 46,
+          "begin_digest": "b18c0e29162307b052e03243bb2d0f9bc3e516e70406f9cb27dedf1996e12247",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            10,
+            11
+          ],
+          "end_batch_count": 30,
+          "end_batch_digest": "b9c014c5f19664106244dc10259e7eb257c82b668422b8908525c913582a8984",
+          "end_owner_scope_len": 46,
+          "end_owner_scope_digest": "b18c0e29162307b052e03243bb2d0f9bc3e516e70406f9cb27dedf1996e12247",
+          "batch_seq_count": 30,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "cold": {
+        "exit": 0,
+        "wall_s": 22.477,
+        "sink": "file",
+        "parsed": 4034,
+        "cached": 0,
+        "files_read": 4086,
+        "generation": [
+          0,
+          1
+        ],
+        "owners_published": 4969,
+        "events": 2173,
+        "run_id": "product-scope-scope-bench-1-1790237879086361000",
+        "manifest": {
+          "begin_count": 8484,
+          "begin_digest": "f3f2bddd292ce978c50c38282a8d5a84635cc48100996abe983d2d4e29aba358",
+          "begin_schema": "enola.graph.v2",
+          "begin_generation": [
+            0,
+            1
+          ],
+          "end_batch_count": 2171,
+          "end_batch_digest": "13f3708fd0d6bd89e59423e2f23d4329cf8c4c9777d2a14c6b29930aac7f0644",
+          "end_owner_scope_len": 8484,
+          "end_owner_scope_digest": "f3f2bddd292ce978c50c38282a8d5a84635cc48100996abe983d2d4e29aba358",
+          "batch_seq_count": 2171,
+          "batch_phase_set": [
+            "resolved"
+          ]
+        }
+      },
+      "begin_scope_count": 46,
+      "necessary_owner_count": 7,
+      "necessary_owners_sample": [
+        "file:docs/analytics/product-core-bronze.md",
+        "file:infra/pulumi/src/gcp/productCoreClickPipes.ts",
+        "file:infra/pulumi/src/index.ts",
+        "file:packages/clickhouse/scripts/clickhouse/print-product-core-contract-digest.ts",
+        "file:packages/clickhouse/src/productCoreBronze/contractDigest.ts",
+        "file:packages/clickhouse/src/productCoreBronze/index.ts",
+        "file:scripts/clickhouse/print-product-core-contract-digest.ts"
+      ],
+      "extra_begin_owner_count": 39,
+      "extra_begin_owners_sample": [
+        "file:infra/pulumi/src/onyxEnvironment.ts",
+        "file:packages/clickhouse/src/index.ts",
+        "file:packages/clickhouse/src/productCoreBronze/canonical.ts",
+        "file:packages/clickhouse/src/productCoreBronze/contract.ts",
+        "file:packages/clickhouse/src/productCoreBronze/currentState.ts",
+        "file:packages/clickhouse/src/productCoreBronze/digestQuery.ts",
+        "file:packages/clickhouse/src/productCoreBronze/inspect.ts",
+        "file:packages/clickhouse/src/productCoreBronze/prepareDestination.ts",
+        "file:packages/clickhouse/src/productCoreBronze/query.ts",
+        "file:packages/clickhouse/src/productCoreBronze/schemaVerifier.ts",
+        "file:scripts/clickhouse/bootstrap-tasks-sync.ts",
+        "file:scripts/clickhouse/bootstrap.ts",
+        "file:scripts/clickhouse/cleanup-ci-databases.ts",
+        "file:scripts/clickhouse/replay-quarantine.ts",
+        "file:scripts/clickhouse/verify-deploy.ts",
+        "file:scripts/clickhouse/verify-isolation.ts",
+        "file:scripts/clickhouse/verify-tasks-sync-isolation.ts",
+        "file:services/memory-provider/src/analytics.ts",
+        "file:services/memory-provider/src/app.ts",
+        "file:services/memory-provider/src/config.ts",
+        "file:services/memory-provider/src/server.ts",
+        "file:services/product-api/src/productCoreBronzeCanary/destination.ts",
+        "file:services/product-api/src/productCoreBronzeCanary/entrypoint.ts",
+        "file:services/product-api/src/productCoreBronzeMonitor/cycle.ts",
+        "file:services/product-api/src/productCoreBronzeMonitor/entrypoint.ts"
+      ],
+      "graph_hash_equal": true,
+      "kind": "delta",
+      "completed_generation": 11,
+      "sink": "file",
+      "blocker": null,
+      "post_transition_noop": {
+        "run": {
+          "exit": 0,
+          "wall_s": 1.962,
+          "sink": "file",
+          "parsed": 0,
+          "cached": 4086,
+          "files_read": 0,
+          "generation": [
+            11,
+            11
+          ],
+          "owners_published": 0,
+          "events": 0,
+          "run_id": "",
+          "stderr_graph": "[graph] /tmp/enola-stage13-main-history10/live: generation 11\u219211 parsed=0 cached=4086 early_local=0 fallbacks=0"
+        },
+        "state_unchanged": true,
+        "state_hashes": {
+          "acks.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "commit.json": "40811a02cf84dcfb3a64e4811d766b57e49fa36a4883cb04280d41a78e24a1f2",
+          "fences.jsonl": "6a5a8a436c2e1fd1f8f583c830eeeb53a663857317789ffb490d39c7b7ac1820",
+          "identity.json": "e9c20050958407eca1641a207f9f5f5f967a2e342417c6ad8ea9a764b4386266",
+          "payloads.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "protocol": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+          "state.json": "a7024b80f104936d53830c36bebff16a71d0cb2b09042e45c69f794d98e9665a",
+          "tombstones.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "completed_generation": 11,
+        "event_bytes_unchanged": 165506269
+      }
+    }
+  ],
+  "work": "/tmp/enola-stage13-main-history10",
+  "output": "/tmp/enola-stage13-main-history10/results.json",
+  "sink": "file",
+  "repeat_limitation": "file-sink diagnostic; not a NATS JetStream or performance-acceptance run; launch the 10-case only when agreed"
+}
