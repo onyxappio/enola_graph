@@ -1,0 +1,55 @@
+{
+  "source_revision": "d988437efb25ea13c6ba47e30ab22ca81a14b58d",
+  "source_mismatches": [],
+  "binary_sha256": "f0f00a3582d1cdba0842bba7089e206e6aab479eccbe75925cb760482d52acb2",
+  "rows": [
+    {
+      "label": "r1-new-initial",
+      "exit": 0,
+      "graph_equal": true,
+      "parsed": 4034
+    },
+    {
+      "label": "r1-new-noop",
+      "exit": 0,
+      "graph_equal": true,
+      "parsed": 0
+    },
+    {
+      "label": "r1-new-body",
+      "exit": 0,
+      "graph_equal": true,
+      "parsed": 11
+    },
+    {
+      "label": "r1-new-structural",
+      "exit": 0,
+      "graph_equal": true,
+      "parsed": 12
+    },
+    {
+      "label": "cold-structural",
+      "exit": 0,
+      "graph_equal": true,
+      "parsed": 4034
+    },
+    {
+      "label": "cold-body",
+      "exit": 0,
+      "graph_equal": true,
+      "parsed": 4034
+    },
+    {
+      "label": "cold-original",
+      "exit": 0,
+      "graph_equal": true,
+      "parsed": 4034
+    }
+  ],
+  "noop_invariants": true,
+  "timing_eligible": false,
+  "affected_suite": "pending",
+  "changes_since_binary_source": [
+    "M\tinternal/graphsession/inventory_fusion_test.go"
+  ]
+}

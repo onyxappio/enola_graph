@@ -1,0 +1,45 @@
+{
+  "base": "370cb7d",
+  "commit": "d988437",
+  "patch_sha256": "271cb117a2c2de1d9e340eebbd6b0ea893e757f2718ec89b5a9dea08328af4ff",
+  "production_bytes_unchanged_since_patch_b6df1662": true,
+  "files": {
+    "internal/graphinput/policy.go": "03d0311b5c367b6475caae03b8473333cc6fd2fa2f5f170c86c1df0991da7db8",
+    "internal/engine/engine.go": "8fc471625f62bf4b1ca72cabd66205e7931731b8b1eb8b6858433c22880f93fa",
+    "internal/graphsession/resident.go": "c0b39102178fe729236d08ab28a53b720e4ad867661038e668acf82b9d6e7a3a",
+    "internal/graphsession/session.go": "140e580fa079789805f2e0e4739d12b4aa252d89c53f3ceef3fc91df9be8b396",
+    "internal/graphsession/inventory_fusion_test.go": "37728b9d0324e14f2ca6f4e4cefc3daa9f5b1a217da3f5395c885e2a1c5ac344"
+  },
+  "tests_run": "go test ./internal/graphsession/ -run TestFused -count=1",
+  "tests": {
+    "count": 10,
+    "result": "PASS",
+    "wall_s": 6.605,
+    "log": "/tmp/enola-stage18-invfusion/test-fused-12.log"
+  },
+  "mutations": [
+    {
+      "id": "mutation-4-graph-vacuity",
+      "change": "both Consumer.ApplyRecords calls in TestFusedGraphEqualsUnfusedAcrossFreshInvocations passed nil (root's mutation)",
+      "result": "FAIL",
+      "first_failure": "cold/fused: the published graph holds no nodes, so comparing it proves nothing: []",
+      "log": "/tmp/enola-stage18-invfusion/mutation-4-graph-vacuity.log"
+    },
+    {
+      "id": "mutation-5-stale-body",
+      "change": "body-edit step rewrites the original bytes instead of fetch('/y')",
+      "result": "FAIL",
+      "first_failure": "body edit/fused: src.leaf io_direct=false, want true",
+      "log": "/tmp/enola-stage18-invfusion/mutation-5-stale-body.log"
+    },
+    {
+      "id": "mutation-6-root-agreement",
+      "change": "fusedRootsAgree(r.abs, scope) replaced by scope != nil && scope.Policy != nil in resident.go",
+      "result": "FAIL",
+      "first_failure": "a proof rooted at <scope> was projected into the inventory of <repo>; all three subcases failed",
+      "log": "/tmp/enola-stage18-invfusion/mutation-6-root-agreement.log",
+      "production_restored": true
+    }
+  ],
+  "affected_package_suite": "NOT RUN - would overlap root's provisional 23:25-23:35 UTC timing window"
+}

@@ -1,0 +1,17 @@
+{
+  "correctness_accepted": true,
+  "source_revision": "d988437efb25ea13c6ba47e30ab22ca81a14b58d",
+  "binary_sha256": "f0f00a3582d1cdba0842bba7089e206e6aab479eccbe75925cb760482d52acb2",
+  "scope": "Stage18 final candidate pre-timing correctness; not performance acceptance or full goal completion",
+  "history_transitions": 10,
+  "history_revisions": 11,
+  "evidence_sha256": {
+    "history/receipt-final-d988437.json": "84ad293c2ac91a5f0de724816ed18295dbd54ebf797add368cd190e8c49f89f4",
+    "product-final-source-equivalence.json": "512c45eabd61046d62b0077db1edff2b0e780a1efe3bcc91c06146746cdcb701",
+    "final-affected-packages-receipt.json": "ca33be7a0c3a89a54eaafc1b138a1a679236041f1bd57ad9f6442deabf36a816",
+    "final-fused-tests-receipt.json": "c5c37a8110ef4f3fa186d5d51413f90be00d0094415eda91bf51978f3a46ae7b",
+    "final-invfusion.patch": "271cb117a2c2de1d9e340eebbd6b0ea893e757f2718ec89b5a9dea08328af4ff",
+    "final-FINAL-MANIFEST.json": "d2237079ddc5b2ff828c84f0b87340525347ad2ff6d8eab6139c912d3e213b62"
+  },
+  "performance_accepted": false
+}
