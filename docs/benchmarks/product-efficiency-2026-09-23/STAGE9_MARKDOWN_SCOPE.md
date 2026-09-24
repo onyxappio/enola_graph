@@ -62,3 +62,31 @@ An unused package addition still dirties unrelated TS contexts. A separate regre
 also demonstrates that adding an unclaimed JSON file can publish an unnecessary
 whole-domain replacement despite zero parses and unchanged graph facts. These
 remain open, alongside fresh CLI no-op overhead and final matched performance gates.
+
+## Repeated fresh CLI timing
+
+Three runs per build, alternating control/candidate/candidate/control/control/candidate,
+on a separate copy of the same Product fixture. Control is `50b64fd`; candidate is
+clean `a648c0b`. Both binaries use Go 1.27.1 with trimpath and the same file sink
+configuration. Values below are whole CLI wall time, median (minimum–maximum).
+
+| Phase | Control seconds | Candidate seconds |
+|---|---:|---:|
+| initial | 25.934 (24.342–26.224) | 23.995 (20.389–25.441) |
+| delta | 4.776 (4.119–4.957) | 3.443 (3.430–3.803) |
+| noop | 1.813 (1.738–1.826) | 1.780 (1.694–1.879) |
+
+The observed median delta fell about 28%, with one parse in both builds and scope
+618 versus 1. Initial and no-op ranges overlap; this run does not establish an
+improvement for those phases. Every successful arm has the same initial/final
+graph, verified manifests and batch digests, and a no-op with zero parses/events,
+no generation advancement and unchanged persisted state. A separate final cold
+analysis matches all six delta graphs.
+
+One additional candidate initial was rejected because a coordinator `git status`
+refreshed the fixture index during analysis. The failed arm is excluded and
+preserved; the successful sequence resumed without further Git commands on the
+fixture. Alias tests overlapped parts of the measurement on the shared host.
+These file-sink diagnostics do not establish final NATS acknowledgment performance.
+Raw timing, binary hashes and interruption details are in
+`stage9-markdown-repeated-timing.json`.

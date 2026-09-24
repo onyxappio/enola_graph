@@ -1,0 +1,255 @@
+{
+  "rows": [
+    {
+      "arm": "control",
+      "initial": {
+        "seconds": 25.933667916,
+        "base": 0,
+        "target": 1,
+        "parsed": 4034,
+        "cached": 0
+      },
+      "delta": {
+        "seconds": 4.118904292,
+        "base": 1,
+        "target": 2,
+        "parsed": 1,
+        "cached": 4034
+      },
+      "noop": {
+        "seconds": 1.7384192079999998,
+        "base": 2,
+        "target": 2,
+        "parsed": 0,
+        "cached": 4087
+      },
+      "scopes": [
+        8484,
+        618
+      ],
+      "hashes": [
+        "2811333813ba062fe9aa602b7adebcd815a1dc7b52f774f564df7a375ccbd6bc",
+        "0ac6ae9f73f5f53fc4c173eeee2059a69ee539e1471f32a5fa95b16ea7cb01e1"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "initial": {
+        "seconds": 25.440968708000007,
+        "base": 0,
+        "target": 1,
+        "parsed": 4034,
+        "cached": 0
+      },
+      "delta": {
+        "seconds": 3.443332957999999,
+        "base": 1,
+        "target": 2,
+        "parsed": 1,
+        "cached": 4034
+      },
+      "noop": {
+        "seconds": 1.7796851660000073,
+        "base": 2,
+        "target": 2,
+        "parsed": 0,
+        "cached": 4087
+      },
+      "scopes": [
+        8484,
+        1
+      ],
+      "hashes": [
+        "2811333813ba062fe9aa602b7adebcd815a1dc7b52f774f564df7a375ccbd6bc",
+        "0ac6ae9f73f5f53fc4c173eeee2059a69ee539e1471f32a5fa95b16ea7cb01e1"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "initial": {
+        "seconds": 20.388893125,
+        "base": 0,
+        "target": 1,
+        "parsed": 4034,
+        "cached": 0
+      },
+      "delta": {
+        "seconds": 3.4304235419999998,
+        "base": 1,
+        "target": 2,
+        "parsed": 1,
+        "cached": 4034
+      },
+      "noop": {
+        "seconds": 1.6936188329999986,
+        "base": 2,
+        "target": 2,
+        "parsed": 0,
+        "cached": 4087
+      },
+      "scopes": [
+        8484,
+        1
+      ],
+      "hashes": [
+        "2811333813ba062fe9aa602b7adebcd815a1dc7b52f774f564df7a375ccbd6bc",
+        "0ac6ae9f73f5f53fc4c173eeee2059a69ee539e1471f32a5fa95b16ea7cb01e1"
+      ]
+    },
+    {
+      "arm": "control",
+      "initial": {
+        "seconds": 24.341949874999997,
+        "base": 0,
+        "target": 1,
+        "parsed": 4034,
+        "cached": 0
+      },
+      "delta": {
+        "seconds": 4.776172500000001,
+        "base": 1,
+        "target": 2,
+        "parsed": 1,
+        "cached": 4034
+      },
+      "noop": {
+        "seconds": 1.826004999999995,
+        "base": 2,
+        "target": 2,
+        "parsed": 0,
+        "cached": 4087
+      },
+      "scopes": [
+        8484,
+        618
+      ],
+      "hashes": [
+        "2811333813ba062fe9aa602b7adebcd815a1dc7b52f774f564df7a375ccbd6bc",
+        "0ac6ae9f73f5f53fc4c173eeee2059a69ee539e1471f32a5fa95b16ea7cb01e1"
+      ]
+    },
+    {
+      "arm": "control",
+      "initial": {
+        "seconds": 26.224188791000003,
+        "base": 0,
+        "target": 1,
+        "parsed": 4034,
+        "cached": 0
+      },
+      "delta": {
+        "seconds": 4.956587874999997,
+        "base": 1,
+        "target": 2,
+        "parsed": 1,
+        "cached": 4034
+      },
+      "noop": {
+        "seconds": 1.8125569160000055,
+        "base": 2,
+        "target": 2,
+        "parsed": 0,
+        "cached": 4087
+      },
+      "scopes": [
+        8484,
+        618
+      ],
+      "hashes": [
+        "2811333813ba062fe9aa602b7adebcd815a1dc7b52f774f564df7a375ccbd6bc",
+        "0ac6ae9f73f5f53fc4c173eeee2059a69ee539e1471f32a5fa95b16ea7cb01e1"
+      ]
+    },
+    {
+      "arm": "candidate",
+      "initial": {
+        "seconds": 23.995417292,
+        "base": 0,
+        "target": 1,
+        "parsed": 4034,
+        "cached": 0
+      },
+      "delta": {
+        "seconds": 3.8033777920000063,
+        "base": 1,
+        "target": 2,
+        "parsed": 1,
+        "cached": 4034
+      },
+      "noop": {
+        "seconds": 1.8790839170000027,
+        "base": 2,
+        "target": 2,
+        "parsed": 0,
+        "cached": 4087
+      },
+      "scopes": [
+        8484,
+        1
+      ],
+      "hashes": [
+        "2811333813ba062fe9aa602b7adebcd815a1dc7b52f774f564df7a375ccbd6bc",
+        "0ac6ae9f73f5f53fc4c173eeee2059a69ee539e1471f32a5fa95b16ea7cb01e1"
+      ]
+    }
+  ],
+  "summary": {
+    "control": {
+      "initial": {
+        "median": 25.933667916,
+        "min": 24.341949874999997,
+        "max": 26.224188791000003
+      },
+      "delta": {
+        "median": 4.776172500000001,
+        "min": 4.118904292,
+        "max": 4.956587874999997
+      },
+      "noop": {
+        "median": 1.8125569160000055,
+        "min": 1.7384192079999998,
+        "max": 1.826004999999995
+      }
+    },
+    "candidate": {
+      "initial": {
+        "median": 23.995417292,
+        "min": 20.388893125,
+        "max": 25.440968708000007
+      },
+      "delta": {
+        "median": 3.443332957999999,
+        "min": 3.4304235419999998,
+        "max": 3.8033777920000063
+      },
+      "noop": {
+        "median": 1.7796851660000073,
+        "min": 1.6936188329999986,
+        "max": 1.8790839170000027
+      }
+    }
+  },
+  "cold": {
+    "seconds": 25.377978874999997,
+    "base": 0,
+    "target": 1,
+    "parsed": 4035,
+    "cached": 0
+  },
+  "binary_sha256": {
+    "control": "e5b35bbbe08b16b2202b172a14021dcb3d6d3f47ef7cdcd6df25e9c8c57fb358",
+    "candidate": "f9d179dff892f126845715753e6d8908af4e1878abdbf7191fb6dd771dda2130"
+  },
+  "note": "Three repeats per arm; fresh CLI/file sink, alternating order, shared host diagnostic. Not NATS acknowledgment acceptance.",
+  "product_revision": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "control_revision": "50b64fd9890a642e7a3c72fad6f928ab1076fd86",
+  "candidate_revision": "a648c0b0f0d59d762e47c06b146e3f7cc6d18bac",
+  "interruption": {
+    "arm": 2,
+    "phase": "initial",
+    "exit": 2,
+    "reason": "Coordinator git status refreshed copied .git/index during transaction; Enola correctly rejected changed inputs.",
+    "action": "Preserve failed arm; resume remaining sequence without Git commands in fixture."
+  },
+  "host_activity": "Alias full suite and independent targeted tests overlapped parts of the run. Diagnostic shared-host timing, not controlled acceptance."
+}
