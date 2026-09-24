@@ -150,6 +150,15 @@ func scanChangeNeutral(st *State, semantic []string, hashes map[string]string, p
 	if st == nil || st.ScanHash == "" || len(neutral) == 0 {
 		return false
 	}
+	restored, appeared := restoreNeutralHashes(hashes, prevFiles, neutral)
+	return st.ScanHash == inventoryDigest(withoutAppeared(semantic, appeared), restored)
+}
+
+// restoreNeutralHashes puts the content hashes a proven-neutral extractor's
+// files had when the stored state was written back over the current ones, and
+// names the files it could not put back because the stored state does not
+// describe them.
+func restoreNeutralHashes(hashes map[string]string, prevFiles map[string]*FileState, neutral map[string]*nonTSPreview) (map[string]string, map[string]bool) {
 	restored := make(map[string]string, len(hashes))
 	for k, v := range hashes {
 		restored[k] = v
@@ -172,17 +181,23 @@ func scanChangeNeutral(st *State, semantic []string, hashes map[string]string, p
 			restored[filepath.ToSlash(f)] = prev.Hash
 		}
 	}
-	names := semantic
-	if len(appeared) > 0 {
-		names = make([]string, 0, len(semantic))
-		for _, f := range semantic {
-			if appeared[filepath.ToSlash(f)] {
-				continue
-			}
-			names = append(names, f)
-		}
+	return restored, appeared
+}
+
+// withoutAppeared drops the names restoreNeutralHashes could not restore, so the
+// comparison is against the name set the stored digest was taken over.
+func withoutAppeared(names []string, appeared map[string]bool) []string {
+	if len(appeared) == 0 {
+		return names
 	}
-	return st.ScanHash == inventoryDigest(names, restored)
+	out := make([]string, 0, len(names))
+	for _, f := range names {
+		if appeared[filepath.ToSlash(f)] {
+			continue
+		}
+		out = append(out, f)
+	}
+	return out
 }
 
 // tsFileContextMoved reports whether a configuration edit moved some source's

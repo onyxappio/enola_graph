@@ -1,0 +1,58 @@
+{
+  "status": "Validated for integration: full v2 suite and all 10 Product transitions passed",
+  "experimental_build": {
+    "kind": "experimental-go-overlay",
+    "base_revision": "9de94e9",
+    "binary_sha256": "075828afc59f05877f461565ae5ade2e03b99662e3a37453b2dcc568c9cea95c",
+    "production_source_sha256": {
+      "state.go": "c48e26eddcfb43080bd5c43ef88ad4f13e68b8665034e8f3ec6764839504a25c",
+      "nonts_neutral.go": "16fb0c7a965fad2de617be68ecd16f4423736a378a91c6c86b1cb943e98f3f8d",
+      "session.go": "1ad57af1a64b74c87e758ddd6113ab2f4f39618ac6e9a5194c538e08642bdbf7",
+      "scan_claimed.go": "cef4f60eaff85cccb1f5dc6c1db47a7691ead40101ae8616976cfe3d7e0d770a"
+    },
+    "note": "Same production source bytes integrated locally and in full-suite snapshot. Go VCS metadata alone does not identify overlay sources."
+  },
+  "independent_focused_guards": {
+    "exit": 0,
+    "seconds": 16.25,
+    "log_sha256": "faac1da5fff84300da08df5c8378ab9e5fabf1c51b8a073c7760fbb6b1bbb369"
+  },
+  "worker_v2_focused": {
+    "exit": 0,
+    "seconds": 15.578,
+    "log": "/tmp/enola-stage9-logs9/applied-main-claimed-v2.log"
+  },
+  "prior_v1_affected_suite": {
+    "exit": 0,
+    "graphsession_s": 459.937,
+    "bootstrap_s": 142.845,
+    "tsextractor_s": 34.116,
+    "limitation": "Does not establish full v2 coverage; gate was moved afterward."
+  },
+  "regression_evidence": {
+    "ts_only_v1": "add/rename/delete fail with3events,0parses,gen1to2",
+    "ts_only_v2": "all four lifecycle arms PASS",
+    "linked_rename": "unresolved-to-resolved and resolved-to-unresolved references change graph, cold-equal, followup silent",
+    "mutation_m5": "disabling claimed proof fails neutral membership regressions",
+    "mutation_m6": "restoring outer neutral-preview requirement fails TS-only regressions"
+  },
+  "remaining": [
+    "production commit/push"
+  ],
+  "full_v2_suite": {
+    "command": "go test -count=1 -timeout=20m ./...",
+    "exit": 0,
+    "snapshot": "/tmp/enola-stage9-claimed-v2-suite",
+    "graphsession_s": 595.351,
+    "log_sha256": "c715b2650867b42d99a402cbb65b0764f0c8014fcf527d2772acfe761dc9fc61"
+  },
+  "product_history": {
+    "exit": 0,
+    "completed_transitions": 10,
+    "verify_noop_after_each_transition": true,
+    "report": "stage9-claimed-membership-history10.json",
+    "report_sha256": "ea517e8dd81a94908f6327b3a1db5abba8dd3900d0c4b3d25c243618824b0b37",
+    "sink": "file",
+    "limitation": "Single diagnostic runs on shared host; not repeated NATS acceptance."
+  }
+}

@@ -1,0 +1,1081 @@
+{
+  "kind": "instrumented watch retry timeline",
+  "observed_timestamp_note": "stderr lines timestamped by external reader at 10ms polling; approximate observation time, not internal hook timestamp",
+  "raw_receipt_sha256": "72c2e43263b9d785cb3971c5d3e499c09a92495b2e97b5fd677ae59cfbac4202",
+  "harness_sha256": "cf56b64e50f6edc16c1c474240a637024f174ab759410a667d9da362275b3a26",
+  "watch": {
+    "measurement_kind": "production-graph-watch",
+    "not_request_driven_resident": true,
+    "not_product_acceptance": true,
+    "fixture": "product",
+    "watch_every": "500ms",
+    "watch_every_s": 0.5,
+    "work": "/tmp/enola-stage9-watch-timeline/run",
+    "port": 55217,
+    "elapsed_s": 88.036,
+    "binary": {
+      "path": "/tmp/enola-stage9-empty-domain-review/enola",
+      "sha256": "ff19e3bff2f8d07647b289bd0021281057b12e71c88c7d05d7b69c4b07836285",
+      "go_version_m": "/tmp/enola-stage9-empty-domain-review/enola: go1.27.1\n\tpath\tgithub.com/enola-labs/enola/cmd/enola\n\tmod\tgithub.com/enola-labs/enola\tv0.0.0-20260924014938-a970a037b209\t\n\tdep\tgithub.com/ebitengine/purego\tv0.10.2\th1:W809HbnvzAxgdm+aOvlSekrM16wGCdT/e76+9tS7gzE=\n\tdep\tgithub.com/fsnotify/fsnotify\tv1.9.0\th1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=\n\tdep\tgithub.com/google/jsonschema-go\tv0.4.3\th1:/DBOLZTfDow7pe2GmaJNhltueGTtDKICi8V8p+DQPd0=\n\tdep\tgithub.com/klauspost/compress\tv1.18.0\th1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=\n\tdep\tgithub.com/mattn/go-pointer\tv0.0.1\th1:n+XhsuGeVO6MEAp7xyEukFINEa+Quek5psIR/ylA6o0=\n\tdep\tgithub.com/modelcontextprotocol/go-sdk\tv1.8.0\th1:KIvahhYqwtbeniWVPs3TcXEA7b8jEtwfBpOTAI+Urx4=\n\tdep\tgithub.com/nats-io/nats.go\tv1.47.0\th1:YQdADw6J/UfGUd2Oy6tn4Hq6YHxCaJrVKayxxFqYrgM=\n\tdep\tgithub.com/nats-io/nkeys\tv0.4.11\th1:q44qGV008kYd9W1b1nEBkNzvnWxtRSQ7A8BoqRrcfa0=\n\tdep\tgithub.com/nats-io/nuid\tv1.0.1\th1:5iA8DT8V7q8WK2EScv2padNa/rTESc1KdnPw4TC2paw=\n\tdep\tgithub.com/pbnjay/memory\tv0.0.0-20210728143218-7b4eea64cf58\th1:onHthvaw9LFnH4t2DcNVpwGmV9E1BkGknEliJkfwQj0=\n\tdep\tgithub.com/segmentio/asm\tv1.1.3\th1:WM03sfUOENvvKexOLp+pCqgb/WDjsi7EK8gIsICtzhc=\n\tdep\tgithub.com/segmentio/encoding\tv0.5.4\th1:OW1VRern8Nw6ITAtwSZ7Idrl3MXCFwXHPgqESYfvNt0=\n\tdep\tgithub.com/tree-sitter-grammars/tree-sitter-kotlin\tv1.1.0\th1:SWIUDASa+WPhDDem1U5IJpYwQEezkqXrUI61OcnORzM=\n\tdep\tgithub.com/tree-sitter/go-tree-sitter\tv0.24.0\th1:kRZb6aBNfcI/u0Qh8XEt3zjNVnmxTisDBN+kXK0xRYQ=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c\tv0.23.6\th1:aHcghKEBgyUDUcCKFT5fELp26UBU7RBltj5MkRYxyy8=\n\tdep\tgithub.com/tree-sitter/tree-sitter-c-sharp\tv0.23.1\th1:ddG6osP34sMieVNN6lu5ZG/3N8Wn+67+43BmipqidyM=\n\tdep\tgithub.com/tree-sitter/tree-sitter-cpp\tv0.23.4\th1:LaWZsiqQKvR65yHgKmnaqA+uz6tlDJTJFCyFIeZU/8w=\n\tdep\tgithub.com/tree-sitter/tree-sitter-java\tv0.23.5\th1:J9YeMGMwXYlKSP3K4Us8CitC6hjtMjqpeOf2GGo6tig=\n\tdep\tgithub.com/tree-sitter/tree-sitter-php\tv0.23.12\th1:zgnxrV5RUEbK9d3jm9R8CjR3uSA1pBPbvq7Tbjg8j0k=\n\tdep\tgithub.com/tree-sitter/tree-sitter-python\tv0.23.6\th1:qHnWFR5WhtMQpxBZRwiaU5Hk/29vGju6CVtmvu5Haas=\n\tdep\tgithub.com/tree-sitter/tree-sitter-ruby\tv0.23.1\th1:T/NKHUA+iVbHM440hFx+lzVOzS4dV6z8Qw8ai+72bYo=\n\tdep\tgithub.com/tree-sitter/tree-sitter-rust\tv0.23.3\th1:v41N2Dx5ZEzouqeQJ0IIH2cUwVw/iepwrUoE9D56IL4=\n\tdep\tgithub.com/tree-sitter/tree-sitter-scala\tv0.24.1\th1:jO4zDfb3vQWmqCDpLfhENVtP3RvOSLYNR69m0R/T6wY=\n\tdep\tgithub.com/tree-sitter/tree-sitter-typescript\tv0.23.2\th1:/Odvphn18PniVixb9e97X0DbNVsU6Qocv9mfkyzdXwU=\n\tdep\tgithub.com/yosida95/uritemplate/v3\tv3.0.2\th1:Ed3Oyj9yrmi9087+NczuL5BwkIc4wvTb5zIM+UJPGz4=\n\tdep\tgolang.org/x/crypto\tv0.37.0\th1:kJNSjF/Xp7kU0iB2Z+9viTPMW4EqqsrywMXLJOOsXSE=\n\tdep\tgolang.org/x/oauth2\tv0.35.0\th1:Mv2mzuHuZuY2+bkyWXIHMfhNdJAdwW3FuWeCPYN5GVQ=\n\tdep\tgolang.org/x/sync\tv0.20.0\th1:e0PTpb7pjO8GAtTs2dQ6jYa5BWYlMuX047Dco/pItO4=\n\tdep\tgolang.org/x/sys\tv0.48.0\th1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=\n\tdep\tgolang.org/x/time\tv0.15.0\th1:bbrp8t3bGUeFOx08pvsMYRTCVSMk89u4tKbNOZbp88U=\n\tdep\tgopkg.in/yaml.v3\tv3.0.1\th1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\t-trimpath=true\n\tbuild\tDefaultGODEBUG=tracebacklabels=0,x509sslcertoverrideplatform=0\n\tbuild\tCGO_ENABLED=1\n\tbuild\tGOARCH=arm64\n\tbuild\tGOOS=darwin\n\tbuild\tGOARM64=v8.0\n\tbuild\tvcs=git\n\tbuild\tvcs.revision=a970a037b209174556be88c90045f76e8d91fee1\n\tbuild\tvcs.time=2026-09-24T01:49:38Z\n\tbuild\tvcs.modified=false\n",
+      "go_version_m_sha256": "5aff8b4be1310988e1ab237ef00ae4378bbe1466e723c310ee1bfaa9b6156ec7",
+      "vcs_revision": "a970a037b209174556be88c90045f76e8d91fee1",
+      "vcs_modified": false,
+      "vcs_modified_explained_by_harness_injection": false
+    },
+    "observer": {
+      "path": "/tmp/enola-stage9-product-watch-control/bin/benchobserver",
+      "sha256": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+      "go_version_m": "/tmp/enola-stage9-product-watch-control/bin/benchobserver: go1.26.8\n\tpath\tgithub.com/enola-labs/enola/benchobserveroverlay\n\tmod\tgithub.com/enola-labs/enola/benchobserveroverlay\t(devel)\t\n\tdep\tgithub.com/ebitengine/purego\tv0.10.2\th1:W809HbnvzAxgdm+aOvlSekrM16wGCdT/e76+9tS7gzE=\n\tdep\tgithub.com/enola-labs/enola\tv0.0.0\n\t=>\t/Users/oleksandr.mykulych/orca/enola_graph\t(devel)\t\n\t\n\tdep\tgithub.com/fsnotify/fsnotify\tv1.9.0\th1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=\n\tdep\tgithub.com/klauspost/compress\tv1.18.0\th1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=\n\tdep\tgithub.com/mattn/go-pointer\tv0.0.1\th1:n+XhsuGeVO6MEAp7xyEukFINEa+Quek5psIR/ylA6o0=\n\tdep\tgithub.com/nats-io/nats.go\tv1.47.0\th1:YQdADw6J/UfGUd2Oy6tn4Hq6YHxCaJrVKayxxFqYrgM=\n\tdep\tgithub.com/nats-io/nkeys\tv0.4.11\th1:q44qGV008kYd9W1b1nEBkNzvnWxtRSQ7A8BoqRrcfa0=\n\tdep\tgithub.com/nats-io/nuid\tv1.0.1\th1:5iA8DT8V7q8WK2EScv2padNa/rTESc1KdnPw4TC2paw=\n\tdep\tgithub.com/tree-sitter/go-tree-sitter\tv0.24.0\th1:kRZb6aBNfcI/u0Qh8XEt3zjNVnmxTisDBN+kXK0xRYQ=\n\tdep\tgithub.com/tree-sitter/tree-sitter-python\tv0.23.6\th1:qHnWFR5WhtMQpxBZRwiaU5Hk/29vGju6CVtmvu5Haas=\n\tdep\tgithub.com/tree-sitter/tree-sitter-ruby\tv0.23.1\th1:T/NKHUA+iVbHM440hFx+lzVOzS4dV6z8Qw8ai+72bYo=\n\tdep\tgithub.com/tree-sitter/tree-sitter-typescript\tv0.23.2\th1:/Odvphn18PniVixb9e97X0DbNVsU6Qocv9mfkyzdXwU=\n\tdep\tgolang.org/x/crypto\tv0.37.0\th1:kJNSjF/Xp7kU0iB2Z+9viTPMW4EqqsrywMXLJOOsXSE=\n\tdep\tgolang.org/x/sys\tv0.48.0\th1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=\n\tdep\tgopkg.in/yaml.v3\tv3.0.1\th1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=\n\tbuild\t-buildmode=exe\n\tbuild\t-compiler=gc\n\tbuild\tCGO_ENABLED=1\n\tbuild\tCGO_CFLAGS=\n\tbuild\tCGO_CPPFLAGS=\n\tbuild\tCGO_CXXFLAGS=\n\tbuild\tCGO_LDFLAGS=\n\tbuild\tGOARCH=arm64\n\tbuild\tGOOS=darwin\n\tbuild\tGOARM64=v8.0\n",
+      "go_version_m_sha256": "e686ce6c8ac3daf118b961111a9f892bc894434ffd4a4d26275da5feeff6e3db",
+      "vcs_revision": "",
+      "vcs_modified": null,
+      "vcs_modified_explained_by_harness_injection": false
+    },
+    "snapshot": "/Users/oleksandr.mykulych/orca/enola_graph",
+    "snapshot_note": "explicit --binary",
+    "edits": [
+      {
+        "kind": "duplicate",
+        "path": "/tmp/enola-stage9-watch-timeline/run/product-live/packages/crypto/src/password.ts",
+        "start_ns": 1790216960678831000,
+        "ns": 1790216960680807000
+      },
+      {
+        "kind": "burst",
+        "path": "/tmp/enola-stage9-watch-timeline/run/product-live/packages/crypto/src/password.ts",
+        "start_ns": 1790216961706003000,
+        "ns": 1790216961708132000
+      },
+      {
+        "kind": "burst",
+        "path": "/tmp/enola-stage9-watch-timeline/run/product-live/packages/crypto/src/password.ts",
+        "start_ns": 1790216961764538000,
+        "ns": 1790216961767748000
+      },
+      {
+        "kind": "burst",
+        "path": "/tmp/enola-stage9-watch-timeline/run/product-live/packages/crypto/src/password.ts",
+        "start_ns": 1790216961827812000,
+        "ns": 1790216961831576000
+      }
+    ],
+    "burst_started_ns": 1790216961705927000,
+    "initial_generation": [
+      0,
+      1
+    ],
+    "completed_generations": [
+      1,
+      2
+    ],
+    "burst_frame_count": 1,
+    "idle_events": 0,
+    "duplicate_events": 0,
+    "repo_id": "watch-bench",
+    "completion_selection": "heuristic-quiescence + observed cold equality",
+    "internal_drain_proved": false,
+    "requires_watcher_watermark_for_proof": true,
+    "quiet_margin_s": 2.5,
+    "open_begin_tracking": "observed",
+    "incomplete_begin_end_pairs_at_selection": [
+      {
+        "run_id": "watch-bench-watch-bench-2-1790216961856694000",
+        "context": "watch-bench",
+        "target_generation": 2
+      }
+    ],
+    "abandoned_begins": [
+      {
+        "run_id": "watch-bench-watch-bench-2-1790216961856694000",
+        "context": "watch-bench",
+        "target_generation": 2,
+        "broker_ns": 1790216962779624000,
+        "abandoned_reason": "superseded-by-later-begin"
+      }
+    ],
+    "generations_begun_after_last_save": [
+      2
+    ],
+    "post_save_generation_observed": true,
+    "begin_after_save_is_not_capture_proof": true,
+    "selected_generation": 2,
+    "quiescence_limitations": [
+      "a final no-op save may publish no generation; selecting an older completed graph for cold comparison does not prove the watcher processed that save",
+      "no watcher watermark exists, so the harness cannot read the watcher's own queue; quiescence is inferred from observed traffic, never proved",
+      "an analysis longer than the quiet margin with its Begin not yet published is indistinguishable from an idle watcher (unobservable pre-Begin work)",
+      "a Begin broker timestamp records when the Begin was published, not when the watcher captured the input, so a Begin after a save does not prove that run scanned the saved bytes",
+      "acceptance therefore rests on cold equality of the final completed generation after inputs are frozen, not on the quiescence signal",
+      "an open Begin that a later Begin supersedes, or that predates a watcher restart, is treated as abandoned and reported separately rather than waited on; if that classification were wrong the harness would stop blocking on a run that is genuinely still in flight"
+    ],
+    "input_hash_scope": "whole-isolated-checkout",
+    "input_stability_across_cold": {
+      "stable": true,
+      "files_before_cold": 45107,
+      "files_after_cold": 45107,
+      "diff": {
+        "added": [],
+        "modified": [],
+        "deleted": [],
+        "changed_count": 0,
+        "outside_allowlist": []
+      },
+      "scope": "whole-isolated-checkout",
+      "note": "if unstable, the watch and cold graphs read different inputs and the equality result is inconclusive, not a verdict"
+    },
+    "input_scope_excluded_dirs": [
+      ".enola",
+      ".git",
+      ".next",
+      ".turbo",
+      ".venv",
+      "__pycache__",
+      "build",
+      "dist",
+      "node_modules"
+    ],
+    "input_files_hashed": 45107,
+    "inputs_isolated_under_work": true,
+    "harness_setup_before_watch_launch_s": 37.861,
+    "watch_launch_to_initial_frame_observed_ms": 12228.988,
+    "watch_launch_to_initial_consumer_applied_ms": 11993.462,
+    "frame_detection_poll_interval_s": 0.05,
+    "observed_startup_note": "Two startup numbers, both from spawning the `graph watch` process to the FIRST completed generation, and neither of them a total. watch_launch_to_initial_frame_observed_ms is the honest observable: a monotonic interval ending when THIS HARNESS read the frame, so it includes up to one poll interval of detection lag (frame_detection_poll_interval_s). watch_launch_to_initial_consumer_applied_ms ends at the apply timestamp the observer stamped into the frame instead, which drops the polling lag but compares a Python clock read with a Go clock read on this host. Both cover process start, config load, the first full repository scan, publication and consumer apply, so they are cold-start figures for THIS harness on THIS fixture. Neither is a user-save latency: harness setup before the spawn is reported separately as harness_setup_before_watch_launch_s, and begin_to_end_ms stays a broker-side interval of a single generation, never an initial total.",
+    "save_observation_basis": "fsync-completion",
+    "save_observation_basis_note": "harness-scripted write; time.time_ns() read after fsync(2) returned",
+    "fsync_visibility_note": "fsync completion is the chosen latency REFERENCE, not a visibility guarantee: a reader or filesystem watcher can observe written bytes before fsync returns. Intervals measured from it can therefore be legitimately NEGATIVE when the watcher sampled during the write; negative offsets are reported and labelled, never clamped away.",
+    "clock_basis": {
+      "time_since_latest_observed_save_at_begin_ms": "local_wall(latest observed save) -> broker(Begin) [CROSS]",
+      "begin_to_first_batch_ms": "broker -> broker [single]",
+      "begin_to_end_ms": "broker -> broker [single]",
+      "end_to_consumer_ms": "broker(End) -> local_wall(observer applied) [CROSS]",
+      "time_since_latest_observed_save_at_consumer_ms": "local_wall -> local_wall [single]",
+      "final_convergence_ms": "local_wall(last observed edit) -> local_wall(first final-cold-equal completion) [single]",
+      "watch_launch_to_initial_frame_observed_ms": "monotonic(watch process spawn) -> monotonic(harness READ the initial frame) [single; includes up to one FRAME_POLL_INTERVAL_S of detection lag]",
+      "watch_launch_to_initial_consumer_applied_ms": "local_wall(watch process spawn) -> local_wall(observer applied the initial End, as stamped in the frame) [single host, two processes]"
+    },
+    "clock_assumption": "single host; broker metadata timestamps and local wall clock are the same physical clock read through different paths; CROSS intervals include unquantified skew and are indicative, not precise",
+    "causality_note": "time_since_latest_observed_save_* pairs each generation with the NEAREST PRIOR observed save. That is correlation, not causation: the collection window is fixed, so a generation may have been triggered by an earlier save and merely happen to follow a later one, and a save landing inside an open window is folded into a run that started before it. Generation and run ids are recorded so a reader can re-pair them. The one causal end-to-end number here is final_convergence_ms: last observed edit to the first completed generation that equals the final cold graph.",
+    "window_semantics": "fixed collection window, not debounce",
+    "initial_hash": "848ac6d4c61fc0059c7980672c9729fcb3a29dbe2b9d14d5b7d6576e0fe8086d",
+    "mutation_changed_graph": true,
+    "watch_hash": "dd768d6b3bc64d273b934c882ac0834fab9216b5c94ed13950f92221b2db69ab",
+    "cold_hash": "dd768d6b3bc64d273b934c882ac0834fab9216b5c94ed13950f92221b2db69ab",
+    "cold_context": "watch-cold",
+    "cold_run_id": "watch-bench-watch-cold-1-1790216979753901000",
+    "convergence": {
+      "converged": true,
+      "first_cold_equal_generation": 2,
+      "first_cold_equal_run_id": "watch-bench-watch-bench-2-1790216965224858000",
+      "first_cold_equal_consumer_ns": 1790216967215847000,
+      "last_observed_edit_ns": 1790216961831576000,
+      "final_convergence_ms": 5384.271,
+      "cold_equal_generations_at_tail": 1,
+      "basis": "last observed edit -> start of the observed final matching suffix: the first completed generation that equals the final cold graph and is never contradicted afterwards",
+      "is_causal_claim": false,
+      "basis_limitation": "observed matching suffix only; a graph-neutral edit can make an earlier generation match, which shortens this number without the work being faster"
+    },
+    "equal": true,
+    "initial_owner_scope_count": 8485,
+    "burst_owner_scope_counts": [
+      11
+    ],
+    "broker_first_ns": 1790216966143602000,
+    "broker_first_batch_ns": 1790216966698640000,
+    "broker_end_ns": 1790216967214632000,
+    "consumer_end_ns": 1790216967215847000,
+    "telemetry_generations": [
+      {
+        "generation": 1,
+        "base_generation": 0,
+        "run_id": "watch-bench-watch-bench-1-1790216949460293000",
+        "context": "watch-bench",
+        "owner_scope_count": 8485,
+        "telemetry_available": true,
+        "generation_kind": "initial",
+        "messages_observed": 1984,
+        "batches_observed": 1982,
+        "batch_count_end": 1982,
+        "batch_count_matches_end": true,
+        "node_records_sent": 58910,
+        "edge_records_sent": 126825,
+        "node_records_sent_resolved": 58910,
+        "edge_records_sent_resolved": 126825,
+        "payload_bytes_begin": 819692,
+        "payload_bytes_batches": 62932042,
+        "payload_bytes_end": 559,
+        "payload_bytes_total": 63752293,
+        "payload_bytes_basis": "json_payload_bytes_including_begin_and_end_excluding_broker_framing",
+        "graph_nodes_total": 58910,
+        "graph_edges_total": 126825,
+        "graph_nodes_delta": 58910,
+        "graph_edges_delta": 126825,
+        "completeness_status": "success",
+        "completeness_files_analyzed": 10967,
+        "completeness_parsed_files": 4035,
+        "completeness_cached_files": 0,
+        "completeness_summary_scans": 1733,
+        "completeness_early_local": false,
+        "completeness_files_unreadable": 0,
+        "completeness_fallbacks": 1
+      },
+      {
+        "generation": 2,
+        "base_generation": 1,
+        "run_id": "watch-bench-watch-bench-2-1790216965224858000",
+        "context": "watch-bench",
+        "owner_scope_count": 11,
+        "telemetry_available": true,
+        "generation_kind": "delta",
+        "messages_observed": 26,
+        "batches_observed": 24,
+        "batch_count_end": 24,
+        "batch_count_matches_end": true,
+        "node_records_sent": 526,
+        "edge_records_sent": 1533,
+        "node_records_sent_resolved": 526,
+        "edge_records_sent_resolved": 1533,
+        "payload_bytes_begin": 1149,
+        "payload_bytes_batches": 686890,
+        "payload_bytes_end": 575,
+        "payload_bytes_total": 688614,
+        "payload_bytes_basis": "json_payload_bytes_including_begin_and_end_excluding_broker_framing",
+        "graph_nodes_total": 58910,
+        "graph_edges_total": 126827,
+        "graph_nodes_delta": 0,
+        "graph_edges_delta": 2,
+        "completeness_status": "success",
+        "completeness_files_analyzed": 10967,
+        "completeness_parsed_files": 11,
+        "completeness_cached_files": 4024,
+        "completeness_summary_scans": 117,
+        "completeness_early_local": false,
+        "completeness_files_unreadable": 0,
+        "completeness_fallbacks": 1
+      }
+    ],
+    "telemetry_totals": {
+      "completed_generations_counted": 2,
+      "completed_generations_without_telemetry": 0,
+      "initial_generations": 1,
+      "delta_generations": 1,
+      "aborted_or_in_flight_included": false,
+      "messages_observed": 2010,
+      "batches_observed": 2006,
+      "node_records_sent": 59436,
+      "edge_records_sent": 128358,
+      "node_records_sent_resolved": 59436,
+      "edge_records_sent_resolved": 128358,
+      "payload_bytes_begin": 820841,
+      "payload_bytes_batches": 63618932,
+      "payload_bytes_end": 1134,
+      "payload_bytes_total": 64440907,
+      "completeness_files_analyzed": 21934,
+      "completeness_parsed_files": 4046,
+      "completeness_cached_files": 4024,
+      "batch_count_mismatches": 0,
+      "net_graph_nodes_after_last_generation": 58910,
+      "net_graph_edges_after_last_generation": 126827,
+      "records_vs_entities_note": "*_records_sent counts records the replacement PUT ON THE WIRE. A replacement resends every owner in its frozen scope, so most of those records REPLACE facts the consumer already held: they are traffic, not new entities. graph_*_total is the resulting net graph SIZE and graph_*_delta the change in that size since this context's previous completed generation. A zero delta therefore means the graph did not change size, NOT that the same facts came back: ids, edge targets and properties can all change at constant counts. normalized_hash is the only equality evidence here. graph_*_total sums per-owner record counts; it is not a count of distinct ids, so an id contributed by two owners counts twice.",
+      "completed_only_note": "All telemetry here comes from COMPLETED generations: the observer writes a frame at End, so an aborted or still-in-flight Begin contributes nothing to any count or byte total. Those attempts are visible only through the lifecycle records, reported separately as incomplete_begin_end_pairs_* and abandoned_begins."
+    },
+    "cold_telemetry": {
+      "generation": 1,
+      "base_generation": 0,
+      "run_id": "watch-bench-watch-cold-1-1790216979753901000",
+      "context": "watch-cold",
+      "owner_scope_count": 8485,
+      "telemetry_available": true,
+      "generation_kind": "initial",
+      "messages_observed": 1984,
+      "batches_observed": 1982,
+      "batch_count_end": 1982,
+      "batch_count_matches_end": true,
+      "node_records_sent": 58910,
+      "edge_records_sent": 126827,
+      "node_records_sent_resolved": 58910,
+      "edge_records_sent_resolved": 126827,
+      "payload_bytes_begin": 819690,
+      "payload_bytes_batches": 62930596,
+      "payload_bytes_end": 558,
+      "payload_bytes_total": 63750844,
+      "payload_bytes_basis": "json_payload_bytes_including_begin_and_end_excluding_broker_framing",
+      "graph_nodes_total": 58910,
+      "graph_edges_total": 126827,
+      "graph_nodes_delta": 58910,
+      "graph_edges_delta": 126827,
+      "completeness_status": "success",
+      "completeness_files_analyzed": 10967,
+      "completeness_parsed_files": 4035,
+      "completeness_cached_files": 0,
+      "completeness_summary_scans": 1666,
+      "completeness_early_local": false,
+      "completeness_files_unreadable": 0,
+      "completeness_fallbacks": 1
+    },
+    "cold_summary": {
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "ParsedFiles": 4035,
+      "OwnersPublished": 4035
+    }
+  },
+  "origin_ns": 1790216947463323000,
+  "timeline": [
+    {
+      "observed_ns": 1790216947463323000,
+      "line": "[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=watch"
+    },
+    {
+      "observed_ns": 1790216947941928000,
+      "line": "[graph-profile] resolve_graph_target               0.481s  total= 0.481s  trace=cli  repos=1"
+    },
+    {
+      "observed_ns": 1790216947944600000,
+      "line": "[graph-profile] connect_sink                       0.001s  total= 0.482s  trace=cli  nats=true"
+    },
+    {
+      "observed_ns": 1790216947944661000,
+      "line": "[graph-profile] lock                               0.000s  total= 0.000s  trace=open"
+    },
+    {
+      "observed_ns": 1790216947944676000,
+      "line": "[graph-profile] bind_identity                      0.000s  total= 0.001s  trace=open"
+    },
+    {
+      "observed_ns": 1790216947945027000,
+      "line": "[graph-profile] open_journal                       0.000s  total= 0.001s  trace=open"
+    },
+    {
+      "observed_ns": 1790216947955638000,
+      "line": "[graph-profile] replay_unacked                     0.012s  total= 0.012s  trace=open"
+    },
+    {
+      "observed_ns": 1790216947956217000,
+      "line": "[graph-profile] load_state                         0.000s  total= 0.012s  trace=open  files=0"
+    },
+    {
+      "observed_ns": 1790216948505376000,
+      "line": "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false"
+    },
+    {
+      "observed_ns": 1790216948505422000,
+      "line": "[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2"
+    },
+    {
+      "observed_ns": 1790216948609453000,
+      "line": "[graph-profile] graph_inputs_proven                0.097s  total= 0.098s  trace=reconcile"
+    },
+    {
+      "observed_ns": 1790216948612105000,
+      "line": "[graph-profile] effective_config                   0.002s  total= 0.100s  trace=reconcile  files=2 fast=false"
+    },
+    {
+      "observed_ns": 1790216948612123000,
+      "line": "[graph-profile] reconcile_complete                 0.000s  total= 0.100s  trace=reconcile  reloaded=false"
+    },
+    {
+      "observed_ns": 1790216948735295000,
+      "line": "[graph-profile] engine_walk_repo                   0.120s  files=10967 tests=0 all_names=10967"
+    },
+    {
+      "observed_ns": 1790216948735350000,
+      "line": "[graph-profile] inventory                          0.121s  total= 0.121s  trace=inputs  files=10967 all_names=10967"
+    },
+    {
+      "observed_ns": 1790216948735363000,
+      "line": "[graph-profile] detect_typescript                  0.001s"
+    },
+    {
+      "observed_ns": 1790216948735371000,
+      "line": "[graph-profile] detect_extractors                  0.001s  total= 0.122s  trace=inputs  detected=1"
+    },
+    {
+      "observed_ns": 1790216948735378000,
+      "line": "[graph-profile] select_hash_targets                0.006s  total= 0.128s  trace=inputs  targets=4106"
+    },
+    {
+      "observed_ns": 1790216949180587000,
+      "line": "[graph-profile] engine_hash_files                  0.435s  n=4106 hashed=4106 bytes=45822355"
+    },
+    {
+      "observed_ns": 1790216949180957000,
+      "line": "[graph-profile] hash_content_inputs                0.437s  total= 0.565s  trace=inputs  targets=4106"
+    },
+    {
+      "observed_ns": 1790216949180973000,
+      "line": "[graph-profile] capture_contexts                   0.000s  total= 0.565s  trace=inputs  contexts=0"
+    },
+    {
+      "observed_ns": 1790216949250824000,
+      "line": "[graph-profile] ts_config_inputs                   0.070s  n=83"
+    },
+    {
+      "observed_ns": 1790216949250854000,
+      "line": "[graph-profile] analysis_fingerprint               0.076s  total= 0.641s  trace=inputs  cfg_files=59"
+    },
+    {
+      "observed_ns": 1790216949250863000,
+      "line": "[graph-profile] angular_probe                      0.003s  total= 0.644s  trace=inputs  angular=false"
+    },
+    {
+      "observed_ns": 1790216949250871000,
+      "line": "[graph-profile] policy_identity                    0.000s  total= 0.644s  trace=inputs"
+    },
+    {
+      "observed_ns": 1790216949250878000,
+      "line": "[graph-profile] engine_context_fingerprint         0.000s  total= 0.644s  trace=inputs"
+    },
+    {
+      "observed_ns": 1790216949383774000,
+      "line": "[graph-profile] ts_disc_nuxt_packages              0.127s  pkgs=0"
+    },
+    {
+      "observed_ns": 1790216949398182000,
+      "line": "[graph-profile] ts_disc_package_gates              0.000s"
+    },
+    {
+      "observed_ns": 1790216949398329000,
+      "line": "[graph-profile] ts_disc_package_names              0.000s  names=30"
+    },
+    {
+      "observed_ns": 1790216949398340000,
+      "line": "[graph-profile] ts_disc_alias_roots                0.003s  roots=1"
+    },
+    {
+      "observed_ns": 1790216949398364000,
+      "line": "[graph-profile] ts_disc_package_exports            0.000s  packages=30"
+    },
+    {
+      "observed_ns": 1790216949398370000,
+      "line": "[graph-profile] ts_discovery_build                 0.145s  side_reads=809 stat_reads=1984 walked_dirs=655 captured=59"
+    },
+    {
+      "observed_ns": 1790216949398377000,
+      "line": "[graph-profile] ts_discovery                       0.145s  total= 0.790s  trace=inputs  names=0 bytes=0 dirs=0"
+    },
+    {
+      "observed_ns": 1790216949451096000,
+      "line": "[graph-profile] ts_session_context                 0.054s  total= 0.844s  trace=inputs  files=4087"
+    },
+    {
+      "observed_ns": 1790216949452200000,
+      "line": "[graph-profile] runtime_inputs_complete            0.000s  total= 0.844s  trace=inputs"
+    },
+    {
+      "observed_ns": 1790216949467245000,
+      "line": "[graph-profile] clone_file_state_copy              0.000s  n=0"
+    },
+    {
+      "observed_ns": 1790216949469085000,
+      "line": "[graph-profile] extractor_need                     0.858s  total= 0.858s  trace=session  non_ts_need=false detected=1 neutral=0"
+    },
+    {
+      "observed_ns": 1790216949484224000,
+      "line": "[graph-profile] changed_terms                      0.008s  total= 0.867s  trace=session  initial=true force=true non_ts=false scan=false raw_cfg=false policy=true neutral_scan=false neutral_cfg=false"
+    },
+    {
+      "observed_ns": 1790216949499301000,
+      "line": "[graph-profile] invalidation_plan                  0.018s  total= 0.885s  trace=session  reason=frozen scope: global name-resolution domain whole=true extra=0"
+    },
+    {
+      "observed_ns": 1790216949589680000,
+      "line": "[graph-profile] begin_publish                      0.094s  total= 0.979s  trace=session  scope=8485"
+    },
+    {
+      "observed_ns": 1790216949589711000,
+      "line": "[graph-profile] ts_dirty_scope                     0.001s  total= 0.980s  trace=session  dirty=0 scope=4087 force=true"
+    },
+    {
+      "observed_ns": 1790216949589719000,
+      "line": "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4087 shared_discovery=true"
+    },
+    {
+      "observed_ns": 1790216949589726000,
+      "line": "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21"
+    },
+    {
+      "observed_ns": 1790216949776300000,
+      "line": "[graph-profile] ts_read_dirty                      0.186s  total= 0.186s  trace=ts  to_read=4087 cached=0"
+    },
+    {
+      "observed_ns": 1790216950164980000,
+      "line": "[graph-profile] ts_graphql_grpc_index              0.385s  total= 0.572s  trace=ts  ts_files=4087"
+    },
+    {
+      "observed_ns": 1790216953969692000,
+      "line": "[graph-profile] ts_mapfiles_aggregate              3.801s  total= 4.373s  trace=ts  parsed=4035 facts=58910 routers=0 scans=1733 derived=2261"
+    },
+    {
+      "observed_ns": 1790216953970494000,
+      "line": "[graph-profile] ts_compose_modules                 0.005s  total= 4.378s  trace=ts  facts=59347 records=4087 unread=0"
+    },
+    {
+      "observed_ns": 1790216953970913000,
+      "line": "[graph-profile] ts_extract_session                 4.382s  total= 5.361s  trace=session  parsed=4035 cached=0 facts=59347 records=4087"
+    },
+    {
+      "observed_ns": 1790216954206262000,
+      "line": "[graph-profile] assemble_new_files                 0.240s  total= 5.601s  trace=session  new=4087 ts_noop=false non_ts_need=false skip=false facts=59347"
+    },
+    {
+      "observed_ns": 1790216954221373000,
+      "line": "[graph-profile] index_group_owners                 0.016s  total= 5.617s  trace=session  facts=58910 owners=4035"
+    },
+    {
+      "observed_ns": 1790216954235179000,
+      "line": "[graph-profile] publish_scope                      0.001s  total= 5.618s  trace=session  scope=8485"
+    },
+    {
+      "observed_ns": 1790216958734853000,
+      "line": "[graph-profile] encode_append_owners               4.511s  total=10.129s  trace=session  published=4035"
+    },
+    {
+      "observed_ns": 1790216958850869000,
+      "line": "[graph-profile] publish_resolved                   0.112s  total=10.241s  trace=session  owners=4035"
+    },
+    {
+      "observed_ns": 1790216959012786000,
+      "line": "[graph-profile] revalidate_ts_records              0.160s  total=10.401s  trace=session  n=4087"
+    },
+    {
+      "observed_ns": 1790216959091831000,
+      "line": "[graph-profile] ts_config_inputs                   0.069s  n=83"
+    },
+    {
+      "observed_ns": 1790216959268664000,
+      "line": "[graph-profile] state_json_marshal                 0.174s  bytes=55682503 files=4087"
+    },
+    {
+      "observed_ns": 1790216959298932000,
+      "line": "[graph-profile] write_pending_state                0.290s  total=10.691s  trace=session"
+    },
+    {
+      "observed_ns": 1790216959376523000,
+      "line": "[graph-profile] end_flush_ack                      0.076s  total=10.767s  trace=session"
+    },
+    {
+      "observed_ns": 1790216959484869000,
+      "line": "[graph-profile] promote_compact_state              0.113s  total=10.880s  trace=session  parsed=4035 published=4035"
+    },
+    {
+      "observed_ns": 1790216959989661000,
+      "line": "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false"
+    },
+    {
+      "observed_ns": 1790216960001806000,
+      "line": "[graph-profile] effective_config_before            0.001s  total= 0.001s  trace=reconcile  files=2"
+    },
+    {
+      "observed_ns": 1790216960499716000,
+      "line": "[graph-profile] rebuild_graph_inputs               0.508s  total= 0.509s  trace=reconcile  engine already used"
+    },
+    {
+      "observed_ns": 1790216960499751000,
+      "line": "[graph-profile] effective_config                   0.002s  total= 0.511s  trace=reconcile  files=2 fast=false"
+    },
+    {
+      "observed_ns": 1790216960499761000,
+      "line": "[graph-profile] reconcile_complete                 0.000s  total= 0.511s  trace=reconcile  reloaded=false"
+    },
+    {
+      "observed_ns": 1790216960627501000,
+      "line": "[graph-profile] engine_walk_repo                   0.124s  files=10967 tests=0 all_names=10967"
+    },
+    {
+      "observed_ns": 1790216960627573000,
+      "line": "[graph-profile] inventory                          0.124s  total= 0.124s  trace=inputs  files=10967 all_names=10967"
+    },
+    {
+      "observed_ns": 1790216960627591000,
+      "line": "[graph-profile] detect_typescript                  0.001s"
+    },
+    {
+      "observed_ns": 1790216960637878000,
+      "line": "[graph-profile] detect_extractors                  0.004s  total= 0.128s  trace=inputs  detected=1"
+    },
+    {
+      "observed_ns": 1790216960641438000,
+      "line": "[graph-profile] select_hash_targets                0.009s  total= 0.137s  trace=inputs  targets=4106"
+    },
+    {
+      "observed_ns": 1790216960806791000,
+      "line": "[graph-profile] engine_hash_files                  0.165s  n=4106 hashed=4106 bytes=45822355"
+    },
+    {
+      "observed_ns": 1790216960807191000,
+      "line": "[graph-profile] hash_content_inputs                0.165s  total= 0.302s  trace=inputs  targets=4106"
+    },
+    {
+      "observed_ns": 1790216960807210000,
+      "line": "[graph-profile] capture_contexts                   0.000s  total= 0.302s  trace=inputs  contexts=0"
+    },
+    {
+      "observed_ns": 1790216960878520000,
+      "line": "[graph-profile] ts_config_inputs                   0.066s  n=83"
+    },
+    {
+      "observed_ns": 1790216960878684000,
+      "line": "[graph-profile] analysis_fingerprint               0.071s  total= 0.373s  trace=inputs  cfg_files=59"
+    },
+    {
+      "observed_ns": 1790216960878694000,
+      "line": "[graph-profile] angular_probe                      0.004s  total= 0.377s  trace=inputs  angular=false"
+    },
+    {
+      "observed_ns": 1790216960878705000,
+      "line": "[graph-profile] policy_identity                    0.002s  total= 0.379s  trace=inputs"
+    },
+    {
+      "observed_ns": 1790216960893742000,
+      "line": "[graph-profile] engine_context_fingerprint         0.000s  total= 0.379s  trace=inputs"
+    },
+    {
+      "observed_ns": 1790216961005663000,
+      "line": "[graph-profile] ts_disc_nuxt_packages              0.120s  pkgs=0"
+    },
+    {
+      "observed_ns": 1790216961018531000,
+      "line": "[graph-profile] ts_disc_package_gates              0.001s"
+    },
+    {
+      "observed_ns": 1790216961018560000,
+      "line": "[graph-profile] ts_disc_package_names              0.000s  names=30"
+    },
+    {
+      "observed_ns": 1790216961018569000,
+      "line": "[graph-profile] ts_disc_alias_roots                0.003s  roots=1"
+    },
+    {
+      "observed_ns": 1790216961018575000,
+      "line": "[graph-profile] ts_disc_package_exports            0.000s  packages=30"
+    },
+    {
+      "observed_ns": 1790216961018580000,
+      "line": "[graph-profile] ts_discovery_build                 0.136s  side_reads=809 stat_reads=1984 walked_dirs=655 captured=59"
+    },
+    {
+      "observed_ns": 1790216961018587000,
+      "line": "[graph-profile] ts_discovery                       0.136s  total= 0.515s  trace=inputs  names=0 bytes=0 dirs=0"
+    },
+    {
+      "observed_ns": 1790216961075649000,
+      "line": "[graph-profile] ts_session_context                 0.057s  total= 0.572s  trace=inputs  files=4087"
+    },
+    {
+      "observed_ns": 1790216961078448000,
+      "line": "[graph-profile] runtime_inputs_complete            0.002s  total= 0.574s  trace=inputs"
+    },
+    {
+      "observed_ns": 1790216961105144000,
+      "line": "[graph-profile] clone_file_state_copy              0.000s  n=4087"
+    },
+    {
+      "observed_ns": 1790216961108470000,
+      "line": "[graph-profile] extractor_need                     0.602s  total= 0.602s  trace=session  non_ts_need=false detected=1 neutral=0"
+    },
+    {
+      "observed_ns": 1790216961119950000,
+      "line": "[graph-profile] changed_terms                      0.009s  total= 0.611s  trace=session  initial=false force=false non_ts=false scan=false raw_cfg=false policy=false neutral_scan=false neutral_cfg=false"
+    },
+    {
+      "observed_ns": 1790216961172407000,
+      "line": "[graph-profile] ts_reuse_cache                     0.048s  total= 0.659s  trace=session  owned=4087 facts=59347"
+    },
+    {
+      "observed_ns": 1790216961174434000,
+      "line": "[graph-profile] assemble_new_files                 0.002s  total= 0.660s  trace=session  new=4087 ts_noop=true non_ts_need=false skip=true facts=59347"
+    },
+    {
+      "observed_ns": 1790216961227477000,
+      "line": "[graph-profile] ts_config_inputs                   0.061s  n=83"
+    },
+    {
+      "observed_ns": 1790216961227513000,
+      "line": "[graph-profile] skip_publish_return                0.064s  total= 0.725s  trace=session"
+    },
+    {
+      "observed_ns": 1790216961753882000,
+      "line": "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=true failed=false"
+    },
+    {
+      "observed_ns": 1790216961754457000,
+      "line": "[graph-profile] effective_config                   0.000s  total= 0.000s  trace=reconcile  files=2 fast=true"
+    },
+    {
+      "observed_ns": 1790216961754472000,
+      "line": "[graph-profile] reconcile_complete                 0.000s  total= 0.000s  trace=reconcile  reloaded=false"
+    },
+    {
+      "observed_ns": 1790216961869630000,
+      "line": "[graph-profile] clone_file_state_copy              0.000s  n=4087"
+    },
+    {
+      "observed_ns": 1790216961872508000,
+      "line": "[graph-profile] extractor_need                     0.122s  total= 0.122s  trace=session  non_ts_need=false detected=1 neutral=0"
+    },
+    {
+      "observed_ns": 1790216961885661000,
+      "line": "[graph-profile] changed_terms                      0.009s  total= 0.131s  trace=session  initial=false force=false non_ts=false scan=true raw_cfg=false policy=false neutral_scan=false neutral_cfg=false"
+    },
+    {
+      "observed_ns": 1790216962106821000,
+      "line": "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4087 shared_discovery=true"
+    },
+    {
+      "observed_ns": 1790216962108292000,
+      "line": "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21"
+    },
+    {
+      "observed_ns": 1790216962108312000,
+      "line": "[graph-profile] ts_read_dirty                      0.010s  total= 0.010s  trace=ts  to_read=53 cached=4034"
+    },
+    {
+      "observed_ns": 1790216962205644000,
+      "line": "[graph-profile] ts_graphql_grpc_index              0.097s  total= 0.107s  trace=ts  ts_files=4087"
+    },
+    {
+      "observed_ns": 1790216962264181000,
+      "line": "[graph-profile] ts_mapfiles_aggregate              0.049s  total= 0.155s  trace=ts  parsed=1 facts=58910 routers=0 scans=0 derived=1"
+    },
+    {
+      "observed_ns": 1790216962266522000,
+      "line": "[graph-profile] ts_compose_modules                 0.004s  total= 0.159s  trace=ts  facts=59347 records=4087 unread=0"
+    },
+    {
+      "observed_ns": 1790216962276802000,
+      "line": "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4087 shared_discovery=true"
+    },
+    {
+      "observed_ns": 1790216962276912000,
+      "line": "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21"
+    },
+    {
+      "observed_ns": 1790216962291952000,
+      "line": "[graph-profile] ts_read_dirty                      0.009s  total= 0.009s  trace=ts  to_read=62 cached=4025"
+    },
+    {
+      "observed_ns": 1790216962389844000,
+      "line": "[graph-profile] ts_graphql_grpc_index              0.103s  total= 0.112s  trace=ts  ts_files=4087"
+    },
+    {
+      "observed_ns": 1790216962679383000,
+      "line": "[graph-profile] ts_mapfiles_aggregate              0.288s  total= 0.400s  trace=ts  parsed=10 facts=58910 routers=0 scans=117 derived=7"
+    },
+    {
+      "observed_ns": 1790216962682478000,
+      "line": "[graph-profile] ts_compose_modules                 0.003s  total= 0.403s  trace=ts  facts=59347 records=4087 unread=0"
+    },
+    {
+      "observed_ns": 1790216962695856000,
+      "line": "[graph-profile] ts_frozen_preview                  0.820s  total= 0.952s  trace=session  dirty=11 err=false"
+    },
+    {
+      "observed_ns": 1790216962764484000,
+      "line": "[graph-profile] invalidation_plan                  0.068s  total= 1.019s  trace=session  reason=frozen scope: prior file-to-file dependency closure whole=false extra=0"
+    },
+    {
+      "observed_ns": 1790216962814097000,
+      "line": "[graph-profile] begin_publish                      0.051s  total= 1.070s  trace=session  scope=11"
+    },
+    {
+      "observed_ns": 1790216963043169000,
+      "line": "[graph-profile] ts_dirty_scope                     0.230s  total= 1.300s  trace=session  dirty=11 scope=11 force=false"
+    },
+    {
+      "observed_ns": 1790216963045273000,
+      "line": "[graph-profile] ts_extract_session                 0.002s  total= 1.302s  trace=session  parsed=11 cached=4024 facts=59347 records=4087"
+    },
+    {
+      "observed_ns": 1790216963123164000,
+      "line": "[graph-profile] assemble_new_files                 0.073s  total= 1.376s  trace=session  new=4087 ts_noop=false non_ts_need=false skip=false facts=59347"
+    },
+    {
+      "observed_ns": 1790216963285455000,
+      "line": "[graph-profile] index_group_owners                 0.168s  total= 1.544s  trace=session  facts=58910 owners=4035"
+    },
+    {
+      "observed_ns": 1790216963287499000,
+      "line": "[graph-profile] publish_scope                      0.001s  total= 1.545s  trace=session  scope=11"
+    },
+    {
+      "observed_ns": 1790216963297669000,
+      "line": "[graph-profile] encode_append_owners               0.005s  total= 1.549s  trace=session  published=11"
+    },
+    {
+      "observed_ns": 1790216963360072000,
+      "line": "[graph-profile] publish_resolved                   0.067s  total= 1.616s  trace=session  owners=11"
+    },
+    {
+      "observed_ns": 1790216963884409000,
+      "line": "[graph-profile] state_read_bytes                   0.021s  state.json bytes=55682503"
+    },
+    {
+      "observed_ns": 1790216964117552000,
+      "line": "[graph-profile] state_json_unmarshal               0.234s  files=4087"
+    },
+    {
+      "observed_ns": 1790216964120464000,
+      "line": "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=true"
+    },
+    {
+      "observed_ns": 1790216964120485000,
+      "line": "[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2"
+    },
+    {
+      "observed_ns": 1790216964612375000,
+      "line": "[graph-profile] rebuild_graph_inputs               0.490s  total= 0.490s  trace=reconcile  engine already used"
+    },
+    {
+      "observed_ns": 1790216964613491000,
+      "line": "[graph-profile] effective_config                   0.000s  total= 0.490s  trace=reconcile  files=2 fast=false"
+    },
+    {
+      "observed_ns": 1790216964613502000,
+      "line": "[graph-profile] reconcile_complete                 0.000s  total= 0.490s  trace=reconcile  reloaded=false"
+    },
+    {
+      "observed_ns": 1790216964729526000,
+      "line": "[graph-profile] engine_walk_repo                   0.122s  files=10967 tests=0 all_names=10967"
+    },
+    {
+      "observed_ns": 1790216964729690000,
+      "line": "[graph-profile] inventory                          0.123s  total= 0.123s  trace=inputs  files=10967 all_names=10967"
+    },
+    {
+      "observed_ns": 1790216964729706000,
+      "line": "[graph-profile] detect_typescript                  0.001s"
+    },
+    {
+      "observed_ns": 1790216964744777000,
+      "line": "[graph-profile] detect_extractors                  0.005s  total= 0.128s  trace=inputs  detected=1"
+    },
+    {
+      "observed_ns": 1790216964744852000,
+      "line": "[graph-profile] select_hash_targets                0.009s  total= 0.137s  trace=inputs  targets=4106"
+    },
+    {
+      "observed_ns": 1790216964907562000,
+      "line": "[graph-profile] engine_hash_files                  0.166s  n=4106 hashed=4106 bytes=45822403"
+    },
+    {
+      "observed_ns": 1790216964907660000,
+      "line": "[graph-profile] hash_content_inputs                0.169s  total= 0.306s  trace=inputs  targets=4106"
+    },
+    {
+      "observed_ns": 1790216964907689000,
+      "line": "[graph-profile] capture_contexts                   0.000s  total= 0.306s  trace=inputs  contexts=0"
+    },
+    {
+      "observed_ns": 1790216964982965000,
+      "line": "[graph-profile] ts_config_inputs                   0.067s  n=83"
+    },
+    {
+      "observed_ns": 1790216964983245000,
+      "line": "[graph-profile] analysis_fingerprint               0.073s  total= 0.378s  trace=inputs  cfg_files=59"
+    },
+    {
+      "observed_ns": 1790216964998376000,
+      "line": "[graph-profile] angular_probe                      0.006s  total= 0.385s  trace=inputs  angular=false"
+    },
+    {
+      "observed_ns": 1790216965000511000,
+      "line": "[graph-profile] policy_identity                    0.001s  total= 0.386s  trace=inputs"
+    },
+    {
+      "observed_ns": 1790216965000537000,
+      "line": "[graph-profile] engine_context_fingerprint         0.000s  total= 0.386s  trace=inputs"
+    },
+    {
+      "observed_ns": 1790216965129800000,
+      "line": "[graph-profile] ts_disc_nuxt_packages              0.127s  pkgs=0"
+    },
+    {
+      "observed_ns": 1790216965132500000,
+      "line": "[graph-profile] ts_disc_package_gates              0.001s"
+    },
+    {
+      "observed_ns": 1790216965132533000,
+      "line": "[graph-profile] ts_disc_package_names              0.000s  names=30"
+    },
+    {
+      "observed_ns": 1790216965147463000,
+      "line": "[graph-profile] ts_disc_alias_roots                0.003s  roots=1"
+    },
+    {
+      "observed_ns": 1790216965147507000,
+      "line": "[graph-profile] ts_disc_package_exports            0.000s  packages=30"
+    },
+    {
+      "observed_ns": 1790216965147516000,
+      "line": "[graph-profile] ts_discovery_build                 0.146s  side_reads=809 stat_reads=1984 walked_dirs=655 captured=59"
+    },
+    {
+      "observed_ns": 1790216965147523000,
+      "line": "[graph-profile] ts_discovery                       0.146s  total= 0.532s  trace=inputs  names=0 bytes=0 dirs=0"
+    },
+    {
+      "observed_ns": 1790216965211330000,
+      "line": "[graph-profile] ts_session_context                 0.067s  total= 0.598s  trace=inputs  files=4087"
+    },
+    {
+      "observed_ns": 1790216965213770000,
+      "line": "[graph-profile] runtime_inputs_complete            0.000s  total= 0.598s  trace=inputs"
+    },
+    {
+      "observed_ns": 1790216965239967000,
+      "line": "[graph-profile] clone_file_state_copy              0.000s  n=4087"
+    },
+    {
+      "observed_ns": 1790216965242610000,
+      "line": "[graph-profile] extractor_need                     0.630s  total= 0.630s  trace=session  non_ts_need=false detected=1 neutral=0"
+    },
+    {
+      "observed_ns": 1790216965254349000,
+      "line": "[graph-profile] changed_terms                      0.009s  total= 0.639s  trace=session  initial=false force=false non_ts=false scan=true raw_cfg=false policy=false neutral_scan=false neutral_cfg=false"
+    },
+    {
+      "observed_ns": 1790216965476057000,
+      "line": "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4087 shared_discovery=true"
+    },
+    {
+      "observed_ns": 1790216965476223000,
+      "line": "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21"
+    },
+    {
+      "observed_ns": 1790216965476235000,
+      "line": "[graph-profile] ts_read_dirty                      0.007s  total= 0.008s  trace=ts  to_read=53 cached=4034"
+    },
+    {
+      "observed_ns": 1790216965579381000,
+      "line": "[graph-profile] ts_graphql_grpc_index              0.107s  total= 0.115s  trace=ts  ts_files=4087"
+    },
+    {
+      "observed_ns": 1790216965617607000,
+      "line": "[graph-profile] ts_mapfiles_aggregate              0.042s  total= 0.157s  trace=ts  parsed=1 facts=58910 routers=0 scans=0 derived=1"
+    },
+    {
+      "observed_ns": 1790216965632710000,
+      "line": "[graph-profile] ts_compose_modules                 0.003s  total= 0.160s  trace=ts  facts=59347 records=4087 unread=0"
+    },
+    {
+      "observed_ns": 1790216965635505000,
+      "line": "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4087 shared_discovery=true"
+    },
+    {
+      "observed_ns": 1790216965635529000,
+      "line": "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21"
+    },
+    {
+      "observed_ns": 1790216965650579000,
+      "line": "[graph-profile] ts_read_dirty                      0.006s  total= 0.006s  trace=ts  to_read=62 cached=4025"
+    },
+    {
+      "observed_ns": 1790216965746562000,
+      "line": "[graph-profile] ts_graphql_grpc_index              0.105s  total= 0.111s  trace=ts  ts_files=4087"
+    },
+    {
+      "observed_ns": 1790216966033282000,
+      "line": "[graph-profile] ts_mapfiles_aggregate              0.284s  total= 0.395s  trace=ts  parsed=10 facts=58910 routers=0 scans=117 derived=7"
+    },
+    {
+      "observed_ns": 1790216966033343000,
+      "line": "[graph-profile] ts_compose_modules                 0.003s  total= 0.397s  trace=ts  facts=59347 records=4087 unread=0"
+    },
+    {
+      "observed_ns": 1790216966046742000,
+      "line": "[graph-profile] ts_frozen_preview                  0.804s  total= 1.444s  trace=session  dirty=11 err=false"
+    },
+    {
+      "observed_ns": 1790216966117697000,
+      "line": "[graph-profile] invalidation_plan                  0.069s  total= 1.512s  trace=session  reason=frozen scope: prior file-to-file dependency closure whole=false extra=0"
+    },
+    {
+      "observed_ns": 1790216966194066000,
+      "line": "[graph-profile] begin_publish                      0.069s  total= 1.581s  trace=session  scope=11"
+    },
+    {
+      "observed_ns": 1790216966430581000,
+      "line": "[graph-profile] ts_dirty_scope                     0.234s  total= 1.815s  trace=session  dirty=11 scope=11 force=false"
+    },
+    {
+      "observed_ns": 1790216966430625000,
+      "line": "[graph-profile] ts_extract_session                 0.001s  total= 1.816s  trace=session  parsed=11 cached=4024 facts=59347 records=4087"
+    },
+    {
+      "observed_ns": 1790216966495273000,
+      "line": "[graph-profile] assemble_new_files                 0.077s  total= 1.893s  trace=session  new=4087 ts_noop=false non_ts_need=false skip=false facts=59347"
+    },
+    {
+      "observed_ns": 1790216966655946000,
+      "line": "[graph-profile] index_group_owners                 0.158s  total= 2.051s  trace=session  facts=58910 owners=4035"
+    },
+    {
+      "observed_ns": 1790216966660734000,
+      "line": "[graph-profile] publish_scope                      0.002s  total= 2.053s  trace=session  scope=11"
+    },
+    {
+      "observed_ns": 1790216966675807000,
+      "line": "[graph-profile] encode_append_owners               0.004s  total= 2.057s  trace=session  published=11"
+    },
+    {
+      "observed_ns": 1790216966748405000,
+      "line": "[graph-profile] publish_resolved                   0.088s  total= 2.145s  trace=session  owners=11"
+    },
+    {
+      "observed_ns": 1790216966915203000,
+      "line": "[graph-profile] revalidate_ts_records              0.154s  total= 2.299s  trace=session  n=4087"
+    },
+    {
+      "observed_ns": 1790216966972506000,
+      "line": "[graph-profile] ts_config_inputs                   0.068s  n=83"
+    },
+    {
+      "observed_ns": 1790216967166614000,
+      "line": "[graph-profile] state_json_marshal                 0.181s  bytes=55682737 files=4087"
+    },
+    {
+      "observed_ns": 1790216967205155000,
+      "line": "[graph-profile] write_pending_state                0.293s  total= 2.592s  trace=session"
+    },
+    {
+      "observed_ns": 1790216967257863000,
+      "line": "[graph-profile] end_flush_ack                      0.056s  total= 2.648s  trace=session"
+    },
+    {
+      "observed_ns": 1790216967384426000,
+      "line": "[graph-profile] promote_compact_state              0.124s  total= 2.772s  trace=session  parsed=11 published=11"
+    }
+  ],
+  "repeated_correlation": [
+    {
+      "arm": "control",
+      "final_convergence_ms": 5321.848,
+      "abandoned_begins": 1
+    },
+    {
+      "arm": "candidate",
+      "final_convergence_ms": 2249.483,
+      "abandoned_begins": 0
+    },
+    {
+      "arm": "candidate",
+      "final_convergence_ms": 5309.603,
+      "abandoned_begins": 1
+    },
+    {
+      "arm": "control",
+      "final_convergence_ms": 5367.37,
+      "abandoned_begins": 1
+    },
+    {
+      "arm": "control",
+      "final_convergence_ms": 1974.962,
+      "abandoned_begins": 0
+    },
+    {
+      "arm": "candidate",
+      "final_convergence_ms": 2154.126,
+      "abandoned_begins": 0
+    }
+  ]
+}

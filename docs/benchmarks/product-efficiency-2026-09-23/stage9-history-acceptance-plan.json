@@ -118,6 +118,19 @@
       "1",
       "--ref",
       "a2ac71af8a22471c27059a9b318ef4880caa50cb"
-    ]
-  }
+    ],
+    "latest_validation": {
+      "integrated_commit": "887b50f",
+      "report": "STAGE9_EMPTY_DOMAIN.md",
+      "scope": 60,
+      "parsed_files": 6,
+      "cold_and_protocol": "PASS",
+      "delta_median_seconds": 4.319,
+      "comparison": "3 alternating file-sink repeats per arm; not NATS acceptance"
+    }
+  },
+  "next_run_args": [
+    "--verify-noop"
+  ],
+  "post_transition_noop": "Driver now supports --verify-noop: fresh CLI after each cold-equal transition, zero parses/events/generation advancement and unchanged persisted-state hashes. Prior reports without this flag only prove their recorded coverage."
 }

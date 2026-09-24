@@ -471,9 +471,16 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	contextInputs, cfgHash, capturedCfg := input.contexts, input.configHash, input.config
 	scanHash := inventoryDigest(inv.AllNames, hashes)
 	scanHashVersion := "inventory-v1"
+	claimedNames, claimedBounded := []string(nil), false
+	claimedScan, claimedScanMeta := "", ""
 	if s.opts.AuthoritativeFiles {
 		scanHash = inventoryDigest(graphSemanticNames(s.eng, inv.AllNames), hashes)
 		scanHashVersion = authoritativeScanHashVersion
+		claimedNames, claimedBounded = claimedScanNames(s.eng, detectedExt, graphSemanticNames(s.eng, inv.AllNames))
+		if claimedBounded {
+			claimedScan = inventoryDigest(claimedNames, hashes)
+			claimedScanMeta = claimedScanVersion
+		}
 	}
 	prevScan := ""
 	if s.state != nil {
@@ -698,13 +705,24 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		// files it owns, and rawConfigScopeBounded states the projection
 		// argument for the rest of the configuration. Neither discharge is
 		// reached while any other reason to publish stands.
-		if !initial && !forceAll && !nonTSNeed && s.state != nil && len(neutralNonTS) > 0 &&
+		// The two discharges that substitute a proven-neutral extractor's recorded
+		// bytes need such an extractor to exist, and keep their own len check. The
+		// claimed-name comparison does not: with nothing to put back it asks the
+		// current claim digest against the stored one directly, which is the whole
+		// question in a repository whose only extractor is TypeScript.
+		if !initial && !forceAll && !nonTSNeed && s.state != nil && (scanChanged || rawConfigChanged) &&
 			!s.tsFileContextMoved(graphSemanticNames(s.eng, inv.Files), prevFiles, input) {
-			if scanChanged && scanChangeNeutral(s.state, semantic, hashes, prevFiles, neutralNonTS) {
+			if scanChanged && len(neutralNonTS) > 0 && scanChangeNeutral(s.state, semantic, hashes, prevFiles, neutralNonTS) {
 				scanChanged = false
 				s.neutralScan = true
 			}
-			if rawConfigChanged && !scanChanged && !policyChanged {
+			if scanChanged && scanMembershipNeutral(s.state, claimedNames, claimedBounded, hashes, prevFiles, neutralNonTS) {
+				// The full digest still differs, and the remaining difference is
+				// entirely in names no extractor claims.
+				scanChanged = false
+				s.neutralScan = true
+			}
+			if rawConfigChanged && !scanChanged && !policyChanged && len(neutralNonTS) > 0 {
 				if bounded, _ := s.rawConfigScopeBounded(haveCache, input, detectedExt, prevFiles); bounded {
 					rawConfigChanged = false
 					s.neutralConfig = true
@@ -1731,6 +1749,8 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			if refreshScan {
 				st.ScanHash = scanHash
 				st.ScanHashVersion = scanHashVersion
+				st.ScanClaimedHash = claimedScan
+				st.ScanClaimedMeta = claimedScanMeta
 			}
 			if refreshPolicy {
 				st.PolicyIdentity = input.policyIdentity
@@ -1891,6 +1911,8 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	next.Synthetic = syn
 	next.ScanHash = scanHash
 	next.ScanHashVersion = scanHashVersion
+	next.ScanClaimedHash = claimedScan
+	next.ScanClaimedMeta = claimedScanMeta
 	next.ExtractorDigest = extractorDigest
 	next.ExtractorInputHash = extractorInput
 	next.ExtractorSynthetic = synByExt
