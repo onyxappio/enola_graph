@@ -26,6 +26,13 @@ The exact persistence implementation is an implementation choice, to be document
 with recovery and performance evidence. No second queryable Memgraph clone is required.
 Old exported edges need not be retained solely to compute individual delete events.
 
+For `calls` and `instantiates` relations, extractor-proven `TargetFile` constrains
+resolution to symbol facts in that exact file, subject to the source-repository filter
+when present. The source fact's file is not a substitute for missing provenance. With no
+`TargetFile`, same-name candidates follow normal ambiguity rules; if a proven target
+file has no matching symbol, the edge stays unresolved instead of falling back to a
+same-name sibling.
+
 An unchanged file is reusable only if all inputs read by its cached computation remain
 valid. Framework context, aliases, file sets and global symbol candidate sets count as
 inputs. Cached intermediate results must remain pristine: derived passes must not
