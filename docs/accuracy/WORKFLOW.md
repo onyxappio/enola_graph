@@ -100,3 +100,10 @@ examples, code-symbol bindings, identity/ownership and incremental behavior.
 Present the proposed schema for explicit user approval before implementation.
 Do not reject a valid FSM modeling proposal merely because the current schema
 cannot express it; extending that schema is the intended work.
+
+### FSM proposal approved — 2026-09-24
+
+The user explicitly replied **“Схвалити FSM-схему”** to the concrete schema and
+implementation proposal. This authorizes that proposal, not blanket auto approval
+of further FSM scope. Implement after stabilizing the in-progress accuracy wave14.
+See [fsm-approved-plan.md](fsm-approved-plan.md) for the approved boundary.
