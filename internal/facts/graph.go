@@ -1544,6 +1544,18 @@ var kindForRel = map[string]string{
 	RelFSMHandlesCommand:         KindFSMCommand,
 }
 
+// FSMRelationTargetKind returns the declared fact kind expected at the far end
+// of a typed FSM relation. Graph construction and streaming resolution share
+// this mapping so source-name collisions cannot bind an FSM edge to the wrong
+// kind of fact.
+func FSMRelationTargetKind(rel string) (string, bool) {
+	if !strings.HasPrefix(rel, "fsm_") {
+		return "", false
+	}
+	kind, ok := kindForRel[rel]
+	return kind, ok
+}
+
 // kindRank orders fact kinds for picking among same-named facts when there is no edge
 // context — a traversal origin, or a relation whose natural kind is absent. Lower wins.
 // Services rank first because they are synthetic whole-repo nodes: if a name is both a

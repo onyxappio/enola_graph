@@ -98,3 +98,94 @@ func TestStaticRuleArrayExpandsOnlyLiteralPerRuleHelperArguments(t *testing.T) {
 		t.Errorf("expanded literal helper = id %q (%v), from %q (%v)", id, idOK, from, fromOK)
 	}
 }
+
+func TestStaticRulesUsesOnlyReturnedRuleArray(t *testing.T) {
+	src := []byte(`function buildRules() {
+  const unrelatedRules = [{ id: 'decoy', from: 'A', on: 'GO', to: 'B' }];
+  const nested = () => [{ id: 'nested', from: 'A', on: 'GO', to: 'B' }];
+  const rules = [{ id: 'actual', from: 'A', on: 'GO', to: 'B' }];
+  return rules;
+}`)
+	root, kinds, done := parse("rules.ts", src)
+	if done == nil {
+		t.Fatal("parse failed")
+	}
+	defer done()
+	body := functionBody(root, "buildRules", src, kinds)
+	rules, unsupported := staticRules(body, root, src, kinds)
+	if unsupported != 0 {
+		t.Fatalf("unsupported returned rules = %d, want 0", unsupported)
+	}
+	if len(rules) != 1 {
+		t.Fatalf("modeled returned rules = %d, want only the returned array entry", len(rules))
+	}
+	if got, ok := ruleString(rules[0], "id", src, kinds); !ok || got != "actual" {
+		t.Fatalf("returned rule id = %q (%v), want actual", got, ok)
+	}
+}
+
+func TestCommandTagsInResolvesReducerAndReturnedCommandsOnly(t *testing.T) {
+	src := []byte(`function unrelated() {
+  const startReduce = () => ({ next: null, commands: [ScanRunCommand.NestedDecoy()] });
+}
+
+const startReduce = (snapshot, event) => {
+  const unused = () => ({ commands: [ScanRunCommand.Uncalled()] });
+  ScanRunCommand.Discarded();
+  if (!event) return { next: snapshot, commands: [] };
+  return { next: snapshot, commands: event.jobs.length === 0 ? [ScanRunCommand.RequestAggregation()] : [] };
+};
+const rules = [{ id: 'start', reduce: startReduce }];`)
+	root, kinds, done := parse("rules.ts", src)
+	if done == nil {
+		t.Fatal("parse failed")
+	}
+	defer done()
+	var reducer *sitter.Node
+	walk(root, func(n *sitter.Node) {
+		if kinds.Of(n) == "pair" && text(n.ChildByFieldName("key"), src) == "reduce" {
+			reducer = n.ChildByFieldName("value")
+		}
+	})
+	if reducer == nil {
+		t.Fatal("reducer reference missing")
+	}
+	got, proven := commandTagsIn(reducer, "ScanRunCommand", src, kinds)
+	if !proven {
+		t.Fatal("local reducer return flow was not proven")
+	}
+	if len(got) != 1 || got[0] != "RequestAggregation" {
+		t.Fatalf("returned command tags = %v, want only conditional RequestAggregation", got)
+	}
+}
+
+func TestReturnedRuleMapPreservesRulesAndTracksConditionalOverrides(t *testing.T) {
+	src := []byte(`function buildRules(overrides = {}) {
+  const rules = [{ id: 'queued-claim', from: 'Queued', on: 'ClaimRequested', to: 'Running', guard: checkClaim }];
+  return rules.map((rule) =>
+    overrides.unguardRuleIds?.has(rule.id) ? { ...rule, guard: undefined, guardIds: [] as const, guardRejection: undefined } : rule,
+  );
+}`)
+	root, kinds, done := parse("rules.ts", src)
+	if done == nil {
+		t.Fatal("parse failed")
+	}
+	defer done()
+	body := functionBody(root, "buildRules", src, kinds)
+	if body == nil {
+		t.Fatal("could not find buildRules body")
+	}
+	rules, unsupported := staticRules(body, root, src, kinds)
+	if unsupported != 0 || len(rules) != 1 {
+		t.Fatalf("returned rules = %d, unsupported = %d; want one preserved source rule", len(rules), unsupported)
+	}
+	if got, ok := ruleString(rules[0], "id", src, kinds); !ok || got != "queued-claim" {
+		t.Fatalf("mapped rule identity = %q (%v), want queued-claim", got, ok)
+	}
+	if !rules[0].mapConditional || text(rules[0].mapOverrides["guard"], src) != "undefined" {
+		t.Fatalf("guard override = %q (conditional %v), want conditional undefined", text(rules[0].mapOverrides["guard"], src), rules[0].mapConditional)
+	}
+	if got := rules[0].mapOverrideConditions["guard"]; got != "overrides.unguardRuleIds?.has(rule.id)" {
+		t.Fatalf("guard override condition = %q, want source predicate", got)
+	}
+}

@@ -75,6 +75,10 @@ type FileRecord struct {
 	// this contribution even when this file is untouched.
 	SideReads      []string          `json:"side_reads,omitempty"`
 	SideReadHashes map[string]string `json:"side_read_hashes,omitempty"`
+	// FSMReads are direct source dependencies consulted by the configured FSM
+	// adapter. Their bodies can affect machine, converter and dispatch facts even
+	// when their exported symbol surface is unchanged.
+	FSMReads []string `json:"fsm_reads,omitempty"`
 	// ExportSurface is the file's observable export membership as the binder sees
 	// it - the encoded namedExportIndex, see (*namedExportIndex).surface. Nothing
 	// else on this record describes it: Declared holds every declaration whether

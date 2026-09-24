@@ -128,6 +128,13 @@ func (a *Analyzer) buildRuleTable(m *machineModel, root *sitter.Node, kinds *tsu
 
 	modeled, unresolved := 0, 0
 	seen := map[string]int{}
+	declaredIn, hasRegistrationSymbol := a.symbolRelation(m.file, spec.Registration, facts.RelFSMDeclaredIn)
+	if hasRegistrationSymbol && declaredIn.TargetFile != "" {
+		m.reads[declaredIn.TargetFile] = true
+	} else if !hasRegistrationSymbol {
+		m.partial = true
+		m.coverage["unresolved_registration_symbol"] = 1
+	}
 	for ordinal, rule := range transitions {
 		id, hasID := ruleString(rule, "id", src, kinds)
 		from, fromOK := ruleString(rule, "from", src, kinds)
@@ -179,26 +186,87 @@ func (a *Analyzer) buildRuleTable(m *machineModel, root *sitter.Node, kinds *tsu
 		}
 		guard := objectPair(rule.node, "guard", src, kinds)
 		reducer := objectPair(rule.node, "reduce", src, kinds)
-		if guard != nil {
+		guardOverride, hasGuardOverride := rule.mapOverrides["guard"]
+		if hasGuardOverride {
+			props["guard_override_text"] = text(guardOverride, src)
+			if condition := rule.mapOverrideConditions["guard"]; condition != "" {
+				props["guard_status"] = "conditional_override"
+				props["guard_override_condition_text"] = condition
+				m.partial = true
+				m.coverage["conditional_guard_overrides"] = 1
+				if guard != nil {
+					props["guard_presence_condition_text"] = "!(" + condition + ")"
+					props["guard_text"] = text(guard, src)
+					props["guard_line"] = nodeLine(guard)
+					props["guard_end_line"] = int(guard.EndPosition().Row) + 1
+					if kinds.Of(guard) == "identifier" {
+						a.appendRuleTableSymbolRef(m, &rels, text(guard, src), facts.RelFSMGuardRef, "unresolved_guard_reference")
+					} else {
+						a.addRuleTableCallRelations(m, &rels, guard, src, kinds, facts.RelFSMGuardCalls, "unresolved_guard_calls")
+					}
+				}
+			} else if text(guardOverride, src) == "undefined" {
+				props["guard_status"] = "none"
+			} else {
+				props["guard_status"] = "unknown_override"
+				m.partial = true
+				m.coverage["unknown_guard_overrides"] = 1
+			}
+		} else if guard != nil {
 			props["guard_text"] = text(guard, src)
 			props["guard_line"] = nodeLine(guard)
 			props["guard_end_line"] = int(guard.EndPosition().Row) + 1
 			if kinds.Of(guard) == "identifier" {
-				rels = append(rels, relation(facts.RelFSMGuardRef, text(guard, src)))
+				a.appendRuleTableSymbolRef(m, &rels, text(guard, src), facts.RelFSMGuardRef, "unresolved_guard_reference")
 			} else {
-				addDirectCallRelations(&rels, guard, src, kinds, facts.RelFSMGuardCalls)
+				a.addRuleTableCallRelations(m, &rels, guard, src, kinds, facts.RelFSMGuardCalls, "unresolved_guard_calls")
 			}
 		}
-		if reducer != nil {
+		reducerOverride, hasReducerOverride := rule.mapOverrides["reduce"]
+		if hasReducerOverride {
+			props["reducer_override_text"] = text(reducerOverride, src)
+			if condition := rule.mapOverrideConditions["reduce"]; condition != "" {
+				props["reducer_status"] = "conditional_override"
+				props["reducer_override_condition_text"] = condition
+				if reducer != nil {
+					props["reducer_presence_condition_text"] = "!(" + condition + ")"
+					props["reducer_text"] = text(reducer, src)
+					props["reducer_line"] = nodeLine(reducer)
+					props["reducer_end_line"] = int(reducer.EndPosition().Row) + 1
+					if kinds.Of(reducer) == "identifier" {
+						a.appendRuleTableSymbolRef(m, &rels, text(reducer, src), facts.RelFSMReducerRef, "unresolved_reducer_reference")
+					} else {
+						a.addRuleTableCallRelations(m, &rels, reducer, src, kinds, facts.RelFSMActionCalls, "unresolved_reducer_calls")
+					}
+					commands, proven := commandTagsIn(reducer, spec.CommandType, src, kinds)
+					if !proven {
+						m.partial = true
+						m.coverage["unresolved_reducer_command_flow"] = 1
+					}
+					for _, command := range commands {
+						rels = append(rels, relation(facts.RelFSMEmits, machineMember(m.machine, "command", command)))
+					}
+				}
+			} else {
+				props["reducer_status"] = "unknown_override"
+				m.partial = true
+				m.coverage["unknown_reducer_overrides"] = 1
+			}
+		} else if reducer != nil {
 			props["reducer_text"] = text(reducer, src)
 			props["reducer_line"] = nodeLine(reducer)
 			props["reducer_end_line"] = int(reducer.EndPosition().Row) + 1
 			if kinds.Of(reducer) == "identifier" {
-				rels = append(rels, relation(facts.RelFSMReducerRef, text(reducer, src)))
+				a.appendRuleTableSymbolRef(m, &rels, text(reducer, src), facts.RelFSMReducerRef, "unresolved_reducer_reference")
 			} else {
-				addDirectCallRelations(&rels, reducer, src, kinds, facts.RelFSMActionCalls)
+				a.addRuleTableCallRelations(m, &rels, reducer, src, kinds, facts.RelFSMActionCalls, "unresolved_reducer_calls")
 			}
-			for _, command := range commandTagsIn(reducer, spec.CommandType, src, kinds) {
+			commands, proven := commandTagsIn(reducer, spec.CommandType, src, kinds)
+			if !proven {
+				m.partial = true
+				m.coverage["unresolved_reducer_command_flow"] = 1
+			}
+			for _, command := range commands {
 				rels = append(rels, relation(facts.RelFSMEmits, machineMember(m.machine, "command", command)))
 			}
 		}
@@ -208,17 +276,21 @@ func (a *Analyzer) buildRuleTable(m *machineModel, root *sitter.Node, kinds *tsu
 		} else {
 			props["availability"] = "declared"
 		}
-		if strings.Contains(text(regBody, src), "unguardRuleIds") && guard != nil {
-			props["guard_status"] = "conditional_override"
+		if hasGuardOverride {
+			// The mapper override above determines whether the source guard may
+			// be absent. Do not emit a stale guard reference from the base rule.
 		} else if guard != nil {
 			props["guard_status"] = "declared"
 		} else {
 			props["guard_status"] = "none"
 		}
 		site := rule.site
+		if hasRegistrationSymbol {
+			rels = append(rels, declaredIn)
+		}
 		fact := facts.Fact{Kind: facts.KindFSMTransition, Name: name, File: m.file,
 			Line: nodeLine(site), EndLine: int(site.EndPosition().Row) + 1,
-			Props: props, Relations: append(rels, relation(facts.RelFSMDeclaredIn, spec.Registration))}
+			Props: props, Relations: rels}
 		if rule.node != site {
 			fact.Props["rule_definition_line"] = nodeLine(rule.node)
 		}
@@ -228,9 +300,15 @@ func (a *Analyzer) buildRuleTable(m *machineModel, root *sitter.Node, kinds *tsu
 
 	for _, typ := range []string{spec.StateType, spec.EventType, spec.CommandType} {
 		if typ != "" {
-			// The machine's type binding is direct and local to the configured
-			// registration. Relations keep the type as a normal code-symbol target.
-			m.facts[0].Relations = append(m.facts[0].Relations, relation(facts.RelFSMTypedBy, typ))
+			if rel, ok := a.typeRelation(m.file, typ, facts.RelFSMTypedBy); ok {
+				m.facts[0].Relations = append(m.facts[0].Relations, rel)
+				if rel.TargetFile != "" {
+					m.reads[rel.TargetFile] = true
+				}
+			} else {
+				m.partial = true
+				m.coverage["unresolved_typed_by"] = 1
+			}
 		}
 	}
 	initial := objectPair(options, "initialState", src, kinds)
@@ -432,63 +510,73 @@ func unique(in []string) []string {
 }
 
 type staticRule struct {
-	node        *sitter.Node
-	site        *sitter.Node
-	bindings    map[string]string
-	conditional bool
-	condition   string
+	node                  *sitter.Node
+	site                  *sitter.Node
+	bindings              map[string]string
+	conditional           bool
+	condition             string
+	mapOverrides          map[string]*sitter.Node
+	mapConditional        bool
+	mapOverrideConditions map[string]string
+}
+
+type ruleMapEffect struct {
+	overrides          map[string]*sitter.Node
+	conditional        bool
+	overrideConditions map[string]string
+}
+
+type returnedRuleSource struct {
+	array     *sitter.Node
+	variable  string
+	transform ruleMapEffect
 }
 
 func staticRules(body, root *sitter.Node, src []byte, kinds *tsutil.KindTable) ([]staticRule, int) {
-	// First resolve the statically initialized array. It is the common shape
-	// used by the rule-table adapter and expands a helper only when the caller
-	// passes a literal builder reference with no arguments.
-	var arr *sitter.Node
-	var varName string
-	walk(body, func(n *sitter.Node) {
-		if arr != nil || kinds.Of(n) != "variable_declarator" {
-			return
-		}
-		value := n.ChildByFieldName("value")
-		if kinds.Of(value) == "array" {
-			arr, varName = value, text(n.ChildByFieldName("name"), src)
-		}
-	})
-	var array *sitter.Node
-	if arr != nil {
-		array = arr
-	} else {
-		// scanRun's factory directly returns its rule array instead of assigning
-		// it to a local first. Restrict the selection to a return owned by the
-		// configured function body.
-		for _, n := range namedChildren(body) {
-			if kinds.Of(n) != "return_statement" {
-				continue
-			}
-			value := returnValue(n)
-			for value != nil && kinds.Of(value) == "parenthesized_expression" && value.NamedChildCount() == 1 {
-				value = value.NamedChild(0)
-			}
-			if kinds.Of(value) == "array" {
-				array = value
-				break
-			}
-		}
-	}
 	var rules []staticRule
 	unsupported := 0
-	if array != nil {
-		var unsupportedArray int
-		rules, unsupportedArray = staticRuleArray(array, root, src, kinds)
-		unsupported += unsupportedArray
+	var sources []returnedRuleSource
+	var returnedNames = map[string]bool{}
+	transforms := map[string]ruleMapEffect{}
+	walkFunctionScope(body, kinds, func(n *sitter.Node) {
+		if kinds.Of(n) != "return_statement" {
+			return
+		}
+		source, ok := returnedRuleArray(returnValue(n), src, kinds)
+		if !ok {
+			unsupported++
+			return
+		}
+		sources = append(sources, source)
+		if source.variable != "" {
+			returnedNames[source.variable] = true
+			transforms[source.variable] = source.transform
+		}
+	})
+	if len(sources) == 0 {
+		unsupported++
 	}
-	if varName != "" {
+	for _, source := range sources {
+		found, skipped := staticRuleArray(source.array, root, src, kinds)
+		for i := range found {
+			found[i].mapOverrides = source.transform.overrides
+			found[i].mapConditional = source.transform.conditional
+			found[i].mapOverrideConditions = source.transform.overrideConditions
+		}
+		rules = append(rules, found...)
+		unsupported += skipped
+	}
+	if len(returnedNames) > 0 {
+		returned := map[string]bool{}
+		for name := range returnedNames {
+			returned[name] = true
+		}
 		walkFunctionScope(body, kinds, func(n *sitter.Node) {
 			if kinds.Of(n) != "call_expression" || calleeName(n, src, kinds) != "push" {
 				return
 			}
 			fn := n.ChildByFieldName("function")
-			if fn == nil || kinds.Of(fn) != "member_expression" || text(fn.ChildByFieldName("object"), src) != varName {
+			if fn == nil || kinds.Of(fn) != "member_expression" || !returned[text(fn.ChildByFieldName("object"), src)] {
 				return
 			}
 			args := callArguments(n, kinds)
@@ -497,10 +585,282 @@ func staticRules(body, root *sitter.Node, src []byte, kinds *tsutil.KindTable) (
 				return
 			}
 			condition, conditional := enclosingCondition(n, src, kinds)
-			rules = append(rules, staticRule{node: args[0], site: n, conditional: conditional, condition: condition})
+			transform := transforms[text(fn.ChildByFieldName("object"), src)]
+			rules = append(rules, staticRule{node: args[0], site: n, conditional: conditional, condition: condition,
+				mapOverrides: transform.overrides, mapConditional: transform.conditional, mapOverrideConditions: transform.overrideConditions})
 		})
 	}
 	return rules, unsupported
+}
+
+// returnedRuleArray follows only the array that reaches a function return. A
+// map is accepted when every callback return either preserves its input rule
+// or shallow-copies that rule without changing its structural identity fields.
+func returnedRuleArray(value *sitter.Node, src []byte, kinds *tsutil.KindTable) (returnedRuleSource, bool) {
+	value = unwrapExpression(value, kinds)
+	if value == nil {
+		return returnedRuleSource{}, false
+	}
+	if kinds.Of(value) == "array" {
+		return returnedRuleSource{array: value}, true
+	}
+	if kinds.Of(value) == "identifier" {
+		name := text(value, src)
+		binding := localBindingAt(value, name, src, kinds)
+		if binding == nil || kinds.Of(binding) != "variable_declarator" {
+			return returnedRuleSource{}, false
+		}
+		array := unwrapExpression(binding.ChildByFieldName("value"), kinds)
+		if kinds.Of(array) == "array" {
+			return returnedRuleSource{array: array, variable: name}, true
+		}
+		return returnedRuleSource{}, false
+	}
+	if kinds.Of(value) != "call_expression" {
+		return returnedRuleSource{}, false
+	}
+	fn := value.ChildByFieldName("function")
+	if fn == nil || kinds.Of(fn) != "member_expression" || text(fn.ChildByFieldName("property"), src) != "map" {
+		return returnedRuleSource{}, false
+	}
+	object := unwrapExpression(fn.ChildByFieldName("object"), kinds)
+	if kinds.Of(object) != "identifier" {
+		return returnedRuleSource{}, false
+	}
+	name := text(object, src)
+	binding := localBindingAt(object, name, src, kinds)
+	if binding == nil || kinds.Of(binding) != "variable_declarator" {
+		return returnedRuleSource{}, false
+	}
+	array := unwrapExpression(binding.ChildByFieldName("value"), kinds)
+	args := callArguments(value, kinds)
+	if kinds.Of(array) != "array" || len(args) != 1 {
+		return returnedRuleSource{}, false
+	}
+	transform, ok := ruleMapTransform(args[0], src, kinds)
+	if !ok {
+		return returnedRuleSource{}, false
+	}
+	return returnedRuleSource{array: array, variable: name, transform: transform}, true
+}
+
+func ruleMapTransform(callback *sitter.Node, src []byte, kinds *tsutil.KindTable) (ruleMapEffect, bool) {
+	callback = unwrapExpression(callback, kinds)
+	if callback == nil || (kinds.Of(callback) != "arrow_function" && kinds.Of(callback) != "function_expression") {
+		return ruleMapEffect{}, false
+	}
+	params := parameterNames(callback, src, kinds)
+	if len(params) == 0 || params[0] == "" {
+		return ruleMapEffect{}, false
+	}
+	body := callback.ChildByFieldName("body")
+	if kinds.Of(body) != "statement_block" {
+		return ruleMapTransformValue(body, callback, params[0], src, kinds)
+	}
+	if ruleCallbackMutatesInput(body, params[0], src, kinds) {
+		return ruleMapEffect{}, false
+	}
+	var returns []*sitter.Node
+	walkFunctionScope(body, kinds, func(n *sitter.Node) {
+		if kinds.Of(n) == "return_statement" {
+			returns = append(returns, returnValue(n))
+		}
+	})
+	if len(returns) == 0 || !functionDefinitelyReturns(body, kinds) {
+		return ruleMapEffect{}, false
+	}
+	merged := ruleMapEffect{overrides: map[string]*sitter.Node{}}
+	first := true
+	for _, value := range returns {
+		branch, ok := ruleMapTransformValue(value, callback, params[0], src, kinds)
+		if !ok {
+			return ruleMapEffect{}, false
+		}
+		if !first && !sameRuleOverrides(merged.overrides, branch.overrides, src) {
+			merged.conditional = true
+		}
+		for key, override := range branch.overrides {
+			merged.overrides[key] = override
+		}
+		first = false
+	}
+	return merged, true
+}
+
+func ruleMapTransformValue(value, callback *sitter.Node, parameter string, src []byte, kinds *tsutil.KindTable) (ruleMapEffect, bool) {
+	value = unwrapExpression(value, kinds)
+	if value == nil {
+		return ruleMapEffect{}, false
+	}
+	switch kinds.Of(value) {
+	case "identifier":
+		return ruleMapEffect{overrides: map[string]*sitter.Node{}}, text(value, src) == parameter && callbackParameterReference(value, callback, parameter, src, kinds)
+	case "conditional_expression", "ternary_expression":
+		left, leftOK := ruleMapTransformValue(value.ChildByFieldName("consequence"), callback, parameter, src, kinds)
+		right, rightOK := ruleMapTransformValue(value.ChildByFieldName("alternative"), callback, parameter, src, kinds)
+		if !leftOK || !rightOK {
+			return ruleMapEffect{}, false
+		}
+		result := ruleMapEffect{overrides: map[string]*sitter.Node{}, overrideConditions: map[string]string{}}
+		result.conditional = left.conditional || right.conditional
+		if !sameRuleOverrides(left.overrides, right.overrides, src) {
+			result.conditional = true
+		}
+		condition := strings.TrimSpace(text(value.ChildByFieldName("condition"), src))
+		keys := map[string]bool{}
+		for key := range left.overrides {
+			keys[key] = true
+		}
+		for key := range right.overrides {
+			keys[key] = true
+		}
+		for key := range keys {
+			leftValue, leftHas := left.overrides[key]
+			rightValue, rightHas := right.overrides[key]
+			if leftHas && rightHas && text(leftValue, src) == text(rightValue, src) {
+				result.overrides[key] = leftValue
+				continue
+			}
+			result.conditional = true
+			if leftHas {
+				result.overrides[key] = leftValue
+				if condition != "" && !rightHas {
+					result.overrideConditions[key] = condition
+				}
+			} else if rightHas {
+				result.overrides[key] = rightValue
+				if condition != "" {
+					result.overrideConditions[key] = "!(" + condition + ")"
+				}
+			} else {
+				result.overrides[key] = nil
+			}
+		}
+		for key, cond := range left.overrideConditions {
+			if _, ok := result.overrideConditions[key]; !ok {
+				result.overrideConditions[key] = cond
+			}
+		}
+		for key, cond := range right.overrideConditions {
+			if _, ok := result.overrideConditions[key]; !ok {
+				result.overrideConditions[key] = cond
+			}
+		}
+		return result, true
+	case "object":
+		preserves := false
+		for _, member := range namedChildren(value) {
+			if kinds.Of(member) == "spread_element" {
+				spread := strings.TrimSpace(strings.TrimPrefix(text(member, src), "..."))
+				if spread != parameter || !callbackParameterReference(member, callback, parameter, src, kinds) || preserves {
+					return ruleMapEffect{}, false
+				}
+				preserves = true
+			}
+		}
+		if !preserves {
+			return ruleMapEffect{}, false
+		}
+		overrides := map[string]*sitter.Node{}
+		for _, member := range namedChildren(value) {
+			if kinds.Of(member) != "pair" {
+				continue
+			}
+			key := text(member.ChildByFieldName("key"), src)
+			if key == "" {
+				return ruleMapEffect{}, false
+			}
+			for _, structural := range []string{"id", "from", "on", "to"} {
+				if key == structural {
+					return ruleMapEffect{}, false
+				}
+			}
+			overrides[key] = member.ChildByFieldName("value")
+		}
+		return ruleMapEffect{overrides: overrides}, true
+	default:
+		return ruleMapEffect{}, false
+	}
+}
+
+func callbackParameterReference(reference, callback *sitter.Node, parameter string, src []byte, kinds *tsutil.KindTable) bool {
+	if reference == nil || callback == nil || parameter == "" {
+		return false
+	}
+	for scope := reference.Parent(); scope != nil && scope != callback; scope = scope.Parent() {
+		if kinds.Of(scope) != "statement_block" {
+			continue
+		}
+		for _, declaration := range namedChildren(scope) {
+			switch kinds.Of(declaration) {
+			case "lexical_declaration", "variable_declaration":
+				for _, binding := range namedChildren(declaration) {
+					if kinds.Of(binding) == "variable_declarator" && text(binding.ChildByFieldName("name"), src) == parameter {
+						return false
+					}
+				}
+			case "function_declaration":
+				if functionName(declaration, src) == parameter {
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
+
+func sameRuleOverrides(a, b map[string]*sitter.Node, src []byte) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for key, value := range a {
+		other, ok := b[key]
+		if !ok || text(value, src) != text(other, src) {
+			return false
+		}
+	}
+	return true
+}
+
+func ruleCallbackMutatesInput(body *sitter.Node, parameter string, src []byte, kinds *tsutil.KindTable) bool {
+	mutates := false
+	walkFunctionScope(body, kinds, func(n *sitter.Node) {
+		if mutates {
+			return
+		}
+		switch kinds.Of(n) {
+		case "assignment_expression", "augmented_assignment_expression":
+			if expressionRootIdentifier(n.ChildByFieldName("left"), src, kinds) == parameter {
+				mutates = true
+			}
+		case "update_expression":
+			if expressionRootIdentifier(n.ChildByFieldName("argument"), src, kinds) == parameter {
+				mutates = true
+			}
+		case "call_expression":
+			for _, arg := range callArguments(n, kinds) {
+				if kinds.Of(unwrapExpression(arg, kinds)) == "identifier" && text(unwrapExpression(arg, kinds), src) == parameter {
+					mutates = true
+				}
+			}
+		}
+	})
+	return mutates
+}
+
+func expressionRootIdentifier(node *sitter.Node, src []byte, kinds *tsutil.KindTable) string {
+	node = unwrapExpression(node, kinds)
+	for node != nil {
+		switch kinds.Of(node) {
+		case "identifier":
+			return text(node, src)
+		case "member_expression", "subscript_expression":
+			node = node.ChildByFieldName("object")
+		default:
+			return ""
+		}
+	}
+	return ""
 }
 
 func staticRuleArray(array, root *sitter.Node, src []byte, kinds *tsutil.KindTable) ([]staticRule, int) {
@@ -673,23 +1033,264 @@ func addDirectCallRelations(rels *[]facts.Relation, node *sitter.Node, src []byt
 	})
 }
 
-func commandTagsIn(node *sitter.Node, commandType string, src []byte, kinds *tsutil.KindTable) []string {
-	var out []string
+func (a *Analyzer) appendRuleTableSymbolRef(m *machineModel, rels *[]facts.Relation, local, relationKind, coverageKey string) bool {
+	rel, ok := a.symbolRelation(m.file, local, relationKind)
+	if !ok {
+		m.partial = true
+		m.coverage[coverageKey] = 1
+		return false
+	}
+	*rels = append(*rels, rel)
+	if rel.TargetFile != "" && rel.TargetFile != m.file {
+		m.reads[rel.TargetFile] = true
+	}
+	return true
+}
+
+func (a *Analyzer) addRuleTableCallRelations(m *machineModel, rels *[]facts.Relation, node *sitter.Node, src []byte, kinds *tsutil.KindTable, relationKind, coverageKey string) {
+	seen := map[string]bool{}
+	unresolved := 0
 	walk(node, func(n *sitter.Node) {
 		if kinds.Of(n) != "call_expression" {
 			return
 		}
 		fn := n.ChildByFieldName("function")
-		if fn == nil || kinds.Of(fn) != "member_expression" {
+		if fn == nil || kinds.Of(fn) != "identifier" {
 			return
 		}
-		obj := fn.ChildByFieldName("object")
-		if obj == nil || text(obj, src) != commandType {
+		name := text(fn, src)
+		if name == "" || seen[name] {
 			return
 		}
-		out = append(out, text(fn.ChildByFieldName("property"), src))
+		seen[name] = true
+		if !a.appendRuleTableSymbolRef(m, rels, name, relationKind, coverageKey) {
+			unresolved++
+		}
 	})
-	return unique(out)
+	if unresolved > 0 {
+		m.partial = true
+		m.coverage[coverageKey] = unresolved
+	}
+}
+
+func commandTagsIn(node *sitter.Node, commandType string, src []byte, kinds *tsutil.KindTable) ([]string, bool) {
+	body, ok := localCallableBodyAt(node, src, kinds)
+	if !ok || body == nil {
+		return nil, false
+	}
+	var returned []*sitter.Node
+	if kinds.Of(body) == "statement_block" {
+		walkFunctionScope(body, kinds, func(n *sitter.Node) {
+			if kinds.Of(n) == "return_statement" {
+				returned = append(returned, returnValue(n))
+			}
+		})
+	} else {
+		returned = append(returned, body)
+	}
+	if len(returned) == 0 {
+		return nil, false
+	}
+	commandExprs := []*sitter.Node{}
+	proven := true
+	var collectCommands func(*sitter.Node, map[string]bool)
+	collectCommands = func(value *sitter.Node, seen map[string]bool) {
+		value = unwrapExpression(value, kinds)
+		if value == nil {
+			proven = false
+			return
+		}
+		switch kinds.Of(value) {
+		case "object":
+			var found bool
+			for _, pair := range namedChildren(value) {
+				if kinds.Of(pair) != "pair" || text(pair.ChildByFieldName("key"), src) != "commands" {
+					continue
+				}
+				found = true
+				commandExprs = append(commandExprs, pair.ChildByFieldName("value"))
+			}
+			if !found {
+				proven = false
+			}
+		case "identifier":
+			name := text(value, src)
+			if seen[name] {
+				proven = false
+				return
+			}
+			binding := localBindingAt(value, name, src, kinds)
+			if binding == nil || kinds.Of(binding) != "variable_declarator" {
+				proven = false
+				return
+			}
+			next := make(map[string]bool, len(seen)+1)
+			for k, v := range seen {
+				next[k] = v
+			}
+			next[name] = true
+			collectCommands(binding.ChildByFieldName("value"), next)
+		case "conditional_expression":
+			collectCommands(value.ChildByFieldName("consequence"), seen)
+			collectCommands(value.ChildByFieldName("alternative"), seen)
+		default:
+			proven = false
+		}
+	}
+	for _, value := range returned {
+		collectCommands(value, map[string]bool{})
+	}
+	if len(commandExprs) == 0 {
+		return nil, false
+	}
+	var out []string
+	for _, expr := range commandExprs {
+		walkFunctionScope(expr, kinds, func(n *sitter.Node) {
+			if kinds.Of(n) != "call_expression" {
+				return
+			}
+			fn := n.ChildByFieldName("function")
+			if fn == nil || kinds.Of(fn) != "member_expression" {
+				return
+			}
+			obj := fn.ChildByFieldName("object")
+			if obj == nil || text(obj, src) != commandType {
+				return
+			}
+			out = append(out, text(fn.ChildByFieldName("property"), src))
+		})
+	}
+	return unique(out), proven
+}
+
+func localBindingAt(reference *sitter.Node, name string, src []byte, kinds *tsutil.KindTable) *sitter.Node {
+	if reference == nil || name == "" {
+		return nil
+	}
+	for scope := reference.Parent(); scope != nil; scope = scope.Parent() {
+		kind := kinds.Of(scope)
+		switch kind {
+		case "function_declaration", "generator_function_declaration", "function_expression", "arrow_function", "method_definition":
+			if functionName(scope, src) == name || text(scope.ChildByFieldName("name"), src) == name {
+				return scope
+			}
+			if parameter := parameterBindingAt(scope, name, src, kinds); parameter != nil {
+				return parameter
+			}
+		case "catch_clause":
+			if parameter := scope.ChildByFieldName("parameter"); bindingPatternHasName(parameter, name, src, kinds) {
+				return parameter
+			}
+		}
+		if kind != "statement_block" && kind != "program" {
+			continue
+		}
+		for _, declaration := range namedChildren(scope) {
+			declarations := []*sitter.Node{declaration}
+			if kinds.Of(declaration) == "export_statement" {
+				declarations = namedChildren(declaration)
+			}
+			for _, declaration := range declarations {
+				switch kinds.Of(declaration) {
+				case "function_declaration":
+					if functionName(declaration, src) == name {
+						return declaration
+					}
+				case "class_declaration":
+					if text(declaration.ChildByFieldName("name"), src) == name {
+						return declaration
+					}
+				case "lexical_declaration", "variable_declaration":
+					for _, binding := range namedChildren(declaration) {
+						if kinds.Of(binding) == "variable_declarator" && bindingPatternHasName(binding.ChildByFieldName("name"), name, src, kinds) {
+							return binding
+						}
+					}
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func parameterBindingAt(function *sitter.Node, name string, src []byte, kinds *tsutil.KindTable) *sitter.Node {
+	if function == nil {
+		return nil
+	}
+	parameters := function.ChildByFieldName("parameters")
+	if parameters == nil {
+		parameters = function.ChildByFieldName("parameter")
+	}
+	if kinds.Of(parameters) == "identifier" && text(parameters, src) == name {
+		return parameters
+	}
+	for _, parameter := range namedChildren(parameters) {
+		pattern := parameter.ChildByFieldName("name")
+		if pattern == nil {
+			pattern = parameter.ChildByFieldName("pattern")
+		}
+		if pattern == nil && kinds.Of(parameter) == "identifier" {
+			pattern = parameter
+		}
+		if bindingPatternHasName(pattern, name, src, kinds) {
+			return pattern
+		}
+	}
+	return nil
+}
+
+func bindingPatternHasName(pattern *sitter.Node, name string, src []byte, kinds *tsutil.KindTable) bool {
+	if pattern == nil || name == "" {
+		return false
+	}
+	switch kinds.Of(pattern) {
+	case "identifier", "shorthand_property_identifier_pattern":
+		return text(pattern, src) == name
+	case "pair_pattern":
+		value := pattern.ChildByFieldName("value")
+		if value == nil {
+			value = pattern.ChildByFieldName("key")
+		}
+		return bindingPatternHasName(value, name, src, kinds)
+	case "assignment_pattern", "required_parameter", "optional_parameter", "rest_pattern":
+		for _, field := range []string{"left", "pattern", "name"} {
+			if child := pattern.ChildByFieldName(field); child != nil && bindingPatternHasName(child, name, src, kinds) {
+				return true
+			}
+		}
+		return false
+	case "object_pattern", "array_pattern":
+		for _, child := range namedChildren(pattern) {
+			if bindingPatternHasName(child, name, src, kinds) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func localCallableBodyAt(reference *sitter.Node, src []byte, kinds *tsutil.KindTable) (*sitter.Node, bool) {
+	seen := map[string]bool{}
+	value := unwrapExpression(reference, kinds)
+	for value != nil && kinds.Of(value) == "identifier" {
+		name := text(value, src)
+		if seen[name] {
+			return nil, false
+		}
+		seen[name] = true
+		binding := localBindingAt(value, name, src, kinds)
+		if binding == nil {
+			return nil, false
+		}
+		if kinds.Of(binding) == "function_declaration" {
+			return binding.ChildByFieldName("body"), true
+		}
+		value = unwrapExpression(binding.ChildByFieldName("value"), kinds)
+	}
+	if value != nil && (kinds.Of(value) == "arrow_function" || kinds.Of(value) == "function_expression") {
+		return value.ChildByFieldName("body"), true
+	}
+	return nil, false
 }
 
 func initialStateTag(node *sitter.Node, stateType string, root *sitter.Node, src []byte, kinds *tsutil.KindTable) string {

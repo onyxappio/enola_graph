@@ -108,9 +108,18 @@ configured runtime factory into a local `send` binding and typed forwarding
 wrappers, or a configured machine tag and argument path for function sinks.
 Event construction and sink dispatch are distinct. A call like
 `sendUi(intentToEvent(intent))` is resolved only when the one imported callee's
-literal event returns are all understood; a dynamic return or unbound sink
-produces unknown dispatch evidence. A local reducer with a `send` method is not
-the configured runtime and does not become a main-machine dispatch.
+literal event returns are all understood. A dynamic or otherwise unresolved
+event value at a proven configured sink produces unknown-dispatch evidence. An
+unrelated or unproven sink does not establish machine dispatch and does not
+produce an unknown-event edge. A local reducer with a `send` method is not the
+configured runtime and does not become a main-machine dispatch.
+
+Construction facts belong to the source callee that creates the event. An
+exported typed converter can contribute its literal returned event constructions
+even when no current caller remains, when its return annotation resolves to the
+configured machine event declaration. Imported type aliases are resolved to
+their declaring module and export; a same-spelling local type is not sufficient.
+An untyped converter is admitted only when a configured sink use proves it.
 
 ## Coverage and identity limits
 
@@ -133,5 +142,6 @@ configured machine/dispatch contributions. Import, type, handler, return-value
 and config changes therefore invalidate the relevant contributions; when
 resolver evidence is incomplete, incremental planning may broaden the affected
 file scope. FSM extraction adds no transitive state properties or caller
-attributes. Cache records use extractor version v321 so v320 contributions are
-recomputed under the new facts and dependency tracking.
+attributes. Cache records use extractor version v322 so v320 and v321 contributions
+are recomputed under the revised return/type dependencies, file-owned coverage, source
+binding and typed relation resolution.

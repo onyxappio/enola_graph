@@ -470,6 +470,18 @@ func functionParameters(fn *sitter.Node, src []byte, kinds *tsutil.KindTable) (e
 func parameterNames(fn *sitter.Node, src []byte, kinds *tsutil.KindTable) []string {
 	params := fn.ChildByFieldName("parameters")
 	var out []string
+	if params == nil && kinds.Of(fn) == "arrow_function" {
+		if parameter := fn.ChildByFieldName("parameter"); parameter != nil {
+			name := parameter.ChildByFieldName("name")
+			if name == nil {
+				name = parameter.ChildByFieldName("pattern")
+			}
+			if name == nil {
+				name = parameter
+			}
+			return []string{text(name, src)}
+		}
+	}
 	for _, p := range namedChildren(params) {
 		name := p.ChildByFieldName("name")
 		if name == nil {
@@ -512,26 +524,33 @@ func selectedReturnCallee(ret *sitter.Node, spec Spec, src []byte, kinds *tsutil
 }
 
 type pathCondition struct {
-	Text   string `json:"text"`
-	Line   int    `json:"line"`
-	Branch string `json:"branch"`
+	Text        string   `json:"text"`
+	Line        int      `json:"line"`
+	Branch      string   `json:"branch"`
+	triggerTags []string `json:"-"`
 }
 
 func branchConditions(ret, fn *sitter.Node, eventParam, snapshotParam, rejectName string, src []byte, kinds *tsutil.KindTable) []pathCondition {
 	var reverse []pathCondition
-	for p := ret.Parent(); p != nil && p != fn; p = p.Parent() {
+	for p := ret.Parent(); p != nil && !sameSyntaxNode(p, fn); p = p.Parent() {
 		if kinds.Of(p) == "if_statement" {
 			cond := p.ChildByFieldName("condition")
 			branch := "true"
 			if alt := p.ChildByFieldName("alternative"); alt != nil && alt.StartByte() <= ret.StartByte() && alt.EndByte() >= ret.EndByte() {
 				branch = "false"
 			}
-			reverse = append(reverse, pathCondition{Text: text(cond, src), Line: nodeLine(cond), Branch: branch})
+			truth := branch != "false"
+			reverse = append(reverse, pathCondition{Text: text(cond, src), Line: nodeLine(cond), Branch: branch,
+				triggerTags: eventDiscriminantTags(cond, eventParam, truth, src, kinds)})
 		}
 		if kinds.Of(p) == "switch_case" {
 			value := p.ChildByFieldName("value")
-			if value != nil && p.Parent() != nil && strings.Contains(text(p.Parent().ChildByFieldName("value"), src), eventParam+".type") {
-				reverse = append(reverse, pathCondition{Text: "case " + text(value, src), Line: nodeLine(value), Branch: "case"})
+			if value != nil && switchDiscriminant(p, eventParam, fn, src, kinds) {
+				triggerTags := []string{}
+				if tag, ok := stringValue(value, src, kinds); ok {
+					triggerTags = append(triggerTags, tag)
+				}
+				reverse = append(reverse, pathCondition{Text: "case " + text(value, src), Line: nodeLine(value), Branch: "case", triggerTags: triggerTags})
 			}
 		}
 	}
@@ -540,7 +559,7 @@ func branchConditions(ret, fn *sitter.Node, eventParam, snapshotParam, rejectNam
 	}
 	// Sequential reject guards constrain a later successful return even though
 	// their `if` node is a preceding sibling, not an ancestor of the return.
-	for p := ret.Parent(); p != nil && p != fn; p = p.Parent() {
+	for p := ret.Parent(); p != nil && !sameSyntaxNode(p, fn); p = p.Parent() {
 		if kinds.Of(p) != "statement_block" {
 			continue
 		}
@@ -552,8 +571,10 @@ func branchConditions(ret, fn *sitter.Node, eventParam, snapshotParam, rejectNam
 				continue
 			}
 			if returnsOnlyReject(sibling.ChildByFieldName("consequence"), rejectName, src, kinds) {
-				cond := text(sibling.ChildByFieldName("condition"), src)
-				reverse = append(reverse, pathCondition{Text: "!(" + cond + ")", Line: nodeLine(sibling.ChildByFieldName("condition")), Branch: "after_reject"})
+				condition := sibling.ChildByFieldName("condition")
+				cond := text(condition, src)
+				reverse = append(reverse, pathCondition{Text: "!(" + cond + ")", Line: nodeLine(condition), Branch: "after_reject",
+					triggerTags: eventDiscriminantTags(condition, eventParam, false, src, kinds)})
 			}
 		}
 	}
@@ -585,31 +606,126 @@ func eventTriggers(path []pathCondition, eventParam string) []string {
 	}
 	var out []string
 	for _, p := range path {
-		if p.Branch == "false" && strings.Contains(p.Text, "!==") {
+		if p.triggerTags != nil {
+			out = append(out, p.triggerTags...)
 			continue
 		}
-		if p.Branch == "false" && strings.Contains(p.Text, "===") {
-			continue
-		}
-		if p.Branch == "case" {
-			for _, match := range stringLiteralRE.FindAllStringSubmatch(p.Text, -1) {
-				if len(match) > 1 {
-					out = append(out, match[1])
-				}
-			}
-			continue
-		}
-		if !strings.Contains(p.Text, eventParam+".type") {
-			continue
-		}
-		if strings.Contains(p.Text, "!==") || strings.Contains(p.Text, "!=") {
-			continue
-		}
-		for _, match := range stringLiteralRE.FindAllStringSubmatch(p.Text, -1) {
-			out = append(out, match[1])
-		}
+		// Keep this helper useful to focused callers that construct pathCondition
+		// values directly. Production paths carry AST-derived tags and do not
+		// reparse condition text.
+		out = append(out, eventTagsFromConditionText(p.Text, eventParam, p.Branch == "false" || p.Branch == "after_reject")...)
 	}
 	return unique(out)
+}
+
+func switchDiscriminant(node *sitter.Node, eventParam string, fn *sitter.Node, src []byte, kinds *tsutil.KindTable) bool {
+	if node == nil || eventParam == "" {
+		return false
+	}
+	for p := node.Parent(); p != nil && !sameSyntaxNode(p, fn); p = p.Parent() {
+		if kinds.Of(p) == "switch_statement" {
+			return isEventDiscriminant(p.ChildByFieldName("value"), eventParam, src, kinds)
+		}
+	}
+	return false
+}
+
+func eventDiscriminantTags(condition *sitter.Node, eventParam string, truth bool, src []byte, kinds *tsutil.KindTable) []string {
+	if condition == nil || eventParam == "" {
+		return []string{}
+	}
+	out := []string{}
+	var collect func(*sitter.Node, bool)
+	collect = func(node *sitter.Node, expected bool) {
+		for node != nil && kinds.Of(node) == "parenthesized_expression" {
+			var inner *sitter.Node
+			for _, child := range namedChildren(node) {
+				if kinds.Of(child) != "comment" {
+					inner = child
+					break
+				}
+			}
+			if inner == nil {
+				break
+			}
+			node = inner
+		}
+		node = unwrapExpression(node, kinds)
+		if node == nil {
+			return
+		}
+		if kinds.Of(node) == "unary_expression" && node.ChildCount() > 0 && node.Child(0).Kind() == "!" {
+			collect(node.ChildByFieldName("argument"), !expected)
+			return
+		}
+		if kinds.Of(node) != "binary_expression" {
+			return
+		}
+		operator := binaryOperator(node)
+		if operator == "&&" || operator == "||" {
+			// A false compound branch can be explained by any operand. It
+			// establishes no particular event tag, so keep it unknown.
+			if expected {
+				collect(node.ChildByFieldName("left"), true)
+				collect(node.ChildByFieldName("right"), true)
+			}
+			return
+		}
+		if operator != "===" && operator != "==" && operator != "!==" && operator != "!=" {
+			return
+		}
+		left, right := node.ChildByFieldName("left"), node.ChildByFieldName("right")
+		var literal *sitter.Node
+		if isEventDiscriminant(left, eventParam, src, kinds) {
+			literal = right
+		} else if isEventDiscriminant(right, eventParam, src, kinds) {
+			literal = left
+		} else {
+			return
+		}
+		tag, ok := stringValue(literal, src, kinds)
+		if !ok {
+			return
+		}
+		equality := operator == "===" || operator == "=="
+		if equality == expected {
+			out = append(out, tag)
+		}
+	}
+	collect(condition, truth)
+	return unique(out)
+}
+
+func binaryOperator(node *sitter.Node) string {
+	if node == nil || node.ChildCount() < 3 {
+		return ""
+	}
+	return node.Child(1).Kind()
+}
+
+func isEventDiscriminant(node *sitter.Node, eventParam string, src []byte, kinds *tsutil.KindTable) bool {
+	node = unwrapExpression(node, kinds)
+	if node == nil || kinds.Of(node) != "member_expression" || text(node.ChildByFieldName("property"), src) != "type" {
+		return false
+	}
+	object := unwrapExpression(node.ChildByFieldName("object"), kinds)
+	return object != nil && kinds.Of(object) == "identifier" && text(object, src) == eventParam
+}
+
+func eventTagsFromConditionText(condition, eventParam string, falseBranch bool) []string {
+	wrapped := []byte("function __fsm(event){if (" + condition + ") { return; }}")
+	root, kinds, done := parse("__fsm_trigger.ts", wrapped)
+	if done == nil {
+		return nil
+	}
+	defer done()
+	var cond *sitter.Node
+	walk(root, func(n *sitter.Node) {
+		if cond == nil && kinds.Of(n) == "if_statement" {
+			cond = n.ChildByFieldName("condition")
+		}
+	})
+	return eventDiscriminantTags(cond, eventParam, !falseBranch, wrapped, kinds)
 }
 
 func fromState(path []pathCondition, snapshotParam string) string {

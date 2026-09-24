@@ -16,15 +16,24 @@ type sourceReader func(string) ([]byte, error)
 type moduleResolver func(fromFile, specifier string) (string, bool)
 
 type Analyzer struct {
-	specs        []Spec
-	known        map[string]bool
-	read         sourceReader
-	resolve      moduleResolver
-	cache        map[string][]byte
-	sourceReads  map[string]bool
-	modelSources map[string]bool
-	models       map[string]*machineModel
-	mu           sync.Mutex
+	specs                     []Spec
+	known                     map[string]bool
+	read                      sourceReader
+	resolve                   moduleResolver
+	cache                     map[string][]byte
+	importBindings            map[string]map[string]string
+	sourceReads               map[string]bool
+	modelSources              map[string]bool
+	models                    map[string]*machineModel
+	constructorUses           map[constructorUseKey]map[string]bool
+	collectingConstructorUses bool
+	mu                        sync.Mutex
+}
+
+type constructorUseKey struct {
+	machine string
+	file    string
+	export  string
 }
 
 type machineModel struct {
@@ -48,7 +57,7 @@ type machineModel struct {
 // index while each changed file contributes only its own FSM facts.
 func NewAnalyzer(specs []Spec, knownFiles []string, read sourceReader, resolve moduleResolver) *Analyzer {
 	a := &Analyzer{specs: append([]Spec(nil), specs...), known: map[string]bool{}, read: read, resolve: resolve,
-		cache: map[string][]byte{}, sourceReads: map[string]bool{}, modelSources: map[string]bool{}, models: map[string]*machineModel{}}
+		cache: map[string][]byte{}, importBindings: map[string]map[string]string{}, sourceReads: map[string]bool{}, modelSources: map[string]bool{}, models: map[string]*machineModel{}}
 	for _, f := range knownFiles {
 		a.known[slash(f)] = true
 	}
@@ -61,6 +70,7 @@ func NewAnalyzer(specs []Spec, knownFiles []string, read sourceReader, resolve m
 			a.modelSources[file] = true
 		}
 	}
+	a.indexConstructorUses()
 	return a
 }
 
@@ -83,8 +93,87 @@ func (a *Analyzer) Rebind(read sourceReader, resolve moduleResolver) *Analyzer {
 	for id, model := range a.models {
 		models[id] = model
 	}
-	return &Analyzer{specs: a.specs, known: known, read: read, resolve: resolve,
-		cache: map[string][]byte{}, sourceReads: map[string]bool{}, modelSources: modelSources, models: models}
+	rebound := &Analyzer{specs: a.specs, known: known, read: read, resolve: resolve,
+		cache: map[string][]byte{}, importBindings: map[string]map[string]string{}, sourceReads: map[string]bool{}, modelSources: modelSources, models: models}
+	rebound.indexConstructorUses()
+	return rebound
+}
+
+// indexConstructorUses records exported functions called from configured
+// dispatch files. Their literal event constructions are owned by the callee
+// file; the caller file is retained as a dependency so removing that use
+// refreshes the callee's complete contribution.
+func (a *Analyzer) indexConstructorUses() {
+	a.constructorUses = map[constructorUseKey]map[string]bool{}
+	a.collectingConstructorUses = true
+	defer func() { a.collectingConstructorUses = false }()
+	for _, spec := range a.specs {
+		if spec.Adapter != AdapterReducerInterpreter && spec.Adapter != AdapterRuleTable {
+			continue
+		}
+		model := a.models[spec.ID]
+		if model == nil {
+			continue
+		}
+		for _, dispatchFile := range spec.DispatchFiles {
+			dispatchFile = slash(dispatchFile)
+			source := a.source(dispatchFile)
+			if len(source) == 0 {
+				continue
+			}
+			root, kinds, done := parse(dispatchFile, source)
+			if done == nil {
+				continue
+			}
+			// Only the configured sink proof is needed to index returned-event
+			// constructors. Running the full interaction extractor here also
+			// walks every event construction in the dispatch file, then repeats
+			// that work when ExtractFile publishes the caller's contribution.
+			for _, sink := range model.spec.DispatchSinks {
+				if sink.MachineTag != nil {
+					a.extractEffectSink(model, dispatchFile, root, source, kinds, sink)
+				} else {
+					a.extractObjectSink(model, dispatchFile, root, source, kinds, sink)
+				}
+			}
+			done()
+		}
+	}
+}
+
+func (a *Analyzer) hasConstructorUses(machine, file string) bool {
+	if a == nil {
+		return false
+	}
+	file = slash(file)
+	for key := range a.constructorUses {
+		if key.machine == machine && key.file == file {
+			return true
+		}
+	}
+	return false
+}
+
+func (a *Analyzer) constructorExports(machine, file string) []string {
+	file = slash(file)
+	var exports []string
+	for key := range a.constructorUses {
+		if key.machine == machine && key.file == file {
+			exports = append(exports, key.export)
+		}
+	}
+	sort.Strings(exports)
+	return exports
+}
+
+func (a *Analyzer) constructorCallers(machine, file, export string) []string {
+	key := constructorUseKey{machine: machine, file: slash(file), export: export}
+	callers := make([]string, 0, len(a.constructorUses[key]))
+	for caller := range a.constructorUses[key] {
+		callers = append(callers, caller)
+	}
+	sort.Strings(callers)
+	return callers
 }
 
 // ExtractFile returns local FSM declarations/relations owned by relFile and
@@ -108,6 +197,8 @@ func (a *Analyzer) ExtractFile(relFile string, src []byte) ([]facts.Fact, []stri
 		isMachineFile := relFile == slash(spec.File)
 		isDispatchFile := containsPath(spec.DispatchFiles, relFile)
 		isHandlerFile := containsPath(spec.HandlerFiles, relFile) || (spec.EffectRunner != nil && slash(spec.EffectRunner.Module) == relFile)
+		isConstructorFile := a.hasConstructorUses(spec.ID, relFile)
+		isTypedConstructorFile := a.sourceHasConfiguredEventReturnType(relFile, src, m)
 		if isMachineFile {
 			out = append(out, m.facts...)
 			for f := range m.reads {
@@ -116,8 +207,8 @@ func (a *Analyzer) ExtractFile(relFile string, src []byte) ([]facts.Fact, []stri
 				}
 			}
 		}
-		if (isDispatchFile || isHandlerFile) && (spec.Adapter == AdapterReducerInterpreter || spec.Adapter == AdapterRuleTable) {
-			ff, rr := a.extractInteractions(m, relFile, src)
+		if (isDispatchFile || isHandlerFile || isConstructorFile || isTypedConstructorFile) && (spec.Adapter == AdapterReducerInterpreter || spec.Adapter == AdapterRuleTable) {
+			ff, rr := a.extractInteractions(m, relFile, src, isConstructorFile || isTypedConstructorFile)
 			out = append(out, ff...)
 			if len(ff) > 0 {
 				for f := range m.reads {
@@ -413,6 +504,116 @@ func functionBody(root *sitter.Node, name string, src []byte, kinds *tsutil.Kind
 	return nil
 }
 
+func (a *Analyzer) sourceHasConfiguredEventReturnType(file string, src []byte, m *machineModel) bool {
+	if a == nil || m == nil || m.eventFile == "" || m.eventExport == "" || !sourceMayContainTypedEventReturn(src) {
+		return false
+	}
+	root, kinds, done := parse(file, src)
+	if done == nil {
+		return false
+	}
+	defer done()
+	for _, export := range topLevelFunctionExports(root, src, kinds) {
+		function, _ := topLevelExportedFunction(root, export, src, kinds)
+		if function == nil {
+			continue
+		}
+		returnType := functionReturnTypeName(function, src, kinds)
+		if returnType == "" {
+			continue
+		}
+		resolvedFile, resolvedExport := a.resolveType(file, returnType)
+		if slash(resolvedFile) == slash(m.eventFile) && resolvedExport == m.eventExport {
+			return true
+		}
+	}
+	return false
+}
+
+// sourceMayContainTypedEventReturn is a cheap candidate check. It deliberately
+// accepts unrelated return types and aliases; the parsed declaration and
+// canonical resolver below establish whether the type is the configured event.
+// Comments and newlines may appear between the closing parenthesis, colon,
+// and identifier in a TypeScript return annotation.
+func sourceMayContainTypedEventReturn(src []byte) bool {
+	if len(src) == 0 || !sourceContainsWord(src, "export") ||
+		(!sourceContainsWord(src, "import") && !sourceContainsWord(src, "type") && !sourceContainsWord(src, "interface")) {
+		return false
+	}
+	for i, value := range src {
+		if value != ')' {
+			continue
+		}
+		j := skipSourceTrivia(src, i+1)
+		if j >= len(src) || src[j] != ':' {
+			continue
+		}
+		j = skipSourceTrivia(src, j+1)
+		if j < len(src) && isIdentifierStart(src[j]) {
+			return true
+		}
+	}
+	return false
+}
+
+func sourceContainsWord(src []byte, word string) bool {
+	if word == "" {
+		return false
+	}
+	for i := 0; i+len(word) <= len(src); i++ {
+		matched := true
+		for j := range word {
+			if src[i+j] != word[j] {
+				matched = false
+				break
+			}
+		}
+		if !matched || (i > 0 && isIdentifierByte(src[i-1])) ||
+			(i+len(word) < len(src) && isIdentifierByte(src[i+len(word)])) {
+			continue
+		}
+		return true
+	}
+	return false
+}
+
+func skipSourceTrivia(src []byte, i int) int {
+	for i < len(src) {
+		if isSpace(src[i]) {
+			i++
+			continue
+		}
+		if i+1 >= len(src) || src[i] != '/' {
+			return i
+		}
+		switch src[i+1] {
+		case '/':
+			i += 2
+			for i < len(src) && src[i] != '\n' {
+				i++
+			}
+		case '*':
+			i += 2
+			for i+1 < len(src) && !(src[i] == '*' && src[i+1] == '/') {
+				i++
+			}
+			if i+1 >= len(src) {
+				return len(src)
+			}
+			i += 2
+		default:
+			return i
+		}
+	}
+	return i
+}
+
+func isSpace(value byte) bool { return value == ' ' || value == '\t' || value == '\n' || value == '\r' }
+
+func isIdentifierByte(value byte) bool {
+	return value == '_' || value == '$' || value >= 'a' && value <= 'z' || value >= 'A' && value <= 'Z' || value >= '0' && value <= '9'
+}
+
 func variableValue(root *sitter.Node, name string, src []byte, kinds *tsutil.KindTable) *sitter.Node {
 	var found *sitter.Node
 	walk(root, func(n *sitter.Node) {
@@ -442,14 +643,10 @@ func topLevelExport(root *sitter.Node, exportName string, src []byte, kinds *tsu
 					return true
 				}
 			case "lexical_declaration", "variable_declaration":
-				var found bool
-				walk(child, func(n *sitter.Node) {
-					if kinds.Of(n) == "variable_declarator" && text(n.ChildByFieldName("name"), src) == exportName {
-						found = true
+				for _, declaration := range namedChildren(child) {
+					if kinds.Of(declaration) == "variable_declarator" && text(declaration.ChildByFieldName("name"), src) == exportName {
+						return true
 					}
-				})
-				if found {
-					return true
 				}
 			case "export_clause":
 				for _, item := range namedChildren(child) {
@@ -471,72 +668,114 @@ func moduleSpec(n *sitter.Node, src []byte, kinds *tsutil.KindTable) string {
 	if n == nil {
 		return ""
 	}
-	var found string
-	walk(n, func(c *sitter.Node) {
-		if found == "" && kinds.Of(c) == "string" {
-			found, _ = stringValue(c, src, kinds)
+	if source := n.ChildByFieldName("source"); source != nil && kinds.Of(source) == "string" {
+		value, _ := stringValue(source, src, kinds)
+		return value
+	}
+	for _, child := range namedChildren(n) {
+		if kinds.Of(child) == "string" {
+			value, _ := stringValue(child, src, kinds)
+			return value
 		}
-	})
-	return found
+	}
+	return ""
 }
 
 func (a *Analyzer) importedLocal(file, local string) (string, bool) {
-	src := a.source(file)
-	if len(src) == 0 {
-		return "", false
-	}
-	root, kinds, done := parse(file, src)
-	if done == nil {
-		return "", false
-	}
-	defer done()
-	var target string
-	var found bool
-	walk(root, func(n *sitter.Node) {
-		if found || kinds.Of(n) != "import_statement" {
-			return
-		}
-		spec := moduleSpec(n, src, kinds)
-		if spec == "" {
-			return
-		}
-		for _, c := range namedChildren(n) {
-			if kinds.Of(c) != "import_clause" {
-				continue
-			}
-			walk(c, func(binding *sitter.Node) {
-				if found {
-					return
-				}
-				k := kinds.Of(binding)
-				switch k {
-				case "identifier":
-					if text(binding, src) == local {
-						target, found = a.resolvePath(file, spec), true
-					}
-				case "import_specifier":
-					name := text(binding.ChildByFieldName("name"), src)
-					alias := text(binding.ChildByFieldName("alias"), src)
-					if alias == "" {
-						alias = name
-					}
-					if alias == local {
-						base := a.resolvePath(file, spec)
-						if base != "" {
-							target, found = base+"#"+name, true
-						}
-					}
-				case "namespace_import":
-					if text(binding.NamedChild(0), src) == local {
-						if base := a.resolvePath(file, spec); base != "" {
-							target, found = base+"#*", true
-						}
-					}
-				}
-			})
-		}
-	})
+	bindings := a.importBindingsFor(file)
+	target, found := bindings[local]
 	return target, found
+}
+
+// importBindingsFor parses a source file's imports once per Analyzer. Import
+// resolution is used by several independent FSM proof walks; reparsing and
+// walking the complete file for every local import dominates constructor
+// indexing on import-heavy dispatch files. Rebind creates a fresh map so no
+// result crosses a source snapshot.
+func (a *Analyzer) importBindingsFor(file string) map[string]string {
+	file = slash(file)
+	a.mu.Lock()
+	if a.importBindings == nil {
+		a.importBindings = map[string]map[string]string{}
+	}
+	if cached, ok := a.importBindings[file]; ok {
+		a.mu.Unlock()
+		return cached
+	}
+	a.mu.Unlock()
+
+	bindings := map[string]string{}
+	src := a.source(file)
+	if len(src) > 0 {
+		root, kinds, done := parse(file, src)
+		if done != nil {
+			for _, statement := range namedChildren(root) {
+				if kinds.Of(statement) != "import_statement" {
+					continue
+				}
+				specifier := moduleSpec(statement, src, kinds)
+				if specifier == "" {
+					continue
+				}
+				base := a.resolvePath(file, specifier)
+				if base == "" {
+					continue
+				}
+				var add func(*sitter.Node)
+				add = func(node *sitter.Node) {
+					if node == nil {
+						return
+					}
+					switch kinds.Of(node) {
+					case "import_specifier":
+						name := text(node.ChildByFieldName("name"), src)
+						alias := text(node.ChildByFieldName("alias"), src)
+						if alias == "" {
+							alias = name
+						}
+						if name != "" {
+							if _, exists := bindings[alias]; !exists {
+								bindings[alias] = base + "#" + name
+							}
+						}
+						return
+					case "namespace_import":
+						if node.NamedChildCount() > 0 {
+							local := text(node.NamedChild(0), src)
+							if _, exists := bindings[local]; !exists {
+								bindings[local] = base + "#*"
+							}
+						}
+						return
+					case "identifier":
+						local := text(node, src)
+						if _, exists := bindings[local]; !exists {
+							bindings[local] = base
+						}
+						return
+					}
+					for _, child := range namedChildren(node) {
+						add(child)
+					}
+				}
+				for _, clause := range namedChildren(statement) {
+					if kinds.Of(clause) == "import_clause" {
+						add(clause)
+					}
+				}
+			}
+			done()
+		}
+	}
+
+	a.mu.Lock()
+	if cached, ok := a.importBindings[file]; ok {
+		bindings = cached
+	} else {
+		a.importBindings[file] = bindings
+	}
+	a.mu.Unlock()
+	return bindings
 }
 
 func (a *Analyzer) resolvePath(from, spec string) string {
@@ -649,16 +888,30 @@ func (a *Analyzer) hasLocalDeclaration(file, name string) bool {
 		return false
 	}
 	defer done()
-	for _, n := range namedChildren(root) {
+	declares := func(n *sitter.Node) bool {
 		switch kinds.Of(n) {
 		case "function_declaration", "class_declaration", "abstract_class_declaration",
 			"interface_declaration", "type_alias_declaration", "enum_declaration":
-			if text(n.ChildByFieldName("name"), src) == name {
-				return true
-			}
+			return text(n.ChildByFieldName("name"), src) == name
 		case "lexical_declaration", "variable_declaration":
 			for _, d := range namedChildren(n) {
 				if kinds.Of(d) == "variable_declarator" && text(d.ChildByFieldName("name"), src) == name {
+					return true
+				}
+			}
+		}
+		return false
+	}
+	for _, n := range namedChildren(root) {
+		if declares(n) {
+			return true
+		}
+		// TypeScript wraps exported declarations in an export_statement. Inspect
+		// only its direct declaration child: walking its whole subtree would let
+		// nested locals masquerade as module-level source bindings.
+		if kinds.Of(n) == "export_statement" {
+			for _, child := range namedChildren(n) {
+				if declares(child) {
 					return true
 				}
 			}
@@ -692,6 +945,40 @@ func nodeLine(n *sitter.Node) int { return int(n.StartPosition().Row) + 1 }
 
 func relation(kind, target string) facts.Relation {
 	return facts.Relation{Kind: kind, Target: target}
+}
+
+func relationAtFile(kind, target, targetFile string) facts.Relation {
+	return facts.Relation{Kind: kind, Target: target, TargetFile: slash(targetFile)}
+}
+
+// symbolRelation binds a local spelling to a real same-file declaration or an
+// imported/re-exported declaration. The canonical target and TargetFile match
+// the TypeScript extractor's symbol identities so streaming can resolve the
+// same source symbol without guessing among same-named facts.
+func (a *Analyzer) symbolRelation(fromFile, local, relationKind string) (facts.Relation, bool) {
+	if local == "" {
+		return facts.Relation{}, false
+	}
+	fromFile = slash(fromFile)
+	if resolved, ok := a.resolvedImport(fromFile, local); ok {
+		file, exported := targetModule(resolved), targetExport(resolved)
+		if file == "" || exported == "" || !a.hasLocalDeclaration(file, exported) {
+			return facts.Relation{}, false
+		}
+		return relationAtFile(relationKind, moduleName(file)+"."+exported, file), true
+	}
+	if a.hasLocalDeclaration(fromFile, local) {
+		return relationAtFile(relationKind, moduleName(fromFile)+"."+local, fromFile), true
+	}
+	return facts.Relation{}, false
+}
+
+func (a *Analyzer) typeRelation(fromFile, typeName, relationKind string) (facts.Relation, bool) {
+	file, exported := a.resolveType(fromFile, typeName)
+	if file == "" || exported == "" || !a.hasType(file, exported) {
+		return facts.Relation{}, false
+	}
+	return relationAtFile(relationKind, moduleName(file)+"."+exported, file), true
 }
 
 func sortedKeys(m map[string]bool) []string {

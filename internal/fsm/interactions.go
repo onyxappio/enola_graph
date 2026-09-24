@@ -1,6 +1,7 @@
 package fsm
 
 import (
+	"sort"
 	"strings"
 
 	"github.com/enola-labs/enola/internal/extractors/tsutil"
@@ -8,7 +9,7 @@ import (
 	sitter "github.com/tree-sitter/go-tree-sitter"
 )
 
-func (a *Analyzer) extractInteractions(m *machineModel, relFile string, src []byte) ([]facts.Fact, map[string]bool) {
+func (a *Analyzer) extractInteractions(m *machineModel, relFile string, src []byte, includeSourceReturns bool) ([]facts.Fact, map[string]bool) {
 	relFile = slash(relFile)
 	root, kinds, done := parse(relFile, src)
 	if done == nil {
@@ -19,6 +20,13 @@ func (a *Analyzer) extractInteractions(m *machineModel, relFile string, src []by
 	reads := map[string]bool{}
 	if containsPath(m.spec.DispatchFiles, relFile) {
 		constructed, rr := a.extractEventConstructions(m, relFile, root, src, kinds)
+		out = append(out, constructed...)
+		for f := range rr {
+			reads[f] = true
+		}
+	}
+	if !a.collectingConstructorUses && includeSourceReturns {
+		constructed, rr := a.extractSourceReturnConstructions(m, relFile, root, src, kinds)
 		out = append(out, constructed...)
 		for f := range rr {
 			reads[f] = true
@@ -42,7 +50,139 @@ func (a *Analyzer) extractInteractions(m *machineModel, relFile string, src []by
 	if containsPath(m.spec.HandlerFiles, relFile) || (m.spec.EffectRunner != nil && slash(m.spec.EffectRunner.Module) == relFile) {
 		out = append(out, a.extractCommandHandlers(m, relFile, root, src, kinds)...)
 	}
-	return out, reads
+	return bindNestedSourceDeclarations(relFile, root, src, kinds, out), reads
+}
+
+// bindNestedSourceDeclarations gives nested callable evidence a stable,
+// source-derived symbol identity. The ordinary TS extractor intentionally
+// indexes top-level declarations only; FSM interaction overlays inside a
+// nested callable therefore carry this exact AST declaration to the merger.
+func bindNestedSourceDeclarations(file string, root *sitter.Node, src []byte, kinds *tsutil.KindTable, overlays []facts.Fact) []facts.Fact {
+	sourceFacts := []facts.Fact{}
+	seen := map[string]bool{}
+	for i := range overlays {
+		overlay := &overlays[i]
+		if overlay.Kind != facts.KindSymbol || overlay.File != file || len(overlay.Relations) == 0 || overlay.Props["fsm_evidence"] != "direct_source_binding" {
+			continue
+		}
+		declaration := functionAtLine(root, overlay.Name, overlay.Line, src, kinds)
+		if declaration == nil {
+			continue
+		}
+		chain, ok := namedFunctionChain(declaration, src, kinds)
+		if !ok || len(chain) < 2 {
+			continue
+		}
+		identity := moduleName(file) + "." + strings.Join(chain, ".")
+		if !uniqueFunctionChain(root, chain, src, kinds) {
+			continue
+		}
+		props := make(map[string]any, len(overlay.Props)+2)
+		for key, value := range overlay.Props {
+			props[key] = value
+		}
+		props["fsm_source_identity"] = identity
+		props["fsm_source_binding"] = "tree_sitter_nested_declaration"
+		overlay.Props = props
+		if seen[identity] {
+			continue
+		}
+		seen[identity] = true
+		sourceFacts = append(sourceFacts, facts.Fact{Kind: facts.KindSymbol, Name: identity, File: file,
+			Line: int(declaration.StartPosition().Row) + 1, EndLine: int(declaration.EndPosition().Row) + 1,
+			Props: map[string]any{"language": "typescript", "symbol_kind": facts.SymbolFunc, "fsm_source_binding": "tree_sitter_nested_declaration"}})
+	}
+	return append(sourceFacts, overlays...)
+}
+
+func functionAtLine(root *sitter.Node, name string, line int, src []byte, kinds *tsutil.KindTable) *sitter.Node {
+	if root == nil || name == "" || line <= 0 {
+		return nil
+	}
+	var selected *sitter.Node
+	var selectedSize uint
+	ambiguous := false
+	walk(root, func(node *sitter.Node) {
+		if !isFunctionBoundary(kinds.Of(node)) || functionSymbolName(node, src, kinds) != name {
+			return
+		}
+		start, end := int(node.StartPosition().Row)+1, int(node.EndPosition().Row)+1
+		if line < start || line > end {
+			return
+		}
+		size := node.EndByte() - node.StartByte()
+		if selected == nil || size < selectedSize {
+			selected, selectedSize, ambiguous = node, size, false
+		} else if size == selectedSize && !sameSyntaxNode(node, selected) {
+			ambiguous = true
+		}
+	})
+	if ambiguous {
+		return nil
+	}
+	return selected
+}
+
+func functionSymbolName(node *sitter.Node, src []byte, kinds *tsutil.KindTable) string {
+	if node == nil {
+		return ""
+	}
+	switch kinds.Of(node) {
+	case "function_declaration", "generator_function_declaration":
+		return functionName(node, src)
+	case "method_definition":
+		return text(node.ChildByFieldName("name"), src)
+	case "arrow_function", "function_expression":
+		parent := node.Parent()
+		value := parent.ChildByFieldName("value")
+		if kinds.Of(parent) == "variable_declarator" && sameSyntaxNode(value, node) {
+			return text(parent.ChildByFieldName("name"), src)
+		}
+		if kinds.Of(parent) == "pair" && sameSyntaxNode(value, node) {
+			return text(parent.ChildByFieldName("key"), src)
+		}
+	}
+	return ""
+}
+
+func sameSyntaxNode(left, right *sitter.Node) bool {
+	return left != nil && right != nil && left.Id() == right.Id()
+}
+
+func namedFunctionChain(node *sitter.Node, src []byte, kinds *tsutil.KindTable) ([]string, bool) {
+	var reversed []string
+	for parent := node; parent != nil; parent = parent.Parent() {
+		if !isFunctionBoundary(kinds.Of(parent)) {
+			continue
+		}
+		name := functionSymbolName(parent, src, kinds)
+		if name == "" {
+			return nil, false
+		}
+		reversed = append(reversed, name)
+	}
+	if len(reversed) == 0 {
+		return nil, false
+	}
+	chain := make([]string, len(reversed))
+	for i := range reversed {
+		chain[len(reversed)-1-i] = reversed[i]
+	}
+	return chain, true
+}
+
+func uniqueFunctionChain(root *sitter.Node, expected []string, src []byte, kinds *tsutil.KindTable) bool {
+	count := 0
+	walk(root, func(node *sitter.Node) {
+		if !isFunctionBoundary(kinds.Of(node)) {
+			return
+		}
+		chain, ok := namedFunctionChain(node, src, kinds)
+		if ok && strings.Join(chain, "\x00") == strings.Join(expected, "\x00") {
+			count++
+		}
+	})
+	return count == 1
 }
 
 func (a *Analyzer) extractObjectSink(m *machineModel, rel string, root *sitter.Node, src []byte, kinds *tsutil.KindTable, sink DispatchSink) ([]facts.Fact, map[string]bool) {
@@ -88,7 +228,7 @@ func (a *Analyzer) extractObjectSink(m *machineModel, rel string, root *sitter.N
 		return []facts.Fact{dispatchCoverageFact(m, rel, map[string]any{"dispatch_sink_status": "local_factory_binding_unresolved", "dispatch_unresolved_sink": 1})}, reads
 	}
 	actors = compactNonempty(actors)
-	sendAliases := map[string]bool{}
+	sendAliases := map[string][]*sitter.Node{}
 	walk(root, func(n *sitter.Node) {
 		if kinds.Of(n) != "variable_declarator" {
 			return
@@ -98,10 +238,11 @@ func (a *Analyzer) extractObjectSink(m *machineModel, rel string, root *sitter.N
 			return
 		}
 		if actors[text(value.ChildByFieldName("object"), src)] && text(value.ChildByFieldName("property"), src) == sink.Method {
-			sendAliases[text(n.ChildByFieldName("name"), src)] = true
+			name := text(n.ChildByFieldName("name"), src)
+			sendAliases[name] = append(sendAliases[name], n)
 		}
 	})
-	wrappers := map[string]bool{}
+	wrappers := map[string][]*sitter.Node{}
 	walk(root, func(n *sitter.Node) {
 		name := ""
 		var value *sitter.Node
@@ -113,14 +254,15 @@ func (a *Analyzer) extractObjectSink(m *machineModel, rel string, root *sitter.N
 		if name == "" || value == nil || !functionLike(value, kinds) {
 			return
 		}
-		if !containsCallToAny(value.ChildByFieldName("body"), sendAliases, src, kinds) {
-			return
-		}
 		eventParam := typedEventParameter(value, m, rel, src, kinds, a)
-		if eventParam == "" {
+		forwards, forwardingReads := a.wrapperForwardsEvent(m, rel, root, value, sendAliases, sink.EventArgument, eventParam, src, kinds)
+		for file := range forwardingReads {
+			reads[file] = true
+		}
+		if eventParam == "" || !forwards {
 			return
 		}
-		wrappers[name] = true
+		wrappers[name] = append(wrappers[name], n)
 	})
 	if len(sendAliases) == 0 {
 		return []facts.Fact{dispatchCoverageFact(m, rel, map[string]any{"dispatch_sink_status": "send_binding_unresolved", "dispatch_unresolved_sink": 1})}, reads
@@ -134,8 +276,8 @@ func (a *Analyzer) extractObjectSink(m *machineModel, rel string, root *sitter.N
 			return
 		}
 		callee := calleeName(n, src, kinds)
-		if wrappers[callee] {
-			if enclosingFunction(n, src, kinds) == callee {
+		if provenLocalBindingAt(n.ChildByFieldName("function"), callee, wrappers, src, kinds) {
+			if callInsideProvenWrapper(n, wrappers, src, kinds) {
 				return
 			}
 			args := callArguments(n, kinds)
@@ -144,9 +286,12 @@ func (a *Analyzer) extractObjectSink(m *machineModel, rel string, root *sitter.N
 			for f := range constructionReads {
 				reads[f] = true
 			}
-			tags, resolved, calleeFile := a.eventArgumentTags(m, rel, args, src, kinds)
+			tags, resolved, calleeFile, typeReads := a.eventArgumentTagsWithReads(m, rel, args, src, kinds)
 			if calleeFile != "" {
 				reads[calleeFile] = true
+			}
+			for _, file := range typeReads {
+				reads[file] = true
 			}
 			if !resolved || len(tags) == 0 {
 				unknown++
@@ -163,7 +308,7 @@ func (a *Analyzer) extractObjectSink(m *machineModel, rel string, root *sitter.N
 			}
 			return
 		}
-		if sendAliases[callee] && enclosingFunction(n, src, kinds) != wrapperForSend(n, wrappers, sendAliases, src, kinds) {
+		if configuredSendAliasAt(n, callee, sendAliases, src, kinds) && !callInsideProvenWrapper(n, wrappers, src, kinds) {
 			// Direct actor.send call, outside the forwarding wrapper.
 			args := callArguments(n, kinds)
 			constructed, constructionReads := a.eventArgumentConstructionFacts(m, rel, args, src, kinds)
@@ -171,9 +316,12 @@ func (a *Analyzer) extractObjectSink(m *machineModel, rel string, root *sitter.N
 			for f := range constructionReads {
 				reads[f] = true
 			}
-			tags, resolved, calleeFile := a.eventArgumentTags(m, rel, args, src, kinds)
+			tags, resolved, calleeFile, typeReads := a.eventArgumentTagsWithReads(m, rel, args, src, kinds)
 			if calleeFile != "" {
 				reads[calleeFile] = true
+			}
+			for _, file := range typeReads {
+				reads[file] = true
 			}
 			if !resolved || len(tags) == 0 {
 				unknown++
@@ -217,13 +365,16 @@ func (a *Analyzer) factoryReturnsMethod(ref SymbolRef, method string) bool {
 	if kinds.Of(body) != "statement_block" {
 		return returnedObjectHasMethod(body, method, src, kinds)
 	}
-	found := false
+	returns, allCallable := 0, true
 	walkFunctionScope(body, kinds, func(n *sitter.Node) {
-		if kinds.Of(n) == "return_statement" && returnedObjectHasMethod(returnValue(n), method, src, kinds) {
-			found = true
+		if kinds.Of(n) == "return_statement" {
+			returns++
+			if !returnedObjectHasMethod(returnValue(n), method, src, kinds) {
+				allCallable = false
+			}
 		}
 	})
-	return found
+	return returns > 0 && allCallable && functionDefinitelyReturns(body, kinds)
 }
 
 func returnedObjectHasMethod(value *sitter.Node, method string, src []byte, kinds *tsutil.KindTable) bool {
@@ -239,7 +390,8 @@ func returnedObjectHasMethod(value *sitter.Node, method string, src []byte, kind
 			}
 		case "pair":
 			if text(member.ChildByFieldName("key"), src) == method {
-				return true
+				value := unwrapExpression(member.ChildByFieldName("value"), kinds)
+				return value != nil && (kinds.Of(value) == "arrow_function" || kinds.Of(value) == "function_expression")
 			}
 		}
 	}
@@ -247,67 +399,728 @@ func returnedObjectHasMethod(value *sitter.Node, method string, src []byte, kind
 }
 
 func (a *Analyzer) eventArgumentTags(m *machineModel, from string, args []*sitter.Node, src []byte, kinds *tsutil.KindTable) ([]string, bool, string) {
+	tags, resolved, calleeFile, _ := a.eventArgumentTagsWithReads(m, from, args, src, kinds)
+	return tags, resolved, calleeFile
+}
+
+func (a *Analyzer) eventArgumentTagsWithReads(m *machineModel, from string, args []*sitter.Node, src []byte, kinds *tsutil.KindTable) ([]string, bool, string, []string) {
 	if len(args) == 0 {
-		return nil, false, ""
+		return nil, false, "", nil
 	}
 	expr := unwrapExpression(args[0], kinds)
 	if tag, ok := eventObjectTag(expr, src, kinds); ok {
-		return []string{tag}, true, ""
+		return []string{tag}, true, "", nil
 	}
 	if kinds.Of(expr) == "identifier" {
 		name := text(expr, src)
 		value := variableValueFromFunction(expr, name, src, kinds)
 		if value != nil {
-			return a.eventArgumentTags(m, from, []*sitter.Node{unwrapExpression(value, kinds)}, src, kinds)
+			return a.eventArgumentTagsWithReads(m, from, []*sitter.Node{unwrapExpression(value, kinds)}, src, kinds)
 		}
 	}
 	if kinds.Of(expr) == "call_expression" {
 		if tag, dep, ok := a.eventConstructorTag(m, from, expr, src, kinds); ok {
-			return []string{tag}, true, dep
+			return []string{tag}, true, dep, nil
 		}
 		name := calleeName(expr, src, kinds)
 		resolved, ok := a.resolvedImport(from, name)
 		if !ok {
-			return nil, false, ""
+			return nil, false, "", nil
 		}
 		calleeFile, exportName := targetModule(resolved), targetExport(resolved)
 		if calleeFile == "" || exportName == "" {
-			return nil, false, ""
+			return nil, false, "", nil
 		}
 		source := a.source(calleeFile)
 		if len(source) == 0 {
-			return nil, false, calleeFile
+			return nil, false, calleeFile, nil
 		}
 		root, calleeKinds, done := parse(calleeFile, source)
 		if done == nil {
-			return nil, false, calleeFile
+			return nil, false, calleeFile, nil
 		}
 		defer done()
 		body := functionBody(root, exportName, source, calleeKinds)
 		if body == nil {
-			return nil, false, calleeFile
+			return nil, false, calleeFile, nil
 		}
 		tags := []string{}
 		unknown := false
-		returns := 0
-		walkFunctionScope(body, calleeKinds, func(n *sitter.Node) {
-			if calleeKinds.Of(n) != "return_statement" {
-				return
+		var returns []*sitter.Node
+		var typeReads []string
+		if calleeKinds.Of(body) == "statement_block" {
+			walkFunctionScope(body, calleeKinds, func(n *sitter.Node) {
+				if calleeKinds.Of(n) == "return_statement" {
+					returns = append(returns, returnValue(n))
+				}
+			})
+			complete := functionDefinitelyReturns(body, calleeKinds)
+			if !complete {
+				if fn := namedFunction(root, exportName, source, calleeKinds); fn != nil {
+					var exhaustive bool
+					exhaustive, typeReads = a.functionSwitchExhaustive(calleeFile, fn, body, source, calleeKinds)
+					complete = exhaustive
+				}
 			}
-			returns++
-			expr := returnValue(n)
-			if tag, ok := eventObjectTag(unwrapExpression(expr, calleeKinds), source, calleeKinds); ok {
-				tags = append(tags, tag)
-			} else if expr != nil {
+			if !complete {
 				unknown = true
 			}
-		})
-		if returns == 0 {
+		} else {
+			returns = append(returns, body)
+		}
+		if len(returns) == 0 {
 			unknown = true
 		}
-		return unique(tags), len(tags) > 0 && !unknown, calleeFile
+		for _, expr := range returns {
+			if tag, ok := eventObjectTag(unwrapExpression(expr, calleeKinds), source, calleeKinds); ok {
+				tags = append(tags, tag)
+			} else {
+				unknown = true
+			}
+		}
+		return unique(tags), len(tags) > 0 && !unknown, calleeFile, typeReads
 	}
-	return nil, false, ""
+	return nil, false, "", nil
+}
+
+func (a *Analyzer) wrapperForwardsEvent(m *machineModel, file string, root, fn *sitter.Node, sends map[string][]*sitter.Node, eventArgument int, eventParam string, src []byte, kinds *tsutil.KindTable) (bool, map[string]bool) {
+	reads := map[string]bool{}
+	if fn == nil || eventArgument < 0 || eventParam == "" {
+		return false, reads
+	}
+	body := fn.ChildByFieldName("body")
+	forwarded := false
+	walkFunctionScope(body, kinds, func(n *sitter.Node) {
+		if forwarded || kinds.Of(n) != "call_expression" || !configuredSendAliasAt(n, calleeName(n, src, kinds), sends, src, kinds) {
+			return
+		}
+		args := callArguments(n, kinds)
+		if eventArgument >= len(args) {
+			return
+		}
+		forwarded = a.wrapperValuePreservesParameter(m, file, root, args[eventArgument], fn, eventParam, src, kinds, reads)
+	})
+	return forwarded, reads
+}
+
+// wrapperValuePreservesParameter follows only value-preserving forms at the
+// configured send argument. Arbitrary nested references (for example
+// send({type: "BOOT", metadata: event}) or send(discard(event))) do not prove
+// that the caller's event reaches the machine.
+func (a *Analyzer) wrapperValuePreservesParameter(m *machineModel, file string, root, value, wrapper *sitter.Node, parameter string, src []byte, kinds *tsutil.KindTable, reads map[string]bool) bool {
+	value = unwrapExpression(value, kinds)
+	if value == nil {
+		return false
+	}
+	switch kinds.Of(value) {
+	case "identifier":
+		return text(value, src) == parameter && parameterReference(value, wrapper, parameter, src, kinds)
+	case "object":
+		return objectPreservesParameter(value, wrapper, parameter, src, kinds)
+	case "conditional_expression":
+		return a.wrapperValuePreservesParameter(m, file, root, value.ChildByFieldName("consequence"), wrapper, parameter, src, kinds, reads) &&
+			a.wrapperValuePreservesParameter(m, file, root, value.ChildByFieldName("alternative"), wrapper, parameter, src, kinds, reads)
+	case "call_expression":
+		return a.forwardingHelperCall(m, file, root, value, wrapper, parameter, src, kinds, reads)
+	default:
+		return false
+	}
+}
+
+func objectPreservesParameter(object, fn *sitter.Node, parameter string, src []byte, kinds *tsutil.KindTable) bool {
+	spreadSeen := false
+	for _, member := range namedChildren(object) {
+		if kinds.Of(member) == "comment" {
+			continue
+		}
+		if kinds.Of(member) == "spread_element" {
+			argument := member.ChildByFieldName("argument")
+			if argument == nil && member.NamedChildCount() > 0 {
+				argument = member.NamedChild(0)
+			}
+			argument = unwrapExpression(argument, kinds)
+			if spreadSeen {
+				// A later spread can overwrite the event discriminator.
+				return false
+			}
+			if kinds.Of(argument) == "identifier" && text(argument, src) == parameter && parameterReference(argument, fn, parameter, src, kinds) {
+				spreadSeen = true
+			}
+			continue
+		}
+		if !spreadSeen {
+			continue
+		}
+		key, known := staticObjectMemberKey(member, src, kinds)
+		if !known || key == "type" {
+			return false
+		}
+	}
+	return spreadSeen
+}
+
+func staticObjectMemberKey(member *sitter.Node, src []byte, kinds *tsutil.KindTable) (string, bool) {
+	if member == nil {
+		return "", false
+	}
+	var key *sitter.Node
+	switch kinds.Of(member) {
+	case "pair":
+		key = member.ChildByFieldName("key")
+	case "method_definition":
+		key = member.ChildByFieldName("name")
+	case "shorthand_property_identifier", "shorthand_property_identifier_pattern":
+		return text(member, src), true
+	default:
+		return "", false
+	}
+	if key == nil {
+		return "", false
+	}
+	if kinds.Of(key) == "computed_property_name" {
+		children := namedChildren(key)
+		if len(children) != 1 {
+			return "", false
+		}
+		if literal, ok := stringValue(children[0], src, kinds); ok {
+			return literal, true
+		}
+		// An arbitrary computed key may overwrite the event discriminator.
+		return "", false
+	}
+	if literal, ok := stringValue(key, src, kinds); ok {
+		return literal, true
+	}
+	if kinds.Of(key) == "identifier" || kinds.Of(key) == "property_identifier" {
+		return text(key, src), true
+	}
+	return "", false
+}
+
+func (a *Analyzer) forwardingHelperCall(m *machineModel, file string, root, call, wrapper *sitter.Node, parameter string, src []byte, kinds *tsutil.KindTable, reads map[string]bool) bool {
+	callee := call.ChildByFieldName("function")
+	if callee == nil || kinds.Of(callee) != "identifier" {
+		return false
+	}
+	name := text(callee, src)
+	args := callArguments(call, kinds)
+	if name == "" || len(args) == 0 {
+		return false
+	}
+	inputIndex := -1
+	for i, arg := range args {
+		arg = unwrapExpression(arg, kinds)
+		if kinds.Of(arg) == "identifier" && text(arg, src) == parameter && parameterReference(arg, wrapper, parameter, src, kinds) {
+			inputIndex = i
+			break
+		}
+	}
+	if inputIndex < 0 {
+		return false
+	}
+
+	var helper *sitter.Node
+	helperSrc := src
+	helperKinds := kinds
+	binding := localBindingAt(callee, name, src, kinds)
+	if binding != nil {
+		switch kinds.Of(binding) {
+		case "function_declaration":
+			helper = binding
+		case "variable_declarator":
+			value := binding.ChildByFieldName("value")
+			if functionLike(value, kinds) {
+				helper = value
+			}
+		}
+	} else {
+		imported, ok := a.importedLocal(file, name)
+		if !ok {
+			return false
+		}
+		module, exportName, hasExport := strings.Cut(imported, "#")
+		if !hasExport || module == "" || exportName == "" {
+			return false
+		}
+		reads[module] = true
+		resolved, ok := a.resolveExport(module, exportName, map[string]bool{})
+		if !ok {
+			return false
+		}
+		module, exportName = targetModule(resolved), targetExport(resolved)
+		if module == "" || exportName == "" {
+			return false
+		}
+		reads[module] = true
+		helperSrc = a.source(module)
+		if len(helperSrc) == 0 {
+			return false
+		}
+		helperRoot, parsedKinds, done := parse(module, helperSrc)
+		if done == nil {
+			return false
+		}
+		defer done()
+		helper = topLevelFunctionNode(helperRoot, exportName, helperSrc, parsedKinds)
+		helperKinds = parsedKinds
+	}
+	if helper == nil {
+		return false
+	}
+	return functionReturnsParameter(helper, inputIndex, helperSrc, helperKinds)
+}
+
+func topLevelFunctionNode(root *sitter.Node, name string, src []byte, kinds *tsutil.KindTable) *sitter.Node {
+	for _, top := range namedChildren(root) {
+		declarations := []*sitter.Node{top}
+		if kinds.Of(top) == "export_statement" {
+			declarations = namedChildren(top)
+		}
+		for _, declaration := range declarations {
+			switch kinds.Of(declaration) {
+			case "function_declaration":
+				if functionName(declaration, src) == name {
+					return declaration
+				}
+			case "lexical_declaration", "variable_declaration":
+				for _, binding := range namedChildren(declaration) {
+					if kinds.Of(binding) == "variable_declarator" && text(binding.ChildByFieldName("name"), src) == name {
+						value := binding.ChildByFieldName("value")
+						if functionLike(value, kinds) {
+							return value
+						}
+					}
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func functionReturnsParameter(fn *sitter.Node, index int, src []byte, kinds *tsutil.KindTable) bool {
+	params := fn.ChildByFieldName("parameters")
+	if params == nil && kinds.Of(fn) == "arrow_function" {
+		parameter := fn.ChildByFieldName("parameter")
+		if index != 0 || parameter == nil {
+			return false
+		}
+		params = parameter.Parent()
+	}
+	parameterNodes := namedChildren(params)
+	if index < 0 || index >= len(parameterNodes) {
+		return false
+	}
+	parameterNode := parameterNodes[index]
+	nameNode := parameterNode.ChildByFieldName("name")
+	if nameNode == nil {
+		nameNode = parameterNode.ChildByFieldName("pattern")
+	}
+	if nameNode == nil || kinds.Of(nameNode) != "identifier" {
+		return false
+	}
+	parameter := text(nameNode, src)
+	body := fn.ChildByFieldName("body")
+	if body == nil {
+		return false
+	}
+	if kinds.Of(body) != "statement_block" {
+		return valuePreservesFunctionParameter(body, fn, parameter, src, kinds)
+	}
+	if !functionDefinitelyReturns(body, kinds) {
+		return false
+	}
+	var returns []*sitter.Node
+	walkFunctionScope(body, kinds, func(node *sitter.Node) {
+		if kinds.Of(node) == "return_statement" {
+			returns = append(returns, returnValue(node))
+		}
+	})
+	if len(returns) == 0 {
+		return false
+	}
+	for _, value := range returns {
+		if !valuePreservesFunctionParameter(value, fn, parameter, src, kinds) {
+			return false
+		}
+	}
+	return true
+}
+
+func valuePreservesFunctionParameter(value, fn *sitter.Node, parameter string, src []byte, kinds *tsutil.KindTable) bool {
+	value = unwrapExpression(value, kinds)
+	if value == nil {
+		return false
+	}
+	switch kinds.Of(value) {
+	case "identifier":
+		return text(value, src) == parameter && parameterReference(value, fn, parameter, src, kinds)
+	case "object":
+		return objectPreservesParameter(value, fn, parameter, src, kinds)
+	case "conditional_expression":
+		return valuePreservesFunctionParameter(value.ChildByFieldName("consequence"), fn, parameter, src, kinds) &&
+			valuePreservesFunctionParameter(value.ChildByFieldName("alternative"), fn, parameter, src, kinds)
+	default:
+		return false
+	}
+}
+
+func parameterReference(reference, fn *sitter.Node, name string, src []byte, kinds *tsutil.KindTable) bool {
+	if reference == nil || fn == nil || name == "" {
+		return false
+	}
+	for scope := reference.Parent(); scope != nil && !sameSyntaxNode(scope, fn); scope = scope.Parent() {
+		if kinds.Of(scope) != "statement_block" {
+			continue
+		}
+		for _, declaration := range namedChildren(scope) {
+			switch kinds.Of(declaration) {
+			case "lexical_declaration", "variable_declaration":
+				for _, binding := range namedChildren(declaration) {
+					if kinds.Of(binding) == "variable_declarator" && text(binding.ChildByFieldName("name"), src) == name {
+						return false
+					}
+				}
+			case "function_declaration":
+				if functionName(declaration, src) == name {
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
+
+// functionDefinitelyReturns is a deliberately small, conservative control-flow
+// proof used for converter and returned-object coverage. Unsupported control
+// flow stays unknown instead of turning a partial branch into a total result.
+func functionDefinitelyReturns(node *sitter.Node, kinds *tsutil.KindTable) bool {
+	if node == nil {
+		return false
+	}
+	switch kinds.Of(node) {
+	case "return_statement", "throw_statement":
+		return true
+	case "statement_block":
+		children := namedChildren(node)
+		return len(children) > 0 && functionDefinitelyReturns(children[len(children)-1], kinds)
+	case "if_statement":
+		consequence := node.ChildByFieldName("consequence")
+		alternative := node.ChildByFieldName("alternative")
+		return alternative != nil && functionDefinitelyReturns(consequence, kinds) && functionDefinitelyReturns(alternative, kinds)
+	case "else_clause", "finally_clause":
+		children := namedChildren(node)
+		return len(children) > 0 && functionDefinitelyReturns(children[len(children)-1], kinds)
+	case "switch_statement":
+		return switchBranchesDefinitelyReturn(node, kinds)
+	case "try_statement":
+		body := node.ChildByFieldName("body")
+		if finally := node.ChildByFieldName("finalizer"); finally != nil && functionDefinitelyReturns(finally, kinds) {
+			return true
+		}
+		catch := node.ChildByFieldName("handler")
+		return functionDefinitelyReturns(body, kinds) && (catch == nil || functionDefinitelyReturns(catch, kinds))
+	case "catch_clause":
+		children := namedChildren(node)
+		return len(children) > 0 && functionDefinitelyReturns(children[len(children)-1], kinds)
+	default:
+		return false
+	}
+}
+
+func switchBranchesDefinitelyReturn(node *sitter.Node, kinds *tsutil.KindTable) bool {
+	body := node.ChildByFieldName("body")
+	branches := namedChildren(body)
+	if len(branches) == 0 {
+		return false
+	}
+	hasDefault := false
+	pendingCase := false
+	for _, branch := range branches {
+		switch kinds.Of(branch) {
+		case "switch_case":
+			pendingCase = true
+			value := branch.ChildByFieldName("value")
+			var statements []*sitter.Node
+			for _, child := range namedChildren(branch) {
+				if sameSyntaxNode(child, value) {
+					continue
+				}
+				statements = append(statements, child)
+			}
+			if len(statements) == 0 {
+				continue
+			}
+			if !functionDefinitelyReturns(statements[len(statements)-1], kinds) {
+				return false
+			}
+			pendingCase = false
+		case "switch_default":
+			hasDefault = true
+			statements := namedChildren(branch)
+			if len(statements) == 0 || !functionDefinitelyReturns(statements[len(statements)-1], kinds) {
+				return false
+			}
+			pendingCase = false
+		default:
+			return false
+		}
+	}
+	return hasDefault && !pendingCase
+}
+
+func (a *Analyzer) functionSwitchExhaustive(file string, fn, body *sitter.Node, src []byte, kinds *tsutil.KindTable) (bool, []string) {
+	var switches []*sitter.Node
+	walkFunctionScope(body, kinds, func(n *sitter.Node) {
+		if kinds.Of(n) == "switch_statement" {
+			switches = append(switches, n)
+		}
+	})
+	for _, sw := range switches {
+		discriminant := unwrapExpression(sw.ChildByFieldName("value"), kinds)
+		if discriminant == nil || kinds.Of(discriminant) != "member_expression" || text(discriminant.ChildByFieldName("property"), src) != "type" {
+			continue
+		}
+		object := unwrapExpression(discriminant.ChildByFieldName("object"), kinds)
+		if object == nil || kinds.Of(object) != "identifier" {
+			continue
+		}
+		parameter := text(object, src)
+		typeName := functionParameterTypeName(fn, parameter, src, kinds)
+		if typeName == "" {
+			continue
+		}
+		typeFile, typeExport := a.resolveType(file, typeName)
+		if typeFile == "" || typeExport == "" {
+			continue
+		}
+		dependency := []string{}
+		if typeFile != file {
+			dependency = append(dependency, typeFile)
+		}
+		typeSrc := a.source(typeFile)
+		if len(typeSrc) == 0 {
+			return false, dependency
+		}
+		typeRoot, typeKinds, done := parse(typeFile, typeSrc)
+		if done == nil {
+			return false, dependency
+		}
+		tags, closed := stringDiscriminantUnion(typeDeclaration(typeRoot, typeExport, typeSrc, typeKinds), "type", typeSrc, typeKinds)
+		done()
+		if !closed || len(tags) == 0 || !functionBodyIsSoleSwitch(body, sw, kinds) {
+			return false, dependency
+		}
+		covered, returns := switchCaseCoverage(sw, src, kinds)
+		if !returns || !sameStringSet(tags, covered) {
+			return false, dependency
+		}
+		return true, dependency
+	}
+	return false, nil
+}
+
+// A complete closed-union switch proves converter return completeness only
+// when it is the function's entire executable body. A nested switch under an
+// if/loop/try can leave another path that falls through the function.
+func functionBodyIsSoleSwitch(body, candidate *sitter.Node, kinds *tsutil.KindTable) bool {
+	if body == nil || candidate == nil || kinds.Of(body) != "statement_block" {
+		return false
+	}
+	parent := candidate.Parent()
+	if parent == nil || kinds.Of(parent) != "statement_block" || !sameSyntaxNode(parent, body) {
+		return false
+	}
+	statements := []*sitter.Node{}
+	for _, child := range namedChildren(body) {
+		switch kinds.Of(child) {
+		case "comment", "function_declaration":
+			// Nested function declarations do not execute on this path.
+		default:
+			statements = append(statements, child)
+		}
+	}
+	if kinds.Of(candidate) != "switch_statement" || len(statements) == 0 {
+		return false
+	}
+	index := -1
+	for i, statement := range statements {
+		if sameSyntaxNode(statement, candidate) {
+			index = i
+			break
+		}
+	}
+	if index != len(statements)-1 {
+		return false
+	}
+	for _, statement := range statements[:index] {
+		switch kinds.Of(statement) {
+		case "lexical_declaration", "variable_declaration", "expression_statement":
+			// These statements fall through to the discriminant switch.
+		default:
+			// In particular, a conditional or loop can bypass the switch.
+			return false
+		}
+	}
+	return true
+}
+
+func functionParameterTypeName(fn *sitter.Node, parameter string, src []byte, kinds *tsutil.KindTable) string {
+	for _, arg := range namedChildren(fn.ChildByFieldName("parameters")) {
+		name := arg.ChildByFieldName("name")
+		if name == nil {
+			name = arg.ChildByFieldName("pattern")
+		}
+		if text(name, src) != parameter {
+			continue
+		}
+		typeNode := arg.ChildByFieldName("type")
+		var names []string
+		walk(typeNode, func(n *sitter.Node) {
+			if kinds.Of(n) == "type_identifier" {
+				names = append(names, text(n, src))
+			}
+		})
+		if len(unique(names)) == 1 {
+			return unique(names)[0]
+		}
+	}
+	return ""
+}
+
+func stringDiscriminantUnion(declaration *sitter.Node, property string, src []byte, kinds *tsutil.KindTable) ([]string, bool) {
+	if declaration == nil {
+		return nil, false
+	}
+	root := declaration.ChildByFieldName("value")
+	if root == nil {
+		return nil, false
+	}
+	var members []*sitter.Node
+	var flatten func(*sitter.Node)
+	flatten = func(n *sitter.Node) {
+		if n == nil {
+			return
+		}
+		if kinds.Of(n) == "union_type" {
+			for _, child := range namedChildren(n) {
+				flatten(child)
+			}
+			return
+		}
+		if kinds.Of(n) == "parenthesized_type" {
+			for _, child := range namedChildren(n) {
+				flatten(child)
+			}
+			return
+		}
+		members = append(members, n)
+	}
+	flatten(root)
+	if len(members) == 0 {
+		return nil, false
+	}
+	tags := []string{}
+	for _, member := range members {
+		if kinds.Of(member) != "object_type" {
+			return nil, false
+		}
+		var fieldType *sitter.Node
+		for _, field := range namedChildren(member) {
+			if kinds.Of(field) == "property_signature" && text(field.ChildByFieldName("name"), src) == property {
+				fieldType = field.ChildByFieldName("type")
+				break
+			}
+		}
+		values, ok := stringLiteralTypeValues(fieldType, src, kinds)
+		if !ok || len(values) == 0 {
+			return nil, false
+		}
+		tags = append(tags, values...)
+	}
+	return unique(tags), true
+}
+
+func stringLiteralTypeValues(node *sitter.Node, src []byte, kinds *tsutil.KindTable) ([]string, bool) {
+	if node == nil {
+		return nil, false
+	}
+	if kinds.Of(node) == "type_annotation" {
+		children := namedChildren(node)
+		if len(children) == 1 {
+			return stringLiteralTypeValues(children[0], src, kinds)
+		}
+	}
+	if kinds.Of(node) == "union_type" {
+		var out []string
+		for _, child := range namedChildren(node) {
+			values, ok := stringLiteralTypeValues(child, src, kinds)
+			if !ok {
+				return nil, false
+			}
+			out = append(out, values...)
+		}
+		return unique(out), len(out) > 0
+	}
+	if kinds.Of(node) != "literal_type" {
+		return nil, false
+	}
+	for _, child := range namedChildren(node) {
+		if value, ok := stringValue(child, src, kinds); ok {
+			return []string{value}, true
+		}
+	}
+	return nil, false
+}
+
+func switchCaseCoverage(node *sitter.Node, src []byte, kinds *tsutil.KindTable) ([]string, bool) {
+	var covered, pending []string
+	for _, branch := range namedChildren(node.ChildByFieldName("body")) {
+		if kinds.Of(branch) != "switch_case" {
+			return nil, false
+		}
+		value := branch.ChildByFieldName("value")
+		tag, ok := stringValue(value, src, kinds)
+		if !ok {
+			return nil, false
+		}
+		pending = append(pending, tag)
+		var statements []*sitter.Node
+		for _, child := range namedChildren(branch) {
+			if sameSyntaxNode(child, value) {
+				continue
+			}
+			statements = append(statements, child)
+		}
+		if len(statements) == 0 {
+			continue
+		}
+		if !functionDefinitelyReturns(statements[len(statements)-1], kinds) {
+			return nil, false
+		}
+		covered = append(covered, pending...)
+		pending = nil
+	}
+	if len(pending) > 0 {
+		return nil, false
+	}
+	return unique(covered), len(covered) > 0
+}
+
+func sameStringSet(a, b []string) bool {
+	left, right := unique(a), unique(b)
+	if len(left) != len(right) {
+		return false
+	}
+	seen := make(map[string]bool, len(left))
+	for _, value := range left {
+		seen[value] = true
+	}
+	for _, value := range right {
+		if !seen[value] {
+			return false
+		}
+	}
+	return true
 }
 
 func (a *Analyzer) eventArgumentConstructionFacts(m *machineModel, from string, args []*sitter.Node, src []byte, kinds *tsutil.KindTable) ([]facts.Fact, map[string]bool) {
@@ -346,31 +1159,206 @@ func (a *Analyzer) eventArgumentConstructionFacts(m *machineModel, from string, 
 		return nil, reads
 	}
 	reads[calleeFile] = true
-	calleeSource := a.source(calleeFile)
-	if len(calleeSource) == 0 {
-		return nil, reads
+	if a.collectingConstructorUses {
+		calleeSource := a.source(calleeFile)
+		if len(calleeSource) > 0 {
+			root, calleeKinds, done := parse(calleeFile, calleeSource)
+			if done != nil {
+				function, body := topLevelExportedFunction(root, exportName, calleeSource, calleeKinds)
+				if function != nil && len(literalReturnEventTags(m, body, calleeSource, calleeKinds)) > 0 {
+					key := constructorUseKey{machine: m.machine, file: calleeFile, export: exportName}
+					if a.constructorUses[key] == nil {
+						a.constructorUses[key] = map[string]bool{}
+					}
+					a.constructorUses[key][slash(from)] = true
+				}
+				done()
+			}
+		}
 	}
-	root, calleeKinds, done := parse(calleeFile, calleeSource)
-	if done == nil {
-		return nil, reads
-	}
-	defer done()
-	body := functionBody(root, exportName, calleeSource, calleeKinds)
-	if body == nil {
-		return nil, reads
-	}
+	// Returned-event construction is emitted by the callee file's own
+	// contribution. Emitting a callee-file symbol overlay from this caller would
+	// give it the wrong owner and leave stale facts when the caller stops using
+	// the converter.
+	return nil, reads
+}
+
+func (a *Analyzer) extractSourceReturnConstructions(m *machineModel, file string, root *sitter.Node, src []byte, kinds *tsutil.KindTable) ([]facts.Fact, map[string]bool) {
+	reads := map[string]bool{}
 	var out []facts.Fact
-	walkFunctionScope(body, calleeKinds, func(n *sitter.Node) {
-		if calleeKinds.Of(n) != "return_statement" {
+	admitted := map[string]bool{}
+	for _, export := range a.constructorExports(m.machine, file) {
+		admitted[export] = true
+	}
+	for _, export := range topLevelFunctionExports(root, src, kinds) {
+		function, body := topLevelExportedFunction(root, export, src, kinds)
+		if function == nil || body == nil {
+			continue
+		}
+		typeName := functionReturnTypeName(function, src, kinds)
+		if typeName == "" {
+			continue
+		}
+		typedBy, ok := a.typeRelation(file, typeName, facts.RelFSMTypedBy)
+		if ok && typedBy.TargetFile == m.eventFile && typedBy.Target == moduleName(m.eventFile)+"."+m.eventExport {
+			admitted[export] = true
+			if typedBy.TargetFile != file {
+				reads[typedBy.TargetFile] = true
+			}
+		}
+	}
+	var orderedExports []string
+	for export := range admitted {
+		orderedExports = append(orderedExports, export)
+	}
+	sort.Strings(orderedExports)
+	for _, export := range orderedExports {
+		function, body := topLevelExportedFunction(root, export, src, kinds)
+		if function == nil || body == nil {
+			continue
+		}
+		if !topLevelExport(root, export, src, kinds) {
+			continue
+		}
+		for _, caller := range a.constructorCallers(m.machine, file, export) {
+			reads[caller] = true
+		}
+		for _, returned := range literalReturnEventSites(m, body, src, kinds) {
+			tag := returned.tag
+			out = append(out, interactionFact(file, export, facts.RelFSMConstructsEvent,
+				machineMember(m.machine, "event", tag), returned.node,
+				map[string]any{"construction_status": "literal_return", "event_tag": tag}))
+		}
+	}
+	return out, reads
+}
+
+type eventReturnSite struct {
+	tag  string
+	node *sitter.Node
+}
+
+func literalReturnEventSites(m *machineModel, body *sitter.Node, src []byte, kinds *tsutil.KindTable) []eventReturnSite {
+	var out []eventReturnSite
+	appendReturn := func(returned *sitter.Node) {
+		if returned == nil {
 			return
 		}
-		returned := returnValue(n)
-		if tag, literal := eventObjectTag(unwrapExpression(returned, calleeKinds), calleeSource, calleeKinds); literal {
-			out = append(out, interactionFact(calleeFile, exportName, facts.RelFSMConstructsEvent,
-				machineMember(m.machine, "event", tag), returned, map[string]any{"construction_status": "literal_return", "event_tag": tag}))
+		tag, ok := eventObjectTag(unwrapExpression(returned, kinds), src, kinds)
+		if !ok || m.events[tag].Kind == "" {
+			return
+		}
+		out = append(out, eventReturnSite{tag: tag, node: returned})
+	}
+	if body == nil {
+		return nil
+	}
+	if kinds.Of(body) != "statement_block" {
+		appendReturn(body)
+		return out
+	}
+	walkFunctionScope(body, kinds, func(node *sitter.Node) {
+		if kinds.Of(node) == "return_statement" {
+			appendReturn(returnValue(node))
 		}
 	})
-	return out, reads
+	return out
+}
+
+func literalReturnEventTags(m *machineModel, body *sitter.Node, src []byte, kinds *tsutil.KindTable) []string {
+	var tags []string
+	for _, site := range literalReturnEventSites(m, body, src, kinds) {
+		tags = append(tags, site.tag)
+	}
+	return unique(tags)
+}
+
+func topLevelFunctionExports(root *sitter.Node, src []byte, kinds *tsutil.KindTable) []string {
+	seen := map[string]bool{}
+	var names []string
+	add := func(name string) {
+		if name != "" && !seen[name] {
+			seen[name] = true
+			names = append(names, name)
+		}
+	}
+	for _, statement := range namedChildren(root) {
+		if kinds.Of(statement) != "export_statement" {
+			continue
+		}
+		for _, declaration := range namedChildren(statement) {
+			switch kinds.Of(declaration) {
+			case "function_declaration":
+				add(functionName(declaration, src))
+			case "lexical_declaration", "variable_declaration":
+				for _, declarator := range namedChildren(declaration) {
+					if kinds.Of(declarator) != "variable_declarator" || !functionLike(declarator.ChildByFieldName("value"), kinds) {
+						continue
+					}
+					add(text(declarator.ChildByFieldName("name"), src))
+				}
+			}
+		}
+	}
+	sort.Strings(names)
+	return names
+}
+
+func functionReturnTypeName(function *sitter.Node, src []byte, kinds *tsutil.KindTable) string {
+	if function == nil {
+		return ""
+	}
+	returnType := function.ChildByFieldName("return_type")
+	if kinds.Of(returnType) == "type_annotation" {
+		var typeNode *sitter.Node
+		for _, child := range namedChildren(returnType) {
+			if kinds.Of(child) == "comment" {
+				continue
+			}
+			if typeNode != nil {
+				return ""
+			}
+			typeNode = child
+		}
+		returnType = typeNode
+	}
+	if returnType == nil {
+		return ""
+	}
+	switch kinds.Of(returnType) {
+	case "type_identifier", "identifier":
+		return text(returnType, src)
+	default:
+		return ""
+	}
+}
+
+func topLevelExportedFunction(root *sitter.Node, name string, src []byte, kinds *tsutil.KindTable) (*sitter.Node, *sitter.Node) {
+	for _, statement := range namedChildren(root) {
+		if kinds.Of(statement) != "export_statement" {
+			continue
+		}
+		for _, declaration := range namedChildren(statement) {
+			switch kinds.Of(declaration) {
+			case "function_declaration":
+				if functionName(declaration, src) == name {
+					return declaration, declaration.ChildByFieldName("body")
+				}
+			case "lexical_declaration", "variable_declaration":
+				for _, declarator := range namedChildren(declaration) {
+					if kinds.Of(declarator) != "variable_declarator" || text(declarator.ChildByFieldName("name"), src) != name {
+						continue
+					}
+					value := declarator.ChildByFieldName("value")
+					if value == nil || !functionLike(value, kinds) {
+						return nil, nil
+					}
+					return value, value.ChildByFieldName("body")
+				}
+			}
+		}
+	}
+	return nil, nil
 }
 
 func (a *Analyzer) eventConstructorTag(m *machineModel, from string, call *sitter.Node, src []byte, kinds *tsutil.KindTable) (string, string, bool) {
@@ -448,7 +1436,7 @@ func (a *Analyzer) extractEffectSink(m *machineModel, rel string, root *sitter.N
 			return
 		}
 		machineBound++
-		tag, eventSource, eventOK := findConfiguredEventInArgument(m, args, sink.EventArgument, sink.EventPath, rel, src, kinds, a)
+		tag, eventSource, eventOK, typeReads := findConfiguredEventInArgument(m, args, sink.EventArgument, sink.EventPath, rel, src, kinds, a)
 		caller := enclosingFunction(n, src, kinds)
 		if eventArg := eventArgumentAt(args, sink.EventArgument, sink.EventPath, src, kinds); eventArg != nil {
 			constructed, constructionReads := a.eventArgumentConstructionFacts(m, rel, []*sitter.Node{eventArg}, src, kinds)
@@ -459,6 +1447,9 @@ func (a *Analyzer) extractEffectSink(m *machineModel, rel string, root *sitter.N
 		}
 		if eventSource != "" {
 			reads[eventSource] = true
+		}
+		for _, file := range typeReads {
+			reads[file] = true
 		}
 		if eventOK && m.events[tag].Kind != "" {
 			out = append(out, interactionFact(rel, caller, facts.RelFSMDispatches, machineMember(m.machine, "event", tag), n, map[string]any{"dispatch_status": "resolved", "event_tag": tag}))
@@ -1062,17 +2053,50 @@ func enclosingFunction(n *sitter.Node, src []byte, kinds *tsutil.KindTable) stri
 	return ""
 }
 
-func wrapperForSend(n *sitter.Node, wrappers, sends map[string]bool, src []byte, kinds *tsutil.KindTable) string {
-	for p := n.Parent(); p != nil; p = p.Parent() {
-		name := enclosingFunction(p, src, kinds)
-		if wrappers[name] {
-			return name
-		}
-		if kinds.Of(p) == "function_declaration" || kinds.Of(p) == "arrow_function" {
-			break
+func provenLocalBindingAt(reference *sitter.Node, name string, bindings map[string][]*sitter.Node, src []byte, kinds *tsutil.KindTable) bool {
+	if reference == nil || name == "" {
+		return false
+	}
+	resolved := localBindingAt(reference, name, src, kinds)
+	if resolved == nil {
+		return false
+	}
+	for _, binding := range bindings[name] {
+		if sameSyntaxNode(resolved, binding) {
+			return true
 		}
 	}
-	return ""
+	return false
+}
+
+func configuredSendAliasAt(call *sitter.Node, name string, bindings map[string][]*sitter.Node, src []byte, kinds *tsutil.KindTable) bool {
+	return call != nil && kinds.Of(call) == "call_expression" &&
+		provenLocalBindingAt(call.ChildByFieldName("function"), name, bindings, src, kinds)
+}
+
+func callInsideProvenWrapper(call *sitter.Node, wrappers map[string][]*sitter.Node, src []byte, kinds *tsutil.KindTable) bool {
+	for scope := call.Parent(); scope != nil; scope = scope.Parent() {
+		if !isFunctionBoundary(kinds.Of(scope)) {
+			continue
+		}
+		for name, candidates := range wrappers {
+			if functionSymbolName(scope, src, kinds) != name {
+				continue
+			}
+			for _, candidate := range candidates {
+				if sameSyntaxNode(scope, candidate) {
+					return true
+				}
+				if kinds.Of(candidate) == "variable_declarator" && sameSyntaxNode(scope, candidate.ChildByFieldName("value")) {
+					return true
+				}
+			}
+		}
+		// A nested unproven function is a new lexical boundary. Do not let a
+		// proven outer wrapper claim its sends or call sites.
+		return false
+	}
+	return false
 }
 
 func memberExpr(n *sitter.Node) (string, bool) {
@@ -1082,17 +2106,17 @@ func memberExpr(n *sitter.Node) (string, bool) {
 	return "", true
 }
 
-func findConfiguredEventInArgument(m *machineModel, args []*sitter.Node, argIndex int, eventPath, file string, src []byte, kinds *tsutil.KindTable, a *Analyzer) (string, string, bool) {
+func findConfiguredEventInArgument(m *machineModel, args []*sitter.Node, argIndex int, eventPath, file string, src []byte, kinds *tsutil.KindTable, a *Analyzer) (string, string, bool, []string) {
 	arg := eventArgumentAt(args, argIndex, eventPath, src, kinds)
 	arg = unwrapExpression(arg, kinds)
 	if tag, ok := eventObjectTag(arg, src, kinds); ok {
-		return tag, "", true
+		return tag, "", true, nil
 	}
-	tags, ok, dep := a.eventArgumentTags(m, file, []*sitter.Node{arg}, src, kinds)
+	tags, ok, dep, typeReads := a.eventArgumentTagsWithReads(m, file, []*sitter.Node{arg}, src, kinds)
 	if ok && len(tags) == 1 {
-		return tags[0], dep, true
+		return tags[0], dep, true, typeReads
 	}
-	return "", dep, false
+	return "", dep, false, typeReads
 }
 
 func eventArgumentAt(args []*sitter.Node, argIndex int, eventPath string, src []byte, kinds *tsutil.KindTable) *sitter.Node {

@@ -170,13 +170,15 @@ func TestPinnedProductDeclarationsAndBackendTransition(t *testing.T) {
 			t.Errorf("queued-claim missing %s -> %s", rel, target)
 		}
 	}
-	if !hasRelation(queued, facts.RelFSMGuardCalls, "hasValidPayload") || !hasRelation(queued, facts.RelFSMGuardCalls, "isDue") {
+	providerFile := "packages/scan-engine/src/machines/providerJob.ts"
+	if !hasRelationToFile(queued, facts.RelFSMGuardCalls, "packages/scan-engine/src/machines.hasValidPayload", providerFile) ||
+		!hasRelationToFile(queued, facts.RelFSMGuardCalls, "packages/scan-engine/src/machines.isDue", providerFile) {
 		t.Errorf("queued-claim guard evidence = %#v", queued.Relations)
 	}
-	if queued.Props["guard_status"] != "declared" || queued.Props["availability"] != "declared" {
+	if queued.Props["guard_status"] != "conditional_override" || queued.Props["guard_presence_condition_text"] != "!(overrides.unguardRuleIds?.has(rule.id))" || queued.Props["availability"] != "declared" {
 		t.Errorf("queued-claim statuses = %#v", queued.Props)
 	}
-	if !hasRelation(queued, facts.RelFSMDeclaredIn, "createProviderJobRegistration") {
+	if !hasRelationToFile(queued, facts.RelFSMDeclaredIn, "packages/scan-engine/src/machines.createProviderJobRegistration", providerFile) {
 		t.Errorf("queued-claim lacks registration evidence: %#v", queued.Relations)
 	}
 	if hasCommandHandler(all, "scan-provider-job/command:CallProvider") {
@@ -249,7 +251,7 @@ func assertPinnedProductMobile(t *testing.T, a *Analyzer, all []facts.Fact) {
 	if !hasRelation(forgot, facts.RelFSMFrom, "mobile-app/state:forgotPassword") || !hasRelation(forgot, facts.RelFSMTo, "mobile-app/state:forgotPassword.requestingReset") {
 		t.Errorf("forgot-password transition endpoints = %#v", forgot.Relations)
 	}
-	if !hasRelation(forgot, facts.RelFSMGuardCalls, "canSubmitResetRequest") {
+	if !hasRelationToFile(forgot, facts.RelFSMGuardCalls, "apps/mobile/src/screens/forgot-password.canSubmitResetRequest", "apps/mobile/src/screens/forgot-password/forgotPasswordRuntimeState.ts") {
 		t.Errorf("forgot-password transition lacks direct guard evidence: %#v", forgot.Relations)
 	}
 	requesting, ok := factByKindAndName(all, facts.KindFSMState, "mobile-app/state:forgotPassword.requestingReset")
@@ -257,7 +259,7 @@ func assertPinnedProductMobile(t *testing.T, a *Analyzer, all []facts.Fact) {
 		t.Errorf("requestingReset entry effect missing: %#v", requesting)
 	}
 	for _, target := range []string{"mobile-app/event:FORGOT_PASSWORD_SUBMIT_EMAIL", "mobile-app/event:FORGOT_PASSWORD_RESEND_EMAIL"} {
-		if !hasConstruction(all, target) || !hasDispatch(all, "sendForgotPasswordIntent", target) {
+		if !hasConstruction(all, target) || !hasDispatch(all, "apps/mobile/src.OnyxApp.renderForgotPasswordScreen.sendForgotPasswordIntent", target) {
 			t.Errorf("event construction and configured sink dispatch should both be proven for %s", target)
 		}
 	}
@@ -284,6 +286,15 @@ func factByKindAndName(all []facts.Fact, kind, name string) (facts.Fact, bool) {
 func hasRelation(f facts.Fact, kind, target string) bool {
 	for _, r := range f.Relations {
 		if r.Kind == kind && r.Target == target {
+			return true
+		}
+	}
+	return false
+}
+
+func hasRelationToFile(f facts.Fact, kind, target, targetFile string) bool {
+	for _, relation := range f.Relations {
+		if relation.Kind == kind && relation.Target == target && relation.TargetFile == targetFile {
 			return true
 		}
 	}
@@ -326,16 +337,17 @@ func coverageHasStatus(all []facts.Fact, name, key, want string) bool {
 
 func hasConstruction(all []facts.Fact, event string) bool {
 	for _, f := range all {
-		if hasRelation(f, facts.RelFSMConstructsEvent, event) && f.File == "apps/mobile/src/screens/forgot-password/forgotPasswordRuntimeEvents.ts" {
+		if f.Name == "forgotPasswordIntentToEvent" && f.Props["construction_status"] == "literal_return" &&
+			hasRelation(f, facts.RelFSMConstructsEvent, event) && f.File == "apps/mobile/src/screens/forgot-password/forgotPasswordRuntimeEvents.ts" {
 			return true
 		}
 	}
 	return false
 }
 
-func hasDispatch(all []facts.Fact, sourceName, event string) bool {
+func hasDispatch(all []facts.Fact, sourceIdentity, event string) bool {
 	for _, f := range all {
-		if f.Name == sourceName && hasRelation(f, facts.RelFSMDispatches, event) {
+		if f.File == "apps/mobile/src/App.tsx" && f.Props["fsm_source_identity"] == sourceIdentity && hasRelation(f, facts.RelFSMDispatches, event) {
 			return true
 		}
 	}

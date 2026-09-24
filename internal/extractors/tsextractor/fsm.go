@@ -116,7 +116,7 @@ func fsmAnalyzerBaseKey(specs []fsm.Spec, knownFiles map[string]bool) string {
 func fsmAnalyzerInputFiles(specs []fsm.Spec, analyzer *fsm.Analyzer) []string {
 	set := map[string]bool{}
 	add := func(file string) {
-		file = filepath.ToSlash(filepath.Clean(file))
+		file = factpath.Clean(file)
 		if file != "" && file != "." {
 			set[file] = true
 		}
@@ -161,7 +161,7 @@ func fsmAnalyzerInputFiles(specs []fsm.Spec, analyzer *fsm.Analyzer) []string {
 func fsmAnalyzerModelInputFiles(specs []fsm.Spec, analyzer *fsm.Analyzer) []string {
 	set := map[string]bool{}
 	add := func(file string) {
-		file = filepath.ToSlash(filepath.Clean(file))
+		file = factpath.Clean(file)
 		if file != "" && file != "." {
 			set[file] = true
 		}
@@ -226,61 +226,109 @@ func mergeFSMFacts(base, added []facts.Fact) []facts.Fact {
 			out = append(out, overlay)
 			continue
 		}
-		merged := false
-		for i := range out {
-			if out[i].Kind != facts.KindSymbol || out[i].Name != overlay.Name || filepath.ToSlash(out[i].File) != filepath.ToSlash(overlay.File) {
-				continue
-			}
-			for _, rel := range overlay.Relations {
-				seen := false
-				for _, existing := range out[i].Relations {
-					if existing.Kind == rel.Kind && existing.Target == rel.Target {
-						seen = true
-						break
-					}
-				}
-				if !seen {
-					out[i].Relations = append(out[i].Relations, rel)
+		owner := fsmOverlayOwner(out, overlay)
+		if owner < 0 {
+			out = append(out, fsmUnboundOverlayEvidence(overlay))
+			continue
+		}
+		for _, rel := range overlay.Relations {
+			seen := false
+			for _, existing := range out[owner].Relations {
+				if existing.Kind == rel.Kind && existing.Target == rel.Target && existing.TargetFile == rel.TargetFile {
+					seen = true
+					break
 				}
 			}
-			if out[i].Props == nil {
-				out[i].Props = map[string]any{}
+			if !seen {
+				out[owner].Relations = append(out[owner].Relations, rel)
 			}
-			sites, _ := out[i].Props["fsm_evidence_sites"].([]map[string]any)
-			props := make(map[string]any, len(overlay.Props))
-			for key, value := range overlay.Props {
-				props[key] = value
-			}
-			relations := make([]map[string]string, 0, len(overlay.Relations))
-			for _, rel := range overlay.Relations {
-				relations = append(relations, map[string]string{"kind": rel.Kind, "target": rel.Target})
-			}
-			sites = append(sites, map[string]any{
-				"line": overlay.Line, "end_line": overlay.EndLine,
-				"props": props, "relations": relations,
-			})
-			out[i].Props["fsm_evidence_sites"] = sites
-			merged = true
-			break
 		}
-		if !merged {
-			if overlay.Props == nil {
-				overlay.Props = map[string]any{}
-			}
-			if overlay.Props["symbol_kind"] == nil {
-				overlay.Props["symbol_kind"] = facts.SymbolFunc
-			}
-			out = append(out, overlay)
+		if out[owner].Props == nil {
+			out[owner].Props = map[string]any{}
 		}
+		sites, _ := out[owner].Props["fsm_evidence_sites"].([]map[string]any)
+		props := make(map[string]any, len(overlay.Props))
+		for key, value := range overlay.Props {
+			props[key] = value
+		}
+		relations := make([]map[string]string, 0, len(overlay.Relations))
+		for _, rel := range overlay.Relations {
+			relations = append(relations, map[string]string{"kind": rel.Kind, "target": rel.Target, "target_file": rel.TargetFile})
+		}
+		sites = append(sites, map[string]any{
+			"line": overlay.Line, "end_line": overlay.EndLine,
+			"props": props, "relations": relations,
+		})
+		out[owner].Props["fsm_evidence_sites"] = sites
 	}
 	return out
 }
 
+// fsmOverlayOwner selects only an existing source declaration. The interaction
+// overlay's line is the binding site; it may lie inside a multiline declaration,
+// so span containment is stronger than choosing the first same-name symbol.
+func fsmOverlayOwner(base []facts.Fact, overlay facts.Fact) int {
+	var candidates, exact []int
+	canonical := factpath.Dir(filepath.ToSlash(overlay.File)) + "." + overlay.Name
+	identity, _ := overlay.Props["fsm_source_identity"].(string)
+	for i := range base {
+		candidate := base[i]
+		if candidate.Kind != facts.KindSymbol || filepath.ToSlash(candidate.File) != filepath.ToSlash(overlay.File) {
+			continue
+		}
+		if identity != "" {
+			if candidate.Name != identity || candidate.Props["fsm_source_binding"] != "tree_sitter_nested_declaration" {
+				continue
+			}
+		} else if candidate.Name != overlay.Name && candidate.Name != canonical {
+			continue
+		}
+		if overlay.Line > 0 && candidate.Line > 0 && candidate.EndLine > 0 &&
+			(overlay.Line < candidate.Line || overlay.Line > candidate.EndLine) {
+			continue
+		}
+		candidates = append(candidates, i)
+		if overlay.Line > 0 && candidate.Line == overlay.Line {
+			exact = append(exact, i)
+		}
+	}
+	if len(exact) == 1 {
+		return exact[0]
+	}
+	if len(candidates) == 1 {
+		return candidates[0]
+	}
+	return -1
+}
+
+func fsmUnboundOverlayEvidence(overlay facts.Fact) facts.Fact {
+	props := make(map[string]any, len(overlay.Props)+3)
+	for key, value := range overlay.Props {
+		props[key] = value
+	}
+	props["coverage_status"] = "partial"
+	props["extractor"] = "typescript:fsm"
+	props["unresolved_source_binding"] = overlay.Name
+	props["unresolved_source_bindings"] = 1
+	relations := make([]map[string]string, 0, len(overlay.Relations))
+	for _, rel := range overlay.Relations {
+		relations = append(relations, map[string]string{"kind": rel.Kind, "target": rel.Target, "target_file": rel.TargetFile})
+	}
+	props["unbound_fsm_relations"] = relations
+	return facts.Fact{Kind: facts.KindExtraction, Name: "typescript:fsm:source-binding:" + filepath.ToSlash(overlay.File) + ":" + overlay.Name,
+		File: overlay.File, Line: overlay.Line, EndLine: overlay.EndLine, Props: props}
+}
+
 func appendFSMReads(rec *FileRecord, paths []string, repoPath string, read func(string) []byte) {
-	if rec == nil || len(paths) == 0 {
+	if rec == nil {
+		return
+	}
+	rec.FSMReads = nil
+	if len(paths) == 0 {
 		return
 	}
 	set := map[string]bool{}
+	fsmSet := map[string]bool{}
 	for _, f := range rec.SideReads {
 		set[filepath.ToSlash(f)] = true
 	}
@@ -292,6 +340,7 @@ func appendFSMReads(rec *FileRecord, paths []string, repoPath string, read func(
 		if f == rec.File {
 			continue
 		}
+		fsmSet[f] = true
 		set[f] = true
 		b := read(f)
 		if b == nil {
@@ -305,6 +354,10 @@ func appendFSMReads(rec *FileRecord, paths []string, repoPath string, read func(
 		rec.SideReads = append(rec.SideReads, f)
 	}
 	sortStrings(rec.SideReads)
+	for f := range fsmSet {
+		rec.FSMReads = append(rec.FSMReads, f)
+	}
+	sortStrings(rec.FSMReads)
 }
 
 func sortStrings(s []string) { sort.Strings(s) }

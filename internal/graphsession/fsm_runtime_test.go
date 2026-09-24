@@ -150,10 +150,12 @@ func TestPinnedProductFSMRuntimePublicationAndDelta(t *testing.T) {
 			t.Errorf("pinned Product transition was not published: %s", name)
 		}
 	}
-	if !consumerHasRelation(consumer, "stepClaimRequested", facts.RelFSMDispatches, "scan-provider-job/event:ClaimRequested") {
+	if !consumerHasResolvedRelation(consumer, "services/workers/src/application.stepClaimRequested", "services/workers/src/application/providerJobClaimStep.ts",
+		facts.RelFSMDispatches, "scan-provider-job/event:ClaimRequested", facts.KindFSMEvent, "packages/scan-engine/src/machines/providerJob.ts") {
 		t.Fatal("resolved Effect sink did not publish the ClaimRequested dispatch")
 	}
-	if !consumerHasRelation(consumer, "sendForgotPasswordIntent", facts.RelFSMDispatches, "mobile-app/event:FORGOT_PASSWORD_RESEND_EMAIL") {
+	if !consumerHasResolvedRelation(consumer, "apps/mobile/src.OnyxApp.renderForgotPasswordScreen.sendForgotPasswordIntent", "apps/mobile/src/App.tsx",
+		facts.RelFSMDispatches, "mobile-app/event:FORGOT_PASSWORD_RESEND_EMAIL", facts.KindFSMEvent, "apps/mobile/src/behavior/mobileAppInterpreter.ts") {
 		t.Fatal("resolved mobile runtime did not publish the forgot-password event dispatch")
 	}
 	if !consumerHasRelation(consumer, "mobile-app/state:forgotPassword.requestingReset", facts.RelFSMEntryEmits, "mobile-app/command:requestPasswordReset") {
@@ -219,8 +221,10 @@ func TestPinnedProductFSMRuntimePublicationAndDelta(t *testing.T) {
 		t.Fatalf("pinned Product FSM edit did not publish a delta: result=%+v events=%d", delta, deltaEvents)
 	}
 	applyRun(t, consumer, deltaSink)
-	if consumerHasRelation(consumer, "sendForgotPasswordIntent", facts.RelFSMDispatches, "mobile-app/event:FORGOT_PASSWORD_RESEND_EMAIL") ||
-		!consumerHasRelation(consumer, "sendForgotPasswordIntent", facts.RelFSMDispatches, "mobile-app/event:FORGOT_PASSWORD_SUBMIT_EMAIL") {
+	if consumerHasResolvedRelation(consumer, "apps/mobile/src.OnyxApp.renderForgotPasswordScreen.sendForgotPasswordIntent", "apps/mobile/src/App.tsx",
+		facts.RelFSMDispatches, "mobile-app/event:FORGOT_PASSWORD_RESEND_EMAIL", facts.KindFSMEvent, "apps/mobile/src/behavior/mobileAppInterpreter.ts") ||
+		!consumerHasResolvedRelation(consumer, "apps/mobile/src.OnyxApp.renderForgotPasswordScreen.sendForgotPasswordIntent", "apps/mobile/src/App.tsx",
+			facts.RelFSMDispatches, "mobile-app/event:FORGOT_PASSWORD_SUBMIT_EMAIL", facts.KindFSMEvent, "apps/mobile/src/behavior/mobileAppInterpreter.ts") {
 		t.Fatal("changed one-callee converter return was not reflected in the dispatch graph")
 	}
 	if !consumerHasNode(consumer, facts.KindFSMTransition, "mobile-app/transition:transitionForgotPassword/forgotPassword.*/FORGOT_PASSWORD_RESEND_EMAIL|FORGOT_PASSWORD_SUBMIT_EMAIL->forgotPassword.requestingReset") {
@@ -572,7 +576,7 @@ export function dispatchIntent(intent: string) { sendUi(intentToEvent(intent)); 
 		t.Fatal("initial machine and dispatch files were not parsed")
 	}
 	applyRun(t, consumer, firstSink)
-	if !consumerHasRelation(consumer, "dispatchIntent", facts.RelFSMDispatches, "app/event:A") {
+	if !consumerHasResolvedRelation(consumer, "..dispatchIntent", "App.tsx", facts.RelFSMDispatches, "app/event:A", facts.KindFSMEvent, "machine.ts") {
 		t.Fatal("configured runtime did not publish the literal converter event")
 	}
 
@@ -598,7 +602,8 @@ export function dispatchIntent(intent: string) { sendUi(intentToEvent(intent)); 
 		t.Fatalf("converter return edit skipped the dispatch owner: parsed_app=%v result=%+v records=%d", parsedApp, delta, len(deltaSink.CloneRecords()))
 	}
 	applyRun(t, consumer, deltaSink)
-	if consumerHasRelation(consumer, "dispatchIntent", facts.RelFSMDispatches, "app/event:A") || !consumerHasRelation(consumer, "dispatchIntent", facts.RelFSMDispatches, "app/event:B") {
+	if consumerHasResolvedRelation(consumer, "..dispatchIntent", "App.tsx", facts.RelFSMDispatches, "app/event:A", facts.KindFSMEvent, "machine.ts") ||
+		!consumerHasResolvedRelation(consumer, "..dispatchIntent", "App.tsx", facts.RelFSMDispatches, "app/event:B", facts.KindFSMEvent, "machine.ts") {
 		t.Fatal("dispatch delta retained A or omitted the callee's current B return")
 	}
 	coldSink := &graphstream.MemorySink{}
@@ -627,6 +632,8 @@ export function createRegistration() {
     rules: [{ id: 'start', from: 'Idle', on: 'START', to: 'Done' }],
   }) };
 }
+
+
 `,
 		"handlers.ts": `import type { JobCommand } from './machine';
 export function oldHandler(command: JobCommand) {
@@ -658,7 +665,7 @@ export function oldHandler(command: JobCommand) {
 		t.Fatal(err)
 	}
 	applyRun(t, consumer, initialSink)
-	if !consumerHasRelation(consumer, "oldHandler", facts.RelFSMHandlesCommand, "jobs/command:Save") {
+	if !consumerHasResolvedRelation(consumer, "..oldHandler", "handlers.ts", facts.RelFSMHandlesCommand, "jobs/command:Save", facts.KindFSMCommand, "machine.ts") {
 		t.Fatal("initial type-bound command handler was not published")
 	}
 
@@ -681,8 +688,8 @@ export function oldHandler(command: JobCommand) {
 	}
 	applyRun(t, consumer, renameSink)
 	if rename.TargetGeneration != initial.TargetGeneration+1 ||
-		consumerHasRelation(consumer, "oldHandler", facts.RelFSMHandlesCommand, "jobs/command:Save") ||
-		!consumerHasRelation(consumer, "newHandler", facts.RelFSMHandlesCommand, "jobs/command:Save") {
+		consumerHasResolvedRelation(consumer, "..oldHandler", "handlers.ts", facts.RelFSMHandlesCommand, "jobs/command:Save", facts.KindFSMCommand, "machine.ts") ||
+		!consumerHasResolvedRelation(consumer, "..newHandler", "handlers.ts", facts.RelFSMHandlesCommand, "jobs/command:Save", facts.KindFSMCommand, "machine.ts") {
 		t.Fatalf("handler rename retained stale evidence or omitted its replacement: result=%+v", rename)
 	}
 	assertFSMConsumerCold(t, consumer, eng, dir, "handler-rename-cold")
@@ -697,10 +704,145 @@ export function oldHandler(command: JobCommand) {
 	}
 	applyRun(t, consumer, deleteSink)
 	if deleted.TargetGeneration != rename.TargetGeneration+1 ||
-		consumerHasRelation(consumer, "newHandler", facts.RelFSMHandlesCommand, "jobs/command:Save") {
+		consumerHasResolvedRelation(consumer, "..newHandler", "handlers.ts", facts.RelFSMHandlesCommand, "jobs/command:Save", facts.KindFSMCommand, "machine.ts") {
 		t.Fatalf("handler deletion retained its owned evidence: result=%+v", deleted)
 	}
 	assertFSMConsumerCold(t, consumer, eng, dir, "handler-delete-cold")
+}
+
+func TestFSMRuntimeImportedUnionBodyChangeMatchesColdAndRestores(t *testing.T) {
+	for _, tc := range []struct {
+		name          string
+		authoritative bool
+	}{{"v1", false}, {"v2", true}} {
+		t.Run(tc.name, func(t *testing.T) {
+			dir := setupTSRepo(t, map[string]string{
+				"machine.ts": `export type AppState = 'idle';
+export type AppEvent = { type: 'A' } | { type: 'B' };
+function enterState(state: AppState) { return state; }
+function rejected(state: AppState, _event: string) { return state; }
+export function dispatch(state: AppState, event: AppEvent) {
+  if (event.type === 'A') return enterState('idle');
+  return rejected(state, event.type);
+}`,
+				"runtime.ts": `import type { AppEvent } from './machine';
+export function createRuntime() { return { send(_event: AppEvent) {} }; }`,
+				"intent.ts": `export type Intent = { type: 'one' } | { type: 'two' };`,
+				"converter.ts": `import type { AppEvent } from './machine';
+import type { Intent } from './intent';
+export function intentToEvent(intent: Intent): AppEvent {
+  switch (intent.type) {
+    case 'one': return { type: 'A' };
+    case 'two': return { type: 'B' };
+  }
+}`,
+				"App.tsx": `import { createRuntime } from './runtime';
+import type { AppEvent } from './machine';
+import type { Intent } from './intent';
+import { intentToEvent } from './converter';
+const runtime = createRuntime();
+const send = runtime.send;
+function sendUi(event: AppEvent) { send(event); }
+export function dispatchIntent(intent: Intent) { sendUi(intentToEvent(intent)); }`,
+			})
+			spec := fsm.Spec{ID: "app", Adapter: fsm.AdapterReducerInterpreter, File: "machine.ts",
+				Dispatcher: "dispatch", Enter: "enterState", Reject: "rejected", StateType: "AppState", EventType: "AppEvent",
+				DispatchFiles: []string{"App.tsx"},
+				DispatchSinks: []fsm.DispatchSink{{Factory: fsm.SymbolRef{Module: "runtime.ts", Export: "createRuntime"}, Method: "send"}},
+			}
+			cfg := config.Default()
+			cfg.Repo, cfg.Output.Dir, cfg.StateMachines = dir, ".enola", []fsm.Spec{spec}
+			newEngine := func() *engine.Engine {
+				eng, err := engine.New(cfg)
+				if err != nil {
+					t.Fatal(err)
+				}
+				eng.RegisterExtractor(tsextractor.New())
+				return eng
+			}
+			eng := newEngine()
+			state := filepath.Join(dir, ".enola", "fsm-imported-union-"+tc.name)
+			options := Options{StateDir: state, AuthoritativeFiles: tc.authoritative}
+			consumer := NewConsumer()
+			initialSink := &graphstream.MemorySink{}
+			initial, err := Run(context.Background(), eng, dir, initialSink, options)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if initial.TargetGeneration != 1 || initial.ParsedFiles == 0 {
+				t.Fatalf("initial imported-union graph missing: %+v", initial)
+			}
+			applyRun(t, consumer, initialSink)
+			for _, event := range []string{"app/event:A", "app/event:B"} {
+				if !consumerHasResolvedRelation(consumer, "..dispatchIntent", "App.tsx", facts.RelFSMDispatches, event, facts.KindFSMEvent, "machine.ts") {
+					t.Fatalf("initial converter dispatch %s is not source-bound/resolved", event)
+				}
+			}
+
+			intentPath := filepath.Join(dir, "intent.ts")
+			if err := os.WriteFile(intentPath, []byte(`export type Intent = { type: 'one' } | { type: 'two' } | { type: 'three' };`), 0o644); err != nil {
+				t.Fatal(err)
+			}
+			parsedApp := false
+			deltaSink := &graphstream.MemorySink{}
+			delta, err := Run(context.Background(), eng, dir, deltaSink, Options{
+				StateDir: state, AuthoritativeFiles: tc.authoritative,
+				OnBeforeParse: func(rel string) { parsedApp = parsedApp || rel == "App.tsx" },
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !parsedApp || delta.ParsedFiles == 0 || len(deltaSink.CloneRecords()) == 0 {
+				t.Fatalf("imported type-body change skipped the dispatch owner: parsedApp=%v result=%+v", parsedApp, delta)
+			}
+			applyRun(t, consumer, deltaSink)
+			for _, event := range []string{"app/event:A", "app/event:B"} {
+				if consumerHasResolvedRelation(consumer, "..dispatchIntent", "App.tsx", facts.RelFSMDispatches, event, facts.KindFSMEvent, "machine.ts") {
+					t.Fatalf("non-exhaustive converter retained proven dispatch %s", event)
+				}
+			}
+			if !consumerHasResolvedRelation(consumer, "..dispatchIntent", "App.tsx", facts.RelFSMDispatchesUnknownEvent, "app", facts.KindFSMMachine, "machine.ts") {
+				t.Fatal("expanded imported union lost its unknown dispatch coverage")
+			}
+			coldSink := &graphstream.MemorySink{}
+			if _, err := Run(context.Background(), newEngine(), dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "fsm-imported-union-cold-"+tc.name), AuthoritativeFiles: tc.authoritative, ForceInitial: true}); err != nil {
+				t.Fatal(err)
+			}
+			cold := NewConsumer()
+			applyRun(t, cold, coldSink)
+			assertAppliedEqualsCold(t, consumer, cold)
+
+			nochangeSink := &graphstream.MemorySink{}
+			nochange, err := Run(context.Background(), eng, dir, nochangeSink, options)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if nochange.ParsedFiles != 0 || nochange.OwnersPublished != 0 || len(nochangeSink.CloneRecords()) != 0 || nochange.TargetGeneration != delta.TargetGeneration {
+				t.Fatalf("unchanged expanded union did not stay silent: result=%+v records=%d", nochange, len(nochangeSink.CloneRecords()))
+			}
+
+			if err := os.WriteFile(intentPath, []byte(`export type Intent = { type: 'one' } | { type: 'two' };`), 0o644); err != nil {
+				t.Fatal(err)
+			}
+			restoreSink := &graphstream.MemorySink{}
+			if _, err := Run(context.Background(), eng, dir, restoreSink, options); err != nil {
+				t.Fatal(err)
+			}
+			applyRun(t, consumer, restoreSink)
+			for _, event := range []string{"app/event:A", "app/event:B"} {
+				if !consumerHasResolvedRelation(consumer, "..dispatchIntent", "App.tsx", facts.RelFSMDispatches, event, facts.KindFSMEvent, "machine.ts") {
+					t.Fatalf("restoring closed union did not restore dispatch %s", event)
+				}
+			}
+			restoreColdSink := &graphstream.MemorySink{}
+			if _, err := Run(context.Background(), newEngine(), dir, restoreColdSink, Options{StateDir: filepath.Join(dir, ".enola", "fsm-imported-union-restore-cold-"+tc.name), AuthoritativeFiles: tc.authoritative, ForceInitial: true}); err != nil {
+				t.Fatal(err)
+			}
+			restoreCold := NewConsumer()
+			applyRun(t, restoreCold, restoreColdSink)
+			assertAppliedEqualsCold(t, consumer, restoreCold)
+		})
+	}
 }
 
 func assertFSMConsumerCold(t *testing.T, got *Consumer, eng *engine.Engine, dir, stateName string) {
@@ -736,6 +878,29 @@ func consumerHasRelation(c *Consumer, source, kind, target string) bool {
 			for _, edge := range c.Edges[owner] {
 				if edge.FromID == node.ID && edge.Kind == kind && edge.TargetName == target {
 					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+func consumerHasResolvedRelation(c *Consumer, source, sourceFile, relationKind, target, targetKind, targetFile string) bool {
+	for owner, nodes := range c.Owners {
+		for _, sourceNode := range nodes {
+			if sourceNode.Kind != facts.KindSymbol || sourceNode.Name != source || sourceNode.File != sourceFile {
+				continue
+			}
+			for _, edge := range c.Edges[owner] {
+				if edge.FromID != sourceNode.ID || edge.Kind != relationKind || edge.TargetName != target || edge.Resolution != graphstream.ResResolved || edge.TargetID == "" {
+					continue
+				}
+				for _, targetNodes := range c.Owners {
+					for _, targetNode := range targetNodes {
+						if targetNode.ID == edge.TargetID && targetNode.Kind == targetKind && targetNode.Name == target && targetNode.File == targetFile {
+							return true
+						}
+					}
 				}
 			}
 		}

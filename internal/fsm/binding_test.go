@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/enola-labs/enola/internal/facts"
+	sitter "github.com/tree-sitter/go-tree-sitter"
 )
 
 func TestAdmissionAndBranchIdentity(t *testing.T) {
@@ -92,13 +93,17 @@ export function dispatchIntent(intent: string) { sendUi(intentToEvent(intent)); 
 	}
 	a, _ := analyzerForSources([]Spec{spec}, sources)
 	appFacts, reads := a.ExtractFile("App.tsx", sources["App.tsx"])
+	calleeFacts, _ := a.ExtractFile("converter.ts", sources["converter.ts"])
 	for _, event := range []string{"A", "B"} {
 		target := "app/event:" + event
 		if !hasDispatch(appFacts, "dispatchIntent", target) {
 			t.Errorf("resolved converter result was not dispatched: %s", target)
 		}
-		if !hasConstructedEvent(appFacts, target) {
-			t.Errorf("event construction was not represented separately: %s", target)
+		if hasConstructedEvent(appFacts, target) {
+			t.Errorf("caller contribution contains a foreign callee construction: %s", target)
+		}
+		if !hasConstructedEvent(calleeFacts, target) {
+			t.Errorf("callee-owned event construction was not represented separately: %s", target)
 		}
 	}
 	if !containsPath(reads, "converter.ts") {
@@ -116,6 +121,271 @@ export function intentToEvent(intent: string): AppEvent { return { type: intent 
 	if hasDispatch(unknownFacts, "dispatchIntent", "app/event:A") || hasDispatch(unknownFacts, "dispatchIntent", "app/event:B") {
 		t.Fatal("dynamic event return produced a concrete dispatch edge")
 	}
+}
+
+func TestConfiguredWrapperCallsRespectLexicalShadowing(t *testing.T) {
+	for _, tc := range []struct {
+		name, before, after string
+		wantDispatch        bool
+	}{
+		{name: "baseline-bound-wrapper", wantDispatch: true},
+		{name: "local-wrapper-shadow", before: "export function dispatchIntent(intent: Intent) { sendUi(intentToEvent(intent)); }", after: "export function dispatchIntent(intent: Intent) { const sendUi = (_event: AppEvent) => {}; sendUi(intentToEvent(intent)); }"},
+		{name: "parameter-wrapper-shadow", before: "dispatchIntent(intent: Intent)", after: "dispatchIntent(intent: Intent, sendUi: (event: AppEvent) => void)"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			sources := map[string][]byte{
+				"machine.ts": []byte(`export type AppState = 'idle'; export type AppEvent = { type: 'A' } | { type: 'B' };
+function enterState(state: AppState) { return state; }
+function rejected(state: AppState, _event: string) { return state; }
+export function dispatch(state: AppState, event: AppEvent) {
+  if (event.type === 'A') return enterState('idle');
+  return rejected(state, event.type);
+}`),
+				"runtime.ts": []byte(`import type { AppEvent } from './machine'; export function createRuntime() { return { send(event: AppEvent) {} }; }`),
+				"converter.ts": []byte(`import type { AppEvent } from './machine';
+export type Intent = { type: 'one' } | { type: 'two' };
+export function intentToEvent(intent: Intent): AppEvent {
+  switch (intent.type) { case 'one': return { type: 'A' }; case 'two': return { type: 'B' }; }
+}`),
+				"App.tsx": []byte(`import { createRuntime } from './runtime';
+import { intentToEvent, type Intent } from './converter';
+import type { AppEvent } from './machine';
+const runtime = createRuntime();
+const send = runtime.send;
+function sendUi(event: AppEvent) { send(event); }
+export function dispatchSibling(intent: Intent) { sendUi(intentToEvent(intent)); }
+export function dispatchIntent(intent: Intent) { sendUi(intentToEvent(intent)); }`),
+			}
+			if tc.before != "" {
+				app := string(sources["App.tsx"])
+				if strings.Count(app, tc.before) != 1 {
+					t.Fatalf("mutation anchor %q is not unique", tc.before)
+				}
+				sources["App.tsx"] = []byte(strings.Replace(app, tc.before, tc.after, 1))
+			}
+			spec := Spec{ID: "app", Adapter: AdapterReducerInterpreter, File: "machine.ts",
+				Dispatcher: "dispatch", Enter: "enterState", Reject: "rejected", StateType: "AppState", EventType: "AppEvent",
+				DispatchFiles: []string{"App.tsx"},
+				DispatchSinks: []DispatchSink{{Factory: SymbolRef{Module: "runtime.ts", Export: "createRuntime"}, Method: "send"}},
+			}
+			a, _ := analyzerForSources([]Spec{spec}, sources)
+			facts, _ := a.ExtractFile("App.tsx", sources["App.tsx"])
+			if got := hasSourceDispatch(facts, "App.tsx", "dispatchIntent", "app/event:A"); got != tc.wantDispatch {
+				t.Fatalf("shadowed caller dispatch = %v, want %v", got, tc.wantDispatch)
+			}
+			if !hasSourceDispatch(facts, "App.tsx", "dispatchSibling", "app/event:A") {
+				t.Fatal("unshadowed sibling lost its proven wrapper dispatch")
+			}
+		})
+	}
+}
+
+func TestImportedClosedUnionProvesGroupedConverterSwitchAndUnknownExits(t *testing.T) {
+	caller := []byte(`import { toEvent } from './converter';
+sendUi(toEvent(intent));`)
+	converter := `import type { Intent } from './intent';
+export function toEvent(intent: Intent) {
+  switch (intent.type) {
+    case 'A':
+    case 'B':
+      return { type: 'GO' } as const;
+  }
+}`
+	typeSource := `export type Intent = { type: 'A' } | { type: 'B' };`
+	conditionalConverter := strings.Replace(converter, "  switch (intent.type)", "  if (Date.now() > 0) {\n    switch (intent.type)", 1)
+	conditionalConverter = strings.TrimSuffix(conditionalConverter, "}") + "  }\n}"
+	cases := []struct {
+		name, converter, typeSource string
+		includeType, resolved       bool
+	}{
+		{"closed-grouped-union", converter, typeSource, true, true},
+		{"expanded-union", converter, `export type Intent = { type: 'A' } | { type: 'B' } | { type: 'C' };`, true, false},
+		{"missing-case", strings.Replace(converter, "    case 'B':\n", "", 1), typeSource, true, false},
+		{"missing-type-dependency", converter, typeSource, false, false},
+		{"nested-unused-return", strings.Replace(converter, "  switch (intent.type)", "  function unused() { return { type: 'DECOY' }; }\n  switch (intent.type)", 1), typeSource, true, true},
+		{"conditional-exhaustive-switch", conditionalConverter, typeSource, true, false},
+		{"bare-return", `export function toEvent(intent) { if (!intent) return; return { type: 'GO' }; }`, "", false, false},
+		{"fallthrough", `export function toEvent(intent) { if (intent) return { type: 'GO' }; }`, "", false, false},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			sources := map[string][]byte{"caller.ts": caller, "converter.ts": []byte(tc.converter)}
+			if tc.includeType {
+				sources["intent.ts"] = []byte(tc.typeSource)
+			}
+			a, _ := analyzerForSources(nil, sources)
+			root, kinds, done := parse("caller.ts", caller)
+			if done == nil {
+				t.Fatal("parse failed")
+			}
+			defer done()
+			var args []*sitter.Node
+			walk(root, func(n *sitter.Node) {
+				if kinds.Of(n) == "call_expression" && calleeName(n, caller, kinds) == "sendUi" {
+					args = callArguments(n, kinds)
+				}
+			})
+			if len(args) != 1 {
+				t.Fatal("dispatch argument missing")
+			}
+			tags, resolved, converterFile, reads := a.eventArgumentTagsWithReads(&machineModel{machine: "app"}, "caller.ts", args, caller, kinds)
+			if resolved != tc.resolved {
+				t.Fatalf("converter resolved=%v tags=%v, want %v", resolved, tags, tc.resolved)
+			}
+			if tc.resolved {
+				if len(tags) != 1 || tags[0] != "GO" || converterFile != "converter.ts" {
+					t.Fatalf("converter result = tags %v, dependency %q", tags, converterFile)
+				}
+				if !containsPath(reads, "intent.ts") {
+					t.Errorf("closed union dependency missing from delta reads: %v", reads)
+				}
+			}
+			if tc.name == "conditional-exhaustive-switch" && !containsPath(reads, "intent.ts") {
+				t.Errorf("partial converter did not retain its imported type dependency: %v", reads)
+			}
+		})
+	}
+}
+
+func TestWrapperDispatchRequiresValuePreservingArgument(t *testing.T) {
+	app := `import { createRuntime } from './runtime';
+import { withMachineEventSource } from './helper';
+import type { AppEvent } from './machine';
+const runtime = createRuntime();
+const send = runtime.send;
+function sendUi(event: AppEvent) { send(withMachineEventSource(event, testID)); }
+export function dispatchIntent() { sendUi({ type: 'A' }); }`
+	helpers := map[string]string{
+		"decorator": `export function withMachineEventSource<E extends { type: string }>(event: E, testID: string) {
+  if (!testID) return event;
+  return { ...event, _source: { testID } };
+}`,
+		"metadata-only": `export function withMachineEventSource<E extends { type: string }>(event: E, testID: string) {
+  return { type: 'BOOT', metadata: event, testID };
+}`,
+		"unknown-transform": `export function withMachineEventSource<E extends { type: string }>(event: E, testID: string) {
+  return discard(event);
+}`,
+		"quoted-type-override": `export function withMachineEventSource<E extends { type: string }>(event: E, testID: string) {
+  return { ...event, "type": "BOOT", _source: { testID } };
+}`,
+		"computed-type-override": `export function withMachineEventSource<E extends { type: string }>(event: E, testID: string) {
+  const key: string = getKey();
+  return { ...event, [key]: "BOOT", _source: { testID } };
+}`,
+	}
+	sourcesFor := func(helper string, source string) map[string][]byte {
+		return map[string][]byte{
+			"machine.ts": []byte(`export type AppState = 'idle';
+export type AppEvent = { type: 'A' };
+function enterState(state: AppState) { return state; }
+function rejected(state: AppState, _event: string) { return state; }
+export function dispatch(state: AppState, event: AppEvent) {
+  if (event.type === 'A') return enterState('idle');
+  return rejected(state, event.type);
+}`),
+			"runtime.ts": []byte(`export function createRuntime() { return { send(_event: unknown) {} }; }`),
+			"helper.ts":  []byte(source),
+			"App.tsx":    []byte(strings.Replace(app, "withMachineEventSource", helper, 1)),
+		}
+	}
+	spec := Spec{ID: "app", Adapter: AdapterReducerInterpreter, File: "machine.ts", Dispatcher: "dispatch",
+		Enter: "enterState", Reject: "rejected", StateType: "AppState", EventType: "AppEvent",
+		DispatchFiles: []string{"App.tsx"}, DispatchSinks: []DispatchSink{{Factory: SymbolRef{Module: "runtime.ts", Export: "createRuntime"}, Method: "send"}}}
+	for _, tc := range []struct {
+		name, helperName string
+		wantDispatch     bool
+	}{
+		{"source-grounded-decorator", "withMachineEventSource", true},
+		{"fixed-tag-metadata", "withMachineEventSource", false},
+		{"unknown-transformer", "withMachineEventSource", false},
+		{"quoted-type-override", "withMachineEventSource", false},
+		{"computed-type-override", "withMachineEventSource", false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			sources := sourcesFor(tc.helperName, helpers[map[string]string{
+				"source-grounded-decorator": "decorator",
+				"fixed-tag-metadata":        "metadata-only",
+				"unknown-transformer":       "unknown-transform",
+				"quoted-type-override":      "quoted-type-override",
+				"computed-type-override":    "computed-type-override",
+			}[tc.name]])
+			a, _ := analyzerForSources([]Spec{spec}, sources)
+			appFacts, reads := a.ExtractFile("App.tsx", sources["App.tsx"])
+			got := hasSourceDispatch(appFacts, "App.tsx", "dispatchIntent", "app/event:A")
+			if got != tc.wantDispatch {
+				t.Fatalf("caller event dispatch = %v, want %v; facts=%#v", got, tc.wantDispatch, appFacts)
+			}
+			if !containsPath(reads, "helper.ts") {
+				t.Fatalf("forwarding proof did not retain helper source dependency: %v", reads)
+			}
+		})
+	}
+	commaSources := sourcesFor("withMachineEventSource", helpers["decorator"])
+	commaSources["App.tsx"] = []byte(strings.Replace(string(commaSources["App.tsx"]),
+		"send(withMachineEventSource(event, testID))", "send((discard(event), { type: 'BOOT' }))", 1))
+	a, _ := analyzerForSources([]Spec{spec}, commaSources)
+	commaFacts, _ := a.ExtractFile("App.tsx", commaSources["App.tsx"])
+	if hasSourceDispatch(commaFacts, "App.tsx", "dispatchIntent", "app/event:A") {
+		t.Fatal("comma-discard expression incorrectly forwarded the caller event")
+	}
+}
+
+func TestNestedInteractionSourceCarriesExactCallableDeclaration(t *testing.T) {
+	sources := map[string][]byte{
+		"machine.ts": []byte(`export type AppState = 'idle';
+export type AppEvent = { type: 'A' };
+function enterState(state: AppState) { return state; }
+function rejected(state: AppState, _event: string) { return state; }
+export function dispatch(state: AppState, event: AppEvent) {
+  if (event.type === 'A') return enterState('idle');
+  return rejected(state, event.type);
+}`),
+		"runtime.ts": []byte(`export function createRuntime() { return { send(_event: unknown) {} }; }`),
+		"App.tsx": []byte(`import { createRuntime } from './runtime';
+import type { AppEvent } from './machine';
+const runtime = createRuntime();
+const send = runtime.send;
+function sendUi(event: AppEvent) { send(event); }
+export function App() {
+  const dispatchIntent = () => sendUi({ type: 'A' });
+  dispatchIntent();
+}`),
+	}
+	spec := Spec{ID: "app", Adapter: AdapterReducerInterpreter, File: "machine.ts", Dispatcher: "dispatch",
+		Enter: "enterState", Reject: "rejected", StateType: "AppState", EventType: "AppEvent",
+		DispatchFiles: []string{"App.tsx"}, DispatchSinks: []DispatchSink{{Factory: SymbolRef{Module: "runtime.ts", Export: "createRuntime"}, Method: "send"}}}
+	a, _ := analyzerForSources([]Spec{spec}, sources)
+	appFacts, _ := a.ExtractFile("App.tsx", sources["App.tsx"])
+	if !hasSourceDispatch(appFacts, "App.tsx", "dispatchIntent", "app/event:A") {
+		t.Fatal("nested caller did not retain the event dispatch evidence")
+	}
+	var sourceSymbol, overlay bool
+	for _, fact := range appFacts {
+		if fact.Kind == facts.KindSymbol && fact.Name == "..App.dispatchIntent" && fact.Props["fsm_source_binding"] == "tree_sitter_nested_declaration" {
+			sourceSymbol = fact.Line > 0 && fact.EndLine >= fact.Line && fact.Props["symbol_kind"] == facts.SymbolFunc
+		}
+		if fact.Name == "dispatchIntent" && fact.Props["fsm_source_identity"] == "..App.dispatchIntent" {
+			overlay = len(fact.Relations) > 0
+		}
+	}
+	if !sourceSymbol || !overlay {
+		t.Fatalf("nested source AST identity was not retained: source=%v overlay=%v facts=%#v", sourceSymbol, overlay, appFacts)
+	}
+}
+
+func hasSourceDispatch(all []facts.Fact, file, source, event string) bool {
+	for _, fact := range all {
+		if fact.File != file || (fact.Name != source && fact.Props["fsm_source_identity"] != source) {
+			continue
+		}
+		for _, relation := range fact.Relations {
+			if relation.Kind == facts.RelFSMDispatches && relation.Target == event {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func TestObjectSinkFactoryAliasAndReturnedMethodBinding(t *testing.T) {

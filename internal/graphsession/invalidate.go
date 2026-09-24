@@ -253,6 +253,13 @@ func replayableDependent(rec *tsextractor.FileRecord) bool {
 	if rec == nil || !rec.ImportComplete {
 		return false
 	}
+	// FSM extraction records direct source-body reads (not only import/export
+	// membership). A type union or helper body can change a caller's FSM facts
+	// while its export surface stays fixed, so those owners must be reparsed when
+	// any recorded FSM read changes.
+	if len(rec.FSMReads) > 0 {
+		return false
+	}
 	if rec.GraphQLServer || len(rec.GraphQLSDL) > 0 || rec.GRPC != nil {
 		return false
 	}

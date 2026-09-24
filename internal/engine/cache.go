@@ -2616,7 +2616,9 @@ import (
 // swaps invalidate importers even when the exported-name set is unchanged.
 // v321: repository-configured TypeScript FSM machines, declaration/transition facts,
 // and their direct source read dependencies are recorded with the extractor cache.
-const cacheVersion = "v321"
+// v322: FSM returned-value/type dependencies, file-owned coverage, canonical source
+// binding and relation-kind constrained endpoint provenance change cached facts.
+const cacheVersion = "v322"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //
