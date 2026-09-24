@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "/opt/homebrew/bin/go",
+    "test",
+    "./...",
+    "-count=1",
+    "-timeout=20m"
+  ],
+  "exit_code": 0,
+  "elapsed_s": 430.83406170800004,
+  "before": {
+    "internal/graphsession/changes.go": "5734e4df9562170302a7852d09d5f4fc89ea81e821e05073ee996becfa1fd144",
+    "internal/graphsession/resident.go": "0209890136b2ec8a7f0fcd3a3947da47a0adf979d06bf5081df78047aeab3653",
+    "internal/graphsession/window_probe_test.go": "db4e5e8c35cb79661b7253ad2b9340f09bbc0c4c9457f976bcfd5936198b2d49",
+    "internal/graphsession/root_probe_review_test.go": "0202124eab52b31947caaf85289226c5af4740a6554909e42285b3ce969d8ef2"
+  },
+  "after": {
+    "internal/graphsession/changes.go": "5734e4df9562170302a7852d09d5f4fc89ea81e821e05073ee996becfa1fd144",
+    "internal/graphsession/resident.go": "0209890136b2ec8a7f0fcd3a3947da47a0adf979d06bf5081df78047aeab3653",
+    "internal/graphsession/window_probe_test.go": "db4e5e8c35cb79661b7253ad2b9340f09bbc0c4c9457f976bcfd5936198b2d49",
+    "internal/graphsession/root_probe_review_test.go": "0202124eab52b31947caaf85289226c5af4740a6554909e42285b3ce969d8ef2"
+  },
+  "stable_source": true
+}

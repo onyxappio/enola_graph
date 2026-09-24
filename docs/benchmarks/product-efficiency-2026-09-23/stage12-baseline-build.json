@@ -1,0 +1,14 @@
+{
+  "commit": "ec43523f8e3536578b3271524f5948aa5602a3de",
+  "working_tree": "",
+  "go": "go version go1.27.1 darwin/arm64",
+  "argv": [
+    "/opt/homebrew/bin/go",
+    "build",
+    "-trimpath",
+    "-o",
+    "/tmp/enola-stage12-watch-probe-review/enola-baseline",
+    "./cmd/enola"
+  ],
+  "sha256": "a6568d927cf37e640a3a38cbe27bf98b579400afe62806e3019775f954ce2afa"
+}

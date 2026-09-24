@@ -1,0 +1,12 @@
+=== RUN   TestRootProbeNewSaveBetweenProofAndCommit
+--- PASS: TestRootProbeNewSaveBetweenProofAndCommit (0.84s)
+=== RUN   TestRootProbeSourceUncertaintyBetweenProofAndCommit
+--- PASS: TestRootProbeSourceUncertaintyBetweenProofAndCommit (0.36s)
+=== RUN   TestRootProbeSilentDuplicateThenColdEqualEdit
+--- PASS: TestRootProbeSilentDuplicateThenColdEqualEdit (0.81s)
+=== RUN   TestRootProbeBusyRegistrationDeclinesPromptly
+--- PASS: TestRootProbeBusyRegistrationDeclinesPromptly (0.33s)
+=== RUN   TestRootProbeElapsedWorkDoesNotRestartWindow
+--- PASS: TestRootProbeElapsedWorkDoesNotRestartWindow (0.88s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	4.809s
