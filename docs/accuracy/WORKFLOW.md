@@ -74,3 +74,18 @@ assignments, as authorized by the user. This supersedes the Grok 4.6 coding
 selection above. Research remains Opus 5.5; the primary independently verifies
 results. Existing completed implementation remains subject to its normal
 acceptance checks. Keep worker notification, isolation, and publication rules.
+
+## Finite-state-machine research and approval — 2026-09-24
+
+Prioritize backend Effect-based machines and custom mobile state machines in
+upcoming research. Verify both entity extraction and direct relationships against
+real source: states, events, transitions, guards, reducers, and side effects.
+Effect usage alone does not establish that code implements a state machine.
+Distinguish current extraction defects from proposals requiring new graph types.
+
+**Exception to auto approval:** all findings from finite-state-machine research
+require explicit user approval before implementation. Present the source excerpt,
+expected versus actual graph behavior, and concise explanation with approve/reject
+buttons. Independent verification still precedes candidate presentation. Other
+accuracy candidates retain the standing auto-approval policy. Research may proceed
+without implementation approval.
