@@ -52,3 +52,28 @@ The agreed order is FSM/cache322 first, then Stage16/cache323 with its own cache
 Before integration, repeat the uninstrumented structural case under a confirmed quiet hold to resolve the RSS signal. The broader goal remains incomplete: fresh no-op is still about1.57s, initial is unchanged and watch has no demonstrated improvement. Follow-up state/indices reuse work is described in `NEXT_STARTUP_INVESTIGATION.md`; it is a candidate plan, not an implemented optimization.
 
 Historical inputs include three manifest transitions, two adding declared dependencies; there are no tsconfig changes in this chain. Tsconfig mutations are covered by differential tests rather than this historical sample. `stage16-history-input-audit.json` records the actual changed inputs.
+
+
+## Additional uninstrumented RSS series (partial)
+
+The follow-up window yielded five accepted CLI arms, each with all correctness
+checks passing and no sampled competing tests/builds/Enola processes. Repeats 4
+and 5 are complete alternating pairs; candidate repeat 6 is unpaired. The driver
+retained its original 21:20 UTC cutoff and refused baseline 6 when less than its
+100-second reserve remained. It exited nonzero for that deadline guard, not for
+a correctness failure. Both coordinators received END at 21:19 UTC. No unconfirmed
+extension was used. Raw metrics, receipts, hold evidence and ambient container
+samples are in `stage16-rss-followup/`.
+
+| Structural delta | Baseline RSS, bytes | Candidate RSS, bytes | Candidate change | Baseline wall, s | Candidate wall, s |
+|---|---:|---:|---:|---:|---:|
+| Repeat 4 | 639877120 | 640385024 | +0.08% | 3.498 | 3.370 |
+| Repeat 5 | 607862784 | 593657856 | -2.34% | 3.455 | 3.355 |
+| Repeat 6 (unpaired) | unavailable | 677920768 | unavailable | unavailable | 3.536 |
+
+The two complete follow-up pairs do not reproduce the original nonoverlapping
+RSS increase. This weakens a claim of a consistent regression, but does not erase
+the original three-pair signal or establish a cause. The unpaired high-RSS
+candidate run is retained, not discarded. Do not pool this incomplete cohort
+into the original medians or claim that memory acceptance is closed. Complete
+paired follow-up and validation of the eventual integrated build remain pending.
