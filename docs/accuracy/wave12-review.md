@@ -1,8 +1,8 @@
 # Wave 12 — independent accuracy review
 
-Verified integration: `54dc28864a874a9b44d8fe1c5d0a72d8c1729288`, including main `fba69b8`. Cache **v317**.
+Verified integration: `088577e35b06894c38ef249621e5822018c216ab`, including main `b7e2fe5430bbbb7fb604b22628a10a42dfc1ac7f`. Cache **v317**.
 Final planner correction: `c7343c75a3aaa28c0246148f52ba9838d242ed4b`.
-Independent binary SHA256: `2cd6e362b28e32ca8616069432f55650292035bd344d0d08a9f3c6fbdc016340`.
+Independent binary SHA256: `18d146c03a4f24459011d3b58fe112426f4564d8a1d4dde833c0c2cbeb68d251`.
 
 ## Behavior
 
@@ -17,7 +17,7 @@ Independent binary SHA256: `2cd6e362b28e32ca8616069432f55650292035bd344d0d08a9f3
 ## Final validation
 
 - All 16 primary gate groups passed: 11 focused groups, full Landings lifecycle, prior regressions, bounded source reads, alias race, and full Go.
-- Full `GOMAXPROCS=1 go test -p 1 ./... -count=1 -timeout 20m`: **PASS, 761.831 s**; graphsession **432.254 s**.
+- Full `GOMAXPROCS=1 go test -p 1 ./... -count=1 -timeout 20m`: **PASS, 847.025 s**; graphsession **585.144 s**.
 - All 18 full Landings stage/protocol combinations passed: original, warmup, page delete/restore, handler delete/restore, autoimport delete/restore, warmup restoration for both v1/v2. Every stage preserves exact cold/delta equality and silent no-change.
 - All 23 full-corpus acceptance groups passed, including four supported v316→v317 forks, exact cold equality, fork lineage, zero parses/events and stable generation on no-change, binding restoration and prior-wave semantics.
 - Final cumulative report has offline Twinkleplop highlighting and annotated source examples. All five new cards pass mobile overflow checks at 390 px; no external network dependencies.
@@ -42,13 +42,17 @@ Broad fallback is intentionally retained. The final v2 page deletion reparsed 1,
 
 Two golden files formerly expected false src.c/src.id loop-local references. Commit b33aa44 removes those edges using source evidence. Earlier metrics expectations similarly named local callback variables; the retained primary oracle changes only those source-proven expectations. The final full Go run passes outright; earlier failed receipts remain preserved.
 
+## Final main synchronization
+
+Merged main `6090161ea9eee44f782fe721bbe14d9e96c6adb4` into `ac224bf8b1c276642523f8617e129e0dca5a44ba`. The only change relative to the accepted runtime is `independent_retry_alias_context_test.go`; production code is identical. Its `TestIndependentRetryAliasContextRemainsColdEqual` passes independently (1.544 s). Prior complete acceptance remains applicable to unchanged production code.
+
 ## Local evidence
 
-- Build and all primary gates: `/tmp/enola-wave12-main3final-independent-review/{build,receipt}.json`.
-- Full 18-stage lifecycle: `/tmp/enola-wave12-main3final-full-landings-lifecycle/receipt.json`.
-- Fresh fork registry: `/tmp/enola-wave12-main3-full-review/`; full acceptance: `/tmp/enola-wave12-main3-full-acceptance/receipt.json`.
-- Source verdict: `/tmp/enola-wave12-main3-primary-full-source-verdict.json`; audit inputs and loop classifications have the same main3 prefix.
+- Build and all primary gates: `/tmp/enola-wave12-main4final-independent-review/{build,receipt}.json`.
+- Full 18-stage lifecycle: `/tmp/enola-wave12-main4final-full-landings-lifecycle/receipt.json`.
+- Fresh fork registry: `/tmp/enola-wave12-main4-full-review/`; full acceptance: `/tmp/enola-wave12-main4-full-acceptance/receipt.json`.
+- Source verdict: `/tmp/enola-wave12-main4-primary-full-source-verdict.json`; audit inputs and loop classifications have the same main3 prefix.
 - Source-pin integrity: `/tmp/enola-wave12-main1-source-pin-receipt.json` records all 13,650 included Product and 3,293 Landings files matching Git blobs, with only authorized Product exclusions.
-- Final HTML QA: `/tmp/enola-wave12-main2-report-final-qa.json` and adjacent card screenshots.
+- Final HTML QA: `/tmp/enola-wave12-main4-report-final-qa.json` and adjacent card screenshots.
 
 Consumed migration states must not be reused. Local evidence paths are machine-local; the cumulative HTML and this review are the portable summary. The continuous accuracy goal remains active for subsequent waves.
