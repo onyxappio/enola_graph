@@ -1,0 +1,29 @@
+=== RUN   TestRetryRejectedEndCommitsWhenBatchesArrive
+--- PASS: TestRetryRejectedEndCommitsWhenBatchesArrive (0.00s)
+=== RUN   TestIndependentConsecutiveRetryAliasContextRemainsColdEqual
+--- PASS: TestIndependentConsecutiveRetryAliasContextRemainsColdEqual (1.00s)
+=== RUN   TestIndependentConsecutiveRetryResolutionPrecedenceRemainsColdEqual
+--- PASS: TestIndependentConsecutiveRetryResolutionPrecedenceRemainsColdEqual (1.04s)
+=== RUN   TestIndependentConsecutiveRefusalsPreserveReusableParses
+--- PASS: TestIndependentConsecutiveRefusalsPreserveReusableParses (0.94s)
+=== RUN   TestIndependentConsecutiveRefusalsPreserveMultiHopParses
+--- PASS: TestIndependentConsecutiveRefusalsPreserveMultiHopParses (0.94s)
+=== RUN   TestConsecutiveRefusalChainKeepsOfferingReprovenRecords
+--- PASS: TestConsecutiveRefusalChainKeepsOfferingReprovenRecords (0.98s)
+=== RUN   TestConsecutiveRefusalOfferWithdrawnOnMembershipChange
+--- PASS: TestConsecutiveRefusalOfferWithdrawnOnMembershipChange (0.93s)
+=== RUN   TestConsecutiveRefusalCarriedRecordStillProvenPerFile
+--- PASS: TestConsecutiveRefusalCarriedRecordStillProvenPerFile (0.69s)
+=== RUN   TestConsecutiveRefusalCarriedRecordDroppedWhenFileRemoved
+--- PASS: TestConsecutiveRefusalCarriedRecordDroppedWhenFileRemoved (0.94s)
+=== RUN   TestRetryReusesUnmovedParsesAndStaysColdEqual
+    zz_retry_reuse_guard_test.go:97: retry reused 49 of 50 captured parses
+--- PASS: TestRetryReusesUnmovedParsesAndStaysColdEqual (1.12s)
+=== RUN   TestRetryOfferIsProvenPerFile
+--- PASS: TestRetryOfferIsProvenPerFile (0.43s)
+=== RUN   TestRetryDeclinesRecordWhoseSideReadMoved
+--- PASS: TestRetryDeclinesRecordWhoseSideReadMoved (0.81s)
+=== RUN   TestRetryDeclinesOfferWhenAliasTargetMoved
+--- PASS: TestRetryDeclinesOfferWhenAliasTargetMoved (0.93s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	11.237s

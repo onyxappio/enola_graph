@@ -1,0 +1,34 @@
+[
+  {
+    "arm": "baseline",
+    "argv": [
+      "/opt/homebrew/bin/go",
+      "build",
+      "-trimpath",
+      "-o",
+      "/tmp/enola-stage9-consecutive-retry-review/enola-baseline-ba5497a",
+      "./cmd/enola"
+    ],
+    "exit_code": 0,
+    "elapsed_s": 3.7387713750000002,
+    "output": "",
+    "sha256": "2ad2bd9d0192698d173f800ba4853fd38d6e2deb4b7792444c5f5d0d0d816a9c"
+  },
+  {
+    "arm": "candidate",
+    "argv": [
+      "/opt/homebrew/bin/go",
+      "build",
+      "-trimpath",
+      "-overlay",
+      "/tmp/enola-stage9-consecutive-retry-review/candidate-v2-overlay.json",
+      "-o",
+      "/tmp/enola-stage9-consecutive-retry-review/enola-candidate-ba5497a",
+      "./cmd/enola"
+    ],
+    "exit_code": 0,
+    "elapsed_s": 3.3812859160000004,
+    "output": "",
+    "sha256": "9e5352bf22ed1a3b5cf2741b4a79eabdeebcac9142148670bd860ece0a0f3faa"
+  }
+]

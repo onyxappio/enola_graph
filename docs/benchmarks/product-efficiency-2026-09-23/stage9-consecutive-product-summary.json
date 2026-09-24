@@ -1,0 +1,76 @@
+{
+  "baseline": {
+    "convergence_s": [
+      4.428764,
+      4.6798850000000005,
+      4.559917
+    ],
+    "median_s": 4.559917,
+    "min_s": 4.428764,
+    "max_s": 4.6798850000000005,
+    "initial_s": [
+      10.749953,
+      8.847464,
+      9.408190000000001
+    ],
+    "initial_median_s": 9.408190000000001,
+    "final_parsed_files": [
+      33,
+      33,
+      33
+    ],
+    "scopes": [
+      [
+        34
+      ],
+      [
+        34
+      ],
+      [
+        34
+      ]
+    ],
+    "binary_sha256": "2ad2bd9d0192698d173f800ba4853fd38d6e2deb4b7792444c5f5d0d0d816a9c"
+  },
+  "candidate": {
+    "convergence_s": [
+      4.331228,
+      4.288756,
+      4.326697
+    ],
+    "median_s": 4.326697,
+    "min_s": 4.288756,
+    "max_s": 4.331228,
+    "initial_s": [
+      10.228799,
+      8.899936,
+      9.203749
+    ],
+    "initial_median_s": 9.203749,
+    "final_parsed_files": [
+      11,
+      11,
+      11
+    ],
+    "scopes": [
+      [
+        34
+      ],
+      [
+        34
+      ],
+      [
+        34
+      ]
+    ],
+    "binary_sha256": "9e5352bf22ed1a3b5cf2741b4a79eabdeebcac9142148670bd860ece0a0f3faa"
+  },
+  "median_reduction_percent": 5.114566778298824,
+  "paired_reduction_s": [
+    0.09753599999999985,
+    0.3911290000000003,
+    0.2332200000000002
+  ],
+  "all_six_cold_equal_stable_two_refusals_silent_idle_and_noop": true,
+  "kind": "controlled two-refusal Product watch; not natural editing or ordinary delta acceptance"
+}
