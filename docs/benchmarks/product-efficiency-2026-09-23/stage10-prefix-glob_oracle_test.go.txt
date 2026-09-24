@@ -1,0 +1,82 @@
+package facts
+
+import (
+	"math/rand"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+// Frozen existing Match implementation: compare boolean and first-pattern
+// behavior, including unusual raw paths, without assuming legacy MatchGlob
+// and compiled Match have identical behavior outside normal repo paths.
+func (s *GlobSet) independentMatchAt5b0934c(relPath string) (string, bool) {
+	if s == nil || len(s.items) == 0 {
+		return "", false
+	}
+	var segs []string
+	base := relPath
+	if i := strings.LastIndex(relPath, "/"); i >= 0 {
+		base = relPath[i+1:]
+	}
+	ext := filepath.Ext(base)
+	for _, g := range s.items {
+		if g.needExt != "" && g.needExt != ext {
+			continue
+		}
+		if g.skipSeg != "" {
+			if segs == nil {
+				if relPath == "" {
+					segs = []string{""}
+				} else {
+					segs = strings.Split(relPath, "/")
+				}
+			}
+			for _, part := range segs {
+				if part == g.skipSeg {
+					return g.raw, true
+				}
+			}
+			continue
+		}
+		if one, ok := MatchGlob(relPath, []string{g.raw}); ok {
+			return one, true
+		}
+	}
+	return "", false
+}
+
+func TestIndependentGlobBooleanPreservesCompiledSemantics(t *testing.T) {
+	patterns := []string{"foo/**", "foo/**/**", "foo/**/x/**", "foo*/**", "foo?/**", "foo\\bar/**", "foo]/**", "./**", "../**", "//**", "foo//bar/**", "bar/**", "foo/bar/**", "./foo/**", "foo//**", "/**", "**/foo/**", "**/*.ts", "**/tests/**/*.ts", "foo/[ab]/**", "foo/\\*/**", "[", "foo/**/x", "café/**", "", "**/dist/**"}
+	paths := []string{"", ".", "..", "/", "foo", "foo/", "foo//x", "foo/../bar", "foo/./x", "foobar/x", "x/foo/y", "foo\\x", "café/x", "foo/a.ts", "./foo/x", "foo/bar", "foo/bar/x", "/foo/x", "foo]", "foo]/x", "foo*/x", "foo?/x", "foo/**", "foo/**/x", "foo/**/x/y", "../x", "foo//bar/x"}
+	rng := rand.New(rand.NewSource(50925))
+	parts := []string{"foo", "bar", "x", "..", ".", "café", "a.ts", "", "dist", "tests"}
+	for i := 0; i < 200; i++ {
+		var segs []string
+		for j := 0; j < 1+rng.Intn(5); j++ {
+			segs = append(segs, parts[rng.Intn(len(parts))])
+		}
+		paths = append(paths, strings.Join(segs, "/"))
+	}
+	for trial := 0; trial < 100; trial++ {
+		var selected []string
+		for j := 0; j < 1+rng.Intn(12); j++ {
+			selected = append(selected, patterns[rng.Intn(len(patterns))])
+		}
+		set := CompileGlobs(selected)
+		for _, path := range paths {
+			pattern, want := set.independentMatchAt5b0934c(path)
+			if got := set.MatchAny(path); got != want {
+				t.Fatalf("trial=%d patterns=%q path=%q boolean=%v want=%v", trial, selected, path, got, want)
+			}
+			gotPattern, got := set.Match(path)
+			if got != want || gotPattern != pattern {
+				t.Fatalf("first-pattern changed patterns=%q path=%q got=(%q,%v) want=(%q,%v)", selected, path, gotPattern, got, pattern, want)
+			}
+		}
+	}
+	var empty *GlobSet
+	if empty.MatchAny("foo/x") {
+		t.Fatal("nil set matched")
+	}
+}

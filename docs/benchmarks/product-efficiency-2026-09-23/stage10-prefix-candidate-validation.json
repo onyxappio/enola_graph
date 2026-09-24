@@ -1,0 +1,42 @@
+{
+  "source": "/private/tmp/enola-stage10-globfast/internal/facts/pathglob_set.go",
+  "sha256": "8e117aec68efaeee8413d347e343f0399ae31e8510e2850bb730c78643b46c95",
+  "head": "5b0934cef18479440840500596ee6066ca0664f6",
+  "checks": [
+    {
+      "check": "glob_oracle",
+      "argv": [
+        "/opt/homebrew/bin/go",
+        "test",
+        "-trimpath",
+        "-overlay",
+        "/private/tmp/enola-stage10-prefix-review/glob_oracle-candidate-overlay.json",
+        "./internal/facts",
+        "-run",
+        "^TestIndependentGlobBooleanPreservesCompiledSemantics$",
+        "-count=1",
+        "-v"
+      ],
+      "exit_code": 0,
+      "wall_s": 0.90760325
+    },
+    {
+      "check": "product_identity",
+      "argv": [
+        "/opt/homebrew/bin/go",
+        "test",
+        "-trimpath",
+        "-overlay",
+        "/private/tmp/enola-stage10-prefix-review/product_identity-candidate-overlay.json",
+        "./internal/graphinput",
+        "-run",
+        "^TestDiagnosticProductPolicySnapshot$",
+        "-count=1",
+        "-v"
+      ],
+      "exit_code": 0,
+      "wall_s": 1.209268417
+    }
+  ],
+  "snapshot_byte_equal": true
+}

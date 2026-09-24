@@ -1,0 +1,33 @@
+{
+  "baseline": {
+    "per_run_construction_medians_s": [
+      0.45872618750000005,
+      0.5385140415,
+      0.6127886874999999
+    ],
+    "per_run_identity_medians_s": [
+      0.152,
+      0.155,
+      0.1545
+    ],
+    "constructions": 60,
+    "all_exit_zero": true
+  },
+  "candidate": {
+    "per_run_construction_medians_s": [
+      0.47371764650000003,
+      0.481980354,
+      0.502687729
+    ],
+    "per_run_identity_medians_s": [
+      0.0385,
+      0.0385,
+      0.037
+    ],
+    "constructions": 60,
+    "all_exit_zero": true
+  },
+  "construction_median_reduction_percent": 10.498089769865366,
+  "identity_median_reduction_percent": 75.08090614886731,
+  "limits": "Policy-only CPU-profiled diagnostic, 3 alternating pairs x20 calls per arm; not end-to-end acceptance. Overall construction medians overlap and drift. No concurrent Go tests detected in checks before each run and sampled during series."
+}

@@ -1,0 +1,5 @@
+=== RUN   TestDiagnosticIdentityMatcherWork
+    diagnostic_slow_count_test.go:37: matcher_calls=34137 tracked=45105 entries=11637
+--- PASS: TestDiagnosticIdentityMatcherWork (0.63s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphinput	1.033s

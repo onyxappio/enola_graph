@@ -10,8 +10,8 @@ import (
 type GlobSet struct {
 	items []compiledGlob
 	// dirPrefixes holds the prefix of every anchored literal "<prefix>/**"
-	// pattern in items. Only MatchAny reads it, so Match alone still decides
-	// which pattern wins.
+	// pattern in items. Only MatchAny reads it; Match answers from items alone,
+	// so which pattern wins is decided exactly where it always was.
 	dirPrefixes []string
 }
 
@@ -35,9 +35,16 @@ func CompileGlobs(patterns []string) *GlobSet {
 }
 
 // literalDirPrefix returns the directory prefix of an anchored "<prefix>/**"
-// pattern whose prefix is a plain path. A glob or escape in the prefix means it
-// is not one, and a pattern containing "/**/" is read by MatchGlob first and
-// exclusively as a directory-scoped file glob; both are left to Match.
+// pattern whose prefix is a plain path, and reports false for any pattern whose
+// meaning is not exactly "this directory and everything beneath it".
+//
+// Two exclusions carry the correctness. A prefix holding a glob or an escape is
+// not a literal path, so comparing it as raw bytes would answer a different
+// question than the matcher does. A pattern containing "/**/" is read by
+// MatchGlob first and exclusively as a directory-scoped file glob, which
+// constrains the basename too, so its "<prefix>/**" reading is not the one in
+// force. Both also exclude the "**/<seg>/**" forms, whose segment may appear at
+// any depth rather than at the front.
 func literalDirPrefix(pattern string) (string, bool) {
 	if !strings.HasSuffix(pattern, "/**") || strings.Contains(pattern, "/**/") {
 		return "", false
@@ -107,15 +114,20 @@ func (s *GlobSet) Match(relPath string) (string, bool) {
 	return "", false
 }
 
-// MatchAny reports whether any pattern matches. Being a boolean it need not find
-// the FIRST matching pattern, so the anchored literal "<prefix>/**" patterns are
-// tested up front: they carry neither of compileGlob's filters and so reach
-// MatchGlob on every call however late in the list they sit.
+// MatchAny reports whether any pattern matches. Its answer is a boolean, so
+// unlike Match it need not find the FIRST matching pattern, and that slack buys
+// the case a real repository is made of: the directories a project generates
+// into are named by anchored literal "<prefix>/**" patterns, which carry neither
+// of compileGlob's filters and so reach MatchGlob on every call however late in
+// the list they sit. Testing those prefixes first answers the calls that
+// dominate without moving Match.
 //
-// The pre-pass is positive-only. A hit is one MatchGlob's own "<prefix>/**"
-// branch would have returned, by the same raw comparison against the same
-// unnormalized path, and every miss falls through to the untouched Match, which
-// stays the sole authority on ordering and on every form not compiled here.
+// Positive-only, and deliberately. A hit here is one MatchGlob's own
+// "<prefix>/**" branch would have returned, reached by the same raw comparison
+// against the same unnormalized path, so nothing is matched that was not matched
+// before. Every miss falls through to the untouched Match, which is what keeps
+// wildcards, escapes, malformed patterns and any other form this pre-pass
+// declines to compile deciding exactly as they did.
 func (s *GlobSet) MatchAny(relPath string) bool {
 	if s == nil {
 		return false
