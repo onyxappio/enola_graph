@@ -36,6 +36,7 @@ import (
 	"github.com/enola-labs/enola/internal/explainers"
 	"github.com/enola-labs/enola/internal/extractors"
 	"github.com/enola-labs/enola/internal/facts"
+	"github.com/enola-labs/enola/internal/fsm"
 	"github.com/enola-labs/enola/internal/graphprofile"
 	"github.com/enola-labs/enola/internal/intent"
 	"github.com/enola-labs/enola/internal/linkers/binders"
@@ -160,6 +161,9 @@ func (e *Engine) SetPersistCache(persist bool) { e.persistCache = persist }
 func (e *Engine) RegisterExtractor(ext extractors.Extractor) {
 	if c, ok := ext.(clientspec.Consumer); ok {
 		c.SetClientSpecs(clientspec.ForLanguage(e.cfg.Clients, ext.Name()))
+	}
+	if c, ok := ext.(fsm.Consumer); ok && ext.Name() == "typescript" {
+		c.SetStateMachineSpecs(append([]fsm.Spec(nil), e.cfg.StateMachines...))
 	}
 	e.extractors.Register(ext)
 }

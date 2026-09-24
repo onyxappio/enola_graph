@@ -45,6 +45,25 @@ func TestExtractorCache_RejectsAnotherBuildsEntries(t *testing.T) {
 	}
 }
 
+func TestFSMCacheVersionInvalidatesV320Contributions(t *testing.T) {
+	if cacheVersion != "v321" {
+		t.Fatalf("FSM extractor cache version = %q, want v321", cacheVersion)
+	}
+	path := filepath.Join(t.TempDir(), "extractor_cache.json")
+	writeCacheFile(t, path, cacheFile{
+		Version: "v320",
+		Build:   buildIdentity(),
+		Entries: map[string]json.RawMessage{
+			"typescript": json.RawMessage(`[{"kind":"fsm_machine","name":"stale-v320"}]`),
+		},
+	})
+	got := loadExtractorCache(path, true)
+	defer got.discard()
+	if len(got.prev) != 0 {
+		t.Fatalf("v320 contributions survived the FSM semantics migration (%d entries)", len(got.prev))
+	}
+}
+
 // TestExtractorCache_RejectsPreBuildStampEntries — a cache written before the build
 // stamp existed has no way to say which binary produced it, so it cannot be trusted.
 func TestExtractorCache_RejectsPreBuildStampEntries(t *testing.T) {

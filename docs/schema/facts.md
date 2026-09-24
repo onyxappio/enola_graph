@@ -91,6 +91,64 @@ fact's name exactly as that fact carries it.
 | `test_ref` | test file path | yes (`calls`, `instantiates`) | Reference-only: which production symbols a test exercises. Test files are otherwise excluded from indexing |
 | `file_ref` | source file path | yes (`calls`, `instantiates`) | Reference-only: call edges made in file-scope (top-level) code with no enclosing symbol |
 | `lint` | the linter finding's id | no | A finding an external linter reported through the provider seam |
+| `fsm_machine` | configured machine id | yes | A repository-configured rule table or reducer/interpreter with resolved declaration evidence |
+| `fsm_state` | `<machine>/state:<path>` | yes | A declared state; nested regions use dotted paths and explicit `fsm_parent` links |
+| `fsm_event` | `<machine>/event:<tag>` | yes | An event type or literal declared by the configured machine |
+| `fsm_transition` | `<machine>/transition:<structural-key>` | yes | One decision branch or declared rule, with source state, target, triggers, guards and direct actions |
+| `fsm_command` | `<machine>/command:<tag>` | yes | A declared command/effect; outcomes and proven code handlers are separate relations |
+
+#### Finite-state-machine facts
+
+FSM extraction is opt-in through repository-local `state_machines:` configuration;
+Effect usage and familiar type or string names do not admit a machine. The two
+adapters share the five fact kinds above. They preserve only locally established
+facts and direct links. A source fact's `file`, `line` and `end_line` identify the
+source declaration or code site; a machine's cross-file type declarations are read
+dependencies of the configured machine contribution.
+
+Canonical names are stable under source movement and trivia edits:
+
+- `fsm_machine`: the configured `id`.
+- `fsm_state`: `<id>/state:<state-path>`; parent regions are explicit nodes.
+- `fsm_event`: `<id>/event:<event-tag>`.
+- `fsm_transition`: `<id>/transition:<structural-key>`.
+- `fsm_command`: `<id>/command:<command-tag>`.
+
+`fsm_machine` carries `adapter` (`rule_table` or `reducer_interpreter`) and
+`admission_status`. Its `fsm_typed_by` relations identify configured source types;
+`fsm_initial` points to the declared initial state when it is resolved. A state
+carries `state_tag`, `state_path`, optional `parent_state`, and
+`declaration_status`; `fsm_parent` names its parent state and `fsm_entry_emits`
+names commands directly emitted on entry. An event carries `event_tag` and
+`event_role` (for example `machine_event` or `effect_result`). A command carries
+`command_tag` and `command_role` (for example `effect_request`).
+
+A transition is one rule-table entry or one return branch in the configured
+interpreter call graph. `fsm_from`, `fsm_to` and one or more `fsm_on` relations
+describe direct endpoints and triggers. An OR trigger remains one transition
+with multiple `fsm_on` edges. `fsm_emits` points to directly emitted commands;
+`fsm_guard_ref` / `fsm_guard_calls` and `fsm_reducer_ref` / `fsm_action_calls`
+point to guard and action code. `fsm_declared_in` identifies the implementing
+registration or handler symbol. Useful evidence props include `rule_id`,
+`branch_ordinal`, `selection`, `availability`, `path_conditions`, `guard_text`,
+`action_line`, and the `*_status` fields. Unsupported or dynamic expressions
+retain unknown statuses and extraction coverage counts.
+
+Code symbols carry interaction evidence on the source fact, not on the relation
+wire object. `fsm_constructs_event` records event construction;
+`fsm_dispatches` records a separately proven call to the configured machine sink;
+`fsm_dispatches_unknown_event` records a proven sink with an unproven event value;
+`fsm_handles_command` records a handler proven by the configured typed binding.
+Their source facts carry `fsm_evidence_sites` when several sites merge into one
+symbol fact. An event constructor alone does not prove dispatch, and an unknown
+dispatch never names a guessed event.
+
+`extraction` facts named `typescript:fsm:<machine>...` report adapter coverage,
+including detected, modeled and unresolved branches, entry effects, dispatches
+and handlers. `partial` or `unknown` means queries cannot treat an absent state,
+handler or dispatch as dead code. No transitive attributes or derived
+reachability facts are materialized by FSM extraction. See
+[repository configuration and adapter limits](../accuracy/fsm-config.md).
 
 ### symbol
 
@@ -244,6 +302,24 @@ adding them to coupling metrics.
 | `handled_by` | A route/endpoint is served by target (e.g. a gRPC RPC route to its handler method). Added post-extraction |
 | `implemented_by` | A declared contract operation is implemented by a code symbol. Added post-extraction |
 | `names` | Source names target by symbol literal without calling it — a method name passed as data for something else to dispatch. A reference, not a call |
+| `fsm_parent` | A nested state is contained by its parent state |
+| `fsm_initial` | A machine's initial state |
+| `fsm_from` | A transition's source state |
+| `fsm_to` | A transition's destination state |
+| `fsm_on` | An event that triggers a transition |
+| `fsm_emits` | A transition directly emits a command |
+| `fsm_entry_emits` | Entering a state directly emits a command |
+| `fsm_outcome` | A command may settle with the linked event outcome |
+| `fsm_guard_ref` | A transition names a guard declaration |
+| `fsm_reducer_ref` | A transition names a reducer/action declaration |
+| `fsm_guard_calls` | A transition guard directly calls code |
+| `fsm_action_calls` | A transition action directly calls code |
+| `fsm_declared_in` | A transition is declared by a registration or handler symbol |
+| `fsm_typed_by` | A machine is bound to a source type |
+| `fsm_constructs_event` | Code constructs an event value |
+| `fsm_dispatches` | Code dispatches a resolved event to the configured machine |
+| `fsm_dispatches_unknown_event` | Code reaches the configured sink, but its event cannot be resolved |
+| `fsm_handles_command` | Code is a type-bound handler for a command |
 
 ## Route sources
 

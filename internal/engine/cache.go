@@ -2614,7 +2614,9 @@ import (
 // v320: TypeScript session records retain the selected local default export identity
 // when imported files cannot store a complete export surface, so default-binding
 // swaps invalidate importers even when the exported-name set is unchanged.
-const cacheVersion = "v320"
+// v321: repository-configured TypeScript FSM machines, declaration/transition facts,
+// and their direct source read dependencies are recorded with the extractor cache.
+const cacheVersion = "v321"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

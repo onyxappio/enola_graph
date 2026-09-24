@@ -9,6 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/enola-labs/enola/internal/clientspec"
+	"github.com/enola-labs/enola/internal/fsm"
 	"github.com/enola-labs/enola/internal/intent"
 	"github.com/enola-labs/enola/internal/linkers/vocab"
 	"github.com/enola-labs/enola/internal/providers"
@@ -91,6 +92,11 @@ type Config struct {
 	// internal/clientspec. It changes emitted facts, so it is folded into the config
 	// hash and into the reading extractor's cache key.
 	Clients []clientspec.Spec `yaml:"clients,omitempty"`
+
+	// StateMachines opts a repository into the finite-state-machine profile.
+	// Entries identify source declarations and runtime sinks; Effect usage or
+	// event/type spelling alone never grants admission. See docs/accuracy/fsm-config.md.
+	StateMachines []fsm.Spec `yaml:"state_machines,omitempty"`
 
 	// ServiceAliases maps a service name a client passes (a string argument, not a
 	// host) to the repository label that serves it, for when the two differ. It only
@@ -657,6 +663,9 @@ func (c *Config) Normalize() error {
 
 	clientspec.Normalize(c.Clients)
 	if err := clientspec.Validate(c.Clients); err != nil {
+		return err
+	}
+	if err := fsm.NormalizeAndValidate(c.StateMachines); err != nil {
 		return err
 	}
 	if err := clientspec.ValidateAliases(c.ServiceAliases); err != nil {

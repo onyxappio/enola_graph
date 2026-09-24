@@ -70,27 +70,50 @@ var (
 
 // Fact kind constants.
 const (
-	KindModule     = internal.KindModule
-	KindSymbol     = internal.KindSymbol
-	KindRoute      = internal.KindRoute
-	KindStorage    = internal.KindStorage
-	KindDependency = internal.KindDependency
-	KindService    = internal.KindService
-	KindTestRef    = internal.KindTestRef
-	KindFileRef    = internal.KindFileRef
+	KindModule        = internal.KindModule
+	KindSymbol        = internal.KindSymbol
+	KindRoute         = internal.KindRoute
+	KindStorage       = internal.KindStorage
+	KindDependency    = internal.KindDependency
+	KindService       = internal.KindService
+	KindTestRef       = internal.KindTestRef
+	KindFileRef       = internal.KindFileRef
+	KindFSMMachine    = internal.KindFSMMachine
+	KindFSMState      = internal.KindFSMState
+	KindFSMEvent      = internal.KindFSMEvent
+	KindFSMTransition = internal.KindFSMTransition
+	KindFSMCommand    = internal.KindFSMCommand
 )
 
 // Relation kind constants.
 const (
-	RelDeclares     = internal.RelDeclares
-	RelImports      = internal.RelImports
-	RelCalls        = internal.RelCalls
-	RelImplements   = internal.RelImplements
-	RelDependsOn    = internal.RelDependsOn
-	RelInstantiates = internal.RelInstantiates
-	RelInjects      = internal.RelInjects
-	RelHasMethod    = internal.RelHasMethod
-	RelHandledBy    = internal.RelHandledBy
+	RelDeclares                  = internal.RelDeclares
+	RelImports                   = internal.RelImports
+	RelCalls                     = internal.RelCalls
+	RelImplements                = internal.RelImplements
+	RelDependsOn                 = internal.RelDependsOn
+	RelInstantiates              = internal.RelInstantiates
+	RelInjects                   = internal.RelInjects
+	RelHasMethod                 = internal.RelHasMethod
+	RelHandledBy                 = internal.RelHandledBy
+	RelFSMParent                 = internal.RelFSMParent
+	RelFSMInitial                = internal.RelFSMInitial
+	RelFSMFrom                   = internal.RelFSMFrom
+	RelFSMTo                     = internal.RelFSMTo
+	RelFSMOn                     = internal.RelFSMOn
+	RelFSMEmits                  = internal.RelFSMEmits
+	RelFSMEntryEmits             = internal.RelFSMEntryEmits
+	RelFSMOutcome                = internal.RelFSMOutcome
+	RelFSMGuardRef               = internal.RelFSMGuardRef
+	RelFSMReducerRef             = internal.RelFSMReducerRef
+	RelFSMGuardCalls             = internal.RelFSMGuardCalls
+	RelFSMActionCalls            = internal.RelFSMActionCalls
+	RelFSMDeclaredIn             = internal.RelFSMDeclaredIn
+	RelFSMTypedBy                = internal.RelFSMTypedBy
+	RelFSMConstructsEvent        = internal.RelFSMConstructsEvent
+	RelFSMDispatches             = internal.RelFSMDispatches
+	RelFSMDispatchesUnknownEvent = internal.RelFSMDispatchesUnknownEvent
+	RelFSMHandlesCommand         = internal.RelFSMHandlesCommand
 )
 
 // Symbol kind property values.

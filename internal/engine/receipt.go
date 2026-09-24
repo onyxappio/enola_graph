@@ -14,6 +14,7 @@ import (
 	"github.com/enola-labs/enola/internal/clientspec"
 	"github.com/enola-labs/enola/internal/config"
 	"github.com/enola-labs/enola/internal/facts"
+	"github.com/enola-labs/enola/internal/fsm"
 )
 
 // parseErrorSampleCap bounds the number of parse errors retained on the receipt.
@@ -99,6 +100,9 @@ func computeConfigHash(cfg *config.Config) string {
 	// Written only when declared, so a config declaring neither hashes exactly as before.
 	if fp := clientspec.Fingerprint(cfg.Clients); fp != "" {
 		sb.WriteString("clients:\n" + fp)
+	}
+	if fp := fsm.Fingerprint(cfg.StateMachines); fp != "" {
+		sb.WriteString("state_machines:\n" + fp)
 	}
 	if fp := clientspec.AliasFingerprint(cfg.ServiceAliases); fp != "" {
 		sb.WriteString("service_aliases:\n" + fp)
