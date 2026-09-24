@@ -69,6 +69,7 @@ type runtimeInputs struct {
 	tsDiscovery       *tsextractor.Discovery
 	tsContext         map[string]string
 	tsFileContext     map[string]string
+	tsFileBase        map[string]string
 	policyIdentity    string
 	admissionIdentity string
 	coverageVersion   uint64
@@ -172,7 +173,7 @@ func readRuntimeInputs(eng *engine.Engine, abs string, st *State, work *WorkCoun
 					tr.Mark("ts_discovery", cost.String())
 				}
 				var used *tsextractor.Discovery
-				result.tsContext, result.tsFileContext, used = ts.SessionContext(abs, cfg, tsConfigPaths, inv.Files, built)
+				result.tsContext, result.tsFileContext, result.tsFileBase, used = ts.SessionContext(abs, cfg, tsConfigPaths, inv.Files, built)
 				if used != built {
 					// SessionContext refused the snapshot and built its own.
 					// Keep that one - it is the proven one - and count it.

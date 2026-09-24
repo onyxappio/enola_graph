@@ -345,6 +345,8 @@ type session struct {
 	// retained is the snapshot the resident's last committed run proved, and
 	// retainedFor the policy identity it was proven under. Both are an offer,
 	// never an answer: nothing is used until this run proves it again.
+	aliasScopeCache   *aliasScope
+	aliasScopeInput   *runtimeInputs
 	retained          *tsextractor.Discovery
 	retainedFor       retainedDiscoveryIdentity
 	plan              *fileInvalidationPlan
@@ -590,12 +592,25 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		})
 	}
 	if s.eng.GraphScope() != nil && haveCache {
-		changes := tsextractor.ContextDifference(s.state.TSContext, input.tsContext)
+		changes := tsextractor.ContextDifferenceDurable(s.state.TSContext, input.tsContext, s.aliasStateMode())
 		invalidation.ContextReasons = changes
 		if len(changes) > 0 {
 			forceAll = true
 			fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "typescript", Scope: "all owned files", Reason: strings.Join(changes, "; ")})
 		}
+	}
+	// A state whose alias projection this build cannot read answers no
+	// comparison, and "nothing moved" is a comparison: the stored digests are
+	// numbers whose meaning is unknown, not evidence of an unchanged repo.
+	// Reconcile the domain once and rewrite the projection in this version's
+	// shape, so only the run that meets such a state pays for it.
+	if s.eng.GraphScope() != nil && haveCache && s.aliasStateMode() == tsextractor.AliasStateUnsupported {
+		forceAll = true
+		fallbacks = append(fallbacks, graphstream.Fallback{
+			Extractor: "typescript",
+			Scope:     "all owned files",
+			Reason:    "stored TS alias projection was written by a different version of this projection",
+		})
 	}
 	if !forceAll && input.angular {
 		forceAll = true
@@ -684,7 +699,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		// argument for the rest of the configuration. Neither discharge is
 		// reached while any other reason to publish stands.
 		if !initial && !forceAll && !nonTSNeed && s.state != nil && len(neutralNonTS) > 0 &&
-			!s.tsFileContextMoved(graphSemanticNames(s.eng, inv.Files), prevFiles, input.tsFileContext) {
+			!s.tsFileContextMoved(graphSemanticNames(s.eng, inv.Files), prevFiles, input) {
 			if scanChanged && scanChangeNeutral(s.state, semantic, hashes, prevFiles, neutralNonTS) {
 				scanChanged = false
 				s.neutralScan = true
@@ -859,7 +874,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 					if s.eng.GraphScope() != nil && s.state != nil {
 						for _, f := range current {
 							st := lookupState(prevFiles, f)
-							if st == nil || st.TS == nil || s.state.TSFileContext[f] == input.tsFileContext[f] {
+							if st == nil || st.TS == nil || !s.tsFileContextMovedFor(f, st.TS, input) {
 								continue
 							}
 							dirty[filepath.ToSlash(f)] = true
@@ -1016,7 +1031,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				}
 				if s.eng.GraphScope() != nil {
 					for _, f := range owned {
-						if prevRecs[f] != nil && s.state.TSFileContext[f] != input.tsFileContext[f] {
+						if prevRecs[f] != nil && s.tsFileContextMovedFor(f, prevRecs[f], input) {
 							dirty[f] = true
 							semanticDirty[f] = true
 							invalidation.ContextAffectedSources++
@@ -1844,6 +1859,8 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	next.ConfigHash = cfgHash
 	next.TSContext = input.tsContext
 	next.TSFileContext = input.tsFileContext
+	next.TSFileBase = input.tsFileBase
+	next.TSAliasMeta = tsextractor.AliasMetaVersion
 	next.EngineContextHash = input.engineContextHash
 	next.PolicyIdentity = input.policyIdentity
 	next.PolicyAdmissionIdentity = input.admissionIdentity

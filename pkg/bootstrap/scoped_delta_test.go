@@ -319,7 +319,8 @@ func TestScopedNearestPackageAndAliases(t *testing.T) {
 	apply("packages/database/tsconfig.json", "packages/database/index.ts")
 	graphWrite(t, root, "packages/database/tsconfig.json", `{"compilerOptions":{"paths":{"@dep":["../../a.ts"]}}}`)
 	res = apply("packages/database/tsconfig.json")
-	if res.ParsedFiles != 2 || res.Invalidation.ContextAffectedSources != 2 || len(res.Invalidation.ContextReasons) != 0 {
+	// The child has no alias import, so only the database importer needs reparsing.
+	if res.ParsedFiles != 1 || res.Invalidation.ContextAffectedSources != 1 || len(res.Invalidation.ContextReasons) != 0 {
 		t.Fatalf("nested alias escaped effective descendant scope: %+v", res)
 	}
 	graphColdEqual(t, root, sink)
@@ -328,7 +329,8 @@ func TestScopedNearestPackageAndAliases(t *testing.T) {
 	apply("packages/tsconfig.base.json", "packages/database/tsconfig.json")
 	graphWrite(t, root, "packages/tsconfig.base.json", `{"compilerOptions":{"paths":{"@dep":["../a.ts"]}}}`)
 	res = apply("packages/tsconfig.base.json")
-	if res.Invalidation.ContextAffectedSources != 3 || len(res.Invalidation.ContextReasons) != 0 {
+	// Inherited alias changes also reach only the file importing that alias.
+	if res.ParsedFiles != 1 || res.Invalidation.ContextAffectedSources != 1 || len(res.Invalidation.ContextReasons) != 0 {
 		t.Fatalf("inherited alias scope wrong: %+v", res)
 	}
 	graphColdEqual(t, root, sink)
