@@ -1,0 +1,48 @@
+{
+  "source_revision": "d988437efb25ea13c6ba47e30ab22ca81a14b58d",
+  "test_sha256": "16d4c9df60f6500266c67eb185ac8199b4fbb29c6c7fb3b95afd4702e9007e05",
+  "input": "/tmp/enola-stage18-root-review/cli-pairs/correctness-candidate-2/cold-original/state.json",
+  "samples": [
+    {
+      "sample": 0,
+      "records": 4086,
+      "facts": 59661,
+      "clone_alloc": 35265792,
+      "clone_mallocs": 187014,
+      "localio_alloc": 16,
+      "append_synthetic_alloc": 43360920,
+      "total_alloc": 78626728,
+      "input_sha": "05b065d7498049f956c380dfdecaddc1802ee61aae8669e0a855c27062ba83f0",
+      "facts_hash": "9397dcc78dbf81eb6d46ae55ba46aaa71617373078d288228bd87f377350b4ef"
+    },
+    {
+      "sample": 1,
+      "records": 4086,
+      "facts": 59661,
+      "clone_alloc": 35265792,
+      "clone_mallocs": 187014,
+      "localio_alloc": 0,
+      "append_synthetic_alloc": 43355328,
+      "total_alloc": 78621120,
+      "input_sha": "05b065d7498049f956c380dfdecaddc1802ee61aae8669e0a855c27062ba83f0",
+      "facts_hash": "9397dcc78dbf81eb6d46ae55ba46aaa71617373078d288228bd87f377350b4ef"
+    },
+    {
+      "sample": 2,
+      "records": 4086,
+      "facts": 59661,
+      "clone_alloc": 35265792,
+      "clone_mallocs": 187014,
+      "localio_alloc": 0,
+      "append_synthetic_alloc": 43355328,
+      "total_alloc": 78621120,
+      "input_sha": "05b065d7498049f956c380dfdecaddc1802ee61aae8669e0a855c27062ba83f0",
+      "facts_hash": "9397dcc78dbf81eb6d46ae55ba46aaa71617373078d288228bd87f377350b4ef"
+    }
+  ],
+  "scope": "All cached TS records: cloneTagged, applyLocalIO, append facts and synthetic grouping. Sorted path traversal for reproducibility. Not a complete Session.Run or an optimized implementation. State decode and final hash outside allocation measurement.",
+  "state_unchanged": true,
+  "exit": 0,
+  "timing_eligible": false,
+  "rss_measured": false
+}

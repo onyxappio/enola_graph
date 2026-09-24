@@ -1,0 +1,38 @@
+package graphsession
+import (
+ "crypto/sha256"
+ "encoding/json"
+ "os"
+ "runtime"
+ "sort"
+ "testing"
+ "github.com/enola-labs/enola/internal/facts"
+)
+func TestProductMaterializationAllocationDiagnostic(t *testing.T) {
+ path:=os.Getenv("MATERIALIZATION_INPUT"); if path=="" {t.Skip("diagnostic only")}
+ raw,err:=os.ReadFile(path);if err!=nil {t.Fatal(err)}
+ inputHash:=sha256.Sum256(raw); var st State
+ if err=json.Unmarshal(raw,&st);err!=nil {t.Fatal(err)};raw=nil
+ keys:=make([]string,0,len(st.Files));for k,v:=range st.Files {if v!=nil && v.TS!=nil {keys=append(keys,k)}};sort.Strings(keys)
+ beforeState,err:=json.Marshal(&st);if err!=nil {t.Fatal(err)};stateHash:=sha256.Sum256(beforeState);beforeState=nil
+ var expected string
+ for sample:=0;sample<3;sample++ {
+ runtime.GC();runtime.GC()
+ var before,cloned,local,appended runtime.MemStats
+ // Holder allocation is outside measured clone phase. Keep every clone alive through all phases.
+ chunks:=make([][]facts.Fact,len(keys));runtime.ReadMemStats(&before)
+ for i,k:=range keys {chunks[i]=cloneTagged(st.Files[k].TS.Facts,st.RepoID)}
+ runtime.ReadMemStats(&cloned)
+ for _,ff:=range chunks {applyLocalIO(ff)}
+ runtime.ReadMemStats(&local)
+ var all []facts.Fact;for _,ff:=range chunks {all=append(all,ff...)}
+ syn:=cloneTagged(syntheticFactsFor(&st,"typescript"),st.RepoID);all=append(all,syn...)
+ byExt:=map[string]map[string][]facts.Fact{};appendExtractorSynthetic(byExt,"typescript",syn)
+ runtime.ReadMemStats(&appended)
+ if len(all)==0 {t.Fatal("empty product materialization")}
+ fp:=factsFingerprint(all);if sample==0 {expected=fp} else if fp!=expected {t.Fatal("materialization differs across samples")}
+ t.Logf("DIAG sample=%d records=%d facts=%d clone_alloc=%d clone_mallocs=%d localio_alloc=%d append_synthetic_alloc=%d total_alloc=%d input_sha=%x facts_hash=%s",sample,len(keys),len(all),cloned.TotalAlloc-before.TotalAlloc,cloned.Mallocs-before.Mallocs,local.TotalAlloc-cloned.TotalAlloc,appended.TotalAlloc-local.TotalAlloc,appended.TotalAlloc-before.TotalAlloc,inputHash,fp)
+ runtime.KeepAlive(chunks);runtime.KeepAlive(all);runtime.KeepAlive(byExt)
+ }
+ afterState,err:=json.Marshal(&st);if err!=nil {t.Fatal(err)};if sha256.Sum256(afterState)!=stateHash {t.Fatal("cached state mutated")}
+}

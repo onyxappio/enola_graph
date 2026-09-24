@@ -1,0 +1,7 @@
+=== RUN   TestProductMaterializationAllocationDiagnostic
+    materialization_diagnostic_test.go:34: DIAG sample=0 records=4086 facts=59661 clone_alloc=35265792 clone_mallocs=187014 localio_alloc=16 append_synthetic_alloc=43360920 total_alloc=78626728 input_sha=05b065d7498049f956c380dfdecaddc1802ee61aae8669e0a855c27062ba83f0 facts_hash=9397dcc78dbf81eb6d46ae55ba46aaa71617373078d288228bd87f377350b4ef
+    materialization_diagnostic_test.go:34: DIAG sample=1 records=4086 facts=59661 clone_alloc=35265792 clone_mallocs=187014 localio_alloc=0 append_synthetic_alloc=43355328 total_alloc=78621120 input_sha=05b065d7498049f956c380dfdecaddc1802ee61aae8669e0a855c27062ba83f0 facts_hash=9397dcc78dbf81eb6d46ae55ba46aaa71617373078d288228bd87f377350b4ef
+    materialization_diagnostic_test.go:34: DIAG sample=2 records=4086 facts=59661 clone_alloc=35265792 clone_mallocs=187014 localio_alloc=0 append_synthetic_alloc=43355328 total_alloc=78621120 input_sha=05b065d7498049f956c380dfdecaddc1802ee61aae8669e0a855c27062ba83f0 facts_hash=9397dcc78dbf81eb6d46ae55ba46aaa71617373078d288228bd87f377350b4ef
+--- PASS: TestProductMaterializationAllocationDiagnostic (1.20s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	1.739s
