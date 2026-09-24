@@ -1,0 +1,86 @@
+{
+  "hold": {
+    "start_utc": "2026-09-24T22:20:00+00:00",
+    "end_utc": "2026-09-24T22:30:00+00:00",
+    "fsm_message": "msg_d614307aa0d9",
+    "codata_message": "msg_086da884d7a8",
+    "worker_message": "msg_c6b440648d4b",
+    "stage17_authorized": true,
+    "ambient_note": "Codata reports ClickHouse background merge around14% CPU, no Codata queries; per-arm docker stats and host competitor sampling retained.",
+    "recorded_utc": "2026-09-24T22:19:17.026774+00:00"
+  },
+  "runs": [
+    {
+      "arm": "baseline",
+      "repeat": 1,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage17-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "msg_c6b440648d4b"
+      ],
+      "start_utc": "2026-09-24T22:22:29.660833+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-24T22:23:32.157783+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 1,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage17-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "msg_c6b440648d4b"
+      ],
+      "start_utc": "2026-09-24T22:23:32.158371+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-24T22:24:34.654421+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 2,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage17-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "2",
+        "--quiet-message-id",
+        "msg_c6b440648d4b"
+      ],
+      "start_utc": "2026-09-24T22:24:34.654788+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-24T22:25:37.334121+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 2,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage17-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "2",
+        "--quiet-message-id",
+        "msg_c6b440648d4b"
+      ],
+      "start_utc": "2026-09-24T22:25:37.334514+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-24T22:26:40.175855+00:00"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "base": "c6332bf",
+  "worker_message": "msg_ec318cf93e33",
+  "verified_files": {
+    "/tmp/enola-stage17-presize/presize.patch": "b8f9bad21a39e4318abfb64b01331b197e00f073de7d4acc3786f57e10c668a6",
+    "/tmp/enola-stage17-presize/src/internal/graphsession/session.go": "80469ff97b30c583d2dcb21d1684f7702e2e0faee883a7de70c6008eb9457756",
+    "/tmp/enola-stage17-presize/src/internal/graphsession/reuse_presize_test.go": "c3261739b219eb7182c875bddfab5d527871e0db1e108ca050035d28387973b1"
+  },
+  "production_matches_tested_binaries": true,
+  "root_focused_receipt": "final-focused-receipt.json",
+  "root_product_receipt": "correctness-comparison.json",
+  "remaining": [
+    "Repeated quiet timing/RSS",
+    "Final integration and required validation/hooks"
+  ],
+  "accepted_for_timing": true,
+  "accepted_for_main": false,
+  "final_test_cleanup": {
+    "test_sha256": "ca246fdefd9c2e35042eef890f53753cf21cca80c8364eed6dbce60e03f44460",
+    "patch_sha256": "f75ce8d8175d7e948b9c959cec1152e8e2f21d79d3a29969b0e9dc0ed722e880",
+    "review": "Only test function naming, comments and failure wording changed since independent focused pass; assertions unchanged. Production unchanged."
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "complete": false,
+  "completed_pairs": [
+    1,
+    2
+  ],
+  "missing_pair": 3,
+  "stop_reason": "original 200-second full-pair reserve refused third before launch",
+  "pairs": [
+    {
+      "repeat": 1,
+      "arms": {
+        "baseline": {
+          "initial": {
+            "wall_s": 8.432057290920056,
+            "rss_bytes": 908148736.0,
+            "parsed": 4034
+          },
+          "noop": {
+            "wall_s": 1.6504412499489263,
+            "rss_bytes": 292241408.0,
+            "parsed": 0
+          },
+          "body": {
+            "wall_s": 3.4485502920579165,
+            "rss_bytes": 673824768.0,
+            "parsed": 11
+          },
+          "structural": {
+            "wall_s": 3.4339567080605775,
+            "rss_bytes": 684212224.0,
+            "parsed": 12
+          }
+        },
+        "candidate": {
+          "initial": {
+            "wall_s": 8.372892166022211,
+            "rss_bytes": 914997248.0,
+            "parsed": 4034
+          },
+          "noop": {
+            "wall_s": 1.6646492090076208,
+            "rss_bytes": 273580032.0,
+            "parsed": 0
+          },
+          "body": {
+            "wall_s": 3.4316304579842836,
+            "rss_bytes": 659800064.0,
+            "parsed": 11
+          },
+          "structural": {
+            "wall_s": 3.442981458036229,
+            "rss_bytes": 687489024.0,
+            "parsed": 12
+          }
+        }
+      }
+    },
+    {
+      "repeat": 2,
+      "arms": {
+        "baseline": {
+          "initial": {
+            "wall_s": 8.40986079198774,
+            "rss_bytes": 916652032.0,
+            "parsed": 4034
+          },
+          "noop": {
+            "wall_s": 1.698248332948424,
+            "rss_bytes": 293797888.0,
+            "parsed": 0
+          },
+          "body": {
+            "wall_s": 3.4521374170435593,
+            "rss_bytes": 643497984.0,
+            "parsed": 11
+          },
+          "structural": {
+            "wall_s": 3.4788529160432518,
+            "rss_bytes": 727187456.0,
+            "parsed": 12
+          }
+        },
+        "candidate": {
+          "initial": {
+            "wall_s": 8.301687500090338,
+            "rss_bytes": 918831104.0,
+            "parsed": 4034
+          },
+          "noop": {
+            "wall_s": 1.6965819590259343,
+            "rss_bytes": 272318464.0,
+            "parsed": 0
+          },
+          "body": {
+            "wall_s": 3.459836332942359,
+            "rss_bytes": 677855232.0,
+            "parsed": 11
+          },
+          "structural": {
+            "wall_s": 3.5222484159749,
+            "rss_bytes": 670859264.0,
+            "parsed": 12
+          }
+        }
+      }
+    }
+  ]
+}

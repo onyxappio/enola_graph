@@ -77,3 +77,16 @@ the original three-pair signal or establish a cause. The unpaired high-RSS
 candidate run is retained, not discarded. Do not pool this incomplete cohort
 into the original medians or claim that memory acceptance is closed. Complete
 paired follow-up and validation of the eventual integrated build remain pending.
+
+
+## Final reserved RSS pair: signal reproduced
+
+The additional pair 7 ran in the confirmed 22:20–22:30 UTC hold on September 24.
+Both arms exited successfully, passed correctness checks and had no competing
+process samples. Structural wall was 3.463429→3.353817s; maximum RSS was
+656,867,328→696,991,744bytes (**+6.108%**). This repeats the direction of the
+original three-pair signal; the earlier two near-flat follow-up pairs do not
+justify dismissing it. Stage16's memory acceptance remains open and the candidate
+is not in main. See [final audit](stage16-rss-final/rss-final-audit.json),
+which keeps original, later complete and unpaired observations distinct, and
+adjacent per-arm metrics/checks/receipts. No combined Stage16+Stage17 claim is made.

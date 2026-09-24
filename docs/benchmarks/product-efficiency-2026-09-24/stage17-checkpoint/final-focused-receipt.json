@@ -1,0 +1,17 @@
+{
+  "base": "c6332bf",
+  "production_sha256": "80469ff97b30c583d2dcb21d1684f7702e2e0faee883a7de70c6008eb9457756",
+  "test_sha256": "c3261739b219eb7182c875bddfab5d527871e0db1e108ca050035d28387973b1",
+  "argv": [
+    "/opt/homebrew/bin/go",
+    "test",
+    "./internal/graphsession",
+    "-run",
+    "^(TestReusedTSFactCount|TestNoopReuse|TestFreshNoopRetainsResultFacts|TestReconciledNoopRetainsResidentSnapshot)",
+    "-count=1",
+    "-v"
+  ],
+  "exit": 0,
+  "operational_seconds": 10.194529208005406,
+  "timing_eligible": false
+}

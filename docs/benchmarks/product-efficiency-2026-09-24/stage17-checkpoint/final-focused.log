@@ -1,0 +1,10 @@
+=== RUN   TestFreshNoopRetainsResultFacts
+--- PASS: TestFreshNoopRetainsResultFacts (0.48s)
+=== RUN   TestReconciledNoopRetainsResidentSnapshot
+--- PASS: TestReconciledNoopRetainsResidentSnapshot (0.36s)
+=== RUN   TestReusedTSFactCountIsExact
+--- PASS: TestReusedTSFactCountIsExact (0.00s)
+=== RUN   TestNoopReuseDoesNotRegrowFactBuffer
+--- PASS: TestNoopReuseDoesNotRegrowFactBuffer (2.34s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	3.729s

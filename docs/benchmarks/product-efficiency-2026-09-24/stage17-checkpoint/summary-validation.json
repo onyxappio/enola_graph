@@ -1,0 +1,44 @@
+{
+  "existing_stage16_complete_series_accepted": true,
+  "existing_stage16_comparisons": {
+    "initial": {
+      "median_percent_change": -0.23934103847883526,
+      "paired_percent_changes": [
+        0.09175955822480208,
+        0.5055202233642753,
+        -3.2544325598638735
+      ],
+      "ranges_overlap": true
+    },
+    "noop": {
+      "median_percent_change": -5.473995800704323,
+      "paired_percent_changes": [
+        -6.0542561806219535,
+        -5.473995800704323,
+        -8.756925957745388
+      ],
+      "ranges_overlap": false
+    },
+    "body": {
+      "median_percent_change": -4.371588557184358,
+      "paired_percent_changes": [
+        -4.371588557184358,
+        -2.5820017205325896,
+        -8.456937270528897
+      ],
+      "ranges_overlap": false
+    },
+    "structural": {
+      "median_percent_change": -2.988538143152042,
+      "paired_percent_changes": [
+        -3.1809448525749184,
+        -2.0915206301695743,
+        -6.518743475986
+      ],
+      "ranges_overlap": false
+    }
+  },
+  "stage17_correctness_only_receipt_rejected": true,
+  "stage17_missing_series_rejected": true,
+  "note": "Analyzer verification only; no new timing experiment or Stage17 speed claim."
+}
