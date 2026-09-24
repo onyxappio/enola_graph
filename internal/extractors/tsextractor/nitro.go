@@ -319,7 +319,7 @@ func defaultHandlerSymbolNameForFile(file string, readSrc func(string) []byte) (
 	if err := parser.SetLanguage(sitter.NewLanguage(lang)); err != nil {
 		return "", false
 	}
-	tree := parseTypeScript(parser, src)
+	tree := parseSourceForFile(parser, src, file)
 	defer tree.Close()
 	return defaultHandlerSymbolName(kinds, tree.RootNode(), src, file)
 }

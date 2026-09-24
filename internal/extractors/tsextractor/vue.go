@@ -1197,7 +1197,7 @@ func (e *TSExtractor) extractVueScriptBlock(kinds *tsutil.KindTable, block *vueS
 		return nil, emberImportBindings{}, nil, nil, nil
 	}
 
-	tree := parseTypeScript(parser, block.Content)
+	tree := parseEmbeddedScript(parser, block.Content, block.Lang)
 	defer tree.Close()
 
 	root := tree.RootNode()
@@ -1241,7 +1241,7 @@ func (e *TSExtractor) extractVueScriptBlock(kinds *tsutil.KindTable, block *vueS
 	ctx.localNames = collectFileScopeCallNames(kinds, root, block.Content)
 	decls := e.extractDeclarations(kinds, root, ctx)
 
-	if exported := collectExportedLocalNames(kinds, root, block.Content); len(exported) > 0 {
+	if exported := collectExportedLocalNames(kinds, root, block.Content, ctx.commonJS); len(exported) > 0 {
 		for i := range decls {
 			if decls[i].Kind != facts.KindSymbol {
 				continue

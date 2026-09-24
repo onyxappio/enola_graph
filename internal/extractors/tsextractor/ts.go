@@ -556,6 +556,7 @@ type extractCtx struct {
 	externalNames map[string]bool     // locals bound to external (npm/node:) specifiers
 	virtualNames  map[string]bool     // locals bound to framework virtual modules (#imports/#app)
 	localNames    map[string]bool     // file-scope function/const names that may own a local call
+	commonJS      commonJSBindings    // module/exports are synthetic only when not rebound locally
 	imports       emberImportBindings // the file's import table, read for the module a superclass identifier came from
 	ioBindings    map[string]bool     // local names bound to imports from a network module (I/O sinks)
 	knownFiles    map[string]bool     // repo-relative (slash) paths of all indexed TS/JS files
@@ -657,7 +658,7 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 		return result, angularCounts{}, nil, nil, nil, nil
 	}
 
-	tree := parseTypeScript(parser, src)
+	tree := parseSourceForFile(parser, src, relFile)
 	defer tree.Close()
 
 	root := tree.RootNode()
@@ -724,7 +725,7 @@ func (e *TSExtractor) extractFile(src []byte, relFile string, isNextJS, isVue, i
 	// A declaration may be exported via a separate `export { A, B }` clause or
 	// `export default Name` statement rather than an inline `export` keyword.
 	// Mark the corresponding symbols as exported.
-	if exported := collectExportedLocalNames(kinds, root, src); len(exported) > 0 {
+	if exported := collectExportedLocalNames(kinds, root, src, ctx.commonJS); len(exported) > 0 {
 		for i := range decls {
 			if decls[i].Kind != facts.KindSymbol {
 				continue
@@ -958,6 +959,7 @@ func dynamicImportSpecifier(kinds *tsutil.KindTable, n *sitter.Node, src []byte)
 }
 
 func (e *TSExtractor) extractDeclarations(kinds *tsutil.KindTable, root *sitter.Node, ctx *extractCtx) []facts.Fact {
+	ctx.commonJS = collectCommonJSModuleBindings(kinds, root, ctx.src)
 	var result []facts.Fact
 	for i := range root.ChildCount() {
 		result = append(result, e.extractNode(kinds, root.Child(i), ctx, false, "")...)
@@ -1236,7 +1238,12 @@ func (e *TSExtractor) extractNode(kinds *tsutil.KindTable, node *sitter.Node, ct
 		if assign == nil {
 			break
 		}
-		name := commonJSExportName(kinds, assign.ChildByFieldName("left"), src)
+		left := assign.ChildByFieldName("left")
+		binding := commonJSExportTargetBinding(kinds, left, src)
+		if binding == "" || ctx.commonJS.shadowed(binding) {
+			break
+		}
+		name := commonJSExportName(kinds, left, src)
 		if name == "" {
 			break
 		}
@@ -2696,10 +2703,10 @@ func toPascal(s string) string {
 	return b.String()
 }
 
-// collectExportedLocalNames returns the set of locally-declared names that are
-// exported via a separate `export { A, B as C }` clause or `export default Name`
-// statement (where the declaration itself carries no inline export keyword).
-func collectExportedLocalNames(kinds *tsutil.KindTable, root *sitter.Node, src []byte) map[string]bool {
+// collectExportedLocalNames returns locally-declared names exported through
+// separate ESM clauses or unconditional CommonJS assignments. CommonJS locals
+// keep their source identity; only their exported visibility changes.
+func collectExportedLocalNames(kinds *tsutil.KindTable, root *sitter.Node, src []byte, commonJS commonJSBindings) map[string]bool {
 	out := make(map[string]bool)
 	for i := range root.ChildCount() {
 		child := root.Child(i)
@@ -2730,26 +2737,27 @@ func collectExportedLocalNames(kinds *tsutil.KindTable, root *sitter.Node, src [
 			// statements; a nested function/conditional assignment is not treated as
 			// an unconditional module export.
 			assign := findChildByKind(kinds, child, "assignment_expression")
-			if assign == nil || !isCommonJSExportTarget(kinds, assign.ChildByFieldName("left"), src) {
+			if assign == nil || !commonJSExportIsHostBinding(kinds, assign.ChildByFieldName("left"), src, commonJS) {
 				continue
 			}
-			collectCommonJSExportLocals(kinds, assign.ChildByFieldName("right"), src, out)
+			collectCommonJSExportLocals(kinds, unwrapCommonJSExportValue(kinds, assign.ChildByFieldName("right")), src, out)
 		}
 	}
 	return out
 }
 
-func isCommonJSExportTarget(kinds *tsutil.KindTable, left *sitter.Node, src []byte) bool {
-	if commonJSExportName(kinds, left, src) != "" {
-		return true
+func unwrapCommonJSExportValue(kinds *tsutil.KindTable, node *sitter.Node) *sitter.Node {
+	for node != nil {
+		kind := kindOf(kinds, node)
+		if kind != "parenthesized_expression" && kind != "as_expression" && kind != "satisfies_expression" && kind != "non_null_expression" {
+			break
+		}
+		if node.NamedChildCount() == 0 {
+			break
+		}
+		node = node.NamedChild(0)
 	}
-	if left == nil || kindOf(kinds, left) != "member_expression" {
-		return false
-	}
-	obj := left.ChildByFieldName("object")
-	prop := left.ChildByFieldName("property")
-	return obj != nil && kindOf(kinds, obj) == "identifier" && nodeText(obj, src) == "module" &&
-		prop != nil && kindOf(kinds, prop) == "property_identifier" && nodeText(prop, src) == "exports"
+	return node
 }
 
 // collectCommonJSExportLocals records only values that directly become part of
@@ -2761,6 +2769,7 @@ func collectCommonJSExportLocals(kinds *tsutil.KindTable, node *sitter.Node, src
 	if node == nil {
 		return
 	}
+	node = unwrapCommonJSExportValue(kinds, node)
 	switch kindOf(kinds, node) {
 	case "identifier", "shorthand_property_identifier":
 		if name := strings.TrimSpace(nodeText(node, src)); name != "" {
@@ -4518,7 +4527,7 @@ func (e *TSExtractor) testRefsFromFile(src []byte, relFile string, aliases map[s
 	if err := parser.SetLanguage(sitter.NewLanguage(lang)); err != nil {
 		return nil
 	}
-	tree := parseTypeScript(parser, src)
+	tree := parseSourceForFile(parser, src, relFile)
 	defer tree.Close()
 
 	ctx := &extractCtx{

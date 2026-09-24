@@ -1,7 +1,9 @@
 package tsextractor
 
 import (
+	"bytes"
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -14,17 +16,37 @@ func TestExtract_Wave13ImportTypeGenericCallsKeepFollowingDeclarations(t *testin
 	src := `
 const actual = await importOriginal<typeof import('@onyxappio/checkout-vue')>()
 const result = wrap<typeof import('./types').Options>(actual)
+const spacedTypeResult = wrap < typeof import('./spaced-types').Options > (actual)
+const awaited = async () => left<(await import('./runtime'))>(right)
 function createDomRect(width: number) { return { width } }
 function afterGenericCalls() { return createDomRect(1) }
 const callback = () => actual
 const routeTable = { mountStripe: callback, key: 'actual object key' }
 const runtime = import('./runtime-module')
 `
+	js := `
+const left = 1, right = 2
+export const spaced = left < import('./spaced-runtime') > (right)
+export const tight = left<import('./tight-runtime')>(right)
+export async function awaitedComparison() { return left<(await import('./js-awaited-runtime'))>(right) }
+const pattern = /call<typeof import("regex-only")>()/
+const text = 'call<typeof import("string-only")>()'
+// call<typeof import("comment-only")>()
+export function afterRuntimeComparisons() { return 1 }
+`
+	jsx := `
+const left = 1, right = 2
+export const jsxComparison = left < import('./jsx-runtime') > (right)
+export const view = <div />
+`
 	ff := extractAll(t, map[string]string{
-		"src/provider.ts":  `export function helper() { return 1 }`,
-		"src/candidate.ts": src,
+		"src/provider.ts":   `export function helper() { return 1 }`,
+		"src/candidate.ts":  src,
+		"src/candidate.js":  js,
+		"src/candidate.jsx": jsx,
+		"src/runtime.ts":    `export const loaded = true`,
 	}, false)
-	for _, name := range []string{"src.actual", "src.result", "src.createDomRect", "src.afterGenericCalls", "src.callback", "src.routeTable"} {
+	for _, name := range []string{"src.actual", "src.result", "src.spacedTypeResult", "src.awaited", "src.createDomRect", "src.afterGenericCalls", "src.callback", "src.routeTable", "src.spaced", "src.tight", "src.awaitedComparison", "src.afterRuntimeComparisons", "src.jsxComparison", "src.view"} {
 		if _, ok := findFact(ff, name); !ok {
 			t.Errorf("missing declaration %s after generic import types; facts=%v", name, factNames(ff))
 		}
@@ -34,14 +56,221 @@ const runtime = import('./runtime-module')
 			t.Errorf("parser emitted phantom declaration %s", phantom)
 		}
 	}
-	var runtimeDependency bool
+	var runtimeDependency, awaitedDependency, spacedDependency, tightDependency, jsAwaitedDependency, jsxDependency bool
 	for _, f := range ff {
-		if f.Kind == facts.KindDependency && f.File == "src/candidate.ts" && f.PropString(facts.PropImportSpec) == "src/runtime-module" {
+		if f.Kind != facts.KindDependency {
+			continue
+		}
+		spec := f.PropString(facts.PropImportSpec)
+		switch f.File + ":" + spec {
+		case "src/candidate.ts:src/runtime-module":
 			runtimeDependency = true
+		case "src/candidate.ts:src/runtime":
+			awaitedDependency = f.PropString(facts.PropTargetFile) == "src/runtime.ts"
+		case "src/candidate.js:src/spaced-runtime":
+			spacedDependency = true
+		case "src/candidate.js:src/tight-runtime":
+			tightDependency = true
+		case "src/candidate.js:src/js-awaited-runtime":
+			jsAwaitedDependency = true
+		case "src/candidate.jsx:src/jsx-runtime":
+			jsxDependency = true
 		}
 	}
 	if !runtimeDependency {
 		t.Fatal("runtime import() outside generic type arguments was lost")
+	}
+	if !awaitedDependency {
+		t.Fatal("unambiguous awaited runtime import() in TypeScript was lost")
+	}
+	if !spacedDependency || !tightDependency || !jsAwaitedDependency || !jsxDependency {
+		t.Fatalf("JavaScript runtime imports were lost: spaced=%v tight=%v awaited=%v jsx=%v", spacedDependency, tightDependency, jsAwaitedDependency, jsxDependency)
+	}
+	for _, file := range []string{"src/candidate.ts", "src/candidate.js"} {
+		for _, f := range ff {
+			if f.Kind == facts.KindDependency && f.File == file {
+				spec := f.PropString(facts.PropImportSpec)
+				if strings.Contains(spec, "regex-only") || strings.Contains(spec, "string-only") || strings.Contains(spec, "comment-only") {
+					t.Errorf("import-like literal text emitted a dependency from %s: %+v", file, f)
+				}
+			}
+		}
+	}
+}
+
+func TestExtract_Wave13ImportTypeModesInVueAndSvelteScripts(t *testing.T) {
+	ff := extractAll(t, map[string]string{
+		"src/Component.vue": `<script>
+const left = 1, right = 2
+export const vueRuntime = left < import('./vue-runtime') > (right)
+</script>
+<script lang="ts">
+const awaited = async () => left < (await import('./vue-awaited-runtime')) > (right)
+const typed = wrap < typeof import('./vue-types').Options > (1)
+export function afterVueTypeImport() { return typed }
+</script>`,
+		"src/Widget.svelte": `<script>
+const left = 1, right = 2
+export const svelteRuntime = left < import('./svelte-runtime') > (right)
+</script>
+<script lang="ts">
+const awaited = async () => left < (await import('./svelte-awaited-runtime')) > (right)
+const typed = wrap < typeof import('./svelte-types').Options > (1)
+export function afterSvelteTypeImport() { return typed }
+</script>`,
+		"src/vue-runtime.ts":            `export const loaded = true`,
+		"src/vue-awaited-runtime.ts":    `export const loaded = true`,
+		"src/svelte-runtime.ts":         `export const loaded = true`,
+		"src/svelte-awaited-runtime.ts": `export const loaded = true`,
+	}, false)
+	for file, decl := range map[string]string{
+		"src/Component.vue": "afterVueTypeImport",
+		"src/Widget.svelte": "afterSvelteTypeImport",
+	} {
+		found := false
+		for _, fact := range ff {
+			if fact.Kind == facts.KindSymbol && fact.File == file && strings.HasSuffix(fact.Name, "."+decl) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("%s lost declaration %s following a typed script block", file, decl)
+		}
+	}
+	want := map[string]map[string]bool{
+		"src/Component.vue": {"vue-runtime": false, "vue-awaited-runtime": false},
+		"src/Widget.svelte": {"svelte-runtime": false, "svelte-awaited-runtime": false},
+	}
+	for _, fact := range ff {
+		if fact.Kind != facts.KindDependency {
+			continue
+		}
+		for file, specs := range want {
+			if fact.File == file {
+				for spec := range specs {
+					if strings.Contains(fact.PropString(facts.PropImportSpec), spec) {
+						specs[spec] = true
+					}
+				}
+			}
+		}
+	}
+	for file, specs := range want {
+		for spec, found := range specs {
+			if !found {
+				t.Errorf("%s lost runtime import dependency %s: facts=%v", file, spec, factNames(ff))
+			}
+		}
+	}
+}
+
+func TestParseInputForTypeScriptProtectsLiteralsAndHandlesIncompleteInput(t *testing.T) {
+	src := []byte("const pattern = /call<typeof import(\"regex-only\")>()/;\n" +
+		"const text = 'call<typeof import(\"string-only\")>()';\n" +
+		"// call<typeof import(\"comment-only\")>()\n" +
+		"const template = `literal import('./template-text') ${wrap<typeof import('./interpolation')>()}`;\n" +
+		"const result = wrap<typeof import('./types').Options>();\n")
+	got := parseInputForTypeScript(src)
+	if len(got) != len(src) {
+		t.Fatalf("parser repair changed byte length: got=%d want=%d", len(got), len(src))
+	}
+	for _, literal := range []string{
+		`/call<typeof import("regex-only")>()/`,
+		`'call<typeof import("string-only")>()'`,
+		`import('./template-text')`,
+	} {
+		if !bytes.Contains(got, []byte(literal)) {
+			t.Errorf("literal text %q was changed: %s", literal, got)
+		}
+	}
+	if bytes.Contains(got, []byte("import('./interpolation')")) || bytes.Contains(got, []byte("import('./types')")) {
+		t.Fatalf("TypeScript ImportType spans were not repaired: %s", got)
+	}
+	if bytes.Contains(got, []byte("comment-only")) && !bytes.Contains(got, []byte(`import("comment-only")`)) {
+		t.Fatalf("comment source was mutated: %s", got)
+	}
+	if _, err := safeParseInputForTypeScript([]byte{'\'', 'a', '\\'}); err != nil {
+		t.Fatalf("incomplete editor input panicked: %v", err)
+	}
+}
+
+func safeParseInputForTypeScript(src []byte) (out []byte, err error) {
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			err = fmt.Errorf("panic: %v", recovered)
+		}
+	}()
+	return parseInputForTypeScript(src), nil
+}
+
+func TestParseInputForJavaScriptKeepsRuntimeComparisonSyntax(t *testing.T) {
+	for _, src := range []string{
+		`const x = left < import("./runtime") > (right);`,
+		`const x = left<import("./runtime")>(right);`,
+	} {
+		got := parserInputForSyntax([]byte(src), parserSyntaxJavaScript)
+		if !bytes.Equal(got, []byte(src)) {
+			t.Errorf("JavaScript comparison was changed: %s", got)
+		}
+	}
+}
+
+func TestSourceSyntaxModesCoverTypeScriptJavaScriptAndComponents(t *testing.T) {
+	src := []byte(`const value = wrap<typeof import("./types")>();`)
+	for _, tc := range []struct {
+		file       string
+		typeScript bool
+	}{
+		{file: "src/file.ts", typeScript: true},
+		{file: "src/file.tsx", typeScript: true},
+		{file: "src/file.mts", typeScript: true},
+		{file: "src/file.cts", typeScript: true},
+		{file: "src/file.gts", typeScript: true},
+		{file: "src/file.js"},
+		{file: "src/file.jsx"},
+		{file: "src/file.mjs"},
+		{file: "src/file.cjs"},
+		{file: "src/file.gjs"},
+	} {
+		got := parserInputForSyntax(src, sourceSyntaxForFile(tc.file))
+		changed := !bytes.Equal(got, src)
+		if changed != tc.typeScript {
+			t.Errorf("%s used the wrong import-type parsing mode: changed=%v want=%v", tc.file, changed, tc.typeScript)
+		}
+	}
+	for _, tc := range []struct {
+		lang       string
+		typeScript bool
+	}{
+		{lang: ""},
+		{lang: "js"},
+		{lang: "jsx"},
+		{lang: "javascript"},
+		{lang: "ts", typeScript: true},
+		{lang: "tsx", typeScript: true},
+		{lang: "typescript", typeScript: true},
+	} {
+		got := parserInputForSyntax(src, sourceSyntaxForEmbeddedScript(tc.lang))
+		changed := !bytes.Equal(got, src)
+		if changed != tc.typeScript {
+			t.Errorf("embedded lang %q used the wrong import-type parsing mode: changed=%v want=%v", tc.lang, changed, tc.typeScript)
+		}
+	}
+}
+
+func BenchmarkParseInputForTypeScriptComparisonsWithUnrelatedImport(b *testing.B) {
+	for _, count := range []int{1000, 2000, 4000} {
+		b.Run(fmt.Sprint(count), func(b *testing.B) {
+			src := []byte("import { runtime } from './unrelated-runtime';\n" + strings.Repeat("if (left < right) consume(left);\n", count))
+			b.SetBytes(int64(len(src)))
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				if got := parseInputForTypeScript(src); !bytes.Equal(got, src) {
+					b.Fatal("runtime-only imports and comparisons should remain unchanged")
+				}
+			}
+		})
 	}
 }
 
@@ -87,22 +316,26 @@ module.exports = { withSentryStaticSerializerCompatibility }
 	for _, name := range []string{
 		"apps/mobile/src/moduleResolution.OUTPUT_STYLE_ESM_SOURCE_EXTENSIONS",
 		"apps/mobile/src/moduleResolution.privateLocal",
+		"apps/mobile/src/moduleResolution.controlledLocal",
+		"apps/mobile/src/moduleResolution.lateLocal",
+	} {
+		f, ok := findFact(ff, name)
+		if !ok {
+			t.Errorf("missing private/unexecuted local %s", name)
+			continue
+		}
+		if f.Props["exported"] != false {
+			t.Errorf("private/unexecuted local %s exported=%v, want false", name, f.Props["exported"])
+		}
+	}
+	for _, name := range []string{
 		"apps/mobile/src/moduleResolution.withOutputStyleEsmSourceResolver#2",
 		"apps/mobile/src/moduleResolution.unknown",
 		"apps/mobile.withOutputStyleEsmSourceResolver",
+		"apps/mobile/src/moduleResolution.publicAlias",
 	} {
-		if f, ok := findFact(ff, name); ok && f.Props["exported"] != true {
-			// The final name is intentionally not a symbol alias: local declarations
-			// keep their source identity and are marked by visibility metadata only.
-			if strings.HasSuffix(name, ".withOutputStyleEsmSourceResolver") {
-				t.Errorf("export alias was emitted as a separate local symbol: %+v", f)
-			} else if strings.HasSuffix(name, ".OUTPUT_STYLE_ESM_SOURCE_EXTENSIONS") || strings.HasSuffix(name, ".privateLocal") {
-				if f.Props["exported"] != false {
-					t.Errorf("private local %s exported=%v, want false", name, f.Props["exported"])
-				}
-			} else {
-				t.Errorf("unexpected symbol %s", name)
-			}
+		if f, ok := findFact(ff, name); ok {
+			t.Errorf("phantom CommonJS alias symbol %s was emitted: %+v", name, f)
 		}
 	}
 	for _, name := range []string{"apps/mobile/src/moduleResolution.controlledLocal", "apps/mobile/src/moduleResolution.lateLocal"} {

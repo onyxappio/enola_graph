@@ -383,7 +383,7 @@ func parseNxTSRoot(src []byte, relFile string) (*tsutil.KindTable, *sitter.Node,
 		parser.Close()
 		return nil, nil, nil
 	}
-	tree := parseTypeScript(parser, src)
+	tree := parseSourceForFile(parser, src, relFile)
 	return kinds, tree.RootNode(), func() {
 		tree.Close()
 		parser.Close()
