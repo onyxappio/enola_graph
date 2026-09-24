@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 )
 
@@ -105,6 +106,63 @@ func TestExtractSession_ReusesUnchangedFiles(t *testing.T) {
 	if third.Stats.FilesParsed != 1 {
 		t.Fatalf("dirty b.ts parsed %d files, want 1", third.Stats.FilesParsed)
 	}
+}
+
+func TestExtractSession_ReusesBodyImportersButRefreshesWrappedDefaultBinding(t *testing.T) {
+	dir := t.TempDir()
+	mustWrite := func(rel, body string) {
+		t.Helper()
+		path := filepath.Join(dir, rel)
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	files := []string{"src/value.ts", "src/use.ts", "src/unrelated.ts"}
+	mustWrite("src/value.ts", "const local = 1;\nexport default (local satisfies number);\n")
+	mustWrite("src/use.ts", "import value from './value';\nexport const result = value;\n")
+	mustWrite("src/unrelated.ts", "export const stable = 1;\n")
+	ext := New()
+	first, err := ext.ExtractSession(context.Background(), dir, files, nil, nil, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assertCold := func(got *SessionResult) {
+		t.Helper()
+		cold, coldErr := ext.ExtractSession(context.Background(), dir, files, nil, nil, SessionHooks{})
+		if coldErr != nil {
+			t.Fatal(coldErr)
+		}
+		if !reflect.DeepEqual(got.Facts, cold.Facts) {
+			t.Fatal("delta facts differ from a cold extraction")
+		}
+	}
+
+	// A body change leaves the default binding surface untouched, so only the
+	// edited module is parsed and the imported contribution is reused.
+	mustWrite("src/value.ts", "const local = 2;\nexport default (local satisfies number);\n")
+	bodyDelta, err := ext.ExtractSession(context.Background(), dir, files, first.Records, map[string]bool{"src/value.ts": true}, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if bodyDelta.Stats.FilesParsed != 1 {
+		t.Fatalf("body-only default edit parsed %d files, want only src/value.ts", bodyDelta.Stats.FilesParsed)
+	}
+	assertCold(bodyDelta)
+
+	// The wrapper's local default target is observable even though the wrapper
+	// syntax surrounds the identifier. Its importer must be refreshed.
+	mustWrite("src/value.ts", "const renamed = 2;\nexport default (renamed satisfies number);\n")
+	renameDelta, err := ext.ExtractSession(context.Background(), dir, files, bodyDelta.Records, map[string]bool{"src/value.ts": true}, SessionHooks{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if renameDelta.Stats.FilesParsed != 2 {
+		t.Fatalf("wrapped default rename parsed %d files, want src/value.ts and its importer", renameDelta.Stats.FilesParsed)
+	}
+	assertCold(renameDelta)
 }
 
 func TestExtractSession_NestedNuxtConfigChangeRebindsPlugin(t *testing.T) {

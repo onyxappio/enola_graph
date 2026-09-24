@@ -10,6 +10,7 @@ import (
 	"log"
 
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -134,7 +135,11 @@ type SessionHooks struct {
 	// independently discovers and revalidates configuration inputs for the run.
 	// It does not alter extraction, config reads, or source overlays.
 	SkipConfigPaths bool
-	OnFileLocal     func(rec *FileRecord)
+	// GraphPlannerOwnsInvalidation tells the graph session to use the frozen
+	// owner scope it already computed. Direct extractor-session callers leave
+	// this false and get observed-surface dependent expansion here.
+	GraphPlannerOwnsInvalidation bool
+	OnFileLocal                  func(rec *FileRecord)
 	// OnBeforeParse is invoked on each dirty file immediately before extractFile.
 	// Tests use it to block later-file analysis while an earlier local batch is in flight.
 	OnBeforeParse func(rel string)
@@ -209,11 +214,38 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	graphprofile.Since("ts_disc_package_aliases", tAliases, fmt.Sprintf("aliases=%d", len(pkgAliases)))
 
 	aliasDirtyPkgs := map[string]bool{}
+	// A dirty dependency only forces its direct importers to be parsed when the
+	// export/read surface those importers observed moved. The previous rule used
+	// file dirt alone, which made a body edit fan out across every importer even
+	// when the binding surface stayed byte-for-byte equivalent.
+	changedSurfaces := map[string]bool{}
+	changedSurfaceNames := map[string]map[string]bool{}
+	nameOnlySurfaces := map[string]bool{}
+	sources := make(map[string][]byte, len(tsFiles))
+	exportCache := newNamedExportCache()
+	readSource := func(rel string) []byte {
+		if b, ok := sources[rel]; ok {
+			return b
+		}
+		if hooks.Sources != nil {
+			if b, ok := hooks.Sources[rel]; ok {
+				return b
+			}
+		}
+		b, err := overlayReadFile(ctx, filepath.Join(repoPath, rel), inputScope)
+		if err != nil {
+			return nil
+		}
+		return b
+	}
+	aliasesForFile := func(rel string) map[string]tsAlias {
+		return mergePackageAliases(aliasesForDir(aliasRoots, factpath.Dir(rel)), pkgAliases)
+	}
 	need := func(rel string) bool {
 		if allDirty {
 			return true
 		}
-		if dirty[rel] {
+		if dirty[rel] || dirty[filepath.ToSlash(rel)] {
 			return true
 		}
 		rec := prev[rel]
@@ -221,13 +253,20 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			return true
 		}
 		// A cached importer's local facts contain the resolved identity and owner
-		// of each imported symbol. If one of those files changes, recompute the
-		// importer so renamed/deleted exports cannot leave stale file_ref edges.
-		// This is a direct dependency invalidation; it does not walk callers of
-		// the importer or propagate local attributes transitively.
-		for _, resolved := range rec.ResolvedFiles {
-			if dirty[filepath.ToSlash(resolved)] {
-				return true
+		// of each imported symbol. Recompute it when the dependency's observable
+		// surface moved; body-only dependency edits can safely reuse those facts.
+		if !hooks.GraphPlannerOwnsInvalidation {
+			for _, resolved := range rec.ResolvedFiles {
+				key := filepath.ToSlash(resolved)
+				if changedSurfaces[key] && surfaceRequiresDependentParse(rec, nameOnlySurfaces[key], changedSurfaceNames[key]) {
+					return true
+				}
+			}
+			for _, side := range rec.SideReads {
+				key := filepath.ToSlash(side)
+				if changedSurfaces[key] && surfaceRequiresDependentParse(rec, nameOnlySurfaces[key], changedSurfaceNames[key]) {
+					return true
+				}
 			}
 		}
 		for _, f := range rec.ResolvedFiles {
@@ -256,41 +295,72 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	}
 
 	var stats ExtractStats
-	sources := make(map[string][]byte, len(tsFiles))
 	toRead := make([]string, 0, len(tsFiles))
+	readSet := make(map[string]bool, len(tsFiles))
 	for _, rel := range tsFiles {
 		if need(rel) {
 			toRead = append(toRead, rel)
-		} else {
-			stats.CachedFiles++
+			readSet[filepath.ToSlash(rel)] = true
 		}
 	}
-	readSources := parallel.MapFiles(ctx, toRead, func(relFile string) struct {
-		src []byte
-		err error
-	} {
-		if hooks.Sources != nil {
-			if src, ok := hooks.Sources[relFile]; ok {
-				return struct {
-					src []byte
-					err error
-				}{src, nil}
-			}
-		}
-		src, err := overlayReadFile(ctx, filepath.Join(repoPath, relFile), inputScope)
-		return struct {
+	readFiles := func(paths []string) {
+		readSources := parallel.MapFiles(ctx, paths, func(relFile string) struct {
 			src []byte
 			err error
-		}{src, err}
-	})
-	for i, read := range readSources {
-		stats.FilesRead++
-		if read.err != nil {
-			log.Printf("[ts-extractor] error reading %s: %v", toRead[i], read.err)
-			continue
+		} {
+			if hooks.Sources != nil {
+				if src, ok := hooks.Sources[relFile]; ok {
+					return struct {
+						src []byte
+						err error
+					}{src, nil}
+				}
+			}
+			src, err := overlayReadFile(ctx, filepath.Join(repoPath, relFile), inputScope)
+			return struct {
+				src []byte
+				err error
+			}{src, err}
+		})
+		for i, read := range readSources {
+			stats.FilesRead++
+			if read.err != nil {
+				log.Printf("[ts-extractor] error reading %s: %v", paths[i], read.err)
+				continue
+			}
+			sources[paths[i]] = read.src
 		}
-		sources[toRead[i]] = read.src
 	}
+	// Read and inspect one observed-surface layer at a time. ExportSurface is
+	// deliberately proof-bearing: recorded equal surfaces stop invalidation;
+	// missing legacy/unsupported evidence remains conservative. Reusing the
+	// session export cache means the index built here is also used by extraction.
+	for len(toRead) > 0 {
+		readFiles(toRead)
+		if hooks.GraphPlannerOwnsInvalidation {
+			break
+		}
+		for _, rel := range toRead {
+			current := exportCache.index(rel, readSource, aliasesForFile(rel), knownFiles).surface()
+			key := filepath.ToSlash(rel)
+			changed, names, nameOnly := compareRecordExportSurface(prev[rel], current)
+			if changed {
+				changedSurfaces[key] = true
+				changedSurfaceNames[key], nameOnlySurfaces[key] = names, nameOnly
+			}
+		}
+		var extra []string
+		for _, rel := range tsFiles {
+			slash := filepath.ToSlash(rel)
+			if readSet[slash] || !need(rel) {
+				continue
+			}
+			readSet[slash] = true
+			extra = append(extra, rel)
+		}
+		toRead = extra
+	}
+	stats.CachedFiles = len(tsFiles) - len(readSet)
 	if isNuxt && !allDirty {
 		readAlias := func(rel string) []byte {
 			if b, ok := sources[rel]; ok {
@@ -413,7 +483,6 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		rec *FileRecord
 	}
 	tr.Mark("ts_graphql_grpc_index", fmt.Sprintf("ts_files=%d", len(tsFiles)))
-	exportCache := newNamedExportCache()
 	perFile := parallel.MapFiles(ctx, tsFiles, func(relFile string) fileOut {
 		if !need(relFile) {
 			rec := prev[relFile]
@@ -738,6 +807,151 @@ func fillRecord(rec *FileRecord, res tsFileResult, knownFiles map[string]bool, g
 	rec.Reexports = reexports
 	rec.UnresolvedSpecs = unresolved
 	rec.ImportComplete = true
+}
+
+// exportSurfaceNameDelta recognizes the surface movement that can be resolved
+// by the export name alone. Every other change can alter where an import or
+// re-export binds and therefore remains conservative.
+func exportSurfaceNameDelta(old, current []string) (map[string]bool, bool) {
+	oldSet := make(map[string]bool, len(old))
+	newSet := make(map[string]bool, len(current))
+	for _, item := range old {
+		oldSet[item] = true
+	}
+	for _, item := range current {
+		newSet[item] = true
+	}
+	names := map[string]bool{}
+	for item := range oldSet {
+		if newSet[item] {
+			continue
+		}
+		if name, ok := exportedSurfaceName(item); ok {
+			names[name] = true
+		} else {
+			return nil, false
+		}
+	}
+	for item := range newSet {
+		if oldSet[item] {
+			continue
+		}
+		if name, ok := exportedSurfaceName(item); ok {
+			names[name] = true
+		} else {
+			return nil, false
+		}
+	}
+	return names, len(names) > 0
+}
+
+// compareRecordExportSurface uses the exact cached index when present. Older
+// eligible records may have no such index; for simple modules with complete
+// local facts, exported symbol names still prove whether their local surface
+// changed. Re-export, composition, and incomplete records stay conservative.
+func compareRecordExportSurface(rec *FileRecord, current []string) (changed bool, names map[string]bool, nameOnly bool) {
+	if rec == nil {
+		return true, nil, false
+	}
+	if rec.ExportSurfaceRecorded {
+		if slices.Equal(rec.ExportSurface, current) {
+			return false, nil, true
+		}
+		names, nameOnly = exportSurfaceNameDelta(rec.ExportSurface, current)
+		return true, names, nameOnly
+	}
+	if !rec.ImportComplete || len(rec.Reexports) > 0 || rec.GraphQLServer ||
+		len(rec.GraphQLSDL) > 0 || rec.GRPC != nil || rec.Router != nil {
+		return true, nil, false
+	}
+	switch rec.ParseKind {
+	case "ts", "vue", "svelte":
+	default:
+		return true, nil, false
+	}
+	oldNames := exportedFactNames(rec.Facts)
+	newNames := map[string]bool{}
+	for _, item := range current {
+		if item == "empty" {
+			continue
+		}
+		name, ok := exportedSurfaceName(item)
+		if !ok {
+			return true, nil, false
+		}
+		newNames[name] = true
+	}
+	for name := range oldNames {
+		if !newNames[name] {
+			names = ensureStringSet(names)
+			names[name] = true
+		}
+	}
+	for name := range newNames {
+		if !oldNames[name] {
+			names = ensureStringSet(names)
+			names[name] = true
+		}
+	}
+	return len(names) > 0, names, true
+}
+
+func ensureStringSet(names map[string]bool) map[string]bool {
+	if names == nil {
+		return map[string]bool{}
+	}
+	return names
+}
+
+func exportedFactNames(ff []facts.Fact) map[string]bool {
+	out := map[string]bool{}
+	for _, f := range ff {
+		if f.Kind != facts.KindSymbol || f.Props["exported"] != true {
+			continue
+		}
+		name := f.Name
+		if dot := strings.LastIndexByte(name, '.'); dot >= 0 {
+			name = name[dot+1:]
+		}
+		if name != "" {
+			out[name] = true
+		}
+	}
+	return out
+}
+
+func exportedSurfaceName(item string) (string, bool) {
+	for _, prefix := range []string{"local:", "default:"} {
+		if strings.HasPrefix(item, prefix) && len(item) > len(prefix) {
+			return strings.TrimPrefix(item, prefix), true
+		}
+	}
+	return "", false
+}
+
+// surfaceRequiresDependentParse is the extractor-session counterpart of the
+// graph session's name-scoped replay rule. A simple local export add/remove
+// affects only proven consumers that mention that name; consumers whose binder
+// has extra cross-file behavior, or whose evidence is old/incomplete, are kept
+// conservative.
+func surfaceRequiresDependentParse(rec *FileRecord, nameOnly bool, names map[string]bool) bool {
+	if !nameOnly || rec == nil || !rec.ImportComplete || rec.GraphQLServer ||
+		len(rec.GraphQLSDL) > 0 || rec.GRPC != nil || rec.Router != nil ||
+		len(rec.Reexports) > 0 || rec.NuxtScope != "-" ||
+		len(rec.AutoImportDirs) > 0 || len(rec.NuxtAliases) > 0 {
+		return true
+	}
+	if rec.ParseKind != "ts" {
+		return true
+	}
+	for _, referenced := range rec.Referenced {
+		for name := range names {
+			if referenced == name || strings.HasSuffix(referenced, "."+name) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func resultFromRecord(rec *FileRecord) tsFileResult {

@@ -1372,8 +1372,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				}
 			}
 			hooks := tsextractor.SessionHooks{
-				SkipConfigPaths: true,
-				Sources:         s.capturedSources,
+				SkipConfigPaths:              true,
+				GraphPlannerOwnsInvalidation: true,
+				Sources:                      s.capturedSources,
 				// The run's snapshot, kept only if this capture agrees with
 				// what it read; the extractor checks that itself and reports a
 				// rebuild in Stats.DiscoveryPasses rather than silently
@@ -3048,9 +3049,10 @@ func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*Fil
 	// so unlike the parse hook it needs no lock.
 	reused := map[string]bool{}
 	hooks := tsextractor.SessionHooks{
-		SkipConfigPaths: true,
-		Sources:         s.capturedSources,
-		Discovery:       s.tsRunDiscovery(),
+		SkipConfigPaths:              true,
+		GraphPlannerOwnsInvalidation: true,
+		Sources:                      s.capturedSources,
+		Discovery:                    s.tsRunDiscovery(),
 		OnBeforeParse: func(path string) {
 			parseMu.Lock()
 			parses = append(parses, preparedParse{path: path, reason: parseReason(path)})
