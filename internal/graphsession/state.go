@@ -13,6 +13,10 @@ import (
 const stateSchema = "enola.graphstate.v1"
 const authoritativeScanHashVersion = "semantic-v1"
 
+// claimedScanVersion marks a state whose ScanClaimedHash was written by this
+// definition of the claim set. A state without it is not comparable.
+const claimedScanVersion = "claimed-v1"
+
 // State is durable analysis state for one (repo, context) pair.
 type State struct {
 	Protocol          string            `json:"protocol,omitempty"`
@@ -51,8 +55,17 @@ type State struct {
 	FrameworkSig            string `json:"framework_sig,omitempty"`
 	// ScanHash is a digest of walked names (including ignore-glob files) and
 	// their content hashes. Unknown-owner extractors use it as their input set.
-	ScanHash        string            `json:"scan_hash,omitempty"`
-	ScanHashVersion string            `json:"scan_hash_version,omitempty"`
+	ScanHash        string `json:"scan_hash,omitempty"`
+	ScanHashVersion string `json:"scan_hash_version,omitempty"`
+	// ScanClaimedHash is the same digest narrowed to the names some active
+	// extractor claims, and ScanClaimedMeta names the version that wrote it.
+	// The marker is what makes the field usable: a state written before the
+	// field existed carries no claim digest and no marker, and absence is read
+	// as "this proves nothing" rather than as an empty claim set, so such a
+	// state discharges nothing and is left exactly as it is until a run that
+	// publishes rewrites it.
+	ScanClaimedHash string            `json:"scan_claimed_hash,omitempty"`
+	ScanClaimedMeta string            `json:"scan_claimed_meta,omitempty"`
 	ExtractorDigest map[string]string `json:"extractor_digest,omitempty"`
 	// ExtractorInputHash is the file-set/context digest each extractor last
 	// consumed (inventory names and hashes passed to Extract), independent of
