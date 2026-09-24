@@ -2914,8 +2914,8 @@ func collectExportedLocalNames(kinds *tsutil.KindTable, root *sitter.Node, src [
 			}
 			// export default Name
 			if hasChildKind(kinds, child, "default") {
-				if id := findChildByKind(kinds, child, "identifier"); id != nil {
-					out[nodeText(id, src)] = true
+				if name := defaultExportLocalName(kinds, child, src); name != "" {
+					out[name] = true
 				}
 			}
 		case "expression_statement":
@@ -2931,6 +2931,34 @@ func collectExportedLocalNames(kinds *tsutil.KindTable, root *sitter.Node, src [
 		}
 	}
 	return out
+}
+
+// defaultExportLocalName returns the local identifier from `export default x`
+// and transparent TypeScript wrappers such as `(x satisfies T)`. It follows
+// only the expression wrapper chain, so identifiers in the wrapper's type do
+// not get mistaken for the exported value.
+func defaultExportLocalName(kinds *tsutil.KindTable, export *sitter.Node, src []byte) string {
+	if export == nil {
+		return ""
+	}
+	var value *sitter.Node
+	for i := range export.NamedChildCount() {
+		child := export.NamedChild(i)
+		switch kindOf(kinds, child) {
+		case "identifier":
+			value = child
+		case "parenthesized_expression", "as_expression", "satisfies_expression", "non_null_expression":
+			value = child
+		}
+		if value != nil {
+			break
+		}
+	}
+	value = unwrapTSSyntaxExpr(kinds, value)
+	if value != nil && kindOf(kinds, value) == "identifier" {
+		return nodeText(value, src)
+	}
+	return ""
 }
 
 func unwrapCommonJSExportValue(kinds *tsutil.KindTable, node *sitter.Node) *sitter.Node {

@@ -7,6 +7,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/enola-labs/enola/internal/extractors/tsutil"
 	"github.com/enola-labs/enola/internal/factpath"
@@ -15,7 +17,6 @@ import (
 )
 
 var (
-	vueIdentifierRe  = regexp.MustCompile(`[A-Za-z_$][A-Za-z0-9_$-]*`)
 	vueEmitLiteralRe = regexp.MustCompile(`\b(?:e|event)\s*:\s*['"]([^'"]+)['"]`)
 	vueStringValueRe = regexp.MustCompile(`['"]([^'"]+)['"]`)
 )
@@ -139,7 +140,7 @@ func vueMacroShape(call string, types map[string]string) string {
 	if lt := strings.IndexByte(call, '<'); lt >= 0 {
 		if end := balancedEnd(call, lt, '<', '>'); end > lt {
 			shape := strings.TrimSpace(call[lt+1 : end])
-			if vueIdentifierRe.MatchString(shape) && vueIdentifierRe.FindString(shape) == shape {
+			if vueIsIdentifier(shape) {
 				if declared := types[shape]; declared != "" {
 					return declared
 				}
@@ -246,6 +247,13 @@ func vueTopLevelKeys(shape string) []string {
 			continue
 		}
 		if c == '{' || c == '[' || c == '(' {
+			// A call signature such as `(e: 'save'): void` occupies a type-member
+			// position but does not introduce a named member. If the scanner stays
+			// armed, its return type (`void`) can look like a property at the closing
+			// brace, especially after a newline or JSDoc comment.
+			if depth == 1 && memberStart {
+				memberStart = false
+			}
 			depth++
 			if depth == 1 {
 				memberStart = true
@@ -264,23 +272,33 @@ func vueTopLevelKeys(shape string) []string {
 			memberStart = true
 			continue
 		}
-		if depth != 1 || !memberStart || c != '_' && c != '$' && (c < 'A' || c > 'Z') && (c < 'a' || c > 'z') {
+		if depth != 1 || !memberStart || !vueIdentifierStartAt(shape, i) {
 			continue
 		}
-		match := vueIdentifierRe.FindString(shape[i:])
-		if match == "readonly" {
-			i += len(match) - 1
-			continue
+		end := vueIdentifierEnd(shape, i)
+		match := shape[i:end]
+		if match == "readonly" || match == "get" || match == "set" {
+			j := end
+			for j < len(shape) && (shape[j] == ' ' || shape[j] == '\t') {
+				j++
+			}
+			if j > end && vueIdentifierStartAt(shape, j) {
+				// readonly is a modifier in front of a property name; get/set
+				// are accessor modifiers in front of their name. Keep the scanner
+				// armed so that next identifier is parsed as the member key.
+				i = end - 1
+				continue
+			}
 		}
 		memberStart = false
-		j := i + len(match)
+		j := end
 		for j < len(shape) && (shape[j] == ' ' || shape[j] == '\t' || shape[j] == '\r' || shape[j] == '\n' || shape[j] == '?') {
 			j++
 		}
 		if j < len(shape) && (shape[j] == ':' || shape[j] == '(' || shape[j] == ',' || shape[j] == '}') {
 			seen[match] = true
 		}
-		i += len(match) - 1
+		i = end - 1
 	}
 	var out []string
 	for name := range seen {
@@ -368,10 +386,7 @@ func vueLooksLikeMemberStart(shape string, start int) bool {
 		i++
 	}
 	wordStart := i
-	for i < len(shape) && (shape[i] == '_' || shape[i] == '$' || shape[i] >= 'A' && shape[i] <= 'Z' || shape[i] >= 'a' && shape[i] <= 'z') {
-		i++
-	}
-	if wordStart == i {
+	if !vueIdentifierStartAt(shape, i) {
 		if i >= len(shape) || shape[i] != '\'' && shape[i] != '"' {
 			return false
 		}
@@ -388,16 +403,23 @@ func vueLooksLikeMemberStart(shape string, start int) bool {
 			}
 			i++
 		}
-	} else if shape[wordStart:i] == "readonly" || shape[wordStart:i] == "get" || shape[wordStart:i] == "set" {
-		for i < len(shape) && (shape[i] == ' ' || shape[i] == '\t') {
-			i++
-		}
-		if i >= len(shape) || shape[i] == ':' || shape[i] == '(' {
-			return shape[wordStart:i] == "readonly" && i < len(shape) && shape[i] == ':'
-		}
-		wordStart = i
-		for i < len(shape) && (shape[i] == '_' || shape[i] == '$' || shape[i] >= 'A' && shape[i] <= 'Z' || shape[i] >= 'a' && shape[i] <= 'z') {
-			i++
+	} else {
+		i = vueIdentifierEnd(shape, i)
+		word := shape[wordStart:i]
+		if word == "readonly" || word == "get" || word == "set" {
+			for i < len(shape) && (shape[i] == ' ' || shape[i] == '\t') {
+				i++
+			}
+			// `get(): T` is a method named get. Treat get/set as accessor
+			// modifiers only when another identifier follows; readonly is a
+			// modifier only in front of a named property.
+			if i < len(shape) && (shape[i] == ':' || shape[i] == '(') {
+				return true
+			}
+			if i < len(shape) && vueIdentifierStartAt(shape, i) {
+				wordStart = i
+				i = vueIdentifierEnd(shape, i)
+			}
 		}
 	}
 	for i < len(shape) && (shape[i] == ' ' || shape[i] == '\t' || shape[i] == '\r' || shape[i] == '\n') {
@@ -410,6 +432,38 @@ func vueLooksLikeMemberStart(shape string, start int) bool {
 		}
 	}
 	return i < len(shape) && (shape[i] == ':' || shape[i] == '(')
+}
+
+// vueIsIdentifier and its byte-indexed helpers recognize TypeScript identifier
+// characters without treating a hyphen as part of an unquoted identifier. TS
+// permits Unicode ID_Start/ID_Continue characters in property names.
+func vueIsIdentifier(s string) bool {
+	if s == "" || !vueIdentifierStartAt(s, 0) {
+		return false
+	}
+	return vueIdentifierEnd(s, 0) == len(s)
+}
+
+func vueIdentifierStartAt(s string, i int) bool {
+	if i < 0 || i >= len(s) {
+		return false
+	}
+	r, _ := utf8.DecodeRuneInString(s[i:])
+	return r == '_' || r == '$' || unicode.IsLetter(r) || unicode.Is(unicode.Other_ID_Start, r)
+}
+
+func vueIdentifierEnd(s string, i int) int {
+	if !vueIdentifierStartAt(s, i) {
+		return i
+	}
+	for i < len(s) {
+		r, size := utf8.DecodeRuneInString(s[i:])
+		if r != '_' && r != '$' && !unicode.IsLetter(r) && !unicode.IsDigit(r) && !unicode.IsMark(r) && !unicode.Is(unicode.Pc, r) && !unicode.Is(unicode.Other_ID_Continue, r) && r != '\u200c' && r != '\u200d' {
+			break
+		}
+		i += size
+	}
+	return i
 }
 
 // extractVueRouterRoutes reads literal Vue Router route records from createRouter.

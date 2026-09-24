@@ -44,6 +44,18 @@ func wave14HasCall(f *facts.Fact, target, file string) bool {
 	return false
 }
 
+func wave14HasInstantiation(f *facts.Fact, target, file string) bool {
+	if f == nil {
+		return false
+	}
+	for _, rel := range f.Relations {
+		if rel.Kind == facts.RelInstantiates && rel.Target == target && (file == "" || rel.TargetFile == file) {
+			return true
+		}
+	}
+	return false
+}
+
 func wave14Symbols(ff []facts.Fact, file, suffix string) []facts.Fact {
 	var out []facts.Fact
 	for _, f := range ff {
@@ -88,7 +100,7 @@ func wave14AssertSessionColdParity(t *testing.T, root string, files []string, re
 		t.Fatal(err)
 	}
 	if got, want := wave14FactsJSON(t, delta.Facts), wave14FactsJSON(t, cold.Facts); !reflect.DeepEqual(got, want) {
-		t.Fatal("delta facts differ from a fresh cold extraction")
+		t.Fatalf("delta facts differ from a fresh cold extraction\ndelta: %s\ncold:  %s", got, want)
 	}
 	return delta
 }
@@ -304,6 +316,23 @@ defineExpose({
 defineProps({ title: String, nested: { value: Number } })
 defineEmits(['save', 'cancel'])
 </script><template><div /></template>`,
+		"src/EmitMembers.vue": `<script setup lang="ts">
+interface Props {
+  value:
+    | string
+    | number
+  option2?: string
+  étiquette?: string
+  café2?: string
+  café?: string
+}
+defineProps<Props>()
+defineEmits<{
+  (e: 'save', value: { id: string }): void
+  /** Cancel action */
+  (e: 'cancel'): void
+}>()
+</script><template><div /></template>`,
 	}
 	ff := extractVue(t, files, false)
 	for _, tc := range []struct {
@@ -320,6 +349,8 @@ defineEmits(['save', 'cancel'])
 		{"Contracts", "vue_exposed_names", []string{"focus", "reset"}},
 		{"Runtime", "vue_prop_names", []string{"nested", "title"}},
 		{"Runtime", "vue_emit_names", []string{"cancel", "save"}},
+		{"EmitMembers", "vue_prop_names", []string{"café", "café2", "option2", "value", "étiquette"}},
+		{"EmitMembers", "vue_emit_names", []string{"cancel", "save"}},
 	} {
 		matches := wave14Symbols(ff, "", tc.name)
 		if len(matches) != 1 {
@@ -499,8 +530,10 @@ export const firstImage = imageMap['personal-details-data-web']`,
 		"src/CallMap.ts":      `export default defineComponent(() => null) satisfies object`,
 		"src/FunctionMap.ts":  `export default (function () {}) as unknown as (() => void)`,
 		"src/ClassMap.ts":     `export default (class {}) satisfies new () => object`,
-		"src/NamedMap.ts": `const localMap = { answer: 42 } as const
-export default localMap`,
+		"src/NamedMap.ts": `const local = { value: 1 }
+export default (local satisfies Record<string, unknown>)`,
+		"src/DefaultConsumer.ts": `import named from './NamedMap'
+export const useNamed = named.value`,
 	}
 	ff := extractAll(t, files, false)
 	wantKinds := map[string]string{
@@ -533,8 +566,11 @@ export default localMap`,
 			named = append(named, f)
 		}
 	}
-	if len(named) != 1 || named[0].Name != "src.localMap" || named[0].Props["exported"] != true {
+	if len(named) != 1 || named[0].Name != "src.local" || named[0].Props["exported"] != true {
 		t.Errorf("named-local default export duplicated or lost identity: %+v", named)
+	}
+	if len(named) == 1 && !wave14HasCall(wave14FileRef(ff, "src/DefaultConsumer.ts"), named[0].Name, "src/NamedMap.ts") {
+		t.Errorf("wrapped local default did not resolve its consumer: %+v", wave14FileRef(ff, "src/DefaultConsumer.ts"))
 	}
 	defaultNode := wave14Symbols(ff, imagePath, "ImageMap")
 	if len(defaultNode) != 1 || defaultNode[0].Props["symbol_kind"] != facts.SymbolVariable || defaultNode[0].Props["exported"] != true {
@@ -581,16 +617,18 @@ func TestExtract_Wave14NewConstructorShadowAndUnknownDoNotBindSibling(t *testing
 	ff := extractAll(t, map[string]string{
 		"src/consumer.ts": `import { RemoteClass as Alias } from './sibling'
 export {}
-class LocalClass {}
-new LocalClass()
+class Local {}
+new Local()
 new Alias()
 new MissingClass()
-function shadow(LocalClass: new () => object) { new LocalClass() }`,
+function make() { return new Local() }
+function shadow(Local: new () => object) { new Local() }`,
 		"src/sibling.ts": `export class RemoteClass {}
+export class Local {}
 export class MissingClass {}`,
 	}, false)
 	ref := wave14FileRef(ff, "src/consumer.ts")
-	locals := wave14Symbols(ff, "src/consumer.ts", "LocalClass")
+	locals := wave14Symbols(ff, "src/consumer.ts", "Local")
 	remotes := wave14Symbols(ff, "src/sibling.ts", "RemoteClass")
 	if len(locals) != 1 || len(remotes) != 1 {
 		t.Fatalf("class controls local=%v imported=%v", locals, remotes)
@@ -598,13 +636,135 @@ export class MissingClass {}`,
 	if !wave14HasCall(ref, locals[0].Name, "src/consumer.ts") || !wave14HasCall(ref, "src.RemoteClass", "src/sibling.ts") {
 		t.Errorf("same-file or imported constructor reference missing: %+v", ref)
 	}
+	make := wave14Symbols(ff, "src/consumer.ts", "make")
+	if len(make) != 1 || !wave14HasInstantiation(&make[0], locals[0].Name, "src/consumer.ts") {
+		t.Errorf("function-body constructor did not retain its same-file class binding: %+v", make)
+	}
 	if wave14HasCall(ref, "src.MissingClass", "") || wave14HasCall(ref, "src.MissingClass", "src/sibling.ts") {
 		t.Errorf("undeclared or parameter-shadowed constructor bound to a sibling: %+v", ref)
 	}
 	shadow := wave14Symbols(ff, "src/consumer.ts", "shadow")
-	if len(shadow) != 1 || wave14HasCall(&shadow[0], "src.LocalClass", "") || wave14HasCall(&shadow[0], "src.LocalClass", "src/consumer.ts") {
+	if len(shadow) != 1 || hasRelation(shadow[0], facts.RelInstantiates, "src.Local") {
 		t.Errorf("constructor parameter shadow resolved to file-local class: %+v", shadow)
 	}
+}
+
+func TestExtractSession_Wave14WrappedNamedDefaultRenameDeleteRestoreEqualsCold(t *testing.T) {
+	root := t.TempDir()
+	write := func(rel, body string) {
+		t.Helper()
+		path := filepath.Join(root, filepath.FromSlash(rel))
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	wrapped := `const local = { value: 1 }
+export default (local satisfies Record<string, unknown>)`
+	objectCase := `export default ({ value: 1 } as const)`
+	arrayCase := `export default ([1, 2] as const)`
+	functionCase := `export default ((() => 1) satisfies (() => number))`
+	classCase := `export default ((class {}) satisfies (new () => object))`
+	callCase := `import { factory } from './factory'
+export default (factory() as Record<string, unknown>)!`
+	factory := `export function factory() { return { value: 1 } }`
+	consumer := `import objectValue from './objectCase'
+import arrayValue from './arrayCase'
+import functionValue from './functionCase'
+import ClassValue from './classCase'
+import callValue from './callCase'
+import named from './namedCase'
+export const useAll = [objectValue, arrayValue, functionValue, ClassValue, callValue, named]`
+	write("package.json", `{"name":"wave14-default"}`)
+	write("src/objectCase.ts", objectCase)
+	write("src/arrayCase.ts", arrayCase)
+	write("src/functionCase.ts", functionCase)
+	write("src/classCase.ts", classCase)
+	write("src/callCase.ts", callCase)
+	write("src/factory.ts", factory)
+	write("src/namedCase.ts", wrapped)
+	write("src/consumer.ts", consumer)
+	allFiles := []string{"package.json", "src/arrayCase.ts", "src/callCase.ts", "src/classCase.ts", "src/consumer.ts", "src/factory.ts", "src/functionCase.ts", "src/namedCase.ts", "src/objectCase.ts"}
+	files := append([]string(nil), allFiles...)
+	sort.Strings(files)
+	state := wave14AssertSessionColdParity(t, root, files, nil, nil)
+	assertCurrent := func(result *SessionResult, namedTarget string, objectExists bool) {
+		t.Helper()
+		wrappers := []struct {
+			file, name, kind string
+		}{
+			{"src/arrayCase.ts", "src.ArrayCase", facts.SymbolVariable},
+			{"src/callCase.ts", "src.CallCase", facts.SymbolVariable},
+			{"src/classCase.ts", "src.ClassCase", facts.SymbolClass},
+			{"src/functionCase.ts", "src.FunctionCase", facts.SymbolFunc},
+		}
+		if objectExists {
+			wrappers = append(wrappers, struct {
+				file, name, kind string
+			}{"src/objectCase.ts", "src.ObjectCase", facts.SymbolVariable})
+		} else if got := wave14Symbols(result.Facts, "src/objectCase.ts", "ObjectCase"); len(got) != 0 {
+			t.Fatalf("deleted anonymous default remained: %+v", got)
+		}
+		for _, want := range wrappers {
+			var nodes []facts.Fact
+			for _, f := range result.Facts {
+				if f.Kind == facts.KindSymbol && f.File == want.file {
+					nodes = append(nodes, f)
+				}
+			}
+			if len(nodes) != 1 || nodes[0].Name != want.name || nodes[0].Props["symbol_kind"] != want.kind || nodes[0].Props["exported"] != true {
+				t.Fatalf("anonymous default %s=%+v, want one exported %s %s", want.file, nodes, want.kind, want.name)
+			}
+			if !wave14HasCall(wave14FileRef(result.Facts, "src/consumer.ts"), want.name, want.file) {
+				t.Fatalf("default consumer missed %s from %s: %+v", want.name, want.file, wave14FileRef(result.Facts, "src/consumer.ts"))
+			}
+		}
+		var named []facts.Fact
+		for _, f := range result.Facts {
+			if f.Kind == facts.KindSymbol && f.File == "src/namedCase.ts" {
+				named = append(named, f)
+			}
+		}
+		if len(named) != 1 || named[0].Name != namedTarget || named[0].Props["exported"] != true {
+			t.Fatalf("wrapped default symbols=%+v, want exactly one exported %s", named, namedTarget)
+		}
+		if !wave14HasCall(wave14FileRef(result.Facts, "src/consumer.ts"), namedTarget, "src/namedCase.ts") {
+			t.Fatalf("default consumer did not resolve %s: %+v", namedTarget, wave14FileRef(result.Facts, "src/consumer.ts"))
+		}
+		if wave14HasCall(wave14FileRef(result.Facts, "src/consumer.ts"), "src.NamedCase", "src/namedCase.ts") {
+			t.Fatalf("named default introduced a duplicate synthetic target: %+v", wave14FileRef(result.Facts, "src/consumer.ts"))
+		}
+		if !objectExists && wave14HasCall(wave14FileRef(result.Facts, "src/consumer.ts"), "src.ObjectCase", "src/objectCase.ts") {
+			t.Fatalf("consumer retained deleted default target: %+v", wave14FileRef(result.Facts, "src/consumer.ts"))
+		}
+	}
+	assertCurrent(state, "src.local", true)
+	wave14AssertNoChange(t, root, files, state.Records)
+
+	renamed := strings.ReplaceAll(wrapped, "local", "renamed")
+	write("src/namedCase.ts", renamed)
+	state = wave14AssertSessionColdParity(t, root, files, state.Records, map[string]bool{"src/namedCase.ts": true})
+	assertCurrent(state, "src.renamed", true)
+	wave14AssertNoChange(t, root, files, state.Records)
+
+	if err := os.Remove(filepath.Join(root, "src/objectCase.ts")); err != nil {
+		t.Fatal(err)
+	}
+	files = []string{"package.json", "src/arrayCase.ts", "src/callCase.ts", "src/classCase.ts", "src/consumer.ts", "src/factory.ts", "src/functionCase.ts", "src/namedCase.ts"}
+	sort.Strings(files)
+	state = wave14AssertSessionColdParity(t, root, files, state.Records, map[string]bool{"src/objectCase.ts": true})
+	assertCurrent(state, "src.renamed", false)
+	wave14AssertNoChange(t, root, files, state.Records)
+
+	write("src/namedCase.ts", wrapped)
+	write("src/objectCase.ts", objectCase)
+	files = append([]string(nil), allFiles...)
+	sort.Strings(files)
+	state = wave14AssertSessionColdParity(t, root, files, state.Records, map[string]bool{"src/namedCase.ts": true, "src/objectCase.ts": true})
+	assertCurrent(state, "src.local", true)
+	wave14AssertNoChange(t, root, files, state.Records)
 }
 
 func TestExtractSession_Wave14NewLocalClassMutationAndRestoreEqualsCold(t *testing.T) {
@@ -620,12 +780,15 @@ func TestExtractSession_Wave14NewLocalClassMutationAndRestoreEqualsCold(t *testi
 		}
 	}
 	consumer := `import { RemoteClass as Alias } from './sibling'
-class LocalClass {}
-new LocalClass()
+class Local {}
+new Local()
 new Alias()
 new MissingClass()
+function make() { return new Local() }
+function makeImported() { return new Alias() }
 `
 	sibling := `export class RemoteClass {}
+export class Local {}
 export class MissingClass {}`
 	write("package.json", `{"name":"wave14-n"}`)
 	write("src/consumer.ts", consumer)
@@ -636,8 +799,11 @@ export class MissingClass {}`
 	assertCurrent := func(result *SessionResult, local, imported bool) {
 		t.Helper()
 		ref := wave14FileRef(result.Facts, "src/consumer.ts")
-		if (wave14HasCall(ref, "src.LocalClass", "src/consumer.ts")) != local {
-			t.Errorf("local class reference present=%v, want %v: %+v", wave14HasCall(ref, "src.LocalClass", "src/consumer.ts"), local, ref)
+		if (wave14HasCall(ref, "src.Local", "src/consumer.ts")) != local {
+			t.Errorf("local class reference present=%v, want %v: %+v", wave14HasCall(ref, "src.Local", "src/consumer.ts"), local, ref)
+		}
+		if !local && wave14HasCall(ref, "src.Local", "src/sibling.ts") {
+			t.Errorf("unbound Local reference fell back to same-named sibling class: %+v", ref)
 		}
 		if (wave14HasCall(ref, "src.RemoteClass", "src/sibling.ts")) != imported {
 			t.Errorf("imported class reference present=%v, want %v: %+v", wave14HasCall(ref, "src.RemoteClass", "src/sibling.ts"), imported, ref)
@@ -645,11 +811,42 @@ export class MissingClass {}`
 		if wave14HasCall(ref, "src.MissingClass", "") || wave14HasCall(ref, "src.MissingClass", "src/sibling.ts") {
 			t.Errorf("unimported MissingClass resolved: %+v", ref)
 		}
+		make := wave14Symbols(result.Facts, "src/consumer.ts", "make")
+		if len(make) != 1 {
+			t.Errorf("make symbol facts=%v, want one", make)
+			return
+		}
+		if wave14HasInstantiation(&make[0], "src.Local", "src/consumer.ts") != local {
+			t.Errorf("make local instantiation present=%v, want %v: %+v", wave14HasInstantiation(&make[0], "src.Local", "src/consumer.ts"), local, make[0].Relations)
+		}
+		if !local && wave14HasInstantiation(&make[0], "src.Local", "src/sibling.ts") {
+			t.Errorf("unbound Local constructor fell back to sibling class: %+v", make[0].Relations)
+		}
+		importedFn := wave14Symbols(result.Facts, "src/consumer.ts", "makeImported")
+		if len(importedFn) != 1 || wave14HasInstantiation(&importedFn[0], "src.RemoteClass", "src/sibling.ts") != imported {
+			t.Errorf("makeImported alias instantiation mismatch: %+v", importedFn)
+		}
 	}
 	assertCurrent(state, true, true)
 	wave14AssertNoChange(t, root, files, state.Records)
 
-	write("src/consumer.ts", strings.Replace(consumer, "class LocalClass {}", "class LocalClassRenamed {}", 1))
+	blockShadow := `import { RemoteClass as Alias } from './sibling'
+class Local {}
+new Local()
+new Alias()
+function make() { return new Local() }
+function makeImported() { return new Alias() }
+{
+  const Local = Alias
+  new Local()
+}
+`
+	write("src/consumer.ts", blockShadow)
+	state = wave14AssertSessionColdParity(t, root, files, state.Records, map[string]bool{"src/consumer.ts": true})
+	assertCurrent(state, true, true)
+	wave14AssertNoChange(t, root, files, state.Records)
+
+	write("src/consumer.ts", strings.Replace(consumer, "class Local {}", "class Other {}", 1))
 	state = wave14AssertSessionColdParity(t, root, files, state.Records, map[string]bool{"src/consumer.ts": true})
 	assertCurrent(state, false, true)
 	wave14AssertNoChange(t, root, files, state.Records)
@@ -659,14 +856,19 @@ export class MissingClass {}`
 	assertCurrent(state, true, true)
 	wave14AssertNoChange(t, root, files, state.Records)
 
-	unimported := `export {}
-class LocalClass {}
-new LocalClass()
-new RemoteClass()
+	unimported := `import { RemoteClass as Local } from './sibling'
+function makeImported() { return new Local() }
 `
 	write("src/consumer.ts", unimported)
 	state = wave14AssertSessionColdParity(t, root, files, state.Records, map[string]bool{"src/consumer.ts": true})
-	assertCurrent(state, true, false)
+	ref := wave14FileRef(state.Facts, "src/consumer.ts")
+	if wave14HasCall(ref, "src.Local", "src/consumer.ts") || !wave14HasCall(ref, "src.RemoteClass", "src/sibling.ts") {
+		t.Errorf("explicit imported alias scope not retained: %+v", ref)
+	}
+	makeImported := wave14Symbols(state.Facts, "src/consumer.ts", "makeImported")
+	if len(makeImported) != 1 || !wave14HasInstantiation(&makeImported[0], "src.RemoteClass", "src/sibling.ts") {
+		t.Errorf("renamed imported alias did not resolve in function body: %+v", makeImported)
+	}
 	wave14AssertNoChange(t, root, files, state.Records)
 
 	write("src/consumer.ts", consumer)
