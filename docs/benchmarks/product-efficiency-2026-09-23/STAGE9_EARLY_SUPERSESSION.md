@@ -165,3 +165,17 @@ same benefit.
 These binaries predate concurrent accuracy main 96e4416. Production integration
 requires composing the patches with those accuracy changes and validating the
 new combination; these receipts do not establish that acceptance.
+
+## Integration with accuracy main
+
+The frozen early-v2 and retry-v3 patches were composed incrementally onto
+`6a8581f`, retaining the intervening accuracy changes. The targeted framework,
+retry-context and checkpoint-corruption tests passed in 20.366 seconds. The full
+repository suite then passed with exit 0 in 488.741 seconds, using a Go overlay
+from the real Git checkout. The production files subsequently copied into the
+working tree match the tested source hashes exactly.
+
+[Validation receipt](stage9-retry-current-main-validation.json) and
+[full suite output](stage9-retry-current-main-full-suite.log) preserve that evidence.
+Product comparisons on this base are still pending. The separate committed-state
+decode-reuse draft is not part of this full-suite result or these binaries.

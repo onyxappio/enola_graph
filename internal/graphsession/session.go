@@ -121,6 +121,113 @@ func (s *session) keepProvenDiscovery(disc *tsextractor.Discovery) {
 	s.inputs.tsDiscovery = disc
 }
 
+// parsedPreviewRecords is what a refused attempt hands the retry that follows
+// it: one record per file its planner preview actually parsed. The records the
+// preview adopted unchanged are left out, because the retry would adopt those
+// from the committed state anyway and carrying them would only make the offer
+// look larger than the work it saves.
+func (s *session) parsedPreviewRecords() map[string]*tsextractor.FileRecord {
+	if s.preparedTS == nil || len(s.preparedParses) == 0 {
+		return nil
+	}
+	out := make(map[string]*tsextractor.FileRecord, len(s.preparedParses))
+	for _, p := range s.preparedParses {
+		if rec := s.preparedTS.Records[p.path]; rec != nil && rec.Hash != "" && !rec.Unreadable {
+			out[p.path] = rec
+		}
+	}
+	if len(out) == 0 {
+		return nil
+	}
+	return out
+}
+
+// retryFileContextFor narrows this run's per-file resolution context to the
+// files it is offering, so that a retry can ask the per-file question without
+// carrying a projection of the whole repository forward.
+func (s *session) retryFileContextFor(recs map[string]*tsextractor.FileRecord) (map[string]string, map[string]string) {
+	if s.inputs == nil || len(recs) == 0 {
+		return nil, nil
+	}
+	ctx := make(map[string]string, len(recs))
+	base := make(map[string]string, len(recs))
+	for path := range recs {
+		ctx[path] = s.inputs.tsFileContext[path]
+		base[path] = s.inputs.tsFileBase[path]
+	}
+	return ctx, base
+}
+
+// reusableRetryRecords narrows the refused attempt's parses to the ones this
+// run may take. A record is a claim about one file's facts, and the bytes it was
+// parsed from are only part of what produced it, so the source hash matching is
+// necessary and nowhere near sufficient:
+//
+//   - The whole run has to be resolving the same way. Scope policy, admission,
+//     the engine's extractor context, the captured configuration bytes and the
+//     alias declarations read out of them are compared as one identity, and a
+//     difference in any of them withdraws every record rather than some.
+//   - The file has to be projected the same way. Its own alias root and context
+//     key are compared per file, because an alias root moving under one file
+//     says nothing about the next.
+//   - Every side read has to be the bytes the record read. This is the guard
+//     that cannot be delegated: the extractor's own reuse test asks whether a
+//     side read still exists, not whether it still says the same thing, and the
+//     hop that puts such a dependent in pending reasons from the committed
+//     record's hashes, not from this offer's. A named re-export chain whose
+//     middle moved between the refusal and the retry is exactly the case this
+//     catches, and the record is declined rather than repaired.
+//
+// What survives all three is handed to the extractor as a cached contribution,
+// which still re-reads it if its resolved files, unresolved specifiers, side
+// read existence or framework scope no longer hold, and the fence before End
+// still re-proves its bytes. What is saved is the read and the parse of a file
+// that did not move, and was not resolved differently, while some other file
+// did move.
+func (s *session) reusableRetryRecords(input *runtimeInputs, hashes map[string]string, pending map[string]bool) map[string]*tsextractor.FileRecord {
+	if len(s.retryRecords) == 0 || input == nil {
+		return nil
+	}
+	if s.retryFor != retryIdentityFor(input) {
+		return nil
+	}
+	out := make(map[string]*tsextractor.FileRecord, len(s.retryRecords))
+	for path, rec := range s.retryRecords {
+		if rec == nil || rec.Hash == "" || !pending[path] {
+			continue
+		}
+		h, ok := lookupHash(hashes, path)
+		if !ok || h != rec.Hash {
+			continue
+		}
+		if s.retryFileContext[path] != input.tsFileContext[path] || s.retryFileBase[path] != input.tsFileBase[path] {
+			continue
+		}
+		if !sideReadsStillCurrent(rec, hashes) {
+			continue
+		}
+		out[path] = rec
+	}
+	if len(out) == 0 {
+		return nil
+	}
+	return out
+}
+
+// sideReadsStillCurrent reports whether every file whose bytes this record was
+// derived from - beyond its own source - still hashes to what the record read.
+// An unknown hash counts as moved: a side read this run cannot see is a side
+// read it cannot vouch for.
+func sideReadsStillCurrent(rec *tsextractor.FileRecord, hashes map[string]string) bool {
+	for side, want := range rec.SideReadHashes {
+		got, ok := lookupHash(hashes, side)
+		if !ok || got != want {
+			return false
+		}
+	}
+	return true
+}
+
 // adoptRetainedDiscovery offers the resident's retained snapshot to a run that
 // is not re-reading the tree, and takes it only if it proves out against the
 // capture this run will extract under.
@@ -345,10 +452,18 @@ type session struct {
 	// retained is the snapshot the resident's last committed run proved, and
 	// retainedFor the policy identity it was proven under. Both are an offer,
 	// never an answer: nothing is used until this run proves it again.
-	aliasScopeCache   *aliasScope
-	aliasScopeInput   *runtimeInputs
-	retained          *tsextractor.Discovery
-	retainedFor       retainedDiscoveryIdentity
+	aliasScopeCache *aliasScope
+	aliasScopeInput *runtimeInputs
+	retained        *tsextractor.Discovery
+	retainedFor     retainedDiscoveryIdentity
+	// retryRecords are what the refused attempt before this one parsed, and
+	// retryFor the identity it parsed them under. Like the snapshot above they
+	// are an offer: each record is used only after this run has found the exact
+	// bytes its hash names still on disk.
+	retryRecords      map[string]*tsextractor.FileRecord
+	retryFor          retryIdentity
+	retryFileContext  map[string]string
+	retryFileBase     map[string]string
 	plan              *fileInvalidationPlan
 	extraFallbacks    []graphstream.Fallback
 	priorResolution   *idIndex
@@ -1918,29 +2033,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	next.ExtractorSynthetic = synByExt
 	next.LastRunID = runID
 	next.LastComplete = true
-	nRehash := 0
-	for path, rec := range tsRecords {
-		if rec == nil || rec.Hash == "" || rec.Unreadable {
-			continue
-		}
-		if s.fast {
-			if _, captured := s.capturedSources[path]; !captured {
-				continue
-			}
-		}
-		s.work.VerifiedFiles++
-		disk, rerr := os.ReadFile(filepath.Join(s.abs, path))
-		if rerr != nil {
-			// A source this run compiled from that is gone by the time the run
-			// re-proves it is the ordinary deletion race, not a fault: the
-			// attempt is refused without an End and the watch reconciles.
-			return nil, classifyVanished(rerr, "source", path, "refusing successful EndReplace")
-		}
-		sum := sha256.Sum256(disk)
-		if hex.EncodeToString(sum[:]) != rec.Hash {
-			return nil, fmt.Errorf("%w: source %s changed during the run; refusing successful EndReplace", ErrInputsChanged, path)
-		}
-		nRehash++
+	nRehash, rehashErr := s.revalidateRecordHashes(tsRecords, "refusing successful EndReplace", &s.work.VerifiedFiles)
+	if rehashErr != nil {
+		return nil, rehashErr
 	}
 	tr.Mark("revalidate_ts_records", fmt.Sprintf("n=%d", nRehash))
 	if !s.fast {
@@ -2060,6 +2155,9 @@ func chunkOwner(nodes []graphstream.Node, edges []graphstream.Edge, limit int) [
 func (s *session) begin(ctx context.Context, runID, repoID string, base, target int64, phase, scopeMode string, owners []graphstream.OwnerRef) error {
 	if s.opts.AuthoritativeFiles && s.began {
 		return s.fileLocalErr()
+	}
+	if err := s.consumedInputsStillCurrent(); err != nil {
+		return err
 	}
 	limit := s.opts.MaxBeginBytes
 	if limit <= 0 {
@@ -2189,8 +2287,24 @@ func (s *session) noteAnnounced(owners []graphstream.OwnerRef) {
 // edited. Both a publication and a run that records observations without
 // publishing have to clear it before committing anything.
 func (s *session) revalidateCapturedInputs(refusing string) error {
+	if err := s.revalidateCapturedSources(refusing, &s.work.CapturedReads); err != nil {
+		return err
+	}
+	for _, fence := range s.previewFences {
+		if err := fence(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// revalidateCapturedSources re-reads every source this run has already consumed
+// and reports the first one whose bytes are no longer the bytes the run read.
+// The counter it charges the reads to is the caller's, because the same question
+// is now asked at two points in a run and the two costs are worth telling apart.
+func (s *session) revalidateCapturedSources(refusing string, reads *int) error {
 	for rel, src := range s.capturedSources {
-		s.work.CapturedReads++
+		*reads++
 		disk, rerr := os.ReadFile(filepath.Join(s.abs, rel))
 		if rerr != nil {
 			// A captured input that vanished changed; one that is still there
@@ -2202,12 +2316,135 @@ func (s *session) revalidateCapturedInputs(refusing string) error {
 			return fmt.Errorf("%w: source/config bytes changed during the run (%s); %s", ErrInputsChanged, rel, refusing)
 		}
 	}
-	for _, fence := range s.previewFences {
-		if err := fence(); err != nil {
-			return err
+	return nil
+}
+
+// revalidateRecordHashes re-reads each source a TypeScript pass compiled and
+// reports the first whose bytes no longer hash to what that pass recorded. A
+// record carries the hash of the bytes the parse consumed, which is why this
+// question is asked of the records rather than of the captured sources: the two
+// reads are separate, and it is the parsed bytes that the facts were derived
+// from.
+func (s *session) revalidateRecordHashes(recs map[string]*tsextractor.FileRecord, refusing string, reads *int) (int, error) {
+	n := 0
+	for path, rec := range recs {
+		if rec == nil || rec.Hash == "" || rec.Unreadable {
+			continue
+		}
+		if s.fast {
+			if _, captured := s.capturedSources[path]; !captured {
+				continue
+			}
+		}
+		*reads++
+		disk, rerr := os.ReadFile(filepath.Join(s.abs, path))
+		if rerr != nil {
+			// A source this run compiled from that is gone by the time the run
+			// re-proves it is the ordinary deletion race, not a fault: the
+			// attempt is refused without an End and the watch reconciles.
+			return n, classifyVanished(rerr, "source", path, refusing)
+		}
+		sum := sha256.Sum256(disk)
+		if hex.EncodeToString(sum[:]) != rec.Hash {
+			return n, fmt.Errorf("%w: source %s changed during the run; %s", ErrInputsChanged, path, refusing)
+		}
+		n++
+	}
+	return n, nil
+}
+
+// previewParsedRecords is the part of the planner preview's result this run
+// actually read the tree for: one record per file the preview parsed. The
+// result carries a record for every file the extractor knows about, most of
+// them adopted unchanged from the stored state and never read, and re-reading
+// those would make a question about this run's own reads cost as much as the
+// repository. The fence before End does read them all, deliberately - by then
+// the run is about to commit them - but a run deciding whether to announce has
+// only its own reads to answer for.
+//
+// A file the run captured is left out, because the captured pass already
+// answers for it and answers the same way. The preview compiles from the
+// captured bytes, so such a record's hash is the hash of exactly those bytes;
+// comparing the tree against the captured bytes therefore settles the record
+// too, and reading it a second time only charges the file twice. A parsed file
+// with no capture behind it has no other answer and stays.
+func (s *session) previewParsedRecords() map[string]*tsextractor.FileRecord {
+	if s.preparedTS == nil || len(s.preparedParses) == 0 {
+		return nil
+	}
+	out := make(map[string]*tsextractor.FileRecord, len(s.preparedParses))
+	for _, p := range s.preparedParses {
+		if _, captured := s.capturedSources[p.path]; captured {
+			continue
+		}
+		if rec := s.preparedTS.Records[p.path]; rec != nil {
+			out[p.path] = rec
 		}
 	}
-	return nil
+	return out
+}
+
+// consumedInputsStillCurrent refuses a run whose already-consumed bytes have
+// been overwritten, before it announces anything.
+//
+// A frozen run reads the tree well before it publishes: the planner preview
+// compiles the dirty files, and discovery reads the manifests around them, all
+// of which happens before the invalidation plan is frozen and a Begin is sent.
+// A write landing in that window is caught, but only at the end, by the
+// revalidation before a successful End - so the attempt announces a replacement,
+// publishes the facts it derived from bytes that are already gone, and only then
+// refuses. The graph stays correct, because that final fence still decides
+// whether the End is sent, and the watch retries from the newer bytes. What is
+// wasted is the announcement: consumers are told a generation is coming and then
+// have to reconcile an abandoned one.
+//
+// Asking the same question before Begin costs one re-read of what this run has
+// already read - its captured sources, and the files the preview parsed that no
+// capture already answers for - and turns that case into a silent retry. It is
+// deliberately the same comparison and the same error, so a caller cannot tell
+// the two fences apart other than by when they fired.
+//
+// That cost is the run's own reads, which is not the same as a small number:
+// this runs on every run, an initial one included, and a run that captured a
+// large tree pays for the tree it captured. It is bounded by what the run has
+// read, never by what the repository holds, and EarlyConsumedReads is kept
+// apart from CapturedReads so the bound can be checked rather than believed.
+// The fast filtering inside the record pass is inherited from the fence before
+// End, where it belongs to that fence's question; it is not a claim that a
+// preview-only dependent is caught here.
+//
+// This adds a refusal; it removes none. The fence before End stays exactly where
+// it is and stays authoritative, because bytes can still move in the window this
+// one cannot see, between Begin and End. The preview fences are not re-run here:
+// they answer for a non-TypeScript extractor's whole capture, and that question
+// belongs where it already is.
+//
+// It is asked only of the frozen file-owner contract. What makes an abandoned
+// announcement worth a re-read is that consumers were told a generation is
+// coming, which is a v2 promise; the legacy streaming path makes no such promise
+// and has a contract of its own about transient configuration - a run there is
+// allowed to read a file that is overwritten and restored underneath it and
+// still finish, and TestConfigChangeRestoreUsesCapturedBytes holds it to exactly
+// that. Refusing there would not make the graph safer, because the End fence
+// already decides correctness in both; it would turn a run that is required to
+// finish into one that retries from bytes the fixture puts back only once.
+func (s *session) consumedInputsStillCurrent() error {
+	if !s.opts.AuthoritativeFiles {
+		return nil
+	}
+	recs := s.previewParsedRecords()
+	if len(s.capturedSources) == 0 && len(recs) == 0 {
+		return nil
+	}
+	const refusing = "refusing to announce an attempt built from superseded bytes"
+	t := time.Now()
+	before := s.work.EarlyConsumedReads
+	err := s.revalidateCapturedSources(refusing, &s.work.EarlyConsumedReads)
+	if err == nil {
+		_, err = s.revalidateRecordHashes(recs, refusing, &s.work.EarlyConsumedReads)
+	}
+	graphprofile.Since("revalidate_before_begin", t, fmt.Sprintf("n=%d superseded=%v", s.work.EarlyConsumedReads-before, err != nil))
+	return err
 }
 
 func (s *session) mergeCaptured(extra map[string][]byte) {
@@ -2789,7 +3026,27 @@ func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*Fil
 	// spot: see the reconsideration below.
 	rebind := map[string]bool{}
 	for {
-		r, err := ts.ExtractSession(ctx, s.abs, owned, work, pending, hooks)
+		// A file the refused attempt before this one parsed, whose bytes have
+		// not moved since, is handed over as a cached contribution rather than
+		// read and parsed again. It stays in pending, because the question of
+		// whether its surface changed against the committed state still has to
+		// be asked and its dependents still have to be reached; only the read
+		// is skipped. The extractor re-reads it regardless if its resolution no
+		// longer holds, and the fence before End re-proves its bytes like any
+		// other record, so nothing here is trusted that is not proven later.
+		extractDirty := pending
+		if reuse := s.reusableRetryRecords(s.inputs, hashes, pending); len(reuse) > 0 {
+			extractDirty = make(map[string]bool, len(pending))
+			for f, v := range pending {
+				extractDirty[f] = v
+			}
+			for f, rec := range reuse {
+				work[f] = rec
+				delete(extractDirty, f)
+				s.work.RetryParsesReused++
+			}
+		}
+		r, err := ts.ExtractSession(ctx, s.abs, owned, work, extractDirty, hooks)
 		if err != nil {
 			return nil, nil, err
 		}

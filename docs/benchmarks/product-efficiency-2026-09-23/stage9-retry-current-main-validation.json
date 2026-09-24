@@ -1,0 +1,48 @@
+{
+  "base": "6a8581f",
+  "kind": "early-v2 plus retry-v3 composed with current accuracy main; state checkpoint optimization excluded",
+  "focused": {
+    "exit_code": 0,
+    "package_seconds": 20.366,
+    "base": "6a8581f",
+    "patches": [
+      "early-supersession-v2",
+      "retry-v3"
+    ],
+    "checkpoint_guard_commit": "34c7e36",
+    "log": "/tmp/enola-stage9-main-retry-review/focused.log"
+  },
+  "full_suite": {
+    "exit_code": 0,
+    "elapsed_seconds": 488.740857917,
+    "base": "6a8581f",
+    "overlay": "/tmp/enola-stage9-main-retry-review/overlay.json"
+  },
+  "builds": [
+    {
+      "name": "enola-control-6a8581f",
+      "exit_code": 0,
+      "elapsed_seconds": 7.937548792,
+      "stderr": "",
+      "sha256": "3267a845c29e7e23407fe21ba93094153a8037249eb383bb1e369455054460cd"
+    },
+    {
+      "name": "enola-candidate-6a8581f",
+      "exit_code": 0,
+      "elapsed_seconds": 6.099667583,
+      "stderr": "",
+      "sha256": "99546c6a5d679914f7f1a7aea2bd49a09c2e31e1edf4f57e95103777fa733127"
+    }
+  ],
+  "sources": {
+    "resident.go": "5acf3fbedd518bb44bbcaebff536b1853dcf6674c172817adb04268140577f03",
+    "session.go": "469ca547a2329f3a9f4c269302ec68b4923ff273559d3e028a6244d189c7c249",
+    "zz_early_supersession_guard_test.go": "dedcfc42bdc97d6d8c0137f9bae9443bb4389422556ac307964a0b9b0e64217a",
+    "zz_early_supersession_aba_test.go": "147c101ab2846637f0b3b14e8293c58aa9e3102432d2898f2439adf34dd682f2",
+    "zz_retry_reuse_guard_test.go": "ddb72887ab3fbef9be2123982fb9872f71eb65591e1022daa986301df61e4669",
+    "independent_superseded_capture_test.go": "98ecda3160ada004145afdcc23864087753210161486642ff5655d702b4cdc1e",
+    "independent_deleted_capture_test.go": "4373e90e1baed08c1c2b2b77ad19a18fccefb15e05a482a6142144d83c9fde80",
+    "independent_retry_checkpoint_bytes_test.go": "cd928bee375253c6f43d8c0e0270014bb17b429423f02ff838667bb4a5738a6e"
+  },
+  "product_validation": "pending on this base; old-base measurements are not new-base acceptance"
+}

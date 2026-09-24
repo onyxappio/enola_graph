@@ -6,10 +6,12 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/enola-labs/enola/internal/graphinput"
 	"os"
 	"path/filepath"
+	"sort"
 	"sync"
 
 	"github.com/enola-labs/enola/internal/engine"
@@ -24,9 +26,20 @@ import (
 // WorkCounters describe session input and persistence work, not extractor internals.
 // Extraction/composition reads remain separately reported by Result.Stats.
 type WorkCounters struct {
-	PolicyBuilds                                              int
-	BoundedContextChecks                                      int
-	FactAssemblies, CapturedReads, PublishedEvents            int
+	PolicyBuilds                                   int
+	BoundedContextChecks                           int
+	FactAssemblies, CapturedReads, PublishedEvents int
+	// EarlyConsumedReads counts the sources a run re-read before announcing a
+	// Begin, to find out whether the bytes it has already consumed are still
+	// the bytes on disk. It is the price of not announcing an attempt that is
+	// already superseded, and it is kept apart from CapturedReads so that price
+	// stays visible rather than folded into the fence before End.
+	EarlyConsumedReads int
+	// RetryParsesReused counts the files a retry took from the refused attempt
+	// before it instead of reading and parsing them again, each one proven to
+	// be the same bytes that attempt parsed. It measures what a refusal now
+	// costs rather than what it used to waste.
+	RetryParsesReused                                         int
 	CheckpointBytes                                           int64
 	InventoryScans, DetectionScans, ContextScans, ConfigScans int
 	HashedFiles, DirtyHashBytes, VerifiedFiles, Checkpoints   int
@@ -84,6 +97,83 @@ type runtimeInputs struct {
 	configHash        string
 	config            map[string][]byte
 	angular           bool
+}
+
+// retryIdentity is what a refused attempt's parses were produced under. It is
+// deliberately wider than retainedDiscoveryIdentity: a discovery snapshot is
+// re-proven read by read before it is believed, while a file record is believed
+// on the strength of a hash comparison that says nothing about how the file was
+// resolved. Everything that decides resolution for the whole run - the scope
+// policy, the admission rules, the engine's extractor context, the captured
+// configuration bytes, the alias declarations read out of them, and the set of
+// names a specifier can land on - therefore has to be the same run-wide, or no
+// record is offered at all. Per-file resolution context is compared separately,
+// per file.
+//
+// The name set is in here rather than left to the extractor because the
+// extractor's reuse test asks whether the targets a record already resolved
+// still exist, which a file arriving next to them does not disturb: a specifier
+// that resolved to dep/index.ts resolves to dep.ts once dep.ts is written, and
+// both are present, and nothing about the record says so. A record is a claim
+// about resolution against one universe of names, and the cheapest honest way to
+// keep that claim is to withdraw it when the universe moves. Files arriving and
+// leaving is not what a refusal is usually about, so the reuse this gives up is
+// not the reuse the retry is for.
+type retryIdentity struct {
+	policy    string
+	admission string
+	engine    string
+	config    string
+	tsContext string
+	names     string
+}
+
+func retryIdentityFor(input *runtimeInputs) retryIdentity {
+	if input == nil {
+		return retryIdentity{}
+	}
+	return retryIdentity{
+		policy:    input.policyIdentity,
+		admission: input.admissionIdentity,
+		engine:    input.engineContextHash,
+		config:    input.configHash,
+		tsContext: stringMapDigest(input.tsContext),
+		names:     nameSetDigest(input.inventory.AllNames),
+	}
+}
+
+// nameSetDigest is order-independent for the same reason stringMapDigest is: two
+// walks of one tree are the same universe whatever order they returned it in.
+func nameSetDigest(names []string) string {
+	if len(names) == 0 {
+		return ""
+	}
+	sorted := make([]string, len(names))
+	copy(sorted, names)
+	sort.Strings(sorted)
+	h := sha256.New()
+	for _, n := range sorted {
+		fmt.Fprintf(h, "%d:%s\n", len(n), n)
+	}
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+// stringMapDigest is order-independent so that two runs reading the same
+// declarations agree whatever order they walked them in.
+func stringMapDigest(m map[string]string) string {
+	if len(m) == 0 {
+		return ""
+	}
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	h := sha256.New()
+	for _, k := range keys {
+		fmt.Fprintf(h, "%d:%s=%d:%s\n", len(k), k, len(m[k]), m[k])
+	}
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 // retainedDiscoveryIdentity is what a snapshot was proven under, as opposed to
@@ -214,10 +304,28 @@ type Resident struct {
 	// leaves no observation worth carrying.
 	tsDiscovery    *tsextractor.Discovery
 	tsDiscoveryFor retainedDiscoveryIdentity
-	snapshot       []facts.Fact
-	epoch          string
-	watermark      uint64
-	failed, closed bool
+	// retryRecords are the file records the last refused attempt parsed, kept
+	// for the retry that follows it. They are the one thing a run that did not
+	// commit does leave behind, because unlike a discovery snapshot a record is
+	// not an observation about the tree as a whole: it is the result of reading
+	// one file, and it carries the hash of the bytes it read. The retry reuses
+	// one only after finding those exact bytes still in place, so a tree that
+	// moved underneath the refused attempt invalidates precisely the records it
+	// moved and no others - see reusableRetryRecords for what "those exact bytes"
+	// has to mean before a record is taken, which is more than the file's own
+	// source. Dropped whole on a commit and on any other kind of failure.
+	retryRecords map[string]*tsextractor.FileRecord
+	retryFor     retryIdentity
+	// retryFileContext and retryFileBase are the per-file resolution context the
+	// refused attempt parsed each offered record under. A record is only taken
+	// by a retry that projects that same file the same way; an alias root moving
+	// under one file is not an argument about the rest.
+	retryFileContext map[string]string
+	retryFileBase    map[string]string
+	snapshot         []facts.Fact
+	epoch            string
+	watermark        uint64
+	failed, closed   bool
 	// engineUnused is the caller's FreshEngine claim, still true. It survives
 	// exactly until the first transaction, because after that the engine is one
 	// this session has been running against rather than one just constructed,
@@ -387,6 +495,8 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 	rtr.Mark("reconcile_complete", fmt.Sprintf("reloaded=%v", reloaded))
 	s := &session{eng: r.eng, abs: r.abs, opts: r.opts, sink: r.sink, state: r.state, journal: r.journal, prof: graphprofile.StartNamed("session"), inputs: input, fast: fast}
 	s.retained, s.retainedFor = r.tsDiscovery, r.tsDiscoveryFor
+	s.retryRecords, s.retryFor = r.retryRecords, r.retryFor
+	s.retryFileContext, s.retryFileBase = r.retryFileContext, r.retryFileBase
 	if !fast && r.eng.GraphScope() != nil {
 		if provenInputs {
 			s.work.GraphInputRebuildsProven = 1
@@ -429,6 +539,19 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 		// snapshot may have been built against a tree that moved underneath it,
 		// which is often why it failed, so the next run starts from no offer.
 		r.tsDiscovery, r.tsDiscoveryFor = nil, retainedDiscoveryIdentity{}
+		// A run refused because its inputs moved has already read most of a
+		// tree that mostly did not move, and the retry would otherwise read it
+		// all again. Keep what it parsed, under the identity it parsed it
+		// under, for the retry to re-prove file by file. Any other failure
+		// leaves nothing: the reason is not known to be a moved input, so the
+		// records are not known to be the result of a completed read.
+		if errors.Is(err, ErrInputsChanged) {
+			r.retryRecords = s.parsedPreviewRecords()
+			r.retryFor = retryIdentityFor(s.inputs)
+			r.retryFileContext, r.retryFileBase = s.retryFileContextFor(r.retryRecords)
+		} else {
+			r.dropRetryRecords()
+		}
 		return nil, s.work, err
 	}
 	promoteEngine = true
@@ -448,6 +571,9 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 	// same value carried one run further.
 	r.tsDiscovery = s.inputs.tsDiscovery
 	r.tsDiscoveryFor = retainedDiscoveryIdentity{policy: s.inputs.policyIdentity, admission: s.inputs.admissionIdentity}
+	// A committed run has folded everything it parsed into the state the next
+	// run starts from, so the retry carry-over has nothing left to add.
+	r.dropRetryRecords()
 	r.snapshot = res.Facts
 	r.opts.ForceInitial = false
 	return res, s.work, nil
@@ -687,4 +813,12 @@ func validateGraphPolicy(eng *engine.Engine) error {
 		}
 	}
 	return nil
+}
+
+// dropRetryRecords forgets the refused attempt's parses. A run that committed
+// has folded them into the state everyone reads next, and a run that failed for
+// any other reason has not shown that they describe anything.
+func (r *Resident) dropRetryRecords() {
+	r.retryRecords, r.retryFor = nil, retryIdentity{}
+	r.retryFileContext, r.retryFileBase = nil, nil
 }
