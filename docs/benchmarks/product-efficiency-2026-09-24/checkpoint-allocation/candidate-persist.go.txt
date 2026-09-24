@@ -1,0 +1,275 @@
+package graphsession
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"time"
+
+	"github.com/enola-labs/enola/internal/facts"
+	"github.com/enola-labs/enola/internal/graphprofile"
+	"github.com/enola-labs/enola/internal/graphstream"
+)
+
+func statePath(dir string) string        { return filepath.Join(dir, "state.json") }
+func pendingStatePath(dir string) string { return filepath.Join(dir, "pending-state.json") }
+func identityPath(dir string) string     { return filepath.Join(dir, "identity.json") }
+
+type boundIdentity struct {
+	RepoID    string `json:"repo_id"`
+	ContextID string `json:"context_id"`
+	SinkID    string `json:"sink_id,omitempty"`
+	Checkout  string `json:"checkout"`
+}
+
+// bindDispatchIdentity records repo/context/sink/checkout before any journal
+// replay or append, and rejects a mismatched reuse of the state directory.
+func bindDispatchIdentity(dir string, opts Options, abs string) error {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return err
+	}
+	path := identityPath(dir)
+	if b, err := os.ReadFile(path); err == nil {
+		var id boundIdentity
+		if err := json.Unmarshal(b, &id); err != nil {
+			return fmt.Errorf("graphsession identity: %w", err)
+		}
+		st := &State{RepoID: id.RepoID, ContextID: id.ContextID, SinkID: id.SinkID, Checkout: id.Checkout}
+		return identityOK(st, opts, abs)
+	} else if !os.IsNotExist(err) {
+		return err
+	}
+	if st, err := loadCommittedState(dir); err != nil {
+		return err
+	} else if st != nil {
+		if err := identityOK(st, opts, abs); err != nil {
+			return err
+		}
+	}
+	if p, err := loadPendingState(dir); err != nil {
+		return err
+	} else if p != nil {
+		if err := identityOK(p, opts, abs); err != nil {
+			return err
+		}
+	}
+	id := boundIdentity{RepoID: opts.RepoID, ContextID: opts.ContextID, SinkID: opts.SinkID, Checkout: abs}
+	raw, err := json.MarshalIndent(id, "", "  ")
+	if err != nil {
+		return err
+	}
+	tmp := path + ".tmp"
+	if err := os.WriteFile(tmp, raw, 0o644); err != nil {
+		return err
+	}
+	return os.Rename(tmp, path)
+}
+
+func loadCommittedState(dir string) (*State, error) {
+	return readStateFile(statePath(dir))
+}
+
+func loadPendingState(dir string) (*State, error) {
+	return readStateFile(pendingStatePath(dir))
+}
+
+func readStateFile(path string) (*State, error) {
+	st, _, err := readStateFileFP(path, nil)
+	return st, err
+}
+
+// readStateFileFP also reports which bytes the returned State was decoded
+// from, so a caller that keeps the value can later prove the file still holds
+// them. The digest is taken over the bytes already in hand; nothing is
+// retained beyond the fingerprint itself.
+func readStateFileFP(path string, w *stateReadWork) (*State, stateFingerprint, error) {
+	tRead := time.Now()
+	b, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, stateFingerprint{}, nil
+		}
+		return nil, stateFingerprint{}, err
+	}
+	graphprofile.Since("state_read_bytes", tRead, fmt.Sprintf("%s bytes=%d", filepath.Base(path), len(b)))
+	tFP := time.Now()
+	fp := fingerprintStateBytes(b)
+	w.digested(len(b))
+	graphprofile.Since("state_fingerprint", tFP, fmt.Sprintf("bytes=%d", len(b)))
+	st, err := decodeStateBytes(path, b)
+	if err != nil {
+		return nil, stateFingerprint{}, err
+	}
+	w.decoded()
+	return st, fp, nil
+}
+
+func decodeStateBytes(path string, b []byte) (*State, error) {
+	tJSON := time.Now()
+	var st State
+	if err := json.Unmarshal(b, &st); err != nil {
+		return nil, fmt.Errorf("graphsession state %s: %w", filepath.Base(path), err)
+	}
+	graphprofile.Since("state_json_unmarshal", tJSON, fmt.Sprintf("files=%d", len(st.Files)))
+	if st.Files == nil {
+		st.Files = map[string]*FileState{}
+	}
+	if st.Synthetic == nil {
+		st.Synthetic = map[string][]facts.Fact{}
+	}
+	if st.ExtractorInputHash == nil {
+		st.ExtractorInputHash = map[string]string{}
+	}
+	if st.ExtractorSynthetic == nil {
+		st.ExtractorSynthetic = map[string]map[string][]facts.Fact{}
+	}
+	return &st, nil
+}
+
+// recoverAcknowledgedPending promotes pending-state.json only when that
+// generation's EndReplace is present and acknowledged in the journal.
+// An empty unacked set is not enough: a crash after writePending and
+// before End leaves prior messages acked with no End, and must not
+// install the unacknowledged generation.
+func recoverAcknowledgedPending(dir string, journal *graphstream.Journal, opts Options, abs string) (*State, error) {
+	st, _, err := recoverAcknowledgedPendingFP(dir, journal, opts, abs, stateCheckpoint{}, nil)
+	return st, err
+}
+
+// recoverAcknowledgedPendingFP is the same barrier, reporting the fingerprint
+// of whichever state it installed and accepting a resident's checkpoint. The
+// checkpoint is consulted on the committed-state fallbacks only, never on the
+// promotion path: a generation that is promoted here is one this process has
+// not decoded, and must be read from disk. A zero checkpoint - a fresh process
+// - validates the disk exactly as before.
+func recoverAcknowledgedPendingFP(dir string, journal *graphstream.Journal, opts Options, abs string, ck stateCheckpoint, w *stateReadWork) (*State, stateFingerprint, error) {
+	pending, pendingFP, err := readStateFileFP(pendingStatePath(dir), w)
+	if err != nil {
+		return nil, stateFingerprint{}, err
+	}
+	if pending == nil || !pending.LastComplete || pending.LastRunID == "" {
+		return reuseCommittedState(dir, ck, w)
+	}
+	if err := identityOK(pending, opts, abs); err != nil {
+		// Pending belongs to a different repo/context/sink; leave it in place
+		// and use the committed checkpoint.
+		return reuseCommittedState(dir, ck, w)
+	}
+	if !journalHasAckedEnd(journal, pending.LastRunID) {
+		return reuseCommittedState(dir, ck, w)
+	}
+	if err := promotePendingState(dir); err != nil {
+		return nil, stateFingerprint{}, err
+	}
+	return pending, pendingFP, nil
+}
+
+// journalHasAckedEnd uses metadata decoded when the journal was appended or opened.
+// Avoid copying and decoding every retained payload at the checkpoint barrier.
+func journalHasAckedEnd(j *graphstream.Journal, runID string) bool {
+	return j.HasAckedEnd(runID)
+}
+
+func writePendingState(dir string, st *State) error {
+	_, err := writePendingStateFP(dir, st)
+	return err
+}
+
+// writePendingStateFP reports the fingerprint of the bytes it wrote. Those are
+// the bytes promotePendingState renames into place, so a caller that promotes
+// them knows the committed file's fingerprint without reading it back.
+func writePendingStateFP(dir string, st *State) (stateFingerprint, error) {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return stateFingerprint{}, err
+	}
+	if st.Synthetic == nil {
+		st.Synthetic = map[string][]facts.Fact{}
+	}
+	if st.ExtractorInputHash == nil {
+		st.ExtractorInputHash = map[string]string{}
+	}
+	if st.ExtractorSynthetic == nil {
+		st.ExtractorSynthetic = map[string]map[string][]facts.Fact{}
+	}
+	graphprofile.Log("state_json_marshal_start", 0, "diagnostic boundary")
+	tJSON := time.Now()
+	b, err := json.Marshal(st)
+	if err != nil {
+		return stateFingerprint{}, err
+	}
+	graphprofile.Since("state_json_marshal", tJSON, fmt.Sprintf("bytes=%d files=%d", len(b), len(st.Files)))
+	path := pendingStatePath(dir)
+	tmp := path + ".tmp"
+	f, err := os.Create(tmp)
+	if err != nil {
+		return stateFingerprint{}, err
+	}
+	if _, err := f.Write(b); err != nil {
+		f.Close()
+		os.Remove(tmp)
+		return stateFingerprint{}, err
+	}
+	if err := f.Sync(); err != nil {
+		f.Close()
+		os.Remove(tmp)
+		return stateFingerprint{}, err
+	}
+	if err := f.Close(); err != nil {
+		os.Remove(tmp)
+		return stateFingerprint{}, err
+	}
+	if err := os.Rename(tmp, path); err != nil {
+		return stateFingerprint{}, err
+	}
+	if err := fsyncDir(dir); err != nil {
+		return stateFingerprint{}, err
+	}
+	// The write path digests too, and pays for it. It has no WorkCounters to
+	// report into - a checkpoint is written from places that do not own a run's
+	// counters - so the cost is left as a trace mark rather than going unrecorded.
+	tFP := time.Now()
+	fp := fingerprintStateBytes(b)
+	graphprofile.Since("state_fingerprint", tFP, fmt.Sprintf("write bytes=%d", len(b)))
+	return fp, nil
+}
+
+func promotePendingState(dir string) error {
+	pending := pendingStatePath(dir)
+	if _, err := os.Stat(pending); err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	if err := os.Rename(pending, statePath(dir)); err != nil {
+		return err
+	}
+	return fsyncDir(dir)
+}
+
+func fsyncDir(dir string) error {
+	d, err := os.Open(dir)
+	if err != nil {
+		return err
+	}
+	defer d.Close()
+	return d.Sync()
+}
+
+func saveState(dir string, st *State) error {
+	_, err := saveStateFP(dir, st)
+	return err
+}
+
+// saveStateFP reports the fingerprint of the committed file it just installed.
+func saveStateFP(dir string, st *State) (stateFingerprint, error) {
+	fp, err := writePendingStateFP(dir, st)
+	if err != nil {
+		return stateFingerprint{}, err
+	}
+	if err := promotePendingState(dir); err != nil {
+		return stateFingerprint{}, err
+	}
+	return fp, nil
+}

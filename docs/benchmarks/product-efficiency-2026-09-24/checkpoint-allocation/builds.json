@@ -1,0 +1,34 @@
+[
+  {
+    "arm": "baseline",
+    "argv": [
+      "/opt/homebrew/bin/go",
+      "build",
+      "-trimpath",
+      "-overlay",
+      "/tmp/enola-stage16-phase-memory/checkpoint-diagnostic/baseline-overlay.json",
+      "-o",
+      "/tmp/enola-stage16-phase-memory/checkpoint-diagnostic/enola-baseline",
+      "./cmd/enola"
+    ],
+    "exit": 0,
+    "build_seconds": 5.110312500037253,
+    "binary_sha256": "8c73f6cf54b05425c4a30820d21b071197f9e237c29292847f5f3bcf3ad8572f"
+  },
+  {
+    "arm": "candidate",
+    "argv": [
+      "/opt/homebrew/bin/go",
+      "build",
+      "-trimpath",
+      "-overlay",
+      "/tmp/enola-stage16-phase-memory/checkpoint-diagnostic/candidate-overlay.json",
+      "-o",
+      "/tmp/enola-stage16-phase-memory/checkpoint-diagnostic/enola-candidate",
+      "./cmd/enola"
+    ],
+    "exit": 0,
+    "build_seconds": 4.39130587503314,
+    "binary_sha256": "7f14f4e1d506ac34dbadb6f8351be4e23436258a2288ad0ad0e78cb7d8df7f9e"
+  }
+]

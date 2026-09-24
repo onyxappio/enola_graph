@@ -1,0 +1,180 @@
+{
+  "diagnostic_only": true,
+  "timing_acceptance": false,
+  "method": "Difference in runtime TotalAlloc at directly adjacent pre/post json.Marshal trace boundaries; includes tiny trace overhead and concurrent goroutine allocation, not exclusive CPU attribution.",
+  "arms": {
+    "baseline": {
+      "r1-new-initial": {
+        "allocated_bytes": 381719456,
+        "mallocs": 689755,
+        "gc_before": 55,
+        "gc_after": 56,
+        "before": {
+          "trace": "since",
+          "phase": "state_json_marshal_start",
+          "total_alloc": "4229666920",
+          "heap_alloc": "235079256",
+          "heap_sys": "514785280",
+          "heap_idle": "180805632",
+          "heap_released": "2318336",
+          "mallocs": "54576553",
+          "num_gc": "55"
+        },
+        "after": {
+          "trace": "since",
+          "phase": "state_json_marshal",
+          "total_alloc": "4611386376",
+          "heap_alloc": "465619024",
+          "heap_sys": "774832128",
+          "heap_idle": "207077376",
+          "heap_released": "25370624",
+          "mallocs": "55266308",
+          "num_gc": "56"
+        }
+      },
+      "r1-new-body": {
+        "allocated_bytes": 381310424,
+        "mallocs": 653473,
+        "gc_before": 19,
+        "gc_after": 21,
+        "before": {
+          "trace": "since",
+          "phase": "state_json_marshal_start",
+          "total_alloc": "1514288976",
+          "heap_alloc": "277601152",
+          "heap_sys": "409829376",
+          "heap_idle": "113352704",
+          "heap_released": "34086912",
+          "mallocs": "6976234",
+          "num_gc": "19"
+        },
+        "after": {
+          "trace": "since",
+          "phase": "state_json_marshal",
+          "total_alloc": "1895599400",
+          "heap_alloc": "395798432",
+          "heap_sys": "640614400",
+          "heap_idle": "223707136",
+          "heap_released": "54444032",
+          "mallocs": "7629707",
+          "num_gc": "21"
+        }
+      },
+      "r1-new-structural": {
+        "allocated_bytes": 381296232,
+        "mallocs": 653470,
+        "gc_before": 18,
+        "gc_after": 20,
+        "before": {
+          "trace": "since",
+          "phase": "state_json_marshal_start",
+          "total_alloc": "1515792616",
+          "heap_alloc": "276504032",
+          "heap_sys": "443383808",
+          "heap_idle": "148627456",
+          "heap_released": "61562880",
+          "mallocs": "7004284",
+          "num_gc": "18"
+        },
+        "after": {
+          "trace": "since",
+          "phase": "state_json_marshal",
+          "total_alloc": "1897088848",
+          "heap_alloc": "395891896",
+          "heap_sys": "552632320",
+          "heap_idle": "135733248",
+          "heap_released": "25182208",
+          "mallocs": "7657754",
+          "num_gc": "20"
+        }
+      }
+    },
+    "candidate": {
+      "r1-new-initial": {
+        "allocated_bytes": 381724032,
+        "mallocs": 689754,
+        "gc_before": 55,
+        "gc_after": 57,
+        "before": {
+          "trace": "since",
+          "phase": "state_json_marshal_start",
+          "total_alloc": "4218505904",
+          "heap_alloc": "348693280",
+          "heap_sys": "485326848",
+          "heap_idle": "51273728",
+          "heap_released": "6840320",
+          "mallocs": "54496915",
+          "num_gc": "55"
+        },
+        "after": {
+          "trace": "since",
+          "phase": "state_json_marshal",
+          "total_alloc": "4600229936",
+          "heap_alloc": "389080416",
+          "heap_sys": "783319040",
+          "heap_idle": "297033728",
+          "heap_released": "29155328",
+          "mallocs": "55186669",
+          "num_gc": "57"
+        }
+      },
+      "r1-new-body": {
+        "allocated_bytes": 404979328,
+        "mallocs": 653435,
+        "gc_before": 18,
+        "gc_after": 20,
+        "before": {
+          "trace": "since",
+          "phase": "state_json_marshal_start",
+          "total_alloc": "1503965136",
+          "heap_alloc": "207056160",
+          "heap_sys": "426803200",
+          "heap_idle": "201850880",
+          "heap_released": "64651264",
+          "mallocs": "6887225",
+          "num_gc": "18"
+        },
+        "after": {
+          "trace": "since",
+          "phase": "state_json_marshal",
+          "total_alloc": "1908944464",
+          "heap_alloc": "373186336",
+          "heap_sys": "594673664",
+          "heap_idle": "199819264",
+          "heap_released": "138477568",
+          "mallocs": "7540660",
+          "num_gc": "20"
+        }
+      },
+      "r1-new-structural": {
+        "allocated_bytes": 381305296,
+        "mallocs": 653481,
+        "gc_before": 20,
+        "gc_after": 22,
+        "before": {
+          "trace": "since",
+          "phase": "state_json_marshal_start",
+          "total_alloc": "1504506056",
+          "heap_alloc": "202727776",
+          "heap_sys": "363855872",
+          "heap_idle": "144498688",
+          "heap_released": "5890048",
+          "mallocs": "6915223",
+          "num_gc": "20"
+        },
+        "after": {
+          "trace": "since",
+          "phase": "state_json_marshal",
+          "total_alloc": "1885811352",
+          "heap_alloc": "362338576",
+          "heap_sys": "577896448",
+          "heap_idle": "195477504",
+          "heap_released": "133292032",
+          "mallocs": "7568704",
+          "num_gc": "22"
+        }
+      }
+    }
+  },
+  "seven_cross_arm_graphs_equal": true
+}

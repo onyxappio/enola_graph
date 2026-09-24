@@ -1,0 +1,75 @@
+{
+  "rows": [
+    {
+      "method": "marshal",
+      "sample": 0,
+      "allocated": 381289312,
+      "mallocs": 652939,
+      "writes": 0,
+      "bytes": 56633952,
+      "input_sha": "a3e6580e259c65dcde0402b5b53a9ad368ba1ea2237119bc4564022495d39f89",
+      "canonical_sha": "a3e6580e259c65dcde0402b5b53a9ad368ba1ea2237119bc4564022495d39f89"
+    },
+    {
+      "method": "marshal",
+      "sample": 1,
+      "allocated": 381293320,
+      "mallocs": 652953,
+      "writes": 0,
+      "bytes": 56633952,
+      "input_sha": "a3e6580e259c65dcde0402b5b53a9ad368ba1ea2237119bc4564022495d39f89",
+      "canonical_sha": "a3e6580e259c65dcde0402b5b53a9ad368ba1ea2237119bc4564022495d39f89"
+    },
+    {
+      "method": "marshal",
+      "sample": 2,
+      "allocated": 381289008,
+      "mallocs": 652936,
+      "writes": 0,
+      "bytes": 56633952,
+      "input_sha": "a3e6580e259c65dcde0402b5b53a9ad368ba1ea2237119bc4564022495d39f89",
+      "canonical_sha": "a3e6580e259c65dcde0402b5b53a9ad368ba1ea2237119bc4564022495d39f89"
+    },
+    {
+      "method": "encoder",
+      "sample": 0,
+      "allocated": 324651384,
+      "mallocs": 652942,
+      "writes": 1,
+      "bytes": 56633952,
+      "input_sha": "a3e6580e259c65dcde0402b5b53a9ad368ba1ea2237119bc4564022495d39f89",
+      "canonical_sha": "a3e6580e259c65dcde0402b5b53a9ad368ba1ea2237119bc4564022495d39f89"
+    },
+    {
+      "method": "encoder",
+      "sample": 1,
+      "allocated": 324653120,
+      "mallocs": 652941,
+      "writes": 1,
+      "bytes": 56633952,
+      "input_sha": "a3e6580e259c65dcde0402b5b53a9ad368ba1ea2237119bc4564022495d39f89",
+      "canonical_sha": "a3e6580e259c65dcde0402b5b53a9ad368ba1ea2237119bc4564022495d39f89"
+    },
+    {
+      "method": "encoder",
+      "sample": 2,
+      "allocated": 324642472,
+      "mallocs": 652930,
+      "writes": 1,
+      "bytes": 56633952,
+      "input_sha": "a3e6580e259c65dcde0402b5b53a9ad368ba1ea2237119bc4564022495d39f89",
+      "canonical_sha": "a3e6580e259c65dcde0402b5b53a9ad368ba1ea2237119bc4564022495d39f89"
+    }
+  ],
+  "median_allocation": {
+    "marshal": 381289312,
+    "encoder": 324651384
+  },
+  "percent_reduction": 14.854318287316692,
+  "diagnostic_only": true,
+  "forced_gc_between_samples": 2,
+  "timing_acceptance": false,
+  "filesystem_io_measured": false,
+  "canonical_bytes_equal_excluding_encoder_newline": true,
+  "caveat": "Same decoded real Product state; GC clears encode pools. Encoder writes one complete buffer and remains non-streaming. No retained-heap or end-to-end speed claim."
+}

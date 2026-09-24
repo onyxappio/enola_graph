@@ -113,3 +113,16 @@ multiple operations; it does not isolate serialization alone. It identifies a
 further allocation investigation target while the memory gate stays open. See
 [diagnostic evidence](stage16-phase-memory/README.md) and
 [phase findings](stage16-phase-memory/FINDINGS.md).
+
+
+## Checkpoint serialization localized
+
+A follow-up with counters immediately before and after json.Marshal isolates
+approximately381 MB allocated for the56.6 MB structural checkpoint in both arms.
+Both full-run correctness checks and seven cross-arm graph comparisons pass.
+A separate controlled three-sample encoding diagnostic reduces allocation from
+381.29 to324.65 MB using Encoder and a hashing writer, preserving canonical bytes
+after removing its newline. It still buffers the entire JSON value. No filesystem
+I/O or end-to-end speed improvement is demonstrated by that experiment, and
+no-op does not serialize. See [checkpoint evidence](checkpoint-allocation/README.md).
+This is a candidate optimization, not an integrated fix or RSS acceptance.

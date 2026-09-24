@@ -1,0 +1,50 @@
+{
+  "validation_error": null,
+  "all_checks_validated": true,
+  "arm": "candidate",
+  "repeat": 1,
+  "quiet_ack_message_id": null,
+  "exit": 0,
+  "competing_samples": [
+    [
+      "50002 go test -count=1 ./internal/docslint/",
+      "50012 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build881135046/b001/docslint.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build881135046/b001/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=XXQ2T-29kkvS32iU2PXE/anre6ocfYYfYwYEU64gg/VNr2J_0FvihRuTDAflTe/XXQ2T-29kkvS32iU2PXE -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/ca/ca54f912a1f6c0cea4d81fb482373b1a330bb2ac2dc805fc96e859fcbeb0a70c-d"
+    ],
+    [
+      "50002 go test -count=1 ./internal/docslint/",
+      "50022 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build881135046/b001/docslint.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "50049 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "50056 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build429676168/b001/engine.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build429676168/b001/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=f9jYo7_8aaAquHsn09iT/ffffTKyB_a4b_aiLmrRP/IMEVMggrtcxLkfBiN1Tn/f9jYo7_8aaAquHsn09iT -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/ad/ad3a814c45ca7fd14ac911ddcce915084a0d8f16f25d85589fafa071b0a4e4b5-d"
+    ],
+    [
+      "50049 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "50082 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build429676168/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "50049 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "50082 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build429676168/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "50049 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "50082 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build429676168/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "50049 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "50082 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build429676168/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "50049 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "50082 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build429676168/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "50049 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "50082 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build429676168/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ]
+  ],
+  "correctness_only": true,
+  "run_succeeded": true,
+  "timing_eligible": false,
+  "binary_sha256": "7f14f4e1d506ac34dbadb6f8351be4e23436258a2288ad0ad0e78cb7d8df7f9e"
+}

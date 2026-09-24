@@ -1,0 +1,41 @@
+package graphsession
+
+import (
+ "crypto/sha256"
+ "encoding/json"
+ "fmt"
+ "hash"
+ "os"
+ "runtime"
+ "testing"
+)
+
+type checkpointHashTail struct { h hash.Hash; tail byte; have bool; bytes int; writes int }
+func (w *checkpointHashTail) Write(p []byte) (int,error) {
+ n:=len(p); if n==0{return 0,nil}; w.bytes+=n;w.writes++
+ if w.have { _,_=w.h.Write([]byte{w.tail}) }
+ _,_=w.h.Write(p[:n-1]);w.tail=p[n-1];w.have=true;return n,nil
+}
+func TestCheckpointEncodingDiagnostic(t *testing.T) {
+ path:=os.Getenv("CHECKPOINT_DIAGNOSTIC_INPUT");if path==""{t.Skip("diagnostic only")}
+ raw,err:=os.ReadFile(path);if err!=nil{t.Fatal(err)}
+ var st State;if err=json.Unmarshal(raw,&st);err!=nil{t.Fatal(err)}
+ inputHash:=sha256.Sum256(raw); raw=nil
+ canonical,err:=json.Marshal(&st);if err!=nil{t.Fatal(err)};want:=sha256.Sum256(canonical);size:=len(canonical);canonical=nil
+ for _,method:=range []string{"marshal","encoder"} { for sample:=0;sample<3;sample++ {
+  // Controlled allocation diagnostic: double GC clears pooled buffers.
+  // These are deliberately NOT operational latency or peak-RSS measurements.
+  runtime.GC();runtime.GC()
+  var before,after runtime.MemStats;runtime.ReadMemStats(&before)
+  var got string;var writes,output int
+  if method=="marshal" {
+   b,e:=json.Marshal(&st);if e!=nil{t.Fatal(e)};sum:=sha256.Sum256(b);got=fmt.Sprintf("%x",sum);output=len(b)
+  } else {
+   w:=&checkpointHashTail{h:sha256.New()};e:=json.NewEncoder(w).Encode(&st);if e!=nil{t.Fatal(e)}
+   if !w.have || w.tail!='\n'{t.Fatal("missing encoder newline")};got=fmt.Sprintf("%x",w.h.Sum(nil));output=w.bytes-1;writes=w.writes
+  }
+  runtime.ReadMemStats(&after)
+  if got!=fmt.Sprintf("%x",want)||output!=size{t.Fatalf("different canonical bytes %s %d",got,output)}
+  t.Logf("DIAG method=%s sample=%d allocated=%d mallocs=%d writes=%d bytes=%d input_sha=%x canonical_sha=%x",method,sample,after.TotalAlloc-before.TotalAlloc,after.Mallocs-before.Mallocs,writes,output,inputHash,want)
+ }}
+}
