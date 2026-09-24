@@ -910,6 +910,22 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 							previewRecs = s.preparedTS.Records
 						}
 						extraOwners = append(extraOwners, composedRouteOwnerDelta(prevFiles, dirty, previewRecs, retired)...)
+						// The extractor's framework signature is evaluated again after
+						// invalidation has closed over the files this preview reparsed.
+						// That expanded dirty set can reveal a Nuxt/GraphQL/gRPC
+						// composition change hidden by reused records. Freeze its global
+						// fallback now, while the owner manifest can still grow.
+						if s.state != nil && s.state.FrameworkSig != "" {
+							changed, ferr := s.frameworkSignatureChangedForDirty(inv.Files, prevFiles, dirty, angular, s.capturedSources)
+							if ferr != nil {
+								return nil, ferr
+							}
+							if changed {
+								wholeDomain = true
+								forceAll = true
+								fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "typescript", Scope: "all owned files", Reason: "graphql/grpc/nuxt composition context changed after dependency closure"})
+							}
+						}
 					}
 				}
 			}
@@ -2539,16 +2555,10 @@ func (s *session) frameworkDirtyRequiresFullScope(files []string, prevFiles map[
 	}
 	owned := tsextractor.SessionFiles(files, angular)
 	dirty := map[string]bool{}
-	prevRecs := map[string]*tsextractor.FileRecord{}
-	for path, rec := range prevFiles {
-		if rec != nil && rec.TS != nil {
-			prevRecs[path] = rec.TS
-		}
-	}
 	for _, f := range owned {
 		st := lookupState(prevFiles, f)
 		h, ok := lookupHash(hashes, f)
-		if !ok || st == nil || st.Hash != h || st.Unreadable {
+		if !ok || st == nil || st.Hash != h || st.Unreadable || recMissing(st) {
 			dirty[filepath.ToSlash(f)] = true
 		}
 	}
@@ -2589,6 +2599,19 @@ func (s *session) frameworkDirtyRequiresFullScope(files []string, prevFiles map[
 		}
 		captured[f] = b
 	}
+	return s.frameworkSignatureChangedForDirty(files, prevFiles, dirty, angular, captured)
+}
+
+// frameworkSignatureChangedForDirty mirrors the post-invalidation composition
+// check in the TypeScript extraction path. The dirty set is part of the
+// signature proof: reusing a cached Nuxt auto-import or GraphQL/gRPC summary for
+// a dependent that the resolver just dirtied can hide a composition change.
+func (s *session) frameworkSignatureChangedForDirty(files []string, prevFiles map[string]*FileState, dirty map[string]bool, angular bool, captured map[string][]byte) (bool, error) {
+	if s.state == nil || s.state.FrameworkSig == "" {
+		return false, nil
+	}
+	owned := tsextractor.SessionFiles(files, angular)
+	prevRecs := tsRecordsFromState(prevFiles)
 	sig, err := tsextractor.CompositionSignature(s.abs, owned, prevRecs, dirty, captured, s.eng.GraphScope())
 	if err != nil {
 		return false, classifyVanished(err, "composition context input for", "typescript", "refusing to plan from a partial capture")
