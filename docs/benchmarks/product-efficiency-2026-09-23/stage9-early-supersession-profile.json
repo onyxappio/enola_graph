@@ -1,0 +1,45 @@
+{
+  "status": "completed exit0",
+  "kind": "instrumented Product NATS watch, single shared-host run",
+  "report": "/tmp/enola-stage9-supersession-timeline/run/watch.json",
+  "equal": true,
+  "stable": true,
+  "convergence": {
+    "converged": true,
+    "first_cold_equal_generation": 2,
+    "first_cold_equal_run_id": "watch-bench-watch-bench-2-1790219563766915000",
+    "first_cold_equal_consumer_ns": 1790219565757528000,
+    "last_observed_edit_ns": 1790219563591796000,
+    "final_convergence_ms": 2165.732,
+    "cold_equal_generations_at_tail": 1,
+    "basis": "last observed edit -> start of the observed final matching suffix: the first completed generation that equals the final cold graph and is never contradicted afterwards",
+    "is_causal_claim": false,
+    "basis_limitation": "observed matching suffix only; a graph-neutral edit can make an earlier generation match, which shortens this number without the work being faster"
+  },
+  "abandoned_begins": [],
+  "early_fence_marks": [
+    {
+      "observed_ns": 1790219546604692000,
+      "line": "[graph-profile] revalidate_before_begin            0.002s  n=59 superseded=false"
+    },
+    {
+      "observed_ns": 1790219564780111000,
+      "line": "[graph-profile] revalidate_before_begin            0.003s  n=70 superseded=false"
+    }
+  ],
+  "transaction_marks": [
+    {
+      "observed_ns": 1790219545510989000,
+      "line": "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false"
+    },
+    {
+      "observed_ns": 1790219561786196000,
+      "line": "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false"
+    },
+    {
+      "observed_ns": 1790219563620465000,
+      "line": "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=true failed=false"
+    }
+  ],
+  "note": "External stderr timestamps sampled every10ms; profile marks overlap nested work. This sample did not reproduce supersession/retry."
+}

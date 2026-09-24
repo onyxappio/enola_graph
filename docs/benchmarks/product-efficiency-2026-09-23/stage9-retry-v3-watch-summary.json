@@ -1,0 +1,104 @@
+{
+  "note": "3 alternating repeats per arm; short NATS Product watch burst, not long-duration acceptance",
+  "source_revision": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "source_status": "?? .enola/\n?? apps/mobile/src/deeplinks/deepLinkDiagnostics.ts\n?? mcp-arch.yaml\n",
+  "limitations": "Source contains prior untracked diagnostic fixture and scope config; same source for both arms. Results are not compared directly with clean-commit history timings.",
+  "arms": {
+    "control": {
+      "initial_ms": {
+        "samples": [
+          11533.949,
+          16806.181,
+          8818.276
+        ],
+        "median": 11533.949,
+        "min": 8818.276,
+        "max": 16806.181
+      },
+      "convergence_ms": {
+        "samples": [
+          2183.143,
+          2184.285,
+          2197.495
+        ],
+        "median": 2184.285,
+        "min": 2183.143,
+        "max": 2197.495
+      },
+      "abandoned_begin_counts": [
+        0,
+        0,
+        0
+      ],
+      "scope_counts": [
+        [
+          11
+        ],
+        [
+          11
+        ],
+        [
+          11
+        ]
+      ],
+      "idle_events": [
+        0,
+        0,
+        0
+      ],
+      "duplicate_events": [
+        0,
+        0,
+        0
+      ]
+    },
+    "candidate": {
+      "initial_ms": {
+        "samples": [
+          18454.357,
+          9400.898,
+          8972.858
+        ],
+        "median": 9400.898,
+        "min": 8972.858,
+        "max": 18454.357
+      },
+      "convergence_ms": {
+        "samples": [
+          2339.451,
+          4768.927,
+          2167.526
+        ],
+        "median": 2339.451,
+        "min": 2167.526,
+        "max": 4768.927
+      },
+      "abandoned_begin_counts": [
+        0,
+        0,
+        0
+      ],
+      "scope_counts": [
+        [
+          11
+        ],
+        [
+          11
+        ],
+        [
+          11
+        ]
+      ],
+      "idle_events": [
+        0,
+        0,
+        0
+      ],
+      "duplicate_events": [
+        0,
+        0,
+        0
+      ]
+    }
+  }
+}
