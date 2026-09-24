@@ -1,8 +1,8 @@
 # Wave 12 — independent accuracy review
 
-Verified integration: `1d5978a8a09c7b5dc3330921f79356bee0a2f9a1`, including main `5c90f851b6b8a0c7d1a1e82769a12902bb81500a`. Cache **v317**.
+Verified integration: `54dc28864a874a9b44d8fe1c5d0a72d8c1729288`, including main `fba69b8`. Cache **v317**.
 Final planner correction: `c7343c75a3aaa28c0246148f52ba9838d242ed4b`.
-Independent binary SHA256: `b1566619b511e28850a4636bc7d572a23aa347445ff99cc505a3cc8a0164a641`.
+Independent binary SHA256: `2cd6e362b28e32ca8616069432f55650292035bd344d0d08a9f3c6fbdc016340`.
 
 ## Behavior
 
@@ -17,7 +17,7 @@ Independent binary SHA256: `b1566619b511e28850a4636bc7d572a23aa347445ff99cc505a3
 ## Final validation
 
 - All 16 primary gate groups passed: 11 focused groups, full Landings lifecycle, prior regressions, bounded source reads, alias race, and full Go.
-- Full `GOMAXPROCS=1 go test -p 1 ./... -count=1 -timeout 20m`: **PASS, 693.875 s**; graphsession **341.915 s**.
+- Full `GOMAXPROCS=1 go test -p 1 ./... -count=1 -timeout 20m`: **PASS, 761.831 s**; graphsession **432.254 s**.
 - All 18 full Landings stage/protocol combinations passed: original, warmup, page delete/restore, handler delete/restore, autoimport delete/restore, warmup restoration for both v1/v2. Every stage preserves exact cold/delta equality and silent no-change.
 - All 23 full-corpus acceptance groups passed, including four supported v316→v317 forks, exact cold equality, fork lineage, zero parses/events and stable generation on no-change, binding restoration and prior-wave semantics.
 - Final cumulative report has offline Twinkleplop highlighting and annotated source examples. All five new cards pass mobile overflow checks at 390 px; no external network dependencies.
@@ -44,10 +44,10 @@ Two golden files formerly expected false src.c/src.id loop-local references. Com
 
 ## Local evidence
 
-- Build and all primary gates: `/tmp/enola-wave12-main2final-independent-review/{build,receipt}.json`.
-- Full 18-stage lifecycle: `/tmp/enola-wave12-main2final-full-landings-lifecycle/receipt.json`.
-- Fresh fork registry: `/tmp/enola-wave12-main2-full-review/`; full acceptance: `/tmp/enola-wave12-main2-full-acceptance/receipt.json`.
-- Source verdict: `/tmp/enola-wave12-main2-primary-full-source-verdict.json`; audit inputs and loop classifications have the same main2 prefix.
+- Build and all primary gates: `/tmp/enola-wave12-main3final-independent-review/{build,receipt}.json`.
+- Full 18-stage lifecycle: `/tmp/enola-wave12-main3final-full-landings-lifecycle/receipt.json`.
+- Fresh fork registry: `/tmp/enola-wave12-main3-full-review/`; full acceptance: `/tmp/enola-wave12-main3-full-acceptance/receipt.json`.
+- Source verdict: `/tmp/enola-wave12-main3-primary-full-source-verdict.json`; audit inputs and loop classifications have the same main3 prefix.
 - Source-pin integrity: `/tmp/enola-wave12-main1-source-pin-receipt.json` records all 13,650 included Product and 3,293 Landings files matching Git blobs, with only authorized Product exclusions.
 - Final HTML QA: `/tmp/enola-wave12-main2-report-final-qa.json` and adjacent card screenshots.
 
