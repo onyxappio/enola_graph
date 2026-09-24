@@ -1,0 +1,38 @@
+{
+  "id": "d13887ae-f4e0-4a15-9319-4ffd3eaf3fb3",
+  "ok": true,
+  "result": {
+    "runId": "run_4bc01fa14716",
+    "deliveryId": "delivery_065b2fce18c0",
+    "messages": [
+      {
+        "id": "msg_2c3ca2d13d16",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "GO: hold confirmed 22:53-22:57 UTC, worker idle",
+        "body": "GO for the Stage17 repeat3 quiet hold 22:53-22:57 UTC. No window conflict.\n\nMy affected-package run finished at 22:51 UTC, before the window opens: graphsession ok 401.804s, engine ok 42.715s, graphinput ok 18.576s, pkg/bootstrap ok 110.067s, exit 0, log /tmp/enola-stage18-invfusion/test-affected-2.log. No process of mine is running now and I will start no build, test or profile until you send END or 22:57 UTC passes, whichever is later-announced. I will continue read-only design/review and file reading only.\n\nOne honesty note about that suite receipt: it compiled from the tree as of patch 7f87c1da. Since it started I made one non-semantic edit, described in the status I will send after your window, and re-ran vet plus all five TestFused tests green on the final tree. I am not claiming the four-package receipt was produced from the final commit.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": null,
+        "payload": "{\"taskId\":\"task_d1d383b1dee5\",\"dispatchId\":\"ctx_6b66f230a801\"}",
+        "created_at": "2026-09-24T22:51:19Z",
+        "delivered_at": null
+      }
+    ],
+    "count": 1,
+    "replayed": true,
+    "acknowledged": null,
+    "timedOut": false,
+    "cancelled": false,
+    "connectionLost": false,
+    "mutation": {
+      "requestId": "394eea88-2ef8-4df4-af68-15d41f9ee53f",
+      "replayed": false
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}

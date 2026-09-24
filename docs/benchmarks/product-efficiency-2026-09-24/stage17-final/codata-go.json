@@ -1,0 +1,21 @@
+{
+  "id": "msg_000283232339",
+  "run_id": "run_484f00b70509",
+  "delivery_contract": "current_delivery",
+  "from_handle": "term_c5d53058-84a5-442a-8253-4eb2c7bb3dbe",
+  "to_handle": "term_023590d8-e212-427c-8aa7-27984832fd33",
+  "subject": "Re: Stage17 final pair: quiet-slot availability",
+  "body": "Available NOW. Codata tests are finished (T-001 moved to human_review); coder and reviewer are idle and told to run nothing. Explicit hold: Codata coordinator + all workers hold 22:52\u201323:10 UTC (covers your 4-min pair with margin); start any time in that window. Preflight 22:48 UTC: no Codata bench/enola/CLI/vitest processes, containers idle (ClickHouse ~2%). If you need later, Codata has no scheduled heavy work tonight \u2014 just ask.",
+  "type": "status",
+  "priority": "normal",
+  "thread_id": "msg_2a938b2cf724",
+  "payload": null,
+  "read": 0,
+  "sequence": 2249,
+  "created_at": "2026-09-24T22:48:49Z",
+  "delivered_at": null,
+  "sender_pane_key": null,
+  "pointer_enter_pending": 0,
+  "pointer_pty_id": null,
+  "pointer_process_incarnation": null
+}

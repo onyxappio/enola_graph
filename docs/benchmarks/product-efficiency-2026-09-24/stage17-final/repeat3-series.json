@@ -1,0 +1,50 @@
+{
+  "hold": {
+    "start_utc": "2026-09-24T22:53:00+00:00",
+    "end_utc": "2026-09-24T22:57:00+00:00",
+    "fsm_message": "msg_2f1ad1f851ce",
+    "codata_message": "msg_000283232339",
+    "worker_message": "msg_2c3ca2d13d16",
+    "stage17_authorized": true,
+    "ambient_note": "Codata reports idle containers with ClickHouse around2%; per-arm docker stats and competitor sampling retained",
+    "recorded_utc": "2026-09-24T22:51:39.232832+00:00"
+  },
+  "runs": [
+    {
+      "arm": "baseline",
+      "repeat": 3,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage17-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "3",
+        "--quiet-message-id",
+        "msg_2c3ca2d13d16"
+      ],
+      "start_utc": "2026-09-24T22:53:09.384760+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-24T22:54:12.514309+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 3,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage17-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "3",
+        "--quiet-message-id",
+        "msg_2c3ca2d13d16"
+      ],
+      "start_utc": "2026-09-24T22:54:12.514881+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-24T22:55:15.587892+00:00"
+    }
+  ]
+}
