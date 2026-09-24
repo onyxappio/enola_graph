@@ -58,9 +58,10 @@ one replacement with 11 owners. Both binaries and the observer are pinned.
 The distributions overlap substantially: both arms have roughly two-second and
 five-second convergence samples. These three-repeat shared-host results do not
 establish a stable watch speedup from the optimization. In the slow samples,
-save → Begin is about 4.3 seconds, compared with about one second Begin → End.
-That pre-Begin latency needs profiling; it is not explained by changed scope or
-parsed-file count. Consumer completion is also distinct from watcher readiness
+save → the **final successful** Begin is about 4.3 seconds, compared with about
+one second from that Begin to End. Subsequent timeline profiling showed an earlier
+Begin whose run was interrupted: the slow tail includes failed work and a retry,
+not 4.3 seconds without publication. See [the retry timeline](STAGE9_WATCH_RETRY_PROFILE.md). Consumer completion is also distinct from watcher readiness
 and local durable-state completion. No internal watcher watermark is available.
 
 This remains a short scripted burst check, not a long-running concurrent coding
