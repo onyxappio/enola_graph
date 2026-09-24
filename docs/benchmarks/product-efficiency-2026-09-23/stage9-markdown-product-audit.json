@@ -1,0 +1,120 @@
+{
+  "base": "0260153",
+  "experimental": true,
+  "note": "Experimental archive overlay arms; not current-main performance acceptance. Strict Begin/End batch validation and applied graph comparison.",
+  "arms": [
+    {
+      "arm": "control3",
+      "bytes": 81417450,
+      "runs": [
+        {
+          "scope": 8484,
+          "generation": 1
+        },
+        {
+          "scope": 618,
+          "generation": 2
+        }
+      ],
+      "hash": "e803bbceaf1948222a205c7dece5cabe2ae33b1dfbdd08670ad73df8fbf4ae17"
+    },
+    {
+      "arm": "cand3",
+      "bytes": 78746093,
+      "runs": [
+        {
+          "scope": 8484,
+          "generation": 1
+        },
+        {
+          "scope": 358,
+          "generation": 2
+        }
+      ],
+      "hash": "e803bbceaf1948222a205c7dece5cabe2ae33b1dfbdd08670ad73df8fbf4ae17"
+    },
+    {
+      "arm": "cand4",
+      "bytes": 75341528,
+      "runs": [
+        {
+          "scope": 8484,
+          "generation": 1
+        },
+        {
+          "scope": 1,
+          "generation": 2
+        }
+      ],
+      "hash": "e803bbceaf1948222a205c7dece5cabe2ae33b1dfbdd08670ad73df8fbf4ae17"
+    },
+    {
+      "arm": "coldfinal",
+      "bytes": 75340005,
+      "runs": [
+        {
+          "scope": 8485,
+          "generation": 1
+        }
+      ],
+      "hash": "e803bbceaf1948222a205c7dece5cabe2ae33b1dfbdd08670ad73df8fbf4ae17"
+    }
+  ],
+  "current_main_arms": [
+    {
+      "arm": "mcontrol",
+      "bytes": 79407687,
+      "runs": [
+        {
+          "scope": 8484,
+          "generation": 1
+        },
+        {
+          "scope": 618,
+          "generation": 2
+        }
+      ],
+      "hash": "0ac6ae9f73f5f53fc4c173eeee2059a69ee539e1471f32a5fa95b16ea7cb01e1"
+    },
+    {
+      "arm": "mcand",
+      "bytes": 73331765,
+      "runs": [
+        {
+          "scope": 8484,
+          "generation": 1
+        },
+        {
+          "scope": 1,
+          "generation": 2
+        }
+      ],
+      "hash": "0ac6ae9f73f5f53fc4c173eeee2059a69ee539e1471f32a5fa95b16ea7cb01e1"
+    },
+    {
+      "arm": "mcold",
+      "bytes": 73330262,
+      "runs": [
+        {
+          "scope": 8485,
+          "generation": 1
+        }
+      ],
+      "hash": "0ac6ae9f73f5f53fc4c173eeee2059a69ee539e1471f32a5fa95b16ea7cb01e1"
+    }
+  ],
+  "current_main_attribution": "Build metadata and patched source identity verified independently; worker run-to-binary receipt pending.",
+  "current_main_candidate": {
+    "base": "8704d6175ca6f0c5a955b9ed1a69f5f92a1f0530",
+    "sha256": "8270c2316015ac8b199f8587c92aae625899b2fbf293a1a855364a173382d497",
+    "go": "go1.27.1",
+    "trimpath": true,
+    "experimental": true,
+    "source_sha256": {
+      "internal/extractors/tsextractor/ts.go": "175690b1ee18a06488fb9a1ee8055d7abdfffcf0e43d9ed952b5cbcdc57fb74a",
+      "internal/graphsession/invalidation_plan.go": "c3461f26ac86ede76f2c94f96ad751a10f7d64ecef02d0afcbc8de55c90313ee",
+      "internal/graphsession/owner.go": "590728e00a4812863f03406e506a273db5f0d9fddb5d1a2d0952be8ff4842074",
+      "internal/graphsession/session.go": "9649433f1e29b91e966fa0abbcba074dcb6ce9506bf76165c4e177c8e7985436"
+    }
+  }
+}

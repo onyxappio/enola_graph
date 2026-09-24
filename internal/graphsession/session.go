@@ -832,7 +832,8 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				// resolution universe the extractor itself will use.
 				membership = membershipScopeWithProof(previous, current, inv.Files, prevFiles, provenRetiredOwners(prevFiles, previewed))
 				if membership.changed {
-					extraOwners = append(extraOwners, directoryModuleSiblings(previous, current, prevFiles)...)
+					claimed, claimBounded := extractorClaimedFiles(s.eng, detectedExt, inv.Files)
+					extraOwners = append(extraOwners, directoryModuleSiblings(previous, current, prevFiles, claimed, claimBounded)...)
 				}
 				if membership.changed && !membership.proven {
 					wholeDomain = true
