@@ -1,0 +1,136 @@
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_typed_by
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_dispatches
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_dispatches_unknown_event
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_to
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_outcome
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_constructs_event
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_from
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_on
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_entry_emits
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_action_calls
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_declared_in
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_initial
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_emits
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_reducer_ref
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_guard_calls
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_handles_command
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_parent
+=== RUN   TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_guard_ref
+--- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_typed_by (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_dispatches (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_dispatches_unknown_event (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_to (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_outcome (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_constructs_event (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_from (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_on (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_entry_emits (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_action_calls (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_declared_in (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_initial (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_emits (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_reducer_ref (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_guard_calls (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_handles_command (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_parent (0.00s)
+    --- PASS: TestFSMResolverUsesTypedEndpointsAndProvenFiles/fsm_guard_ref (0.00s)
+=== RUN   TestFSMExtractionCoverageUsesFileOwnership
+--- PASS: TestFSMExtractionCoverageUsesFileOwnership (0.00s)
+=== RUN   TestFSMRuntimePublicationDeltaColdAndRetirement
+--- PASS: TestFSMRuntimePublicationDeltaColdAndRetirement (0.89s)
+=== RUN   TestGrowScopeOutOfScopeOwnerFailsClosed
+--- PASS: TestGrowScopeOutOfScopeOwnerFailsClosed (0.00s)
+=== RUN   TestChangedCandidateNamesIgnoresAssemblyOrder
+--- PASS: TestChangedCandidateNamesIgnoresAssemblyOrder (0.00s)
+=== RUN   TestChangedCandidateNamesDetectsAddedCollision
+--- PASS: TestChangedCandidateNamesDetectsAddedCollision (0.00s)
+=== RUN   TestChangedCandidateNamesDetectsIdentityMultisetCountChange
+--- PASS: TestChangedCandidateNamesDetectsIdentityMultisetCountChange (0.00s)
+=== RUN   TestPrimaryFSMGuardFileProvenance
+=== RUN   TestPrimaryFSMGuardFileProvenance/calls
+=== RUN   TestPrimaryFSMGuardFileProvenance/fsm_guard_ref
+=== RUN   TestPrimaryFSMGuardFileProvenance/fsm_guard_calls
+=== RUN   TestPrimaryFSMGuardFileProvenance/fsm_reducer_ref
+=== RUN   TestPrimaryFSMGuardFileProvenance/fsm_action_calls
+--- PASS: TestPrimaryFSMGuardFileProvenance (0.00s)
+    --- PASS: TestPrimaryFSMGuardFileProvenance/calls (0.00s)
+    --- PASS: TestPrimaryFSMGuardFileProvenance/fsm_guard_ref (0.00s)
+    --- PASS: TestPrimaryFSMGuardFileProvenance/fsm_guard_calls (0.00s)
+    --- PASS: TestPrimaryFSMGuardFileProvenance/fsm_reducer_ref (0.00s)
+    --- PASS: TestPrimaryFSMGuardFileProvenance/fsm_action_calls (0.00s)
+=== RUN   TestPrimaryFSMStateEndpointKind
+--- PASS: TestPrimaryFSMStateEndpointKind (0.00s)
+=== RUN   TestPrimaryFSMAllRelationKinds
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_typed_by
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_constructs_event
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_dispatches_unknown_event
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_guard_ref
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_declared_in
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_dispatches
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_parent
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_initial
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_from
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_on
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_guard_calls
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_action_calls
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_handles_command
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_to
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_emits
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_entry_emits
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_outcome
+=== RUN   TestPrimaryFSMAllRelationKinds/fsm_reducer_ref
+--- PASS: TestPrimaryFSMAllRelationKinds (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_typed_by (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_constructs_event (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_dispatches_unknown_event (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_guard_ref (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_declared_in (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_dispatches (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_parent (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_initial (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_from (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_on (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_guard_calls (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_action_calls (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_handles_command (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_to (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_emits (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_entry_emits (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_outcome (0.00s)
+    --- PASS: TestPrimaryFSMAllRelationKinds/fsm_reducer_ref (0.00s)
+=== RUN   TestFileContributionFactsMatchesLegacy
+--- PASS: TestFileContributionFactsMatchesLegacy (0.00s)
+=== RUN   TestFileContributionFactsRepoLabelsAndSyntheticFilter
+--- PASS: TestFileContributionFactsRepoLabelsAndSyntheticFilter (0.00s)
+=== RUN   TestFileContributionFactsPreservesFullFactFields
+--- PASS: TestFileContributionFactsPreservesFullFactFields (0.00s)
+=== RUN   TestOverlayStablePublishedMatchesLegacy
+--- PASS: TestOverlayStablePublishedMatchesLegacy (0.00s)
+=== RUN   TestOverlayStablePublishedPreservesBaseDuplicateMultiplicity
+--- PASS: TestOverlayStablePublishedPreservesBaseDuplicateMultiplicity (0.00s)
+=== RUN   TestOverlayStablePublishedDeduplicatesAdditionsAmongThemselves
+--- PASS: TestOverlayStablePublishedDeduplicatesAdditionsAmongThemselves (0.00s)
+=== RUN   TestOverlayStablePublishedDoesNotAliasOrMutateBase
+--- PASS: TestOverlayStablePublishedDoesNotAliasOrMutateBase (0.00s)
+=== RUN   TestOverlayCapacityIsExactNotBaseAndPublishedSum
+--- PASS: TestOverlayCapacityIsExactNotBaseAndPublishedSum (0.00s)
+=== RUN   TestBuildIndexMatchesLegacy
+--- PASS: TestBuildIndexMatchesLegacy (0.00s)
+=== RUN   TestBuildIndexBucketsCannotOverwriteAdjacentBucket
+--- PASS: TestBuildIndexBucketsCannotOverwriteAdjacentBucket (0.00s)
+=== RUN   TestGroupOwnersMatchesLegacy
+--- PASS: TestGroupOwnersMatchesLegacy (0.00s)
+=== RUN   TestGroupOwnersBucketsCannotOverwriteAdjacentBucket
+--- PASS: TestGroupOwnersBucketsCannotOverwriteAdjacentBucket (0.00s)
+=== RUN   TestChangedCandidateNamesMatchesLegacy
+--- PASS: TestChangedCandidateNamesMatchesLegacy (0.00s)
+=== RUN   TestCandidateKeyAgreesWithFactIdentityOnTheLegalDomain
+--- PASS: TestCandidateKeyAgreesWithFactIdentityOnTheLegalDomain (0.00s)
+=== RUN   TestCandidateKeySeparatesDelimiterInvalidInputsThatTheIdMerges
+--- PASS: TestCandidateKeySeparatesDelimiterInvalidInputsThatTheIdMerges (0.00s)
+=== RUN   TestResolutionIndexesMatchesLegacyEndToEnd
+--- PASS: TestResolutionIndexesMatchesLegacyEndToEnd (0.00s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	1.419s

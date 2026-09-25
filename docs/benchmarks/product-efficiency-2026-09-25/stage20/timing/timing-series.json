@@ -1,0 +1,120 @@
+{
+  "hold": {
+    "start_utc": "2026-09-25T03:42:00+00:00",
+    "end_utc": "2026-09-25T03:52:00+00:00",
+    "fsm_message": "msg_e875865118c7",
+    "codata_message": "msg_2aac59a9bed1",
+    "worker_message": "msg_e588123af8f3",
+    "stage20_authorized": true
+  },
+  "runs": [
+    {
+      "arm": "baseline",
+      "repeat": 1,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage20-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "msg_e588123af8f3"
+      ],
+      "start_utc": "2026-09-25T03:42:05.963607+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-25T03:43:09.756550+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 1,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage20-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "msg_e588123af8f3"
+      ],
+      "start_utc": "2026-09-25T03:43:09.757032+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-25T03:44:12.173692+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 2,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage20-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "2",
+        "--quiet-message-id",
+        "msg_e588123af8f3"
+      ],
+      "start_utc": "2026-09-25T03:44:12.174072+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-25T03:45:14.878603+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 2,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage20-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "2",
+        "--quiet-message-id",
+        "msg_e588123af8f3"
+      ],
+      "start_utc": "2026-09-25T03:45:14.878988+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-25T03:46:17.932326+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 3,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage20-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "3",
+        "--quiet-message-id",
+        "msg_e588123af8f3"
+      ],
+      "start_utc": "2026-09-25T03:46:17.932716+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-25T03:47:20.870016+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 3,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-stage20-root-review/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "3",
+        "--quiet-message-id",
+        "msg_e588123af8f3"
+      ],
+      "start_utc": "2026-09-25T03:47:20.870407+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-25T03:48:24.029223+00:00"
+    }
+  ]
+}

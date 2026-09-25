@@ -751,7 +751,22 @@ type idIndex struct {
 }
 
 func buildIndex(ff []facts.Fact) *idIndex {
-	idx := &idIndex{byName: map[string][]facts.Fact{}}
+	// One backing array carved into exact-capacity buckets, rather than growing
+	// every name bucket on its own. The full slice expression pins each bucket's
+	// capacity to its own length, so the fill append can never reach into the
+	// next bucket. Bucket contents and their order are unchanged: the fill walks
+	// ff in the same order the old append loop did.
+	counts := make(map[string]int, len(ff))
+	for _, f := range ff {
+		counts[f.Name]++
+	}
+	backing := make([]facts.Fact, len(ff))
+	idx := &idIndex{byName: make(map[string][]facts.Fact, len(counts))}
+	off := 0
+	for name, n := range counts {
+		idx.byName[name] = backing[off : off : off+n]
+		off += n
+	}
 	for _, f := range ff {
 		idx.byName[f.Name] = append(idx.byName[f.Name], f)
 	}
@@ -914,22 +929,38 @@ type ownerOutput struct {
 }
 
 func groupOwners(ff []facts.Fact) []ownerOutput {
+	// Keyed by the OwnerRef struct rather than by OwnerRef.String(): the struct is
+	// comparable and separates at least as much as the string does, since the only
+	// owner kinds are OwnerFile and OwnerSynthetic and neither contains the ":"
+	// that String() joins on. Owners are computed once and kept, and the fact
+	// buckets are carved from one backing array at exact capacity. Owner order and
+	// bucket contents are unchanged.
+	type bucket struct{ at, n int }
+	owners := make([]graphstream.OwnerRef, len(ff))
+	buckets := make(map[graphstream.OwnerRef]*bucket, 0)
 	order := make([]graphstream.OwnerRef, 0)
-	grouped := map[string]*ownerOutput{}
-	for _, f := range ff {
+	for i, f := range ff {
 		o := ownerOf(f)
-		key := o.String()
-		g, ok := grouped[key]
+		owners[i] = o
+		b, ok := buckets[o]
 		if !ok {
-			g = &ownerOutput{Owner: o}
-			grouped[key] = g
+			b = &bucket{at: len(order)}
+			buckets[o] = b
 			order = append(order, o)
 		}
-		g.Facts = append(g.Facts, f)
+		b.n++
 	}
-	out := make([]ownerOutput, 0, len(order))
-	for _, o := range order {
-		out = append(out, *grouped[o.String()])
+	backing := make([]facts.Fact, len(ff))
+	out := make([]ownerOutput, len(order))
+	off := 0
+	for i, o := range order {
+		n := buckets[o].n
+		out[i] = ownerOutput{Owner: o, Facts: backing[off : off : off+n]}
+		off += n
+	}
+	for i, f := range ff {
+		at := buckets[owners[i]].at
+		out[at].Facts = append(out[at].Facts, f)
 	}
 	return out
 }
@@ -1029,8 +1060,8 @@ func ownerReferencesChangedCandidates(g ownerOutput, changedNames map[string]boo
 }
 
 func changedCandidateNames(old, next *idIndex, ignored ...map[string]bool) map[string]bool {
-	ignoredFiles := map[string]bool{}
-	if len(ignored) > 0 && ignored[0] != nil {
+	var ignoredFiles map[string]bool
+	if len(ignored) > 0 {
 		ignoredFiles = ignored[0]
 	}
 	changed := map[string]bool{}
@@ -1046,31 +1077,97 @@ func changedCandidateNames(old, next *idIndex, ignored ...map[string]bool) map[s
 		}
 	}
 	for name := range all {
-		if !slicesEqual(candidateFingerprint(old, name, ignoredFiles), candidateFingerprint(next, name, ignoredFiles)) {
+		if !sameCandidates(old, next, name, ignoredFiles) {
 			changed[name] = true
 		}
 	}
 	return changed
 }
 
+// resolutionKey is the four-field identity predicate that facts.FactID hashes:
+// it is exactly internal/facts.sameIdentity, with File normalized the way
+// candidateIdentity normalizes it. Using it as a map or comparison key removes
+// the SHA-256 and hex-encode allocation per fact. Go still hashes the key, it
+// just no longer materializes a 32-character identity string to do it.
+//
+// This is NOT universally interchangeable with the hashed identity. FactID
+// truncates to 128 bits, so two distinct tuples may share an id; and it joins
+// the fields with NUL, so tuples containing a NUL byte can hash equal while
+// differing as tuples. factIDInto states "no field may contain a NUL" in a
+// comment, but nothing validates it, so that is a stated precondition rather
+// than an enforced one. In both cases the tuple separates facts that the id
+// merges, which is the fail-closed direction for an invalidation fingerprint:
+// more names are reported changed, never fewer.
+type resolutionKey struct {
+	Repo string
+	Kind string
+	Name string
+	File string
+}
+
+// candidateKey is candidateIdentity without the hash: same File normalization,
+// same four fields, no string built.
+func candidateKey(f facts.Fact) resolutionKey {
+	return resolutionKey{Repo: f.Repo, Kind: f.Kind, Name: f.Name, File: canonicalFactFile(f.File)}
+}
+
+func (k resolutionKey) less(o resolutionKey) bool {
+	if k.Repo != o.Repo {
+		return k.Repo < o.Repo
+	}
+	if k.Kind != o.Kind {
+		return k.Kind < o.Kind
+	}
+	if k.Name != o.Name {
+		return k.Name < o.Name
+	}
+	return k.File < o.File
+}
+
+// sameCandidates reports whether one name has the same resolver-domain candidate
+// multiset on both sides. It is the comparison changedCandidateNames needs;
+// candidateFingerprint remains the materialized form of one side.
+func sameCandidates(old, next *idIndex, name string, ignoredFiles map[string]bool) bool {
+	if len(ignoredFiles) == 0 {
+		var a, b []facts.Fact
+		if old != nil {
+			a = old.byName[name]
+		}
+		if next != nil {
+			b = next.byName[name]
+		}
+		if len(a) != len(b) {
+			return false
+		}
+		// Most names hold exactly one fact per side; compare the tuple in place
+		// rather than building and sorting two slices for it.
+		if len(a) == 1 {
+			return candidateKey(a[0]) == candidateKey(b[0])
+		}
+		if len(a) == 0 {
+			return true
+		}
+	}
+	return slicesEqual(candidateFingerprint(old, name, ignoredFiles), candidateFingerprint(next, name, ignoredFiles))
+}
+
 // candidateFingerprint is the canonical resolver-domain key for one name: the
-// sorted Fact.Identity() multiset from idx.byName. Line, column, and props are
-// outside Identity, so a body-only edit does not change the fingerprint.
-func candidateFingerprint(idx *idIndex, name string, ignoredFiles map[string]bool) []string {
+// sorted identity multiset from idx.byName, as the four identity fields rather
+// than their hash. Line, column, and props are outside the identity, so a
+// body-only edit does not change the fingerprint.
+func candidateFingerprint(idx *idIndex, name string, ignoredFiles map[string]bool) []resolutionKey {
 	if idx == nil {
 		return nil
 	}
-	if ignoredFiles == nil {
-		ignoredFiles = map[string]bool{}
-	}
-	rows := make([]string, 0, len(idx.byName[name]))
+	rows := make([]resolutionKey, 0, len(idx.byName[name]))
 	for _, f := range idx.byName[name] {
-		if ignoredFiles[canonicalFactFile(f.File)] {
+		k := candidateKey(f)
+		if len(ignoredFiles) > 0 && ignoredFiles[k.File] {
 			continue
 		}
-		rows = append(rows, candidateIdentity(f))
+		rows = append(rows, k)
 	}
-	sort.Strings(rows)
+	sort.Slice(rows, func(i, j int) bool { return rows[i].less(rows[j]) })
 	return rows
 }
 
@@ -1086,7 +1183,7 @@ func candidateIdentity(f facts.Fact) string {
 	return f.Identity()
 }
 
-func slicesEqual(a, b []string) bool {
+func slicesEqual[T comparable](a, b []T) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -1116,20 +1213,39 @@ func fileResolutionIndex(files map[string]*FileState, repo string) *idIndex {
 }
 
 func fileContributionFacts(files map[string]*FileState, repo string) []facts.Fact {
-	var ff []facts.Fact
+	// Counted up front and projected in place: the old shape grew a raw slice of
+	// every contribution by doubling and then copied the whole thing into the
+	// filtered one. The count is an upper bound because the synthetic filter only
+	// removes facts, so the single allocation never has to grow. The visit order
+	// is the same single map walk as before.
+	n := 0
 	for _, rec := range files {
-		ff = append(ff, fileFacts(rec)...)
+		n += len(fileFacts(rec))
 		if rec != nil {
 			for _, contrib := range rec.Contrib {
-				ff = append(ff, contrib...)
+				n += len(contrib)
 			}
 		}
 	}
-	return publishedResolutionFacts(ff, repo)
+	out := make([]facts.Fact, 0, n)
+	for _, rec := range files {
+		out = appendPublishedResolutionFacts(out, fileFacts(rec), repo)
+		if rec != nil {
+			for _, contrib := range rec.Contrib {
+				out = appendPublishedResolutionFacts(out, contrib, repo)
+			}
+		}
+	}
+	return out
 }
 
 func publishedResolutionFacts(ff []facts.Fact, repo string) []facts.Fact {
-	out := make([]facts.Fact, 0, len(ff))
+	return appendPublishedResolutionFacts(make([]facts.Fact, 0, len(ff)), ff, repo)
+}
+
+// appendPublishedResolutionFacts is publishedResolutionFacts into a caller's
+// slice: same synthetic filter, same per-fact canonicalization, same order.
+func appendPublishedResolutionFacts(out, ff []facts.Fact, repo string) []facts.Fact {
 	for _, f := range ff {
 		if ownerOf(f).Kind == graphstream.OwnerSynthetic {
 			continue
@@ -1169,22 +1285,33 @@ func changedContentOwners(prev, next map[string]*FileState) map[string]bool {
 // Facts owned by content-changed files stay on the next side only (fail-closed
 // for new names and collisions).
 func overlayStablePublished(base, published []facts.Fact, unstable map[string]bool) []facts.Fact {
-	have := make(map[string]bool, len(base))
+	// Membership on the identity tuple rather than on its hash, and the additions
+	// selected before allocating so the result is sized exactly. Sizing it
+	// len(base)+len(published) instead would reserve about 18 MB at this scale for
+	// what is normally a handful of overlay extras. The base is still copied whole
+	// and never written through, so its duplicate multiplicity survives untouched:
+	// only additions are deduplicated.
+	have := make(map[resolutionKey]bool, len(base))
 	for _, f := range base {
-		have[candidateIdentity(f)] = true
+		have[candidateKey(f)] = true
 	}
-	out := append([]facts.Fact(nil), base...)
-	for _, f := range published {
+	extras := make([]int, 0, 16)
+	for i, f := range published {
 		o := ownerOf(f)
 		if o.Kind == graphstream.OwnerFile && unstable[o.ID] {
 			continue
 		}
-		k := candidateIdentity(f)
+		k := candidateKey(f)
 		if have[k] {
 			continue
 		}
-		out = append(out, f)
+		extras = append(extras, i)
 		have[k] = true
+	}
+	out := make([]facts.Fact, 0, len(base)+len(extras))
+	out = append(out, base...)
+	for _, i := range extras {
+		out = append(out, published[i])
 	}
 	return out
 }

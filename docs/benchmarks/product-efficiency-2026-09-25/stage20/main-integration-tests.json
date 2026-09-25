@@ -1,0 +1,17 @@
+{
+  "status": "pass",
+  "command": "/opt/homebrew/bin/go test ./internal/graphsession ./internal/graphstream -count=1",
+  "exit_code": 0,
+  "packages": {
+    "graphsession": 451.568,
+    "graphstream": 35.469
+  },
+  "scope": "Full affected integration packages; shared load, not benchmark",
+  "base_main": "7c4bb26",
+  "candidate_revision": "d39c43e793919ac5d0beffe91cfccb9ad3ab9676",
+  "source_sha256": {
+    "internal/graphsession/owner.go": "2673574ae559a20a2817c9a54fdf1ca66acb21a12495cb6ea38e8022270a97ed",
+    "internal/graphsession/resolution_copies_test.go": "6ea6fd2e503fb9689c642712c628ec37ebebefd3f9a656f7d9d6055fbbf7ab4b"
+  },
+  "recorded_utc": "2026-09-25T03:58:59.812155+00:00"
+}
