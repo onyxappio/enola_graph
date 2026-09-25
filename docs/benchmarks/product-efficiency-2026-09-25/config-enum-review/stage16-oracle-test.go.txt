@@ -1,0 +1,438 @@
+package tsextractor
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
+	"testing"
+
+	"github.com/enola-labs/enola/internal/extractors/inputscope"
+	"github.com/enola-labs/enola/internal/graphinput"
+)
+
+// The fused traversal has to reproduce what two separate passes produce today,
+// and final sorted path equality does not say that: the alias pass decides
+// precedence by directory, reads inherited configs the walk never opens, and
+// leaves the probe records the walk then finds already taken. So the oracle
+// captures each of those separately and compares against goldens generated
+// from unmodified source.
+
+const configEnumGoldenDir = "/tmp/enola-config-enum/src/internal/extractors/tsextractor/testdata/zz_config_enum_golden"
+
+type oracleAlias struct {
+	Prefix      string `json:"prefix"`
+	Replacement string `json:"replacement"`
+	Suffix      string `json:"suffix"`
+	Exact       bool   `json:"exact"`
+}
+
+type oracleAliasRoot struct {
+	Dir     string        `json:"dir"`
+	Aliases []oracleAlias `json:"aliases"`
+}
+
+type oracleCapture struct {
+	Fixture string `json:"fixture"`
+	// Inputs is tsConfigInputs' return, already sorted by the function itself.
+	Inputs []string `json:"inputs"`
+	// AliasRoots keeps collectTSAliasRoots' own order. Order is what
+	// aliasesForDir's longest-prefix tie-break reads, so it is observable.
+	AliasRoots []oracleAliasRoot `json:"alias_roots"`
+	// ProbeReads are the byte observations, keyed by path and carrying the
+	// origin marker and digest the reader recorded. Inherited configs the walk
+	// never opens appear only here.
+	ProbeReads map[string]string `json:"probe_reads"`
+	ProbeStats map[string]string `json:"probe_stats"`
+	// ProbeDirs is the recorded enumerations. recordDir keeps the first
+	// complete listing of a directory, so today these are the alias pass's
+	// records wherever both passes reach the same directory.
+	ProbeDirs map[string]map[string]string `json:"probe_dirs"`
+	// AliasProbeDirs is what the alias pass alone observes, captured under its
+	// own probe. It is the set the fused traversal must still produce.
+	AliasProbeDirs  map[string]map[string]string `json:"alias_probe_dirs"`
+	AliasProbeReads map[string]string            `json:"alias_probe_reads"`
+}
+
+type oracleFixture struct {
+	name string
+	// build returns the repository path handed to the readers and the scope
+	// they run under, after asserting whatever the fixture needs asserted
+	// about the tree it just built.
+	build func(t *testing.T) (repo string, scope *inputscope.Scope, norm []string)
+}
+
+func writeFile(t *testing.T, path, body string) {
+	t.Helper()
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func aliasConfig(prefix, target string) string {
+	return `{"compilerOptions":{"baseUrl":".","paths":{"` + prefix + `":["` + target + `"]}}}`
+}
+
+var configEnumFixtures = []oracleFixture{
+	{
+		name: "root_tsconfig_only",
+		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
+			repo := t.TempDir()
+			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@app/*", "./src/*"))
+			writeFile(t, filepath.Join(repo, "src", "index.ts"), "export {}\n")
+			return repo, nil, []string{repo}
+		},
+	},
+	{
+		name: "monorepo_three_alias_roots",
+		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
+			repo := t.TempDir()
+			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@root/*", "./src/*"))
+			writeFile(t, filepath.Join(repo, "packages", "ui", "tsconfig.json"), aliasConfig("@ui/*", "./src/*"))
+			writeFile(t, filepath.Join(repo, "packages", "nested", "deep", "tsconfig.base.json"), aliasConfig("@deep/*", "./lib/*"))
+			writeFile(t, filepath.Join(repo, "apps", "web", "package.json"), `{"name":"web"}`)
+			return repo, nil, []string{repo}
+		},
+	},
+	{
+		name: "extends_outside_subtree_and_missing",
+		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
+			parent := t.TempDir()
+			repo := filepath.Join(parent, "repo")
+			// A parent config outside the walked subtree: only the extends
+			// reader ever opens it, never the directory walk.
+			writeFile(t, filepath.Join(parent, "shared", "tsconfig.base.json"), aliasConfig("@shared/*", "./src/*"))
+			writeFile(t, filepath.Join(repo, "tsconfig.json"), `{"extends":"../shared/tsconfig.base.json"}`)
+			writeFile(t, filepath.Join(repo, "packages", "app", "tsconfig.json"), `{"extends":"./missing-parent.json","compilerOptions":{"baseUrl":".","paths":{"@app/*":["./src/*"]}}}`)
+			return repo, nil, []string{repo, parent}
+		},
+	},
+	{
+		name: "testdata_tsconfig_included",
+		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
+			repo := t.TempDir()
+			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@app/*", "./src/*"))
+			// Discovery prunes testdata; the config walks do not. This fixture
+			// exists to keep that difference visible.
+			writeFile(t, filepath.Join(repo, "testdata", "tsconfig.json"), aliasConfig("@fixture/*", "./cases/*"))
+			writeFile(t, filepath.Join(repo, "testdata", "package.json"), `{"name":"fixture"}`)
+			return repo, nil, []string{repo}
+		},
+	},
+	{
+		name: "dot_and_skip_dirs_excluded",
+		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
+			repo := t.TempDir()
+			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@app/*", "./src/*"))
+			writeFile(t, filepath.Join(repo, ".hidden", "tsconfig.json"), aliasConfig("@hidden/*", "./src/*"))
+			for name := range tsSkipDirs {
+				writeFile(t, filepath.Join(repo, name, "tsconfig.json"), aliasConfig("@"+name+"/*", "./src/*"))
+			}
+			return repo, nil, []string{repo}
+		},
+	},
+	{
+		name: "unreadable_dir",
+		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
+			repo := t.TempDir()
+			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@app/*", "./src/*"))
+			blocked := filepath.Join(repo, "blocked")
+			writeFile(t, filepath.Join(blocked, "tsconfig.json"), aliasConfig("@blocked/*", "./src/*"))
+			if err := os.Chmod(blocked, 0o000); err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() { _ = os.Chmod(blocked, 0o755) })
+			// The denial has to be proven, not assumed: running as root, or on
+			// a filesystem that ignores the mode, would make this fixture
+			// silently characterize an ordinary readable directory instead.
+			if _, err := os.ReadDir(blocked); err == nil {
+				t.Skip("directory remained readable at mode 0000; denial not reproducible here")
+			} else if !errors.Is(err, fs.ErrPermission) {
+				t.Fatalf("blocked directory failed for the wrong reason: %v", err)
+			}
+			return repo, nil, []string{repo}
+		},
+	},
+	{
+		name: "child_symlink_dir",
+		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
+			repo := t.TempDir()
+			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@app/*", "./src/*"))
+			writeFile(t, filepath.Join(repo, "real", "tsconfig.json"), aliasConfig("@real/*", "./src/*"))
+			if err := os.Symlink(filepath.Join(repo, "real"), filepath.Join(repo, "linked")); err != nil {
+				t.Fatal(err)
+			}
+			return repo, nil, []string{repo}
+		},
+	},
+	{
+		name: "symlink_root_nested_alias",
+		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
+			parent := t.TempDir()
+			repo := filepath.Join(parent, "real")
+			writeFile(t, filepath.Join(repo, "packages", "feature", "tsconfig.json"), aliasConfig("@feature/*", "./src/*"))
+			link := filepath.Join(parent, "linked")
+			if err := os.Symlink(repo, link); err != nil {
+				t.Fatal(err)
+			}
+			// The divergence this fixture pins: ReadDir follows the root link,
+			// filepath.WalkDir Lstats it and descends nothing.
+			visits := 0
+			if err := filepath.WalkDir(link, func(path string, d fs.DirEntry, err error) error {
+				if err != nil {
+					return err
+				}
+				if path != link {
+					visits++
+				}
+				return nil
+			}); err != nil {
+				t.Fatal(err)
+			}
+			if visits != 0 {
+				t.Fatalf("WalkDir followed the root symlink: %d descendants", visits)
+			}
+			return link, nil, []string{link, repo, parent}
+		},
+	},
+	{
+		name: "scope_excludes_subtree",
+		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
+			repo := t.TempDir()
+			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@app/*", "./src/*"))
+			writeFile(t, filepath.Join(repo, "excluded", "tsconfig.json"), aliasConfig("@excluded/*", "./src/*"))
+			writeFile(t, filepath.Join(repo, "kept", "tsconfig.json"), aliasConfig("@kept/*", "./src/*"))
+			policy, err := graphinput.Build(repo, graphinput.Options{CacheExclusions: []string{}, Exclude: []string{"excluded/**"}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			scope := &inputscope.Scope{Root: repo, Policy: policy}
+			if scope.Allowed(filepath.Join(repo, "excluded"), true) {
+				t.Fatal("scope did not exclude the subtree it was built to exclude")
+			}
+			return repo, scope, []string{repo}
+		},
+	},
+	{
+		name: "policy_refused_root",
+		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
+			parent := t.TempDir()
+			repo := filepath.Join(parent, "repo")
+			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@app/*", "./src/*"))
+			writeFile(t, filepath.Join(repo, "packages", "app", "tsconfig.json"), aliasConfig("@pkg/*", "./src/*"))
+			// A policy rooted elsewhere refuses this directory outright. The
+			// alias pass still reads the root's own tsconfig, because
+			// aliasesAtDir goes through the file policy before any directory
+			// check; Scope.WalkDir refuses the root before the callback runs.
+			policy, err := graphinput.Build(parent, graphinput.Options{CacheExclusions: []string{}, Exclude: []string{"repo/**", "repo"}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			scope := &inputscope.Scope{Root: parent, Policy: policy}
+			if scope.Allowed(repo, true) {
+				t.Skip("policy did not refuse the repository root; fixture cannot characterize the refusal")
+			}
+			return repo, scope, []string{repo, parent}
+		},
+	},
+	{
+		name: "out_of_scope_root_readable_config",
+		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
+			parent := t.TempDir()
+			repo := filepath.Join(parent, "outside")
+			inside := filepath.Join(parent, "inside")
+			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@app/*", "./src/*"))
+			writeFile(t, filepath.Join(repo, "packages", "app", "tsconfig.json"), aliasConfig("@pkg/*", "./src/*"))
+			writeFile(t, filepath.Join(inside, "keep.ts"), "export {}\n")
+			policy, err := graphinput.Build(inside, graphinput.Options{CacheExclusions: []string{}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			scope := &inputscope.Scope{Root: inside, Policy: policy}
+			// The separation this fixture exists for: the directory policy
+			// refuses the root while ClassifyDependency still hands back its
+			// tsconfig as an explicit external dependency. aliasesAtDir runs
+			// before any directory check, so the alias pass reads a config the
+			// walk is never allowed to reach.
+			if scope.Allowed(repo, true) {
+				t.Skip("directory policy did not refuse the out-of-scope root")
+			}
+			if !scope.Allowed(filepath.Join(repo, "tsconfig.json"), false) {
+				t.Skip("dependency policy refused the config too; the two cannot be separated here")
+			}
+			return repo, scope, []string{repo, parent}
+		},
+	},
+	{
+		name: "ignored_but_semantic_manifests",
+		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
+			repo := t.TempDir()
+			writeFile(t, filepath.Join(repo, "package.json"), `{"name":"root"}`)
+			writeFile(t, filepath.Join(repo, "package-lock.json"), `{"lockfileVersion":3}`)
+			writeFile(t, filepath.Join(repo, "pnpm-lock.yaml"), "lockfileVersion: '9.0'\n")
+			writeFile(t, filepath.Join(repo, "packages", "ui", "package.json"), `{"name":"ui"}`)
+			writeFile(t, filepath.Join(repo, "packages", "ui", "package-lock.json"), `{"lockfileVersion":3}`)
+			return repo, nil, []string{repo}
+		},
+	},
+	{
+		name: "no_config_negative",
+		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
+			repo := t.TempDir()
+			writeFile(t, filepath.Join(repo, "README.md"), "# nothing here\n")
+			writeFile(t, filepath.Join(repo, "src", "main.go"), "package main\n")
+			return repo, nil, []string{repo}
+		},
+	},
+}
+
+// normalizer rewrites the absolute paths the probe records into stable tokens,
+// longest prefix first so a nested root does not get masked by its parent.
+func newNormalizer(roots []string) func(string) string {
+	type entry struct{ from, to string }
+	var entries []entry
+	for i, r := range roots {
+		clean := filepath.Clean(r)
+		token := "<root>"
+		if i > 0 {
+			token = "<root" + string(rune('0'+i)) + ">"
+		}
+		entries = append(entries, entry{from: clean, to: token})
+		if resolved, err := filepath.EvalSymlinks(clean); err == nil && resolved != clean {
+			entries = append(entries, entry{from: resolved, to: token + "!"})
+		}
+	}
+	sort.Slice(entries, func(i, j int) bool { return len(entries[i].from) > len(entries[j].from) })
+	return func(s string) string {
+		for _, e := range entries {
+			if s == e.from {
+				return e.to
+			}
+			if strings.HasPrefix(s, e.from+string(filepath.Separator)) {
+				return e.to + "/" + filepath.ToSlash(s[len(e.from)+1:])
+			}
+		}
+		return s
+	}
+}
+
+func captureFixture(t *testing.T, f oracleFixture) oracleCapture {
+	t.Helper()
+	repo, scope, roots := f.build(t)
+	norm := newNormalizer(roots)
+
+	// Two probes, not one. tsConfigInputs calls collectTSAliasRoots itself, and
+	// recordDir keeps the first complete enumeration of a directory; sharing a
+	// probe with the oracle's own alias call would hand tsConfigInputs records
+	// it did not make, which is the very thing being characterized.
+	aliasProbe := newOverlayProbe()
+	roots2 := collectTSAliasRoots(withOverlayProbe(context.Background(), aliasProbe), repo, scope)
+
+	probe := newOverlayProbe()
+	inputs := tsConfigInputs(withOverlayProbe(context.Background(), probe), repo, scope)
+
+	capture := oracleCapture{
+		Fixture:         f.name,
+		Inputs:          inputs,
+		ProbeReads:      map[string]string{},
+		ProbeStats:      map[string]string{},
+		ProbeDirs:       map[string]map[string]string{},
+		AliasProbeDirs:  map[string]map[string]string{},
+		AliasProbeReads: map[string]string{},
+	}
+	for _, r := range roots2 {
+		out := oracleAliasRoot{Dir: r.dir}
+		var prefixes []string
+		for p := range r.aliases {
+			prefixes = append(prefixes, p)
+		}
+		sort.Strings(prefixes)
+		for _, p := range prefixes {
+			a := r.aliases[p]
+			out.Aliases = append(out.Aliases, oracleAlias{Prefix: p, Replacement: a.replacement, Suffix: a.suffix, Exact: a.exact})
+		}
+		capture.AliasRoots = append(capture.AliasRoots, out)
+	}
+	for k, v := range probe.snapshot() {
+		capture.ProbeReads[norm(k)] = v
+	}
+	for k, v := range probe.statSnapshot() {
+		capture.ProbeStats[norm(k)] = v
+	}
+	for k, v := range aliasProbe.snapshot() {
+		capture.AliasProbeReads[norm(k)] = v
+	}
+	for k, names := range aliasProbe.dirSnapshot() {
+		set := map[string]string{}
+		for n, kind := range names {
+			set[n] = kind
+		}
+		capture.AliasProbeDirs[norm(k)] = set
+	}
+	for k, names := range probe.dirSnapshot() {
+		set := map[string]string{}
+		for n, kind := range names {
+			set[n] = kind
+		}
+		capture.ProbeDirs[norm(k)] = set
+	}
+	return capture
+}
+
+func TestConfigEnumerationCharacterizationOracle(t *testing.T) {
+	update := os.Getenv("ENOLA_CONFIG_ENUM_ORACLE_UPDATE") == "1"
+	if update {
+		if err := os.MkdirAll(configEnumGoldenDir, 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, f := range configEnumFixtures {
+		t.Run(f.name, func(t *testing.T) {
+			got := captureFixture(t, f)
+			body, err := json.MarshalIndent(got, "", "  ")
+			if err != nil {
+				t.Fatal(err)
+			}
+			body = append(body, '\n')
+			golden := filepath.Join(configEnumGoldenDir, f.name+".json")
+			if update {
+				if err := os.WriteFile(golden, body, 0o644); err != nil {
+					t.Fatal(err)
+				}
+				t.Logf("wrote %s (%d bytes)", golden, len(body))
+				return
+			}
+			want, err := os.ReadFile(golden)
+			if err != nil {
+				t.Fatalf("golden missing; regenerate against unmodified source: %v", err)
+			}
+			if string(want) != string(body) {
+				t.Fatalf("capture differs from golden %s\n--- want ---\n%s\n--- got ---\n%s", golden, want, body)
+			}
+		})
+	}
+}
+
+// Production contexts have no probe; Stage16 intentionally falls back when a probe exists.
+func TestConfigEnumerationProductionInputsRootReview(t *testing.T) {
+ for _, f := range configEnumFixtures {
+  t.Run(f.name, func(t *testing.T) {
+   repo, scope, _ := f.build(t)
+   got := tsConfigInputs(context.Background(), repo, scope)
+   body, err := os.ReadFile(filepath.Join(configEnumGoldenDir, f.name+".json"))
+   if err != nil { t.Fatal(err) }
+   var want oracleCapture
+   if err := json.Unmarshal(body, &want); err != nil { t.Fatal(err) }
+   a, _ := json.Marshal(got)
+   b, _ := json.Marshal(want.Inputs)
+   if string(a) != string(b) { t.Fatalf("production inputs differ: got %s want %s", a, b) }
+  })
+ }
+}

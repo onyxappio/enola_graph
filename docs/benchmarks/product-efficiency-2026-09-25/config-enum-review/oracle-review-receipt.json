@@ -1,29 +1,39 @@
 {
-  "created_utc": "2026-09-25T03:00:00.047903+00:00",
-  "candidate_commit": "0b05b9b91bc0550282993075df2f984d4eb0bbe9",
+  "created_utc": "2026-09-25T03:09:29.438177+00:00",
+  "candidate_initial_commit": "0b05b9b91bc0550282993075df2f984d4eb0bbe9",
+  "candidate_counter_free_rerun_commit": "022fbfdd940451ea68f0895ddda126b3517a2a92",
   "baseline": "02e5e2d4448e9e14835052aa6e8b23a3bdfd643c",
   "results": [
     {
       "log": "candidate-oracle.log",
-      "sha256": "1030e941bd4f4b969fb1300517849cdc945e16dad623192ee7a6eca0562f99cd",
       "cases_passed": 13,
-      "skipped": 0
+      "skipped": 0,
+      "sha256": "1030e941bd4f4b969fb1300517849cdc945e16dad623192ee7a6eca0562f99cd",
+      "go_result": "ok  \tgithub.com/enola-labs/enola/internal/extractors/tsextractor\t0.605s"
     },
     {
       "log": "production-scope-oracle.log",
-      "sha256": "79c16568a9ac9dd51f1d5a20ec6ac50c95c9bb08dbc2cde465e0c59cad9de727",
       "cases_passed": 13,
-      "skipped": 0
+      "skipped": 0,
+      "sha256": "7c87ed0bca55f07ccadef47f6b217ad61278cf7f8f373512a151dcf03bcaf142",
+      "go_result": "ok  \tgithub.com/enola-labs/enola/internal/extractors/tsextractor\t0.521s"
     },
     {
       "log": "baseline-source-oracle.log",
-      "sha256": "743c6c4b8fb52ff8bea88e94eb485dbe65cdcf3d101244cecef9b643bfe1666c",
       "cases_passed": 13,
-      "skipped": 0
+      "skipped": 0,
+      "sha256": "8bf05d6a5ce1d8f94ea013d1f47ac5286ebde9a01e2f30b9070731477f14c911",
+      "go_result": "ok  \tgithub.com/enola-labs/enola/internal/extractors/tsextractor\t0.523s"
+    },
+    {
+      "log": "stage16-both-oracles.log",
+      "cases_passed": 26,
+      "skipped": 0,
+      "sha256": "218d38388404b8fa0ee166d07b0c86e199ee067854d6a272f1846ddcf27821a4",
+      "go_result": "ok  \tgithub.com/enola-labs/enola/internal/extractors/tsextractor\t0.753s"
     }
   ],
-  "production_scope_overlay": "production-scope-overlay.json",
-  "baseline_overlay": "baseline-source-overlay.json",
+  "correction": "Prior two /tmp overlay attempts did not prove replacement-source use. Superseded; reruns use canonical /private/tmp keys. Stage16 initial attempts discovered no tests and are explicitly invalid. Corrected Stage16 run executes13 probe and13 no-probe cases.",
   "timing_eligible": false,
-  "limit": "Targeted source/probe oracle only. No full Product graph or latency acceptance. Scratch diagnostic declarations remain but Scope implementation overlaid with baseline removes counters."
+  "limit": "Targeted oracle only; no graph/performance acceptance. Candidate commit change since first run only explanatory comments in production source. Overlay files point to local scratch sources."
 }

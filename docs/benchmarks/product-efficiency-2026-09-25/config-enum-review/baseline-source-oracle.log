@@ -12,19 +12,19 @@
 === RUN   TestConfigEnumerationCharacterizationOracle/out_of_scope_root_readable_config
 === RUN   TestConfigEnumerationCharacterizationOracle/ignored_but_semantic_manifests
 === RUN   TestConfigEnumerationCharacterizationOracle/no_config_negative
---- PASS: TestConfigEnumerationCharacterizationOracle (0.18s)
+--- PASS: TestConfigEnumerationCharacterizationOracle (0.15s)
     --- PASS: TestConfigEnumerationCharacterizationOracle/root_tsconfig_only (0.00s)
-    --- PASS: TestConfigEnumerationCharacterizationOracle/monorepo_three_alias_roots (0.01s)
-    --- PASS: TestConfigEnumerationCharacterizationOracle/extends_outside_subtree_and_missing (0.01s)
+    --- PASS: TestConfigEnumerationCharacterizationOracle/monorepo_three_alias_roots (0.00s)
+    --- PASS: TestConfigEnumerationCharacterizationOracle/extends_outside_subtree_and_missing (0.00s)
     --- PASS: TestConfigEnumerationCharacterizationOracle/testdata_tsconfig_included (0.00s)
     --- PASS: TestConfigEnumerationCharacterizationOracle/dot_and_skip_dirs_excluded (0.00s)
     --- PASS: TestConfigEnumerationCharacterizationOracle/unreadable_dir (0.00s)
     --- PASS: TestConfigEnumerationCharacterizationOracle/child_symlink_dir (0.00s)
     --- PASS: TestConfigEnumerationCharacterizationOracle/symlink_root_nested_alias (0.00s)
     --- PASS: TestConfigEnumerationCharacterizationOracle/scope_excludes_subtree (0.05s)
-    --- PASS: TestConfigEnumerationCharacterizationOracle/policy_refused_root (0.05s)
+    --- PASS: TestConfigEnumerationCharacterizationOracle/policy_refused_root (0.03s)
     --- PASS: TestConfigEnumerationCharacterizationOracle/out_of_scope_root_readable_config (0.05s)
     --- PASS: TestConfigEnumerationCharacterizationOracle/ignored_but_semantic_manifests (0.00s)
     --- PASS: TestConfigEnumerationCharacterizationOracle/no_config_negative (0.00s)
 PASS
-ok  	github.com/enola-labs/enola/internal/extractors/tsextractor	0.546s
+ok  	github.com/enola-labs/enola/internal/extractors/tsextractor	0.523s
