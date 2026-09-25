@@ -1,0 +1,1897 @@
+diff --git a/internal/extractors/tsextractor/configwalk.go b/internal/extractors/tsextractor/configwalk.go
+index 35339bb..56a89d0 100644
+--- a/internal/extractors/tsextractor/configwalk.go
++++ b/internal/extractors/tsextractor/configwalk.go
+@@ -114,9 +114,13 @@ func (w *tsAliasWalk) walk(ctx context.Context, dir string) {
+ // walkDirDescendsInto reports whether filepath.WalkDir would descend into root.
+ // It is the one place the two enumerations genuinely disagree: WalkDir lstats
+ // its root and stops at a symlink, while overlayReadDir follows one, so a
+-// symlinked repository root would gain config candidates it has never had. The
+-// lstat is the same one filepath.WalkDir performs before any scope check, so
+-// asking here observes nothing the walk did not already observe.
++// symlinked repository root would gain config candidates it has never had.
++//
++// The lstat is an addition, not a reuse. filepath.WalkDir performs its own and
++// cannot be handed this one, so the declining path pays two; the fused path
++// pays this one alone, with no walk to share it with. Operation accounting for
++// this enumeration must include one added lstat per tsConfigInputs call.
++// Against it stands one fewer listing of every directory in the tree.
+ func walkDirDescendsInto(root string) bool {
+ 	info, err := os.Lstat(root) //factpath:host
+ 	return err == nil && info.IsDir()
+diff --git a/internal/extractors/tsextractor/testdata/zz_config_enum_golden/child_symlink_dir.json b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/child_symlink_dir.json
+new file mode 100644
+index 0000000..9bd1a2e
+--- /dev/null
++++ b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/child_symlink_dir.json
+@@ -0,0 +1,107 @@
++{
++  "fixture": "child_symlink_dir",
++  "inputs": [
++    "angular.json",
++    "deno.json",
++    "deno.jsonc",
++    "jsconfig.json",
++    "next.config.js",
++    "next.config.mjs",
++    "next.config.ts",
++    "nuxt.config.js",
++    "nuxt.config.mjs",
++    "nuxt.config.ts",
++    "nx.json",
++    "package-lock.json",
++    "package.json",
++    "pnpm-lock.yaml",
++    "prisma/schema.prisma",
++    "real/svelte.config.js",
++    "real/svelte.config.mjs",
++    "real/svelte.config.ts",
++    "real/tsconfig.json",
++    "schema.prisma",
++    "svelte.config.js",
++    "svelte.config.mjs",
++    "svelte.config.ts",
++    "tsconfig.base.json",
++    "tsconfig.json",
++    "yarn.lock"
++  ],
++  "alias_roots": [
++    {
++      "dir": "",
++      "aliases": [
++        {
++          "prefix": "@app/",
++          "replacement": "src/",
++          "suffix": "",
++          "exact": false
++        }
++      ]
++    },
++    {
++      "dir": "real",
++      "aliases": [
++        {
++          "prefix": "@real/",
++          "replacement": "real/src/",
++          "suffix": "",
++          "exact": false
++        }
++      ]
++    }
++  ],
++  "probe_reads": {
++    "\u003croot\u003e/real/tsconfig.json": "l:sha256:ece2755195c349291c75b84f11b48d58dfbe9a63d0877bfe47f6ed9696e3d20a",
++    "\u003croot\u003e/tsconfig.json": "l:sha256:3a08021beb2fb48605845669c9bc80678e845d878baee71c1ce3cc0ea72d897e"
++  },
++  "probe_stats": {
++    "\u003croot\u003e/angular.json": "sm:",
++    "\u003croot\u003e/deno.json": "sm:",
++    "\u003croot\u003e/deno.jsonc": "sm:",
++    "\u003croot\u003e/jsconfig.json": "sm:",
++    "\u003croot\u003e/next.config.js": "sm:",
++    "\u003croot\u003e/next.config.mjs": "sm:",
++    "\u003croot\u003e/next.config.ts": "sm:",
++    "\u003croot\u003e/nuxt.config.js": "sm:",
++    "\u003croot\u003e/nuxt.config.mjs": "sm:",
++    "\u003croot\u003e/nuxt.config.ts": "sm:",
++    "\u003croot\u003e/nx.json": "sm:",
++    "\u003croot\u003e/package-lock.json": "sm:",
++    "\u003croot\u003e/package.json": "sm:",
++    "\u003croot\u003e/pnpm-lock.yaml": "sm:",
++    "\u003croot\u003e/prisma/schema.prisma": "sm:",
++    "\u003croot\u003e/schema.prisma": "sm:",
++    "\u003croot\u003e/svelte.config.js": "sm:",
++    "\u003croot\u003e/svelte.config.mjs": "sm:",
++    "\u003croot\u003e/svelte.config.ts": "sm:",
++    "\u003croot\u003e/tsconfig.base.json": "sm:",
++    "\u003croot\u003e/tsconfig.json": "sf:",
++    "\u003croot\u003e/yarn.lock": "sm:"
++  },
++  "probe_dirs": {
++    "\u003croot\u003e": {
++      "linked": "l",
++      "real": "d",
++      "tsconfig.json": "f"
++    },
++    "\u003croot\u003e/real": {
++      "tsconfig.json": "f"
++    }
++  },
++  "alias_probe_dirs": {
++    "\u003croot\u003e": {
++      "linked": "l",
++      "real": "d",
++      "tsconfig.json": "f"
++    },
++    "\u003croot\u003e/real": {
++      "tsconfig.json": "f"
++    }
++  },
++  "alias_probe_reads": {
++    "\u003croot\u003e/real/tsconfig.json": "l:sha256:ece2755195c349291c75b84f11b48d58dfbe9a63d0877bfe47f6ed9696e3d20a",
++    "\u003croot\u003e/tsconfig.json": "l:sha256:3a08021beb2fb48605845669c9bc80678e845d878baee71c1ce3cc0ea72d897e"
++  }
++}
+diff --git a/internal/extractors/tsextractor/testdata/zz_config_enum_golden/dot_and_skip_dirs_excluded.json b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/dot_and_skip_dirs_excluded.json
+new file mode 100644
+index 0000000..68e1bfa
+--- /dev/null
++++ b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/dot_and_skip_dirs_excluded.json
+@@ -0,0 +1,96 @@
++{
++  "fixture": "dot_and_skip_dirs_excluded",
++  "inputs": [
++    "angular.json",
++    "deno.json",
++    "deno.jsonc",
++    "jsconfig.json",
++    "next.config.js",
++    "next.config.mjs",
++    "next.config.ts",
++    "nuxt.config.js",
++    "nuxt.config.mjs",
++    "nuxt.config.ts",
++    "nx.json",
++    "package-lock.json",
++    "package.json",
++    "pnpm-lock.yaml",
++    "prisma/schema.prisma",
++    "schema.prisma",
++    "svelte.config.js",
++    "svelte.config.mjs",
++    "svelte.config.ts",
++    "tsconfig.base.json",
++    "tsconfig.json",
++    "yarn.lock"
++  ],
++  "alias_roots": [
++    {
++      "dir": "",
++      "aliases": [
++        {
++          "prefix": "@app/",
++          "replacement": "src/",
++          "suffix": "",
++          "exact": false
++        }
++      ]
++    }
++  ],
++  "probe_reads": {
++    "\u003croot\u003e/tsconfig.json": "l:sha256:3a08021beb2fb48605845669c9bc80678e845d878baee71c1ce3cc0ea72d897e"
++  },
++  "probe_stats": {
++    "\u003croot\u003e/angular.json": "sm:",
++    "\u003croot\u003e/deno.json": "sm:",
++    "\u003croot\u003e/deno.jsonc": "sm:",
++    "\u003croot\u003e/jsconfig.json": "sm:",
++    "\u003croot\u003e/next.config.js": "sm:",
++    "\u003croot\u003e/next.config.mjs": "sm:",
++    "\u003croot\u003e/next.config.ts": "sm:",
++    "\u003croot\u003e/nuxt.config.js": "sm:",
++    "\u003croot\u003e/nuxt.config.mjs": "sm:",
++    "\u003croot\u003e/nuxt.config.ts": "sm:",
++    "\u003croot\u003e/nx.json": "sm:",
++    "\u003croot\u003e/package-lock.json": "sm:",
++    "\u003croot\u003e/package.json": "sm:",
++    "\u003croot\u003e/pnpm-lock.yaml": "sm:",
++    "\u003croot\u003e/prisma/schema.prisma": "sm:",
++    "\u003croot\u003e/schema.prisma": "sm:",
++    "\u003croot\u003e/svelte.config.js": "sm:",
++    "\u003croot\u003e/svelte.config.mjs": "sm:",
++    "\u003croot\u003e/svelte.config.ts": "sm:",
++    "\u003croot\u003e/tsconfig.base.json": "sm:",
++    "\u003croot\u003e/tsconfig.json": "sf:",
++    "\u003croot\u003e/yarn.lock": "sm:"
++  },
++  "probe_dirs": {
++    "\u003croot\u003e": {
++      ".hidden": "d",
++      ".next": "d",
++      "build": "d",
++      "dist": "d",
++      "node_modules": "d",
++      "out": "d",
++      "target": "d",
++      "tsconfig.json": "f",
++      "vendor": "d"
++    }
++  },
++  "alias_probe_dirs": {
++    "\u003croot\u003e": {
++      ".hidden": "d",
++      ".next": "d",
++      "build": "d",
++      "dist": "d",
++      "node_modules": "d",
++      "out": "d",
++      "target": "d",
++      "tsconfig.json": "f",
++      "vendor": "d"
++    }
++  },
++  "alias_probe_reads": {
++    "\u003croot\u003e/tsconfig.json": "l:sha256:3a08021beb2fb48605845669c9bc80678e845d878baee71c1ce3cc0ea72d897e"
++  }
++}
+diff --git a/internal/extractors/tsextractor/testdata/zz_config_enum_golden/extends_outside_subtree_and_missing.json b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/extends_outside_subtree_and_missing.json
+new file mode 100644
+index 0000000..24e5870
+--- /dev/null
++++ b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/extends_outside_subtree_and_missing.json
+@@ -0,0 +1,119 @@
++{
++  "fixture": "extends_outside_subtree_and_missing",
++  "inputs": [
++    "../shared/tsconfig.base.json",
++    "angular.json",
++    "deno.json",
++    "deno.jsonc",
++    "jsconfig.json",
++    "next.config.js",
++    "next.config.mjs",
++    "next.config.ts",
++    "nuxt.config.js",
++    "nuxt.config.mjs",
++    "nuxt.config.ts",
++    "nx.json",
++    "package-lock.json",
++    "package.json",
++    "packages/app/missing-parent.json",
++    "packages/app/svelte.config.js",
++    "packages/app/svelte.config.mjs",
++    "packages/app/svelte.config.ts",
++    "packages/app/tsconfig.json",
++    "pnpm-lock.yaml",
++    "prisma/schema.prisma",
++    "schema.prisma",
++    "svelte.config.js",
++    "svelte.config.mjs",
++    "svelte.config.ts",
++    "tsconfig.base.json",
++    "tsconfig.json",
++    "yarn.lock"
++  ],
++  "alias_roots": [
++    {
++      "dir": "",
++      "aliases": [
++        {
++          "prefix": "@shared/",
++          "replacement": "../shared/src/",
++          "suffix": "",
++          "exact": false
++        }
++      ]
++    },
++    {
++      "dir": "packages/app",
++      "aliases": [
++        {
++          "prefix": "@app/",
++          "replacement": "packages/app/src/",
++          "suffix": "",
++          "exact": false
++        }
++      ]
++    }
++  ],
++  "probe_reads": {
++    "\u003croot1\u003e/shared/tsconfig.base.json": "l:sha256:79dfbe11af4fef44d710e4873584393e1e7bde79ab16a614d82ed1dc1b65c76e",
++    "\u003croot\u003e/packages/app/tsconfig.json": "l:sha256:f0f538bd2eb118b2e2af189d3d19e0fce41dbcf309b89361df6fcce79de49ada",
++    "\u003croot\u003e/packages/tsconfig.base.json": "m:",
++    "\u003croot\u003e/packages/tsconfig.json": "m:",
++    "\u003croot\u003e/tsconfig.json": "l:sha256:3f57964a123108b5680fc9593b8fdcf6e26cf35fbd6b63a012f8a9ea2346d462"
++  },
++  "probe_stats": {
++    "\u003croot\u003e/angular.json": "sm:",
++    "\u003croot\u003e/deno.json": "sm:",
++    "\u003croot\u003e/deno.jsonc": "sm:",
++    "\u003croot\u003e/jsconfig.json": "sm:",
++    "\u003croot\u003e/next.config.js": "sm:",
++    "\u003croot\u003e/next.config.mjs": "sm:",
++    "\u003croot\u003e/next.config.ts": "sm:",
++    "\u003croot\u003e/nuxt.config.js": "sm:",
++    "\u003croot\u003e/nuxt.config.mjs": "sm:",
++    "\u003croot\u003e/nuxt.config.ts": "sm:",
++    "\u003croot\u003e/nx.json": "sm:",
++    "\u003croot\u003e/package-lock.json": "sm:",
++    "\u003croot\u003e/package.json": "sm:",
++    "\u003croot\u003e/pnpm-lock.yaml": "sm:",
++    "\u003croot\u003e/prisma/schema.prisma": "sm:",
++    "\u003croot\u003e/schema.prisma": "sm:",
++    "\u003croot\u003e/svelte.config.js": "sm:",
++    "\u003croot\u003e/svelte.config.mjs": "sm:",
++    "\u003croot\u003e/svelte.config.ts": "sm:",
++    "\u003croot\u003e/tsconfig.base.json": "sm:",
++    "\u003croot\u003e/tsconfig.json": "sf:",
++    "\u003croot\u003e/yarn.lock": "sm:"
++  },
++  "probe_dirs": {
++    "\u003croot\u003e": {
++      "packages": "d",
++      "tsconfig.json": "f"
++    },
++    "\u003croot\u003e/packages": {
++      "app": "d"
++    },
++    "\u003croot\u003e/packages/app": {
++      "tsconfig.json": "f"
++    }
++  },
++  "alias_probe_dirs": {
++    "\u003croot\u003e": {
++      "packages": "d",
++      "tsconfig.json": "f"
++    },
++    "\u003croot\u003e/packages": {
++      "app": "d"
++    },
++    "\u003croot\u003e/packages/app": {
++      "tsconfig.json": "f"
++    }
++  },
++  "alias_probe_reads": {
++    "\u003croot1\u003e/shared/tsconfig.base.json": "l:sha256:79dfbe11af4fef44d710e4873584393e1e7bde79ab16a614d82ed1dc1b65c76e",
++    "\u003croot\u003e/packages/app/tsconfig.json": "l:sha256:f0f538bd2eb118b2e2af189d3d19e0fce41dbcf309b89361df6fcce79de49ada",
++    "\u003croot\u003e/packages/tsconfig.base.json": "m:",
++    "\u003croot\u003e/packages/tsconfig.json": "m:",
++    "\u003croot\u003e/tsconfig.json": "l:sha256:3f57964a123108b5680fc9593b8fdcf6e26cf35fbd6b63a012f8a9ea2346d462"
++  }
++}
+diff --git a/internal/extractors/tsextractor/testdata/zz_config_enum_golden/ignored_but_semantic_manifests.json b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/ignored_but_semantic_manifests.json
+new file mode 100644
+index 0000000..8af18f9
+--- /dev/null
++++ b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/ignored_but_semantic_manifests.json
+@@ -0,0 +1,123 @@
++{
++  "fixture": "ignored_but_semantic_manifests",
++  "inputs": [
++    "angular.json",
++    "deno.json",
++    "deno.jsonc",
++    "jsconfig.json",
++    "next.config.js",
++    "next.config.mjs",
++    "next.config.ts",
++    "nuxt.config.js",
++    "nuxt.config.mjs",
++    "nuxt.config.ts",
++    "nx.json",
++    "package-lock.json",
++    "package.json",
++    "packages/ui/package.json",
++    "pnpm-lock.yaml",
++    "prisma/schema.prisma",
++    "schema.prisma",
++    "svelte.config.js",
++    "svelte.config.mjs",
++    "svelte.config.ts",
++    "tsconfig.base.json",
++    "tsconfig.json",
++    "yarn.lock"
++  ],
++  "alias_roots": null,
++  "probe_reads": {
++    "\u003croot\u003e/package.json": "l:sha256:a559a2b5f485dba650dbaf3b2e17bb90b47f64a5977ea9dc8d5ec2470333ad7f",
++    "\u003croot\u003e/packages/package.json": "m:",
++    "\u003croot\u003e/packages/tsconfig.base.json": "m:",
++    "\u003croot\u003e/packages/tsconfig.json": "m:",
++    "\u003croot\u003e/packages/ui/package.json": "l:sha256:7ef9abeef36ce84ea25345e4a7b5b83c6fd39a8952fe4aa59409dbcf58d6ff70",
++    "\u003croot\u003e/packages/ui/tsconfig.base.json": "m:",
++    "\u003croot\u003e/packages/ui/tsconfig.json": "m:",
++    "\u003croot\u003e/tsconfig.base.json": "m:",
++    "\u003croot\u003e/tsconfig.json": "m:"
++  },
++  "probe_stats": {
++    "\u003croot\u003e/angular.json": "sm:",
++    "\u003croot\u003e/build.gradle": "sm:",
++    "\u003croot\u003e/build.gradle.kts": "sm:",
++    "\u003croot\u003e/config/importmap.rb": "sm:",
++    "\u003croot\u003e/deno.json": "sm:",
++    "\u003croot\u003e/deno.jsonc": "sm:",
++    "\u003croot\u003e/import_map.json": "sm:",
++    "\u003croot\u003e/jsconfig.json": "sm:",
++    "\u003croot\u003e/next.config.js": "sm:",
++    "\u003croot\u003e/next.config.mjs": "sm:",
++    "\u003croot\u003e/next.config.ts": "sm:",
++    "\u003croot\u003e/nuxt.config.js": "sm:",
++    "\u003croot\u003e/nuxt.config.mjs": "sm:",
++    "\u003croot\u003e/nuxt.config.ts": "sm:",
++    "\u003croot\u003e/nx.json": "sm:",
++    "\u003croot\u003e/package-lock.json": "sf:",
++    "\u003croot\u003e/package.json": "sf:",
++    "\u003croot\u003e/packages/config/importmap.rb": "sm:",
++    "\u003croot\u003e/packages/deno.json": "sm:",
++    "\u003croot\u003e/packages/deno.jsonc": "sm:",
++    "\u003croot\u003e/packages/import_map.json": "sm:",
++    "\u003croot\u003e/packages/tsconfig.base.json": "sm:",
++    "\u003croot\u003e/packages/tsconfig.json": "sm:",
++    "\u003croot\u003e/packages/ui/config/importmap.rb": "sm:",
++    "\u003croot\u003e/packages/ui/deno.json": "sm:",
++    "\u003croot\u003e/packages/ui/deno.jsonc": "sm:",
++    "\u003croot\u003e/packages/ui/import_map.json": "sm:",
++    "\u003croot\u003e/packages/ui/tsconfig.base.json": "sm:",
++    "\u003croot\u003e/packages/ui/tsconfig.json": "sm:",
++    "\u003croot\u003e/pnpm-lock.yaml": "sf:",
++    "\u003croot\u003e/pom.xml": "sm:",
++    "\u003croot\u003e/prisma/schema.prisma": "sm:",
++    "\u003croot\u003e/pyproject.toml": "sm:",
++    "\u003croot\u003e/requirements.txt": "sm:",
++    "\u003croot\u003e/schema.prisma": "sm:",
++    "\u003croot\u003e/setup.cfg": "sm:",
++    "\u003croot\u003e/setup.py": "sm:",
++    "\u003croot\u003e/svelte.config.js": "sm:",
++    "\u003croot\u003e/svelte.config.mjs": "sm:",
++    "\u003croot\u003e/svelte.config.ts": "sm:",
++    "\u003croot\u003e/tsconfig.base.json": "sm:",
++    "\u003croot\u003e/tsconfig.json": "sm:",
++    "\u003croot\u003e/yarn.lock": "sm:"
++  },
++  "probe_dirs": {
++    "\u003croot\u003e": {
++      "package-lock.json": "f",
++      "package.json": "f",
++      "packages": "d",
++      "pnpm-lock.yaml": "f"
++    },
++    "\u003croot\u003e/packages": {
++      "ui": "d"
++    },
++    "\u003croot\u003e/packages/ui": {
++      "package-lock.json": "f",
++      "package.json": "f"
++    }
++  },
++  "alias_probe_dirs": {
++    "\u003croot\u003e": {
++      "package-lock.json": "f",
++      "package.json": "f",
++      "packages": "d",
++      "pnpm-lock.yaml": "f"
++    },
++    "\u003croot\u003e/packages": {
++      "ui": "d"
++    },
++    "\u003croot\u003e/packages/ui": {
++      "package-lock.json": "f",
++      "package.json": "f"
++    }
++  },
++  "alias_probe_reads": {
++    "\u003croot\u003e/packages/tsconfig.base.json": "m:",
++    "\u003croot\u003e/packages/tsconfig.json": "m:",
++    "\u003croot\u003e/packages/ui/tsconfig.base.json": "m:",
++    "\u003croot\u003e/packages/ui/tsconfig.json": "m:",
++    "\u003croot\u003e/tsconfig.base.json": "m:",
++    "\u003croot\u003e/tsconfig.json": "m:"
++  }
++}
+diff --git a/internal/extractors/tsextractor/testdata/zz_config_enum_golden/monorepo_three_alias_roots.json b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/monorepo_three_alias_roots.json
+new file mode 100644
+index 0000000..6556e9f
+--- /dev/null
++++ b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/monorepo_three_alias_roots.json
+@@ -0,0 +1,175 @@
++{
++  "fixture": "monorepo_three_alias_roots",
++  "inputs": [
++    "angular.json",
++    "apps/web/package.json",
++    "deno.json",
++    "deno.jsonc",
++    "jsconfig.json",
++    "next.config.js",
++    "next.config.mjs",
++    "next.config.ts",
++    "nuxt.config.js",
++    "nuxt.config.mjs",
++    "nuxt.config.ts",
++    "nx.json",
++    "package-lock.json",
++    "package.json",
++    "packages/nested/deep/svelte.config.js",
++    "packages/nested/deep/svelte.config.mjs",
++    "packages/nested/deep/svelte.config.ts",
++    "packages/nested/deep/tsconfig.base.json",
++    "packages/ui/svelte.config.js",
++    "packages/ui/svelte.config.mjs",
++    "packages/ui/svelte.config.ts",
++    "packages/ui/tsconfig.json",
++    "pnpm-lock.yaml",
++    "prisma/schema.prisma",
++    "schema.prisma",
++    "svelte.config.js",
++    "svelte.config.mjs",
++    "svelte.config.ts",
++    "tsconfig.base.json",
++    "tsconfig.json",
++    "yarn.lock"
++  ],
++  "alias_roots": [
++    {
++      "dir": "",
++      "aliases": [
++        {
++          "prefix": "@root/",
++          "replacement": "src/",
++          "suffix": "",
++          "exact": false
++        }
++      ]
++    },
++    {
++      "dir": "packages/nested/deep",
++      "aliases": [
++        {
++          "prefix": "@deep/",
++          "replacement": "packages/nested/deep/lib/",
++          "suffix": "",
++          "exact": false
++        }
++      ]
++    },
++    {
++      "dir": "packages/ui",
++      "aliases": [
++        {
++          "prefix": "@ui/",
++          "replacement": "packages/ui/src/",
++          "suffix": "",
++          "exact": false
++        }
++      ]
++    }
++  ],
++  "probe_reads": {
++    "\u003croot\u003e/apps/tsconfig.base.json": "m:",
++    "\u003croot\u003e/apps/tsconfig.json": "m:",
++    "\u003croot\u003e/apps/web/tsconfig.base.json": "m:",
++    "\u003croot\u003e/apps/web/tsconfig.json": "m:",
++    "\u003croot\u003e/packages/nested/deep/tsconfig.base.json": "l:sha256:93f92f9934e6e571cee5d283c2c326e30c95818555a12e7961d9df323ea25ece",
++    "\u003croot\u003e/packages/nested/deep/tsconfig.json": "m:",
++    "\u003croot\u003e/packages/nested/tsconfig.base.json": "m:",
++    "\u003croot\u003e/packages/nested/tsconfig.json": "m:",
++    "\u003croot\u003e/packages/tsconfig.base.json": "m:",
++    "\u003croot\u003e/packages/tsconfig.json": "m:",
++    "\u003croot\u003e/packages/ui/tsconfig.json": "l:sha256:5fc31c75697d3ff4fec6fe99d5585b6e222feee4b25b71ce7430f3506b7f5713",
++    "\u003croot\u003e/tsconfig.json": "l:sha256:37d58ea20b27340af6c9e4c5abe7278d5023d8154eb0cd739f790742c21546b7"
++  },
++  "probe_stats": {
++    "\u003croot\u003e/angular.json": "sm:",
++    "\u003croot\u003e/deno.json": "sm:",
++    "\u003croot\u003e/deno.jsonc": "sm:",
++    "\u003croot\u003e/jsconfig.json": "sm:",
++    "\u003croot\u003e/next.config.js": "sm:",
++    "\u003croot\u003e/next.config.mjs": "sm:",
++    "\u003croot\u003e/next.config.ts": "sm:",
++    "\u003croot\u003e/nuxt.config.js": "sm:",
++    "\u003croot\u003e/nuxt.config.mjs": "sm:",
++    "\u003croot\u003e/nuxt.config.ts": "sm:",
++    "\u003croot\u003e/nx.json": "sm:",
++    "\u003croot\u003e/package-lock.json": "sm:",
++    "\u003croot\u003e/package.json": "sm:",
++    "\u003croot\u003e/pnpm-lock.yaml": "sm:",
++    "\u003croot\u003e/prisma/schema.prisma": "sm:",
++    "\u003croot\u003e/schema.prisma": "sm:",
++    "\u003croot\u003e/svelte.config.js": "sm:",
++    "\u003croot\u003e/svelte.config.mjs": "sm:",
++    "\u003croot\u003e/svelte.config.ts": "sm:",
++    "\u003croot\u003e/tsconfig.base.json": "sm:",
++    "\u003croot\u003e/tsconfig.json": "sf:",
++    "\u003croot\u003e/yarn.lock": "sm:"
++  },
++  "probe_dirs": {
++    "\u003croot\u003e": {
++      "apps": "d",
++      "packages": "d",
++      "tsconfig.json": "f"
++    },
++    "\u003croot\u003e/apps": {
++      "web": "d"
++    },
++    "\u003croot\u003e/apps/web": {
++      "package.json": "f"
++    },
++    "\u003croot\u003e/packages": {
++      "nested": "d",
++      "ui": "d"
++    },
++    "\u003croot\u003e/packages/nested": {
++      "deep": "d"
++    },
++    "\u003croot\u003e/packages/nested/deep": {
++      "tsconfig.base.json": "f"
++    },
++    "\u003croot\u003e/packages/ui": {
++      "tsconfig.json": "f"
++    }
++  },
++  "alias_probe_dirs": {
++    "\u003croot\u003e": {
++      "apps": "d",
++      "packages": "d",
++      "tsconfig.json": "f"
++    },
++    "\u003croot\u003e/apps": {
++      "web": "d"
++    },
++    "\u003croot\u003e/apps/web": {
++      "package.json": "f"
++    },
++    "\u003croot\u003e/packages": {
++      "nested": "d",
++      "ui": "d"
++    },
++    "\u003croot\u003e/packages/nested": {
++      "deep": "d"
++    },
++    "\u003croot\u003e/packages/nested/deep": {
++      "tsconfig.base.json": "f"
++    },
++    "\u003croot\u003e/packages/ui": {
++      "tsconfig.json": "f"
++    }
++  },
++  "alias_probe_reads": {
++    "\u003croot\u003e/apps/tsconfig.base.json": "m:",
++    "\u003croot\u003e/apps/tsconfig.json": "m:",
++    "\u003croot\u003e/apps/web/tsconfig.base.json": "m:",
++    "\u003croot\u003e/apps/web/tsconfig.json": "m:",
++    "\u003croot\u003e/packages/nested/deep/tsconfig.base.json": "l:sha256:93f92f9934e6e571cee5d283c2c326e30c95818555a12e7961d9df323ea25ece",
++    "\u003croot\u003e/packages/nested/deep/tsconfig.json": "m:",
++    "\u003croot\u003e/packages/nested/tsconfig.base.json": "m:",
++    "\u003croot\u003e/packages/nested/tsconfig.json": "m:",
++    "\u003croot\u003e/packages/tsconfig.base.json": "m:",
++    "\u003croot\u003e/packages/tsconfig.json": "m:",
++    "\u003croot\u003e/packages/ui/tsconfig.json": "l:sha256:5fc31c75697d3ff4fec6fe99d5585b6e222feee4b25b71ce7430f3506b7f5713",
++    "\u003croot\u003e/tsconfig.json": "l:sha256:37d58ea20b27340af6c9e4c5abe7278d5023d8154eb0cd739f790742c21546b7"
++  }
++}
+diff --git a/internal/extractors/tsextractor/testdata/zz_config_enum_golden/no_config_negative.json b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/no_config_negative.json
+new file mode 100644
+index 0000000..d31d0ef
+--- /dev/null
++++ b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/no_config_negative.json
+@@ -0,0 +1,99 @@
++{
++  "fixture": "no_config_negative",
++  "inputs": [
++    "angular.json",
++    "deno.json",
++    "deno.jsonc",
++    "jsconfig.json",
++    "next.config.js",
++    "next.config.mjs",
++    "next.config.ts",
++    "nuxt.config.js",
++    "nuxt.config.mjs",
++    "nuxt.config.ts",
++    "nx.json",
++    "package-lock.json",
++    "package.json",
++    "pnpm-lock.yaml",
++    "prisma/schema.prisma",
++    "schema.prisma",
++    "svelte.config.js",
++    "svelte.config.mjs",
++    "svelte.config.ts",
++    "tsconfig.base.json",
++    "tsconfig.json",
++    "yarn.lock"
++  ],
++  "alias_roots": null,
++  "probe_reads": {
++    "\u003croot\u003e/package.json": "m:",
++    "\u003croot\u003e/src/package.json": "m:",
++    "\u003croot\u003e/src/tsconfig.base.json": "m:",
++    "\u003croot\u003e/src/tsconfig.json": "m:",
++    "\u003croot\u003e/tsconfig.base.json": "m:",
++    "\u003croot\u003e/tsconfig.json": "m:"
++  },
++  "probe_stats": {
++    "\u003croot\u003e/angular.json": "sm:",
++    "\u003croot\u003e/build.gradle": "sm:",
++    "\u003croot\u003e/build.gradle.kts": "sm:",
++    "\u003croot\u003e/config/importmap.rb": "sm:",
++    "\u003croot\u003e/deno.json": "sm:",
++    "\u003croot\u003e/deno.jsonc": "sm:",
++    "\u003croot\u003e/import_map.json": "sm:",
++    "\u003croot\u003e/jsconfig.json": "sm:",
++    "\u003croot\u003e/next.config.js": "sm:",
++    "\u003croot\u003e/next.config.mjs": "sm:",
++    "\u003croot\u003e/next.config.ts": "sm:",
++    "\u003croot\u003e/nuxt.config.js": "sm:",
++    "\u003croot\u003e/nuxt.config.mjs": "sm:",
++    "\u003croot\u003e/nuxt.config.ts": "sm:",
++    "\u003croot\u003e/nx.json": "sm:",
++    "\u003croot\u003e/package-lock.json": "sm:",
++    "\u003croot\u003e/package.json": "sm:",
++    "\u003croot\u003e/pnpm-lock.yaml": "sm:",
++    "\u003croot\u003e/pom.xml": "sm:",
++    "\u003croot\u003e/prisma/schema.prisma": "sm:",
++    "\u003croot\u003e/pyproject.toml": "sm:",
++    "\u003croot\u003e/requirements.txt": "sm:",
++    "\u003croot\u003e/schema.prisma": "sm:",
++    "\u003croot\u003e/setup.cfg": "sm:",
++    "\u003croot\u003e/setup.py": "sm:",
++    "\u003croot\u003e/src/config/importmap.rb": "sm:",
++    "\u003croot\u003e/src/deno.json": "sm:",
++    "\u003croot\u003e/src/deno.jsonc": "sm:",
++    "\u003croot\u003e/src/import_map.json": "sm:",
++    "\u003croot\u003e/src/tsconfig.base.json": "sm:",
++    "\u003croot\u003e/src/tsconfig.json": "sm:",
++    "\u003croot\u003e/svelte.config.js": "sm:",
++    "\u003croot\u003e/svelte.config.mjs": "sm:",
++    "\u003croot\u003e/svelte.config.ts": "sm:",
++    "\u003croot\u003e/tsconfig.base.json": "sm:",
++    "\u003croot\u003e/tsconfig.json": "sm:",
++    "\u003croot\u003e/yarn.lock": "sm:"
++  },
++  "probe_dirs": {
++    "\u003croot\u003e": {
++      "README.md": "f",
++      "src": "d"
++    },
++    "\u003croot\u003e/src": {
++      "main.go": "f"
++    }
++  },
++  "alias_probe_dirs": {
++    "\u003croot\u003e": {
++      "README.md": "f",
++      "src": "d"
++    },
++    "\u003croot\u003e/src": {
++      "main.go": "f"
++    }
++  },
++  "alias_probe_reads": {
++    "\u003croot\u003e/src/tsconfig.base.json": "m:",
++    "\u003croot\u003e/src/tsconfig.json": "m:",
++    "\u003croot\u003e/tsconfig.base.json": "m:",
++    "\u003croot\u003e/tsconfig.json": "m:"
++  }
++}
+diff --git a/internal/extractors/tsextractor/testdata/zz_config_enum_golden/out_of_scope_root_readable_config.json b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/out_of_scope_root_readable_config.json
+new file mode 100644
+index 0000000..fcf1cb2
+--- /dev/null
++++ b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/out_of_scope_root_readable_config.json
+@@ -0,0 +1,69 @@
++{
++  "fixture": "out_of_scope_root_readable_config",
++  "inputs": [
++    "angular.json",
++    "deno.json",
++    "deno.jsonc",
++    "jsconfig.json",
++    "next.config.js",
++    "next.config.mjs",
++    "next.config.ts",
++    "nuxt.config.js",
++    "nuxt.config.mjs",
++    "nuxt.config.ts",
++    "nx.json",
++    "package-lock.json",
++    "package.json",
++    "pnpm-lock.yaml",
++    "prisma/schema.prisma",
++    "schema.prisma",
++    "svelte.config.js",
++    "svelte.config.mjs",
++    "svelte.config.ts",
++    "tsconfig.base.json",
++    "tsconfig.json",
++    "yarn.lock"
++  ],
++  "alias_roots": [
++    {
++      "dir": "",
++      "aliases": [
++        {
++          "prefix": "@app/",
++          "replacement": "src/",
++          "suffix": "",
++          "exact": false
++        }
++      ]
++    }
++  ],
++  "probe_reads": {
++    "\u003croot\u003e/tsconfig.json": "l:sha256:3a08021beb2fb48605845669c9bc80678e845d878baee71c1ce3cc0ea72d897e"
++  },
++  "probe_stats": {
++    "\u003croot\u003e/angular.json": "sm:",
++    "\u003croot\u003e/deno.json": "sm:",
++    "\u003croot\u003e/deno.jsonc": "sm:",
++    "\u003croot\u003e/jsconfig.json": "sm:",
++    "\u003croot\u003e/next.config.js": "sm:",
++    "\u003croot\u003e/next.config.mjs": "sm:",
++    "\u003croot\u003e/next.config.ts": "sm:",
++    "\u003croot\u003e/nuxt.config.js": "sm:",
++    "\u003croot\u003e/nuxt.config.mjs": "sm:",
++    "\u003croot\u003e/nuxt.config.ts": "sm:",
++    "\u003croot\u003e/nx.json": "sm:",
++    "\u003croot\u003e/package.json": "sm:",
++    "\u003croot\u003e/prisma/schema.prisma": "sm:",
++    "\u003croot\u003e/schema.prisma": "sm:",
++    "\u003croot\u003e/svelte.config.js": "sm:",
++    "\u003croot\u003e/svelte.config.mjs": "sm:",
++    "\u003croot\u003e/svelte.config.ts": "sm:",
++    "\u003croot\u003e/tsconfig.base.json": "sm:",
++    "\u003croot\u003e/tsconfig.json": "sf:"
++  },
++  "probe_dirs": {},
++  "alias_probe_dirs": {},
++  "alias_probe_reads": {
++    "\u003croot\u003e/tsconfig.json": "l:sha256:3a08021beb2fb48605845669c9bc80678e845d878baee71c1ce3cc0ea72d897e"
++  }
++}
+diff --git a/internal/extractors/tsextractor/testdata/zz_config_enum_golden/policy_refused_root.json b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/policy_refused_root.json
+new file mode 100644
+index 0000000..31adb4f
+--- /dev/null
++++ b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/policy_refused_root.json
+@@ -0,0 +1,33 @@
++{
++  "fixture": "policy_refused_root",
++  "inputs": [
++    "angular.json",
++    "deno.json",
++    "deno.jsonc",
++    "jsconfig.json",
++    "next.config.js",
++    "next.config.mjs",
++    "next.config.ts",
++    "nuxt.config.js",
++    "nuxt.config.mjs",
++    "nuxt.config.ts",
++    "nx.json",
++    "package-lock.json",
++    "package.json",
++    "pnpm-lock.yaml",
++    "prisma/schema.prisma",
++    "schema.prisma",
++    "svelte.config.js",
++    "svelte.config.mjs",
++    "svelte.config.ts",
++    "tsconfig.base.json",
++    "tsconfig.json",
++    "yarn.lock"
++  ],
++  "alias_roots": null,
++  "probe_reads": {},
++  "probe_stats": {},
++  "probe_dirs": {},
++  "alias_probe_dirs": {},
++  "alias_probe_reads": {}
++}
+diff --git a/internal/extractors/tsextractor/testdata/zz_config_enum_golden/root_tsconfig_only.json b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/root_tsconfig_only.json
+new file mode 100644
+index 0000000..e41757e
+--- /dev/null
++++ b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/root_tsconfig_only.json
+@@ -0,0 +1,92 @@
++{
++  "fixture": "root_tsconfig_only",
++  "inputs": [
++    "angular.json",
++    "deno.json",
++    "deno.jsonc",
++    "jsconfig.json",
++    "next.config.js",
++    "next.config.mjs",
++    "next.config.ts",
++    "nuxt.config.js",
++    "nuxt.config.mjs",
++    "nuxt.config.ts",
++    "nx.json",
++    "package-lock.json",
++    "package.json",
++    "pnpm-lock.yaml",
++    "prisma/schema.prisma",
++    "schema.prisma",
++    "svelte.config.js",
++    "svelte.config.mjs",
++    "svelte.config.ts",
++    "tsconfig.base.json",
++    "tsconfig.json",
++    "yarn.lock"
++  ],
++  "alias_roots": [
++    {
++      "dir": "",
++      "aliases": [
++        {
++          "prefix": "@app/",
++          "replacement": "src/",
++          "suffix": "",
++          "exact": false
++        }
++      ]
++    }
++  ],
++  "probe_reads": {
++    "\u003croot\u003e/src/tsconfig.base.json": "m:",
++    "\u003croot\u003e/src/tsconfig.json": "m:",
++    "\u003croot\u003e/tsconfig.json": "l:sha256:3a08021beb2fb48605845669c9bc80678e845d878baee71c1ce3cc0ea72d897e"
++  },
++  "probe_stats": {
++    "\u003croot\u003e/angular.json": "sm:",
++    "\u003croot\u003e/deno.json": "sm:",
++    "\u003croot\u003e/deno.jsonc": "sm:",
++    "\u003croot\u003e/jsconfig.json": "sm:",
++    "\u003croot\u003e/next.config.js": "sm:",
++    "\u003croot\u003e/next.config.mjs": "sm:",
++    "\u003croot\u003e/next.config.ts": "sm:",
++    "\u003croot\u003e/nuxt.config.js": "sm:",
++    "\u003croot\u003e/nuxt.config.mjs": "sm:",
++    "\u003croot\u003e/nuxt.config.ts": "sm:",
++    "\u003croot\u003e/nx.json": "sm:",
++    "\u003croot\u003e/package-lock.json": "sm:",
++    "\u003croot\u003e/package.json": "sm:",
++    "\u003croot\u003e/pnpm-lock.yaml": "sm:",
++    "\u003croot\u003e/prisma/schema.prisma": "sm:",
++    "\u003croot\u003e/schema.prisma": "sm:",
++    "\u003croot\u003e/svelte.config.js": "sm:",
++    "\u003croot\u003e/svelte.config.mjs": "sm:",
++    "\u003croot\u003e/svelte.config.ts": "sm:",
++    "\u003croot\u003e/tsconfig.base.json": "sm:",
++    "\u003croot\u003e/tsconfig.json": "sf:",
++    "\u003croot\u003e/yarn.lock": "sm:"
++  },
++  "probe_dirs": {
++    "\u003croot\u003e": {
++      "src": "d",
++      "tsconfig.json": "f"
++    },
++    "\u003croot\u003e/src": {
++      "index.ts": "f"
++    }
++  },
++  "alias_probe_dirs": {
++    "\u003croot\u003e": {
++      "src": "d",
++      "tsconfig.json": "f"
++    },
++    "\u003croot\u003e/src": {
++      "index.ts": "f"
++    }
++  },
++  "alias_probe_reads": {
++    "\u003croot\u003e/src/tsconfig.base.json": "m:",
++    "\u003croot\u003e/src/tsconfig.json": "m:",
++    "\u003croot\u003e/tsconfig.json": "l:sha256:3a08021beb2fb48605845669c9bc80678e845d878baee71c1ce3cc0ea72d897e"
++  }
++}
+diff --git a/internal/extractors/tsextractor/testdata/zz_config_enum_golden/scope_excludes_subtree.json b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/scope_excludes_subtree.json
+new file mode 100644
+index 0000000..c8513ec
+--- /dev/null
++++ b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/scope_excludes_subtree.json
+@@ -0,0 +1,102 @@
++{
++  "fixture": "scope_excludes_subtree",
++  "inputs": [
++    "angular.json",
++    "deno.json",
++    "deno.jsonc",
++    "jsconfig.json",
++    "kept/svelte.config.js",
++    "kept/svelte.config.mjs",
++    "kept/svelte.config.ts",
++    "kept/tsconfig.json",
++    "next.config.js",
++    "next.config.mjs",
++    "next.config.ts",
++    "nuxt.config.js",
++    "nuxt.config.mjs",
++    "nuxt.config.ts",
++    "nx.json",
++    "package-lock.json",
++    "package.json",
++    "pnpm-lock.yaml",
++    "prisma/schema.prisma",
++    "schema.prisma",
++    "svelte.config.js",
++    "svelte.config.mjs",
++    "svelte.config.ts",
++    "tsconfig.base.json",
++    "tsconfig.json",
++    "yarn.lock"
++  ],
++  "alias_roots": [
++    {
++      "dir": "",
++      "aliases": [
++        {
++          "prefix": "@app/",
++          "replacement": "src/",
++          "suffix": "",
++          "exact": false
++        }
++      ]
++    },
++    {
++      "dir": "kept",
++      "aliases": [
++        {
++          "prefix": "@kept/",
++          "replacement": "kept/src/",
++          "suffix": "",
++          "exact": false
++        }
++      ]
++    }
++  ],
++  "probe_reads": {
++    "\u003croot\u003e/kept/tsconfig.json": "l:sha256:e5b5257d367ecfbde09040787ad8aff62c5a7fc65b0a3c16e86f20a673cb119b",
++    "\u003croot\u003e/tsconfig.json": "l:sha256:3a08021beb2fb48605845669c9bc80678e845d878baee71c1ce3cc0ea72d897e"
++  },
++  "probe_stats": {
++    "\u003croot\u003e/angular.json": "sm:",
++    "\u003croot\u003e/deno.json": "sm:",
++    "\u003croot\u003e/deno.jsonc": "sm:",
++    "\u003croot\u003e/jsconfig.json": "sm:",
++    "\u003croot\u003e/next.config.js": "sm:",
++    "\u003croot\u003e/next.config.mjs": "sm:",
++    "\u003croot\u003e/next.config.ts": "sm:",
++    "\u003croot\u003e/nuxt.config.js": "sm:",
++    "\u003croot\u003e/nuxt.config.mjs": "sm:",
++    "\u003croot\u003e/nuxt.config.ts": "sm:",
++    "\u003croot\u003e/nx.json": "sm:",
++    "\u003croot\u003e/package.json": "sm:",
++    "\u003croot\u003e/prisma/schema.prisma": "sm:",
++    "\u003croot\u003e/schema.prisma": "sm:",
++    "\u003croot\u003e/svelte.config.js": "sm:",
++    "\u003croot\u003e/svelte.config.mjs": "sm:",
++    "\u003croot\u003e/svelte.config.ts": "sm:",
++    "\u003croot\u003e/tsconfig.base.json": "sm:",
++    "\u003croot\u003e/tsconfig.json": "sf:"
++  },
++  "probe_dirs": {
++    "\u003croot\u003e": {
++      "kept": "d",
++      "tsconfig.json": "f"
++    },
++    "\u003croot\u003e/kept": {
++      "tsconfig.json": "f"
++    }
++  },
++  "alias_probe_dirs": {
++    "\u003croot\u003e": {
++      "kept": "d",
++      "tsconfig.json": "f"
++    },
++    "\u003croot\u003e/kept": {
++      "tsconfig.json": "f"
++    }
++  },
++  "alias_probe_reads": {
++    "\u003croot\u003e/kept/tsconfig.json": "l:sha256:e5b5257d367ecfbde09040787ad8aff62c5a7fc65b0a3c16e86f20a673cb119b",
++    "\u003croot\u003e/tsconfig.json": "l:sha256:3a08021beb2fb48605845669c9bc80678e845d878baee71c1ce3cc0ea72d897e"
++  }
++}
+diff --git a/internal/extractors/tsextractor/testdata/zz_config_enum_golden/symlink_root_nested_alias.json b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/symlink_root_nested_alias.json
+new file mode 100644
+index 0000000..f94042a
+--- /dev/null
++++ b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/symlink_root_nested_alias.json
+@@ -0,0 +1,127 @@
++{
++  "fixture": "symlink_root_nested_alias",
++  "inputs": [
++    "angular.json",
++    "deno.json",
++    "deno.jsonc",
++    "jsconfig.json",
++    "next.config.js",
++    "next.config.mjs",
++    "next.config.ts",
++    "nuxt.config.js",
++    "nuxt.config.mjs",
++    "nuxt.config.ts",
++    "nx.json",
++    "package-lock.json",
++    "package.json",
++    "packages/feature/next.config.js",
++    "packages/feature/next.config.mjs",
++    "packages/feature/next.config.ts",
++    "packages/feature/nuxt.config.js",
++    "packages/feature/nuxt.config.mjs",
++    "packages/feature/nuxt.config.ts",
++    "packages/feature/svelte.config.js",
++    "packages/feature/svelte.config.mjs",
++    "packages/feature/svelte.config.ts",
++    "pnpm-lock.yaml",
++    "prisma/schema.prisma",
++    "schema.prisma",
++    "svelte.config.js",
++    "svelte.config.mjs",
++    "svelte.config.ts",
++    "tsconfig.base.json",
++    "tsconfig.json",
++    "yarn.lock"
++  ],
++  "alias_roots": [
++    {
++      "dir": "packages/feature",
++      "aliases": [
++        {
++          "prefix": "@feature/",
++          "replacement": "packages/feature/src/",
++          "suffix": "",
++          "exact": false
++        }
++      ]
++    }
++  ],
++  "probe_reads": {
++    "\u003croot\u003e/package.json": "m:",
++    "\u003croot\u003e/packages/feature/tsconfig.json": "l:sha256:287535e09ed698f67afa718cc1c0f9e6a2e0b1e928fa46d2fbe191e9763a50ff",
++    "\u003croot\u003e/packages/package.json": "m:",
++    "\u003croot\u003e/packages/tsconfig.base.json": "m:",
++    "\u003croot\u003e/packages/tsconfig.json": "m:",
++    "\u003croot\u003e/tsconfig.base.json": "m:",
++    "\u003croot\u003e/tsconfig.json": "m:"
++  },
++  "probe_stats": {
++    "\u003croot\u003e/angular.json": "sm:",
++    "\u003croot\u003e/build.gradle": "sm:",
++    "\u003croot\u003e/build.gradle.kts": "sm:",
++    "\u003croot\u003e/config/importmap.rb": "sm:",
++    "\u003croot\u003e/deno.json": "sm:",
++    "\u003croot\u003e/deno.jsonc": "sm:",
++    "\u003croot\u003e/import_map.json": "sm:",
++    "\u003croot\u003e/jsconfig.json": "sm:",
++    "\u003croot\u003e/next.config.js": "sm:",
++    "\u003croot\u003e/next.config.mjs": "sm:",
++    "\u003croot\u003e/next.config.ts": "sm:",
++    "\u003croot\u003e/nuxt.config.js": "sm:",
++    "\u003croot\u003e/nuxt.config.mjs": "sm:",
++    "\u003croot\u003e/nuxt.config.ts": "sm:",
++    "\u003croot\u003e/nx.json": "sm:",
++    "\u003croot\u003e/package-lock.json": "sm:",
++    "\u003croot\u003e/package.json": "sm:",
++    "\u003croot\u003e/packages/config/importmap.rb": "sm:",
++    "\u003croot\u003e/packages/deno.json": "sm:",
++    "\u003croot\u003e/packages/deno.jsonc": "sm:",
++    "\u003croot\u003e/packages/feature/tsconfig.json": "sf:",
++    "\u003croot\u003e/packages/import_map.json": "sm:",
++    "\u003croot\u003e/packages/tsconfig.base.json": "sm:",
++    "\u003croot\u003e/packages/tsconfig.json": "sm:",
++    "\u003croot\u003e/pnpm-lock.yaml": "sm:",
++    "\u003croot\u003e/pom.xml": "sm:",
++    "\u003croot\u003e/prisma/schema.prisma": "sm:",
++    "\u003croot\u003e/pyproject.toml": "sm:",
++    "\u003croot\u003e/requirements.txt": "sm:",
++    "\u003croot\u003e/schema.prisma": "sm:",
++    "\u003croot\u003e/setup.cfg": "sm:",
++    "\u003croot\u003e/setup.py": "sm:",
++    "\u003croot\u003e/svelte.config.js": "sm:",
++    "\u003croot\u003e/svelte.config.mjs": "sm:",
++    "\u003croot\u003e/svelte.config.ts": "sm:",
++    "\u003croot\u003e/tsconfig.base.json": "sm:",
++    "\u003croot\u003e/tsconfig.json": "sm:",
++    "\u003croot\u003e/yarn.lock": "sm:"
++  },
++  "probe_dirs": {
++    "\u003croot\u003e": {
++      "packages": "d"
++    },
++    "\u003croot\u003e/packages": {
++      "feature": "d"
++    },
++    "\u003croot\u003e/packages/feature": {
++      "tsconfig.json": "f"
++    }
++  },
++  "alias_probe_dirs": {
++    "\u003croot\u003e": {
++      "packages": "d"
++    },
++    "\u003croot\u003e/packages": {
++      "feature": "d"
++    },
++    "\u003croot\u003e/packages/feature": {
++      "tsconfig.json": "f"
++    }
++  },
++  "alias_probe_reads": {
++    "\u003croot\u003e/packages/feature/tsconfig.json": "l:sha256:287535e09ed698f67afa718cc1c0f9e6a2e0b1e928fa46d2fbe191e9763a50ff",
++    "\u003croot\u003e/packages/tsconfig.base.json": "m:",
++    "\u003croot\u003e/packages/tsconfig.json": "m:",
++    "\u003croot\u003e/tsconfig.base.json": "m:",
++    "\u003croot\u003e/tsconfig.json": "m:"
++  }
++}
+diff --git a/internal/extractors/tsextractor/testdata/zz_config_enum_golden/testdata_tsconfig_included.json b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/testdata_tsconfig_included.json
+new file mode 100644
+index 0000000..6496c43
+--- /dev/null
++++ b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/testdata_tsconfig_included.json
+@@ -0,0 +1,108 @@
++{
++  "fixture": "testdata_tsconfig_included",
++  "inputs": [
++    "angular.json",
++    "deno.json",
++    "deno.jsonc",
++    "jsconfig.json",
++    "next.config.js",
++    "next.config.mjs",
++    "next.config.ts",
++    "nuxt.config.js",
++    "nuxt.config.mjs",
++    "nuxt.config.ts",
++    "nx.json",
++    "package-lock.json",
++    "package.json",
++    "pnpm-lock.yaml",
++    "prisma/schema.prisma",
++    "schema.prisma",
++    "svelte.config.js",
++    "svelte.config.mjs",
++    "svelte.config.ts",
++    "testdata/package.json",
++    "testdata/svelte.config.js",
++    "testdata/svelte.config.mjs",
++    "testdata/svelte.config.ts",
++    "testdata/tsconfig.json",
++    "tsconfig.base.json",
++    "tsconfig.json",
++    "yarn.lock"
++  ],
++  "alias_roots": [
++    {
++      "dir": "",
++      "aliases": [
++        {
++          "prefix": "@app/",
++          "replacement": "src/",
++          "suffix": "",
++          "exact": false
++        }
++      ]
++    },
++    {
++      "dir": "testdata",
++      "aliases": [
++        {
++          "prefix": "@fixture/",
++          "replacement": "testdata/cases/",
++          "suffix": "",
++          "exact": false
++        }
++      ]
++    }
++  ],
++  "probe_reads": {
++    "\u003croot\u003e/testdata/tsconfig.json": "l:sha256:94ea4b0e6070de3d938c3155bc3505aa6cd31e46444e81f824176f4d7ad97eab",
++    "\u003croot\u003e/tsconfig.json": "l:sha256:3a08021beb2fb48605845669c9bc80678e845d878baee71c1ce3cc0ea72d897e"
++  },
++  "probe_stats": {
++    "\u003croot\u003e/angular.json": "sm:",
++    "\u003croot\u003e/deno.json": "sm:",
++    "\u003croot\u003e/deno.jsonc": "sm:",
++    "\u003croot\u003e/jsconfig.json": "sm:",
++    "\u003croot\u003e/next.config.js": "sm:",
++    "\u003croot\u003e/next.config.mjs": "sm:",
++    "\u003croot\u003e/next.config.ts": "sm:",
++    "\u003croot\u003e/nuxt.config.js": "sm:",
++    "\u003croot\u003e/nuxt.config.mjs": "sm:",
++    "\u003croot\u003e/nuxt.config.ts": "sm:",
++    "\u003croot\u003e/nx.json": "sm:",
++    "\u003croot\u003e/package-lock.json": "sm:",
++    "\u003croot\u003e/package.json": "sm:",
++    "\u003croot\u003e/pnpm-lock.yaml": "sm:",
++    "\u003croot\u003e/prisma/schema.prisma": "sm:",
++    "\u003croot\u003e/schema.prisma": "sm:",
++    "\u003croot\u003e/svelte.config.js": "sm:",
++    "\u003croot\u003e/svelte.config.mjs": "sm:",
++    "\u003croot\u003e/svelte.config.ts": "sm:",
++    "\u003croot\u003e/tsconfig.base.json": "sm:",
++    "\u003croot\u003e/tsconfig.json": "sf:",
++    "\u003croot\u003e/yarn.lock": "sm:"
++  },
++  "probe_dirs": {
++    "\u003croot\u003e": {
++      "testdata": "d",
++      "tsconfig.json": "f"
++    },
++    "\u003croot\u003e/testdata": {
++      "package.json": "f",
++      "tsconfig.json": "f"
++    }
++  },
++  "alias_probe_dirs": {
++    "\u003croot\u003e": {
++      "testdata": "d",
++      "tsconfig.json": "f"
++    },
++    "\u003croot\u003e/testdata": {
++      "package.json": "f",
++      "tsconfig.json": "f"
++    }
++  },
++  "alias_probe_reads": {
++    "\u003croot\u003e/testdata/tsconfig.json": "l:sha256:94ea4b0e6070de3d938c3155bc3505aa6cd31e46444e81f824176f4d7ad97eab",
++    "\u003croot\u003e/tsconfig.json": "l:sha256:3a08021beb2fb48605845669c9bc80678e845d878baee71c1ce3cc0ea72d897e"
++  }
++}
+diff --git a/internal/extractors/tsextractor/testdata/zz_config_enum_golden/unreadable_dir.json b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/unreadable_dir.json
+new file mode 100644
+index 0000000..ee5cfb5
+--- /dev/null
++++ b/internal/extractors/tsextractor/testdata/zz_config_enum_golden/unreadable_dir.json
+@@ -0,0 +1,87 @@
++{
++  "fixture": "unreadable_dir",
++  "inputs": [
++    "angular.json",
++    "deno.json",
++    "deno.jsonc",
++    "jsconfig.json",
++    "next.config.js",
++    "next.config.mjs",
++    "next.config.ts",
++    "nuxt.config.js",
++    "nuxt.config.mjs",
++    "nuxt.config.ts",
++    "nx.json",
++    "package-lock.json",
++    "package.json",
++    "pnpm-lock.yaml",
++    "prisma/schema.prisma",
++    "schema.prisma",
++    "svelte.config.js",
++    "svelte.config.mjs",
++    "svelte.config.ts",
++    "tsconfig.base.json",
++    "tsconfig.json",
++    "yarn.lock"
++  ],
++  "alias_roots": [
++    {
++      "dir": "",
++      "aliases": [
++        {
++          "prefix": "@app/",
++          "replacement": "src/",
++          "suffix": "",
++          "exact": false
++        }
++      ]
++    }
++  ],
++  "probe_reads": {
++    "\u003croot\u003e/blocked/tsconfig.base.json": "m:",
++    "\u003croot\u003e/blocked/tsconfig.json": "m:",
++    "\u003croot\u003e/tsconfig.json": "l:sha256:3a08021beb2fb48605845669c9bc80678e845d878baee71c1ce3cc0ea72d897e"
++  },
++  "probe_stats": {
++    "\u003croot\u003e/angular.json": "sm:",
++    "\u003croot\u003e/deno.json": "sm:",
++    "\u003croot\u003e/deno.jsonc": "sm:",
++    "\u003croot\u003e/jsconfig.json": "sm:",
++    "\u003croot\u003e/next.config.js": "sm:",
++    "\u003croot\u003e/next.config.mjs": "sm:",
++    "\u003croot\u003e/next.config.ts": "sm:",
++    "\u003croot\u003e/nuxt.config.js": "sm:",
++    "\u003croot\u003e/nuxt.config.mjs": "sm:",
++    "\u003croot\u003e/nuxt.config.ts": "sm:",
++    "\u003croot\u003e/nx.json": "sm:",
++    "\u003croot\u003e/package-lock.json": "sm:",
++    "\u003croot\u003e/package.json": "sm:",
++    "\u003croot\u003e/pnpm-lock.yaml": "sm:",
++    "\u003croot\u003e/prisma/schema.prisma": "sm:",
++    "\u003croot\u003e/schema.prisma": "sm:",
++    "\u003croot\u003e/svelte.config.js": "sm:",
++    "\u003croot\u003e/svelte.config.mjs": "sm:",
++    "\u003croot\u003e/svelte.config.ts": "sm:",
++    "\u003croot\u003e/tsconfig.base.json": "sm:",
++    "\u003croot\u003e/tsconfig.json": "sf:",
++    "\u003croot\u003e/yarn.lock": "sm:"
++  },
++  "probe_dirs": {
++    "\u003croot\u003e": {
++      "blocked": "d",
++      "tsconfig.json": "f"
++    },
++    "\u003croot\u003e/blocked": {}
++  },
++  "alias_probe_dirs": {
++    "\u003croot\u003e": {
++      "blocked": "d",
++      "tsconfig.json": "f"
++    }
++  },
++  "alias_probe_reads": {
++    "\u003croot\u003e/blocked/tsconfig.base.json": "m:",
++    "\u003croot\u003e/blocked/tsconfig.json": "m:",
++    "\u003croot\u003e/tsconfig.json": "l:sha256:3a08021beb2fb48605845669c9bc80678e845d878baee71c1ce3cc0ea72d897e"
++  }
++}
+diff --git a/internal/extractors/tsextractor/zz_config_enum_oracle_test.go b/internal/extractors/tsextractor/zz_config_enum_oracle_test.go
+new file mode 100644
+index 0000000..875f06c
+--- /dev/null
++++ b/internal/extractors/tsextractor/zz_config_enum_oracle_test.go
+@@ -0,0 +1,455 @@
++package tsextractor
++
++import (
++	"context"
++	"encoding/json"
++	"errors"
++	"io/fs"
++	"os"
++	"path/filepath"
++	"sort"
++	"strings"
++	"testing"
++
++	"github.com/enola-labs/enola/internal/extractors/inputscope"
++	"github.com/enola-labs/enola/internal/graphinput"
++)
++
++// The fused traversal has to reproduce what two separate passes produce today,
++// and final sorted path equality does not say that: the alias pass decides
++// precedence by directory, reads inherited configs the walk never opens, and
++// leaves the probe records the walk then finds already taken. So the oracle
++// captures each of those separately and compares against goldens generated
++// from unmodified source.
++
++const configEnumGoldenDir = "testdata/zz_config_enum_golden"
++
++type oracleAlias struct {
++	Prefix      string `json:"prefix"`
++	Replacement string `json:"replacement"`
++	Suffix      string `json:"suffix"`
++	Exact       bool   `json:"exact"`
++}
++
++type oracleAliasRoot struct {
++	Dir     string        `json:"dir"`
++	Aliases []oracleAlias `json:"aliases"`
++}
++
++type oracleCapture struct {
++	Fixture string `json:"fixture"`
++	// Inputs is tsConfigInputs' return, already sorted by the function itself.
++	Inputs []string `json:"inputs"`
++	// AliasRoots keeps collectTSAliasRoots' own order. Order is what
++	// aliasesForDir's longest-prefix tie-break reads, so it is observable.
++	AliasRoots []oracleAliasRoot `json:"alias_roots"`
++	// ProbeReads are the byte observations, keyed by path and carrying the
++	// origin marker and digest the reader recorded. Inherited configs the walk
++	// never opens appear only here.
++	ProbeReads map[string]string `json:"probe_reads"`
++	ProbeStats map[string]string `json:"probe_stats"`
++	// ProbeDirs is the recorded enumerations. recordDir keeps the first
++	// complete listing of a directory, so today these are the alias pass's
++	// records wherever both passes reach the same directory.
++	ProbeDirs map[string]map[string]string `json:"probe_dirs"`
++	// AliasProbeDirs is what the alias pass alone observes, captured under its
++	// own probe. It is the set the fused traversal must still produce.
++	AliasProbeDirs  map[string]map[string]string `json:"alias_probe_dirs"`
++	AliasProbeReads map[string]string            `json:"alias_probe_reads"`
++}
++
++type oracleFixture struct {
++	name string
++	// build returns the repository path handed to the readers and the scope
++	// they run under, after asserting whatever the fixture needs asserted
++	// about the tree it just built.
++	build func(t *testing.T) (repo string, scope *inputscope.Scope, norm []string)
++}
++
++func writeFile(t *testing.T, path, body string) {
++	t.Helper()
++	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
++		t.Fatal(err)
++	}
++	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
++		t.Fatal(err)
++	}
++}
++
++func aliasConfig(prefix, target string) string {
++	return `{"compilerOptions":{"baseUrl":".","paths":{"` + prefix + `":["` + target + `"]}}}`
++}
++
++var configEnumFixtures = []oracleFixture{
++	{
++		name: "root_tsconfig_only",
++		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
++			repo := t.TempDir()
++			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@app/*", "./src/*"))
++			writeFile(t, filepath.Join(repo, "src", "index.ts"), "export {}\n")
++			return repo, nil, []string{repo}
++		},
++	},
++	{
++		name: "monorepo_three_alias_roots",
++		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
++			repo := t.TempDir()
++			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@root/*", "./src/*"))
++			writeFile(t, filepath.Join(repo, "packages", "ui", "tsconfig.json"), aliasConfig("@ui/*", "./src/*"))
++			writeFile(t, filepath.Join(repo, "packages", "nested", "deep", "tsconfig.base.json"), aliasConfig("@deep/*", "./lib/*"))
++			writeFile(t, filepath.Join(repo, "apps", "web", "package.json"), `{"name":"web"}`)
++			return repo, nil, []string{repo}
++		},
++	},
++	{
++		name: "extends_outside_subtree_and_missing",
++		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
++			parent := t.TempDir()
++			repo := filepath.Join(parent, "repo")
++			// A parent config outside the walked subtree: only the extends
++			// reader ever opens it, never the directory walk.
++			writeFile(t, filepath.Join(parent, "shared", "tsconfig.base.json"), aliasConfig("@shared/*", "./src/*"))
++			writeFile(t, filepath.Join(repo, "tsconfig.json"), `{"extends":"../shared/tsconfig.base.json"}`)
++			writeFile(t, filepath.Join(repo, "packages", "app", "tsconfig.json"), `{"extends":"./missing-parent.json","compilerOptions":{"baseUrl":".","paths":{"@app/*":["./src/*"]}}}`)
++			return repo, nil, []string{repo, parent}
++		},
++	},
++	{
++		name: "testdata_tsconfig_included",
++		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
++			repo := t.TempDir()
++			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@app/*", "./src/*"))
++			// Discovery prunes testdata; the config walks do not. This fixture
++			// exists to keep that difference visible.
++			writeFile(t, filepath.Join(repo, "testdata", "tsconfig.json"), aliasConfig("@fixture/*", "./cases/*"))
++			writeFile(t, filepath.Join(repo, "testdata", "package.json"), `{"name":"fixture"}`)
++			return repo, nil, []string{repo}
++		},
++	},
++	{
++		name: "dot_and_skip_dirs_excluded",
++		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
++			repo := t.TempDir()
++			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@app/*", "./src/*"))
++			writeFile(t, filepath.Join(repo, ".hidden", "tsconfig.json"), aliasConfig("@hidden/*", "./src/*"))
++			for name := range tsSkipDirs {
++				writeFile(t, filepath.Join(repo, name, "tsconfig.json"), aliasConfig("@"+name+"/*", "./src/*"))
++			}
++			return repo, nil, []string{repo}
++		},
++	},
++	{
++		name: "unreadable_dir",
++		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
++			repo := t.TempDir()
++			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@app/*", "./src/*"))
++			blocked := filepath.Join(repo, "blocked")
++			writeFile(t, filepath.Join(blocked, "tsconfig.json"), aliasConfig("@blocked/*", "./src/*"))
++			if err := os.Chmod(blocked, 0o000); err != nil {
++				t.Fatal(err)
++			}
++			t.Cleanup(func() { _ = os.Chmod(blocked, 0o755) })
++			// The denial has to be proven, not assumed: running as root, or on
++			// a filesystem that ignores the mode, would make this fixture
++			// silently characterize an ordinary readable directory instead.
++			if _, err := os.ReadDir(blocked); err == nil {
++				t.Skip("directory remained readable at mode 0000; denial not reproducible here")
++			} else if !errors.Is(err, fs.ErrPermission) {
++				t.Fatalf("blocked directory failed for the wrong reason: %v", err)
++			}
++			return repo, nil, []string{repo}
++		},
++	},
++	{
++		name: "child_symlink_dir",
++		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
++			repo := t.TempDir()
++			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@app/*", "./src/*"))
++			writeFile(t, filepath.Join(repo, "real", "tsconfig.json"), aliasConfig("@real/*", "./src/*"))
++			if err := os.Symlink(filepath.Join(repo, "real"), filepath.Join(repo, "linked")); err != nil {
++				t.Fatal(err)
++			}
++			return repo, nil, []string{repo}
++		},
++	},
++	{
++		name: "symlink_root_nested_alias",
++		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
++			parent := t.TempDir()
++			repo := filepath.Join(parent, "real")
++			writeFile(t, filepath.Join(repo, "packages", "feature", "tsconfig.json"), aliasConfig("@feature/*", "./src/*"))
++			link := filepath.Join(parent, "linked")
++			if err := os.Symlink(repo, link); err != nil {
++				t.Fatal(err)
++			}
++			// The divergence this fixture pins: ReadDir follows the root link,
++			// filepath.WalkDir Lstats it and descends nothing.
++			visits := 0
++			if err := filepath.WalkDir(link, func(path string, d fs.DirEntry, err error) error {
++				if err != nil {
++					return err
++				}
++				if path != link {
++					visits++
++				}
++				return nil
++			}); err != nil {
++				t.Fatal(err)
++			}
++			if visits != 0 {
++				t.Fatalf("WalkDir followed the root symlink: %d descendants", visits)
++			}
++			return link, nil, []string{link, repo, parent}
++		},
++	},
++	{
++		name: "scope_excludes_subtree",
++		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
++			repo := t.TempDir()
++			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@app/*", "./src/*"))
++			writeFile(t, filepath.Join(repo, "excluded", "tsconfig.json"), aliasConfig("@excluded/*", "./src/*"))
++			writeFile(t, filepath.Join(repo, "kept", "tsconfig.json"), aliasConfig("@kept/*", "./src/*"))
++			policy, err := graphinput.Build(repo, graphinput.Options{CacheExclusions: []string{}, Exclude: []string{"excluded/**"}})
++			if err != nil {
++				t.Fatal(err)
++			}
++			scope := &inputscope.Scope{Root: repo, Policy: policy}
++			if scope.Allowed(filepath.Join(repo, "excluded"), true) {
++				t.Fatal("scope did not exclude the subtree it was built to exclude")
++			}
++			return repo, scope, []string{repo}
++		},
++	},
++	{
++		name: "policy_refused_root",
++		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
++			parent := t.TempDir()
++			repo := filepath.Join(parent, "repo")
++			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@app/*", "./src/*"))
++			writeFile(t, filepath.Join(repo, "packages", "app", "tsconfig.json"), aliasConfig("@pkg/*", "./src/*"))
++			// A policy rooted elsewhere refuses this directory outright. The
++			// alias pass still reads the root's own tsconfig, because
++			// aliasesAtDir goes through the file policy before any directory
++			// check; Scope.WalkDir refuses the root before the callback runs.
++			policy, err := graphinput.Build(parent, graphinput.Options{CacheExclusions: []string{}, Exclude: []string{"repo/**", "repo"}})
++			if err != nil {
++				t.Fatal(err)
++			}
++			scope := &inputscope.Scope{Root: parent, Policy: policy}
++			if scope.Allowed(repo, true) {
++				t.Skip("policy did not refuse the repository root; fixture cannot characterize the refusal")
++			}
++			return repo, scope, []string{repo, parent}
++		},
++	},
++	{
++		name: "out_of_scope_root_readable_config",
++		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
++			parent := t.TempDir()
++			repo := filepath.Join(parent, "outside")
++			inside := filepath.Join(parent, "inside")
++			writeFile(t, filepath.Join(repo, "tsconfig.json"), aliasConfig("@app/*", "./src/*"))
++			writeFile(t, filepath.Join(repo, "packages", "app", "tsconfig.json"), aliasConfig("@pkg/*", "./src/*"))
++			writeFile(t, filepath.Join(inside, "keep.ts"), "export {}\n")
++			policy, err := graphinput.Build(inside, graphinput.Options{CacheExclusions: []string{}})
++			if err != nil {
++				t.Fatal(err)
++			}
++			scope := &inputscope.Scope{Root: inside, Policy: policy}
++			// The separation this fixture exists for: the directory policy
++			// refuses the root while ClassifyDependency still hands back its
++			// tsconfig as an explicit external dependency. aliasesAtDir runs
++			// before any directory check, so the alias pass reads a config the
++			// walk is never allowed to reach.
++			if scope.Allowed(repo, true) {
++				t.Skip("directory policy did not refuse the out-of-scope root")
++			}
++			if !scope.Allowed(filepath.Join(repo, "tsconfig.json"), false) {
++				t.Skip("dependency policy refused the config too; the two cannot be separated here")
++			}
++			return repo, scope, []string{repo, parent}
++		},
++	},
++	{
++		name: "ignored_but_semantic_manifests",
++		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
++			repo := t.TempDir()
++			writeFile(t, filepath.Join(repo, "package.json"), `{"name":"root"}`)
++			writeFile(t, filepath.Join(repo, "package-lock.json"), `{"lockfileVersion":3}`)
++			writeFile(t, filepath.Join(repo, "pnpm-lock.yaml"), "lockfileVersion: '9.0'\n")
++			writeFile(t, filepath.Join(repo, "packages", "ui", "package.json"), `{"name":"ui"}`)
++			writeFile(t, filepath.Join(repo, "packages", "ui", "package-lock.json"), `{"lockfileVersion":3}`)
++			return repo, nil, []string{repo}
++		},
++	},
++	{
++		name: "no_config_negative",
++		build: func(t *testing.T) (string, *inputscope.Scope, []string) {
++			repo := t.TempDir()
++			writeFile(t, filepath.Join(repo, "README.md"), "# nothing here\n")
++			writeFile(t, filepath.Join(repo, "src", "main.go"), "package main\n")
++			return repo, nil, []string{repo}
++		},
++	},
++}
++
++// normalizer rewrites the absolute paths the probe records into stable tokens,
++// longest prefix first so a nested root does not get masked by its parent.
++func newNormalizer(roots []string) func(string) string {
++	type entry struct{ from, to string }
++	var entries []entry
++	for i, r := range roots {
++		clean := filepath.Clean(r)
++		token := "<root>"
++		if i > 0 {
++			token = "<root" + string(rune('0'+i)) + ">"
++		}
++		entries = append(entries, entry{from: clean, to: token})
++		if resolved, err := filepath.EvalSymlinks(clean); err == nil && resolved != clean {
++			entries = append(entries, entry{from: resolved, to: token + "!"})
++		}
++	}
++	sort.Slice(entries, func(i, j int) bool { return len(entries[i].from) > len(entries[j].from) })
++	return func(s string) string {
++		for _, e := range entries {
++			if s == e.from {
++				return e.to
++			}
++			if strings.HasPrefix(s, e.from+string(filepath.Separator)) {
++				return e.to + "/" + filepath.ToSlash(s[len(e.from)+1:])
++			}
++		}
++		return s
++	}
++}
++
++func captureFixture(t *testing.T, f oracleFixture) oracleCapture {
++	t.Helper()
++	repo, scope, roots := f.build(t)
++	norm := newNormalizer(roots)
++
++	// Two probes, not one. tsConfigInputs calls collectTSAliasRoots itself, and
++	// recordDir keeps the first complete enumeration of a directory; sharing a
++	// probe with the oracle's own alias call would hand tsConfigInputs records
++	// it did not make, which is the very thing being characterized.
++	aliasProbe := newOverlayProbe()
++	roots2 := collectTSAliasRoots(withOverlayProbe(context.Background(), aliasProbe), repo, scope)
++
++	probe := newOverlayProbe()
++	inputs := tsConfigInputs(withOverlayProbe(context.Background(), probe), repo, scope)
++
++	capture := oracleCapture{
++		Fixture:         f.name,
++		Inputs:          inputs,
++		ProbeReads:      map[string]string{},
++		ProbeStats:      map[string]string{},
++		ProbeDirs:       map[string]map[string]string{},
++		AliasProbeDirs:  map[string]map[string]string{},
++		AliasProbeReads: map[string]string{},
++	}
++	for _, r := range roots2 {
++		out := oracleAliasRoot{Dir: r.dir}
++		var prefixes []string
++		for p := range r.aliases {
++			prefixes = append(prefixes, p)
++		}
++		sort.Strings(prefixes)
++		for _, p := range prefixes {
++			a := r.aliases[p]
++			out.Aliases = append(out.Aliases, oracleAlias{Prefix: p, Replacement: a.replacement, Suffix: a.suffix, Exact: a.exact})
++		}
++		capture.AliasRoots = append(capture.AliasRoots, out)
++	}
++	for k, v := range probe.snapshot() {
++		capture.ProbeReads[norm(k)] = v
++	}
++	for k, v := range probe.statSnapshot() {
++		capture.ProbeStats[norm(k)] = v
++	}
++	for k, v := range aliasProbe.snapshot() {
++		capture.AliasProbeReads[norm(k)] = v
++	}
++	for k, names := range aliasProbe.dirSnapshot() {
++		set := map[string]string{}
++		for n, kind := range names {
++			set[n] = kind
++		}
++		capture.AliasProbeDirs[norm(k)] = set
++	}
++	for k, names := range probe.dirSnapshot() {
++		set := map[string]string{}
++		for n, kind := range names {
++			set[n] = kind
++		}
++		capture.ProbeDirs[norm(k)] = set
++	}
++	return capture
++}
++
++func TestConfigEnumerationCharacterizationOracle(t *testing.T) {
++	update := os.Getenv("ENOLA_CONFIG_ENUM_ORACLE_UPDATE") == "1"
++	if update {
++		if err := os.MkdirAll(configEnumGoldenDir, 0o755); err != nil {
++			t.Fatal(err)
++		}
++	}
++	for _, f := range configEnumFixtures {
++		t.Run(f.name, func(t *testing.T) {
++			got := captureFixture(t, f)
++			body, err := json.MarshalIndent(got, "", "  ")
++			if err != nil {
++				t.Fatal(err)
++			}
++			body = append(body, '\n')
++			golden := filepath.Join(configEnumGoldenDir, f.name+".json")
++			if update {
++				if err := os.WriteFile(golden, body, 0o644); err != nil {
++					t.Fatal(err)
++				}
++				t.Logf("wrote %s (%d bytes)", golden, len(body))
++				return
++			}
++			want, err := os.ReadFile(golden)
++			if err != nil {
++				t.Fatalf("golden missing; regenerate against unmodified source: %v", err)
++			}
++			if string(want) != string(body) {
++				t.Fatalf("capture differs from golden %s\n--- want ---\n%s\n--- got ---\n%s", golden, want, body)
++			}
++		})
++	}
++}
++
++// TestConfigEnumerationProductionInputsRootReview covers the path production
++// actually takes. Every production caller of tsConfigInputs runs without a
++// probe -- the only non-test withOverlayProbe attach point is newDiscovery,
++// whose context never reaches here -- and the fused enumeration is declined
++// while a probe is present, so the oracle above characterizes the fallback.
++//
++// This asserts the returned candidate set on the same fixtures with no probe
++// attached. That reaches the fused enumeration only where the call is eligible
++// for it: the symlinked-root, unreadable-directory and policy-refused fixtures
++// decline for their own reasons and exercise the fallback here too, which is
++// the point of keeping them. It reuses each golden's Inputs rather than a
++// second expectation, so both paths answer to one baseline.
++func TestConfigEnumerationProductionInputsRootReview(t *testing.T) {
++	for _, f := range configEnumFixtures {
++		t.Run(f.name, func(t *testing.T) {
++			repo, scope, _ := f.build(t)
++			got := tsConfigInputs(context.Background(), repo, scope)
++			body, err := os.ReadFile(filepath.Join(configEnumGoldenDir, f.name+".json"))
++			if err != nil {
++				t.Fatalf("golden missing; regenerate against unmodified source: %v", err)
++			}
++			var want oracleCapture
++			if err := json.Unmarshal(body, &want); err != nil {
++				t.Fatal(err)
++			}
++			a, _ := json.Marshal(got)
++			b, _ := json.Marshal(want.Inputs)
++			if string(a) != string(b) {
++				t.Fatalf("production inputs differ\n--- want ---\n%s\n--- got ---\n%s", b, a)
++			}
++		})
++	}
++}

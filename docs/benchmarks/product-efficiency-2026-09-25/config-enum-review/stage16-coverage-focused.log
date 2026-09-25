@@ -1,0 +1,88 @@
+=== RUN   TestConfigWalkMatchesUnderNestedGitignoreWithTrackedExceptions
+--- PASS: TestConfigWalkMatchesUnderNestedGitignoreWithTrackedExceptions (0.18s)
+=== RUN   TestConfigWalkMatchesForSymlinkedChildren
+--- PASS: TestConfigWalkMatchesForSymlinkedChildren (0.01s)
+=== RUN   TestConfigWalkMatchesForExternalAndRenamedExtends
+--- PASS: TestConfigWalkMatchesForExternalAndRenamedExtends (0.02s)
+=== RUN   TestConfigWalkMatchesAcrossExtendsTargetRename
+--- PASS: TestConfigWalkMatchesAcrossExtendsTargetRename (0.09s)
+=== RUN   TestConfigWalkKeepsLockfilesSilent
+--- PASS: TestConfigWalkKeepsLockfilesSilent (0.01s)
+=== RUN   TestConfigWalkMatchesSeparateWalks
+--- PASS: TestConfigWalkMatchesSeparateWalks (0.01s)
+=== RUN   TestConfigWalkMatchesUnderScopeExclusions
+--- PASS: TestConfigWalkMatchesUnderScopeExclusions (0.05s)
+=== RUN   TestConfigWalkMatchesForHiddenRoot
+--- PASS: TestConfigWalkMatchesForHiddenRoot (0.01s)
+=== RUN   TestConfigWalkMatchesForSymlinkedRoot
+--- PASS: TestConfigWalkMatchesForSymlinkedRoot (0.01s)
+=== RUN   TestConfigWalkMatchesAcrossConfigAddAndRemove
+--- PASS: TestConfigWalkMatchesAcrossConfigAddAndRemove (0.02s)
+=== RUN   TestConfigWalkMatchesWithUnreadableDirectory
+--- PASS: TestConfigWalkMatchesWithUnreadableDirectory (0.01s)
+=== RUN   TestConfigWalkFusesWithoutProbe
+--- PASS: TestConfigWalkFusesWithoutProbe (0.01s)
+=== RUN   TestFusedAnswerIsProducedByOneDescent
+--- PASS: TestFusedAnswerIsProducedByOneDescent (0.01s)
+=== RUN   TestConfigWalkFallsBackOnPartialListingError
+--- PASS: TestConfigWalkFallsBackOnPartialListingError (0.01s)
+=== RUN   TestPartialListingErrorFallbackHoldsUnderScope
+--- PASS: TestPartialListingErrorFallbackHoldsUnderScope (0.04s)
+=== RUN   TestConfigEnumerationCharacterizationOracle
+=== RUN   TestConfigEnumerationCharacterizationOracle/root_tsconfig_only
+=== RUN   TestConfigEnumerationCharacterizationOracle/monorepo_three_alias_roots
+=== RUN   TestConfigEnumerationCharacterizationOracle/extends_outside_subtree_and_missing
+=== RUN   TestConfigEnumerationCharacterizationOracle/testdata_tsconfig_included
+=== RUN   TestConfigEnumerationCharacterizationOracle/dot_and_skip_dirs_excluded
+=== RUN   TestConfigEnumerationCharacterizationOracle/unreadable_dir
+=== RUN   TestConfigEnumerationCharacterizationOracle/child_symlink_dir
+=== RUN   TestConfigEnumerationCharacterizationOracle/symlink_root_nested_alias
+=== RUN   TestConfigEnumerationCharacterizationOracle/scope_excludes_subtree
+=== RUN   TestConfigEnumerationCharacterizationOracle/policy_refused_root
+=== RUN   TestConfigEnumerationCharacterizationOracle/out_of_scope_root_readable_config
+=== RUN   TestConfigEnumerationCharacterizationOracle/ignored_but_semantic_manifests
+=== RUN   TestConfigEnumerationCharacterizationOracle/no_config_negative
+--- PASS: TestConfigEnumerationCharacterizationOracle (0.12s)
+    --- PASS: TestConfigEnumerationCharacterizationOracle/root_tsconfig_only (0.00s)
+    --- PASS: TestConfigEnumerationCharacterizationOracle/monorepo_three_alias_roots (0.00s)
+    --- PASS: TestConfigEnumerationCharacterizationOracle/extends_outside_subtree_and_missing (0.00s)
+    --- PASS: TestConfigEnumerationCharacterizationOracle/testdata_tsconfig_included (0.00s)
+    --- PASS: TestConfigEnumerationCharacterizationOracle/dot_and_skip_dirs_excluded (0.00s)
+    --- PASS: TestConfigEnumerationCharacterizationOracle/unreadable_dir (0.00s)
+    --- PASS: TestConfigEnumerationCharacterizationOracle/child_symlink_dir (0.00s)
+    --- PASS: TestConfigEnumerationCharacterizationOracle/symlink_root_nested_alias (0.00s)
+    --- PASS: TestConfigEnumerationCharacterizationOracle/scope_excludes_subtree (0.04s)
+    --- PASS: TestConfigEnumerationCharacterizationOracle/policy_refused_root (0.03s)
+    --- PASS: TestConfigEnumerationCharacterizationOracle/out_of_scope_root_readable_config (0.04s)
+    --- PASS: TestConfigEnumerationCharacterizationOracle/ignored_but_semantic_manifests (0.00s)
+    --- PASS: TestConfigEnumerationCharacterizationOracle/no_config_negative (0.00s)
+=== RUN   TestConfigEnumerationProductionInputsRootReview
+=== RUN   TestConfigEnumerationProductionInputsRootReview/root_tsconfig_only
+=== RUN   TestConfigEnumerationProductionInputsRootReview/monorepo_three_alias_roots
+=== RUN   TestConfigEnumerationProductionInputsRootReview/extends_outside_subtree_and_missing
+=== RUN   TestConfigEnumerationProductionInputsRootReview/testdata_tsconfig_included
+=== RUN   TestConfigEnumerationProductionInputsRootReview/dot_and_skip_dirs_excluded
+=== RUN   TestConfigEnumerationProductionInputsRootReview/unreadable_dir
+=== RUN   TestConfigEnumerationProductionInputsRootReview/child_symlink_dir
+=== RUN   TestConfigEnumerationProductionInputsRootReview/symlink_root_nested_alias
+=== RUN   TestConfigEnumerationProductionInputsRootReview/scope_excludes_subtree
+=== RUN   TestConfigEnumerationProductionInputsRootReview/policy_refused_root
+=== RUN   TestConfigEnumerationProductionInputsRootReview/out_of_scope_root_readable_config
+=== RUN   TestConfigEnumerationProductionInputsRootReview/ignored_but_semantic_manifests
+=== RUN   TestConfigEnumerationProductionInputsRootReview/no_config_negative
+--- PASS: TestConfigEnumerationProductionInputsRootReview (0.11s)
+    --- PASS: TestConfigEnumerationProductionInputsRootReview/root_tsconfig_only (0.00s)
+    --- PASS: TestConfigEnumerationProductionInputsRootReview/monorepo_three_alias_roots (0.00s)
+    --- PASS: TestConfigEnumerationProductionInputsRootReview/extends_outside_subtree_and_missing (0.00s)
+    --- PASS: TestConfigEnumerationProductionInputsRootReview/testdata_tsconfig_included (0.00s)
+    --- PASS: TestConfigEnumerationProductionInputsRootReview/dot_and_skip_dirs_excluded (0.00s)
+    --- PASS: TestConfigEnumerationProductionInputsRootReview/unreadable_dir (0.00s)
+    --- PASS: TestConfigEnumerationProductionInputsRootReview/child_symlink_dir (0.00s)
+    --- PASS: TestConfigEnumerationProductionInputsRootReview/symlink_root_nested_alias (0.00s)
+    --- PASS: TestConfigEnumerationProductionInputsRootReview/scope_excludes_subtree (0.04s)
+    --- PASS: TestConfigEnumerationProductionInputsRootReview/policy_refused_root (0.03s)
+    --- PASS: TestConfigEnumerationProductionInputsRootReview/out_of_scope_root_readable_config (0.04s)
+    --- PASS: TestConfigEnumerationProductionInputsRootReview/ignored_but_semantic_manifests (0.00s)
+    --- PASS: TestConfigEnumerationProductionInputsRootReview/no_config_negative (0.00s)
+PASS
+ok  	github.com/enola-labs/enola/internal/extractors/tsextractor	1.196s

@@ -1,0 +1,23 @@
+patch02 portability and apply-check receipt
+
+Patch generation (repo-relative a/ b/ headers), in a fresh cp -Rc copy of
+/tmp/enola-stage16-root-review/source at /tmp/enola-config-enum/stage16-base
+with the frozen candidate worktree committed as ea1ea5d and the coverage
+changes committed as e9cfc5a:
+
+  cd /tmp/enola-config-enum/stage16-base
+  git diff --no-ext-diff --src-prefix=a/ --dst-prefix=b/ HEAD~1 HEAD \
+    -- internal/extractors/tsextractor \
+    > /tmp/enola-config-enum/patch02-stage16-permanent-coverage.patch
+
+Apply check against a second, untouched fresh copy of frozen Stage16
+(/tmp/enola-config-enum/stage16-applycheck, cp -Rc of the same source, worktree
+state M session.go, M ts.go, ?? configwalk*.go exactly as frozen):
+
+  cd /tmp/enola-config-enum/stage16-applycheck
+  git apply --check --verbose \
+    /tmp/enola-config-enum/patch02-stage16-permanent-coverage.patch
+
+Result: exit 0. All 15 files checked: configwalk.go, 13 goldens under
+testdata/zz_config_enum_golden/, zz_config_enum_oracle_test.go.
+No file was applied; --check only.

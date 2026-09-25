@@ -1,0 +1,9 @@
+{
+  "patch_sha256": "75ab2f134ec1602960b2718a720b2de3f4746c7c10533135142f7085130a1e16",
+  "existing_source_changes": "configwalk.go comments only; six other files byte-identical",
+  "goldens": "13 unchanged baseline goldens",
+  "focused_test_functions_passed": 17,
+  "focused_subtests_passed": 26,
+  "runtime_integration": false,
+  "git_apply_check": "Root independently exit0 against frozen Stage16 source"
+}

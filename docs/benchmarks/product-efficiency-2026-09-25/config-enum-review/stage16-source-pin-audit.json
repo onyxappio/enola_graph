@@ -1,0 +1,38 @@
+{
+  "checked_utc": "2026-09-25T03:12:18.881175+00:00",
+  "source": "/tmp/enola-stage16-root-review/source",
+  "freeze_manifest": "/tmp/enola-stage16-freeze/SHA256SUMS.txt",
+  "freeze_manifest_sha256": "9bdb7c9797de66cf63e20645b34400e60d63bdd6f2f57363f366e4cac5ebd75b",
+  "verified_files": [
+    {
+      "path": "internal/extractors/tsextractor/session.go",
+      "sha256": "555f45f4e6261ec2fd5d1c4d268e465c32696231741338f41417cb55a04fd3f2"
+    },
+    {
+      "path": "internal/extractors/tsextractor/ts.go",
+      "sha256": "8f3336b49878b668663b62ee1296170afc339cb4122502156c15388acc5a2382"
+    },
+    {
+      "path": "internal/extractors/tsextractor/configwalk.go",
+      "sha256": "e25a2a4fc8246dbbf6298165dafbb4ed5bb32fe8fd9b54263e2995f570525b30"
+    },
+    {
+      "path": "internal/extractors/tsextractor/configwalk_equivalence_test.go",
+      "sha256": "912f294b1db4ba0e8f81318d537db744d7d94a8c3eea7dbd529f55ebe0d82576"
+    },
+    {
+      "path": "internal/extractors/tsextractor/configwalk_oracle_test.go",
+      "sha256": "22c953e9e3c9bd87a5ec5d7f77e3cfaf6e27dc576f5d6ec7ac5994d5a8e7c129"
+    },
+    {
+      "path": "internal/extractors/tsextractor/configwalk_error_path_test.go",
+      "sha256": "2ef141325de7e1133fb62d8aac832631f5a356fc0066c5235ccf6d65239df2b2"
+    },
+    {
+      "path": "internal/extractors/tsextractor/configwalk_coverage_test.go",
+      "sha256": "f14110b5b3fd255892a9cfb9f296c69ab13ccec9fba1b588c744d6855790f731"
+    }
+  ],
+  "all_match": true,
+  "scope": "Post-test source pin audit; tests were Go overlay only and did not modify these files."
+}
