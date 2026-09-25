@@ -1,0 +1,56 @@
+{
+  "scope": "Intermediate frozen candidate01; allocations only, not CLI latency acceptance",
+  "limitations": [
+    "assembledFrom omits composed extras",
+    "concurrent host load; no ns/op inference",
+    "not final worker revision"
+  ],
+  "benchmarks": {
+    "ResolutionIndexes": {
+      "baseline": {
+        "B_per_op": [
+          174175477,
+          173504778,
+          178212178
+        ],
+        "median": 174175477,
+        "min": 173504778,
+        "max": 178212178
+      },
+      "candidate": {
+        "B_per_op": [
+          68691312,
+          68724485,
+          68691312
+        ],
+        "median": 68691312,
+        "min": 68691312,
+        "max": 68724485
+      },
+      "median_reduction_percent": 60.562007245141636
+    },
+    "ChangedCandidateNames": {
+      "baseline": {
+        "B_per_op": [
+          64159176,
+          64159176,
+          64159176
+        ],
+        "median": 64159176,
+        "min": 64159176,
+        "max": 64159176
+      },
+      "candidate": {
+        "B_per_op": [
+          7443064,
+          7443064,
+          7443064
+        ],
+        "median": 7443064,
+        "min": 7443064,
+        "max": 7443064
+      },
+      "median_reduction_percent": 88.39906547428228
+    }
+  }
+}

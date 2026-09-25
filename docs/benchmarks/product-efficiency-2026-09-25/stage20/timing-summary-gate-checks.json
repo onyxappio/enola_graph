@@ -1,0 +1,14 @@
+{
+  "script_sha256": "9919b076cf25d2475e7c5bee3e31b9736bf55ba1764533c22d980af21fefd0f7",
+  "checks": {
+    "missing_hold_refused": true,
+    "partial_cohort_refused": true,
+    "window_overrun_refused": true,
+    "failed_arm_refused": true,
+    "hold_mismatch_refused": true,
+    "synthetic_valid_cohort_accepted": true,
+    "internally_cold_equal_cross_arm_drift_refused": true
+  },
+  "timing_executed": false,
+  "synthetic_test_script": "test-timing-summary.py"
+}

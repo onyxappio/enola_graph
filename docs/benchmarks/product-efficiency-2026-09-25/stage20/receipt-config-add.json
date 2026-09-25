@@ -1,0 +1,436 @@
+{
+  "purpose": "correctness-only history validation; no timing claim of any kind",
+  "started_utc": "2026-09-25T02:00:57Z",
+  "source": "/private/tmp/enola-stage20-root-review/config-history-source",
+  "expected_commits": [
+    "d0fbbf855af5f4a33c364885f85805d71f9fac7c",
+    "a2ac71af8a22471c27059a9b318ef4880caa50cb"
+  ],
+  "baseline_arm": true,
+  "series_gates": [
+    {
+      "key": "candidate-binary-pin",
+      "pass": true,
+      "detail": {
+        "measured": "787f36ded2fcd0f26fb2153358a5001912e00e59fd267442dd366515d87d7685",
+        "pinned": "787f36ded2fcd0f26fb2153358a5001912e00e59fd267442dd366515d87d7685"
+      }
+    },
+    {
+      "key": "baseline-binary-pin",
+      "pass": true,
+      "detail": {
+        "measured": "bc53ceed5a8dbe54d65eb1cdf93a37cf9b624bf0dd92d66b030fda863e4017b8",
+        "pinned": "bc53ceed5a8dbe54d65eb1cdf93a37cf9b624bf0dd92d66b030fda863e4017b8"
+      }
+    },
+    {
+      "key": "policy-pin",
+      "pass": true,
+      "detail": {
+        "measured": "b81b19598dd74c63084ae11488cb7f4fa7df783b0887d2c42dcf61dc67890bf7",
+        "pinned": "b81b19598dd74c63084ae11488cb7f4fa7df783b0887d2c42dcf61dc67890bf7",
+        "path": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/product-graph-scope.yaml"
+      }
+    },
+    {
+      "key": "observer-pin",
+      "pass": true,
+      "detail": {
+        "measured": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+        "pinned": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f"
+      }
+    },
+    {
+      "key": "nats-pin",
+      "pass": true,
+      "detail": {
+        "measured": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af",
+        "pinned": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af"
+      }
+    },
+    {
+      "key": "source-head-pin",
+      "pass": true,
+      "detail": {
+        "head": "a2ac71af8a22471c27059a9b318ef4880caa50cb",
+        "pinned": "a2ac71af8a22471c27059a9b318ef4880caa50cb",
+        "porcelain": ""
+      }
+    },
+    {
+      "key": "commit-chain-pin",
+      "pass": true,
+      "detail": {
+        "git_first_parent_oldest_first": [
+          "d0fbbf855af5f4a33c364885f85805d71f9fac7c",
+          "a2ac71af8a22471c27059a9b318ef4880caa50cb"
+        ]
+      }
+    },
+    {
+      "key": "chain-initial-fresh",
+      "pass": true,
+      "detail": {
+        "base": 0,
+        "target": 1
+      }
+    }
+  ],
+  "steps": [
+    {
+      "label": "00-initial-d0fbbf85",
+      "kind": "initial",
+      "index": 0,
+      "expected_commit": "d0fbbf855af5f4a33c364885f85805d71f9fac7c",
+      "completed": true,
+      "gates": [
+        {
+          "key": "source-pin",
+          "pass": true,
+          "detail": {
+            "head": "d0fbbf855af5f4a33c364885f85805d71f9fac7c",
+            "expected": "d0fbbf855af5f4a33c364885f85805d71f9fac7c"
+          }
+        },
+        {
+          "key": "worktree-clean",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "worktree-clean-after",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "candidate-published",
+          "pass": true,
+          "detail": {
+            "published": true
+          }
+        },
+        {
+          "key": "delta-equals-cold",
+          "pass": true,
+          "detail": {
+            "effective_chain_hash": "0de4594b28672b4d3c27339ad7d14b8b0986c89509f69b5bf6e5267c7d8277ee",
+            "candidate_cold_hash": "0de4594b28672b4d3c27339ad7d14b8b0986c89509f69b5bf6e5267c7d8277ee",
+            "published": true
+          }
+        },
+        {
+          "key": "noop-zero-parses",
+          "pass": true,
+          "detail": {
+            "parsed_files": 0
+          }
+        },
+        {
+          "key": "noop-stable-generation",
+          "pass": true,
+          "detail": {
+            "base": 1,
+            "target": 1
+          }
+        },
+        {
+          "key": "noop-zero-events",
+          "pass": true,
+          "detail": {
+            "wire_messages": 0
+          }
+        },
+        {
+          "key": "noop-state-unchanged",
+          "pass": true,
+          "detail": {
+            "before": "0ee7c2d72e38e3ce51412dc374bcd62c1b104c5e9e22a4d72457254036da4e13",
+            "after": "0ee7c2d72e38e3ce51412dc374bcd62c1b104c5e9e22a4d72457254036da4e13"
+          }
+        },
+        {
+          "key": "baseline-cold-equals-candidate-cold",
+          "pass": true,
+          "detail": {
+            "baseline_cold_hash": "0de4594b28672b4d3c27339ad7d14b8b0986c89509f69b5bf6e5267c7d8277ee",
+            "candidate_cold_hash": "0de4594b28672b4d3c27339ad7d14b8b0986c89509f69b5bf6e5267c7d8277ee",
+            "inputs": "same physical checkout, same policy overlay, same commit"
+          }
+        }
+      ],
+      "head": "d0fbbf855af5f4a33c364885f85805d71f9fac7c",
+      "status_before": "",
+      "subject": "Merge pull request #881 from onyxappio/AlexanderMykulych/back-effect",
+      "chain": {
+        "label": "001-00-initial-d0fbbf85-chain",
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "initial": 3934
+            }
+          },
+          "RunID": "stage20-config-history-product-stage20-history-chain-1-1790301678345938000",
+          "BaseGeneration": 0,
+          "TargetGeneration": 1,
+          "Stats": {
+            "files_read": 3986,
+            "files_parsed": 3934,
+            "cached_files": 0,
+            "graphql_parsed": 2,
+            "sfc_parsed": 17,
+            "summary_scans": 1636,
+            "derived_indexes": 2259,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "all prior/current file owners",
+              "reason": "frozen scope: global name-resolution domain"
+            },
+            {
+              "extractor": "manifests",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            },
+            {
+              "extractor": "mdintent",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            },
+            {
+              "extractor": "hcl",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            },
+            {
+              "extractor": "python",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            },
+            {
+              "extractor": "swift",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 4766,
+          "ParsedFiles": 3934,
+          "EarlyLocal": 0
+        },
+        "published": true,
+        "fallbacks": [
+          "graph: all prior/current file owners (frozen scope: global name-resolution domain)",
+          "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+          "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+          "hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+          "python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+          "swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+        ],
+        "graph_hash": "0de4594b28672b4d3c27339ad7d14b8b0986c89509f69b5bf6e5267c7d8277ee"
+      },
+      "published": true,
+      "effective_hash": "0de4594b28672b4d3c27339ad7d14b8b0986c89509f69b5bf6e5267c7d8277ee",
+      "noop": {
+        "parsed_files": 0,
+        "base_generation": 1,
+        "target_generation": 1,
+        "wire_messages": 0,
+        "state_before": "0ee7c2d72e38e3ce51412dc374bcd62c1b104c5e9e22a4d72457254036da4e13",
+        "state_after": "0ee7c2d72e38e3ce51412dc374bcd62c1b104c5e9e22a4d72457254036da4e13"
+      },
+      "candidate_cold_hash": "0de4594b28672b4d3c27339ad7d14b8b0986c89509f69b5bf6e5267c7d8277ee",
+      "baseline_cold_hash": "0de4594b28672b4d3c27339ad7d14b8b0986c89509f69b5bf6e5267c7d8277ee",
+      "status_after": "",
+      "gates_missing": [],
+      "gates_present": true,
+      "all_gates_pass": true,
+      "accepted": true
+    },
+    {
+      "label": "01-transition-a2ac71af",
+      "kind": "transition",
+      "index": 1,
+      "expected_commit": "a2ac71af8a22471c27059a9b318ef4880caa50cb",
+      "completed": true,
+      "gates": [
+        {
+          "key": "source-pin",
+          "pass": true,
+          "detail": {
+            "head": "a2ac71af8a22471c27059a9b318ef4880caa50cb",
+            "expected": "a2ac71af8a22471c27059a9b318ef4880caa50cb"
+          }
+        },
+        {
+          "key": "worktree-clean",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "worktree-clean-after",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "candidate-published",
+          "pass": true,
+          "detail": {
+            "published": true
+          }
+        },
+        {
+          "key": "delta-equals-cold",
+          "pass": true,
+          "detail": {
+            "effective_chain_hash": "80f4adca0e12d3c1d69d39cb37f604dd0c49c6c5ec0849aeca2600df1667293d",
+            "candidate_cold_hash": "80f4adca0e12d3c1d69d39cb37f604dd0c49c6c5ec0849aeca2600df1667293d",
+            "published": true
+          }
+        },
+        {
+          "key": "noop-zero-parses",
+          "pass": true,
+          "detail": {
+            "parsed_files": 0
+          }
+        },
+        {
+          "key": "noop-stable-generation",
+          "pass": true,
+          "detail": {
+            "base": 2,
+            "target": 2
+          }
+        },
+        {
+          "key": "noop-zero-events",
+          "pass": true,
+          "detail": {
+            "wire_messages": 0
+          }
+        },
+        {
+          "key": "noop-state-unchanged",
+          "pass": true,
+          "detail": {
+            "before": "325d710fa36c2d2e4237b902372a73f17182383cd4c49f280bc85831cd28809a",
+            "after": "325d710fa36c2d2e4237b902372a73f17182383cd4c49f280bc85831cd28809a"
+          }
+        },
+        {
+          "key": "baseline-cold-equals-candidate-cold",
+          "pass": true,
+          "detail": {
+            "baseline_cold_hash": "80f4adca0e12d3c1d69d39cb37f604dd0c49c6c5ec0849aeca2600df1667293d",
+            "candidate_cold_hash": "80f4adca0e12d3c1d69d39cb37f604dd0c49c6c5ec0849aeca2600df1667293d",
+            "inputs": "same physical checkout, same policy overlay, same commit"
+          }
+        }
+      ],
+      "head": "a2ac71af8a22471c27059a9b318ef4880caa50cb",
+      "status_before": "",
+      "subject": "feat(T-519): add F4 closed machine telemetry contract",
+      "chain": {
+        "label": "005-01-transition-a2ac71af-chain",
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": true,
+            "PolicyReconciled": false,
+            "AddedSources": 6,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 52,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "added source": 6
+            }
+          },
+          "RunID": "stage20-config-history-product-stage20-history-chain-2-1790301710010751000",
+          "BaseGeneration": 1,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 58,
+            "files_parsed": 6,
+            "cached_files": 3934,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 0,
+            "derived_indexes": 5,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files, resolution-rebound importers and reverse file dependents",
+              "reason": "add/delete/rename: reverse-close plus owners whose cached import resolution changes"
+            },
+            {
+              "extractor": "mdintent",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 8,
+          "ParsedFiles": 6,
+          "EarlyLocal": 0
+        },
+        "published": true,
+        "fallbacks": [
+          "graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)",
+          "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+        ],
+        "graph_hash": "80f4adca0e12d3c1d69d39cb37f604dd0c49c6c5ec0849aeca2600df1667293d"
+      },
+      "published": true,
+      "effective_hash": "80f4adca0e12d3c1d69d39cb37f604dd0c49c6c5ec0849aeca2600df1667293d",
+      "noop": {
+        "parsed_files": 0,
+        "base_generation": 2,
+        "target_generation": 2,
+        "wire_messages": 0,
+        "state_before": "325d710fa36c2d2e4237b902372a73f17182383cd4c49f280bc85831cd28809a",
+        "state_after": "325d710fa36c2d2e4237b902372a73f17182383cd4c49f280bc85831cd28809a"
+      },
+      "candidate_cold_hash": "80f4adca0e12d3c1d69d39cb37f604dd0c49c6c5ec0849aeca2600df1667293d",
+      "baseline_cold_hash": "80f4adca0e12d3c1d69d39cb37f604dd0c49c6c5ec0849aeca2600df1667293d",
+      "status_after": "",
+      "gates_missing": [],
+      "gates_present": true,
+      "all_gates_pass": true,
+      "accepted": true
+    }
+  ],
+  "completed_sequence": true,
+  "tag": "config-add",
+  "binary_sha256": {
+    "baseline": "bc53ceed5a8dbe54d65eb1cdf93a37cf9b624bf0dd92d66b030fda863e4017b8",
+    "candidate": "787f36ded2fcd0f26fb2153358a5001912e00e59fd267442dd366515d87d7685"
+  },
+  "policy_sha256": "b81b19598dd74c63084ae11488cb7f4fa7df783b0887d2c42dcf61dc67890bf7",
+  "config": "repo: /private/tmp/enola-stage20-root-review/history/work-config-add/product\n\n# Overlay without repo. Paths are relative to the Product checkout.\ngraph_inputs:\n  exclude:\n    - \"apps/mobile/e2e/artifacts/**\"\n    - \"worker-reports/**\"\n",
+  "checkout": "/private/tmp/enola-stage20-root-review/history/work-config-add/product",
+  "problems": [
+    "expected exactly 11 pinned commits, got 2",
+    "expected 10 first-parent transitions, got 1"
+  ],
+  "accepted": false,
+  "baseline_claim": "baseline and candidate cold graph hashes are equal at every commit, from the same physical checkout, policy overlay and commit",
+  "finished_utc": "2026-09-25T02:02:13Z"
+}

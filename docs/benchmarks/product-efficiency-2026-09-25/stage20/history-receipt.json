@@ -1,0 +1,1857 @@
+{
+  "purpose": "correctness-only history validation; no timing claim of any kind",
+  "started_utc": "2026-09-25T01:45:35Z",
+  "source": "/tmp/enola-stage16-root-review/product-source",
+  "expected_commits": [
+    "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+    "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+    "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+    "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+    "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+    "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+    "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+    "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+    "a6f1f3a91a36ea3dead786560412a4944a009694",
+    "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+    "a609c19f3861971930fae7b33dcb2950598953c5"
+  ],
+  "baseline_arm": true,
+  "series_gates": [
+    {
+      "key": "candidate-binary-pin",
+      "pass": true,
+      "detail": {
+        "measured": "787f36ded2fcd0f26fb2153358a5001912e00e59fd267442dd366515d87d7685",
+        "pinned": "787f36ded2fcd0f26fb2153358a5001912e00e59fd267442dd366515d87d7685"
+      }
+    },
+    {
+      "key": "baseline-binary-pin",
+      "pass": true,
+      "detail": {
+        "measured": "bc53ceed5a8dbe54d65eb1cdf93a37cf9b624bf0dd92d66b030fda863e4017b8",
+        "pinned": "bc53ceed5a8dbe54d65eb1cdf93a37cf9b624bf0dd92d66b030fda863e4017b8"
+      }
+    },
+    {
+      "key": "policy-pin",
+      "pass": true,
+      "detail": {
+        "measured": "b81b19598dd74c63084ae11488cb7f4fa7df783b0887d2c42dcf61dc67890bf7",
+        "pinned": "b81b19598dd74c63084ae11488cb7f4fa7df783b0887d2c42dcf61dc67890bf7",
+        "path": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/product-graph-scope.yaml"
+      }
+    },
+    {
+      "key": "observer-pin",
+      "pass": true,
+      "detail": {
+        "measured": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+        "pinned": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f"
+      }
+    },
+    {
+      "key": "nats-pin",
+      "pass": true,
+      "detail": {
+        "measured": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af",
+        "pinned": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af"
+      }
+    },
+    {
+      "key": "source-head-pin",
+      "pass": true,
+      "detail": {
+        "head": "a609c19f3861971930fae7b33dcb2950598953c5",
+        "pinned": "a609c19f3861971930fae7b33dcb2950598953c5",
+        "porcelain": ""
+      }
+    },
+    {
+      "key": "commit-chain-pin",
+      "pass": true,
+      "detail": {
+        "git_first_parent_oldest_first": [
+          "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+          "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+          "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+          "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+          "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+          "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+          "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+          "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+          "a6f1f3a91a36ea3dead786560412a4944a009694",
+          "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+          "a609c19f3861971930fae7b33dcb2950598953c5"
+        ]
+      }
+    },
+    {
+      "key": "chain-initial-fresh",
+      "pass": true,
+      "detail": {
+        "base": 0,
+        "target": 1
+      }
+    }
+  ],
+  "steps": [
+    {
+      "label": "00-initial-4d104e60",
+      "kind": "initial",
+      "index": 0,
+      "expected_commit": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+      "completed": true,
+      "gates": [
+        {
+          "key": "source-pin",
+          "pass": true,
+          "detail": {
+            "head": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+            "expected": "4d104e600f89cfc0d84a93c02a6635191805b7d9"
+          }
+        },
+        {
+          "key": "worktree-clean",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "worktree-clean-after",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "candidate-published",
+          "pass": true,
+          "detail": {
+            "published": true
+          }
+        },
+        {
+          "key": "delta-equals-cold",
+          "pass": true,
+          "detail": {
+            "effective_chain_hash": "e490925ac80848fab17ab06d5eb044a82f63a8e1336c6643e81100b075947450",
+            "candidate_cold_hash": "e490925ac80848fab17ab06d5eb044a82f63a8e1336c6643e81100b075947450",
+            "published": true
+          }
+        },
+        {
+          "key": "noop-zero-parses",
+          "pass": true,
+          "detail": {
+            "parsed_files": 0
+          }
+        },
+        {
+          "key": "noop-stable-generation",
+          "pass": true,
+          "detail": {
+            "base": 1,
+            "target": 1
+          }
+        },
+        {
+          "key": "noop-zero-events",
+          "pass": true,
+          "detail": {
+            "wire_messages": 0
+          }
+        },
+        {
+          "key": "noop-state-unchanged",
+          "pass": true,
+          "detail": {
+            "before": "b70f1c710501850512a278a7d1a7b4b858af10d40f39f15122f8789982318bc7",
+            "after": "b70f1c710501850512a278a7d1a7b4b858af10d40f39f15122f8789982318bc7"
+          }
+        },
+        {
+          "key": "baseline-cold-equals-candidate-cold",
+          "pass": true,
+          "detail": {
+            "baseline_cold_hash": "e490925ac80848fab17ab06d5eb044a82f63a8e1336c6643e81100b075947450",
+            "candidate_cold_hash": "e490925ac80848fab17ab06d5eb044a82f63a8e1336c6643e81100b075947450",
+            "inputs": "same physical checkout, same policy overlay, same commit"
+          }
+        }
+      ],
+      "head": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+      "status_before": "",
+      "subject": "Merge pull request #964 from onyxappio/AlexanderMykulych/t578-managed-prod-offers-integration",
+      "chain": {
+        "label": "001-00-initial-4d104e60-chain",
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "initial": 4012
+            }
+          },
+          "RunID": "stage20-history-product-stage20-history-chain-1-1790300794654329000",
+          "BaseGeneration": 0,
+          "TargetGeneration": 1,
+          "Stats": {
+            "files_read": 4064,
+            "files_parsed": 4012,
+            "cached_files": 0,
+            "graphql_parsed": 2,
+            "sfc_parsed": 17,
+            "summary_scans": 1744,
+            "derived_indexes": 2227,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "all prior/current file owners",
+              "reason": "frozen scope: global name-resolution domain"
+            },
+            {
+              "extractor": "manifests",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            },
+            {
+              "extractor": "mdintent",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            },
+            {
+              "extractor": "hcl",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            },
+            {
+              "extractor": "python",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            },
+            {
+              "extractor": "swift",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 4942,
+          "ParsedFiles": 4012,
+          "EarlyLocal": 0
+        },
+        "published": true,
+        "fallbacks": [
+          "graph: all prior/current file owners (frozen scope: global name-resolution domain)",
+          "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+          "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+          "hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+          "python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+          "swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+        ],
+        "graph_hash": "e490925ac80848fab17ab06d5eb044a82f63a8e1336c6643e81100b075947450"
+      },
+      "published": true,
+      "effective_hash": "e490925ac80848fab17ab06d5eb044a82f63a8e1336c6643e81100b075947450",
+      "noop": {
+        "parsed_files": 0,
+        "base_generation": 1,
+        "target_generation": 1,
+        "wire_messages": 0,
+        "state_before": "b70f1c710501850512a278a7d1a7b4b858af10d40f39f15122f8789982318bc7",
+        "state_after": "b70f1c710501850512a278a7d1a7b4b858af10d40f39f15122f8789982318bc7"
+      },
+      "candidate_cold_hash": "e490925ac80848fab17ab06d5eb044a82f63a8e1336c6643e81100b075947450",
+      "baseline_cold_hash": "e490925ac80848fab17ab06d5eb044a82f63a8e1336c6643e81100b075947450",
+      "status_after": "",
+      "gates_missing": [],
+      "gates_present": true,
+      "all_gates_pass": true,
+      "accepted": true
+    },
+    {
+      "label": "01-transition-07fb4a41",
+      "kind": "transition",
+      "index": 1,
+      "expected_commit": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+      "completed": true,
+      "gates": [
+        {
+          "key": "source-pin",
+          "pass": true,
+          "detail": {
+            "head": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+            "expected": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7"
+          }
+        },
+        {
+          "key": "worktree-clean",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "worktree-clean-after",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "candidate-published",
+          "pass": true,
+          "detail": {
+            "published": true
+          }
+        },
+        {
+          "key": "delta-equals-cold",
+          "pass": true,
+          "detail": {
+            "effective_chain_hash": "36681dfde4b3e2970db78fcd86a9676c83cfc4f27242f0a166f96818ac0bc0d0",
+            "candidate_cold_hash": "36681dfde4b3e2970db78fcd86a9676c83cfc4f27242f0a166f96818ac0bc0d0",
+            "published": true
+          }
+        },
+        {
+          "key": "noop-zero-parses",
+          "pass": true,
+          "detail": {
+            "parsed_files": 0
+          }
+        },
+        {
+          "key": "noop-stable-generation",
+          "pass": true,
+          "detail": {
+            "base": 2,
+            "target": 2
+          }
+        },
+        {
+          "key": "noop-zero-events",
+          "pass": true,
+          "detail": {
+            "wire_messages": 0
+          }
+        },
+        {
+          "key": "noop-state-unchanged",
+          "pass": true,
+          "detail": {
+            "before": "f415d458cc342cbf41abe41491720a38afaf88742fc83fb2a5924f8f9f66f328",
+            "after": "f415d458cc342cbf41abe41491720a38afaf88742fc83fb2a5924f8f9f66f328"
+          }
+        },
+        {
+          "key": "baseline-cold-equals-candidate-cold",
+          "pass": true,
+          "detail": {
+            "baseline_cold_hash": "36681dfde4b3e2970db78fcd86a9676c83cfc4f27242f0a166f96818ac0bc0d0",
+            "candidate_cold_hash": "36681dfde4b3e2970db78fcd86a9676c83cfc4f27242f0a166f96818ac0bc0d0",
+            "inputs": "same physical checkout, same policy overlay, same commit"
+          }
+        }
+      ],
+      "head": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+      "status_before": "",
+      "subject": "Merge pull request #965 from onyxappio/AlexanderMykulych/t578-tracking-queue-feedback-loop",
+      "chain": {
+        "label": "005-01-transition-07fb4a41-chain",
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": true,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 3,
+              "source content": 2
+            }
+          },
+          "RunID": "stage20-history-product-stage20-history-chain-2-1790300836022813000",
+          "BaseGeneration": 1,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 109,
+            "files_parsed": 5,
+            "cached_files": 4007,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 17,
+            "derived_indexes": 3,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 5,
+          "ParsedFiles": 5,
+          "EarlyLocal": 0
+        },
+        "published": true,
+        "fallbacks": [
+          "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+        ],
+        "graph_hash": "36681dfde4b3e2970db78fcd86a9676c83cfc4f27242f0a166f96818ac0bc0d0"
+      },
+      "published": true,
+      "effective_hash": "36681dfde4b3e2970db78fcd86a9676c83cfc4f27242f0a166f96818ac0bc0d0",
+      "noop": {
+        "parsed_files": 0,
+        "base_generation": 2,
+        "target_generation": 2,
+        "wire_messages": 0,
+        "state_before": "f415d458cc342cbf41abe41491720a38afaf88742fc83fb2a5924f8f9f66f328",
+        "state_after": "f415d458cc342cbf41abe41491720a38afaf88742fc83fb2a5924f8f9f66f328"
+      },
+      "candidate_cold_hash": "36681dfde4b3e2970db78fcd86a9676c83cfc4f27242f0a166f96818ac0bc0d0",
+      "baseline_cold_hash": "36681dfde4b3e2970db78fcd86a9676c83cfc4f27242f0a166f96818ac0bc0d0",
+      "status_after": "",
+      "gates_missing": [],
+      "gates_present": true,
+      "all_gates_pass": true,
+      "accepted": true
+    },
+    {
+      "label": "02-transition-fec1eac3",
+      "kind": "transition",
+      "index": 2,
+      "expected_commit": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+      "completed": true,
+      "gates": [
+        {
+          "key": "source-pin",
+          "pass": true,
+          "detail": {
+            "head": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+            "expected": "fec1eac346c48dbc68072803d89b2e4709f9bd42"
+          }
+        },
+        {
+          "key": "worktree-clean",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "worktree-clean-after",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "candidate-published",
+          "pass": true,
+          "detail": {
+            "published": true
+          }
+        },
+        {
+          "key": "delta-equals-cold",
+          "pass": true,
+          "detail": {
+            "effective_chain_hash": "e00d06af49db7f3cf909c75c06965f73a588fb95ec33fe341303fcad3a4e76ca",
+            "candidate_cold_hash": "e00d06af49db7f3cf909c75c06965f73a588fb95ec33fe341303fcad3a4e76ca",
+            "published": true
+          }
+        },
+        {
+          "key": "noop-zero-parses",
+          "pass": true,
+          "detail": {
+            "parsed_files": 0
+          }
+        },
+        {
+          "key": "noop-stable-generation",
+          "pass": true,
+          "detail": {
+            "base": 3,
+            "target": 3
+          }
+        },
+        {
+          "key": "noop-zero-events",
+          "pass": true,
+          "detail": {
+            "wire_messages": 0
+          }
+        },
+        {
+          "key": "noop-state-unchanged",
+          "pass": true,
+          "detail": {
+            "before": "0a5424a72280cceafd97db0dc11ef9e12d67f0a5d89996949e9617f174faf091",
+            "after": "0a5424a72280cceafd97db0dc11ef9e12d67f0a5d89996949e9617f174faf091"
+          }
+        },
+        {
+          "key": "baseline-cold-equals-candidate-cold",
+          "pass": true,
+          "detail": {
+            "baseline_cold_hash": "e00d06af49db7f3cf909c75c06965f73a588fb95ec33fe341303fcad3a4e76ca",
+            "candidate_cold_hash": "e00d06af49db7f3cf909c75c06965f73a588fb95ec33fe341303fcad3a4e76ca",
+            "inputs": "same physical checkout, same policy overlay, same commit"
+          }
+        }
+      ],
+      "head": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+      "status_before": "",
+      "subject": "Merge pull request #960 from onyxappio/AlexanderMykulych/t284-screen-onboarding-first-session-device-outdated",
+      "chain": {
+        "label": "009-02-transition-fec1eac3-chain",
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 4,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "added source": 4,
+              "resolution": 417,
+              "source content": 92
+            }
+          },
+          "RunID": "stage20-history-product-stage20-history-chain-3-1790300878355751000",
+          "BaseGeneration": 2,
+          "TargetGeneration": 3,
+          "Stats": {
+            "files_read": 617,
+            "files_parsed": 513,
+            "cached_files": 3503,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 1706,
+            "derived_indexes": 308,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files, resolution-rebound importers and reverse file dependents",
+              "reason": "add/delete/rename: reverse-close plus owners whose cached import resolution changes"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 1149,
+          "ParsedFiles": 513,
+          "EarlyLocal": 0
+        },
+        "published": true,
+        "fallbacks": [
+          "graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)"
+        ],
+        "graph_hash": "e00d06af49db7f3cf909c75c06965f73a588fb95ec33fe341303fcad3a4e76ca"
+      },
+      "published": true,
+      "effective_hash": "e00d06af49db7f3cf909c75c06965f73a588fb95ec33fe341303fcad3a4e76ca",
+      "noop": {
+        "parsed_files": 0,
+        "base_generation": 3,
+        "target_generation": 3,
+        "wire_messages": 0,
+        "state_before": "0a5424a72280cceafd97db0dc11ef9e12d67f0a5d89996949e9617f174faf091",
+        "state_after": "0a5424a72280cceafd97db0dc11ef9e12d67f0a5d89996949e9617f174faf091"
+      },
+      "candidate_cold_hash": "e00d06af49db7f3cf909c75c06965f73a588fb95ec33fe341303fcad3a4e76ca",
+      "baseline_cold_hash": "e00d06af49db7f3cf909c75c06965f73a588fb95ec33fe341303fcad3a4e76ca",
+      "status_after": "",
+      "gates_missing": [],
+      "gates_present": true,
+      "all_gates_pass": true,
+      "accepted": true
+    },
+    {
+      "label": "03-transition-9fc7ae5b",
+      "kind": "transition",
+      "index": 3,
+      "expected_commit": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+      "completed": true,
+      "gates": [
+        {
+          "key": "source-pin",
+          "pass": true,
+          "detail": {
+            "head": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+            "expected": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030"
+          }
+        },
+        {
+          "key": "worktree-clean",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "worktree-clean-after",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "candidate-published",
+          "pass": true,
+          "detail": {
+            "published": true
+          }
+        },
+        {
+          "key": "delta-equals-cold",
+          "pass": true,
+          "detail": {
+            "effective_chain_hash": "b26ed6cf3d223e9241bc199139a91c5d1df343a8afca08ecbf42e0c3f94e7ce8",
+            "candidate_cold_hash": "b26ed6cf3d223e9241bc199139a91c5d1df343a8afca08ecbf42e0c3f94e7ce8",
+            "published": true
+          }
+        },
+        {
+          "key": "noop-zero-parses",
+          "pass": true,
+          "detail": {
+            "parsed_files": 0
+          }
+        },
+        {
+          "key": "noop-stable-generation",
+          "pass": true,
+          "detail": {
+            "base": 4,
+            "target": 4
+          }
+        },
+        {
+          "key": "noop-zero-events",
+          "pass": true,
+          "detail": {
+            "wire_messages": 0
+          }
+        },
+        {
+          "key": "noop-state-unchanged",
+          "pass": true,
+          "detail": {
+            "before": "fb2b6c9e9848cd3af7c471dee0048be86c31cb693479d441794033cd0a945392",
+            "after": "fb2b6c9e9848cd3af7c471dee0048be86c31cb693479d441794033cd0a945392"
+          }
+        },
+        {
+          "key": "baseline-cold-equals-candidate-cold",
+          "pass": true,
+          "detail": {
+            "baseline_cold_hash": "b26ed6cf3d223e9241bc199139a91c5d1df343a8afca08ecbf42e0c3f94e7ce8",
+            "candidate_cold_hash": "b26ed6cf3d223e9241bc199139a91c5d1df343a8afca08ecbf42e0c3f94e7ce8",
+            "inputs": "same physical checkout, same policy overlay, same commit"
+          }
+        }
+      ],
+      "head": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+      "status_before": "",
+      "subject": "Merge pull request #969 from onyxappio/AlexanderMykulych/t284-screen-onboarding-first-session-device-outdated",
+      "chain": {
+        "label": "013-03-transition-9fc7ae5b-chain",
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 2,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "added source": 2,
+              "resolution": 9,
+              "source content": 14
+            }
+          },
+          "RunID": "stage20-history-product-stage20-history-chain-4-1790300919651163000",
+          "BaseGeneration": 3,
+          "TargetGeneration": 4,
+          "Stats": {
+            "files_read": 129,
+            "files_parsed": 25,
+            "cached_files": 3993,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 405,
+            "derived_indexes": 20,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files, resolution-rebound importers and reverse file dependents",
+              "reason": "add/delete/rename: reverse-close plus owners whose cached import resolution changes"
+            },
+            {
+              "extractor": "mdintent",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 1662,
+          "ParsedFiles": 25,
+          "EarlyLocal": 0
+        },
+        "published": true,
+        "fallbacks": [
+          "graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)",
+          "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+        ],
+        "graph_hash": "b26ed6cf3d223e9241bc199139a91c5d1df343a8afca08ecbf42e0c3f94e7ce8"
+      },
+      "published": true,
+      "effective_hash": "b26ed6cf3d223e9241bc199139a91c5d1df343a8afca08ecbf42e0c3f94e7ce8",
+      "noop": {
+        "parsed_files": 0,
+        "base_generation": 4,
+        "target_generation": 4,
+        "wire_messages": 0,
+        "state_before": "fb2b6c9e9848cd3af7c471dee0048be86c31cb693479d441794033cd0a945392",
+        "state_after": "fb2b6c9e9848cd3af7c471dee0048be86c31cb693479d441794033cd0a945392"
+      },
+      "candidate_cold_hash": "b26ed6cf3d223e9241bc199139a91c5d1df343a8afca08ecbf42e0c3f94e7ce8",
+      "baseline_cold_hash": "b26ed6cf3d223e9241bc199139a91c5d1df343a8afca08ecbf42e0c3f94e7ce8",
+      "status_after": "",
+      "gates_missing": [],
+      "gates_present": true,
+      "all_gates_pass": true,
+      "accepted": true
+    },
+    {
+      "label": "04-transition-1c260747",
+      "kind": "transition",
+      "index": 4,
+      "expected_commit": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+      "completed": true,
+      "gates": [
+        {
+          "key": "source-pin",
+          "pass": true,
+          "detail": {
+            "head": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+            "expected": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895"
+          }
+        },
+        {
+          "key": "worktree-clean",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "worktree-clean-after",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "candidate-published",
+          "pass": true,
+          "detail": {
+            "published": true
+          }
+        },
+        {
+          "key": "delta-equals-cold",
+          "pass": true,
+          "detail": {
+            "effective_chain_hash": "8c9f9633043e23989ba499750d3ce413bbb742bbeaa4bc851ca5b6f45f279e7a",
+            "candidate_cold_hash": "8c9f9633043e23989ba499750d3ce413bbb742bbeaa4bc851ca5b6f45f279e7a",
+            "published": true
+          }
+        },
+        {
+          "key": "noop-zero-parses",
+          "pass": true,
+          "detail": {
+            "parsed_files": 0
+          }
+        },
+        {
+          "key": "noop-stable-generation",
+          "pass": true,
+          "detail": {
+            "base": 5,
+            "target": 5
+          }
+        },
+        {
+          "key": "noop-zero-events",
+          "pass": true,
+          "detail": {
+            "wire_messages": 0
+          }
+        },
+        {
+          "key": "noop-state-unchanged",
+          "pass": true,
+          "detail": {
+            "before": "b0412fed851c737813c26b4b45f9922c0ed0d974f6aeed1598b61cf9f4794178",
+            "after": "b0412fed851c737813c26b4b45f9922c0ed0d974f6aeed1598b61cf9f4794178"
+          }
+        },
+        {
+          "key": "baseline-cold-equals-candidate-cold",
+          "pass": true,
+          "detail": {
+            "baseline_cold_hash": "8c9f9633043e23989ba499750d3ce413bbb742bbeaa4bc851ca5b6f45f279e7a",
+            "candidate_cold_hash": "8c9f9633043e23989ba499750d3ce413bbb742bbeaa4bc851ca5b6f45f279e7a",
+            "inputs": "same physical checkout, same policy overlay, same commit"
+          }
+        }
+      ],
+      "head": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+      "status_before": "",
+      "subject": "Merge pull request #970 from onyxappio/t578-test-deploy-final",
+      "chain": {
+        "label": "017-04-transition-1c260747-chain",
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 2,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "added source": 2,
+              "resolution": 400,
+              "source content": 29
+            }
+          },
+          "RunID": "stage20-history-product-stage20-history-chain-5-1790300953331104000",
+          "BaseGeneration": 4,
+          "TargetGeneration": 5,
+          "Stats": {
+            "files_read": 587,
+            "files_parsed": 431,
+            "cached_files": 3589,
+            "graphql_parsed": 1,
+            "sfc_parsed": 0,
+            "summary_scans": 1186,
+            "derived_indexes": 264,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files, resolution-rebound importers and reverse file dependents",
+              "reason": "add/delete/rename: reverse-close plus owners whose cached import resolution changes"
+            },
+            {
+              "extractor": "mdintent",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 554,
+          "ParsedFiles": 431,
+          "EarlyLocal": 0
+        },
+        "published": true,
+        "fallbacks": [
+          "graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)",
+          "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+        ],
+        "graph_hash": "8c9f9633043e23989ba499750d3ce413bbb742bbeaa4bc851ca5b6f45f279e7a"
+      },
+      "published": true,
+      "effective_hash": "8c9f9633043e23989ba499750d3ce413bbb742bbeaa4bc851ca5b6f45f279e7a",
+      "noop": {
+        "parsed_files": 0,
+        "base_generation": 5,
+        "target_generation": 5,
+        "wire_messages": 0,
+        "state_before": "b0412fed851c737813c26b4b45f9922c0ed0d974f6aeed1598b61cf9f4794178",
+        "state_after": "b0412fed851c737813c26b4b45f9922c0ed0d974f6aeed1598b61cf9f4794178"
+      },
+      "candidate_cold_hash": "8c9f9633043e23989ba499750d3ce413bbb742bbeaa4bc851ca5b6f45f279e7a",
+      "baseline_cold_hash": "8c9f9633043e23989ba499750d3ce413bbb742bbeaa4bc851ca5b6f45f279e7a",
+      "status_after": "",
+      "gates_missing": [],
+      "gates_present": true,
+      "all_gates_pass": true,
+      "accepted": true
+    },
+    {
+      "label": "05-transition-599575d0",
+      "kind": "transition",
+      "index": 5,
+      "expected_commit": "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+      "completed": true,
+      "gates": [
+        {
+          "key": "source-pin",
+          "pass": true,
+          "detail": {
+            "head": "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+            "expected": "599575d0aa398615cde6a4ac12bc0c7734a686d9"
+          }
+        },
+        {
+          "key": "worktree-clean",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "worktree-clean-after",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "candidate-published",
+          "pass": true,
+          "detail": {
+            "published": true
+          }
+        },
+        {
+          "key": "delta-equals-cold",
+          "pass": true,
+          "detail": {
+            "effective_chain_hash": "18d4c839b4b78439075be93f4d7718a8cca2329831e9b6e71b77c52d95b54aa9",
+            "candidate_cold_hash": "18d4c839b4b78439075be93f4d7718a8cca2329831e9b6e71b77c52d95b54aa9",
+            "published": true
+          }
+        },
+        {
+          "key": "noop-zero-parses",
+          "pass": true,
+          "detail": {
+            "parsed_files": 0
+          }
+        },
+        {
+          "key": "noop-stable-generation",
+          "pass": true,
+          "detail": {
+            "base": 6,
+            "target": 6
+          }
+        },
+        {
+          "key": "noop-zero-events",
+          "pass": true,
+          "detail": {
+            "wire_messages": 0
+          }
+        },
+        {
+          "key": "noop-state-unchanged",
+          "pass": true,
+          "detail": {
+            "before": "304310bf4fee6331b6d41ea55030d8f8ccc0d1de786644828888016683b0c3f8",
+            "after": "304310bf4fee6331b6d41ea55030d8f8ccc0d1de786644828888016683b0c3f8"
+          }
+        },
+        {
+          "key": "baseline-cold-equals-candidate-cold",
+          "pass": true,
+          "detail": {
+            "baseline_cold_hash": "18d4c839b4b78439075be93f4d7718a8cca2329831e9b6e71b77c52d95b54aa9",
+            "candidate_cold_hash": "18d4c839b4b78439075be93f4d7718a8cca2329831e9b6e71b77c52d95b54aa9",
+            "inputs": "same physical checkout, same policy overlay, same commit"
+          }
+        }
+      ],
+      "head": "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+      "status_before": "",
+      "subject": "Merge pull request #971 from onyxappio/t578-prod-origin-allowlist-hotfix",
+      "chain": {
+        "label": "021-05-transition-599575d0-chain",
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "source content": 7
+            }
+          },
+          "RunID": "stage20-history-product-stage20-history-chain-6-1790300992402876000",
+          "BaseGeneration": 5,
+          "TargetGeneration": 6,
+          "Stats": {
+            "files_read": 59,
+            "files_parsed": 7,
+            "cached_files": 4013,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 111,
+            "derived_indexes": 5,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: reverse-close plus owners that reference added or removed fact names"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 9,
+          "ParsedFiles": 7,
+          "EarlyLocal": 0
+        },
+        "published": true,
+        "fallbacks": [
+          "graph: changed files and reverse file dependents (frozen scope: reverse-close plus owners that reference added or removed fact names)"
+        ],
+        "graph_hash": "18d4c839b4b78439075be93f4d7718a8cca2329831e9b6e71b77c52d95b54aa9"
+      },
+      "published": true,
+      "effective_hash": "18d4c839b4b78439075be93f4d7718a8cca2329831e9b6e71b77c52d95b54aa9",
+      "noop": {
+        "parsed_files": 0,
+        "base_generation": 6,
+        "target_generation": 6,
+        "wire_messages": 0,
+        "state_before": "304310bf4fee6331b6d41ea55030d8f8ccc0d1de786644828888016683b0c3f8",
+        "state_after": "304310bf4fee6331b6d41ea55030d8f8ccc0d1de786644828888016683b0c3f8"
+      },
+      "candidate_cold_hash": "18d4c839b4b78439075be93f4d7718a8cca2329831e9b6e71b77c52d95b54aa9",
+      "baseline_cold_hash": "18d4c839b4b78439075be93f4d7718a8cca2329831e9b6e71b77c52d95b54aa9",
+      "status_after": "",
+      "gates_missing": [],
+      "gates_present": true,
+      "all_gates_pass": true,
+      "accepted": true
+    },
+    {
+      "label": "06-transition-ae233c5f",
+      "kind": "transition",
+      "index": 6,
+      "expected_commit": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "completed": true,
+      "gates": [
+        {
+          "key": "source-pin",
+          "pass": true,
+          "detail": {
+            "head": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+            "expected": "ae233c5f56959ce5852c8381edd6cb472c4b9f95"
+          }
+        },
+        {
+          "key": "worktree-clean",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "worktree-clean-after",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "candidate-published",
+          "pass": true,
+          "detail": {
+            "published": true
+          }
+        },
+        {
+          "key": "delta-equals-cold",
+          "pass": true,
+          "detail": {
+            "effective_chain_hash": "442a2e2b0e068746a4f741d3647c49f32ee521f2c6cc60963c32b4a17a872c99",
+            "candidate_cold_hash": "442a2e2b0e068746a4f741d3647c49f32ee521f2c6cc60963c32b4a17a872c99",
+            "published": true
+          }
+        },
+        {
+          "key": "noop-zero-parses",
+          "pass": true,
+          "detail": {
+            "parsed_files": 0
+          }
+        },
+        {
+          "key": "noop-stable-generation",
+          "pass": true,
+          "detail": {
+            "base": 7,
+            "target": 7
+          }
+        },
+        {
+          "key": "noop-zero-events",
+          "pass": true,
+          "detail": {
+            "wire_messages": 0
+          }
+        },
+        {
+          "key": "noop-state-unchanged",
+          "pass": true,
+          "detail": {
+            "before": "059fef148d418b4967d5682d89339e7e38f3c7b8d99bb116ac455d66644e5b1d",
+            "after": "059fef148d418b4967d5682d89339e7e38f3c7b8d99bb116ac455d66644e5b1d"
+          }
+        },
+        {
+          "key": "baseline-cold-equals-candidate-cold",
+          "pass": true,
+          "detail": {
+            "baseline_cold_hash": "442a2e2b0e068746a4f741d3647c49f32ee521f2c6cc60963c32b4a17a872c99",
+            "candidate_cold_hash": "442a2e2b0e068746a4f741d3647c49f32ee521f2c6cc60963c32b4a17a872c99",
+            "inputs": "same physical checkout, same policy overlay, same commit"
+          }
+        }
+      ],
+      "head": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "status_before": "",
+      "subject": "Merge pull request #973 from onyxappio/t578-managed-catalog-parity",
+      "chain": {
+        "label": "025-06-transition-ae233c5f-chain",
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": true,
+            "PolicyReconciled": false,
+            "AddedSources": 7,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "added source": 7,
+              "resolution": 72,
+              "source content": 13
+            }
+          },
+          "RunID": "stage20-history-product-stage20-history-chain-7-1790301028181191000",
+          "BaseGeneration": 6,
+          "TargetGeneration": 7,
+          "Stats": {
+            "files_read": 196,
+            "files_parsed": 92,
+            "cached_files": 3935,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 403,
+            "derived_indexes": 75,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files, resolution-rebound importers and reverse file dependents",
+              "reason": "add/delete/rename: reverse-close plus owners whose cached import resolution changes"
+            },
+            {
+              "extractor": "mdintent",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 345,
+          "ParsedFiles": 92,
+          "EarlyLocal": 0
+        },
+        "published": true,
+        "fallbacks": [
+          "graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)",
+          "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+        ],
+        "graph_hash": "442a2e2b0e068746a4f741d3647c49f32ee521f2c6cc60963c32b4a17a872c99"
+      },
+      "published": true,
+      "effective_hash": "442a2e2b0e068746a4f741d3647c49f32ee521f2c6cc60963c32b4a17a872c99",
+      "noop": {
+        "parsed_files": 0,
+        "base_generation": 7,
+        "target_generation": 7,
+        "wire_messages": 0,
+        "state_before": "059fef148d418b4967d5682d89339e7e38f3c7b8d99bb116ac455d66644e5b1d",
+        "state_after": "059fef148d418b4967d5682d89339e7e38f3c7b8d99bb116ac455d66644e5b1d"
+      },
+      "candidate_cold_hash": "442a2e2b0e068746a4f741d3647c49f32ee521f2c6cc60963c32b4a17a872c99",
+      "baseline_cold_hash": "442a2e2b0e068746a4f741d3647c49f32ee521f2c6cc60963c32b4a17a872c99",
+      "status_after": "",
+      "gates_missing": [],
+      "gates_present": true,
+      "all_gates_pass": true,
+      "accepted": true
+    },
+    {
+      "label": "07-transition-4168360e",
+      "kind": "transition",
+      "index": 7,
+      "expected_commit": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "completed": true,
+      "gates": [
+        {
+          "key": "source-pin",
+          "pass": true,
+          "detail": {
+            "head": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+            "expected": "4168360e2e7f5140115ea5af58db62afd4dc9f43"
+          }
+        },
+        {
+          "key": "worktree-clean",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "worktree-clean-after",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "candidate-published",
+          "pass": true,
+          "detail": {
+            "published": true
+          }
+        },
+        {
+          "key": "delta-equals-cold",
+          "pass": true,
+          "detail": {
+            "effective_chain_hash": "7a7d077676abe312b4a98af7bf27d352598172e502bfd9677f65047ff809f3d4",
+            "candidate_cold_hash": "7a7d077676abe312b4a98af7bf27d352598172e502bfd9677f65047ff809f3d4",
+            "published": true
+          }
+        },
+        {
+          "key": "noop-zero-parses",
+          "pass": true,
+          "detail": {
+            "parsed_files": 0
+          }
+        },
+        {
+          "key": "noop-stable-generation",
+          "pass": true,
+          "detail": {
+            "base": 8,
+            "target": 8
+          }
+        },
+        {
+          "key": "noop-zero-events",
+          "pass": true,
+          "detail": {
+            "wire_messages": 0
+          }
+        },
+        {
+          "key": "noop-state-unchanged",
+          "pass": true,
+          "detail": {
+            "before": "f5584aea879b1d358b5cedcc29cec915a0073ae783dc588596a1e59f67701638",
+            "after": "f5584aea879b1d358b5cedcc29cec915a0073ae783dc588596a1e59f67701638"
+          }
+        },
+        {
+          "key": "baseline-cold-equals-candidate-cold",
+          "pass": true,
+          "detail": {
+            "baseline_cold_hash": "7a7d077676abe312b4a98af7bf27d352598172e502bfd9677f65047ff809f3d4",
+            "candidate_cold_hash": "7a7d077676abe312b4a98af7bf27d352598172e502bfd9677f65047ff809f3d4",
+            "inputs": "same physical checkout, same policy overlay, same commit"
+          }
+        }
+      ],
+      "head": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "status_before": "",
+      "subject": "Merge pull request #972 from onyxappio/AlexanderMykulych/t464-cdc-column-projection",
+      "chain": {
+        "label": "029-07-transition-4168360e-chain",
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": true,
+            "PolicyReconciled": false,
+            "AddedSources": 1,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 29,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "added source": 1,
+              "file semantic context": 26,
+              "resolution": 77,
+              "source content": 7
+            }
+          },
+          "RunID": "stage20-history-product-stage20-history-chain-8-1790301057006605000",
+          "BaseGeneration": 7,
+          "TargetGeneration": 8,
+          "Stats": {
+            "files_read": 267,
+            "files_parsed": 111,
+            "cached_files": 3917,
+            "graphql_parsed": 1,
+            "sfc_parsed": 0,
+            "summary_scans": 302,
+            "derived_indexes": 76,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files, resolution-rebound importers and reverse file dependents",
+              "reason": "add/delete/rename: reverse-close plus owners whose cached import resolution changes"
+            },
+            {
+              "extractor": "manifests",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            },
+            {
+              "extractor": "mdintent",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 150,
+          "ParsedFiles": 111,
+          "EarlyLocal": 0
+        },
+        "published": true,
+        "fallbacks": [
+          "graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)",
+          "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+          "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+        ],
+        "graph_hash": "7a7d077676abe312b4a98af7bf27d352598172e502bfd9677f65047ff809f3d4"
+      },
+      "published": true,
+      "effective_hash": "7a7d077676abe312b4a98af7bf27d352598172e502bfd9677f65047ff809f3d4",
+      "noop": {
+        "parsed_files": 0,
+        "base_generation": 8,
+        "target_generation": 8,
+        "wire_messages": 0,
+        "state_before": "f5584aea879b1d358b5cedcc29cec915a0073ae783dc588596a1e59f67701638",
+        "state_after": "f5584aea879b1d358b5cedcc29cec915a0073ae783dc588596a1e59f67701638"
+      },
+      "candidate_cold_hash": "7a7d077676abe312b4a98af7bf27d352598172e502bfd9677f65047ff809f3d4",
+      "baseline_cold_hash": "7a7d077676abe312b4a98af7bf27d352598172e502bfd9677f65047ff809f3d4",
+      "status_after": "",
+      "gates_missing": [],
+      "gates_present": true,
+      "all_gates_pass": true,
+      "accepted": true
+    },
+    {
+      "label": "08-transition-a6f1f3a9",
+      "kind": "transition",
+      "index": 8,
+      "expected_commit": "a6f1f3a91a36ea3dead786560412a4944a009694",
+      "completed": true,
+      "gates": [
+        {
+          "key": "source-pin",
+          "pass": true,
+          "detail": {
+            "head": "a6f1f3a91a36ea3dead786560412a4944a009694",
+            "expected": "a6f1f3a91a36ea3dead786560412a4944a009694"
+          }
+        },
+        {
+          "key": "worktree-clean",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "worktree-clean-after",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "candidate-published",
+          "pass": true,
+          "detail": {
+            "published": true
+          }
+        },
+        {
+          "key": "delta-equals-cold",
+          "pass": true,
+          "detail": {
+            "effective_chain_hash": "296d0a44432a86ea4163813b9029feb4b2908982bd923d1a0b52882f50770af7",
+            "candidate_cold_hash": "296d0a44432a86ea4163813b9029feb4b2908982bd923d1a0b52882f50770af7",
+            "published": true
+          }
+        },
+        {
+          "key": "noop-zero-parses",
+          "pass": true,
+          "detail": {
+            "parsed_files": 0
+          }
+        },
+        {
+          "key": "noop-stable-generation",
+          "pass": true,
+          "detail": {
+            "base": 9,
+            "target": 9
+          }
+        },
+        {
+          "key": "noop-zero-events",
+          "pass": true,
+          "detail": {
+            "wire_messages": 0
+          }
+        },
+        {
+          "key": "noop-state-unchanged",
+          "pass": true,
+          "detail": {
+            "before": "9252f4984fa0cfc70d9f2a63ed8033b72c60d9ff5e7a285c97b737d4229bc27d",
+            "after": "9252f4984fa0cfc70d9f2a63ed8033b72c60d9ff5e7a285c97b737d4229bc27d"
+          }
+        },
+        {
+          "key": "baseline-cold-equals-candidate-cold",
+          "pass": true,
+          "detail": {
+            "baseline_cold_hash": "296d0a44432a86ea4163813b9029feb4b2908982bd923d1a0b52882f50770af7",
+            "candidate_cold_hash": "296d0a44432a86ea4163813b9029feb4b2908982bd923d1a0b52882f50770af7",
+            "inputs": "same physical checkout, same policy overlay, same commit"
+          }
+        }
+      ],
+      "head": "a6f1f3a91a36ea3dead786560412a4944a009694",
+      "status_before": "",
+      "subject": "Merge pull request #974 from onyxappio/AlexanderMykulych/t464-bronze-include-leaked-columns",
+      "chain": {
+        "label": "033-08-transition-a6f1f3a9-chain",
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 76,
+              "source content": 4
+            }
+          },
+          "RunID": "stage20-history-product-stage20-history-chain-9-1790301086320400000",
+          "BaseGeneration": 8,
+          "TargetGeneration": 9,
+          "Stats": {
+            "files_read": 236,
+            "files_parsed": 80,
+            "cached_files": 3948,
+            "graphql_parsed": 1,
+            "sfc_parsed": 0,
+            "summary_scans": 281,
+            "derived_indexes": 63,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 80,
+          "ParsedFiles": 80,
+          "EarlyLocal": 0
+        },
+        "published": true,
+        "fallbacks": [
+          "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+        ],
+        "graph_hash": "296d0a44432a86ea4163813b9029feb4b2908982bd923d1a0b52882f50770af7"
+      },
+      "published": true,
+      "effective_hash": "296d0a44432a86ea4163813b9029feb4b2908982bd923d1a0b52882f50770af7",
+      "noop": {
+        "parsed_files": 0,
+        "base_generation": 9,
+        "target_generation": 9,
+        "wire_messages": 0,
+        "state_before": "9252f4984fa0cfc70d9f2a63ed8033b72c60d9ff5e7a285c97b737d4229bc27d",
+        "state_after": "9252f4984fa0cfc70d9f2a63ed8033b72c60d9ff5e7a285c97b737d4229bc27d"
+      },
+      "candidate_cold_hash": "296d0a44432a86ea4163813b9029feb4b2908982bd923d1a0b52882f50770af7",
+      "baseline_cold_hash": "296d0a44432a86ea4163813b9029feb4b2908982bd923d1a0b52882f50770af7",
+      "status_after": "",
+      "gates_missing": [],
+      "gates_present": true,
+      "all_gates_pass": true,
+      "accepted": true
+    },
+    {
+      "label": "09-transition-5dfb2c8f",
+      "kind": "transition",
+      "index": 9,
+      "expected_commit": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "completed": true,
+      "gates": [
+        {
+          "key": "source-pin",
+          "pass": true,
+          "detail": {
+            "head": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+            "expected": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347"
+          }
+        },
+        {
+          "key": "worktree-clean",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "worktree-clean-after",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "candidate-published",
+          "pass": true,
+          "detail": {
+            "published": true
+          }
+        },
+        {
+          "key": "delta-equals-cold",
+          "pass": true,
+          "detail": {
+            "effective_chain_hash": "35a24772d710d9839c5028c203dbc3bdc7de471ec357bb092042536218117c9f",
+            "candidate_cold_hash": "35a24772d710d9839c5028c203dbc3bdc7de471ec357bb092042536218117c9f",
+            "published": true
+          }
+        },
+        {
+          "key": "noop-zero-parses",
+          "pass": true,
+          "detail": {
+            "parsed_files": 0
+          }
+        },
+        {
+          "key": "noop-stable-generation",
+          "pass": true,
+          "detail": {
+            "base": 10,
+            "target": 10
+          }
+        },
+        {
+          "key": "noop-zero-events",
+          "pass": true,
+          "detail": {
+            "wire_messages": 0
+          }
+        },
+        {
+          "key": "noop-state-unchanged",
+          "pass": true,
+          "detail": {
+            "before": "232b3bbd4d52d592362475de556c6ed18255ff00e61e5103bb73b892afcbcb6c",
+            "after": "232b3bbd4d52d592362475de556c6ed18255ff00e61e5103bb73b892afcbcb6c"
+          }
+        },
+        {
+          "key": "baseline-cold-equals-candidate-cold",
+          "pass": true,
+          "detail": {
+            "baseline_cold_hash": "35a24772d710d9839c5028c203dbc3bdc7de471ec357bb092042536218117c9f",
+            "candidate_cold_hash": "35a24772d710d9839c5028c203dbc3bdc7de471ec357bb092042536218117c9f",
+            "inputs": "same physical checkout, same policy overlay, same commit"
+          }
+        }
+      ],
+      "head": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "status_before": "",
+      "subject": "Merge pull request #975 from onyxappio/AlexanderMykulych/t464-lane-prepare-destination",
+      "chain": {
+        "label": "037-09-transition-5dfb2c8f-chain",
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 3,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "added source": 3,
+              "resolution": 38,
+              "source content": 2
+            }
+          },
+          "RunID": "stage20-history-product-stage20-history-chain-10-1790301114689686000",
+          "BaseGeneration": 9,
+          "TargetGeneration": 10,
+          "Stats": {
+            "files_read": 251,
+            "files_parsed": 43,
+            "cached_files": 3988,
+            "graphql_parsed": 1,
+            "sfc_parsed": 0,
+            "summary_scans": 215,
+            "derived_indexes": 32,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files, resolution-rebound importers and reverse file dependents",
+              "reason": "add/delete/rename: reverse-close plus owners whose cached import resolution changes"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 126,
+          "ParsedFiles": 43,
+          "EarlyLocal": 0
+        },
+        "published": true,
+        "fallbacks": [
+          "graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)"
+        ],
+        "graph_hash": "35a24772d710d9839c5028c203dbc3bdc7de471ec357bb092042536218117c9f"
+      },
+      "published": true,
+      "effective_hash": "35a24772d710d9839c5028c203dbc3bdc7de471ec357bb092042536218117c9f",
+      "noop": {
+        "parsed_files": 0,
+        "base_generation": 10,
+        "target_generation": 10,
+        "wire_messages": 0,
+        "state_before": "232b3bbd4d52d592362475de556c6ed18255ff00e61e5103bb73b892afcbcb6c",
+        "state_after": "232b3bbd4d52d592362475de556c6ed18255ff00e61e5103bb73b892afcbcb6c"
+      },
+      "candidate_cold_hash": "35a24772d710d9839c5028c203dbc3bdc7de471ec357bb092042536218117c9f",
+      "baseline_cold_hash": "35a24772d710d9839c5028c203dbc3bdc7de471ec357bb092042536218117c9f",
+      "status_after": "",
+      "gates_missing": [],
+      "gates_present": true,
+      "all_gates_pass": true,
+      "accepted": true
+    },
+    {
+      "label": "10-transition-a609c19f",
+      "kind": "transition",
+      "index": 10,
+      "expected_commit": "a609c19f3861971930fae7b33dcb2950598953c5",
+      "completed": true,
+      "gates": [
+        {
+          "key": "source-pin",
+          "pass": true,
+          "detail": {
+            "head": "a609c19f3861971930fae7b33dcb2950598953c5",
+            "expected": "a609c19f3861971930fae7b33dcb2950598953c5"
+          }
+        },
+        {
+          "key": "worktree-clean",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "worktree-clean-after",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "candidate-published",
+          "pass": true,
+          "detail": {
+            "published": true
+          }
+        },
+        {
+          "key": "delta-equals-cold",
+          "pass": true,
+          "detail": {
+            "effective_chain_hash": "3f5fda9a8bdda4c3858f84d8e0a0ced3536a91b9b32c84f60d4cea809084eec9",
+            "candidate_cold_hash": "3f5fda9a8bdda4c3858f84d8e0a0ced3536a91b9b32c84f60d4cea809084eec9",
+            "published": true
+          }
+        },
+        {
+          "key": "noop-zero-parses",
+          "pass": true,
+          "detail": {
+            "parsed_files": 0
+          }
+        },
+        {
+          "key": "noop-stable-generation",
+          "pass": true,
+          "detail": {
+            "base": 11,
+            "target": 11
+          }
+        },
+        {
+          "key": "noop-zero-events",
+          "pass": true,
+          "detail": {
+            "wire_messages": 0
+          }
+        },
+        {
+          "key": "noop-state-unchanged",
+          "pass": true,
+          "detail": {
+            "before": "8e76b305a9b05197fef4b98f980ecd4cd327879698e15735c9b45af7925ba8be",
+            "after": "8e76b305a9b05197fef4b98f980ecd4cd327879698e15735c9b45af7925ba8be"
+          }
+        },
+        {
+          "key": "baseline-cold-equals-candidate-cold",
+          "pass": true,
+          "detail": {
+            "baseline_cold_hash": "3f5fda9a8bdda4c3858f84d8e0a0ced3536a91b9b32c84f60d4cea809084eec9",
+            "candidate_cold_hash": "3f5fda9a8bdda4c3858f84d8e0a0ced3536a91b9b32c84f60d4cea809084eec9",
+            "inputs": "same physical checkout, same policy overlay, same commit"
+          }
+        }
+      ],
+      "head": "a609c19f3861971930fae7b33dcb2950598953c5",
+      "status_before": "",
+      "subject": "Merge pull request #976 from onyxappio/AlexanderMykulych/t464-contract-rollout-marker",
+      "chain": {
+        "label": "041-10-transition-a609c19f-chain",
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 3,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "added source": 3,
+              "resolution": 30,
+              "source content": 4
+            }
+          },
+          "RunID": "stage20-history-product-stage20-history-chain-11-1790301144952694000",
+          "BaseGeneration": 10,
+          "TargetGeneration": 11,
+          "Stats": {
+            "files_read": 193,
+            "files_parsed": 37,
+            "cached_files": 3997,
+            "graphql_parsed": 1,
+            "sfc_parsed": 0,
+            "summary_scans": 231,
+            "derived_indexes": 29,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files, resolution-rebound importers and reverse file dependents",
+              "reason": "add/delete/rename: reverse-close plus owners whose cached import resolution changes"
+            },
+            {
+              "extractor": "mdintent",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 46,
+          "ParsedFiles": 37,
+          "EarlyLocal": 0
+        },
+        "published": true,
+        "fallbacks": [
+          "graph: changed files, resolution-rebound importers and reverse file dependents (add/delete/rename: reverse-close plus owners whose cached import resolution changes)",
+          "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+        ],
+        "graph_hash": "3f5fda9a8bdda4c3858f84d8e0a0ced3536a91b9b32c84f60d4cea809084eec9"
+      },
+      "published": true,
+      "effective_hash": "3f5fda9a8bdda4c3858f84d8e0a0ced3536a91b9b32c84f60d4cea809084eec9",
+      "noop": {
+        "parsed_files": 0,
+        "base_generation": 11,
+        "target_generation": 11,
+        "wire_messages": 0,
+        "state_before": "8e76b305a9b05197fef4b98f980ecd4cd327879698e15735c9b45af7925ba8be",
+        "state_after": "8e76b305a9b05197fef4b98f980ecd4cd327879698e15735c9b45af7925ba8be"
+      },
+      "candidate_cold_hash": "3f5fda9a8bdda4c3858f84d8e0a0ced3536a91b9b32c84f60d4cea809084eec9",
+      "baseline_cold_hash": "3f5fda9a8bdda4c3858f84d8e0a0ced3536a91b9b32c84f60d4cea809084eec9",
+      "status_after": "",
+      "gates_missing": [],
+      "gates_present": true,
+      "all_gates_pass": true,
+      "accepted": true
+    }
+  ],
+  "completed_sequence": true,
+  "tag": "candidate01",
+  "binary_sha256": {
+    "baseline": "bc53ceed5a8dbe54d65eb1cdf93a37cf9b624bf0dd92d66b030fda863e4017b8",
+    "candidate": "787f36ded2fcd0f26fb2153358a5001912e00e59fd267442dd366515d87d7685"
+  },
+  "policy_sha256": "b81b19598dd74c63084ae11488cb7f4fa7df783b0887d2c42dcf61dc67890bf7",
+  "config": "repo: /private/tmp/enola-stage20-root-review/history/work-candidate01/product\n\n# Overlay without repo. Paths are relative to the Product checkout.\ngraph_inputs:\n  exclude:\n    - \"apps/mobile/e2e/artifacts/**\"\n    - \"worker-reports/**\"\n",
+  "checkout": "/private/tmp/enola-stage20-root-review/history/work-candidate01/product",
+  "problems": [],
+  "accepted": true,
+  "baseline_claim": "baseline and candidate cold graph hashes are equal at every commit, from the same physical checkout, policy overlay and commit",
+  "finished_utc": "2026-09-25T01:52:52Z"
+}

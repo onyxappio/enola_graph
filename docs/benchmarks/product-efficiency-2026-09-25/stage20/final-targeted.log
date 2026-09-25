@@ -1,0 +1,40 @@
+=== RUN   TestChangedCandidateNamesIgnoresAssemblyOrder
+--- PASS: TestChangedCandidateNamesIgnoresAssemblyOrder (0.00s)
+=== RUN   TestChangedCandidateNamesDetectsAddedCollision
+--- PASS: TestChangedCandidateNamesDetectsAddedCollision (0.00s)
+=== RUN   TestChangedCandidateNamesDetectsIdentityMultisetCountChange
+--- PASS: TestChangedCandidateNamesDetectsIdentityMultisetCountChange (0.00s)
+=== RUN   TestFileContributionFactsMatchesLegacy
+--- PASS: TestFileContributionFactsMatchesLegacy (0.00s)
+=== RUN   TestFileContributionFactsRepoLabelsAndSyntheticFilter
+--- PASS: TestFileContributionFactsRepoLabelsAndSyntheticFilter (0.00s)
+=== RUN   TestFileContributionFactsPreservesFullFactFields
+--- PASS: TestFileContributionFactsPreservesFullFactFields (0.00s)
+=== RUN   TestOverlayStablePublishedMatchesLegacy
+--- PASS: TestOverlayStablePublishedMatchesLegacy (0.00s)
+=== RUN   TestOverlayStablePublishedPreservesBaseDuplicateMultiplicity
+--- PASS: TestOverlayStablePublishedPreservesBaseDuplicateMultiplicity (0.00s)
+=== RUN   TestOverlayStablePublishedDeduplicatesAdditionsAmongThemselves
+--- PASS: TestOverlayStablePublishedDeduplicatesAdditionsAmongThemselves (0.00s)
+=== RUN   TestOverlayStablePublishedDoesNotAliasOrMutateBase
+--- PASS: TestOverlayStablePublishedDoesNotAliasOrMutateBase (0.00s)
+=== RUN   TestOverlayCapacityIsExactNotBaseAndPublishedSum
+--- PASS: TestOverlayCapacityIsExactNotBaseAndPublishedSum (0.00s)
+=== RUN   TestBuildIndexMatchesLegacy
+--- PASS: TestBuildIndexMatchesLegacy (0.00s)
+=== RUN   TestBuildIndexBucketsCannotOverwriteAdjacentBucket
+--- PASS: TestBuildIndexBucketsCannotOverwriteAdjacentBucket (0.00s)
+=== RUN   TestGroupOwnersMatchesLegacy
+--- PASS: TestGroupOwnersMatchesLegacy (0.00s)
+=== RUN   TestGroupOwnersBucketsCannotOverwriteAdjacentBucket
+--- PASS: TestGroupOwnersBucketsCannotOverwriteAdjacentBucket (0.00s)
+=== RUN   TestChangedCandidateNamesMatchesLegacy
+--- PASS: TestChangedCandidateNamesMatchesLegacy (0.00s)
+=== RUN   TestCandidateKeyAgreesWithFactIdentityOnTheLegalDomain
+--- PASS: TestCandidateKeyAgreesWithFactIdentityOnTheLegalDomain (0.00s)
+=== RUN   TestCandidateKeySeparatesDelimiterInvalidInputsThatTheIdMerges
+--- PASS: TestCandidateKeySeparatesDelimiterInvalidInputsThatTheIdMerges (0.00s)
+=== RUN   TestResolutionIndexesMatchesLegacyEndToEnd
+--- PASS: TestResolutionIndexesMatchesLegacyEndToEnd (0.00s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	0.467s
