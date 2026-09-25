@@ -1,0 +1,17 @@
+{
+  "source_revision": "7b03158a2ca8da1858030acdca4d0a3cedefbc1f",
+  "base_revision": "5e145dd82fa2420b96f1c9ca78e4815d38180d15",
+  "source_mismatches": [],
+  "changed_files": [
+    "internal/graphsession/resident.go",
+    "internal/graphsession/session.go",
+    "internal/graphsession/summary_facts_regression_test.go",
+    "pkg/command/graph.go",
+    "pkg/command/graph_run_entry_test.go"
+  ],
+  "binary_sha256": "50baa1a9816631899b724b2d8a32f36a11b58a8407f9fb86ff6c5436cdaa8477",
+  "patch_sha256": "429956fbb45d16c525d18ec1eeb48f4217bbabe92e53659bfa734efeb6ceb989",
+  "production_matches_tested_build": true,
+  "tests_match_root_overlay": true,
+  "timing_accepted": false
+}

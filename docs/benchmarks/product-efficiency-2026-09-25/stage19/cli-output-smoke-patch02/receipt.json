@@ -1,0 +1,54 @@
+{
+  "binary_sha256": "50baa1a9816631899b724b2d8a32f36a11b58a8407f9fb86ff6c5436cdaa8477",
+  "harness_sha256": "f8281abf0221c86a63e8abee833cd76d00eff8ee1d270328caa61600760f6874",
+  "timing_eligible": false,
+  "purpose": "Observable CLI correctness smoke; debug sink, never performance evidence.",
+  "initial_facts": 7,
+  "checks": [
+    {
+      "mode": "full",
+      "all_state_bytes_unchanged": true,
+      "events_unchanged": true,
+      "complete_facts_match_initial": true,
+      "parsed": 0,
+      "generation": 1,
+      "facts": 7
+    },
+    {
+      "mode": "summary",
+      "all_state_bytes_unchanged": true,
+      "events_unchanged": true,
+      "facts_omitted_as_requested": true,
+      "parsed": 0,
+      "generation": 1,
+      "facts": 0
+    },
+    {
+      "mode": "both",
+      "all_state_bytes_unchanged": true,
+      "events_unchanged": true,
+      "complete_facts_match_initial": true,
+      "parsed": 0,
+      "generation": 1,
+      "facts": 7
+    },
+    {
+      "mode": "plain",
+      "all_state_bytes_unchanged": true,
+      "events_unchanged": true
+    }
+  ],
+  "all_passed": true,
+  "state_before_after": {
+    "state/state.json": "92620da8003cc311bd4bcef3be71e891365fae7bc10c27ac9392fdf9a38f7228",
+    "state/fences.jsonl": "8f190251b1d60e0ba11fc9228a06ca149e1911bce8312803efd3b2c16a5408e7",
+    "state/protocol": "3f3229338901b11217fb92f009dad01b924a947dddc4b51184162a4bac5a6385",
+    "state/commit.json": "cd65b0a3e2a1914dd3cc1169e9ed068e7de543c31f1de8ae26ea7d499533ba62",
+    "state/identity.json": "3b72222d85076d91550c1f64df8da6e3f34d3579156b97219a118537cc251d2b",
+    "state/payloads.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "state/session.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "state/acks.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "state/tombstones.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "events.jsonl": "0a232fff56294a47d8a5e56353de5caa10df4c3ed71dfe2f1c55d6d7c53f031b"
+  }
+}

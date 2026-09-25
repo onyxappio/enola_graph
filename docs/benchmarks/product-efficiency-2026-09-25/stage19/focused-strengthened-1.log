@@ -1,0 +1,34 @@
+=== RUN   TestRunSummaryNoopSkipsCachedFactClone
+--- PASS: TestRunSummaryNoopSkipsCachedFactClone (0.25s)
+=== RUN   TestRunDefaultsToFullFacts
+--- PASS: TestRunDefaultsToFullFacts (0.25s)
+=== RUN   TestOpenSessionHasNoOmissionCapability
+--- PASS: TestOpenSessionHasNoOmissionCapability (0.19s)
+=== RUN   TestRunSummaryMixedExtractorPublishReconstructs
+2026/09/25 03:24:21 [mdintent] 1 document(s), 3 section(s), 1 link(s) resolved on disk, 0 not
+2026/09/25 03:24:21 [mdintent] 1 document(s), 3 section(s), 1 link(s) resolved on disk, 0 not
+2026/09/25 03:24:21 [mdintent] 1 document(s), 4 section(s), 1 link(s) resolved on disk, 0 not
+2026/09/25 03:24:21 [mdintent] 1 document(s), 4 section(s), 1 link(s) resolved on disk, 0 not
+2026/09/25 03:24:21 [mdintent] 1 document(s), 4 section(s), 1 link(s) resolved on disk, 0 not
+2026/09/25 03:24:21 [mdintent] 1 document(s), 4 section(s), 1 link(s) resolved on disk, 0 not
+2026/09/25 03:24:21 [mdintent] 1 document(s), 4 section(s), 1 link(s) resolved on disk, 0 not
+--- PASS: TestRunSummaryMixedExtractorPublishReconstructs (0.88s)
+=== RUN   TestRunSummaryNeutralBookkeepingRunSkipsClone
+2026/09/25 03:24:21 [mdintent] 1 document(s), 3 section(s), 1 link(s) resolved on disk, 0 not
+2026/09/25 03:24:22 [mdintent] 1 document(s), 3 section(s), 1 link(s) resolved on disk, 0 not
+--- PASS: TestRunSummaryNeutralBookkeepingRunSkipsClone (0.23s)
+=== RUN   TestRunSummaryNoopLeavesStateUsable
+--- PASS: TestRunSummaryNoopLeavesStateUsable (0.66s)
+=== RUN   TestTSCacheFactSegmentMatchesEagerClone
+--- PASS: TestTSCacheFactSegmentMatchesEagerClone (0.00s)
+=== RUN   TestTSCacheFactSegmentLeavesRecordsAlone
+--- PASS: TestTSCacheFactSegmentLeavesRecordsAlone (0.00s)
+=== RUN   TestRunSummaryFailedEndThenRestart
+2026/09/25 03:24:22 [mdintent] 1 document(s), 3 section(s), 1 link(s) resolved on disk, 0 not
+2026/09/25 03:24:22 [mdintent] 1 document(s), 4 section(s), 1 link(s) resolved on disk, 0 not
+2026/09/25 03:24:22 [mdintent] 1 document(s), 4 section(s), 1 link(s) resolved on disk, 0 not
+2026/09/25 03:24:23 [mdintent] 1 document(s), 4 section(s), 1 link(s) resolved on disk, 0 not
+--- PASS: TestRunSummaryFailedEndThenRestart (0.49s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	3.492s
+exit=0

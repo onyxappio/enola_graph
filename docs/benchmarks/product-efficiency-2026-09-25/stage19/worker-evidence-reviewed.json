@@ -1,0 +1,31 @@
+{
+  "message": "msg_7b112b15ae23",
+  "verified": [
+    {
+      "file": "focused-strengthened-1.log",
+      "sha256": "b55048475e963362f53f1cafbcec4b3a642be8f00e4e3edd7f024ab216539434",
+      "failed_tests": []
+    },
+    {
+      "file": "package-tests-1.log",
+      "sha256": "557f9692dd550e05921e20ca8af81a5c1fc6d06348fbf8afe5cdab5052457186",
+      "failed_tests": []
+    },
+    {
+      "file": "mutation-control-1-drop-materialize.log",
+      "sha256": "fd0a034d3de4b488f13f5173a6473acfe07b49054ffdeca0aa544048ef0965bb",
+      "failed_tests": [
+        "TestRunSummaryMixedExtractorPublishReconstructs (0.74s)",
+        "TestRunSummaryFailedEndThenRestart (0.50s)"
+      ]
+    },
+    {
+      "file": "mutation-control-3-drop-fields.log",
+      "sha256": "7c65bec88187d6375b10b1e44b3c2671e2c5e4be09110b0798a8920cacd29477",
+      "failed_tests": [
+        "TestTSCacheFactSegmentMatchesEagerClone (0.00s)"
+      ]
+    }
+  ],
+  "sort_mutation": "reported by worker; no standalone log listed"
+}

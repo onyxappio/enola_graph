@@ -1,0 +1,11 @@
+=== RUN   TestTSCacheFactSegmentMatchesEagerClone
+    summary_facts_regression_test.go:447: deferred segment differs from the eager loop at 0:
+         got={"kind":"symbol","name":"a.only","file":"src/a.ts","line":7,"end_line":15,"column":3,"repo":"repo","props":{"arity":6,"exported":true,"io_direct":false,"origin":{"extractor":"typescript","symbol":"a.only"},"signature":"(a.only) =\u003e void","tags":["ts","a.only"]},"relations":[{"kind":"declares","target":"src/a.ts"},{"kind":"calls","target":"a.only.callee"}]}
+         want={"kind":"symbol","name":"a.only","file":"src/a.ts","line":7,"end_line":15,"column":3,"end_column":17,"repo":"repo","props":{"arity":6,"exported":true,"io_direct":false,"origin":{"extractor":"typescript","symbol":"a.only"},"signature":"(a.only) =\u003e void","tags":["ts","a.only"]},"relations":[{"kind":"declares","target":"src/a.ts"},{"kind":"calls","target":"a.only.callee","target_file":"src/a.ts"}]}
+--- FAIL: TestTSCacheFactSegmentMatchesEagerClone (0.00s)
+=== RUN   TestTSCacheFactSegmentLeavesRecordsAlone
+--- PASS: TestTSCacheFactSegmentLeavesRecordsAlone (0.00s)
+FAIL
+FAIL	github.com/enola-labs/enola/internal/graphsession	0.467s
+FAIL
+exit=1

@@ -1,0 +1,43 @@
+{
+  "containers": [
+    {
+      "name": "/codata-clickhouse",
+      "paused": true
+    },
+    {
+      "name": "/codata-temporal",
+      "paused": true
+    },
+    {
+      "name": "/codata-memgraph-17688",
+      "paused": true
+    },
+    {
+      "name": "/codata-memgraph-17689",
+      "paused": true
+    },
+    {
+      "name": "/codata-stage1-memgraph",
+      "paused": true
+    },
+    {
+      "name": "/codata-nats",
+      "paused": true
+    },
+    {
+      "name": "/codata-nats-14222",
+      "paused": true
+    }
+  ],
+  "vm_samples": [
+    {
+      "utc": "2026-09-25T00:37:27.930161+00:00",
+      "vm": "43565   0.2 438:17.83"
+    },
+    {
+      "utc": "2026-09-25T00:37:29.944347+00:00",
+      "vm": "43565   0.4 438:17.84"
+    }
+  ],
+  "codata_go": "msg_724e4aac37a2"
+}

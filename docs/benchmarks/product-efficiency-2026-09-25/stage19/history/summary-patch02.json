@@ -1,0 +1,141 @@
+{
+  "source_revision": "7b03158a2ca8da1858030acdca4d0a3cedefbc1f",
+  "candidate_binary_sha256": "50baa1a9816631899b724b2d8a32f36a11b58a8407f9fb86ff6c5436cdaa8477",
+  "transitions": 10,
+  "revisions": 11,
+  "cli_runs": 44,
+  "manifest_transitions": 3,
+  "tsconfig_transitions": 0,
+  "accepted": true,
+  "timing_eligible": false,
+  "receipt_sha256": "7ad41609a02c46c6f6176eaff496372e740bbd58c80439d895081c37d2db9408",
+  "rows": [
+    {
+      "revision": "4d104e600f89cfc0d84a93c02a6635191805b7d9",
+      "kind": "initial",
+      "changed_paths": 0,
+      "manifest_paths": [],
+      "tsconfig_paths": [],
+      "parsed": 4012,
+      "graph_equal": true,
+      "noop_parsed": 0,
+      "all_gates_pass": true
+    },
+    {
+      "revision": "07fb4a41ddafff7f42ebd55af8a23fe5739f4cd7",
+      "kind": "transition",
+      "changed_paths": 6,
+      "manifest_paths": [
+        "packages/tracking-client/package.json"
+      ],
+      "tsconfig_paths": [],
+      "parsed": 5,
+      "graph_equal": true,
+      "noop_parsed": 0,
+      "all_gates_pass": true
+    },
+    {
+      "revision": "fec1eac346c48dbc68072803d89b2e4709f9bd42",
+      "kind": "transition",
+      "changed_paths": 9345,
+      "manifest_paths": [],
+      "tsconfig_paths": [],
+      "parsed": 513,
+      "graph_equal": true,
+      "noop_parsed": 0,
+      "all_gates_pass": true
+    },
+    {
+      "revision": "9fc7ae5b4c3fc4fc266b24b1df0ef2bfcb1f7030",
+      "kind": "transition",
+      "changed_paths": 8125,
+      "manifest_paths": [],
+      "tsconfig_paths": [],
+      "parsed": 25,
+      "graph_equal": true,
+      "noop_parsed": 0,
+      "all_gates_pass": true
+    },
+    {
+      "revision": "1c2607479b6d0c6a0ae329f72eea20af0ff5d895",
+      "kind": "transition",
+      "changed_paths": 70,
+      "manifest_paths": [],
+      "tsconfig_paths": [],
+      "parsed": 431,
+      "graph_equal": true,
+      "noop_parsed": 0,
+      "all_gates_pass": true
+    },
+    {
+      "revision": "599575d0aa398615cde6a4ac12bc0c7734a686d9",
+      "kind": "transition",
+      "changed_paths": 15,
+      "manifest_paths": [],
+      "tsconfig_paths": [],
+      "parsed": 7,
+      "graph_equal": true,
+      "noop_parsed": 0,
+      "all_gates_pass": true
+    },
+    {
+      "revision": "ae233c5f56959ce5852c8381edd6cb472c4b9f95",
+      "kind": "transition",
+      "changed_paths": 60,
+      "manifest_paths": [
+        "packages/database/package.json"
+      ],
+      "tsconfig_paths": [],
+      "parsed": 92,
+      "graph_equal": true,
+      "noop_parsed": 0,
+      "all_gates_pass": true
+    },
+    {
+      "revision": "4168360e2e7f5140115ea5af58db62afd4dc9f43",
+      "kind": "transition",
+      "changed_paths": 15,
+      "manifest_paths": [
+        "packages/clickhouse/package.json"
+      ],
+      "tsconfig_paths": [],
+      "parsed": 111,
+      "graph_equal": true,
+      "noop_parsed": 0,
+      "all_gates_pass": true
+    },
+    {
+      "revision": "a6f1f3a91a36ea3dead786560412a4944a009694",
+      "kind": "transition",
+      "changed_paths": 5,
+      "manifest_paths": [],
+      "tsconfig_paths": [],
+      "parsed": 80,
+      "graph_equal": true,
+      "noop_parsed": 0,
+      "all_gates_pass": true
+    },
+    {
+      "revision": "5dfb2c8f276d99a710d739c11339ee5d9b9a0347",
+      "kind": "transition",
+      "changed_paths": 15,
+      "manifest_paths": [],
+      "tsconfig_paths": [],
+      "parsed": 43,
+      "graph_equal": true,
+      "noop_parsed": 0,
+      "all_gates_pass": true
+    },
+    {
+      "revision": "a609c19f3861971930fae7b33dcb2950598953c5",
+      "kind": "transition",
+      "changed_paths": 19,
+      "manifest_paths": [],
+      "tsconfig_paths": [],
+      "parsed": 37,
+      "graph_equal": true,
+      "noop_parsed": 0,
+      "all_gates_pass": true
+    }
+  ]
+}

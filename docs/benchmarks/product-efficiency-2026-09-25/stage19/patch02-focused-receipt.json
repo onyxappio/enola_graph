@@ -1,0 +1,20 @@
+{
+  "exit": 0,
+  "tests_passed": 10,
+  "tests": [
+    "TestRunSummaryNoopSkipsCachedFactClone",
+    "TestRunDefaultsToFullFacts",
+    "TestOpenSessionHasNoOmissionCapability",
+    "TestRunSummaryMixedExtractorPublishReconstructs",
+    "TestRunSummaryNeutralBookkeepingRunSkipsClone",
+    "TestRunSummaryNoopLeavesStateUsable",
+    "TestTSCacheFactSegmentMatchesEagerClone",
+    "TestTSCacheFactSegmentLeavesRecordsAlone",
+    "TestRunSummaryFailedEndThenRestart",
+    "TestGraphRunEntrySelection"
+  ],
+  "log_sha256": "4f08388dbd9a3f78ea0887e7616bc05c485f0cccc27a33ef51dc6d3b9b4aad2e",
+  "test_source_pins": "patch02-test-overlay-pins.json",
+  "production_source_pins": "patch02-pins.json",
+  "timing_eligible": false
+}

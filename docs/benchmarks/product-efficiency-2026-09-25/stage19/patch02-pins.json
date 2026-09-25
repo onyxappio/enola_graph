@@ -1,0 +1,19 @@
+{
+  "base": "5e145dd82fa2420b96f1c9ca78e4815d38180d15",
+  "patch_sha256": "429956fbb45d16c525d18ec1eeb48f4217bbabe92e53659bfa734efeb6ceb989",
+  "production_files": [
+    {
+      "file": "internal/graphsession/session.go",
+      "sha256": "27864cba242db4085a8fe6d2516f2ea8321e1d4133841c6b223203270a1133ba"
+    },
+    {
+      "file": "internal/graphsession/resident.go",
+      "sha256": "246c164b3d482c252f61879cc79dea89071e9660c1e633f3944402a7c5321843"
+    },
+    {
+      "file": "pkg/command/graph.go",
+      "sha256": "97989ec5c8b289f3afeac3f94e9fda3db65db947e72dff7cb55dc9a0d558bf17"
+    }
+  ],
+  "final_acceptance": false
+}

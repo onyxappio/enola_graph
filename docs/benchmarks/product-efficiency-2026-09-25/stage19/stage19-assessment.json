@@ -1,0 +1,113 @@
+{
+  "cross_arm_graphs_equal": 21,
+  "checks": [
+    {
+      "pair": 1,
+      "label": "r1-new-initial",
+      "equal": true
+    },
+    {
+      "pair": 1,
+      "label": "r1-new-noop",
+      "equal": true
+    },
+    {
+      "pair": 1,
+      "label": "r1-new-body",
+      "equal": true
+    },
+    {
+      "pair": 1,
+      "label": "r1-new-structural",
+      "equal": true
+    },
+    {
+      "pair": 1,
+      "label": "cold-structural",
+      "equal": true
+    },
+    {
+      "pair": 1,
+      "label": "cold-body",
+      "equal": true
+    },
+    {
+      "pair": 1,
+      "label": "cold-original",
+      "equal": true
+    },
+    {
+      "pair": 2,
+      "label": "r1-new-initial",
+      "equal": true
+    },
+    {
+      "pair": 2,
+      "label": "r1-new-noop",
+      "equal": true
+    },
+    {
+      "pair": 2,
+      "label": "r1-new-body",
+      "equal": true
+    },
+    {
+      "pair": 2,
+      "label": "r1-new-structural",
+      "equal": true
+    },
+    {
+      "pair": 2,
+      "label": "cold-structural",
+      "equal": true
+    },
+    {
+      "pair": 2,
+      "label": "cold-body",
+      "equal": true
+    },
+    {
+      "pair": 2,
+      "label": "cold-original",
+      "equal": true
+    },
+    {
+      "pair": 3,
+      "label": "r1-new-initial",
+      "equal": true
+    },
+    {
+      "pair": 3,
+      "label": "r1-new-noop",
+      "equal": true
+    },
+    {
+      "pair": 3,
+      "label": "r1-new-body",
+      "equal": true
+    },
+    {
+      "pair": 3,
+      "label": "r1-new-structural",
+      "equal": true
+    },
+    {
+      "pair": 3,
+      "label": "cold-structural",
+      "equal": true
+    },
+    {
+      "pair": 3,
+      "label": "cold-body",
+      "equal": true
+    },
+    {
+      "pair": 3,
+      "label": "cold-original",
+      "equal": true
+    }
+  ],
+  "performance_accepted": false,
+  "merge_accepted": false,
+  "reason": "No consistent latency gain; all latency ranges overlap; body-delta median RSS rises12.77%. No-op median RSS falls8.41%, insufficient to close remaining concern or fresh-start objective."
+}
