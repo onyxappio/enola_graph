@@ -13,7 +13,7 @@ func TestInterpreterGuardsBindDeclarationsAndIgnoreTextAndMembers(t *testing.T) 
 	a, _ := analyzerForSources(nil, sources)
 	m := &machineModel{file: "machine.ts", reads: map[string]bool{}, coverage: map[string]any{}}
 	var rels []facts.Relation
-	a.addInterpreterGuardRelations(m, &rels, []string{`canProceed() && local() && obj.decoy() && "decoy()" && missing()`})
+	a.addInterpreterGuardRelations(m, &rels, []string{`canProceed() && local() && obj.decoy() && "decoy()" && missing()`}, nil, nil, nil)
 	if len(rels) != 2 {
 		t.Fatalf("expected only two proven direct calls: %#v", rels)
 	}

@@ -173,7 +173,7 @@ func (a *Analyzer) buildInterpreter(m *machineModel, root *sitter.Node, kinds *t
 			if len(guardConds) > 0 {
 				props["guard_text"] = strings.Join(guardConds, " && ")
 				props["guard_status"] = "declared"
-				a.addInterpreterGuardRelations(m, &rels, guardConds)
+				a.addInterpreterGuardRelations(m, &rels, guardConds, r, src, kinds)
 			} else {
 				props["guard_status"] = "none_detected"
 			}
@@ -831,7 +831,7 @@ func statusOf(ok bool) string {
 	return "unknown"
 }
 
-func (a *Analyzer) addInterpreterGuardRelations(m *machineModel, rels *[]facts.Relation, conds []string) {
+func (a *Analyzer) addInterpreterGuardRelations(m *machineModel, rels *[]facts.Relation, conds []string, site *sitter.Node, original []byte, originalKinds *tsutil.KindTable) {
 	seen := map[string]bool{}
 	for _, cond := range conds {
 		source := []byte(cond)
@@ -852,6 +852,17 @@ func (a *Analyzer) addInterpreterGuardRelations(m *machineModel, rels *[]facts.R
 				return
 			}
 			seen[name] = true
+			if binding := localBindingAt(site, name, original, originalKinds); binding != nil {
+				parent := binding.Parent()
+				for parent != nil && (originalKinds.Of(parent) == "lexical_declaration" || originalKinds.Of(parent) == "variable_declaration" || originalKinds.Of(parent) == "export_statement") {
+					parent = parent.Parent()
+				}
+				if parent == nil || originalKinds.Of(parent) != "program" {
+					m.partial = true
+					m.coverage["unresolved_guard_calls"] = 1
+					return
+				}
+			}
 			a.appendRuleTableSymbolRef(m, rels, name, facts.RelFSMGuardCalls, "unresolved_guard_calls")
 		})
 		closeTree()
