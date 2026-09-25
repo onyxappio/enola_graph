@@ -45,3 +45,13 @@ The revised investigation should focus on avoiding duplicate resolver/config com
 ## Independent experiment boundary
 
 After the second timing cancellation, the existing worker was assigned an independent scratch prototype from production-equivalent main, without modifying Stage20. Start inside one `tsConfigInputs` invocation; keep the later fence entirely fresh and defer cross-phase Discovery sharing. Root source review found that `overlayWalkDir` delegates to `inputScope.WalkDir`, while alias-root recursion uses `overlayReadDir`; caching only the latter would not remove the second filesystem traversal. The experiment must measure underlying enumeration calls and preserve differing pruning/probe semantics, not report memo hits as eliminated work.
+
+## September 25 review correction: overlap with Stage16
+
+The prototype at `0b05b9b91bc0550282993075df2f984d4eb0bbe9` removes the same duplicate enumeration already targeted by the unmerged Stage16 candidate. It is not a new independent optimization stage. Root identified this overlap while comparing the actual frozen Stage16 source with the prototype and requested a differential assessment before further implementation or performance runs. The earlier assignment failed to account for this existing work.
+
+There are implementation differences requiring review: Stage16 collects configuration candidates during alias recursion and performs extends reads afterwards, preserving the original read order; the prototype invokes alias reads during WalkDir and interleaves them with configuration reads. Stage16 also retains explicit probe/error fallbacks. Passing static fixtures does not establish equivalence for changing inputs or replace those safeguards.
+
+Root independently passed all 13 characterization fixtures, without skips, on the prototype, the prototype with the production Scope implementation overlaid to remove diagnostic counters, and the original baseline source. The checked outputs include candidate names, alias roots and recorded reads/stats/directory membership. Logs and source pins are in [config-enum-review](config-enum-review/oracle-review-receipt.json). These are shared-load correctness checks, not CLI performance measurements or full graph acceptance. The Go package durations were 0.605 s, 0.414 s and 0.546 s respectively; consult the logs for the authoritative duration of each run.
+
+Retain useful additional fixtures, but do not count the duplicate prototype as extra speedup or discard Stage16's unresolved RSS evidence. The worker must identify a distinct justified improvement or consolidate the coverage into the existing Stage16 work. Stage20 remains frozen and awaits its own measurements.

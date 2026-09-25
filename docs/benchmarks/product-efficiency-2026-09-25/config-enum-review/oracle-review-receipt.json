@@ -1,0 +1,29 @@
+{
+  "created_utc": "2026-09-25T03:00:00.047903+00:00",
+  "candidate_commit": "0b05b9b91bc0550282993075df2f984d4eb0bbe9",
+  "baseline": "02e5e2d4448e9e14835052aa6e8b23a3bdfd643c",
+  "results": [
+    {
+      "log": "candidate-oracle.log",
+      "sha256": "1030e941bd4f4b969fb1300517849cdc945e16dad623192ee7a6eca0562f99cd",
+      "cases_passed": 13,
+      "skipped": 0
+    },
+    {
+      "log": "production-scope-oracle.log",
+      "sha256": "79c16568a9ac9dd51f1d5a20ec6ac50c95c9bb08dbc2cde465e0c59cad9de727",
+      "cases_passed": 13,
+      "skipped": 0
+    },
+    {
+      "log": "baseline-source-oracle.log",
+      "sha256": "743c6c4b8fb52ff8bea88e94eb485dbe65cdcf3d101244cecef9b643bfe1666c",
+      "cases_passed": 13,
+      "skipped": 0
+    }
+  ],
+  "production_scope_overlay": "production-scope-overlay.json",
+  "baseline_overlay": "baseline-source-overlay.json",
+  "timing_eligible": false,
+  "limit": "Targeted source/probe oracle only. No full Product graph or latency acceptance. Scratch diagnostic declarations remain but Scope implementation overlaid with baseline removes counters."
+}
