@@ -1,6 +1,6 @@
 # Stage22: per-hop derived-work profiling
 
-Status: Stage22 candidate passed correctness and three-pair Product speed acceptance; integration review is pending. Stage21 retained candidate remains rejected after repeated changed-file regressions. Stage22 code comes from pinned main, not Stage21.
+Status: Stage22 passed correctness and three-pair Product speed acceptance and was pushed to main as c75e33e. Stage21 retained candidate remains rejected after repeated changed-file regressions. Stage22 code comes from pinned main, not Stage21.
 
 ## Source and recorded-input finding
 
@@ -146,3 +146,9 @@ The Codata note `2984-enola-fanout-note.md` describes a distinct, large deletion
 Production `graph watch` on an isolated pinned Product copy completed the existing scripted smoke with default5s collection window, final cold graph equality and idle/duplicate-save checks, exit0 / total harness90.483s. Evidence: `stage22/product-watch/`. It observed initial plus one coalesced delta, not a sustained long-running soak. This shared-host correctness run is not paired watch performance acceptance.
 
 Integration uses the exact tested production source SHA f06556a0 and exact test snapshots. The change only populates existing graph-session record fields and lazily refreshes recognizable legacy records; it changes neither cold extracted facts nor engine cache payload/schema, so no engine cacheVersion bump is introduced. Legacy no-op retains its checkpoint; first changed run can broaden once as recorded above.
+
+## Publication
+
+Production change and exact tested sources were committed and pushed as `c75e33e` on main. Pre-push passed cache coverage0.511s, documentation0.852s, golden/determinism3.835s. Stage21 remains unintegrated; only its evidence was archived. Unrelated September22 __pycache__ remains untracked and untouched.
+
+Stage22 is complete as a bounded optimization, not the full thread goal: near-zero no-op, much faster delta and the newly reported contracts deletion fanout remain open. The ~5.35% gain applies to the warmed Stage22 records in the measured Product scope; existing legacy records retain their prior cost until refreshed on a changed run.
