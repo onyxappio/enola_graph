@@ -173,7 +173,7 @@ func (a *Analyzer) buildInterpreter(m *machineModel, root *sitter.Node, kinds *t
 			if len(guardConds) > 0 {
 				props["guard_text"] = strings.Join(guardConds, " && ")
 				props["guard_status"] = "declared"
-				addCallRelations(&rels, guardConds, src, kinds, facts.RelFSMGuardCalls)
+				a.addInterpreterGuardRelations(m, &rels, guardConds)
 			} else {
 				props["guard_status"] = "none_detected"
 			}
@@ -831,16 +831,30 @@ func statusOf(ok bool) string {
 	return "unknown"
 }
 
-func addCallRelations(rels *[]facts.Relation, conds []string, src []byte, kinds *tsutil.KindTable, kind string) {
-	_ = src
-	_ = kinds
-	callRE := regexp.MustCompile(`\b([A-Za-z_$][A-Za-z0-9_$]*)\s*\(`)
+func (a *Analyzer) addInterpreterGuardRelations(m *machineModel, rels *[]facts.Relation, conds []string) {
+	seen := map[string]bool{}
 	for _, cond := range conds {
-		for _, match := range callRE.FindAllStringSubmatch(cond, -1) {
-			if len(match) > 1 && match[1] != "if" && match[1] != "matches" && match[1] != "switch" {
-				*rels = append(*rels, relation(kind, match[1]))
-			}
+		source := []byte(cond)
+		root, kinds, closeTree := parse(m.file, source)
+		if root == nil {
+			continue
 		}
+		walk(root, func(n *sitter.Node) {
+			if kinds.Of(n) != "call_expression" {
+				return
+			}
+			fn := n.ChildByFieldName("function")
+			if fn == nil || kinds.Of(fn) != "identifier" {
+				return
+			}
+			name := text(fn, source)
+			if seen[name] {
+				return
+			}
+			seen[name] = true
+			a.appendRuleTableSymbolRef(m, rels, name, facts.RelFSMGuardCalls, "unresolved_guard_calls")
+		})
+		closeTree()
 	}
 }
 

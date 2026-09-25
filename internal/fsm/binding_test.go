@@ -96,7 +96,7 @@ export function dispatchIntent(intent: string) { sendUi(intentToEvent(intent)); 
 	calleeFacts, _ := a.ExtractFile("converter.ts", sources["converter.ts"])
 	for _, event := range []string{"A", "B"} {
 		target := "app/event:" + event
-		if !hasDispatch(appFacts, "dispatchIntent", target) {
+		if !hasSourceDispatch(appFacts, "App.tsx", "dispatchIntent", target) {
 			t.Errorf("resolved converter result was not dispatched: %s", target)
 		}
 		if hasConstructedEvent(appFacts, target) {
@@ -118,7 +118,7 @@ export function intentToEvent(intent: string): AppEvent { return { type: intent 
 	if !hasUnknownDispatch(unknownFacts, "dispatchIntent") {
 		t.Fatal("dynamic event return was guessed or dropped instead of marked unknown")
 	}
-	if hasDispatch(unknownFacts, "dispatchIntent", "app/event:A") || hasDispatch(unknownFacts, "dispatchIntent", "app/event:B") {
+	if hasSourceDispatch(unknownFacts, "App.tsx", "dispatchIntent", "app/event:A") || hasSourceDispatch(unknownFacts, "App.tsx", "dispatchIntent", "app/event:B") {
 		t.Fatal("dynamic event return produced a concrete dispatch edge")
 	}
 }
@@ -417,7 +417,7 @@ func TestObjectSinkFactoryAliasAndReturnedMethodBinding(t *testing.T) {
 	}
 	a, _ := analyzerForSources([]Spec{spec}, sources)
 	bound, _ := a.ExtractFile("App.tsx", sources["App.tsx"])
-	if !hasDispatch(bound, "dispatchIntent", "app/event:A") {
+	if !hasSourceDispatch(bound, "App.tsx", "dispatchIntent", "app/event:A") {
 		t.Fatal("configured sink factory alias/re-export and returned send method were not proven")
 	}
 
@@ -428,7 +428,7 @@ func TestObjectSinkFactoryAliasAndReturnedMethodBinding(t *testing.T) {
 		"}")
 	b, _ := analyzerForSources([]Spec{spec}, decoy)
 	unbound, _ := b.ExtractFile("App.tsx", decoy["App.tsx"])
-	if hasDispatch(unbound, "dispatchIntent", "app/event:A") {
+	if hasSourceDispatch(unbound, "App.tsx", "dispatchIntent", "app/event:A") {
 		t.Fatal("a nested decoy send method proved the runtime factory sink")
 	}
 }

@@ -155,7 +155,7 @@ func TestPinnedProductFSMRuntimePublicationAndDelta(t *testing.T) {
 		t.Fatal("resolved Effect sink did not publish the ClaimRequested dispatch")
 	}
 	if !consumerHasResolvedRelation(consumer, "apps/mobile/src.OnyxApp.renderForgotPasswordScreen.sendForgotPasswordIntent", "apps/mobile/src/App.tsx",
-		facts.RelFSMDispatches, "mobile-app/event:FORGOT_PASSWORD_RESEND_EMAIL", facts.KindFSMEvent, "apps/mobile/src/behavior/mobileAppInterpreter.ts") {
+		facts.RelFSMDispatches, "mobile-app/event:FORGOT_PASSWORD_RESEND_EMAIL", facts.KindFSMEvent, "apps/mobile/src/state/mobileAppMachine.types.ts") {
 		t.Fatal("resolved mobile runtime did not publish the forgot-password event dispatch")
 	}
 	if !consumerHasRelation(consumer, "mobile-app/state:forgotPassword.requestingReset", facts.RelFSMEntryEmits, "mobile-app/command:requestPasswordReset") {
@@ -222,9 +222,9 @@ func TestPinnedProductFSMRuntimePublicationAndDelta(t *testing.T) {
 	}
 	applyRun(t, consumer, deltaSink)
 	if consumerHasResolvedRelation(consumer, "apps/mobile/src.OnyxApp.renderForgotPasswordScreen.sendForgotPasswordIntent", "apps/mobile/src/App.tsx",
-		facts.RelFSMDispatches, "mobile-app/event:FORGOT_PASSWORD_RESEND_EMAIL", facts.KindFSMEvent, "apps/mobile/src/behavior/mobileAppInterpreter.ts") ||
+		facts.RelFSMDispatches, "mobile-app/event:FORGOT_PASSWORD_RESEND_EMAIL", facts.KindFSMEvent, "apps/mobile/src/state/mobileAppMachine.types.ts") ||
 		!consumerHasResolvedRelation(consumer, "apps/mobile/src.OnyxApp.renderForgotPasswordScreen.sendForgotPasswordIntent", "apps/mobile/src/App.tsx",
-			facts.RelFSMDispatches, "mobile-app/event:FORGOT_PASSWORD_SUBMIT_EMAIL", facts.KindFSMEvent, "apps/mobile/src/behavior/mobileAppInterpreter.ts") {
+			facts.RelFSMDispatches, "mobile-app/event:FORGOT_PASSWORD_SUBMIT_EMAIL", facts.KindFSMEvent, "apps/mobile/src/state/mobileAppMachine.types.ts") {
 		t.Fatal("changed one-callee converter return was not reflected in the dispatch graph")
 	}
 	if !consumerHasNode(consumer, facts.KindFSMTransition, "mobile-app/transition:transitionForgotPassword/forgotPassword.*/FORGOT_PASSWORD_RESEND_EMAIL|FORGOT_PASSWORD_SUBMIT_EMAIL->forgotPassword.requestingReset") {
