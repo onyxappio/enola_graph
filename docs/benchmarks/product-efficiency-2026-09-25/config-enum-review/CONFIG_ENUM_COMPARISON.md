@@ -17,7 +17,7 @@ One `tsConfigInputs` call enumerated the repository tree twice: once through
 (dot-prefixed names and `tsSkipDirs`, root exempt) and neither excludes
 `testdata`, so one enumeration can answer for both.
 
-Stage16 (`49b486b`, `internal/extractors/tsextractor/configwalk.go`) fuses them
+Stage16 (base `49b486b`, configwalk.go in the unmerged candidate) fuses them
 with the **alias traversal primary**: `tsAliasWalk.walk` recurses via
 `overlayReadDir` and collects config candidate paths through `collectFile`, which
 the caller reads after the walk. The prototype (`022fbfd`, retired) fused them
