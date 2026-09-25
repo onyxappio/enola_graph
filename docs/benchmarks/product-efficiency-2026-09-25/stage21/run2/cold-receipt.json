@@ -1,0 +1,350 @@
+{
+  "cold_run": {
+    "label": "c1-cold",
+    "mode": "analyze",
+    "wall_seconds": 9.09944458398968,
+    "exit": 0,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4034
+        }
+      },
+      "RunID": "stage21-cli-product-stage21-main-1-1790309728383874000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4086,
+        "files_parsed": 4034,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 1723,
+        "derived_indexes": 2270,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "all prior/current file owners",
+          "reason": "frozen scope: global name-resolution domain"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 4034,
+      "ParsedFiles": 4034,
+      "EarlyLocal": 0
+    },
+    "process_real_s": 9.09,
+    "rss_bytes": 902840320
+  },
+  "cold_phases": [
+    "[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=analyze",
+    "[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml",
+    "[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2",
+    "[graph-profile] discover_git                       0.038s  total= 0.038s  trace=graphinput_build  repo=true dirs=2",
+    "[graph-profile] declare_git_control                0.010s  total= 0.048s  trace=graphinput_build  deps=10",
+    "[graph-profile] git_ls_files                       0.061s  total= 0.110s  trace=graphinput_build  tracked=45105 dirs=5818",
+    "[graph-profile] walk_tree                          0.125s  total= 0.235s  trace=graphinput_build  names=11635 ignorefiles=4",
+    "[graph-profile] check_ignore_setup                 0.016s  total= 0.251s  trace=graphinput_build",
+    "[graph-profile] check_ignore_run                   0.058s  total= 0.309s  trace=graphinput_build  names=11635 ignored=0",
+    "[graph-profile] declare_ignore_files               0.000s  total= 0.309s  trace=graphinput_build  deps=13",
+    "[graph-profile] compute_identities                 0.034s  total= 0.343s  trace=graphinput_build  deps=13 entries=11635",
+    "[graph-profile] graphinput_build                   0.344s  total= 0.344s  trace=graph_engine  configpaths=2",
+    "[graph-profile] engine_new                         0.000s  total= 0.344s  trace=graph_engine",
+    "[graph-profile] register_plugins                   0.000s  total= 0.344s  trace=graph_engine",
+    "[graph-profile] config_recheck                     0.000s  total= 0.344s  trace=graph_engine",
+    "[graph-profile] resolve_graph_target               0.344s  total= 0.344s  trace=cli  repos=1",
+    "[graph-profile] connect_sink                       0.001s  total= 0.346s  trace=cli  nats=true",
+    "[graph-profile] session_options                    0.000s  total= 0.346s  trace=cli  repo=/tmp/enola-stage21-startup-profile/run1/product",
+    "[graph-profile] lock                               0.000s  total= 0.000s  trace=open",
+    "[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open",
+    "[graph-profile] open_journal                       0.000s  total= 0.001s  trace=open",
+    "[graph-profile] replay_unacked                     0.006s  total= 0.007s  trace=open",
+    "[graph-profile] load_state                         0.000s  total= 0.007s  trace=open  files=0",
+    "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false",
+    "[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2",
+    "[graph-profile] graph_inputs_proven                0.097s  total= 0.097s  trace=reconcile",
+    "[graph-profile] effective_config                   0.000s  total= 0.097s  trace=reconcile  files=2 fast=false",
+    "[graph-profile] reconcile_complete                 0.000s  total= 0.097s  trace=reconcile  reloaded=false",
+    "[graph-profile] engine_walk_repo                   0.118s  files=10965 tests=0 all_names=10965",
+    "[graph-profile] inventory                          0.119s  total= 0.119s  trace=inputs  files=10965 all_names=10965",
+    "[graph-profile] detect_typescript                  0.001s",
+    "[graph-profile] detect_extractors                  0.001s  total= 0.120s  trace=inputs  detected=1",
+    "[graph-profile] select_hash_targets                0.006s  total= 0.126s  trace=inputs  targets=4105",
+    "[graph-profile] engine_hash_files                  0.150s  n=4105 hashed=4105 bytes=45822335",
+    "[graph-profile] hash_content_inputs                0.150s  total= 0.276s  trace=inputs  targets=4105",
+    "[graph-profile] capture_contexts                   0.000s  total= 0.276s  trace=inputs  contexts=0",
+    "[graph-profile] ts_config_inputs                   0.139s  n=83",
+    "[graph-profile] analysis_fingerprint               0.141s  total= 0.417s  trace=inputs  cfg_files=59",
+    "[graph-profile] angular_probe                      0.003s  total= 0.420s  trace=inputs  angular=false",
+    "[graph-profile] policy_identity                    0.000s  total= 0.420s  trace=inputs",
+    "[graph-profile] engine_context_fingerprint         0.000s  total= 0.420s  trace=inputs",
+    "[graph-profile] ts_disc_nuxt_packages              0.118s  pkgs=0",
+    "[graph-profile] ts_disc_package_gates              0.001s",
+    "[graph-profile] ts_disc_package_names              0.000s  names=30",
+    "[graph-profile] ts_disc_alias_roots                0.083s  roots=1",
+    "[graph-profile] ts_disc_package_exports            0.000s  packages=30",
+    "[graph-profile] ts_discovery_build                 0.214s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59",
+    "[graph-profile] ts_discovery                       0.214s  total= 0.634s  trace=inputs  names=0 bytes=0 dirs=0",
+    "[graph-profile] ts_session_context                 0.054s  total= 0.689s  trace=inputs  files=4086",
+    "[graph-profile] runtime_inputs_complete            0.000s  total= 0.689s  trace=inputs",
+    "[graph-profile] clone_file_state_copy              0.000s  n=0",
+    "[graph-profile] extractor_need                     0.713s  total= 0.713s  trace=session  non_ts_need=false detected=1 neutral=0",
+    "[graph-profile] changed_terms                      0.007s  total= 0.720s  trace=session  initial=true force=true non_ts=false scan=false raw_cfg=false policy=true neutral_scan=false neutral_cfg=false",
+    "[graph-profile] invalidation_plan                  0.016s  total= 0.736s  trace=session  reason=frozen scope: global name-resolution domain whole=true extra=0",
+    "[graph-profile] revalidate_before_begin            0.001s  n=59 superseded=false",
+    "[graph-profile] begin_publish                      0.048s  total= 0.784s  trace=session  scope=8483",
+    "[graph-profile] ts_dirty_scope                     0.001s  total= 0.784s  trace=session  dirty=0 scope=4086 force=true",
+    "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+    "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+    "[graph-profile] ts_read_dirty                      0.051s  total= 0.052s  trace=ts  to_read=4086 cached=0",
+    "[graph-profile] ts_graphql_grpc_index              0.387s  total= 0.438s  trace=ts  ts_files=4086",
+    "[graph-profile] ts_mapfiles_aggregate              4.624s  total= 5.063s  trace=ts  parsed=4034 facts=59224 routers=0 scans=1723 derived=2270",
+    "[graph-profile] ts_compose_modules                 0.003s  total= 5.066s  trace=ts  facts=59661 records=4086 unread=0",
+    "[graph-profile] ts_extract_session                 5.068s  total= 5.852s  trace=session  parsed=4034 cached=0 facts=59661 records=4086",
+    "[graph-profile] assemble_new_files                 0.132s  total= 5.984s  trace=session  new=4086 ts_noop=false non_ts_need=false skip=false facts=59661",
+    "[graph-profile] index_group_owners                 0.021s  total= 6.006s  trace=session  facts=59224 owners=4034",
+    "[graph-profile] publish_scope                      0.002s  total= 6.008s  trace=session  scope=8483",
+    "[graph-profile] encode_append_owners               1.858s  total= 7.866s  trace=session  published=4034",
+    "[graph-profile] publish_resolved                   0.062s  total= 7.928s  trace=session  owners=4034",
+    "[graph-profile] revalidate_ts_records              0.165s  total= 8.093s  trace=session  n=4086",
+    "[graph-profile] ts_config_inputs                   0.139s  n=83",
+    "[graph-profile] state_json_marshal                 0.172s  bytes=56633359 files=4086",
+    "[graph-profile] state_fingerprint                  0.024s  write bytes=56633359",
+    "[graph-profile] write_pending_state                0.390s  total= 8.483s  trace=session",
+    "[graph-profile] end_flush_ack                      0.062s  total= 8.545s  trace=session",
+    "[graph-profile] promote_compact_state              0.069s  total= 8.614s  trace=session  parsed=4034 published=4034",
+    "[graph-profile] graph_session_run                  8.718s  total= 9.064s  trace=cli  repo=/tmp/enola-stage21-startup-profile/run1/product parsed=4034",
+    "[graph-profile] cli_complete                       0.000s  total= 9.064s  trace=cli  results=1"
+  ],
+  "graph_equivalence": {
+    "compared": "run1/state1/state.json (delta, generation 2) vs run2/state-cold/state.json (cold, generation 1), identical edited source",
+    "label_correction": "the first harness emission swapped the two side labels; this block is the recomputed, correctly labelled result. No run was repeated.",
+    "normalized_away": [
+      "generation",
+      "last_run_id",
+      "sink_id"
+    ],
+    "volatile_values": {
+      "generation": [
+        2,
+        1
+      ],
+      "last_run_id": [
+        "stage21-cli-product-stage21-main-2-1790309234914007000",
+        "stage21-cli-product-stage21-main-1-1790309728383874000"
+      ],
+      "sink_id": [
+        "nats|nats://127.0.0.1:61248|ENOLA_GRAPH|enola.graph.>",
+        "nats|nats://127.0.0.1:64346|ENOLA_GRAPH|enola.graph.>"
+      ]
+    },
+    "delta_file_count": 4086,
+    "cold_file_count": 4086,
+    "file_key_sets_equal": true,
+    "difference_count": 9,
+    "differences": [
+      {
+        "path": "/files/apps/behavior-visualizer/src/components/CoverageView.vue/ts/export_surface",
+        "detail": "present in delta-graph, absent in cold-graph"
+      },
+      {
+        "path": "/files/apps/behavior-visualizer/src/components/CoverageView.vue/ts/export_surface_context_free",
+        "detail": "present in delta-graph, absent in cold-graph"
+      },
+      {
+        "path": "/files/apps/behavior-visualizer/src/components/CoverageView.vue/ts/export_surface_recorded",
+        "detail": "present in delta-graph, absent in cold-graph"
+      },
+      {
+        "path": "/files/apps/behavior-visualizer/src/components/inspectors/HandoffInspector.vue/ts/export_surface",
+        "detail": "present in delta-graph, absent in cold-graph"
+      },
+      {
+        "path": "/files/apps/behavior-visualizer/src/components/inspectors/HandoffInspector.vue/ts/export_surface_context_free",
+        "detail": "present in delta-graph, absent in cold-graph"
+      },
+      {
+        "path": "/files/apps/behavior-visualizer/src/components/inspectors/HandoffInspector.vue/ts/export_surface_recorded",
+        "detail": "present in delta-graph, absent in cold-graph"
+      },
+      {
+        "path": "/files/apps/behavior-visualizer/src/components/inspectors/ScenarioInspector.vue/ts/export_surface",
+        "detail": "present in delta-graph, absent in cold-graph"
+      },
+      {
+        "path": "/files/apps/behavior-visualizer/src/components/inspectors/ScenarioInspector.vue/ts/export_surface_context_free",
+        "detail": "present in delta-graph, absent in cold-graph"
+      },
+      {
+        "path": "/files/apps/behavior-visualizer/src/components/inspectors/ScenarioInspector.vue/ts/export_surface_recorded",
+        "detail": "present in delta-graph, absent in cold-graph"
+      }
+    ],
+    "byte_equivalent_after_normalization": false,
+    "delta_state_sha256": "09c89bc8464240e081f5fec27cb20b2cfc5642eb265b3529c4340e1d46bc06b6",
+    "cold_state_sha256": "fdac97193cbb0bfea708f6d850f839f77ba4f3918983681d66f5ef4ff52ab34a"
+  },
+  "label": "diagnostic only; shared load; not a timing measurement",
+  "restored_pristine": true,
+  "pins": {
+    "enola_source": "main a1dec99086fc1ace834e5616bd31c39ddce0b39b",
+    "enola_build": "go build -o enola-a1dec99 ./cmd/enola (clean tree, no dirty .go)",
+    "go_toolchain": "go version go1.27.1 darwin/arm64",
+    "binary": "/tmp/enola-stage21-startup-profile/enola-a1dec99",
+    "binary_sha256": "e9964ea1e7a99afee568b8f6d8aa7d9d9e66f03063d9dbfafe75f4a0f53b4a0b",
+    "product_path": "/tmp/enola-stage16-root-review/product-source",
+    "product_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+    "repo_clone": "/tmp/enola-stage21-startup-profile/run1/product",
+    "edited_file": "packages/crypto/src/password.ts",
+    "pristine_sha256": "b940122ddebf67b8f46073ba98a5bb3e1c82d80a9a28ac1a48cc680b5c0f80c3",
+    "edited_sha256": "b20431065c89e899cc2a17f1e7290dfe36f0d46224848c7e6f6a00af60cee971",
+    "config": "/tmp/enola-stage21-startup-profile/run1/config.yaml",
+    "config_sha256": "fc2a7b9cb640ed6677b0d9ca6160978745049f6fb97ff2a1b7e3954498cd1a22",
+    "scope_overlay": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/product-graph-scope.yaml",
+    "scope_overlay_sha256": "b81b19598dd74c63084ae11488cb7f4fa7df783b0887d2c42dcf61dc67890bf7",
+    "profile": "ts + product-graph-scope.yaml overlay",
+    "observer": "/tmp/enola-stage9-product-watch-control/bin/benchobserver",
+    "observer_sha256": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+    "nats_server": "/tmp/enola-toolchain/bin/nats-server",
+    "nats_server_sha256": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af",
+    "nats_version": "nats-server: v2.11.9",
+    "harness": "/tmp/enola-stage21-startup-profile/cold-check.py",
+    "harness_sha256": "a1a4169cacb19c1d272c2a4d0ab917bb2c5ca4efa1bb3ca5ffd6c26889425650",
+    "cli_argv": [
+      "/tmp/enola-stage21-startup-profile/enola-a1dec99",
+      "graph",
+      "analyze",
+      "--authoritative-scope",
+      "--max-begin-bytes",
+      "1048576",
+      "--repo-id",
+      "stage21-cli-product",
+      "--summary-json",
+      "--nats",
+      "nats://127.0.0.1:64346",
+      "--state-dir",
+      "/tmp/enola-stage21-startup-profile/run2/state-cold",
+      "--context",
+      "stage21-main",
+      "/tmp/enola-stage21-startup-profile/run1/config.yaml"
+    ],
+    "profiling_env": "ENOLA_GRAPH_PROFILE=1"
+  },
+  "competing_samples": [
+    [
+      "20818 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "20818 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "20818 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "21023 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ]
+  ],
+  "provenance_correction": {
+    "previous_label": "clean tree, no dirty .go  -- INCORRECT as a build label",
+    "corrected": "built from main a1dec99086fc1ace834e5616bd31c39ddce0b39b with a docs-only dirty working tree; no dirty .go files. Go stamps vcs.modified=true and the module version as v0.0.0-20260925040210-a1dec99086fc+dirty.",
+    "dirty_paths_at_build": [
+      "docs/benchmarks/product-efficiency-2026-09-25/POST_STAGE20_PRIORITIES.md",
+      "docs/benchmarks/progress/enola-stages.html",
+      "docs/benchmarks/product-efficiency-2026-09-22/__pycache__/ (untracked)"
+    ],
+    "vcs_revision": "a1dec99086fc1ace834e5616bd31c39ddce0b39b",
+    "vcs_modified": true
+  },
+  "difference_classification": {
+    "class_1_cache_proof_metadata": {
+      "what": "state.json ExportSurface / ExportSurfaceRecorded / ExportSurfaceContextFree on 3 of 17 .vue records",
+      "source": "internal/extractors/tsextractor/session.go:80-99 (field doc), :593-610 (recording arms)",
+      "count": 9,
+      "status": "cache proof fields, not graph facts. Unrecorded reads as unknown and fails closed at internal/graphsession/resolution_replay.go:95 and internal/graphsession/invalidate.go:567.",
+      "determinism": "not deterministic across cold runs: recorded only when exportCache.peek already holds an index, and the per-file pass is parallel.MapFiles (session.go:503). o1 and c1, both cold, also differ in summary_scans 1705 vs 1723 and derived_indexes 2288 vs 2270.",
+      "not_erased": "differences preserved verbatim in graph_equivalence.differences"
+    },
+    "class_2_actual_graph_equality": {
+      "oracle": "published graph applied by the observer (normalized_hash over the applied graph), not state.json bytes",
+      "delta_generation_2": {
+        "run_id": "stage21-cli-product-stage21-main-2-1790309234914007000",
+        "normalized_hash": "4412eeb573c637e0baaf9eb58195200d593d2b25ce4abde9e6ad3d421b10002d",
+        "graph_nodes_total": 59224,
+        "graph_edges_total": 124878,
+        "graph_nodes_delta": 0,
+        "graph_edges_delta": 0,
+        "owner_scope_count": 11,
+        "completeness_status": "success",
+        "completeness_files_analyzed": 10965
+      },
+      "cold_generation_1": {
+        "run_id": "stage21-cli-product-stage21-main-1-1790309728383874000",
+        "normalized_hash": "4412eeb573c637e0baaf9eb58195200d593d2b25ce4abde9e6ad3d421b10002d",
+        "graph_nodes_total": 59224,
+        "graph_edges_total": 124878,
+        "owner_scope_count": 8483,
+        "completeness_status": "success",
+        "completeness_files_analyzed": 10965
+      },
+      "equal": true,
+      "identical_fields": [
+        "batch_count_matches_end",
+        "completeness_early_local",
+        "completeness_fallbacks",
+        "completeness_files_analyzed",
+        "completeness_files_unreadable",
+        "completeness_status",
+        "context",
+        "graph_edges_total",
+        "graph_nodes_total",
+        "normalized_hash",
+        "payload_bytes_basis",
+        "repo_id",
+        "schema_version",
+        "scope_mode",
+        "time_base"
+      ],
+      "discriminating_power": "LIMITED. The edit is graph-neutral: the delta applied 11 owners with graph_nodes_delta 0 and graph_edges_delta 0, and the cold run on PRISTINE source (run1 generation 1, hash 4412eeb573c637e0baaf9eb58195200d593d2b25ce4abde9e6ad3d421b10002d) has the same normalized_hash as the cold run on EDITED source. So this equality confirms the delta did not corrupt or diverge from the cold graph, but it cannot distinguish a delta that dropped the edit entirely. A graph-affecting edit would be needed for that, and no such run is authorized."
+    },
+    "class_3_consumer_delivery_coverage": {
+      "live_run1_observer": "captured generation 1 End only; lifecycle.jsonl shows the generation 2 begin and no end, because the observer was stopped when the harness finished. run1/consumer.jsonl therefore holds the initial frame, not the delta frame.",
+      "recovery": "retained JetStream store copied to replay2/ and replayed to a scratch DeliverAllPolicy observer; the original store was not modified and no enola run was repeated.",
+      "delta_delivery": {
+        "messages_observed": 26,
+        "batches_observed": 24,
+        "batch_count_matches_end": true,
+        "node_records_sent": 526,
+        "edge_records_sent": 1515,
+        "payload_bytes_total": 688914
+      },
+      "cold_delivery": {
+        "messages_observed": 1954,
+        "batches_observed": 1952,
+        "batch_count_matches_end": true,
+        "node_records_sent": 59224,
+        "edge_records_sent": 124878,
+        "payload_bytes_total": 63891192
+      },
+      "note": "delivery volumes differ by design between a delta and a cold run; they are reported as coverage, not as equivalence."
+    }
+  },
+  "replay_harness": {
+    "observer": "/tmp/enola-stage21-startup-profile/replayobserver",
+    "observer_sha256": "bf5e4ba171d59c80137d63c9f09b0049f4c6d2294c2748ad9a68b7c4e2b4067b",
+    "built_from": "/tmp/enola-stage9-product-watch-control/bin/observer-overlay (copied, unmodified go.mod/go.sum)",
+    "source_diff": "/tmp/enola-stage21-startup-profile/replayobs-source.diff",
+    "source_diff_sha256": "8d1c9764005880215d5dad64228ab2204a305a2167b424cccef833c89c9d5847",
+    "change": "two lines only: DeliverNewPolicy -> DeliverAllPolicy, durable prefix benchobs- -> replayobs-. Validation, ordering, normalization and summary emission untouched.",
+    "production_observer_sha256": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+    "replay_receipt": "/tmp/enola-stage21-startup-profile/replay2/replay-receipt.json",
+    "failed_attempt": "replay1/ used the DeliverNewPolicy observer and could never receive history; root interrupted that harness. Kept as a recorded harness failure, not a graph failure."
+  }
+}

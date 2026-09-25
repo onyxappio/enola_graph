@@ -1,6 +1,6 @@
 # Remaining startup work after Stage20: evidence and next investigation
 
-Status: read-only assessment, not an implemented optimization or latency acceptance. Stage20 remains frozen and unmerged pending paired measurements.
+Status: Stage20 integrated and pushed in `a1dec99` after three paired CLI measurements and full affected-package tests. The next startup investigation is diagnostic only; no new optimization is implemented by this note.
 
 ## Evidence
 
@@ -20,7 +20,7 @@ Current source confirms OpenSession reads and decodes full committed state befor
 
 ## Next investigation
 
-1. Obtain the pending Stage20 uninstrumented timing/RSS decision before changing its source. If accepted, profile that exact integrated source; do not treat older mark durations as its cost distribution.
+1. Profile exact integrated Stage20 source `a1dec99`; do not treat older mark durations as its cost distribution. Its accepted body/structural delta gains did not improve fresh no-op (~1.70 s). The three-pair evidence is in [Stage20 validation](STAGE20_VALIDATION.md).
 2. Prefer a compact, separately verifiable input/context summary only if it can prove no-change without materializing all graph facts. It must cover repository membership, policy and Git controls, source content, semantic side inputs and resolver discovery. A path/mtime-only shortcut is insufficient. Unknown or changed evidence must fall back to full reconciliation.
 3. Keep fresh CLI and resident-session optimization separate. An existing resident may reuse proven state; a fresh CLI still needs a sound observation of current inputs, so a near-zero fresh no-op target needs measurement and a clearly defined correctness argument, not a daemon benchmark.
 4. Evaluate state representation/decode and write costs independently of the no-op proof. The prior roughly 390 MB allocation interval before pending-state completion includes multiple operations and is not evidence that serialization alone allocates that amount.
@@ -68,4 +68,37 @@ Applying the oracle to frozen Stage16 first discovered no tests for the same pat
 
 The prototype is retired; the [final comparison](config-enum-review/CONFIG_ENUM_COMPARISON.md) records the read-order difference and preserves the limits of its measurements. Carry forward only the [permanent Stage16 coverage patch](config-enum-review/patch02-stage16-permanent-coverage.patch), SHA256 `75ab2f134ec1602960b2718a720b2de3f4746c7c10533135142f7085130a1e16`: 13 unchanged baseline goldens, probe/no-probe assertions and a corrected Lstat cost comment. It is archived here, not applied to production.
 
-Root independently verified clean `git apply --check` against frozen Stage16, six unchanged existing source/test files, comment-only changes in the seventh, and all 13 unchanged goldens. The focused log contains 17 passing top-level tests and 26 passing subtests with no skips or failures. Root also ran the original `oracle-refresh.py --check` in the coverage tree, exit 0: the generated oracle matches a verbatim lift of `49b486b`. The final comment-only revision does not change assertions; the worker additionally reports build and vet passing. Stage16 integration, its RSS review and Stage20 timing remain outstanding.
+Root independently verified clean `git apply --check` against frozen Stage16, six unchanged existing source/test files, comment-only changes in the seventh, and all 13 unchanged goldens. The focused log contains 17 passing top-level tests and 26 passing subtests with no skips or failures. Root also ran the original `oracle-refresh.py --check` in the coverage tree, exit 0: the generated oracle matches a verbatim lift of `49b486b`. The final comment-only revision does not change assertions; the worker additionally reports build and vet passing. Stage16 integration and its RSS review remain outstanding. Stage20 timing and integration subsequently completed; see STAGE20_VALIDATION.md.
+
+## Post-integration no-op review boundaries
+
+Current `session.go` reaches the no-publication return only after input observation and extraction decisions. The return path separately checks analysis configuration, effective inputs and policy bookkeeping. Proven-neutral configuration, membership or non-TS changes may update stored observations while preserving generation and published facts; a fast no-op must not suppress those necessary refreshes. Unsupported alias projections, forced initial runs, Angular composition and unknown extractors retain conservative handling. Existing callers may consume returned facts, so avoiding their materialization needs an explicit compatible API boundary and must not silently repeat the parked Stage19 experiment.
+
+Current `persist.go` fully reads and typed-decodes pending state before testing completeness, identity or acknowledged End. A header-only fallback would weaken corruption handling. A potential compact input proof must bind the exact validated committed bytes, schema/extractor/profile and dispatch/protocol identities; absent, stale or invalid proof must take the existing safe path. Fresh content, membership, side-input and discovery observations remain necessary, including inputs absent from the previous inventory. This is a feasibility constraint, not approval of a particular persistence design.
+
+The existing worker has a bounded diagnostic assignment on `a1dec99`: one initial setup, two no-op observations and one body-edit/cold check on pinned Product and the Stage20 scope. Shared-load phase durations locate work only and must not be reported as performance acceptance. Implementation follows evidence review; frozen benchmark inputs and prior candidates remain unchanged.
+
+### Existing regression anchors for a future startup fast path
+
+| Contract | Existing regression anchor | Implication for any new proof |
+|---|---|---|
+| Fresh no-op returns facts and leaves state bytes unchanged | `TestFreshNoopRetainsResultFacts` in `noop_result_contract_test.go` | Preserve the default full-result API; a summary-only optimization cannot silently replace it. |
+| Summary reconcile preserves resident snapshot | `TestReconciledNoopRetainsResidentSnapshot` | A nil summary result does not authorize discarding resident facts. |
+| Equal-length corrupt committed state is rejected | `TestRecoveryRejectsCorruptCommittedStateAtEqualLength` | Metadata equality cannot establish valid state. |
+| Missing committed state wins over cached knowledge | `TestRecoveryReportsMissingCommittedStateOverCheckpoint` | A detached proof cannot invent a missing generation. |
+| Fresh process without a checkpoint decodes | `TestRecoveryWithoutCheckpointDecodes` | Keep the existing no-proof fallback; a new proof needs independent validation and negative controls. |
+| Promotion requires acknowledged End | `TestRecoverPendingRequiresAckedEnd`, `TestRecoveryNeverServesCheckpointOverPromotedPending` | Replay and promotion ordering remain authoritative. |
+| Neutral observations commit under an input fence | `TestNeutralObservationCommitsOnlyUnderTheCapturedInputFence` | Silence is not permission to persist stale bookkeeping. |
+| Unknown alias metadata is not interpreted as no-change | `TestAliasStateUnknownMetadataIsRefusedNotGuessed` | Version mismatch must trigger reconciliation, not bypass it. |
+
+These anchors identify assertions to preserve, not evidence that a future fast path already passes them. New proof corruption/staleness and missed-input cases must be selected from the eventual implementation.
+
+
+### Stage21 design and harness review checkpoint
+
+The diagnostic draft targets committed-state JSON materialization, which is distinct from Stage19's deferred cloning after eager decode. This distinction keeps the design open, but does not establish feasibility: a summary derived by decoding the complete state on every startup cannot remove that same decode. A proposed persisted proof must describe its production, exact-byte and identity/version binding, atomic lifecycle and fallback, plus the compact observations that permit a no-change decision without accessing full file records. Changed inputs, neutral bookkeeping refresh and full-result consumers still need explicitly correct materialization paths. No implementation is approved at this checkpoint.
+
+The first retained-stream replay attempt used the existing observer's `DeliverNewPolicy`, so its empty output cannot establish whether historical delta publication succeeded. The worker has been directed to use a separate, pinned replay observer with `DeliverAllPolicy`, preserving validation and normalization, and to consume through generation 2 End before comparing the applied graph with the fresh cold result. Cache metadata differences and whole-state byte comparisons must remain separate from this published-graph check. The corrected replay subsequently applied generations 1 and 2 and matched the cold graph; see STAGE21_DIAGNOSTIC.md. This closes the single observed body-edit oracle gap, not wider optimization acceptance.
+
+
+Concrete access boundary from current source: `readRuntimeInputs` passes `st.Files` to `filesToHash`, but that helper uses only the previous file keys, so a validated compact key set could serve this particular dependency. Later `session.run` directly inspects `FileState.TS` while counting added/removed sources, then assembles complete `newFiles` before its current no-publication return. A lazy decoder inserted only at that return would already be too late. The design must place an independently proven unchanged-input decision before those record consumers, or document their compact equivalents; it must not supply incomplete fake `FileState` values to the existing path. This is a source-level feasibility finding, not implementation acceptance.

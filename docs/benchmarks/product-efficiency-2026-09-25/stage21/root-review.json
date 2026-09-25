@@ -1,0 +1,218 @@
+{
+  "scope": "Read-only root review of instrumented shared-load diagnostics; not performance acceptance",
+  "inputs_sha256": {
+    "phase-metrics.json": "e74725fdf211082ddd5551c0b608ccf847fd0711651672a0b400732f080dc69c",
+    "diagnostic-receipt.json": "f5298e428c3087e864f619a6f7b964566cb613a469efb3d9756228ddfcd0c839",
+    "o2-noop.log": "53b576696c51992f71f2661203d2624e9d6d2028a7bfba261aa3abeb4dc597da",
+    "o3-noop.log": "c22169a838f11998eece80f3cdfc4e39d3cabe9114eb4c1446e7102797633662"
+  },
+  "runs": [
+    {
+      "label": "o1-initial",
+      "wall_seconds": 10.048235041089356,
+      "exit": 0,
+      "parsed_files": 4034,
+      "phases_seconds": {
+        "graphinput_build": [
+          0.332
+        ],
+        "engine_hash_files": [
+          0.362
+        ],
+        "ts_config_inputs": [
+          0.141,
+          0.146
+        ],
+        "ts_discovery_build": [
+          0.214
+        ],
+        "ts_session_context": [
+          0.054
+        ],
+        "state_json_marshal": [
+          0.202
+        ]
+      },
+      "noop_checks": {}
+    },
+    {
+      "label": "o2-noop",
+      "wall_seconds": 1.660243667080067,
+      "exit": 0,
+      "parsed_files": 0,
+      "phases_seconds": {
+        "graphinput_build": [
+          0.329
+        ],
+        "state_json_unmarshal": [
+          0.249
+        ],
+        "engine_hash_files": [
+          0.166
+        ],
+        "ts_config_inputs": [
+          0.135,
+          0.134
+        ],
+        "ts_discovery_build": [
+          0.207
+        ],
+        "ts_session_context": [
+          0.06
+        ],
+        "ts_reuse_cache": [
+          0.042
+        ]
+      },
+      "noop_checks": {
+        "noop_parsed_files": 0,
+        "noop_generation_unchanged": true,
+        "noop_wire_messages": 0,
+        "noop_state_unchanged": true
+      }
+    },
+    {
+      "label": "o3-noop",
+      "wall_seconds": 1.6358907499816269,
+      "exit": 0,
+      "parsed_files": 0,
+      "phases_seconds": {
+        "graphinput_build": [
+          0.319
+        ],
+        "state_json_unmarshal": [
+          0.246
+        ],
+        "engine_hash_files": [
+          0.155
+        ],
+        "ts_config_inputs": [
+          0.135,
+          0.132
+        ],
+        "ts_discovery_build": [
+          0.211
+        ],
+        "ts_session_context": [
+          0.057
+        ],
+        "ts_reuse_cache": [
+          0.039
+        ]
+      },
+      "noop_checks": {
+        "noop_parsed_files": 0,
+        "noop_generation_unchanged": true,
+        "noop_wire_messages": 0,
+        "noop_state_unchanged": true
+      }
+    },
+    {
+      "label": "o4-body",
+      "wall_seconds": 3.368849250022322,
+      "exit": 0,
+      "parsed_files": 11,
+      "phases_seconds": {
+        "graphinput_build": [
+          0.317
+        ],
+        "state_json_unmarshal": [
+          0.246
+        ],
+        "engine_hash_files": [
+          0.158
+        ],
+        "ts_config_inputs": [
+          0.137,
+          0.137
+        ],
+        "ts_discovery_build": [
+          0.21
+        ],
+        "ts_session_context": [
+          0.057
+        ],
+        "state_json_marshal": [
+          0.161
+        ]
+      },
+      "noop_checks": {}
+    }
+  ],
+  "pending": [
+    "body-edit versus fresh cold graph comparison",
+    "worker build/tool/scope provenance",
+    "design proposal"
+  ],
+  "note": "Selected phases are not a complete additive accounting; nested trace marks must not be summed.",
+  "cold_review": {
+    "receipt": "/tmp/enola-stage21-startup-profile/run2/cold-receipt.json",
+    "observed_state_differences": 9,
+    "classification": "Export-surface cache proof metadata on three Vue records; not graph-equivalence oracle",
+    "consumer_run1_generations": [
+      1
+    ],
+    "consumer_run2_generations": [
+      1
+    ],
+    "graph_equivalence": "not yet proven: delta generation2 consumer frame absent",
+    "build_note": "go version -m reports a1dec99 with vcs.modified=true; do not label clean tree"
+  },
+  "replay_harness_review": {
+    "reviewed_at_utc": "2026-09-25T04:23:30.840135+00:00",
+    "observer_source": "/tmp/enola-stage9-product-watch-control/bin/observer-overlay.go",
+    "source_delivery_policy": "jetstream.DeliverNewPolicy",
+    "finding": "Existing observer receives only new stream messages and cannot replay retained history; empty replay output is not evidence of missing producer publications.",
+    "required_fix": "Separate replay observer with DeliverAllPolicy and fresh durable; preserve validation/normalization, pin diff and binary, consume through generation 2 End and compare final applied graph against cold.",
+    "worker_guidance": "msg_911ecb94afb1",
+    "status": "corrected_replay_verified",
+    "failed_attempt_cleanup": {
+      "time_utc": "2026-09-25T04:26:39.234117+00:00",
+      "action": "SIGINT to confirmed replay Python PID31694 only",
+      "reason": "DeliverNewPolicy cannot receive pre-existing messages",
+      "children_confirmed_exited": [
+        31698,
+        31703
+      ],
+      "receipt": "/tmp/enola-stage21-startup-profile/replay1/replay-receipt.json",
+      "observed_lifecycle": [],
+      "summary": null,
+      "original_store_modified": false,
+      "worker_agent_stopped": false
+    }
+  },
+  "design_review": {
+    "status": "not_approved",
+    "issues": [
+      "Deferred files proposal must distinguish itself from parked Stage19 and prove downstream no-op consumers do not require decoded records.",
+      "Derived-at-load summary cannot assume type validation is free; specify the actual validated proof lifecycle.",
+      "Zero Nuxt packages is an observed answer, not permission to omit fresh discovery: collectNuxtPackages probes nested nuxt.config files and package dependencies.",
+      "Raw Git ignore answers are used in policy identity/admission/dependency logic, not only final tracked-file classification; tracked query omission requires full semantic review."
+    ],
+    "stage19_distinction": "Stage19 deferred fact cloning after eager JSON decoding; skipping committed record decoding is a distinct possible mechanism, contingent on a valid proof lifecycle and compatible consumers."
+  },
+  "published_graph_review": {
+    "reviewed_at_utc": "2026-09-25T04:28:19.454682+00:00",
+    "status": "PASS",
+    "replay_applied_generations": [
+      1,
+      2
+    ],
+    "delta_batches": 24,
+    "delta_scope": 11,
+    "delta_actual_parses": 11,
+    "nodes": 59224,
+    "edges": 124878,
+    "normalized_hash": "4412eeb573c637e0baaf9eb58195200d593d2b25ce4abde9e6ad3d421b10002d",
+    "cold_applied_generation": 1,
+    "observer_diff": "Only durable prefix and DeliverNewPolicy to DeliverAllPolicy",
+    "artifacts": {
+      "/tmp/enola-stage21-startup-profile/replay2/consumer.jsonl": "dc292acb68d97e5701e8036f793e49b2cf298c77a13459e4b4d009d02860baac",
+      "/tmp/enola-stage21-startup-profile/replay2/replay-receipt.json": "cceb48a56cf861bfec7bbeeaeaa8790af15c0696d06372163ed2d7171f241060",
+      "/tmp/enola-stage21-startup-profile/run2/consumer.jsonl": "9499b3453e058563fe3406b263d9011ecb812ef6c881d4b398cf1281bb1649ef",
+      "/tmp/enola-stage21-startup-profile/replayobs-source.diff": "8d1c9764005880215d5dad64228ab2204a305a2167b424cccef833c89c9d5847",
+      "/tmp/enola-stage21-startup-profile/replayobserver": "bf5e4ba171d59c80137d63c9f09b0049f4c6d2294c2748ad9a68b7c4e2b4067b"
+    },
+    "limitation": "One body-edit correctness diagnostic; replay completion timestamps are not original consumer latency or performance acceptance."
+  }
+}

@@ -1,0 +1,16 @@
+--- /tmp/enola-stage9-product-watch-control/bin/observer-overlay/main.go	2026-09-24 04:38:11
++++ main.go	2026-09-25 07:27:23
+@@ -131,11 +131,11 @@
+ 		fail("jetstream: %v", err)
+ 	}
+ 	stream := waitValidStream(ctx, js)
+-	durable := fmt.Sprintf("benchobs-%d", os.Getpid())
++	durable := fmt.Sprintf("replayobs-%d", os.Getpid())
+ 	cons, err := js.CreateOrUpdateConsumer(ctx, stream, jetstream.ConsumerConfig{
+ 		Durable: durable, AckPolicy: jetstream.AckExplicitPolicy,
+ 		FilterSubject: "enola.graph.>", AckWait: 30 * time.Second,
+-		DeliverPolicy: jetstream.DeliverNewPolicy,
++		DeliverPolicy: jetstream.DeliverAllPolicy,
+ 		MaxAckPending: 4096,
+ 	})
+ 	if err != nil {

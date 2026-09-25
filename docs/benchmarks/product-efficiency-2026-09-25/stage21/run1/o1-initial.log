@@ -1,0 +1,151 @@
+[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=analyze
+[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml
+[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2
+[graph-profile] discover_git                       0.031s  total= 0.032s  trace=graphinput_build  repo=true dirs=2
+[graph-profile] declare_git_control                0.010s  total= 0.042s  trace=graphinput_build  deps=10
+[graph-profile] git_ls_files                       0.055s  total= 0.097s  trace=graphinput_build  tracked=45105 dirs=5818
+[graph-profile] walk_tree                          0.126s  total= 0.223s  trace=graphinput_build  names=11635 ignorefiles=4
+[graph-profile] check_ignore_setup                 0.016s  total= 0.238s  trace=graphinput_build
+[graph-profile] check_ignore_run                   0.057s  total= 0.295s  trace=graphinput_build  names=11635 ignored=0
+[graph-profile] declare_ignore_files               0.000s  total= 0.295s  trace=graphinput_build  deps=13
+[graph-profile] compute_identities                 0.035s  total= 0.331s  trace=graphinput_build  deps=13 entries=11635
+[graph-profile] graphinput_build                   0.332s  total= 0.332s  trace=graph_engine  configpaths=2
+[graph-profile] engine_new                         0.000s  total= 0.332s  trace=graph_engine
+[graph-profile] register_plugins                   0.000s  total= 0.332s  trace=graph_engine
+[graph-profile] config_recheck                     0.000s  total= 0.332s  trace=graph_engine
+[graph-profile] resolve_graph_target               0.333s  total= 0.333s  trace=cli  repos=1
+enola graph: config /tmp/enola-stage21-startup-profile/run1/config.yaml
+[graph-profile] connect_sink                       0.002s  total= 0.334s  trace=cli  nats=true
+[graph-profile] session_options                    0.000s  total= 0.334s  trace=cli  repo=/tmp/enola-stage21-startup-profile/run1/product
+[graph-profile] lock                               0.000s  total= 0.000s  trace=open
+[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open
+[graph-profile] open_journal                       0.000s  total= 0.001s  trace=open
+[graph-profile] replay_unacked                     0.005s  total= 0.006s  trace=open
+[graph-profile] load_state                         0.000s  total= 0.006s  trace=open  files=0
+[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false
+[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2
+[graph-profile] graph_inputs_proven                0.091s  total= 0.091s  trace=reconcile
+[graph-profile] effective_config                   0.000s  total= 0.091s  trace=reconcile  files=2 fast=false
+[graph-profile] reconcile_complete                 0.000s  total= 0.091s  trace=reconcile  reloaded=false
+[graph-profile] engine_walk_repo                   0.111s  files=10965 tests=0 all_names=10965
+[graph-profile] inventory                          0.111s  total= 0.111s  trace=inputs  files=10965 all_names=10965
+[graph-profile] detect_typescript                  0.002s
+[graph-profile] detect_extractors                  0.002s  total= 0.113s  trace=inputs  detected=1
+[graph-profile] select_hash_targets                0.006s  total= 0.119s  trace=inputs  targets=4105
+[graph-profile] engine_hash_files                  0.362s  n=4105 hashed=4105 bytes=45822317
+[graph-profile] hash_content_inputs                0.362s  total= 0.481s  trace=inputs  targets=4105
+[graph-profile] capture_contexts                   0.000s  total= 0.481s  trace=inputs  contexts=0
+[graph-profile] ts_config_inputs                   0.141s  n=83
+[graph-profile] analysis_fingerprint               0.147s  total= 0.628s  trace=inputs  cfg_files=59
+[graph-profile] angular_probe                      0.003s  total= 0.631s  trace=inputs  angular=false
+[graph-profile] policy_identity                    0.000s  total= 0.631s  trace=inputs
+[graph-profile] engine_context_fingerprint         0.000s  total= 0.631s  trace=inputs
+[graph-profile] ts_disc_nuxt_packages              0.122s  pkgs=0
+[graph-profile] ts_disc_package_gates              0.000s
+[graph-profile] ts_disc_package_names              0.000s  names=30
+[graph-profile] ts_disc_alias_roots                0.080s  roots=1
+[graph-profile] ts_disc_package_exports            0.000s  packages=30
+[graph-profile] ts_discovery_build                 0.214s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59
+[graph-profile] ts_discovery                       0.214s  total= 0.845s  trace=inputs  names=0 bytes=0 dirs=0
+[graph-profile] ts_session_context                 0.054s  total= 0.899s  trace=inputs  files=4086
+[graph-profile] runtime_inputs_complete            0.000s  total= 0.900s  trace=inputs
+[graph-profile] clone_file_state_copy              0.000s  n=0
+[graph-profile] extractor_need                     0.924s  total= 0.924s  trace=session  non_ts_need=false detected=1 neutral=0
+[graph-profile] changed_terms                      0.008s  total= 0.931s  trace=session  initial=true force=true non_ts=false scan=false raw_cfg=false policy=true neutral_scan=false neutral_cfg=false
+[graph-profile] invalidation_plan                  0.016s  total= 0.947s  trace=session  reason=frozen scope: global name-resolution domain whole=true extra=0
+[graph-profile] revalidate_before_begin            0.001s  n=59 superseded=false
+[graph-profile] begin_publish                      0.047s  total= 0.994s  trace=session  scope=8483
+[graph-profile] ts_dirty_scope                     0.001s  total= 0.995s  trace=session  dirty=0 scope=4086 force=true
+[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true
+[graph-profile] ts_disc_package_aliases            0.000s  aliases=21
+[graph-profile] ts_read_dirty                      0.053s  total= 0.053s  trace=ts  to_read=4086 cached=0
+[graph-profile] ts_graphql_grpc_index              0.388s  total= 0.441s  trace=ts  ts_files=4086
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/DeepScan-DHvM5dCJ.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/DocsRenderer-LL677BLK-BuIR6bZY.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/Color-23OOGO2C-CFyZFonx.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/GetStartedFreeScreen-BnD4gdvs.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/LeakedLogo-DG0KS9dA.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/MainAppShell-DykjRsCQ.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/OnboardingFirstSessionScreen-Ccla2iGl.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/PointsCard-UPQ-OhXY.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/PricingContentContext-ENjeFjYN.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProfileScreen-aoCBlYSa.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProjectedFigmaScreen-B-0ULYBe.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProtectFreeScreen-4DLtefNg.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/GetStartedScreen-DiHBSXQR.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProtectSurface-CtgJS1RL.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/RiskIndicatorDropMessage-f1IgdUCx.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenBackgroundBlur-DBMfPfhN.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenCompositionHost-WK6OxeVJ.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenContentTransition-Bs4S8klL.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenFigmaComparisonPanel-CvcgEIaM.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/StatusBadge-DGggXXdu.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/SubscriptionInfoCard-CX9utM5L.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/TabBar-vMBrgBKe.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/Toast-DoOWktSp.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/WithTooltip-65CFNBJE-B3RsNAAg.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/chunk-3LY4VQVK-DCoUZ6n4.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/chunk-LITCR56V-JVUNf0OC.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/components-BtTjbzAC.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/deepscan-components.stories-DuUlNjuO.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/figma-components.stories-LvwegD9L.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/figmaScreenStructures.generated-JjgbhcQt.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/generatedFigmaComponents-DmjMpYnh.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/getStartedDataSlotSource-Rr5d3rz_.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/iframe-D-RxKruK.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/legalLinks-CB7C40_C.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/onboardingDataSlotSource-qPx6fUNU.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/onyxStoryMetadata-Bq_5Th--.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/pricingFixtures.generated-CEiD1ca2.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/profile.stories-DlPoX8YC.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/protect-task.stories-dOTaLEMy.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/react-18-BfUV1oqG.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/screenBackgroundMorph-RdKWbQdJ.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/screenReviewStoryKit-Dt_Rkzsv.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/screenStructureStoryKit-ComKfaDB.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/syntaxhighlighter-W7WJGI2T-BKWqXrBS.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/theming-BRkukHDK.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-addons/docs-1/manager-bundle.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/train.stories-Dz3ntN8J.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/vite-inject-mocker-entry.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-addons/storybook-core-server-presets-0/common-manager-bundle.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-manager/runtime.js
+2026/09/25 07:07:05 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-manager/globals-runtime.js
+2026/09/25 07:07:06 [ts-extractor] skipping minified/bundled file scripts/deploy/t013-pulumi-role-handoff.mjs
+[graph-profile] ts_mapfiles_aggregate              4.403s  total= 4.844s  trace=ts  parsed=4034 facts=59224 routers=0 scans=1705 derived=2288
+[graph-profile] ts_compose_modules                 0.003s  total= 4.846s  trace=ts  facts=59661 records=4086 unread=0
+[graph-profile] ts_extract_session                 4.849s  total= 5.844s  trace=session  parsed=4034 cached=0 facts=59661 records=4086
+[graph-profile] assemble_new_files                 0.135s  total= 5.979s  trace=session  new=4086 ts_noop=false non_ts_need=false skip=false facts=59661
+[graph-profile] index_group_owners                 0.014s  total= 5.993s  trace=session  facts=59224 owners=4034
+[graph-profile] publish_scope                      0.001s  total= 5.994s  trace=session  scope=8483
+[graph-profile] encode_append_owners               1.851s  total= 7.845s  trace=session  published=4034
+[graph-profile] publish_resolved                   0.055s  total= 7.900s  trace=session  owners=4034
+[graph-profile] revalidate_ts_records              0.159s  total= 8.059s  trace=session  n=4086
+[graph-profile] ts_config_inputs                   0.146s  n=83
+[graph-profile] state_json_marshal                 0.202s  bytes=56633692 files=4086
+[graph-profile] state_fingerprint                  0.025s  write bytes=56633692
+[graph-profile] write_pending_state                0.531s  total= 8.590s  trace=session
+[graph-profile] end_flush_ack                      0.062s  total= 8.652s  trace=session
+[graph-profile] promote_compact_state              0.071s  total= 8.723s  trace=session  parsed=4034 published=4034
+[graph-profile] graph_session_run                  8.820s  total= 9.154s  trace=cli  repo=/tmp/enola-stage21-startup-profile/run1/product parsed=4034
+[graph] /tmp/enola-stage21-startup-profile/run1/product: generation 0→1 parsed=4034 cached=0 early_local=0 fallbacks=1
+[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)
+[graph-profile] cli_complete                       0.000s  total= 9.154s  trace=cli  results=1
+       10.04 real        34.20 user         1.67 sys
+           948584448  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               75540  page reclaims
+                 241  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                1749  messages sent
+                 502  messages received
+                3982  signals received
+                8191  voluntary context switches
+               72956  involuntary context switches
+        382127992430  instructions retired
+        103145625656  cycles elapsed
+           826248896  peak memory footprint

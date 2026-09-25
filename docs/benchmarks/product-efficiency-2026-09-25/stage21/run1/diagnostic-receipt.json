@@ -1,0 +1,59 @@
+{
+  "label": "diagnostic only; shared load; not a timing measurement",
+  "enola_source": "main a1dec99086fc1ace834e5616bd31c39ddce0b39b",
+  "binary_sha256": "e9964ea1e7a99afee568b8f6d8aa7d9d9e66f03063d9dbfafe75f4a0f53b4a0b",
+  "product_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "profile": "ts + product-graph-scope.yaml overlay",
+  "authorized_runs": "1 initial + 2 no-op + 1 body-edit",
+  "runs_executed": 4,
+  "competing_samples": [
+    [
+      "3618 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "3618 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "3618 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "3618 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "3618 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "3618 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "3618 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "3618 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "3618 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "3618 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "3618 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "3618 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "3618 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "3618 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "3618 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ],
+    [
+      "3618 /tmp/enola-fsm-primary-acceptance/final-r24-acceptance/enola-v322 graph analyze --config /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2.yaml --summary-json --events /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state-events.jsonl --repo-id product --context fsm-acceptance --state-dir /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-v2-state --max-begin-bytes 4194304 --authoritative-scope /tmp/enola-fsm-primary-acceptance/final-r24-corpus-r2/product-source"
+    ]
+  ]
+}
