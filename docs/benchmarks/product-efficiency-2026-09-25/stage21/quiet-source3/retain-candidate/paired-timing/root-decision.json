@@ -1,0 +1,9 @@
+{
+  "correctness_accepted": true,
+  "performance_integration_accepted": false,
+  "decision": "defer Stage21 integration",
+  "reason": "No-op improves18.7%, but body delta slower in all3pairs and disjoint ranges; structural delta not improved; candidate delta still40%of initial, not final target",
+  "host_note": "145 whole-host samples, no sample errors or recognized competing builds/tests. Background OS/app/VM activity present: first baseline mds_stores sample peak131.1% CPU. Coordinated shared host, not isolated machine; no causal noise explanation asserted.",
+  "outlier_note": "Prior4.23s body not reproduced; absence does not establish cause. Retained memory lifetime still needs characterization.",
+  "created_utc": "2026-09-25T10:22:44.507547+00:00"
+}

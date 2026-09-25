@@ -1,0 +1,11 @@
+{
+  "label": "diagnostic only; shared load; not a timing measurement",
+  "enola_source": "option C retain candidate /tmp/enola-stage21-retain/src; see REVIEW_NOTES.md and optionC.diff",
+  "comparable_with": "product-proof-profile3.py rows, same flags and budget, different load",
+  "binary_sha256": "d3229b4a5d622d1e9986565782a8c0cab7c078821775d361cb85809927c0aef6",
+  "product_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "profile": "ts + product-graph-scope.yaml overlay",
+  "authorized_runs": "1 initial + 2 no-op + 1 body-edit",
+  "runs_executed": 4,
+  "competing_samples": []
+}

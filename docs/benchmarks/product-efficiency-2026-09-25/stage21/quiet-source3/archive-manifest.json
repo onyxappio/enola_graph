@@ -1,0 +1,290 @@
+[
+  {
+    "path": "timing-comparison.json",
+    "source": "/tmp/enola-stage21-root-review/timing-comparison.json",
+    "sha256": "604c4a9b38391be1f174a5520b100467b03229cb39a5409bd6002b4e600f8b58",
+    "bytes": 17884
+  },
+  {
+    "path": "timing-series.json",
+    "source": "/tmp/enola-stage21-root-review/timing-series.json",
+    "sha256": "a93070a501386d5c8a057903b2a572c5c656ff7db8666b65e6388768754b1f2d",
+    "bytes": 3125
+  },
+  {
+    "path": "timing-window.json",
+    "source": "/tmp/enola-stage21-root-review/timing-window.json",
+    "sha256": "efaaa6d51382c4761d1d11701337e8cfcd31d8de35fbad6a436d0b5d34b5dcf4",
+    "bytes": 449
+  },
+  {
+    "path": "stage21-decision.json",
+    "source": "/tmp/enola-stage21-root-review/stage21-decision.json",
+    "sha256": "c1ee284cfab1b0148ecff57cd3691f829591a11aa46d5a7895eb9981b5c221cc",
+    "bytes": 806
+  },
+  {
+    "path": "freeze-root-review.json",
+    "source": "/tmp/enola-stage21-root-review/freeze-root-review.json",
+    "sha256": "b021d2a8909750b91f64a6963a793f347b14972d4890e3023faf331eebbcfa07",
+    "bytes": 411
+  },
+  {
+    "path": "final-candidate-acceptance.json",
+    "source": "/tmp/enola-stage21-root-review/final-candidate-acceptance.json",
+    "sha256": "cb8c590a559f65dbf2a5ef44a6116aced983d6682b6ee5fb64a1781194550ce9",
+    "bytes": 727
+  },
+  {
+    "path": "summarize-timing.py",
+    "source": "/tmp/enola-stage21-root-review/summarize-timing.py",
+    "sha256": "e7bbbc45ec5fcc1a98a6b4015bfe2776f0e3313df23875aed69f87313b827ae2",
+    "bytes": 7915
+  },
+  {
+    "path": "run-timing-series.py",
+    "source": "/tmp/enola-stage21-root-review/run-timing-series.py",
+    "sha256": "694d8831a795535fac88d86be03a5e52f189543356003160e1d925364181c7fb",
+    "bytes": 2901
+  },
+  {
+    "path": "test-timing-summary.py",
+    "source": "/tmp/enola-stage21-root-review/test-timing-summary.py",
+    "sha256": "08a9317348a32f0ea00dcd43713eee69cebd64028ab805129c7d5ae0a11819d5",
+    "bytes": 2451
+  },
+  {
+    "path": "full-repo-output-audit.json",
+    "source": "/tmp/enola-stage21-root-review/full-repo-output-audit.json",
+    "sha256": "2d25c1ffb58911629ee0691117fb37c206ff716fa546b41d50a440114657e8db",
+    "bytes": 224
+  },
+  {
+    "path": "history/root-summary.json",
+    "source": "/tmp/enola-stage21-root-review/history/root-summary.json",
+    "sha256": "e2087f2c75bf0183c23bef13da8160197ccb37be0a5e2b4214fcc270eaa9db1c",
+    "bytes": 3114
+  },
+  {
+    "path": "history/config-add-independent-audit.json",
+    "source": "/tmp/enola-stage21-root-review/history/config-add-independent-audit.json",
+    "sha256": "af1154276c71a200101064cd93c7a938a8a7d32a45b53a8dc622661be47dc162",
+    "bytes": 804
+  },
+  {
+    "path": "watch-pairs/root-watch-review.json",
+    "source": "/tmp/enola-stage21-root-review/watch-pairs/root-watch-review.json",
+    "sha256": "d4638dbe18e63c68c22b49327543861f13ff6b029d2f1efb47f1dc55c6cf5e8d",
+    "bytes": 375
+  },
+  {
+    "path": "cli-pairs/pins.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/pins.json",
+    "sha256": "b694e7c21c5dbf889607d6533a7f8564141f69bd252a7cd7cc089215e3b79a73",
+    "bytes": 2771
+  },
+  {
+    "path": "cli-pairs/cli.py",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/cli.py",
+    "sha256": "94cb4e07996ab45f1a804a260ec6c3f1686f34d78718d9ece2d32466f41826f3",
+    "bytes": 10859
+  },
+  {
+    "path": "cli-pairs/run-arm.py",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/run-arm.py",
+    "sha256": "e3a449d73bb37f3ebbb70716ac890a9504a2e8711ef4bb35d52f588cf4cc94a3",
+    "bytes": 5507
+  },
+  {
+    "path": "cli-pairs/validate_results.py",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/validate_results.py",
+    "sha256": "7e4846646167653d6d3de7d3d5d805a02aa889dfe09e4d0b42a61d19173e7b02",
+    "bytes": 1510
+  },
+  {
+    "path": "cli-pairs/harness_support.py",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/harness_support.py",
+    "sha256": "95d70a9e3e3a0986fd8a1684524a8c9f2205df5529786979d08376abb46e4cac",
+    "bytes": 8938
+  },
+  {
+    "path": "cli-pairs/baseline-1/metrics.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/baseline-1/metrics.json",
+    "sha256": "293d961c91310e8f462060ca3ad3f7a99a89c0eaa38c77c9f600c44c532d3110",
+    "bytes": 23048
+  },
+  {
+    "path": "cli-pairs/baseline-1/checks.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/baseline-1/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9",
+    "bytes": 293
+  },
+  {
+    "path": "cli-pairs/baseline-1/pair-receipt.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/baseline-1/pair-receipt.json",
+    "sha256": "5883746dfa86b52239e0cc5a6aa2abb01b624e1905a22527e8441fa54b9f6ea6",
+    "bytes": 353
+  },
+  {
+    "path": "baseline-1-containers.log",
+    "source": "/tmp/enola-stage21-root-review/baseline-1-containers.log",
+    "sha256": "517c3c3fe1185a59a032b1e31813a76d4bae7f954f69e6ba9b161057582749f8",
+    "bytes": 312
+  },
+  {
+    "path": "cli-pairs/baseline-2/metrics.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/baseline-2/metrics.json",
+    "sha256": "976e1fb19ae851ccfd900a4e7928b9ec26e62c79f376369d632cea679626535a",
+    "bytes": 23052
+  },
+  {
+    "path": "cli-pairs/baseline-2/checks.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/baseline-2/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9",
+    "bytes": 293
+  },
+  {
+    "path": "cli-pairs/baseline-2/pair-receipt.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/baseline-2/pair-receipt.json",
+    "sha256": "efebc071e14f9ba4684e53c29e927b6a0a0e51d52f3f8ddc1b116794124fa3b8",
+    "bytes": 353
+  },
+  {
+    "path": "baseline-2-containers.log",
+    "source": "/tmp/enola-stage21-root-review/baseline-2-containers.log",
+    "sha256": "b4e59e626bf176dda8e02778fce7fc275f132192ee156c5586f525ada543086a",
+    "bytes": 312
+  },
+  {
+    "path": "cli-pairs/baseline-3/metrics.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/baseline-3/metrics.json",
+    "sha256": "949d23cbd9181017da17479efa413dadde976344508ba92d62fcc9bd7054ab6d",
+    "bytes": 23051
+  },
+  {
+    "path": "cli-pairs/baseline-3/checks.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/baseline-3/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9",
+    "bytes": 293
+  },
+  {
+    "path": "cli-pairs/baseline-3/pair-receipt.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/baseline-3/pair-receipt.json",
+    "sha256": "27a674c565846c57ad5ad752c6e8ed570681e35cc4fe2947211fe038bcf8969e",
+    "bytes": 353
+  },
+  {
+    "path": "baseline-3-containers.log",
+    "source": "/tmp/enola-stage21-root-review/baseline-3-containers.log",
+    "sha256": "7e3008cd1cdc5bbf1f158482010d8fc1574dcb45daa9007df00a2e374ff2afc8",
+    "bytes": 312
+  },
+  {
+    "path": "cli-pairs/candidate-1/metrics.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/candidate-1/metrics.json",
+    "sha256": "7e14fa527d4f946fb557a6902acbf5f66004da1feee3762fad0c71d6e82be6e6",
+    "bytes": 23072
+  },
+  {
+    "path": "cli-pairs/candidate-1/checks.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/candidate-1/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9",
+    "bytes": 293
+  },
+  {
+    "path": "cli-pairs/candidate-1/pair-receipt.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/candidate-1/pair-receipt.json",
+    "sha256": "9300da1f0c174846281272f03e16105d30326d69675cc3e25c01fa5cf39009c9",
+    "bytes": 354
+  },
+  {
+    "path": "candidate-1-containers.log",
+    "source": "/tmp/enola-stage21-root-review/candidate-1-containers.log",
+    "sha256": "233ad7a92736165344907a9650825be75b1df8c16501eba4d41cb2839445c820",
+    "bytes": 312
+  },
+  {
+    "path": "cli-pairs/candidate-2/metrics.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/candidate-2/metrics.json",
+    "sha256": "683a50c5b0922ff2f57dec5a263933583b52e8b996b5f9ce38a0eeefb78394f8",
+    "bytes": 23072
+  },
+  {
+    "path": "cli-pairs/candidate-2/checks.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/candidate-2/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9",
+    "bytes": 293
+  },
+  {
+    "path": "cli-pairs/candidate-2/pair-receipt.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/candidate-2/pair-receipt.json",
+    "sha256": "fc7243a52c62547c5a6639ac4102e821f84131722c2967e565dad188a91cf79d",
+    "bytes": 354
+  },
+  {
+    "path": "candidate-2-containers.log",
+    "source": "/tmp/enola-stage21-root-review/candidate-2-containers.log",
+    "sha256": "7c734f6684f5f75fa07413c931bf25a9d1e1c724e25d123d99a5ae25a4dc671b",
+    "bytes": 313
+  },
+  {
+    "path": "cli-pairs/candidate-3/metrics.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/candidate-3/metrics.json",
+    "sha256": "e9a2839aea6c1bba2e27b5b6efd77185b402a26a1ffb2b369f6bd6dcbe3ccb6c",
+    "bytes": 23071
+  },
+  {
+    "path": "cli-pairs/candidate-3/checks.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/candidate-3/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9",
+    "bytes": 293
+  },
+  {
+    "path": "cli-pairs/candidate-3/pair-receipt.json",
+    "source": "/tmp/enola-stage21-root-review/cli-pairs/candidate-3/pair-receipt.json",
+    "sha256": "d9c3369416499778488637cd1cdd29cf55a4052fc5fac0de9b0eb98eb55c7238",
+    "bytes": 354
+  },
+  {
+    "path": "candidate-3-containers.log",
+    "source": "/tmp/enola-stage21-root-review/candidate-3-containers.log",
+    "sha256": "a84bdfb9244e738d9d45b2cadfc5d6c93583b7b059a24b86a6be51d00218ab58",
+    "bytes": 312
+  },
+  {
+    "path": "paired-work-counter-review.json",
+    "source": "/tmp/enola-stage21-root-review/paired-work-counter-review.json",
+    "sha256": "0cfd5857118da6e0bb326ed4891636579290f34e96be395f0a4c69eec72dceef",
+    "bytes": 21921
+  },
+  {
+    "path": "allocation/s21-alloc-boundary-1.log",
+    "source": "/tmp/s21-alloc-boundary-1.log",
+    "sha256": "2a2c6a634d4be374afdf8fc73c881f5030073ed06a09049b94cd8808da86fd24",
+    "bytes": 2593
+  },
+  {
+    "path": "allocation/s21-alloc-commitproof-1.log",
+    "source": "/tmp/s21-alloc-commitproof-1.log",
+    "sha256": "d993c996b35f181ff716427bab3823544a6fc2c81f9776999a098add9a5eb626",
+    "bytes": 882
+  },
+  {
+    "path": "allocation/s21-alloc-ref-1.log",
+    "source": "/tmp/s21-alloc-ref-1.log",
+    "sha256": "a7db5367bd88f5daeac5819a403eafa9f3f93213c2a100cc81b12ef83ceba7e8",
+    "bytes": 466
+  },
+  {
+    "path": "allocation/zz_scratch_commit_proof_alloc_test.go",
+    "source": "/tmp/enola-stage21-proof/src/internal/graphsession/zz_scratch_commit_proof_alloc_test.go",
+    "sha256": "b91bc31d50f73851146c8afbf9f54a199472cee5c52a93f381fcf4cf24c24a22",
+    "bytes": 8171
+  },
+  {
+    "path": "allocation/commitproof-alloc-receipt.json",
+    "source": "/tmp/enola-stage21-proof/alloc/commitproof-alloc-receipt.json",
+    "sha256": "10028a13ff1989434c9e29f6d9e13bea42df7e8c17e635f661d42c1a7ef4efd1",
+    "bytes": 7058
+  }
+]

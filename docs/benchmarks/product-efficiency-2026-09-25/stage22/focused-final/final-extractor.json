@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-overlay",
+    "/tmp/enola-stage22-root-signature/final-extractor-overlay.json",
+    "-count=1",
+    "-v",
+    "-run",
+    "^(TestMinifiedRecordCarriesFrameworkSummary|TestMinifiedGraphQLProducerRecordCarriesServerAndSDL|TestCompositionSignatureCachedEqualsColdForMinifiedGRPCProducer|TestCompositionSignatureCachedEqualsColdForMinifiedGraphQLProducer|TestCompositionSignatureRereadsLegacyMinifiedRecord|TestCompositionSignatureMinifiedAmbiguityMatchesCold|TestMinifiedGRPCStubStillResolvesConsumerAfterReuse|TestMinifiedGraphQLServerStillShapesConsumerAfterReuse|TestMinifiedRecordIsNotRereadOnUnchangedSecondExtract|TestLegacyMinifiedRecordRefreshesOnceThenIsSkipped|TestMinifiedRecordRereadWhenBytesChange|TestMinifiedBoundaryTransitionsBothWays|TestMinifiedRecordRereadWhenStoredScopeDoesNotMatchLayout)$",
+    "./internal/extractors/tsextractor"
+  ],
+  "exit": 0,
+  "wall_s": 2.748872167081572,
+  "test_count": 13,
+  "source_sha256": "f06556a0e96ca71dc07e318f119130f0e80f5ff031b14dccadead2be9fb57797",
+  "test_sha256": "fe6ebf5148f6eed8efccde29a3453d3e1de2e041e11c7f550eeb94d536f68d86"
+}

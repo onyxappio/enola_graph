@@ -1,0 +1,40 @@
+[
+  {
+    "Invalidation": {
+      "RawConfigChanged": false,
+      "PolicyReconciled": false,
+      "AddedSources": 0,
+      "RemovedSources": 0,
+      "ContextAffectedSources": 0,
+      "ContextReasons": null,
+      "ParsedByReason": {
+        "source content": 1
+      }
+    },
+    "RunID": "/tmp/enola-stage22-legacy-cli/repo-default-2-1790336590261302000",
+    "BaseGeneration": 1,
+    "TargetGeneration": 2,
+    "Stats": {
+      "files_read": 2,
+      "files_parsed": 1,
+      "cached_files": 1,
+      "graphql_parsed": 1,
+      "sfc_parsed": 0,
+      "summary_scans": 0,
+      "derived_indexes": 1,
+      "discovery_passes": 0
+    },
+    "Fallbacks": [
+      {
+        "extractor": "graph",
+        "scope": "changed files and reverse file dependents",
+        "reason": "frozen scope: prior file-to-file dependency closure"
+      }
+    ],
+    "Unreadable": null,
+    "OwnersPublished": 1,
+    "ParsedFiles": 1,
+    "EarlyLocal": 0,
+    "Facts": null
+  }
+]

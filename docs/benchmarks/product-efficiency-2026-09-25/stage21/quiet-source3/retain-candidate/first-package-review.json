@@ -1,0 +1,8 @@
+{
+  "result": "FAIL",
+  "elapsed_seconds": 477.805,
+  "failure": "TestRefusedDeferralDigestsTheStateOnce: state_read_bytes marks1 expected2",
+  "root_cause_review": "openSession was outside captureProfile; test boundary excluded first read",
+  "next": "finish transaction-exit lifetime cleanup and all queued test corrections; named focused tests before broader rerun",
+  "first_focused_claim": "23.123s package success exists but six-test coverage not yet independently confirmed"
+}

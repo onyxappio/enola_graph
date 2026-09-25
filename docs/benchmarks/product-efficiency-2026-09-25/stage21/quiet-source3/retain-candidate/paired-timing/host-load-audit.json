@@ -1,0 +1,572 @@
+{
+  "baseline-1": {
+    "samples": 25,
+    "errors": [],
+    "recognized_competitor_samples": 0,
+    "loadavg_range": [
+      8.0615234375,
+      10.7666015625
+    ],
+    "top_processes": [
+      {
+        "pid": 15161,
+        "mean_cpu": 75.93,
+        "peak_cpu": 885.6,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:52909 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-1/state1 --context baseline-1-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-1/config.yaml"
+      },
+      {
+        "pid": 16847,
+        "mean_cpu": 53.66,
+        "peak_cpu": 713.1,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:52909 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-1/cold-original --context baseline-1-cold-original /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-1/config.yaml"
+      },
+      {
+        "pid": 16067,
+        "mean_cpu": 53.22,
+        "peak_cpu": 828.1,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:52909 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-1/cold-structural --context baseline-1-cold-structural /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-1/config.yaml"
+      },
+      {
+        "pid": 16214,
+        "mean_cpu": 51.18,
+        "peak_cpu": 826.8,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:52909 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-1/cold-body --context baseline-1-cold-body /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-1/config.yaml"
+      },
+      {
+        "pid": 14748,
+        "mean_cpu": 25.37,
+        "peak_cpu": 118.9,
+        "samples_present": 25,
+        "command": "/tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:52909 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-1/consumer.jsonl"
+      },
+      {
+        "pid": 268,
+        "mean_cpu": 22.19,
+        "peak_cpu": 131.1,
+        "samples_present": 25,
+        "command": "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mds_stores"
+      },
+      {
+        "pid": 14750,
+        "mean_cpu": 10.12,
+        "peak_cpu": 67.6,
+        "samples_present": 4,
+        "command": "/Library/Developer/CommandLineTools/usr/bin/git status --porcelain --untracked-files=no"
+      },
+      {
+        "pid": 15863,
+        "mean_cpu": 8.82,
+        "peak_cpu": 113.6,
+        "samples_present": 2,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph delta --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:52909 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-1/state1 --context baseline-1-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-1/config.yaml"
+      },
+      {
+        "pid": 43565,
+        "mean_cpu": 8.46,
+        "peak_cpu": 38.5,
+        "samples_present": 25,
+        "command": "/System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.VirtualMachine.xpc/Contents/MacOS/com.apple.Virtualization.VirtualMachine"
+      },
+      {
+        "pid": 448,
+        "mean_cpu": 8.29,
+        "peak_cpu": 11.2,
+        "samples_present": 25,
+        "command": "/Applications/ClearVPN.app/Contents/MacOS/ClearVPN"
+      },
+      {
+        "pid": 59576,
+        "mean_cpu": 8.08,
+        "peak_cpu": 10.8,
+        "samples_present": 25,
+        "command": "/Applications/Orca.app/Contents/MacOS/Orca"
+      },
+      {
+        "pid": 15945,
+        "mean_cpu": 5.47,
+        "peak_cpu": 136.8,
+        "samples_present": 1,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph delta --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:52909 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-1/state1 --context baseline-1-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-1/config.yaml"
+      }
+    ]
+  },
+  "baseline-2": {
+    "samples": 24,
+    "errors": [],
+    "recognized_competitor_samples": 0,
+    "loadavg_range": [
+      6.76513671875,
+      8.45361328125
+    ],
+    "top_processes": [
+      {
+        "pid": 23129,
+        "mean_cpu": 82.56,
+        "peak_cpu": 921.7,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:54241 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-2/cold-body --context baseline-2-cold-body /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-2/config.yaml"
+      },
+      {
+        "pid": 23673,
+        "mean_cpu": 78.9,
+        "peak_cpu": 868.1,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:54241 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-2/cold-original --context baseline-2-cold-original /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-2/config.yaml"
+      },
+      {
+        "pid": 22954,
+        "mean_cpu": 67.0,
+        "peak_cpu": 885.8,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:54241 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-2/cold-structural --context baseline-2-cold-structural /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-2/config.yaml"
+      },
+      {
+        "pid": 22158,
+        "mean_cpu": 52.6,
+        "peak_cpu": 797.4,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:54241 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-2/state1 --context baseline-2-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-2/config.yaml"
+      },
+      {
+        "pid": 21934,
+        "mean_cpu": 20.93,
+        "peak_cpu": 121.7,
+        "samples_present": 24,
+        "command": "/tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:54241 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-2/consumer.jsonl"
+      },
+      {
+        "pid": 43565,
+        "mean_cpu": 11.91,
+        "peak_cpu": 52.0,
+        "samples_present": 24,
+        "command": "/System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.VirtualMachine.xpc/Contents/MacOS/com.apple.Virtualization.VirtualMachine"
+      },
+      {
+        "pid": 22892,
+        "mean_cpu": 9.67,
+        "peak_cpu": 121.5,
+        "samples_present": 2,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph delta --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:54241 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-2/state1 --context baseline-2-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-2/config.yaml"
+      },
+      {
+        "pid": 22790,
+        "mean_cpu": 9.44,
+        "peak_cpu": 182.7,
+        "samples_present": 2,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph delta --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:54241 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-2/state1 --context baseline-2-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-2/config.yaml"
+      },
+      {
+        "pid": 59576,
+        "mean_cpu": 8.96,
+        "peak_cpu": 12.2,
+        "samples_present": 24,
+        "command": "/Applications/Orca.app/Contents/MacOS/Orca"
+      },
+      {
+        "pid": 21962,
+        "mean_cpu": 8.85,
+        "peak_cpu": 72.9,
+        "samples_present": 3,
+        "command": "/Library/Developer/CommandLineTools/usr/bin/git status --porcelain --untracked-files=no"
+      },
+      {
+        "pid": 448,
+        "mean_cpu": 7.86,
+        "peak_cpu": 10.9,
+        "samples_present": 24,
+        "command": "/Applications/ClearVPN.app/Contents/MacOS/ClearVPN"
+      },
+      {
+        "pid": 17228,
+        "mean_cpu": 3.62,
+        "peak_cpu": 25.2,
+        "samples_present": 24,
+        "command": "/usr/libexec/sysmond"
+      }
+    ]
+  },
+  "baseline-3": {
+    "samples": 24,
+    "errors": [],
+    "recognized_competitor_samples": 0,
+    "loadavg_range": [
+      5.38623046875,
+      7.48583984375
+    ],
+    "top_processes": [
+      {
+        "pid": 25364,
+        "mean_cpu": 81.4,
+        "peak_cpu": 924.6,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:54614 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-3/cold-body --context baseline-3-cold-body /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-3/config.yaml"
+      },
+      {
+        "pid": 25916,
+        "mean_cpu": 81.36,
+        "peak_cpu": 904.4,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:54614 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-3/cold-original --context baseline-3-cold-original /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-3/config.yaml"
+      },
+      {
+        "pid": 25177,
+        "mean_cpu": 70.54,
+        "peak_cpu": 923.0,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:54614 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-3/cold-structural --context baseline-3-cold-structural /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-3/config.yaml"
+      },
+      {
+        "pid": 24369,
+        "mean_cpu": 58.0,
+        "peak_cpu": 771.4,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:54614 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-3/state1 --context baseline-3-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-3/config.yaml"
+      },
+      {
+        "pid": 24170,
+        "mean_cpu": 18.85,
+        "peak_cpu": 97.4,
+        "samples_present": 24,
+        "command": "/tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:54614 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-3/consumer.jsonl"
+      },
+      {
+        "pid": 25016,
+        "mean_cpu": 10.65,
+        "peak_cpu": 215.9,
+        "samples_present": 2,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph delta --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:54614 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-3/state1 --context baseline-3-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-3/config.yaml"
+      },
+      {
+        "pid": 43565,
+        "mean_cpu": 10.15,
+        "peak_cpu": 60.1,
+        "samples_present": 24,
+        "command": "/System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.VirtualMachine.xpc/Contents/MacOS/com.apple.Virtualization.VirtualMachine"
+      },
+      {
+        "pid": 24172,
+        "mean_cpu": 8.85,
+        "peak_cpu": 72.9,
+        "samples_present": 3,
+        "command": "/Library/Developer/CommandLineTools/usr/bin/git status --porcelain --untracked-files=no"
+      },
+      {
+        "pid": 59576,
+        "mean_cpu": 8.82,
+        "peak_cpu": 14.7,
+        "samples_present": 24,
+        "command": "/Applications/Orca.app/Contents/MacOS/Orca"
+      },
+      {
+        "pid": 25115,
+        "mean_cpu": 8.37,
+        "peak_cpu": 115.1,
+        "samples_present": 2,
+        "command": "/tmp/enola-stage21-root-review/enola-stage20-baseline graph delta --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:54614 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-3/state1 --context baseline-3-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/baseline-3/config.yaml"
+      },
+      {
+        "pid": 448,
+        "mean_cpu": 7.99,
+        "peak_cpu": 11.3,
+        "samples_present": 24,
+        "command": "/Applications/ClearVPN.app/Contents/MacOS/ClearVPN"
+      },
+      {
+        "pid": 39742,
+        "mean_cpu": 3.83,
+        "peak_cpu": 22.9,
+        "samples_present": 24,
+        "command": "/opt/homebrew/opt/cliproxyapi/bin/cliproxyapi"
+      }
+    ]
+  },
+  "candidate-1": {
+    "samples": 24,
+    "errors": [],
+    "recognized_competitor_samples": 0,
+    "loadavg_range": [
+      7.13671875,
+      9.5458984375
+    ],
+    "top_processes": [
+      {
+        "pid": 18625,
+        "mean_cpu": 87.56,
+        "peak_cpu": 929.2,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:53409 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-1/cold-body --context candidate-1-cold-body /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-1/config.yaml"
+      },
+      {
+        "pid": 19325,
+        "mean_cpu": 79.9,
+        "peak_cpu": 906.8,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:53409 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-1/cold-original --context candidate-1-cold-original /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-1/config.yaml"
+      },
+      {
+        "pid": 18470,
+        "mean_cpu": 77.75,
+        "peak_cpu": 929.6,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:53409 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-1/cold-structural --context candidate-1-cold-structural /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-1/config.yaml"
+      },
+      {
+        "pid": 17486,
+        "mean_cpu": 59.35,
+        "peak_cpu": 632.0,
+        "samples_present": 5,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:53409 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-1/state1 --context candidate-1-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-1/config.yaml"
+      },
+      {
+        "pid": 17248,
+        "mean_cpu": 16.91,
+        "peak_cpu": 96.8,
+        "samples_present": 24,
+        "command": "/tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:53409 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-1/consumer.jsonl"
+      },
+      {
+        "pid": 43565,
+        "mean_cpu": 10.28,
+        "peak_cpu": 58.5,
+        "samples_present": 24,
+        "command": "/System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.VirtualMachine.xpc/Contents/MacOS/com.apple.Virtualization.VirtualMachine"
+      },
+      {
+        "pid": 59576,
+        "mean_cpu": 10.24,
+        "peak_cpu": 44.3,
+        "samples_present": 24,
+        "command": "/Applications/Orca.app/Contents/MacOS/Orca"
+      },
+      {
+        "pid": 18286,
+        "mean_cpu": 9.62,
+        "peak_cpu": 216.4,
+        "samples_present": 2,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph delta --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:53409 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-1/state1 --context candidate-1-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-1/config.yaml"
+      },
+      {
+        "pid": 18370,
+        "mean_cpu": 9.0,
+        "peak_cpu": 127.0,
+        "samples_present": 2,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph delta --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:53409 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-1/state1 --context candidate-1-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-1/config.yaml"
+      },
+      {
+        "pid": 17250,
+        "mean_cpu": 8.94,
+        "peak_cpu": 73.9,
+        "samples_present": 3,
+        "command": "/Library/Developer/CommandLineTools/usr/bin/git status --porcelain --untracked-files=no"
+      },
+      {
+        "pid": 448,
+        "mean_cpu": 7.47,
+        "peak_cpu": 11.3,
+        "samples_present": 24,
+        "command": "/Applications/ClearVPN.app/Contents/MacOS/ClearVPN"
+      },
+      {
+        "pid": 39742,
+        "mean_cpu": 6.11,
+        "peak_cpu": 48.8,
+        "samples_present": 24,
+        "command": "/opt/homebrew/opt/cliproxyapi/bin/cliproxyapi"
+      }
+    ]
+  },
+  "candidate-2": {
+    "samples": 24,
+    "errors": [],
+    "recognized_competitor_samples": 0,
+    "loadavg_range": [
+      7.185546875,
+      8.80224609375
+    ],
+    "top_processes": [
+      {
+        "pid": 21529,
+        "mean_cpu": 68.0,
+        "peak_cpu": 889.9,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:53882 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-2/cold-original --context candidate-2-cold-original /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-2/config.yaml"
+      },
+      {
+        "pid": 20913,
+        "mean_cpu": 65.42,
+        "peak_cpu": 924.8,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:53882 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-2/cold-body --context candidate-2-cold-body /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-2/config.yaml"
+      },
+      {
+        "pid": 20665,
+        "mean_cpu": 61.43,
+        "peak_cpu": 851.2,
+        "samples_present": 4,
+        "command": "(enola-retain-fin)"
+      },
+      {
+        "pid": 19871,
+        "mean_cpu": 54.64,
+        "peak_cpu": 814.4,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:53882 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-2/state1 --context candidate-2-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-2/config.yaml"
+      },
+      {
+        "pid": 19730,
+        "mean_cpu": 16.4,
+        "peak_cpu": 91.5,
+        "samples_present": 24,
+        "command": "/tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:53882 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-2/consumer.jsonl"
+      },
+      {
+        "pid": 43565,
+        "mean_cpu": 10.56,
+        "peak_cpu": 57.1,
+        "samples_present": 24,
+        "command": "/System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.VirtualMachine.xpc/Contents/MacOS/com.apple.Virtualization.VirtualMachine"
+      },
+      {
+        "pid": 20600,
+        "mean_cpu": 9.95,
+        "peak_cpu": 144.3,
+        "samples_present": 2,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph delta --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:53882 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-2/state1 --context candidate-2-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-2/config.yaml"
+      },
+      {
+        "pid": 448,
+        "mean_cpu": 9.5,
+        "peak_cpu": 29.6,
+        "samples_present": 24,
+        "command": "/Applications/ClearVPN.app/Contents/MacOS/ClearVPN"
+      },
+      {
+        "pid": 59576,
+        "mean_cpu": 8.86,
+        "peak_cpu": 19.6,
+        "samples_present": 24,
+        "command": "/Applications/Orca.app/Contents/MacOS/Orca"
+      },
+      {
+        "pid": 19732,
+        "mean_cpu": 8.79,
+        "peak_cpu": 72.9,
+        "samples_present": 3,
+        "command": "/Library/Developer/CommandLineTools/usr/bin/git status --porcelain --untracked-files=no"
+      },
+      {
+        "pid": 20492,
+        "mean_cpu": 8.55,
+        "peak_cpu": 145.7,
+        "samples_present": 2,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph delta --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:53882 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-2/state1 --context candidate-2-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-2/config.yaml"
+      },
+      {
+        "pid": 39742,
+        "mean_cpu": 3.4,
+        "peak_cpu": 34.5,
+        "samples_present": 24,
+        "command": "/opt/homebrew/opt/cliproxyapi/bin/cliproxyapi"
+      }
+    ]
+  },
+  "candidate-3": {
+    "samples": 24,
+    "errors": [],
+    "recognized_competitor_samples": 0,
+    "loadavg_range": [
+      5.5107421875,
+      7.93359375
+    ],
+    "top_processes": [
+      {
+        "pid": 27631,
+        "mean_cpu": 82.62,
+        "peak_cpu": 866.6,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:55071 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-3/cold-body --context candidate-3-cold-body /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-3/config.yaml"
+      },
+      {
+        "pid": 28227,
+        "mean_cpu": 79.85,
+        "peak_cpu": 921.7,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:55071 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-3/cold-original --context candidate-3-cold-original /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-3/config.yaml"
+      },
+      {
+        "pid": 26682,
+        "mean_cpu": 70.71,
+        "peak_cpu": 800.8,
+        "samples_present": 5,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:55071 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-3/state1 --context candidate-3-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-3/config.yaml"
+      },
+      {
+        "pid": 27479,
+        "mean_cpu": 69.68,
+        "peak_cpu": 906.2,
+        "samples_present": 4,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph analyze --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:55071 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-3/cold-structural --context candidate-3-cold-structural /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-3/config.yaml"
+      },
+      {
+        "pid": 26376,
+        "mean_cpu": 16.17,
+        "peak_cpu": 116.4,
+        "samples_present": 24,
+        "command": "/tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55071 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-3/consumer.jsonl"
+      },
+      {
+        "pid": 43565,
+        "mean_cpu": 10.09,
+        "peak_cpu": 93.7,
+        "samples_present": 24,
+        "command": "/System/Library/Frameworks/Virtualization.framework/Versions/A/XPCServices/com.apple.Virtualization.VirtualMachine.xpc/Contents/MacOS/com.apple.Virtualization.VirtualMachine"
+      },
+      {
+        "pid": 59576,
+        "mean_cpu": 9.17,
+        "peak_cpu": 21.9,
+        "samples_present": 24,
+        "command": "/Applications/Orca.app/Contents/MacOS/Orca"
+      },
+      {
+        "pid": 27406,
+        "mean_cpu": 9.07,
+        "peak_cpu": 124.6,
+        "samples_present": 2,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph delta --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:55071 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-3/state1 --context candidate-3-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-3/config.yaml"
+      },
+      {
+        "pid": 27325,
+        "mean_cpu": 8.82,
+        "peak_cpu": 169.9,
+        "samples_present": 2,
+        "command": "/tmp/enola-stage21-root-review/enola-retain-final1 graph delta --authoritative-scope --max-begin-bytes 1048576 --repo-id stage15-cli-product --summary-json --nats nats://127.0.0.1:55071 --state-dir /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-3/state1 --context candidate-3-main1 /private/tmp/enola-stage21-retain/acceptance/cli-pairs/candidate-3/config.yaml"
+      },
+      {
+        "pid": 26378,
+        "mean_cpu": 8.69,
+        "peak_cpu": 72.2,
+        "samples_present": 3,
+        "command": "/Library/Developer/CommandLineTools/usr/bin/git status --porcelain --untracked-files=no"
+      },
+      {
+        "pid": 448,
+        "mean_cpu": 7.88,
+        "peak_cpu": 12.0,
+        "samples_present": 24,
+        "command": "/Applications/ClearVPN.app/Contents/MacOS/ClearVPN"
+      },
+      {
+        "pid": 39742,
+        "mean_cpu": 4.34,
+        "peak_cpu": 30.2,
+        "samples_present": 24,
+        "command": "/opt/homebrew/opt/cliproxyapi/bin/cliproxyapi"
+      }
+    ]
+  }
+}

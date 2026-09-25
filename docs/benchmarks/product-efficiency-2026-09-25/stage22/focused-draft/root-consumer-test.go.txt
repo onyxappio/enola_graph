@@ -1,0 +1,19 @@
+package tsextractor
+import ("context";"encoding/json";"os";"path/filepath";"sort";"strings";"testing";"github.com/enola-labs/enola/internal/facts")
+func TestRootStage22PersistedMinifiedGRPCConsumer(t *testing.T) {
+ root:=t.TempDir(); stub:="gen/users/v1/users.client.ts"
+ files:=map[string]string{stub:genUsersClient+"\nexport const pad=["+strings.Repeat("0,",1600)+"0];\n", "gen/users/v1/users.ts":genUsersService,"app.ts":`import { UserServiceClient } from "./gen/users/v1/users.client";
+const userService = new UserServiceClient(makeTransport());
+async function submit(name: string) { return await userService.createUser({name}); }
+`}
+ names:=[]string{};for n,s:=range files {p:=filepath.Join(root,n);if err:=os.MkdirAll(filepath.Dir(p),0755);err!=nil{t.Fatal(err)};if err:=os.WriteFile(p,[]byte(s),0600);err!=nil{t.Fatal(err)};names=append(names,n)};sort.Strings(names)
+ e:=New();cold,err:=e.ExtractSession(context.Background(),root,names,nil,nil,SessionHooks{});if err!=nil{t.Fatal(err)}
+ if cold.Records[stub]==nil || !cold.Records[stub].Minified || cold.Records[stub].GRPC==nil{t.Fatal("missing minified producer")}
+ if _,ok:=hasGRPCRoute(cold.Facts,"/users.v1.UserService/CreateUser");!ok{t.Fatal("fixture missing expected cold consumer route")}
+ raw,err:=json.Marshal(cold.Records);if err!=nil{t.Fatal(err)};var records map[string]*FileRecord;if err:=json.Unmarshal(raw,&records);err!=nil{t.Fatal(err)}
+ warm,err:=e.ExtractSession(context.Background(),root,names,records,map[string]bool{"app.ts":true},SessionHooks{GraphPlannerOwnsInvalidation:true});if err!=nil{t.Fatal(err)}
+ if warm.Stats.FilesRead!=1{t.Fatalf("expected only consumer read, got %d",warm.Stats.FilesRead)}
+ if _,ok:=hasGRPCRoute(warm.Facts,"/users.v1.UserService/CreateUser");!ok{t.Fatal("persisted summary lost consumer route")}
+ canonical:=func(ff []facts.Fact)string{rows:=[]string{};for _,f:=range ff{b,err:=json.Marshal(f);if err!=nil{t.Fatal(err)};rows=append(rows,string(b))};sort.Strings(rows);return strings.Join(rows,"\n")}
+ if canonical(cold.Facts)!=canonical(warm.Facts){t.Fatal("cold and persisted-summary consumer facts differ")}
+}

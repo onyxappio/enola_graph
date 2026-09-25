@@ -1,0 +1,804 @@
+diff -ruN /tmp/enola-stage21-proof/src/internal/graphsession/resident.go /tmp/enola-stage21-retain/src/internal/graphsession/resident.go
+--- /tmp/enola-stage21-proof/src/internal/graphsession/resident.go	2026-09-25 09:51:41
++++ /tmp/enola-stage21-retain/src/internal/graphsession/resident.go	2026-09-25 12:04:27
+@@ -459,6 +459,11 @@
+ 		return nil
+ 	}
+ 	r.closed = true
++	// A resident closed before any transaction resolved its deferral is still
++	// holding the committed state it read at open. Nothing will decode it now.
++	if r.deferred != nil {
++		r.deferred.bytes = nil
++	}
+ 	err := r.journal.Close()
+ 	r.lock.Release()
+ 	return err
+@@ -485,6 +490,23 @@
+ }
+ 
+ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast bool) (*Result, WorkCounters, error) {
++	// No transaction leaves this resident holding the raw committed state. The
++	// deferral's buffer exists to be compared and decoded by the transaction that
++	// resolves it, and a transaction that ends without resolving it - because the
++	// configuration could not be read, because the graph inputs could not be
++	// rebuilt, because anything at all failed before the decode - has no further
++	// use for it. What survives is the proof and its fingerprint, which is all the
++	// next attempt needs: with no buffer the decode falls back to reading and
++	// digesting the file, the comparison the mechanism shipped with.
++	//
++	// Stated here, once, for every exit rather than at each of them, because the
++	// exits are many and a new one added later would otherwise silently start
++	// retaining 54MB.
++	defer func() {
++		if r.deferred != nil {
++			r.deferred.bytes = nil
++		}
++	}()
+ 	if r.closed {
+ 		return nil, WorkCounters{}, fmt.Errorf("graphsession: session closed")
+ 	}
+diff -ruN /tmp/enola-stage21-proof/src/internal/graphsession/stateproof_persist.go /tmp/enola-stage21-retain/src/internal/graphsession/stateproof_persist.go
+--- /tmp/enola-stage21-proof/src/internal/graphsession/stateproof_persist.go	2026-09-25 08:54:16
++++ /tmp/enola-stage21-retain/src/internal/graphsession/stateproof_persist.go	2026-09-25 11:48:31
+@@ -1,6 +1,7 @@
+ package graphsession
+ 
+ import (
++	"bytes"
+ 	"encoding/json"
+ 	"fmt"
+ 	"os"
+@@ -167,6 +168,13 @@
+ 	reads   int
+ 	bytes   int64
+ 	refusal string
++	// retained is the committed state exactly as it was read, kept only when a
++	// proof bound those bytes and the decode was therefore skipped. It is the
++	// buffer the deferral decodes if the proof is refused, and it is what makes
++	// the re-read a byte comparison rather than a second digest. Nothing else
++	// reads it: openSeekValue drops it, so the accounting copy this struct is
++	// otherwise used for does not become a second reference to 54MB.
++	retained []byte
+ }
+ 
+ // readCommittedForProof answers a committed-state read without decoding it when,
+@@ -223,8 +231,64 @@
+ 	// the pair is what makes "zero decode on an eligible run" a reading of the
+ 	// receipt rather than an inference from a missing number.
+ 	w.reused()
++	// Held rather than released. The deferral that follows either admits the
++	// proof, in which case these bytes are dropped without being looked at, or
++	// refuses it and decodes them - and decoding the bytes already in hand is
++	// what lets the rewrite check be a comparison against them instead of a
++	// second read-and-digest of the same file.
++	seek.retained = b
+ 	graphprofile.Log("state_proof_bound", 0, fmt.Sprintf("owners=%d hash_inputs=%d proof_bytes=%d state_bytes=%d", p.OwnerCount, p.HashInputCount, n, len(b)))
+ 	return nil, fp, nil
++}
++
++// committedRecheck is what a re-read of the committed state found relative to
++// the bytes a proof was bound to.
++type committedRecheck int
++
++const (
++	// committedSame means the file still holds exactly the retained bytes.
++	committedSame committedRecheck = iota
++	// committedRemoved means the file is gone.
++	committedRemoved
++	// committedRewritten means the file exists and holds different bytes.
++	committedRewritten
++)
++
++// recheckCommitted re-reads the committed state and compares it with the bytes
++// the proof was bound to, byte for byte.
++//
++// This is the rewrite detection materializeDeferred used to get by digesting
++// the file a second time and comparing fingerprints. Comparing the bytes
++// themselves is the same check without the second SHA-256: it catches every
++// rewrite a digest comparison catches, including an in-place edit of the same
++// length that restored the timestamps, and it needs no argument about
++// collisions. The read is not avoided - the file is read again, because a check
++// that does not look at the file cannot see a writer that ignored the lock.
++//
++// Both buffers are live while bytes.Equal runs: comparing two readings of a file
++// means holding two readings of it, and the peak here is the size of the state
++// twice over. What the locality buys is the other side of that - the comparison
++// buffer is unreferenced once this returns, so it is not still held across the
++// caller's decode, where the retained buffer and the typed state are both alive.
++// Unreferenced is not reclaimed; when the collector actually frees it is its own
++// business, and the peak is measured rather than asserted here.
++func recheckCommitted(path string, retained []byte) (committedRecheck, error) {
++	tRead := time.Now()
++	b, err := os.ReadFile(path)
++	if err != nil {
++		if os.IsNotExist(err) {
++			return committedRemoved, nil
++		}
++		return committedRewritten, err
++	}
++	graphprofile.Since("state_read_bytes", tRead, fmt.Sprintf("%s bytes=%d", filepath.Base(path), len(b)))
++	tCmp := time.Now()
++	same := bytes.Equal(b, retained)
++	graphprofile.Since("state_bytes_compared", tCmp, fmt.Sprintf("bytes=%d same=%v", len(b), same))
++	if !same {
++		return committedRewritten, nil
++	}
++	return committedSame, nil
+ }
+ 
+ // recoverAcknowledgedPendingSeek is recoverAcknowledgedPendingFP with the
+diff -ruN /tmp/enola-stage21-proof/src/internal/graphsession/stateproof_retain_test.go /tmp/enola-stage21-retain/src/internal/graphsession/stateproof_retain_test.go
+--- /tmp/enola-stage21-proof/src/internal/graphsession/stateproof_retain_test.go	1970-01-01 03:00:00
++++ /tmp/enola-stage21-retain/src/internal/graphsession/stateproof_retain_test.go	2026-09-25 12:05:49
+@@ -0,0 +1,508 @@
++package graphsession
++
++import (
++	"bytes"
++	"context"
++	"errors"
++	"os"
++	"path/filepath"
++	"regexp"
++	"strings"
++	"testing"
++
++	"github.com/enola-labs/enola/internal/engine"
++	"github.com/enola-labs/enola/internal/graphstream"
++)
++
++// The deferral holds the committed state it did not decode, and decides whether
++// the file still holds those bytes by comparing against them rather than by
++// digesting the file a second time. These are the cases where that comparison
++// has to answer the same way the fingerprint comparison it replaced did.
++//
++// A rewrite between the proof and the decode is the condition the check exists
++// for. It is not a race the lock covers - the lock excludes another session, not
++// another process - so every shape of it is stated here: the same bytes edited
++// in place with the timestamps put back, a wholesale replacement, a removal and
++// a truncation. The first is the one a cheaper check would miss, and the reason
++// the bytes are retained at all.
++
++// deferredSession opens a summary session over an unchanged committed
++// generation and returns it with the deferral in place, having established that
++// the open really did defer and really is holding the bytes.
++func deferredSession(t *testing.T, eng *engine.Engine, root, dir string) *Resident {
++	t.Helper()
++	r, err := openSession(context.Background(), eng, root, &graphstream.MemorySink{}, summaryOpts(dir))
++	if err != nil {
++		t.Fatalf("open summary session: %v", err)
++	}
++	t.Cleanup(func() { _ = r.Close() })
++	if r.deferred == nil {
++		t.Fatal("the summary open decoded the committed state instead of deferring it")
++	}
++	if r.deferred.bytes == nil {
++		t.Fatal("the deferral kept no bytes, so nothing can be compared against them")
++	}
++	if !bytes.Equal(r.deferred.bytes, stateBytes(t, dir)) {
++		t.Fatal("the retained bytes are not the bytes on disk")
++	}
++	// The accounting copy must not be a second reference to the same 54MB the
++	// deferral is holding: openSeek outlives the deferral.
++	if r.openSeek.retained != nil {
++		t.Fatal("openSeek kept its own reference to the committed state")
++	}
++	return r
++}
++
++var hexDigest = regexp.MustCompile(`[0-9a-f]{64}`)
++
++// editInPlaceSameLength changes one byte of the committed state without
++// changing its length, its validity or its timestamps.
++//
++// The edited byte is inside a hex digest, so the file still parses and still
++// decodes: a test that corrupted the JSON would be caught by the decoder and
++// would say nothing about the check in front of it. Size and mtime are what they
++// were, which is what makes this the case a stat comparison cannot see.
++func editInPlaceSameLength(t *testing.T, dir string) {
++	t.Helper()
++	path := statePath(dir)
++	info, err := os.Stat(path)
++	if err != nil {
++		t.Fatal(err)
++	}
++	b := stateBytes(t, dir)
++	loc := hexDigest.FindIndex(b)
++	if loc == nil {
++		t.Fatal("no digest in the committed state to edit")
++	}
++	edited := append([]byte(nil), b...)
++	if edited[loc[0]] == '0' {
++		edited[loc[0]] = '1'
++	} else {
++		edited[loc[0]] = '0'
++	}
++	if len(edited) != len(b) {
++		t.Fatal("the in-place edit changed the length")
++	}
++	if err := os.WriteFile(path, edited, 0o644); err != nil {
++		t.Fatal(err)
++	}
++	if err := os.Chtimes(path, info.ModTime(), info.ModTime()); err != nil {
++		t.Fatal(err)
++	}
++	after, err := os.Stat(path)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if after.Size() != info.Size() || !after.ModTime().Equal(info.ModTime()) {
++		t.Fatalf("the rewrite is visible in the metadata: size %d->%d mtime %v->%v",
++			info.Size(), after.Size(), info.ModTime(), after.ModTime())
++	}
++}
++
++func TestDeferredDecodeRefusesEveryShapeOfRewrite(t *testing.T) {
++	for _, tc := range []struct {
++		name   string
++		want   string
++		break_ func(t *testing.T, dir string)
++	}{
++		{"same length in place, timestamps restored", "rewritten", editInPlaceSameLength},
++		{"replaced with a different state", "rewritten", func(t *testing.T, dir string) {
++			if err := os.WriteFile(statePath(dir), []byte(`{"Generation":1}`), 0o644); err != nil {
++				t.Fatal(err)
++			}
++		}},
++		{"truncated", "rewritten", func(t *testing.T, dir string) {
++			b := stateBytes(t, dir)
++			if err := os.WriteFile(statePath(dir), b[:len(b)/2], 0o644); err != nil {
++				t.Fatal(err)
++			}
++		}},
++		{"removed", "removed", func(t *testing.T, dir string) {
++			if err := os.Remove(statePath(dir)); err != nil {
++				t.Fatal(err)
++			}
++		}},
++	} {
++		t.Run(tc.name, func(t *testing.T) {
++			eng, root, dir, _ := predicateFixture(t)
++			r := deferredSession(t, eng, root, dir)
++			tc.break_(t, dir)
++
++			err := r.materializeDeferred(&WorkCounters{})
++			if err == nil {
++				t.Fatal("a state that moved under its proof was decoded anyway")
++			}
++			if !errors.Is(err, ErrInputsChanged) {
++				t.Fatalf("error = %v, want ErrInputsChanged", err)
++			}
++			if !bytes.Contains([]byte(err.Error()), []byte(tc.want)) {
++				t.Fatalf("error = %q, want it to say %q", err, tc.want)
++			}
++			if r.state != nil {
++				t.Fatal("the refused decode installed a state")
++			}
++			// The retained buffer is stale the moment the file stops matching it,
++			// and a deferral that keeps it is holding the whole committed state
++			// for a retry that must not use it.
++			if r.deferred == nil || r.deferred.bytes != nil {
++				t.Fatalf("failure left deferred=%v with bytes retained", r.deferred != nil)
++			}
++		})
++	}
++}
++
++// TestRetryAfterARefusedDecodeStillSeesTheRewrite is the other half of dropping
++// the buffer on failure: the check that follows has nothing to compare against,
++// and must fall back to the digest comparison rather than passing for lack of a
++// reference.
++func TestRetryAfterARefusedDecodeStillSeesTheRewrite(t *testing.T) {
++	eng, root, dir, _ := predicateFixture(t)
++	r := deferredSession(t, eng, root, dir)
++	original := stateBytes(t, dir)
++	editInPlaceSameLength(t, dir)
++
++	if err := r.materializeDeferred(&WorkCounters{}); err == nil {
++		t.Fatal("the first decode accepted a rewritten state")
++	}
++	if r.deferred.bytes != nil {
++		t.Fatal("the failed decode kept its stale buffer")
++	}
++
++	err := r.materializeDeferred(&WorkCounters{})
++	if !errors.Is(err, ErrInputsChanged) {
++		t.Fatalf("retry without a retained buffer: err = %v, want ErrInputsChanged", err)
++	}
++
++	// And the fallback is a real comparison, not a refusal of everything: put the
++	// bytes back and the same call has to succeed, or the buffer being absent
++	// would mean the deferral could never be resolved.
++	if err := os.WriteFile(statePath(dir), original, 0o644); err != nil {
++		t.Fatal(err)
++	}
++	var work WorkCounters
++	if err := r.materializeDeferred(&work); err != nil {
++		t.Fatalf("restored state was refused by the fallback: %v", err)
++	}
++	if r.state == nil || r.deferred != nil {
++		t.Fatal("the fallback decode did not resolve the deferral")
++	}
++	if work.StateDecodes != 1 {
++		t.Fatalf("fallback decodes = %d, want 1", work.StateDecodes)
++	}
++	// The fallback is the original path, so it pays the digest the retained
++	// comparison avoids. That it costs one is the point of recording it.
++	if work.StateFingerprints != 1 {
++		t.Fatalf("fallback fingerprints = %d, want the one it reads for", work.StateFingerprints)
++	}
++}
++
++// TestAdmittedProofReleasesTheBytesAndTheNextRefusalStillDecodes is the ordinary
++// two-transaction life of a resident: a no-op answers from the proof and has no
++// use for the bytes, and a later transaction over a moved tree still has to
++// produce the same state a first-transaction refusal would.
++func TestAdmittedProofReleasesTheBytesAndTheNextRefusalStillDecodes(t *testing.T) {
++	eng, root, dir, st := predicateFixture(t)
++	r := deferredSession(t, eng, root, dir)
++
++	res, work, err := r.transaction(context.Background(), nil, false)
++	if err != nil {
++		t.Fatalf("no-op transaction: %v", err)
++	}
++	if work.ProofRefusal != "" {
++		t.Fatalf("unchanged tree was refused: %s", work.ProofRefusal)
++	}
++	if res.TargetGeneration != st.Generation {
++		t.Fatalf("the no-op moved the generation to %d", res.TargetGeneration)
++	}
++	if r.deferred == nil {
++		t.Fatal("the admitted proof resolved the deferral, so the resident has no state and no deferral")
++	}
++	if r.deferred.bytes != nil {
++		t.Fatal("an admitted proof never decodes, but the bytes it did not decode are still held")
++	}
++
++	if err := os.WriteFile(filepath.Join(root, "src/leaf.ts"),
++		[]byte("import {base} from './base';\nexport const leaf=base+2;\n"), 0o644); err != nil {
++		t.Fatal(err)
++	}
++	res2, work2, err := r.transaction(context.Background(), nil, false)
++	if err != nil {
++		t.Fatalf("second transaction after the edit: %v", err)
++	}
++	if work2.ProofRefusal == "" {
++		t.Fatal("an edited tree was admitted")
++	}
++	if work2.StateDecodes != 1 {
++		t.Fatalf("decodes = %d, want the one the fallback needs", work2.StateDecodes)
++	}
++	if res2.ParsedFiles == 0 {
++		t.Fatalf("the fallback parsed nothing after an edit: %+v", res2)
++	}
++	if r.state == nil || r.deferred != nil {
++		t.Fatal("the refusal did not resolve the deferral")
++	}
++}
++
++// TestCloseBeforeAnyTransactionReleasesTheRetainedState covers the resident that
++// is opened and dropped. Nothing will decode those bytes, and until Close there
++// is no other moment that says so.
++func TestCloseBeforeAnyTransactionReleasesTheRetainedState(t *testing.T) {
++	eng, root, dir, _ := predicateFixture(t)
++	r := deferredSession(t, eng, root, dir)
++	if err := r.Close(); err != nil {
++		t.Fatalf("close: %v", err)
++	}
++	if r.deferred == nil || r.deferred.bytes != nil {
++		t.Fatal("Close left the committed state held")
++	}
++}
++
++// TestRefusedDeferralDigestsTheStateOnce is the reason for the change, stated as
++// a count rather than as a duration.
++//
++// The refused path used to read and digest the committed state at the open and
++// then read and digest it again to decide whether it had moved. It now reads it
++// again and compares. The read is still there - this is not a claim that the
++// second read went away - and the digest is not.
++func TestRefusedDeferralDigestsTheStateOnce(t *testing.T) {
++	eng, root, dir, _ := predicateFixture(t)
++	if err := os.WriteFile(filepath.Join(root, "src/leaf.ts"),
++		[]byte("import {base} from './base';\nexport const leaf=base+3;\n"), 0o644); err != nil {
++		t.Fatal(err)
++	}
++
++	// The open is inside the capture, not before it. The claim is about what one
++	// session does to the committed state from end to end - the open reads and
++	// digests it, the refusal reads it again - and a trace that starts after the
++	// open can only see half of that.
++	var work WorkCounters
++	var terr error
++	trace := captureProfile(t, func() {
++		r, err := openSession(context.Background(), eng, root, &graphstream.MemorySink{}, summaryOpts(dir))
++		if err != nil {
++			terr = err
++			return
++		}
++		defer func() { _ = r.Close() }()
++		if r.deferred == nil || r.deferred.bytes == nil {
++			terr = errors.New("the open did not defer with its bytes retained")
++			return
++		}
++		_, work, terr = r.transaction(context.Background(), nil, false)
++	})
++	if terr != nil {
++		t.Fatalf("refused transaction: %v", terr)
++	}
++	if work.ProofRefusal == "" {
++		t.Fatal("an edited tree was admitted")
++	}
++	// state_fingerprint is logged by the read side and by the commit's write
++	// side, and only the read side is what changed here, so the two are counted
++	// apart rather than together. The write mark carries "write" in its tail;
++	// that is the whole difference between them in the trace.
++	marks := func(name string, want func(string) bool) int {
++		n := 0
++		for _, line := range strings.Split(trace, "\n") {
++			if strings.Contains(line, name) && (want == nil || want(line)) {
++				n++
++			}
++		}
++		return n
++	}
++	read := func(line string) bool { return !strings.Contains(line, "write") }
++	write := func(line string) bool { return strings.Contains(line, "write") }
++	defer func() {
++		if t.Failed() {
++			t.Logf("trace:\n%s", trace)
++		}
++	}()
++
++	// One digest over the committed state, where there used to be two.
++	if work.StateFingerprints != 1 {
++		t.Fatalf("a refused deferral digested the committed state %d times, want 1", work.StateFingerprints)
++	}
++	if n := marks("state_fingerprint", read); n != 1 {
++		t.Fatalf("read-side state_fingerprint marks = %d, want 1: the duplicate digest is back", n)
++	}
++	// The write side is unchanged and is named so that it is accounted for
++	// rather than quietly excluded: this run publishes, and what it publishes it
++	// digests once on the way out.
++	if n := marks("state_fingerprint", write); n != 1 {
++		t.Fatalf("write-side state_fingerprint marks = %d, want the committing run's one", n)
++	}
++	// What replaced the second read-side digest, and what did not: the file is
++	// still read twice.
++	if n := marks("state_bytes_compared", nil); n != 1 {
++		t.Fatalf("state_bytes_compared marks = %d, want 1", n)
++	}
++	if n := marks("state_read_bytes", func(l string) bool { return strings.Contains(l, "state.json") }); n != 2 {
++		t.Fatalf("state_read_bytes marks over state.json = %d, want 2: option C removes the hash, not the read", n)
++	}
++	// And the decode the deferral existed to skip happens exactly once, on the
++	// retained bytes.
++	if n := marks("state_json_unmarshal", nil); n != 1 {
++		t.Fatalf("state_json_unmarshal marks = %d, want 1", n)
++	}
++	if work.StateDecodes != 1 {
++		t.Fatalf("decodes = %d, want 1", work.StateDecodes)
++	}
++}
++
++// TestTransactionRefusesARewrittenStateWithoutPublishing takes the same-length
++// rewrite through a whole transaction rather than through materializeDeferred
++// directly, because the thing that matters is not only that the check fires: it
++// is that nothing is published, no generation moves and the retry that follows
++// behaves.
++func TestTransactionRefusesARewrittenStateWithoutPublishing(t *testing.T) {
++	eng, root, dir, st := predicateFixture(t)
++	sink := &graphstream.MemorySink{}
++	r, err := openSession(context.Background(), eng, root, sink, summaryOpts(dir))
++	if err != nil {
++		t.Fatalf("open: %v", err)
++	}
++	t.Cleanup(func() { _ = r.Close() })
++	if r.deferred == nil || r.deferred.bytes == nil {
++		t.Fatal("the open did not defer with its bytes retained")
++	}
++	if err := os.WriteFile(filepath.Join(root, "src/leaf.ts"),
++		[]byte("import {base} from './base';\nexport const leaf=base+4;\n"), 0o644); err != nil {
++		t.Fatal(err)
++	}
++	original := stateBytes(t, dir)
++	editInPlaceSameLength(t, dir)
++	rewritten := stateBytes(t, dir)
++
++	res, _, err := r.transaction(context.Background(), nil, false)
++	if !errors.Is(err, ErrInputsChanged) {
++		t.Fatalf("transaction over a rewritten state: err = %v, res = %+v, want ErrInputsChanged", err, res)
++	}
++	if len(sink.CloneRecords()) != 0 {
++		t.Fatalf("the refused transaction published %d records", len(sink.CloneRecords()))
++	}
++	// The generation on disk is the one the rewriter left, unmoved by this run:
++	// a refused transaction commits nothing.
++	after, _, err := readStateFileFP(statePath(dir), &stateReadWork{})
++	if err != nil {
++		t.Fatalf("the rewritten state does not decode, so this test proved the decoder caught it rather than the check: %v", err)
++	}
++	if after.Generation != st.Generation {
++		t.Fatalf("generation moved %d -> %d behind a refused transaction", st.Generation, after.Generation)
++	}
++	if !bytes.Equal(stateBytes(t, dir), rewritten) {
++		t.Fatal("the refused transaction wrote to the state file")
++	}
++	// And the failure did not leave the resident holding the state it could not
++	// use, on a deferral a later transaction would meet.
++	if r.deferred != nil && r.deferred.bytes != nil {
++		t.Fatal("the failed transaction kept its stale buffer")
++	}
++
++	// Put the bytes back and the same resident has to go on and do the work. A
++	// refusal that left it permanently unable to resolve its deferral would be a
++	// worse failure than the one it was protecting against.
++	if err := os.WriteFile(statePath(dir), original, 0o644); err != nil {
++		t.Fatal(err)
++	}
++	res, work, err := r.transaction(context.Background(), nil, false)
++	if err != nil {
++		t.Fatalf("retry after the state was restored: %v", err)
++	}
++	if work.ProofRefusal == "" {
++		t.Fatal("the edited tree was admitted on the retry")
++	}
++	if work.StateDecodes != 1 {
++		t.Fatalf("retry decodes = %d, want 1", work.StateDecodes)
++	}
++	if res.ParsedFiles == 0 {
++		t.Fatalf("the retry parsed nothing after the edit: %+v", res)
++	}
++	if r.state == nil || r.deferred != nil {
++		t.Fatal("the retry did not resolve the deferral")
++	}
++}
++
++// TestFailureBeforeTheDecodeReleasesTheBytesAndRetryStillWorks covers the exits
++// that never reach the comparison at all.
++//
++// A transaction can end before the decode for reasons that have nothing to do
++// with the state file - here the repository cannot be enumerated - and the
++// deferral it leaves behind must not be carrying the committed state with it.
++// The retry afterwards is the other half: releasing the buffer is only correct
++// if the fingerprint fallback can still resolve the deferral without it.
++func TestFailureBeforeTheDecodeReleasesTheBytesAndRetryStillWorks(t *testing.T) {
++	eng, root, dir, st := predicateFixture(t)
++	r := deferredSession(t, eng, root, dir)
++
++	info, err := os.Stat(root)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if err := os.Chmod(root, 0o000); err != nil {
++		t.Fatal(err)
++	}
++	_, _, err = r.transaction(context.Background(), nil, false)
++	if chErr := os.Chmod(root, info.Mode().Perm()); chErr != nil {
++		t.Fatal(chErr)
++	}
++	if err == nil {
++		// Not a pass. The denial has to have actually happened for the rest of
++		// this test to be about anything.
++		t.Skip("the unreadable repository was read anyway; this environment cannot stage the failure")
++	}
++	if r.deferred == nil {
++		t.Fatal("a failure before the decode resolved the deferral")
++	}
++	if r.deferred.bytes != nil {
++		t.Fatal("a transaction that failed before the decode kept the committed state")
++	}
++	if r.deferred.proof == nil {
++		t.Fatal("the release took the proof with it, so the retry has nothing to check against")
++	}
++
++	res, work, err := r.transaction(context.Background(), nil, false)
++	if err != nil {
++		t.Fatalf("retry after the repository was readable again: %v", err)
++	}
++	if work.ProofRefusal != "" {
++		t.Fatalf("the unchanged tree was refused on the retry: %s", work.ProofRefusal)
++	}
++	if res.TargetGeneration != st.Generation {
++		t.Fatalf("the retry moved the generation to %d", res.TargetGeneration)
++	}
++}
++
++// TestRecheckCommittedDoesNotTouchTheRetainedBuffer is about the helper's
++// handling of the caller's buffer, and nothing more.
++//
++// It does not establish reachability or reclamation. Whether the comparison
++// buffer is actually freed, and what the peak is while both readings are live,
++// is an RSS observation on a measured run; a unit test asserting it would be
++// asserting the collector's schedule. What is checked here is what can be:
++// the retained buffer comes back exactly as it went in, and a difference is
++// reported as a difference.
++func TestRecheckCommittedDoesNotTouchTheRetainedBuffer(t *testing.T) {
++	dir := t.TempDir()
++	path := filepath.Join(dir, "state.json")
++	payload := bytes.Repeat([]byte("abcdefgh"), 1024)
++	if err := os.WriteFile(path, payload, 0o644); err != nil {
++		t.Fatal(err)
++	}
++	retained := append([]byte(nil), payload...)
++
++	found, err := recheckCommitted(path, retained)
++	if err != nil || found != committedSame {
++		t.Fatalf("recheck of an unchanged file = %v, %v", found, err)
++	}
++	// The comparison reads the caller's buffer; one that reused it as scratch
++	// would corrupt the thing about to be decoded.
++	if !bytes.Equal(retained, payload) {
++		t.Fatal("the comparison modified the retained buffer")
++	}
++
++	if found, err := recheckCommitted(path, retained[:len(retained)-1]); err != nil || found != committedRewritten {
++		t.Fatalf("recheck against a shorter retained buffer = %v, %v", found, err)
++	}
++	if found, err := recheckCommitted(filepath.Join(dir, "absent.json"), retained); err != nil || found != committedRemoved {
++		t.Fatalf("recheck of an absent file = %v, %v", found, err)
++	}
++}
+diff -ruN /tmp/enola-stage21-proof/src/internal/graphsession/stateproof_startup.go /tmp/enola-stage21-retain/src/internal/graphsession/stateproof_startup.go
+--- /tmp/enola-stage21-proof/src/internal/graphsession/stateproof_startup.go	2026-09-25 09:51:29
++++ /tmp/enola-stage21-retain/src/internal/graphsession/stateproof_startup.go	2026-09-25 12:02:04
+@@ -19,6 +19,11 @@
+ type deferredState struct {
+ 	proof *StateProof
+ 	fp    stateFingerprint
++	// bytes is the committed state as openSession read it. It is held for the
++	// one transaction that resolves this deferral and released the moment that
++	// transaction is done with it, by either path: dropped unread on admission,
++	// and decoded then dropped on refusal.
++	bytes []byte
+ }
+ 
+ // deferStartupState turns a committed-state read that a proof answered for into
+@@ -30,7 +35,7 @@
+ 	if seek == nil || st != nil || seek.proof == nil {
+ 		return nil
+ 	}
+-	return &deferredState{proof: seek.proof, fp: fp}
++	return &deferredState{proof: seek.proof, fp: fp, bytes: seek.retained}
+ }
+ 
+ // resolveDeferred decides what a transaction does with a state it has not
+@@ -51,7 +56,20 @@
+ // before them, so the identities the predicate compares are this run's
+ // observations of this run's tree. Placing it earlier would compare against
+ // whatever the engine happened to be built with.
+-func (r *Resident) resolveDeferred(rtr *graphprofile.Trace, fast bool, work *WorkCounters, validateEffective func() error) (*Result, *runtimeInputs, error) {
++func (r *Resident) resolveDeferred(rtr *graphprofile.Trace, fast bool, work *WorkCounters, validateEffective func() error) (_ *Result, _ *runtimeInputs, err error) {
++	// Every way out of here that is not a resolution releases the bytes. A
++	// deferral that survives a failed transaction - refused fresh inputs, a fence
++	// that caught a configuration move, a decode that found a rewrite - is going
++	// to be resolved by some later transaction or by Close, and none of them need
++	// this buffer: the later one reads the file for itself and compares
++	// fingerprints, which is what it did before the buffer existed. Holding the
++	// committed state across a failure would be the whole point of the change
++	// spent on a resident that is not using it.
++	defer func() {
++		if err != nil && r.deferred != nil {
++			r.deferred.bytes = nil
++		}
++	}()
+ 	p := r.deferred.proof
+ 	if fast {
+ 		// A fast batch is incremental against a previous transaction of this
+@@ -102,6 +120,9 @@
+ 	if err := validateEffective(); err != nil {
+ 		return nil, nil, err
+ 	}
++	// The admitted path never decodes, so the retained bytes have served their
++	// purpose and are released here rather than at the end of the resident.
++	r.deferred.bytes = nil
+ 	rtr.Mark("state_proof_admitted", fmt.Sprintf("generation=%d owners=%d hash_inputs=%d", p.Generation, p.OwnerCount, p.HashInputCount))
+ 	// The shape of the no-publication return, with the one field that needs the
+ 	// records - Facts - absent, which is what FactsOmit asked for. Generation
+@@ -138,27 +159,86 @@
+ // path the original check does its original job.
+ func (r *Resident) materializeDeferred(work *WorkCounters) error {
+ 	var w stateReadWork
+-	st, fp, err := readStateFileFP(statePath(r.opts.StateDir), &w)
+-	w.fold(work)
++	// Folded on every path, including the failing ones: a read that happened and
++	// then found a rewrite is work this run did, and the counters said so before
++	// the comparison replaced the second digest.
++	// In a closure: fold takes its receiver by value, so a bare defer would fold
++	// the counters as they were at the defer statement rather than as they end up.
++	defer func() { w.fold(work) }()
++	// Dropped on the way out whatever happens. A buffer that has been decoded is
++	// spent; a buffer whose file has been rewritten underneath it is stale, and
++	// leaving either alive would hold 54MB against a resident that no longer has
++	// a use for it. The retry that follows a failure reads the file for itself.
++	defer func() {
++		if r.deferred != nil {
++			r.deferred.bytes = nil
++		}
++	}()
++	path := statePath(r.opts.StateDir)
++	st, fp, err := r.decodeDeferred(path, &w)
+ 	if err != nil {
+ 		return err
+ 	}
+-	if st == nil {
+-		return fmt.Errorf("%w: committed state removed between its proof and its decode", ErrInputsChanged)
+-	}
+-	if fp != r.deferred.fp {
+-		return fmt.Errorf("%w: committed state rewritten between its proof and its decode", ErrInputsChanged)
+-	}
+ 	if err := identityOK(st, r.opts, r.abs); err != nil {
+ 		return err
+ 	}
+ 	r.state = st
+ 	r.ck = newStateCheckpoint(st, fp)
++	// Clears the retained bytes with it: the deferral is the only reference.
+ 	r.deferred = nil
+ 	graphprofile.Log("state_proof_fallback_decode", 0, fmt.Sprintf("files=%d", len(st.Files)))
+ 	return nil
+ }
+ 
++// decodeDeferred produces the typed state the deferral did not decode, having
++// first established that the committed file still holds the bytes the proof was
++// bound to.
++//
++// Two ways in. With the open-time buffer in hand the check is recheckCommitted:
++// the file is read again and compared with those bytes directly, and the
++// fingerprint taken over them at open - already proven to bind the proof - is
++// carried through rather than recomputed over an identical buffer.
++//
++// Without it the check is the original one: read, digest, compare fingerprints,
++// decode. The buffer is absent whenever a previous transaction resolved this
++// deferral by admitting the proof, which is the ordinary no-op case, and the
++// deferral outlives that transaction because the resident still has no decoded
++// state. That is not a reason to trust the file unexamined, and it is not a
++// reason to invent a weaker test: this is the comparison the mechanism shipped
++// with, and it is exactly as strong as it was before the buffer existed. A
++// missing buffer costs a digest; it never skips the check.
++func (r *Resident) decodeDeferred(path string, w *stateReadWork) (*State, stateFingerprint, error) {
++	if r.deferred.bytes == nil {
++		st, fp, err := readStateFileFP(path, w)
++		if err != nil {
++			return nil, stateFingerprint{}, err
++		}
++		if st == nil {
++			return nil, stateFingerprint{}, fmt.Errorf("%w: committed state removed between its proof and its decode", ErrInputsChanged)
++		}
++		if fp != r.deferred.fp {
++			return nil, stateFingerprint{}, fmt.Errorf("%w: committed state rewritten between its proof and its decode", ErrInputsChanged)
++		}
++		return st, fp, nil
++	}
++	found, err := recheckCommitted(path, r.deferred.bytes)
++	if err != nil {
++		return nil, stateFingerprint{}, err
++	}
++	switch found {
++	case committedRemoved:
++		return nil, stateFingerprint{}, fmt.Errorf("%w: committed state removed between its proof and its decode", ErrInputsChanged)
++	case committedRewritten:
++		return nil, stateFingerprint{}, fmt.Errorf("%w: committed state rewritten between its proof and its decode", ErrInputsChanged)
++	}
++	st, err := decodeStateBytes(path, r.deferred.bytes)
++	if err != nil {
++		return nil, stateFingerprint{}, err
++	}
++	w.decoded()
++	return st, r.deferred.fp, nil
++}
++
+ // addPreRunWork adds the counters a deferral moved to the counters of the run
+ // that followed it.
+ //
+@@ -222,5 +302,10 @@
+ 	if seek == nil {
+ 		return proofSeek{}
+ 	}
+-	return *seek
++	v := *seek
++	// Accounting only. The retained bytes belong to the deferral, which is the
++	// one thing that resolves them; a copy kept here would hold the state alive
++	// for the life of the resident rather than for one transaction.
++	v.retained = nil
++	return v
+ }

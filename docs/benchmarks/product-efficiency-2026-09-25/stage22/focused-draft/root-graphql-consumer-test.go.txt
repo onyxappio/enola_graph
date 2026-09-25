@@ -1,0 +1,16 @@
+package tsextractor
+import ("context";"encoding/json";"os";"path/filepath";"sort";"strings";"testing";"github.com/enola-labs/enola/internal/facts")
+func TestRootStage22PersistedMinifiedGraphQLConsumer(t *testing.T) {
+ root:=t.TempDir(); producer:="server.ts"; consumer:="schema.graphql"
+ files:=map[string]string{producer:`import schema from "./schema.graphql"; buildSchema(schema);`+"\nexport const pad=["+strings.Repeat("0,",1600)+"0];\n",consumer:"type Query { real: String }\n"};names:=[]string{consumer,producer}
+ for n,s:=range files {if err:=os.WriteFile(filepath.Join(root,n),[]byte(s),0600);err!=nil{t.Fatal(err)}}
+ e:=New();cold,err:=e.ExtractSession(context.Background(),root,names,nil,nil,SessionHooks{});if err!=nil{t.Fatal(err)}
+ rec:=cold.Records[producer];if rec==nil||!rec.Minified||!rec.GraphQLServer||len(rec.GraphQLSDL)!=1||rec.GraphQLSDL[0]!=consumer{t.Fatalf("incomplete producer: %+v",rec)}
+ route:=func(ff []facts.Fact)bool{for _,f:=range ff{if f.Name=="Query.real"&&f.Kind==facts.KindRoute&&f.File==consumer{return true}};return false}
+ if !route(cold.Facts){t.Fatalf("fixture missing cold GraphQL route: %+v",cold.Facts)}
+ raw,err:=json.Marshal(cold.Records);if err!=nil{t.Fatal(err)};var records map[string]*FileRecord;if err:=json.Unmarshal(raw,&records);err!=nil{t.Fatal(err)}
+ warm,err:=e.ExtractSession(context.Background(),root,names,records,map[string]bool{consumer:true},SessionHooks{GraphPlannerOwnsInvalidation:true});if err!=nil{t.Fatal(err)}
+ if warm.Stats.FilesRead!=1{t.Fatalf("expected consumer-only read, got %d",warm.Stats.FilesRead)};if !route(warm.Facts){t.Fatal("persisted producer lost GraphQL consumer route")}
+ canonical:=func(ff []facts.Fact)string{rows:=[]string{};for _,f:=range ff{b,err:=json.Marshal(f);if err!=nil{t.Fatal(err)};rows=append(rows,string(b))};sort.Strings(rows);return strings.Join(rows,"\n")}
+ if canonical(cold.Facts)!=canonical(warm.Facts){t.Fatal("cold/persisted GraphQL facts differ")}
+}

@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-overlay",
+    "/tmp/enola-stage22-legacy-cli/replay-overlay.json",
+    "-count=1",
+    "-v",
+    "-run",
+    "^TestRootStage22ActualLegacyCLIReplay$",
+    "./internal/graphsession"
+  ],
+  "exit": 0,
+  "wall_s": 2.172719166963361
+}

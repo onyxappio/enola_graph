@@ -1,0 +1,18 @@
+{
+  "classification": "shared-load diagnostic only; no wall-latency attribution or acceptance",
+  "scenarios": {
+    "body": {
+      "independent_gates": "pass",
+      "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+      "parsed": 11,
+      "owners": 11
+    },
+    "structural": {
+      "independent_gates": "pass",
+      "graph_hash": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666",
+      "parsed": 12,
+      "owners": 12
+    }
+  },
+  "duration_caveat": "23-24ms differences of individual phase sums are load-sensitive; not proven net wall savings and cannot rule out causes of prior quiet regression"
+}

@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/extractors/tsextractor",
+    "-run",
+    "^(TestMinifiedRecordCarriesFrameworkSummary|TestMinifiedGraphQLProducerRecordCarriesSDL|TestCompositionSignatureCachedEqualsColdForMinifiedGRPCProducer|TestCompositionSignatureCachedEqualsColdForMinifiedGraphQLProducer|TestCompositionSignatureRereadsLegacyMinifiedRecord|TestCompositionSignatureMinifiedAmbiguityMatchesCold|TestCompositionSignatureUnreadableRecordIsNotReread|TestMinifiedRecordIsNotRereadOnUnchangedSecondExtract|TestLegacyMinifiedRecordRefreshesOnceThenIsSkipped|TestMinifiedRecordRereadWhenBytesChange|TestMinifiedBoundaryTransitionsBothWays|TestMinifiedRecordRereadWhenNuxtScopeMoves)$",
+    "-count=1",
+    "-v"
+  ],
+  "exit": 1,
+  "wall_seconds": 0.846690958016552,
+  "names": [
+    "TestMinifiedRecordCarriesFrameworkSummary",
+    "TestMinifiedGraphQLProducerRecordCarriesSDL",
+    "TestCompositionSignatureCachedEqualsColdForMinifiedGRPCProducer",
+    "TestCompositionSignatureCachedEqualsColdForMinifiedGraphQLProducer",
+    "TestCompositionSignatureRereadsLegacyMinifiedRecord",
+    "TestCompositionSignatureMinifiedAmbiguityMatchesCold",
+    "TestCompositionSignatureUnreadableRecordIsNotReread",
+    "TestMinifiedRecordIsNotRereadOnUnchangedSecondExtract",
+    "TestLegacyMinifiedRecordRefreshesOnceThenIsSkipped",
+    "TestMinifiedRecordRereadWhenBytesChange",
+    "TestMinifiedBoundaryTransitionsBothWays",
+    "TestMinifiedRecordRereadWhenNuxtScopeMoves"
+  ],
+  "preliminary": true
+}

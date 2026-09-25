@@ -1,0 +1,42 @@
+{
+  "label": "bounded retain-vs-frozen-vs-baseline diagnostic; shared load; NOT acceptance timing and NOT a speed claim",
+  "protocol": "one canonical Product path/config/state-dir/context; seed produced once per scenario with the frozen binary; broker stopped, full state dir and JetStream store snapshotted together at rest; each arm restores both to the same paths, starts a fresh broker and a fresh pinned replay observer over an empty output file, and waits for the retained stream to be replayed into a consumer graph whose run id, normalized hash and applied generation equal the seed before its one measured delta",
+  "frozen_binary": "/tmp/enola-stage21-root-review/enola-proof-diagnostic3",
+  "frozen_sha256": "6553bf7c8c847b9eddb22ce4a63c65c96b4d1cf383c89b2d330c5c6bd51fc705",
+  "retain_binary": "/tmp/enola-stage21-root-review/enola-retain-final1",
+  "retain_sha256": "d3229b4a5d622d1e9986565782a8c0cab7c078821775d361cb85809927c0aef6",
+  "retain_built_by": "root (msg_b42fbd555990, msg_d37d79fcf12a); not rebuilt here",
+  "baseline_binary": "/tmp/enola-stage21-root-review/enola-stage20-baseline",
+  "baseline_sha256": "99162b12e148c995c0a6e91ff73ffea05f2fb978ec004887f89e35a337006f60",
+  "retain_diff": "/tmp/enola-stage21-retain/optionC.diff",
+  "retain_diff_sha256": "2e07fc13dad3dd57c72845eee8eaa4e534e38ef9dc84110bb5aba49fde382a85",
+  "retain_source_manifest": "/tmp/enola-stage21-retain/SOURCE_MANIFEST.txt",
+  "retain_source_manifest_sha256": "ef4878ac13e7979eea7a95753cb601b1521edaf4836b0fc2491f24a629a916c3",
+  "product_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "profile": "ts + product-graph-scope.yaml overlay",
+  "observer": "/tmp/enola-stage21-startup-profile/replayobserver",
+  "observer_sha256": "bf5e4ba171d59c80137d63c9f09b0049f4c6d2294c2748ad9a68b7c4e2b4067b",
+  "observer_diff": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-25/stage21/replayobs-source.diff",
+  "seeds": {
+    "seed-body": {
+      "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790328754619235000",
+      "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+      "base_generation": 0,
+      "target_generation": 1,
+      "state_files": 10,
+      "state_sha256": "5d838dfff27b7f2858d3a2bd9c66cc7ac418b6ccdb971c7cb477e3cf7f242747",
+      "proof_sha256": "8baf195cbf46c54ad18d1700553f20ca787a807f91d37f787c67572d15e7e46a"
+    },
+    "seed-structural": {
+      "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790328789252719000",
+      "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+      "base_generation": 1,
+      "target_generation": 2,
+      "state_files": 10,
+      "state_sha256": "7c7959ce8ea33d1c4fe70c7e0030f8cd335f81d55eb5114241e4ab3e6090a078",
+      "proof_sha256": "6f5372be40bb1168f023b0a2e7dd058d342d99387ba3e075629e16babcd99c78"
+    }
+  },
+  "runs_executed": 11,
+  "competing_samples": []
+}

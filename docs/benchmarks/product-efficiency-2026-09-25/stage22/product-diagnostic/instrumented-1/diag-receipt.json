@@ -1,0 +1,30 @@
+{
+  "validation_error": null,
+  "all_checks_validated": true,
+  "arm": "instrumented",
+  "repeat": 1,
+  "note": "shared-host-diagnostic",
+  "exit": 0,
+  "competing_samples": [],
+  "competitors_before_start": [],
+  "host_load_log": "/private/tmp/enola-stage22-hop-profile/diag/cli-pairs/instrumented-1/host-load.jsonl",
+  "host_load_samples": 25,
+  "host_sample_errors": [],
+  "correctness_only": false,
+  "run_succeeded": true,
+  "binary_sha256": "c6d37a34be46d0262f96a422fb13ddbcda978a101301fd372da2b2628c81d299",
+  "graph_profile_env": "1",
+  "graph_profile_logs": [
+    "/private/tmp/enola-stage22-hop-profile/diag/cli-pairs/instrumented-1/cold-body.log",
+    "/private/tmp/enola-stage22-hop-profile/diag/cli-pairs/instrumented-1/cold-original.log",
+    "/private/tmp/enola-stage22-hop-profile/diag/cli-pairs/instrumented-1/cold-structural.log",
+    "/private/tmp/enola-stage22-hop-profile/diag/cli-pairs/instrumented-1/r1-new-body.log",
+    "/private/tmp/enola-stage22-hop-profile/diag/cli-pairs/instrumented-1/r1-new-initial.log",
+    "/private/tmp/enola-stage22-hop-profile/diag/cli-pairs/instrumented-1/r1-new-noop.log",
+    "/private/tmp/enola-stage22-hop-profile/diag/cli-pairs/instrumented-1/r1-new-structural.log"
+  ],
+  "purpose": "diagnostic per-hop profiling",
+  "timing_eligible": false,
+  "timing_ineligible_because": "diagnostic run: shared host with no quiet hold, and one arm carries scratch instrumentation the other does not",
+  "no_acceptance_claim": "durations here are not an acceptance measurement and the arm difference is not a measured instrumentation overhead"
+}

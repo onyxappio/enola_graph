@@ -1,0 +1,74 @@
+{
+  "correctness_accepted": true,
+  "source_revision": "Stage21 source3 freeze patch 9029305036bfbd4152641e545af02381a60898bdd9b2ac95403cc34fab186b37 (itself over main 6db3ed834daab2adf8083ac46dc15ac21b670eb2 / runtime a1dec99086fc1ace834e5616bd31c39ddce0b39b) + option C retain patch 2e07fc13dad3dd57c72845eee8eaa4e534e38ef9dc84110bb5aba49fde382a85",
+  "binary_sha256": "d3229b4a5d622d1e9986565782a8c0cab7c078821775d361cb85809927c0aef6",
+  "binary_path": "/tmp/enola-stage21-root-review/enola-retain-final1",
+  "binary_provenance": "built by root; worker has not rebuilt it",
+  "candidate": "option C: retain the first-read committed-state buffer, reread and bytes.Equal at materializeDeferred, then decode the retained buffer and reuse its proven fingerprint. Removes the second SHA-256; the second disk read remains.",
+  "source_tree": "/tmp/enola-stage21-retain/src",
+  "diff": {
+    "path": "/tmp/enola-stage21-retain/optionC.diff",
+    "sha256": "2e07fc13dad3dd57c72845eee8eaa4e534e38ef9dc84110bb5aba49fde382a85",
+    "relative_to": "Stage21 source3 freeze 9029305036bfbd4152641e545af02381a60898bdd9b2ac95403cc34fab186b37, not main"
+  },
+  "review_notes": {
+    "path": "/tmp/enola-stage21-retain/REVIEW_NOTES.md",
+    "sha256": "3ae557968878f09cc82358176b79520b144705ea9ac2ba79439ed9e478cf5cb8"
+  },
+  "focused_gate": {
+    "result": "8 tests / 11 cases, 4.172s, exit 0"
+  },
+  "package_final": {
+    "log": "/tmp/s21-retain-pkg-final.log",
+    "result": "ok github.com/enola-labs/enola/internal/graphsession 500.393s, exit 0",
+    "earlier_failing_run_retained_at": "/tmp/s21-retain-pkg.log (477.805s FAIL, kept as evidence)"
+  },
+  "work8": {
+    "outputs": "/tmp/enola-stage21-ablate/work8",
+    "receipt": "cohort-receipt.json",
+    "comparison": "cohort-comparison.json",
+    "gates": "FULL_COHORT_INTERPRETABLE true, zero failed gates, three arms (stage20 baseline / frozen proof / retain)",
+    "counts_retain": {
+      "committed_state_reads": 2,
+      "fingerprints_total": 2,
+      "fingerprints_read": 1,
+      "fingerprints_write": 1,
+      "decodes": 1,
+      "byte_comparisons": 1
+    },
+    "counts_frozen": {
+      "committed_state_reads": 2,
+      "fingerprints_total": 3,
+      "fingerprints_read": 2,
+      "fingerprints_write": 1,
+      "decodes": 1,
+      "byte_comparisons": 0
+    },
+    "counts_stage20_baseline": {
+      "committed_state_reads": 1,
+      "fingerprints_total": 2,
+      "fingerprints_read": 1,
+      "fingerprints_write": 1,
+      "decodes": 1,
+      "byte_comparisons": 0
+    },
+    "label": "diagnostic; not a speed claim"
+  },
+  "profile1": {
+    "outputs": "/tmp/enola-stage21-retain/profile-retain1",
+    "verdict": "correctness-verdict.json, 16/16 checks PASS, exit 0",
+    "receipt": "diagnostic-receipt.json",
+    "label": "diagnostic; not a speed claim"
+  },
+  "meaning": "eligible for performance comparison only; not production acceptance and not a performance acceptance",
+  "not_claimed": [
+    "no latency or speed acceptance for option C",
+    "the body-cell whole-wall outlier of the first retain execution is unexplained; cause unresolved",
+    "the measured memory cost (+43.4MB body, +43.8MB structural peak RSS over frozen) is not accepted or excused"
+  ],
+  "remaining": [
+    "repeated unchanged paired end-to-end timing and RSS, candidate vs Stage20, in a coordinated quiet window",
+    "allocation and object lifetime characterization",
+    "integration, hooks and push - root owns these"
+  ]
+}

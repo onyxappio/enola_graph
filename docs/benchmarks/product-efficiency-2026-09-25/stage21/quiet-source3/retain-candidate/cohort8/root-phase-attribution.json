@@ -1,0 +1,168 @@
+{
+  "meaning": "Existing diagnostic traces only; inclusive marks are not additive and do not prove savings",
+  "source": "/tmp/enola-stage21-ablate/work8",
+  "rows": {
+    "body-baseline": {
+      "ts_graphql_grpc_index": [
+        "[graph-profile] ts_graphql_grpc_index              0.096s  total= 0.105s  trace=ts  ts_files=4086",
+        "[graph-profile] ts_graphql_grpc_index              0.100s  total= 0.120s  trace=ts  ts_files=4086"
+      ],
+      "ts_mapfiles_aggregate": [
+        "[graph-profile] ts_mapfiles_aggregate              0.040s  total= 0.145s  trace=ts  parsed=1 facts=59224 routers=0 scans=0 derived=1",
+        "[graph-profile] ts_mapfiles_aggregate              0.289s  total= 0.408s  trace=ts  parsed=10 facts=59224 routers=0 scans=117 derived=7"
+      ],
+      "ts_compose_modules": [
+        "[graph-profile] ts_compose_modules                 0.003s  total= 0.148s  trace=ts  facts=59661 records=4086 unread=0",
+        "[graph-profile] ts_compose_modules                 0.002s  total= 0.411s  trace=ts  facts=59661 records=4086 unread=0"
+      ],
+      "ts_frozen_preview": [
+        "[graph-profile] ts_frozen_preview                  0.706s  total= 1.423s  trace=session  dirty=11 err=false"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.161s  bytes=56634804 files=4086"
+      ],
+      "ts_config_inputs": [
+        "[graph-profile] ts_config_inputs                   0.134s  n=83",
+        "[graph-profile] ts_config_inputs                   0.130s  n=83"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.355s  total= 2.485s  trace=session"
+      ]
+    },
+    "body-frozen": {
+      "ts_graphql_grpc_index": [
+        "[graph-profile] ts_graphql_grpc_index              0.095s  total= 0.101s  trace=ts  ts_files=4086",
+        "[graph-profile] ts_graphql_grpc_index              0.100s  total= 0.106s  trace=ts  ts_files=4086"
+      ],
+      "ts_mapfiles_aggregate": [
+        "[graph-profile] ts_mapfiles_aggregate              0.039s  total= 0.140s  trace=ts  parsed=1 facts=59224 routers=0 scans=0 derived=1",
+        "[graph-profile] ts_mapfiles_aggregate              0.292s  total= 0.398s  trace=ts  parsed=10 facts=59224 routers=0 scans=117 derived=7"
+      ],
+      "ts_compose_modules": [
+        "[graph-profile] ts_compose_modules                 0.003s  total= 0.143s  trace=ts  facts=59661 records=4086 unread=0",
+        "[graph-profile] ts_compose_modules                 0.002s  total= 0.401s  trace=ts  facts=59661 records=4086 unread=0"
+      ],
+      "ts_frozen_preview": [
+        "[graph-profile] ts_frozen_preview                  0.689s  total= 0.728s  trace=session  dirty=11 err=false"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.161s  bytes=56634804 files=4086"
+      ],
+      "ts_config_inputs": [
+        "[graph-profile] ts_config_inputs                   0.133s  n=83",
+        "[graph-profile] ts_config_inputs                   0.129s  n=83"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.390s  total= 1.833s  trace=session"
+      ]
+    },
+    "body-retain": {
+      "ts_graphql_grpc_index": [
+        "[graph-profile] ts_graphql_grpc_index              0.096s  total= 0.101s  trace=ts  ts_files=4086",
+        "[graph-profile] ts_graphql_grpc_index              0.100s  total= 0.105s  trace=ts  ts_files=4086"
+      ],
+      "ts_mapfiles_aggregate": [
+        "[graph-profile] ts_mapfiles_aggregate              0.041s  total= 0.143s  trace=ts  parsed=1 facts=59224 routers=0 scans=0 derived=1",
+        "[graph-profile] ts_mapfiles_aggregate              0.297s  total= 0.402s  trace=ts  parsed=10 facts=59224 routers=0 scans=117 derived=7"
+      ],
+      "ts_compose_modules": [
+        "[graph-profile] ts_compose_modules                 0.003s  total= 0.145s  trace=ts  facts=59661 records=4086 unread=0",
+        "[graph-profile] ts_compose_modules                 0.003s  total= 0.404s  trace=ts  facts=59661 records=4086 unread=0"
+      ],
+      "ts_frozen_preview": [
+        "[graph-profile] ts_frozen_preview                  0.700s  total= 0.742s  trace=session  dirty=11 err=false"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.166s  bytes=56634804 files=4086"
+      ],
+      "ts_config_inputs": [
+        "[graph-profile] ts_config_inputs                   0.135s  n=83",
+        "[graph-profile] ts_config_inputs                   0.132s  n=83"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.392s  total= 1.834s  trace=session"
+      ]
+    },
+    "structural-baseline": {
+      "ts_graphql_grpc_index": [
+        "[graph-profile] ts_graphql_grpc_index              0.099s  total= 0.105s  trace=ts  ts_files=4086",
+        "[graph-profile] ts_graphql_grpc_index              0.105s  total= 0.110s  trace=ts  ts_files=4086"
+      ],
+      "ts_mapfiles_aggregate": [
+        "[graph-profile] ts_mapfiles_aggregate              0.043s  total= 0.148s  trace=ts  parsed=1 facts=59225 routers=0 scans=0 derived=1",
+        "[graph-profile] ts_mapfiles_aggregate              0.297s  total= 0.407s  trace=ts  parsed=11 facts=59225 routers=0 scans=117 derived=7"
+      ],
+      "ts_compose_modules": [
+        "[graph-profile] ts_compose_modules                 0.003s  total= 0.150s  trace=ts  facts=59662 records=4086 unread=0",
+        "[graph-profile] ts_compose_modules                 0.002s  total= 0.410s  trace=ts  facts=59662 records=4086 unread=0"
+      ],
+      "ts_frozen_preview": [
+        "[graph-profile] ts_frozen_preview                  0.710s  total= 1.438s  trace=session  dirty=12 err=false"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.164s  bytes=56635634 files=4086"
+      ],
+      "ts_config_inputs": [
+        "[graph-profile] ts_config_inputs                   0.135s  n=83",
+        "[graph-profile] ts_config_inputs                   0.133s  n=83"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.361s  total= 2.547s  trace=session"
+      ]
+    },
+    "structural-frozen": {
+      "ts_graphql_grpc_index": [
+        "[graph-profile] ts_graphql_grpc_index              0.097s  total= 0.103s  trace=ts  ts_files=4086",
+        "[graph-profile] ts_graphql_grpc_index              0.100s  total= 0.106s  trace=ts  ts_files=4086"
+      ],
+      "ts_mapfiles_aggregate": [
+        "[graph-profile] ts_mapfiles_aggregate              0.040s  total= 0.143s  trace=ts  parsed=1 facts=59225 routers=0 scans=0 derived=1",
+        "[graph-profile] ts_mapfiles_aggregate              0.291s  total= 0.396s  trace=ts  parsed=11 facts=59225 routers=0 scans=117 derived=7"
+      ],
+      "ts_compose_modules": [
+        "[graph-profile] ts_compose_modules                 0.002s  total= 0.145s  trace=ts  facts=59662 records=4086 unread=0",
+        "[graph-profile] ts_compose_modules                 0.002s  total= 0.399s  trace=ts  facts=59662 records=4086 unread=0"
+      ],
+      "ts_frozen_preview": [
+        "[graph-profile] ts_frozen_preview                  0.693s  total= 0.735s  trace=session  dirty=12 err=false"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.171s  bytes=56635634 files=4086"
+      ],
+      "ts_config_inputs": [
+        "[graph-profile] ts_config_inputs                   0.137s  n=83",
+        "[graph-profile] ts_config_inputs                   0.127s  n=83"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.390s  total= 1.870s  trace=session"
+      ]
+    },
+    "structural-retain": {
+      "ts_graphql_grpc_index": [
+        "[graph-profile] ts_graphql_grpc_index              0.096s  total= 0.101s  trace=ts  ts_files=4086",
+        "[graph-profile] ts_graphql_grpc_index              0.100s  total= 0.105s  trace=ts  ts_files=4086"
+      ],
+      "ts_mapfiles_aggregate": [
+        "[graph-profile] ts_mapfiles_aggregate              0.039s  total= 0.141s  trace=ts  parsed=1 facts=59225 routers=0 scans=0 derived=1",
+        "[graph-profile] ts_mapfiles_aggregate              0.299s  total= 0.404s  trace=ts  parsed=11 facts=59225 routers=0 scans=117 derived=7"
+      ],
+      "ts_compose_modules": [
+        "[graph-profile] ts_compose_modules                 0.003s  total= 0.143s  trace=ts  facts=59662 records=4086 unread=0",
+        "[graph-profile] ts_compose_modules                 0.003s  total= 0.407s  trace=ts  facts=59662 records=4086 unread=0"
+      ],
+      "ts_frozen_preview": [
+        "[graph-profile] ts_frozen_preview                  0.698s  total= 0.741s  trace=session  dirty=12 err=false"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.160s  bytes=56635634 files=4086"
+      ],
+      "ts_config_inputs": [
+        "[graph-profile] ts_config_inputs                   0.135s  n=83",
+        "[graph-profile] ts_config_inputs                   0.129s  n=83"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.383s  total= 1.859s  trace=session"
+      ]
+    }
+  }
+}

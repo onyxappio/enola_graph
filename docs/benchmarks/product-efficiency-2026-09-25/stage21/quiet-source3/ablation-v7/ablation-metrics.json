@@ -1,0 +1,2757 @@
+[
+  {
+    "label": "seed-body-analyze",
+    "arm": null,
+    "scenario": "body",
+    "measured": false,
+    "mode": "analyze",
+    "binary": "/tmp/enola-stage21-root-review/enola-proof-diagnostic3",
+    "binary_sha256": "6553bf7c8c847b9eddb22ce4a63c65c96b4d1cf383c89b2d330c5c6bd51fc705",
+    "context": "stage21-ablate-seed",
+    "wall_seconds": 8.841399834025651,
+    "exit": 0,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4034
+        }
+      },
+      "RunID": "stage21-ablate-product-stage21-ablate-seed-1-1790325288904244000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4086,
+        "files_parsed": 4034,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 1676,
+        "derived_indexes": 2317,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "all prior/current file owners",
+          "reason": "frozen scope: global name-resolution domain"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 4034,
+      "ParsedFiles": 4034,
+      "EarlyLocal": 0
+    },
+    "phases": [
+      "[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=analyze",
+      "[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml",
+      "[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2",
+      "[graph-profile] discover_git                       0.036s  total= 0.036s  trace=graphinput_build  repo=true dirs=2",
+      "[graph-profile] declare_git_control                0.006s  total= 0.042s  trace=graphinput_build  deps=6",
+      "[graph-profile] git_ls_files                       0.053s  total= 0.095s  trace=graphinput_build  tracked=45105 dirs=5818",
+      "[graph-profile] walk_tree                          0.116s  total= 0.210s  trace=graphinput_build  names=11635 ignorefiles=4",
+      "[graph-profile] check_ignore_setup                 0.014s  total= 0.224s  trace=graphinput_build",
+      "[graph-profile] check_ignore_run                   0.057s  total= 0.281s  trace=graphinput_build  names=11635 ignored=0",
+      "[graph-profile] declare_ignore_files               0.000s  total= 0.281s  trace=graphinput_build  deps=9",
+      "[graph-profile] compute_identities                 0.036s  total= 0.318s  trace=graphinput_build  deps=9 entries=11635",
+      "[graph-profile] graphinput_build                   0.318s  total= 0.318s  trace=graph_engine  configpaths=2",
+      "[graph-profile] engine_new                         0.000s  total= 0.319s  trace=graph_engine",
+      "[graph-profile] register_plugins                   0.000s  total= 0.319s  trace=graph_engine",
+      "[graph-profile] config_recheck                     0.000s  total= 0.319s  trace=graph_engine",
+      "[graph-profile] resolve_graph_target               0.319s  total= 0.319s  trace=cli  repos=1",
+      "[graph-profile] connect_sink                       0.002s  total= 0.321s  trace=cli  nats=true",
+      "[graph-profile] session_options                    0.000s  total= 0.321s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product",
+      "[graph-profile] lock                               0.000s  total= 0.000s  trace=open",
+      "[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open",
+      "[graph-profile] open_journal                       0.000s  total= 0.000s  trace=open",
+      "[graph-profile] replay_unacked                     0.006s  total= 0.007s  trace=open",
+      "[graph-profile] load_state                         0.000s  total= 0.007s  trace=open  files=0",
+      "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false",
+      "[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2",
+      "[graph-profile] graph_inputs_proven                0.083s  total= 0.083s  trace=reconcile",
+      "[graph-profile] effective_config                   0.000s  total= 0.083s  trace=reconcile  files=2 fast=false",
+      "[graph-profile] reconcile_complete                 0.000s  total= 0.083s  trace=reconcile  reloaded=false",
+      "[graph-profile] engine_walk_repo                   0.109s  files=10965 tests=0 all_names=10965",
+      "[graph-profile] inventory                          0.109s  total= 0.109s  trace=inputs  files=10965 all_names=10965",
+      "[graph-profile] detect_typescript                  0.002s",
+      "[graph-profile] detect_extractors                  0.002s  total= 0.111s  trace=inputs  detected=1",
+      "[graph-profile] select_hash_targets                0.006s  total= 0.117s  trace=inputs  targets=4105",
+      "[graph-profile] engine_hash_files                  0.342s  n=4105 hashed=4105 bytes=45822317",
+      "[graph-profile] hash_content_inputs                0.342s  total= 0.459s  trace=inputs  targets=4105",
+      "[graph-profile] capture_contexts                   0.000s  total= 0.459s  trace=inputs  contexts=0",
+      "[graph-profile] ts_config_inputs                   0.135s  n=83",
+      "[graph-profile] analysis_fingerprint               0.141s  total= 0.600s  trace=inputs  cfg_files=59",
+      "[graph-profile] angular_probe                      0.003s  total= 0.603s  trace=inputs  angular=false",
+      "[graph-profile] policy_identity                    0.000s  total= 0.603s  trace=inputs",
+      "[graph-profile] engine_context_fingerprint         0.000s  total= 0.603s  trace=inputs",
+      "[graph-profile] ts_disc_nuxt_packages              0.113s  pkgs=0",
+      "[graph-profile] ts_disc_package_gates              0.000s",
+      "[graph-profile] ts_disc_package_names              0.000s  names=30",
+      "[graph-profile] ts_disc_alias_roots                0.076s  roots=1",
+      "[graph-profile] ts_disc_package_exports            0.000s  packages=30",
+      "[graph-profile] ts_discovery_build                 0.200s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59",
+      "[graph-profile] ts_discovery                       0.200s  total= 0.803s  trace=inputs  names=0 bytes=0 dirs=0",
+      "[graph-profile] ts_session_context                 0.054s  total= 0.857s  trace=inputs  files=4086",
+      "[graph-profile] runtime_inputs_complete            0.000s  total= 0.857s  trace=inputs",
+      "[graph-profile] clone_file_state_copy              0.000s  n=0",
+      "[graph-profile] extractor_need                     0.872s  total= 0.872s  trace=session  non_ts_need=false detected=1 neutral=0",
+      "[graph-profile] changed_terms                      0.007s  total= 0.879s  trace=session  initial=true force=true non_ts=false scan=false raw_cfg=false policy=true neutral_scan=false neutral_cfg=false",
+      "[graph-profile] invalidation_plan                  0.015s  total= 0.895s  trace=session  reason=frozen scope: global name-resolution domain whole=true extra=0",
+      "[graph-profile] revalidate_before_begin            0.001s  n=59 superseded=false",
+      "[graph-profile] begin_publish                      0.054s  total= 0.949s  trace=session  scope=8483",
+      "[graph-profile] ts_dirty_scope                     0.001s  total= 0.950s  trace=session  dirty=0 scope=4086 force=true",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.049s  total= 0.049s  trace=ts  to_read=4086 cached=0",
+      "[graph-profile] ts_graphql_grpc_index              0.377s  total= 0.426s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              4.050s  total= 4.477s  trace=ts  parsed=4034 facts=59224 routers=0 scans=1676 derived=2317",
+      "[graph-profile] ts_compose_modules                 0.003s  total= 4.480s  trace=ts  facts=59661 records=4086 unread=0",
+      "[graph-profile] ts_extract_session                 4.485s  total= 5.435s  trace=session  parsed=4034 cached=0 facts=59661 records=4086",
+      "[graph-profile] assemble_new_files                 0.128s  total= 5.563s  trace=session  new=4086 ts_noop=false non_ts_need=false skip=false facts=59661",
+      "[graph-profile] index_group_owners                 0.016s  total= 5.579s  trace=session  facts=59224 owners=4034",
+      "[graph-profile] publish_scope                      0.001s  total= 5.580s  trace=session  scope=8483",
+      "[graph-profile] encode_append_owners               2.031s  total= 7.611s  trace=session  published=4034",
+      "[graph-profile] publish_resolved                   0.053s  total= 7.664s  trace=session  owners=4034",
+      "[graph-profile] revalidate_ts_records              0.145s  total= 7.808s  trace=session  n=4086",
+      "[graph-profile] ts_config_inputs                   0.132s  n=83",
+      "[graph-profile] state_json_marshal                 0.187s  bytes=56634916 files=4086",
+      "[graph-profile] state_fingerprint                  0.024s  write bytes=56634916",
+      "[graph-profile] state_proof_written                0.032s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=22432958",
+      "[graph-profile] write_pending_state                0.428s  total= 8.236s  trace=session",
+      "[graph-profile] end_flush_ack                      0.060s  total= 8.296s  trace=session",
+      "[graph-profile] state_proof_promoted               0.003s",
+      "[graph-profile] promote_compact_state              0.073s  total= 8.369s  trace=session  parsed=4034 published=4034",
+      "[graph-profile] graph_session_run                  8.459s  total= 8.780s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=4034",
+      "[graph-profile] cli_complete                       0.000s  total= 8.780s  trace=cli  results=1"
+    ],
+    "pinned": {
+      "state_proof_written": [
+        "[graph-profile] state_proof_written                0.032s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=22432958"
+      ],
+      "state_proof_promoted": [
+        "[graph-profile] state_proof_promoted               0.003s"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.187s  bytes=56634916 files=4086"
+      ],
+      "state_fingerprint": [
+        "[graph-profile] state_fingerprint                  0.024s  write bytes=56634916"
+      ],
+      "load_state": [
+        "[graph-profile] load_state                         0.000s  total= 0.007s  trace=open  files=0"
+      ],
+      "select_hash_targets": [
+        "[graph-profile] select_hash_targets                0.006s  total= 0.117s  trace=inputs  targets=4105"
+      ],
+      "hash_content_inputs": [
+        "[graph-profile] hash_content_inputs                0.342s  total= 0.459s  trace=inputs  targets=4105"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.428s  total= 8.236s  trace=session"
+      ],
+      "promote_compact_state": [
+        "[graph-profile] promote_compact_state              0.073s  total= 8.369s  trace=session  parsed=4034 published=4034"
+      ],
+      "end_flush_ack": [
+        "[graph-profile] end_flush_ack                      0.060s  total= 8.296s  trace=session"
+      ],
+      "graph_session_run": [
+        "[graph-profile] graph_session_run                  8.459s  total= 8.780s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=4034"
+      ],
+      "cli_complete": [
+        "[graph-profile] cli_complete                       0.000s  total= 8.780s  trace=cli  results=1"
+      ]
+    },
+    "seed": null,
+    "fallbacks": [
+      "graph: all prior/current file owners (frozen scope: global name-resolution domain)"
+    ],
+    "process_real_s": 8.83,
+    "rss_bytes": 935313408.0,
+    "user_s": 33.47,
+    "sys_s": 1.58,
+    "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+    "wire_run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790325288904244000",
+    "wire_applied_generation": 1,
+    "gate_observations": {
+      "exit_zero": true,
+      "generation_advanced": true,
+      "proof_bound": false,
+      "capture_reused": false,
+      "proof_written": true,
+      "proof_promoted": true,
+      "proof_unavailable": false,
+      "parsed_files": 4034,
+      "owners_published": 4034,
+      "graph_hash_present": true,
+      "wire_run_id_matches_result": true
+    }
+  },
+  {
+    "label": "body-frozen",
+    "arm": "frozen",
+    "scenario": "body",
+    "measured": true,
+    "mode": "delta",
+    "binary": "/tmp/enola-stage21-root-review/enola-proof-diagnostic3",
+    "binary_sha256": "6553bf7c8c847b9eddb22ce4a63c65c96b4d1cf383c89b2d330c5c6bd51fc705",
+    "context": "stage21-ablate-seed",
+    "wall_seconds": 3.489514041924849,
+    "exit": 0,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "resolution": 10,
+          "source content": 1
+        }
+      },
+      "RunID": "stage21-ablate-product-stage21-ablate-seed-2-1790325299972080000",
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "Stats": {
+        "files_read": 115,
+        "files_parsed": 11,
+        "cached_files": 4023,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 117,
+        "derived_indexes": 8,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "changed files and reverse file dependents",
+          "reason": "frozen scope: prior file-to-file dependency closure"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 11,
+      "ParsedFiles": 11,
+      "EarlyLocal": 0
+    },
+    "phases": [
+      "[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=delta",
+      "[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml",
+      "[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2",
+      "[graph-profile] discover_git                       0.033s  total= 0.033s  trace=graphinput_build  repo=true dirs=2",
+      "[graph-profile] declare_git_control                0.005s  total= 0.038s  trace=graphinput_build  deps=6",
+      "[graph-profile] git_ls_files                       0.054s  total= 0.092s  trace=graphinput_build  tracked=45105 dirs=5818",
+      "[graph-profile] walk_tree                          0.115s  total= 0.207s  trace=graphinput_build  names=11635 ignorefiles=4",
+      "[graph-profile] check_ignore_setup                 0.014s  total= 0.221s  trace=graphinput_build",
+      "[graph-profile] check_ignore_run                   0.057s  total= 0.278s  trace=graphinput_build  names=11635 ignored=0",
+      "[graph-profile] declare_ignore_files               0.000s  total= 0.278s  trace=graphinput_build  deps=9",
+      "[graph-profile] compute_identities                 0.037s  total= 0.315s  trace=graphinput_build  deps=9 entries=11635",
+      "[graph-profile] graphinput_build                   0.316s  total= 0.316s  trace=graph_engine  configpaths=2",
+      "[graph-profile] engine_new                         0.000s  total= 0.316s  trace=graph_engine",
+      "[graph-profile] register_plugins                   0.000s  total= 0.316s  trace=graph_engine",
+      "[graph-profile] config_recheck                     0.000s  total= 0.316s  trace=graph_engine",
+      "[graph-profile] resolve_graph_target               0.316s  total= 0.316s  trace=cli  repos=1",
+      "[graph-profile] connect_sink                       0.001s  total= 0.317s  trace=cli  nats=true",
+      "[graph-profile] session_options                    0.000s  total= 0.317s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product",
+      "[graph-profile] lock                               0.000s  total= 0.000s  trace=open",
+      "[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open",
+      "[graph-profile] open_journal                       0.000s  total= 0.000s  trace=open",
+      "[graph-profile] replay_unacked                     0.000s  total= 0.000s  trace=open",
+      "[graph-profile] state_read_bytes                   0.008s  state.json bytes=56634916",
+      "[graph-profile] state_fingerprint                  0.025s  bytes=56634916",
+      "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634916",
+      "[graph-profile] load_state                         0.034s  total= 0.034s  trace=open  deferred owners=4086",
+      "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false",
+      "[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2",
+      "[graph-profile] graph_inputs_proven                0.094s  total= 0.094s  trace=reconcile",
+      "[graph-profile] effective_config                   0.000s  total= 0.094s  trace=reconcile  files=2 fast=false",
+      "[graph-profile] reconcile_complete                 0.000s  total= 0.094s  trace=reconcile  reloaded=false",
+      "[graph-profile] engine_walk_repo                   0.116s  files=10965 tests=0 all_names=10965",
+      "[graph-profile] inventory                          0.116s  total= 0.116s  trace=inputs  files=10965 all_names=10965",
+      "[graph-profile] detect_typescript                  0.001s",
+      "[graph-profile] detect_extractors                  0.001s  total= 0.117s  trace=inputs  detected=1",
+      "[graph-profile] select_hash_targets                0.006s  total= 0.123s  trace=inputs  targets=4105",
+      "[graph-profile] engine_hash_files                  0.139s  n=4105 hashed=4105 bytes=45822335",
+      "[graph-profile] hash_content_inputs                0.139s  total= 0.263s  trace=inputs  targets=4105",
+      "[graph-profile] capture_contexts                   0.000s  total= 0.263s  trace=inputs  contexts=0",
+      "[graph-profile] ts_config_inputs                   0.128s  n=83",
+      "[graph-profile] analysis_fingerprint               0.130s  total= 0.393s  trace=inputs  cfg_files=59",
+      "[graph-profile] angular_probe                      0.003s  total= 0.395s  trace=inputs  angular=false",
+      "[graph-profile] policy_identity                    0.000s  total= 0.395s  trace=inputs",
+      "[graph-profile] engine_context_fingerprint         0.000s  total= 0.395s  trace=inputs",
+      "[graph-profile] ts_disc_nuxt_packages              0.112s  pkgs=0",
+      "[graph-profile] ts_disc_package_gates              0.000s",
+      "[graph-profile] ts_disc_package_names              0.000s  names=30",
+      "[graph-profile] ts_disc_alias_roots                0.075s  roots=1",
+      "[graph-profile] ts_disc_package_exports            0.000s  packages=30",
+      "[graph-profile] ts_discovery_build                 0.198s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59",
+      "[graph-profile] ts_discovery                       0.198s  total= 0.593s  trace=inputs  names=0 bytes=0 dirs=0",
+      "[graph-profile] ts_session_context                 0.054s  total= 0.647s  trace=inputs  files=4086",
+      "[graph-profile] runtime_inputs_complete            0.000s  total= 0.647s  trace=inputs",
+      "[graph-profile] state_proof_refused                0.666s  total= 0.760s  trace=reconcile  inventory scan digest moved",
+      "[graph-profile] state_read_bytes                   0.019s  state.json bytes=56634916",
+      "[graph-profile] state_fingerprint                  0.023s  bytes=56634916",
+      "[graph-profile] state_json_unmarshal               0.241s  files=4086",
+      "[graph-profile] state_proof_fallback_decode        0.000s  files=4086",
+      "[graph-profile] runtime_inputs_reusable            0.293s  total= 1.053s  trace=reconcile  targets=4105",
+      "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0",
+      "[graph-profile] clone_file_state_copy              0.000s  n=4086",
+      "[graph-profile] extractor_need                     0.024s  total= 0.024s  trace=session  non_ts_need=false detected=1 neutral=0",
+      "[graph-profile] changed_terms                      0.017s  total= 0.041s  trace=session  initial=false force=false non_ts=false scan=true raw_cfg=false policy=false neutral_scan=false neutral_cfg=false",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.005s  total= 0.005s  trace=ts  to_read=53 cached=4033",
+      "[graph-profile] ts_graphql_grpc_index              0.096s  total= 0.101s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              0.038s  total= 0.139s  trace=ts  parsed=1 facts=59224 routers=0 scans=0 derived=1",
+      "[graph-profile] ts_compose_modules                 0.002s  total= 0.142s  trace=ts  facts=59661 records=4086 unread=0",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.005s  total= 0.005s  trace=ts  to_read=62 cached=4024",
+      "[graph-profile] ts_graphql_grpc_index              0.100s  total= 0.105s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              0.291s  total= 0.396s  trace=ts  parsed=10 facts=59224 routers=0 scans=117 derived=7",
+      "[graph-profile] ts_compose_modules                 0.002s  total= 0.398s  trace=ts  facts=59661 records=4086 unread=0",
+      "[graph-profile] ts_frozen_preview                  0.691s  total= 0.731s  trace=session  dirty=11 err=false",
+      "[graph-profile] invalidation_plan                  0.160s  total= 0.891s  trace=session  reason=frozen scope: prior file-to-file dependency closure whole=false extra=0",
+      "[graph-profile] revalidate_before_begin            0.001s  n=70 superseded=false",
+      "[graph-profile] begin_publish                      0.057s  total= 0.948s  trace=session  scope=11",
+      "[graph-profile] ts_dirty_scope                     0.099s  total= 1.047s  trace=session  dirty=11 scope=11 force=false",
+      "[graph-profile] ts_extract_session                 0.000s  total= 1.047s  trace=session  parsed=11 cached=4023 facts=59661 records=4086",
+      "[graph-profile] assemble_new_files                 0.165s  total= 1.212s  trace=session  new=4086 ts_noop=false non_ts_need=false skip=false facts=59661",
+      "[graph-profile] index_group_owners                 0.080s  total= 1.291s  trace=session  facts=59224 owners=4034",
+      "[graph-profile] publish_scope                      0.000s  total= 1.292s  trace=session  scope=11",
+      "[graph-profile] encode_append_owners               0.004s  total= 1.296s  trace=session  published=11",
+      "[graph-profile] publish_resolved                   0.051s  total= 1.347s  trace=session  owners=11",
+      "[graph-profile] revalidate_ts_records              0.107s  total= 1.454s  trace=session  n=4086",
+      "[graph-profile] ts_config_inputs                   0.128s  n=83",
+      "[graph-profile] state_json_marshal                 0.161s  bytes=56634916 files=4086",
+      "[graph-profile] state_fingerprint                  0.024s  write bytes=56634916",
+      "[graph-profile] state_proof_written                0.028s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19158792",
+      "[graph-profile] write_pending_state                0.502s  total= 1.956s  trace=session",
+      "[graph-profile] end_flush_ack                      0.033s  total= 1.989s  trace=session",
+      "[graph-profile] state_proof_promoted               0.003s",
+      "[graph-profile] promote_compact_state              0.071s  total= 2.060s  trace=session  parsed=11 published=11",
+      "[graph-profile] graph_session_run                  3.147s  total= 3.465s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=11",
+      "[graph-profile] cli_complete                       0.000s  total= 3.465s  trace=cli  results=1"
+    ],
+    "pinned": {
+      "state_proof_bound": [
+        "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634916"
+      ],
+      "runtime_inputs_reused": [
+        "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+      ],
+      "runtime_inputs_reusable": [
+        "[graph-profile] runtime_inputs_reusable            0.293s  total= 1.053s  trace=reconcile  targets=4105"
+      ],
+      "state_proof_refused": [
+        "[graph-profile] state_proof_refused                0.666s  total= 0.760s  trace=reconcile  inventory scan digest moved"
+      ],
+      "state_proof_written": [
+        "[graph-profile] state_proof_written                0.028s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19158792"
+      ],
+      "state_proof_promoted": [
+        "[graph-profile] state_proof_promoted               0.003s"
+      ],
+      "state_proof_fallback_decode": [
+        "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+      ],
+      "state_json_unmarshal": [
+        "[graph-profile] state_json_unmarshal               0.241s  files=4086"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.161s  bytes=56634916 files=4086"
+      ],
+      "state_read_bytes": [
+        "[graph-profile] state_read_bytes                   0.008s  state.json bytes=56634916",
+        "[graph-profile] state_read_bytes                   0.019s  state.json bytes=56634916"
+      ],
+      "state_fingerprint": [
+        "[graph-profile] state_fingerprint                  0.025s  bytes=56634916",
+        "[graph-profile] state_fingerprint                  0.023s  bytes=56634916",
+        "[graph-profile] state_fingerprint                  0.024s  write bytes=56634916"
+      ],
+      "load_state": [
+        "[graph-profile] load_state                         0.034s  total= 0.034s  trace=open  deferred owners=4086"
+      ],
+      "select_hash_targets": [
+        "[graph-profile] select_hash_targets                0.006s  total= 0.123s  trace=inputs  targets=4105"
+      ],
+      "hash_content_inputs": [
+        "[graph-profile] hash_content_inputs                0.139s  total= 0.263s  trace=inputs  targets=4105"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.502s  total= 1.956s  trace=session"
+      ],
+      "promote_compact_state": [
+        "[graph-profile] promote_compact_state              0.071s  total= 2.060s  trace=session  parsed=11 published=11"
+      ],
+      "end_flush_ack": [
+        "[graph-profile] end_flush_ack                      0.033s  total= 1.989s  trace=session"
+      ],
+      "graph_session_run": [
+        "[graph-profile] graph_session_run                  3.147s  total= 3.465s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=11"
+      ],
+      "cli_complete": [
+        "[graph-profile] cli_complete                       0.000s  total= 3.465s  trace=cli  results=1"
+      ]
+    },
+    "seed": {
+      "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790325288904244000",
+      "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+      "base_generation": 0,
+      "target_generation": 1,
+      "state_files": 10,
+      "state_sha256": "91cd3ee4c361e108181a85f82126bcc18e50509eaaa11e8a6d7ff6a0ca91b668",
+      "proof_sha256": "fe4824cbea0472ece581135be8a1d9ea7d93e6075033039d369cada043b831bc"
+    },
+    "fallbacks": [
+      "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+    ],
+    "process_real_s": 3.48,
+    "rss_bytes": 615563264.0,
+    "user_s": 3.68,
+    "sys_s": 0.76,
+    "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+    "wire_run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790325299972080000",
+    "wire_applied_generation": 2,
+    "gate_observations": {
+      "exit_zero": true,
+      "generation_advanced": true,
+      "proof_bound": true,
+      "capture_reused": true,
+      "proof_written": true,
+      "proof_promoted": true,
+      "proof_unavailable": false,
+      "parsed_files": 11,
+      "owners_published": 11,
+      "graph_hash_present": true,
+      "wire_run_id_matches_result": true
+    },
+    "restored_state_manifest": {
+      "acks.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "commit.json": {
+        "sha256": "764e8825c2e63a93b6564441bb2dc1f38c27dd2f96ca1764ab1d24f2f1b83a7a",
+        "bytes": 217
+      },
+      "fences.jsonl": {
+        "sha256": "676f0efd33667f818e5fddd4ed6b40bac3a16ced8b2ed68178f514efdf095aa6",
+        "bytes": 78
+      },
+      "identity.json": {
+        "sha256": "484cd44558ff809c8f6b213cc445b27d7800c83c3463991c38808b884410d86b",
+        "bytes": 220
+      },
+      "payloads.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "protocol": {
+        "sha256": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+        "bytes": 14
+      },
+      "session.lock": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "state-proof.json": {
+        "sha256": "fe4824cbea0472ece581135be8a1d9ea7d93e6075033039d369cada043b831bc",
+        "bytes": 10952
+      },
+      "state.json": {
+        "sha256": "91cd3ee4c361e108181a85f82126bcc18e50509eaaa11e8a6d7ff6a0ca91b668",
+        "bytes": 56634916
+      },
+      "tombstones.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "observer": {
+      "phase": 2,
+      "pid": 93212,
+      "stderr": "observer-2.stderr"
+    },
+    "replay": {
+      "replayed_frames": 1,
+      "matched": {
+        "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790325288904244000",
+        "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+        "base_generation": 0,
+        "applied_generation": 1
+      }
+    },
+    "stream_last_seq_before_delta": 1954
+  },
+  {
+    "label": "body-ablated",
+    "arm": "ablated",
+    "scenario": "body",
+    "measured": true,
+    "mode": "delta",
+    "binary": "/tmp/enola-stage21-ablate/enola-ablate-noproof2",
+    "binary_sha256": "4c6cb04fa773b42fe39223f37d5ebb4e5efffd3b87cb72cc5ab226681977c4e5",
+    "context": "stage21-ablate-seed",
+    "wall_seconds": 3.470128708984703,
+    "exit": 0,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "resolution": 10,
+          "source content": 1
+        }
+      },
+      "RunID": "stage21-ablate-product-stage21-ablate-seed-2-1790325305468783000",
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "Stats": {
+        "files_read": 115,
+        "files_parsed": 11,
+        "cached_files": 4023,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 117,
+        "derived_indexes": 8,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "changed files and reverse file dependents",
+          "reason": "frozen scope: prior file-to-file dependency closure"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 11,
+      "ParsedFiles": 11,
+      "EarlyLocal": 0
+    },
+    "phases": [
+      "[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=delta",
+      "[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml",
+      "[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2",
+      "[graph-profile] discover_git                       0.036s  total= 0.037s  trace=graphinput_build  repo=true dirs=2",
+      "[graph-profile] declare_git_control                0.005s  total= 0.042s  trace=graphinput_build  deps=6",
+      "[graph-profile] git_ls_files                       0.054s  total= 0.096s  trace=graphinput_build  tracked=45105 dirs=5818",
+      "[graph-profile] walk_tree                          0.122s  total= 0.218s  trace=graphinput_build  names=11635 ignorefiles=4",
+      "[graph-profile] check_ignore_setup                 0.014s  total= 0.232s  trace=graphinput_build",
+      "[graph-profile] check_ignore_run                   0.054s  total= 0.286s  trace=graphinput_build  names=11635 ignored=0",
+      "[graph-profile] declare_ignore_files               0.000s  total= 0.287s  trace=graphinput_build  deps=9",
+      "[graph-profile] compute_identities                 0.038s  total= 0.325s  trace=graphinput_build  deps=9 entries=11635",
+      "[graph-profile] graphinput_build                   0.325s  total= 0.325s  trace=graph_engine  configpaths=2",
+      "[graph-profile] engine_new                         0.000s  total= 0.326s  trace=graph_engine",
+      "[graph-profile] register_plugins                   0.000s  total= 0.326s  trace=graph_engine",
+      "[graph-profile] config_recheck                     0.000s  total= 0.326s  trace=graph_engine",
+      "[graph-profile] resolve_graph_target               0.327s  total= 0.327s  trace=cli  repos=1",
+      "[graph-profile] connect_sink                       0.005s  total= 0.332s  trace=cli  nats=true",
+      "[graph-profile] session_options                    0.000s  total= 0.332s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product",
+      "[graph-profile] lock                               0.000s  total= 0.000s  trace=open",
+      "[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open",
+      "[graph-profile] open_journal                       0.000s  total= 0.001s  trace=open",
+      "[graph-profile] replay_unacked                     0.000s  total= 0.001s  trace=open",
+      "[graph-profile] state_read_bytes                   0.008s  state.json bytes=56634916",
+      "[graph-profile] state_fingerprint                  0.025s  bytes=56634916",
+      "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634916",
+      "[graph-profile] load_state                         0.034s  total= 0.035s  trace=open  deferred owners=4086",
+      "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false",
+      "[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2",
+      "[graph-profile] graph_inputs_proven                0.090s  total= 0.090s  trace=reconcile",
+      "[graph-profile] effective_config                   0.000s  total= 0.090s  trace=reconcile  files=2 fast=false",
+      "[graph-profile] reconcile_complete                 0.000s  total= 0.090s  trace=reconcile  reloaded=false",
+      "[graph-profile] engine_walk_repo                   0.113s  files=10965 tests=0 all_names=10965",
+      "[graph-profile] inventory                          0.113s  total= 0.113s  trace=inputs  files=10965 all_names=10965",
+      "[graph-profile] detect_typescript                  0.001s",
+      "[graph-profile] detect_extractors                  0.002s  total= 0.114s  trace=inputs  detected=1",
+      "[graph-profile] select_hash_targets                0.006s  total= 0.120s  trace=inputs  targets=4105",
+      "[graph-profile] engine_hash_files                  0.135s  n=4105 hashed=4105 bytes=45822335",
+      "[graph-profile] hash_content_inputs                0.135s  total= 0.255s  trace=inputs  targets=4105",
+      "[graph-profile] capture_contexts                   0.000s  total= 0.255s  trace=inputs  contexts=0",
+      "[graph-profile] ts_config_inputs                   0.129s  n=83",
+      "[graph-profile] analysis_fingerprint               0.131s  total= 0.386s  trace=inputs  cfg_files=59",
+      "[graph-profile] angular_probe                      0.003s  total= 0.388s  trace=inputs  angular=false",
+      "[graph-profile] policy_identity                    0.000s  total= 0.388s  trace=inputs",
+      "[graph-profile] engine_context_fingerprint         0.000s  total= 0.388s  trace=inputs",
+      "[graph-profile] ts_disc_nuxt_packages              0.112s  pkgs=0",
+      "[graph-profile] ts_disc_package_gates              0.001s",
+      "[graph-profile] ts_disc_package_names              0.000s  names=30",
+      "[graph-profile] ts_disc_alias_roots                0.078s  roots=1",
+      "[graph-profile] ts_disc_package_exports            0.000s  packages=30",
+      "[graph-profile] ts_discovery_build                 0.200s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59",
+      "[graph-profile] ts_discovery                       0.200s  total= 0.589s  trace=inputs  names=0 bytes=0 dirs=0",
+      "[graph-profile] ts_session_context                 0.056s  total= 0.644s  trace=inputs  files=4086",
+      "[graph-profile] runtime_inputs_complete            0.000s  total= 0.644s  trace=inputs",
+      "[graph-profile] state_proof_refused                0.663s  total= 0.754s  trace=reconcile  inventory scan digest moved",
+      "[graph-profile] state_read_bytes                   0.018s  state.json bytes=56634916",
+      "[graph-profile] state_fingerprint                  0.024s  bytes=56634916",
+      "[graph-profile] state_json_unmarshal               0.243s  files=4086",
+      "[graph-profile] state_proof_fallback_decode        0.000s  files=4086",
+      "[graph-profile] runtime_inputs_reusable            0.293s  total= 1.047s  trace=reconcile  targets=4105",
+      "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0",
+      "[graph-profile] clone_file_state_copy              0.000s  n=4086",
+      "[graph-profile] extractor_need                     0.025s  total= 0.025s  trace=session  non_ts_need=false detected=1 neutral=0",
+      "[graph-profile] changed_terms                      0.016s  total= 0.041s  trace=session  initial=false force=false non_ts=false scan=true raw_cfg=false policy=false neutral_scan=false neutral_cfg=false",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.006s  total= 0.006s  trace=ts  to_read=53 cached=4033",
+      "[graph-profile] ts_graphql_grpc_index              0.099s  total= 0.106s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              0.043s  total= 0.148s  trace=ts  parsed=1 facts=59224 routers=0 scans=0 derived=1",
+      "[graph-profile] ts_compose_modules                 0.003s  total= 0.151s  trace=ts  facts=59661 records=4086 unread=0",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.005s  total= 0.006s  trace=ts  to_read=62 cached=4024",
+      "[graph-profile] ts_graphql_grpc_index              0.103s  total= 0.108s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              0.297s  total= 0.406s  trace=ts  parsed=10 facts=59224 routers=0 scans=117 derived=7",
+      "[graph-profile] ts_compose_modules                 0.002s  total= 0.408s  trace=ts  facts=59661 records=4086 unread=0",
+      "[graph-profile] ts_frozen_preview                  0.713s  total= 0.754s  trace=session  dirty=11 err=false",
+      "[graph-profile] invalidation_plan                  0.160s  total= 0.914s  trace=session  reason=frozen scope: prior file-to-file dependency closure whole=false extra=0",
+      "[graph-profile] revalidate_before_begin            0.001s  n=70 superseded=false",
+      "[graph-profile] begin_publish                      0.062s  total= 0.976s  trace=session  scope=11",
+      "[graph-profile] ts_dirty_scope                     0.098s  total= 1.074s  trace=session  dirty=11 scope=11 force=false",
+      "[graph-profile] ts_extract_session                 0.000s  total= 1.074s  trace=session  parsed=11 cached=4023 facts=59661 records=4086",
+      "[graph-profile] assemble_new_files                 0.165s  total= 1.239s  trace=session  new=4086 ts_noop=false non_ts_need=false skip=false facts=59661",
+      "[graph-profile] index_group_owners                 0.081s  total= 1.320s  trace=session  facts=59224 owners=4034",
+      "[graph-profile] publish_scope                      0.000s  total= 1.321s  trace=session  scope=11",
+      "[graph-profile] encode_append_owners               0.004s  total= 1.325s  trace=session  published=11",
+      "[graph-profile] publish_resolved                   0.056s  total= 1.381s  trace=session  owners=11",
+      "[graph-profile] revalidate_ts_records              0.103s  total= 1.484s  trace=session  n=4086",
+      "[graph-profile] ts_config_inputs                   0.127s  n=83",
+      "[graph-profile] state_json_marshal                 0.170s  bytes=56634916 files=4086",
+      "[graph-profile] state_fingerprint                  0.024s  write bytes=56634916",
+      "[graph-profile] state_proof_unavailable            0.000s  diagnostic ablation: proof production disabled",
+      "[graph-profile] ablation_proof_cleanup_stage       0.005s  where=1",
+      "[graph-profile] write_pending_state                0.380s  total= 1.864s  trace=session",
+      "[graph-profile] end_flush_ack                      0.032s  total= 1.896s  trace=session",
+      "[graph-profile] state_proof_unavailable            0.000s  diagnostic ablation: proof production disabled",
+      "[graph-profile] ablation_proof_cleanup_promote     0.005s",
+      "[graph-profile] promote_compact_state              0.067s  total= 1.963s  trace=session  parsed=11 published=11",
+      "[graph-profile] graph_session_run                  3.044s  total= 3.376s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=11",
+      "[graph-profile] cli_complete                       0.000s  total= 3.376s  trace=cli  results=1"
+    ],
+    "pinned": {
+      "state_proof_bound": [
+        "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634916"
+      ],
+      "runtime_inputs_reused": [
+        "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+      ],
+      "runtime_inputs_reusable": [
+        "[graph-profile] runtime_inputs_reusable            0.293s  total= 1.047s  trace=reconcile  targets=4105"
+      ],
+      "state_proof_refused": [
+        "[graph-profile] state_proof_refused                0.663s  total= 0.754s  trace=reconcile  inventory scan digest moved"
+      ],
+      "state_proof_unavailable": [
+        "[graph-profile] state_proof_unavailable            0.000s  diagnostic ablation: proof production disabled",
+        "[graph-profile] state_proof_unavailable            0.000s  diagnostic ablation: proof production disabled"
+      ],
+      "ablation_proof_cleanup_stage": [
+        "[graph-profile] ablation_proof_cleanup_stage       0.005s  where=1"
+      ],
+      "ablation_proof_cleanup_promote": [
+        "[graph-profile] ablation_proof_cleanup_promote     0.005s"
+      ],
+      "state_proof_fallback_decode": [
+        "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+      ],
+      "state_json_unmarshal": [
+        "[graph-profile] state_json_unmarshal               0.243s  files=4086"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.170s  bytes=56634916 files=4086"
+      ],
+      "state_read_bytes": [
+        "[graph-profile] state_read_bytes                   0.008s  state.json bytes=56634916",
+        "[graph-profile] state_read_bytes                   0.018s  state.json bytes=56634916"
+      ],
+      "state_fingerprint": [
+        "[graph-profile] state_fingerprint                  0.025s  bytes=56634916",
+        "[graph-profile] state_fingerprint                  0.024s  bytes=56634916",
+        "[graph-profile] state_fingerprint                  0.024s  write bytes=56634916"
+      ],
+      "load_state": [
+        "[graph-profile] load_state                         0.034s  total= 0.035s  trace=open  deferred owners=4086"
+      ],
+      "select_hash_targets": [
+        "[graph-profile] select_hash_targets                0.006s  total= 0.120s  trace=inputs  targets=4105"
+      ],
+      "hash_content_inputs": [
+        "[graph-profile] hash_content_inputs                0.135s  total= 0.255s  trace=inputs  targets=4105"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.380s  total= 1.864s  trace=session"
+      ],
+      "promote_compact_state": [
+        "[graph-profile] promote_compact_state              0.067s  total= 1.963s  trace=session  parsed=11 published=11"
+      ],
+      "end_flush_ack": [
+        "[graph-profile] end_flush_ack                      0.032s  total= 1.896s  trace=session"
+      ],
+      "graph_session_run": [
+        "[graph-profile] graph_session_run                  3.044s  total= 3.376s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=11"
+      ],
+      "cli_complete": [
+        "[graph-profile] cli_complete                       0.000s  total= 3.376s  trace=cli  results=1"
+      ]
+    },
+    "seed": {
+      "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790325288904244000",
+      "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+      "base_generation": 0,
+      "target_generation": 1,
+      "state_files": 10,
+      "state_sha256": "91cd3ee4c361e108181a85f82126bcc18e50509eaaa11e8a6d7ff6a0ca91b668",
+      "proof_sha256": "fe4824cbea0472ece581135be8a1d9ea7d93e6075033039d369cada043b831bc"
+    },
+    "fallbacks": [
+      "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+    ],
+    "process_real_s": 3.46,
+    "rss_bytes": 622755840.0,
+    "user_s": 3.67,
+    "sys_s": 0.75,
+    "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+    "wire_run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790325305468783000",
+    "wire_applied_generation": 2,
+    "gate_observations": {
+      "exit_zero": true,
+      "generation_advanced": true,
+      "proof_bound": true,
+      "capture_reused": true,
+      "proof_written": false,
+      "proof_promoted": false,
+      "proof_unavailable": true,
+      "parsed_files": 11,
+      "owners_published": 11,
+      "graph_hash_present": true,
+      "wire_run_id_matches_result": true
+    },
+    "restored_state_manifest": {
+      "acks.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "commit.json": {
+        "sha256": "764e8825c2e63a93b6564441bb2dc1f38c27dd2f96ca1764ab1d24f2f1b83a7a",
+        "bytes": 217
+      },
+      "fences.jsonl": {
+        "sha256": "676f0efd33667f818e5fddd4ed6b40bac3a16ced8b2ed68178f514efdf095aa6",
+        "bytes": 78
+      },
+      "identity.json": {
+        "sha256": "484cd44558ff809c8f6b213cc445b27d7800c83c3463991c38808b884410d86b",
+        "bytes": 220
+      },
+      "payloads.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "protocol": {
+        "sha256": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+        "bytes": 14
+      },
+      "session.lock": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "state-proof.json": {
+        "sha256": "fe4824cbea0472ece581135be8a1d9ea7d93e6075033039d369cada043b831bc",
+        "bytes": 10952
+      },
+      "state.json": {
+        "sha256": "91cd3ee4c361e108181a85f82126bcc18e50509eaaa11e8a6d7ff6a0ca91b668",
+        "bytes": 56634916
+      },
+      "tombstones.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "observer": {
+      "phase": 3,
+      "pid": 93317,
+      "stderr": "observer-3.stderr"
+    },
+    "replay": {
+      "replayed_frames": 1,
+      "matched": {
+        "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790325288904244000",
+        "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+        "base_generation": 0,
+        "applied_generation": 1
+      }
+    },
+    "stream_last_seq_before_delta": 1954
+  },
+  {
+    "label": "body-baseline",
+    "arm": "baseline",
+    "scenario": "body",
+    "measured": true,
+    "mode": "delta",
+    "binary": "/tmp/enola-stage21-root-review/enola-stage20-baseline",
+    "binary_sha256": "99162b12e148c995c0a6e91ff73ffea05f2fb978ec004887f89e35a337006f60",
+    "context": "stage21-ablate-seed",
+    "wall_seconds": 3.332098125014454,
+    "exit": 0,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "resolution": 10,
+          "source content": 1
+        }
+      },
+      "RunID": "stage21-ablate-product-stage21-ablate-seed-2-1790325310743964000",
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "Stats": {
+        "files_read": 115,
+        "files_parsed": 11,
+        "cached_files": 4023,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 117,
+        "derived_indexes": 8,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "changed files and reverse file dependents",
+          "reason": "frozen scope: prior file-to-file dependency closure"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 11,
+      "ParsedFiles": 11,
+      "EarlyLocal": 0
+    },
+    "phases": [
+      "[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=delta",
+      "[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml",
+      "[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2",
+      "[graph-profile] discover_git                       0.033s  total= 0.033s  trace=graphinput_build  repo=true dirs=2",
+      "[graph-profile] declare_git_control                0.006s  total= 0.038s  trace=graphinput_build  deps=6",
+      "[graph-profile] git_ls_files                       0.055s  total= 0.094s  trace=graphinput_build  tracked=45105 dirs=5818",
+      "[graph-profile] walk_tree                          0.119s  total= 0.213s  trace=graphinput_build  names=11635 ignorefiles=4",
+      "[graph-profile] check_ignore_setup                 0.015s  total= 0.228s  trace=graphinput_build",
+      "[graph-profile] check_ignore_run                   0.055s  total= 0.283s  trace=graphinput_build  names=11635 ignored=0",
+      "[graph-profile] declare_ignore_files               0.000s  total= 0.283s  trace=graphinput_build  deps=9",
+      "[graph-profile] compute_identities                 0.034s  total= 0.317s  trace=graphinput_build  deps=9 entries=11635",
+      "[graph-profile] graphinput_build                   0.318s  total= 0.318s  trace=graph_engine  configpaths=2",
+      "[graph-profile] engine_new                         0.000s  total= 0.318s  trace=graph_engine",
+      "[graph-profile] register_plugins                   0.000s  total= 0.318s  trace=graph_engine",
+      "[graph-profile] config_recheck                     0.000s  total= 0.318s  trace=graph_engine",
+      "[graph-profile] resolve_graph_target               0.319s  total= 0.319s  trace=cli  repos=1",
+      "[graph-profile] connect_sink                       0.002s  total= 0.320s  trace=cli  nats=true",
+      "[graph-profile] session_options                    0.000s  total= 0.320s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product",
+      "[graph-profile] lock                               0.000s  total= 0.000s  trace=open",
+      "[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open",
+      "[graph-profile] open_journal                       0.000s  total= 0.000s  trace=open",
+      "[graph-profile] replay_unacked                     0.000s  total= 0.000s  trace=open",
+      "[graph-profile] state_read_bytes                   0.013s  state.json bytes=56634916",
+      "[graph-profile] state_fingerprint                  0.023s  bytes=56634916",
+      "[graph-profile] state_json_unmarshal               0.238s  files=4086",
+      "[graph-profile] load_state                         0.274s  total= 0.274s  trace=open  files=4086",
+      "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false",
+      "[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2",
+      "[graph-profile] graph_inputs_proven                0.085s  total= 0.085s  trace=reconcile",
+      "[graph-profile] effective_config                   0.000s  total= 0.085s  trace=reconcile  files=2 fast=false",
+      "[graph-profile] reconcile_complete                 0.000s  total= 0.085s  trace=reconcile  reloaded=false",
+      "[graph-profile] engine_walk_repo                   0.111s  files=10965 tests=0 all_names=10965",
+      "[graph-profile] inventory                          0.111s  total= 0.111s  trace=inputs  files=10965 all_names=10965",
+      "[graph-profile] detect_typescript                  0.001s",
+      "[graph-profile] detect_extractors                  0.001s  total= 0.113s  trace=inputs  detected=1",
+      "[graph-profile] select_hash_targets                0.009s  total= 0.121s  trace=inputs  targets=4105",
+      "[graph-profile] engine_hash_files                  0.144s  n=4105 hashed=4105 bytes=45822335",
+      "[graph-profile] hash_content_inputs                0.144s  total= 0.265s  trace=inputs  targets=4105",
+      "[graph-profile] capture_contexts                   0.000s  total= 0.265s  trace=inputs  contexts=0",
+      "[graph-profile] ts_config_inputs                   0.131s  n=83",
+      "[graph-profile] analysis_fingerprint               0.133s  total= 0.398s  trace=inputs  cfg_files=59",
+      "[graph-profile] angular_probe                      0.003s  total= 0.402s  trace=inputs  angular=false",
+      "[graph-profile] policy_identity                    0.000s  total= 0.402s  trace=inputs",
+      "[graph-profile] engine_context_fingerprint         0.000s  total= 0.402s  trace=inputs",
+      "[graph-profile] ts_disc_nuxt_packages              0.113s  pkgs=0",
+      "[graph-profile] ts_disc_package_gates              0.001s",
+      "[graph-profile] ts_disc_package_names              0.000s  names=30",
+      "[graph-profile] ts_disc_alias_roots                0.077s  roots=1",
+      "[graph-profile] ts_disc_package_exports            0.000s  packages=30",
+      "[graph-profile] ts_discovery_build                 0.201s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59",
+      "[graph-profile] ts_discovery                       0.201s  total= 0.603s  trace=inputs  names=0 bytes=0 dirs=0",
+      "[graph-profile] ts_session_context                 0.056s  total= 0.659s  trace=inputs  files=4086",
+      "[graph-profile] runtime_inputs_complete            0.000s  total= 0.659s  trace=inputs",
+      "[graph-profile] clone_file_state_copy              0.000s  n=4086",
+      "[graph-profile] extractor_need                     0.690s  total= 0.690s  trace=session  non_ts_need=false detected=1 neutral=0",
+      "[graph-profile] changed_terms                      0.015s  total= 0.706s  trace=session  initial=false force=false non_ts=false scan=true raw_cfg=false policy=false neutral_scan=false neutral_cfg=false",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.005s  total= 0.005s  trace=ts  to_read=53 cached=4033",
+      "[graph-profile] ts_graphql_grpc_index              0.097s  total= 0.102s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              0.043s  total= 0.145s  trace=ts  parsed=1 facts=59224 routers=0 scans=0 derived=1",
+      "[graph-profile] ts_compose_modules                 0.003s  total= 0.148s  trace=ts  facts=59661 records=4086 unread=0",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.006s  total= 0.006s  trace=ts  to_read=62 cached=4024",
+      "[graph-profile] ts_graphql_grpc_index              0.103s  total= 0.108s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              0.294s  total= 0.402s  trace=ts  parsed=10 facts=59224 routers=0 scans=117 derived=7",
+      "[graph-profile] ts_compose_modules                 0.003s  total= 0.405s  trace=ts  facts=59661 records=4086 unread=0",
+      "[graph-profile] ts_frozen_preview                  0.698s  total= 1.404s  trace=session  dirty=11 err=false",
+      "[graph-profile] invalidation_plan                  0.166s  total= 1.570s  trace=session  reason=frozen scope: prior file-to-file dependency closure whole=false extra=0",
+      "[graph-profile] revalidate_before_begin            0.002s  n=70 superseded=false",
+      "[graph-profile] begin_publish                      0.057s  total= 1.627s  trace=session  scope=11",
+      "[graph-profile] ts_dirty_scope                     0.097s  total= 1.724s  trace=session  dirty=11 scope=11 force=false",
+      "[graph-profile] ts_extract_session                 0.000s  total= 1.724s  trace=session  parsed=11 cached=4023 facts=59661 records=4086",
+      "[graph-profile] assemble_new_files                 0.166s  total= 1.890s  trace=session  new=4086 ts_noop=false non_ts_need=false skip=false facts=59661",
+      "[graph-profile] index_group_owners                 0.083s  total= 1.973s  trace=session  facts=59224 owners=4034",
+      "[graph-profile] publish_scope                      0.000s  total= 1.973s  trace=session  scope=11",
+      "[graph-profile] encode_append_owners               0.004s  total= 1.977s  trace=session  published=11",
+      "[graph-profile] publish_resolved                   0.051s  total= 2.028s  trace=session  owners=11",
+      "[graph-profile] revalidate_ts_records              0.109s  total= 2.137s  trace=session  n=4086",
+      "[graph-profile] ts_config_inputs                   0.125s  n=83",
+      "[graph-profile] state_json_marshal                 0.159s  bytes=56634916 files=4086",
+      "[graph-profile] state_fingerprint                  0.025s  write bytes=56634916",
+      "[graph-profile] write_pending_state                0.349s  total= 2.486s  trace=session",
+      "[graph-profile] end_flush_ack                      0.032s  total= 2.517s  trace=session",
+      "[graph-profile] promote_compact_state              0.067s  total= 2.584s  trace=session  parsed=11 published=11",
+      "[graph-profile] graph_session_run                  2.944s  total= 3.264s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=11",
+      "[graph-profile] cli_complete                       0.000s  total= 3.265s  trace=cli  results=1"
+    ],
+    "pinned": {
+      "state_json_unmarshal": [
+        "[graph-profile] state_json_unmarshal               0.238s  files=4086"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.159s  bytes=56634916 files=4086"
+      ],
+      "state_read_bytes": [
+        "[graph-profile] state_read_bytes                   0.013s  state.json bytes=56634916"
+      ],
+      "state_fingerprint": [
+        "[graph-profile] state_fingerprint                  0.023s  bytes=56634916",
+        "[graph-profile] state_fingerprint                  0.025s  write bytes=56634916"
+      ],
+      "load_state": [
+        "[graph-profile] load_state                         0.274s  total= 0.274s  trace=open  files=4086"
+      ],
+      "select_hash_targets": [
+        "[graph-profile] select_hash_targets                0.009s  total= 0.121s  trace=inputs  targets=4105"
+      ],
+      "hash_content_inputs": [
+        "[graph-profile] hash_content_inputs                0.144s  total= 0.265s  trace=inputs  targets=4105"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.349s  total= 2.486s  trace=session"
+      ],
+      "promote_compact_state": [
+        "[graph-profile] promote_compact_state              0.067s  total= 2.584s  trace=session  parsed=11 published=11"
+      ],
+      "end_flush_ack": [
+        "[graph-profile] end_flush_ack                      0.032s  total= 2.517s  trace=session"
+      ],
+      "graph_session_run": [
+        "[graph-profile] graph_session_run                  2.944s  total= 3.264s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=11"
+      ],
+      "cli_complete": [
+        "[graph-profile] cli_complete                       0.000s  total= 3.265s  trace=cli  results=1"
+      ]
+    },
+    "seed": {
+      "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790325288904244000",
+      "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+      "base_generation": 0,
+      "target_generation": 1,
+      "state_files": 10,
+      "state_sha256": "91cd3ee4c361e108181a85f82126bcc18e50509eaaa11e8a6d7ff6a0ca91b668",
+      "proof_sha256": "fe4824cbea0472ece581135be8a1d9ea7d93e6075033039d369cada043b831bc"
+    },
+    "fallbacks": [
+      "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+    ],
+    "process_real_s": 3.32,
+    "rss_bytes": 599703552.0,
+    "user_s": 3.64,
+    "sys_s": 0.74,
+    "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+    "wire_run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790325310743964000",
+    "wire_applied_generation": 2,
+    "gate_observations": {
+      "exit_zero": true,
+      "generation_advanced": true,
+      "proof_bound": false,
+      "capture_reused": false,
+      "proof_written": false,
+      "proof_promoted": false,
+      "proof_unavailable": false,
+      "parsed_files": 11,
+      "owners_published": 11,
+      "graph_hash_present": true,
+      "wire_run_id_matches_result": true
+    },
+    "restored_state_manifest": {
+      "acks.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "commit.json": {
+        "sha256": "764e8825c2e63a93b6564441bb2dc1f38c27dd2f96ca1764ab1d24f2f1b83a7a",
+        "bytes": 217
+      },
+      "fences.jsonl": {
+        "sha256": "676f0efd33667f818e5fddd4ed6b40bac3a16ced8b2ed68178f514efdf095aa6",
+        "bytes": 78
+      },
+      "identity.json": {
+        "sha256": "484cd44558ff809c8f6b213cc445b27d7800c83c3463991c38808b884410d86b",
+        "bytes": 220
+      },
+      "payloads.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "protocol": {
+        "sha256": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+        "bytes": 14
+      },
+      "session.lock": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "state-proof.json": {
+        "sha256": "fe4824cbea0472ece581135be8a1d9ea7d93e6075033039d369cada043b831bc",
+        "bytes": 10952
+      },
+      "state.json": {
+        "sha256": "91cd3ee4c361e108181a85f82126bcc18e50509eaaa11e8a6d7ff6a0ca91b668",
+        "bytes": 56634916
+      },
+      "tombstones.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "observer": {
+      "phase": 4,
+      "pid": 93572,
+      "stderr": "observer-4.stderr"
+    },
+    "replay": {
+      "replayed_frames": 1,
+      "matched": {
+        "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790325288904244000",
+        "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+        "base_generation": 0,
+        "applied_generation": 1
+      }
+    },
+    "stream_last_seq_before_delta": 1954
+  },
+  {
+    "label": "seed-structural-analyze",
+    "arm": null,
+    "scenario": "structural",
+    "measured": false,
+    "mode": "analyze",
+    "binary": "/tmp/enola-stage21-root-review/enola-proof-diagnostic3",
+    "binary_sha256": "6553bf7c8c847b9eddb22ce4a63c65c96b4d1cf383c89b2d330c5c6bd51fc705",
+    "context": "stage21-ablate-seed",
+    "wall_seconds": 8.366386999958195,
+    "exit": 0,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4034
+        }
+      },
+      "RunID": "stage21-ablate-product-stage21-ablate-seed-1-1790325314108059000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4086,
+        "files_parsed": 4034,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 1704,
+        "derived_indexes": 2289,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "all prior/current file owners",
+          "reason": "frozen scope: global name-resolution domain"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 4034,
+      "ParsedFiles": 4034,
+      "EarlyLocal": 0
+    },
+    "phases": [
+      "[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=analyze",
+      "[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml",
+      "[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2",
+      "[graph-profile] discover_git                       0.034s  total= 0.034s  trace=graphinput_build  repo=true dirs=2",
+      "[graph-profile] declare_git_control                0.005s  total= 0.039s  trace=graphinput_build  deps=6",
+      "[graph-profile] git_ls_files                       0.054s  total= 0.093s  trace=graphinput_build  tracked=45105 dirs=5818",
+      "[graph-profile] walk_tree                          0.116s  total= 0.209s  trace=graphinput_build  names=11635 ignorefiles=4",
+      "[graph-profile] check_ignore_setup                 0.014s  total= 0.223s  trace=graphinput_build",
+      "[graph-profile] check_ignore_run                   0.056s  total= 0.279s  trace=graphinput_build  names=11635 ignored=0",
+      "[graph-profile] declare_ignore_files               0.000s  total= 0.280s  trace=graphinput_build  deps=9",
+      "[graph-profile] compute_identities                 0.035s  total= 0.315s  trace=graphinput_build  deps=9 entries=11635",
+      "[graph-profile] graphinput_build                   0.316s  total= 0.316s  trace=graph_engine  configpaths=2",
+      "[graph-profile] engine_new                         0.000s  total= 0.316s  trace=graph_engine",
+      "[graph-profile] register_plugins                   0.000s  total= 0.316s  trace=graph_engine",
+      "[graph-profile] config_recheck                     0.000s  total= 0.316s  trace=graph_engine",
+      "[graph-profile] resolve_graph_target               0.316s  total= 0.316s  trace=cli  repos=1",
+      "[graph-profile] connect_sink                       0.001s  total= 0.317s  trace=cli  nats=true",
+      "[graph-profile] session_options                    0.000s  total= 0.317s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product",
+      "[graph-profile] lock                               0.000s  total= 0.000s  trace=open",
+      "[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open",
+      "[graph-profile] open_journal                       0.000s  total= 0.000s  trace=open",
+      "[graph-profile] replay_unacked                     0.006s  total= 0.007s  trace=open",
+      "[graph-profile] load_state                         0.000s  total= 0.007s  trace=open  files=0",
+      "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false",
+      "[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2",
+      "[graph-profile] graph_inputs_proven                0.083s  total= 0.083s  trace=reconcile",
+      "[graph-profile] effective_config                   0.000s  total= 0.083s  trace=reconcile  files=2 fast=false",
+      "[graph-profile] reconcile_complete                 0.000s  total= 0.083s  trace=reconcile  reloaded=false",
+      "[graph-profile] engine_walk_repo                   0.108s  files=10965 tests=0 all_names=10965",
+      "[graph-profile] inventory                          0.111s  total= 0.111s  trace=inputs  files=10965 all_names=10965",
+      "[graph-profile] detect_typescript                  0.001s",
+      "[graph-profile] detect_extractors                  0.001s  total= 0.112s  trace=inputs  detected=1",
+      "[graph-profile] select_hash_targets                0.006s  total= 0.118s  trace=inputs  targets=4105",
+      "[graph-profile] engine_hash_files                  0.137s  n=4105 hashed=4105 bytes=45822317",
+      "[graph-profile] hash_content_inputs                0.138s  total= 0.255s  trace=inputs  targets=4105",
+      "[graph-profile] capture_contexts                   0.000s  total= 0.255s  trace=inputs  contexts=0",
+      "[graph-profile] ts_config_inputs                   0.128s  n=83",
+      "[graph-profile] analysis_fingerprint               0.130s  total= 0.385s  trace=inputs  cfg_files=59",
+      "[graph-profile] angular_probe                      0.003s  total= 0.388s  trace=inputs  angular=false",
+      "[graph-profile] policy_identity                    0.000s  total= 0.388s  trace=inputs",
+      "[graph-profile] engine_context_fingerprint         0.000s  total= 0.388s  trace=inputs",
+      "[graph-profile] ts_disc_nuxt_packages              0.112s  pkgs=0",
+      "[graph-profile] ts_disc_package_gates              0.000s",
+      "[graph-profile] ts_disc_package_names              0.000s  names=30",
+      "[graph-profile] ts_disc_alias_roots                0.077s  roots=1",
+      "[graph-profile] ts_disc_package_exports            0.000s  packages=30",
+      "[graph-profile] ts_discovery_build                 0.199s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59",
+      "[graph-profile] ts_discovery                       0.199s  total= 0.587s  trace=inputs  names=0 bytes=0 dirs=0",
+      "[graph-profile] ts_session_context                 0.057s  total= 0.644s  trace=inputs  files=4086",
+      "[graph-profile] runtime_inputs_complete            0.000s  total= 0.644s  trace=inputs",
+      "[graph-profile] clone_file_state_copy              0.000s  n=0",
+      "[graph-profile] extractor_need                     0.660s  total= 0.660s  trace=session  non_ts_need=false detected=1 neutral=0",
+      "[graph-profile] changed_terms                      0.007s  total= 0.667s  trace=session  initial=true force=true non_ts=false scan=false raw_cfg=false policy=true neutral_scan=false neutral_cfg=false",
+      "[graph-profile] invalidation_plan                  0.016s  total= 0.683s  trace=session  reason=frozen scope: global name-resolution domain whole=true extra=0",
+      "[graph-profile] revalidate_before_begin            0.001s  n=59 superseded=false",
+      "[graph-profile] begin_publish                      0.048s  total= 0.731s  trace=session  scope=8483",
+      "[graph-profile] ts_dirty_scope                     0.001s  total= 0.731s  trace=session  dirty=0 scope=4086 force=true",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.049s  total= 0.049s  trace=ts  to_read=4086 cached=0",
+      "[graph-profile] ts_graphql_grpc_index              0.377s  total= 0.426s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              3.985s  total= 4.411s  trace=ts  parsed=4034 facts=59224 routers=0 scans=1704 derived=2289",
+      "[graph-profile] ts_compose_modules                 0.003s  total= 4.413s  trace=ts  facts=59661 records=4086 unread=0",
+      "[graph-profile] ts_extract_session                 4.415s  total= 5.147s  trace=session  parsed=4034 cached=0 facts=59661 records=4086",
+      "[graph-profile] assemble_new_files                 0.122s  total= 5.269s  trace=session  new=4086 ts_noop=false non_ts_need=false skip=false facts=59661",
+      "[graph-profile] index_group_owners                 0.014s  total= 5.283s  trace=session  facts=59224 owners=4034",
+      "[graph-profile] publish_scope                      0.001s  total= 5.284s  trace=session  scope=8483",
+      "[graph-profile] encode_append_owners               1.937s  total= 7.220s  trace=session  published=4034",
+      "[graph-profile] publish_resolved                   0.054s  total= 7.274s  trace=session  owners=4034",
+      "[graph-profile] revalidate_ts_records              0.107s  total= 7.381s  trace=session  n=4086",
+      "[graph-profile] ts_config_inputs                   0.131s  n=83",
+      "[graph-profile] state_json_marshal                 0.183s  bytes=56634804 files=4086",
+      "[graph-profile] state_fingerprint                  0.024s  write bytes=56634804",
+      "[graph-profile] state_proof_written                0.030s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19812084",
+      "[graph-profile] write_pending_state                0.409s  total= 7.790s  trace=session",
+      "[graph-profile] end_flush_ack                      0.061s  total= 7.851s  trace=session",
+      "[graph-profile] state_proof_promoted               0.004s",
+      "[graph-profile] promote_compact_state              0.076s  total= 7.927s  trace=session  parsed=4034 published=4034",
+      "[graph-profile] graph_session_run                  8.017s  total= 8.335s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=4034",
+      "[graph-profile] cli_complete                       0.000s  total= 8.335s  trace=cli  results=1"
+    ],
+    "pinned": {
+      "state_proof_written": [
+        "[graph-profile] state_proof_written                0.030s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19812084"
+      ],
+      "state_proof_promoted": [
+        "[graph-profile] state_proof_promoted               0.004s"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.183s  bytes=56634804 files=4086"
+      ],
+      "state_fingerprint": [
+        "[graph-profile] state_fingerprint                  0.024s  write bytes=56634804"
+      ],
+      "load_state": [
+        "[graph-profile] load_state                         0.000s  total= 0.007s  trace=open  files=0"
+      ],
+      "select_hash_targets": [
+        "[graph-profile] select_hash_targets                0.006s  total= 0.118s  trace=inputs  targets=4105"
+      ],
+      "hash_content_inputs": [
+        "[graph-profile] hash_content_inputs                0.138s  total= 0.255s  trace=inputs  targets=4105"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.409s  total= 7.790s  trace=session"
+      ],
+      "promote_compact_state": [
+        "[graph-profile] promote_compact_state              0.076s  total= 7.927s  trace=session  parsed=4034 published=4034"
+      ],
+      "end_flush_ack": [
+        "[graph-profile] end_flush_ack                      0.061s  total= 7.851s  trace=session"
+      ],
+      "graph_session_run": [
+        "[graph-profile] graph_session_run                  8.017s  total= 8.335s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=4034"
+      ],
+      "cli_complete": [
+        "[graph-profile] cli_complete                       0.000s  total= 8.335s  trace=cli  results=1"
+      ]
+    },
+    "seed": null,
+    "fallbacks": [
+      "graph: all prior/current file owners (frozen scope: global name-resolution domain)"
+    ],
+    "process_real_s": 8.36,
+    "rss_bytes": 931905536.0,
+    "user_s": 33.77,
+    "sys_s": 1.44,
+    "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+    "wire_run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790325314108059000",
+    "wire_applied_generation": 1,
+    "gate_observations": {
+      "exit_zero": true,
+      "generation_advanced": true,
+      "proof_bound": false,
+      "capture_reused": false,
+      "proof_written": true,
+      "proof_promoted": true,
+      "proof_unavailable": false,
+      "parsed_files": 4034,
+      "owners_published": 4034,
+      "graph_hash_present": true,
+      "wire_run_id_matches_result": true
+    }
+  },
+  {
+    "label": "seed-structural-body",
+    "arm": null,
+    "scenario": "structural",
+    "measured": false,
+    "mode": "delta",
+    "binary": "/tmp/enola-stage21-root-review/enola-proof-diagnostic3",
+    "binary_sha256": "6553bf7c8c847b9eddb22ce4a63c65c96b4d1cf383c89b2d330c5c6bd51fc705",
+    "context": "stage21-ablate-seed",
+    "wall_seconds": 3.557265415904112,
+    "exit": 0,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "resolution": 10,
+          "source content": 1
+        }
+      },
+      "RunID": "stage21-ablate-product-stage21-ablate-seed-2-1790325323029335000",
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "Stats": {
+        "files_read": 115,
+        "files_parsed": 11,
+        "cached_files": 4023,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 117,
+        "derived_indexes": 8,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "changed files and reverse file dependents",
+          "reason": "frozen scope: prior file-to-file dependency closure"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 11,
+      "ParsedFiles": 11,
+      "EarlyLocal": 0
+    },
+    "phases": [
+      "[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=delta",
+      "[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml",
+      "[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2",
+      "[graph-profile] discover_git                       0.032s  total= 0.032s  trace=graphinput_build  repo=true dirs=2",
+      "[graph-profile] declare_git_control                0.005s  total= 0.037s  trace=graphinput_build  deps=6",
+      "[graph-profile] git_ls_files                       0.054s  total= 0.091s  trace=graphinput_build  tracked=45105 dirs=5818",
+      "[graph-profile] walk_tree                          0.111s  total= 0.202s  trace=graphinput_build  names=11635 ignorefiles=4",
+      "[graph-profile] check_ignore_setup                 0.014s  total= 0.216s  trace=graphinput_build",
+      "[graph-profile] check_ignore_run                   0.056s  total= 0.272s  trace=graphinput_build  names=11635 ignored=0",
+      "[graph-profile] declare_ignore_files               0.000s  total= 0.272s  trace=graphinput_build  deps=9",
+      "[graph-profile] compute_identities                 0.034s  total= 0.306s  trace=graphinput_build  deps=9 entries=11635",
+      "[graph-profile] graphinput_build                   0.307s  total= 0.307s  trace=graph_engine  configpaths=2",
+      "[graph-profile] engine_new                         0.000s  total= 0.307s  trace=graph_engine",
+      "[graph-profile] register_plugins                   0.000s  total= 0.307s  trace=graph_engine",
+      "[graph-profile] config_recheck                     0.000s  total= 0.307s  trace=graph_engine",
+      "[graph-profile] resolve_graph_target               0.307s  total= 0.307s  trace=cli  repos=1",
+      "[graph-profile] connect_sink                       0.002s  total= 0.309s  trace=cli  nats=true",
+      "[graph-profile] session_options                    0.000s  total= 0.309s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product",
+      "[graph-profile] lock                               0.000s  total= 0.000s  trace=open",
+      "[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open",
+      "[graph-profile] open_journal                       0.000s  total= 0.000s  trace=open",
+      "[graph-profile] replay_unacked                     0.000s  total= 0.000s  trace=open",
+      "[graph-profile] state_read_bytes                   0.013s  state.json bytes=56634804",
+      "[graph-profile] state_fingerprint                  0.023s  bytes=56634804",
+      "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634804",
+      "[graph-profile] load_state                         0.037s  total= 0.037s  trace=open  deferred owners=4086",
+      "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false",
+      "[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2",
+      "[graph-profile] graph_inputs_proven                0.085s  total= 0.085s  trace=reconcile",
+      "[graph-profile] effective_config                   0.000s  total= 0.085s  trace=reconcile  files=2 fast=false",
+      "[graph-profile] reconcile_complete                 0.000s  total= 0.085s  trace=reconcile  reloaded=false",
+      "[graph-profile] engine_walk_repo                   0.111s  files=10965 tests=0 all_names=10965",
+      "[graph-profile] inventory                          0.111s  total= 0.111s  trace=inputs  files=10965 all_names=10965",
+      "[graph-profile] detect_typescript                  0.001s",
+      "[graph-profile] detect_extractors                  0.001s  total= 0.112s  trace=inputs  detected=1",
+      "[graph-profile] select_hash_targets                0.005s  total= 0.117s  trace=inputs  targets=4105",
+      "[graph-profile] engine_hash_files                  0.136s  n=4105 hashed=4105 bytes=45822335",
+      "[graph-profile] hash_content_inputs                0.136s  total= 0.253s  trace=inputs  targets=4105",
+      "[graph-profile] capture_contexts                   0.000s  total= 0.253s  trace=inputs  contexts=0",
+      "[graph-profile] ts_config_inputs                   0.129s  n=83",
+      "[graph-profile] analysis_fingerprint               0.131s  total= 0.384s  trace=inputs  cfg_files=59",
+      "[graph-profile] angular_probe                      0.003s  total= 0.387s  trace=inputs  angular=false",
+      "[graph-profile] policy_identity                    0.000s  total= 0.387s  trace=inputs",
+      "[graph-profile] engine_context_fingerprint         0.000s  total= 0.387s  trace=inputs",
+      "[graph-profile] ts_disc_nuxt_packages              0.112s  pkgs=0",
+      "[graph-profile] ts_disc_package_gates              0.000s",
+      "[graph-profile] ts_disc_package_names              0.000s  names=30",
+      "[graph-profile] ts_disc_alias_roots                0.076s  roots=1",
+      "[graph-profile] ts_disc_package_exports            0.000s  packages=30",
+      "[graph-profile] ts_discovery_build                 0.199s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59",
+      "[graph-profile] ts_discovery                       0.199s  total= 0.586s  trace=inputs  names=0 bytes=0 dirs=0",
+      "[graph-profile] ts_session_context                 0.054s  total= 0.640s  trace=inputs  files=4086",
+      "[graph-profile] runtime_inputs_complete            0.000s  total= 0.640s  trace=inputs",
+      "[graph-profile] state_proof_refused                0.659s  total= 0.745s  trace=reconcile  inventory scan digest moved",
+      "[graph-profile] state_read_bytes                   0.017s  state.json bytes=56634804",
+      "[graph-profile] state_fingerprint                  0.023s  bytes=56634804",
+      "[graph-profile] state_json_unmarshal               0.242s  files=4086",
+      "[graph-profile] state_proof_fallback_decode        0.000s  files=4086",
+      "[graph-profile] runtime_inputs_reusable            0.291s  total= 1.036s  trace=reconcile  targets=4105",
+      "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0",
+      "[graph-profile] clone_file_state_copy              0.000s  n=4086",
+      "[graph-profile] extractor_need                     0.025s  total= 0.025s  trace=session  non_ts_need=false detected=1 neutral=0",
+      "[graph-profile] changed_terms                      0.017s  total= 0.042s  trace=session  initial=false force=false non_ts=false scan=true raw_cfg=false policy=false neutral_scan=false neutral_cfg=false",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.005s  total= 0.005s  trace=ts  to_read=53 cached=4033",
+      "[graph-profile] ts_graphql_grpc_index              0.096s  total= 0.101s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              0.039s  total= 0.140s  trace=ts  parsed=1 facts=59224 routers=0 scans=0 derived=1",
+      "[graph-profile] ts_compose_modules                 0.002s  total= 0.143s  trace=ts  facts=59661 records=4086 unread=0",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.006s  total= 0.006s  trace=ts  to_read=62 cached=4024",
+      "[graph-profile] ts_graphql_grpc_index              0.103s  total= 0.109s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              0.298s  total= 0.407s  trace=ts  parsed=10 facts=59224 routers=0 scans=117 derived=7",
+      "[graph-profile] ts_compose_modules                 0.003s  total= 0.409s  trace=ts  facts=59661 records=4086 unread=0",
+      "[graph-profile] ts_frozen_preview                  0.703s  total= 0.745s  trace=session  dirty=11 err=false",
+      "[graph-profile] invalidation_plan                  0.160s  total= 0.905s  trace=session  reason=frozen scope: prior file-to-file dependency closure whole=false extra=0",
+      "[graph-profile] revalidate_before_begin            0.002s  n=70 superseded=false",
+      "[graph-profile] begin_publish                      0.065s  total= 0.971s  trace=session  scope=11",
+      "[graph-profile] ts_dirty_scope                     0.109s  total= 1.080s  trace=session  dirty=11 scope=11 force=false",
+      "[graph-profile] ts_extract_session                 0.000s  total= 1.080s  trace=session  parsed=11 cached=4023 facts=59661 records=4086",
+      "[graph-profile] assemble_new_files                 0.189s  total= 1.269s  trace=session  new=4086 ts_noop=false non_ts_need=false skip=false facts=59661",
+      "[graph-profile] index_group_owners                 0.102s  total= 1.371s  trace=session  facts=59224 owners=4034",
+      "[graph-profile] publish_scope                      0.000s  total= 1.371s  trace=session  scope=11",
+      "[graph-profile] encode_append_owners               0.005s  total= 1.376s  trace=session  published=11",
+      "[graph-profile] publish_resolved                   0.078s  total= 1.454s  trace=session  owners=11",
+      "[graph-profile] revalidate_ts_records              0.126s  total= 1.580s  trace=session  n=4086",
+      "[graph-profile] ts_config_inputs                   0.139s  n=83",
+      "[graph-profile] state_json_marshal                 0.176s  bytes=56634804 files=4086",
+      "[graph-profile] state_fingerprint                  0.025s  write bytes=56634804",
+      "[graph-profile] state_proof_written                0.037s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=20478416",
+      "[graph-profile] write_pending_state                0.440s  total= 2.021s  trace=session",
+      "[graph-profile] end_flush_ack                      0.044s  total= 2.065s  trace=session",
+      "[graph-profile] state_proof_promoted               0.005s",
+      "[graph-profile] promote_compact_state              0.080s  total= 2.145s  trace=session  parsed=11 published=11",
+      "[graph-profile] graph_session_run                  3.218s  total= 3.527s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=11",
+      "[graph-profile] cli_complete                       0.000s  total= 3.527s  trace=cli  results=1"
+    ],
+    "pinned": {
+      "state_proof_bound": [
+        "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634804"
+      ],
+      "runtime_inputs_reused": [
+        "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+      ],
+      "runtime_inputs_reusable": [
+        "[graph-profile] runtime_inputs_reusable            0.291s  total= 1.036s  trace=reconcile  targets=4105"
+      ],
+      "state_proof_refused": [
+        "[graph-profile] state_proof_refused                0.659s  total= 0.745s  trace=reconcile  inventory scan digest moved"
+      ],
+      "state_proof_written": [
+        "[graph-profile] state_proof_written                0.037s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=20478416"
+      ],
+      "state_proof_promoted": [
+        "[graph-profile] state_proof_promoted               0.005s"
+      ],
+      "state_proof_fallback_decode": [
+        "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+      ],
+      "state_json_unmarshal": [
+        "[graph-profile] state_json_unmarshal               0.242s  files=4086"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.176s  bytes=56634804 files=4086"
+      ],
+      "state_read_bytes": [
+        "[graph-profile] state_read_bytes                   0.013s  state.json bytes=56634804",
+        "[graph-profile] state_read_bytes                   0.017s  state.json bytes=56634804"
+      ],
+      "state_fingerprint": [
+        "[graph-profile] state_fingerprint                  0.023s  bytes=56634804",
+        "[graph-profile] state_fingerprint                  0.023s  bytes=56634804",
+        "[graph-profile] state_fingerprint                  0.025s  write bytes=56634804"
+      ],
+      "load_state": [
+        "[graph-profile] load_state                         0.037s  total= 0.037s  trace=open  deferred owners=4086"
+      ],
+      "select_hash_targets": [
+        "[graph-profile] select_hash_targets                0.005s  total= 0.117s  trace=inputs  targets=4105"
+      ],
+      "hash_content_inputs": [
+        "[graph-profile] hash_content_inputs                0.136s  total= 0.253s  trace=inputs  targets=4105"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.440s  total= 2.021s  trace=session"
+      ],
+      "promote_compact_state": [
+        "[graph-profile] promote_compact_state              0.080s  total= 2.145s  trace=session  parsed=11 published=11"
+      ],
+      "end_flush_ack": [
+        "[graph-profile] end_flush_ack                      0.044s  total= 2.065s  trace=session"
+      ],
+      "graph_session_run": [
+        "[graph-profile] graph_session_run                  3.218s  total= 3.527s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=11"
+      ],
+      "cli_complete": [
+        "[graph-profile] cli_complete                       0.000s  total= 3.527s  trace=cli  results=1"
+      ]
+    },
+    "seed": null,
+    "fallbacks": [
+      "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+    ],
+    "process_real_s": 3.55,
+    "rss_bytes": 656162816.0,
+    "user_s": 3.69,
+    "sys_s": 0.79,
+    "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+    "wire_run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790325323029335000",
+    "wire_applied_generation": 2,
+    "gate_observations": {
+      "exit_zero": true,
+      "generation_advanced": true,
+      "proof_bound": true,
+      "capture_reused": true,
+      "proof_written": true,
+      "proof_promoted": true,
+      "proof_unavailable": false,
+      "parsed_files": 11,
+      "owners_published": 11,
+      "graph_hash_present": true,
+      "wire_run_id_matches_result": true
+    }
+  },
+  {
+    "label": "structural-frozen",
+    "arm": "frozen",
+    "scenario": "structural",
+    "measured": true,
+    "mode": "delta",
+    "binary": "/tmp/enola-stage21-root-review/enola-proof-diagnostic3",
+    "binary_sha256": "6553bf7c8c847b9eddb22ce4a63c65c96b4d1cf383c89b2d330c5c6bd51fc705",
+    "context": "stage21-ablate-seed",
+    "wall_seconds": 3.788115583010949,
+    "exit": 0,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "resolution": 11,
+          "source content": 1
+        }
+      },
+      "RunID": "stage21-ablate-product-stage21-ablate-seed-3-1790325329124285000",
+      "BaseGeneration": 2,
+      "TargetGeneration": 3,
+      "Stats": {
+        "files_read": 116,
+        "files_parsed": 12,
+        "cached_files": 4022,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 117,
+        "derived_indexes": 8,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "changed files and reverse file dependents",
+          "reason": "frozen scope: prior file-to-file dependency closure"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 12,
+      "ParsedFiles": 12,
+      "EarlyLocal": 0
+    },
+    "phases": [
+      "[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=delta",
+      "[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml",
+      "[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2",
+      "[graph-profile] discover_git                       0.032s  total= 0.032s  trace=graphinput_build  repo=true dirs=2",
+      "[graph-profile] declare_git_control                0.005s  total= 0.038s  trace=graphinput_build  deps=6",
+      "[graph-profile] git_ls_files                       0.058s  total= 0.096s  trace=graphinput_build  tracked=45105 dirs=5818",
+      "[graph-profile] walk_tree                          0.128s  total= 0.224s  trace=graphinput_build  names=11635 ignorefiles=4",
+      "[graph-profile] check_ignore_setup                 0.014s  total= 0.238s  trace=graphinput_build",
+      "[graph-profile] check_ignore_run                   0.065s  total= 0.303s  trace=graphinput_build  names=11635 ignored=0",
+      "[graph-profile] declare_ignore_files               0.000s  total= 0.303s  trace=graphinput_build  deps=9",
+      "[graph-profile] compute_identities                 0.038s  total= 0.341s  trace=graphinput_build  deps=9 entries=11635",
+      "[graph-profile] graphinput_build                   0.342s  total= 0.342s  trace=graph_engine  configpaths=2",
+      "[graph-profile] engine_new                         0.000s  total= 0.342s  trace=graph_engine",
+      "[graph-profile] register_plugins                   0.000s  total= 0.342s  trace=graph_engine",
+      "[graph-profile] config_recheck                     0.000s  total= 0.342s  trace=graph_engine",
+      "[graph-profile] resolve_graph_target               0.342s  total= 0.342s  trace=cli  repos=1",
+      "[graph-profile] connect_sink                       0.001s  total= 0.343s  trace=cli  nats=true",
+      "[graph-profile] session_options                    0.000s  total= 0.343s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product",
+      "[graph-profile] lock                               0.000s  total= 0.000s  trace=open",
+      "[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open",
+      "[graph-profile] open_journal                       0.000s  total= 0.000s  trace=open",
+      "[graph-profile] replay_unacked                     0.000s  total= 0.000s  trace=open",
+      "[graph-profile] state_read_bytes                   0.012s  state.json bytes=56634804",
+      "[graph-profile] state_fingerprint                  0.025s  bytes=56634804",
+      "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634804",
+      "[graph-profile] load_state                         0.037s  total= 0.038s  trace=open  deferred owners=4086",
+      "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false",
+      "[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2",
+      "[graph-profile] graph_inputs_proven                0.095s  total= 0.095s  trace=reconcile",
+      "[graph-profile] effective_config                   0.000s  total= 0.095s  trace=reconcile  files=2 fast=false",
+      "[graph-profile] reconcile_complete                 0.000s  total= 0.095s  trace=reconcile  reloaded=false",
+      "[graph-profile] engine_walk_repo                   0.132s  files=10965 tests=0 all_names=10965",
+      "[graph-profile] inventory                          0.132s  total= 0.132s  trace=inputs  files=10965 all_names=10965",
+      "[graph-profile] detect_typescript                  0.001s",
+      "[graph-profile] detect_extractors                  0.001s  total= 0.133s  trace=inputs  detected=1",
+      "[graph-profile] select_hash_targets                0.006s  total= 0.139s  trace=inputs  targets=4105",
+      "[graph-profile] engine_hash_files                  0.156s  n=4105 hashed=4105 bytes=45822424",
+      "[graph-profile] hash_content_inputs                0.156s  total= 0.295s  trace=inputs  targets=4105",
+      "[graph-profile] capture_contexts                   0.000s  total= 0.295s  trace=inputs  contexts=0",
+      "[graph-profile] ts_config_inputs                   0.145s  n=83",
+      "[graph-profile] analysis_fingerprint               0.148s  total= 0.443s  trace=inputs  cfg_files=59",
+      "[graph-profile] angular_probe                      0.004s  total= 0.446s  trace=inputs  angular=false",
+      "[graph-profile] policy_identity                    0.000s  total= 0.446s  trace=inputs",
+      "[graph-profile] engine_context_fingerprint         0.000s  total= 0.446s  trace=inputs",
+      "[graph-profile] ts_disc_nuxt_packages              0.123s  pkgs=0",
+      "[graph-profile] ts_disc_package_gates              0.000s",
+      "[graph-profile] ts_disc_package_names              0.000s  names=30",
+      "[graph-profile] ts_disc_alias_roots                0.082s  roots=1",
+      "[graph-profile] ts_disc_package_exports            0.000s  packages=30",
+      "[graph-profile] ts_discovery_build                 0.224s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59",
+      "[graph-profile] ts_discovery                       0.224s  total= 0.670s  trace=inputs  names=0 bytes=0 dirs=0",
+      "[graph-profile] ts_session_context                 0.054s  total= 0.725s  trace=inputs  files=4086",
+      "[graph-profile] runtime_inputs_complete            0.000s  total= 0.725s  trace=inputs",
+      "[graph-profile] state_proof_refused                0.745s  total= 0.840s  trace=reconcile  inventory scan digest moved",
+      "[graph-profile] state_read_bytes                   0.017s  state.json bytes=56634804",
+      "[graph-profile] state_fingerprint                  0.024s  bytes=56634804",
+      "[graph-profile] state_json_unmarshal               0.251s  files=4086",
+      "[graph-profile] state_proof_fallback_decode        0.000s  files=4086",
+      "[graph-profile] runtime_inputs_reusable            0.302s  total= 1.142s  trace=reconcile  targets=4105",
+      "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0",
+      "[graph-profile] clone_file_state_copy              0.000s  n=4086",
+      "[graph-profile] extractor_need                     0.026s  total= 0.026s  trace=session  non_ts_need=false detected=1 neutral=0",
+      "[graph-profile] changed_terms                      0.017s  total= 0.043s  trace=session  initial=false force=false non_ts=false scan=true raw_cfg=false policy=false neutral_scan=false neutral_cfg=false",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.006s  total= 0.006s  trace=ts  to_read=53 cached=4033",
+      "[graph-profile] ts_graphql_grpc_index              0.100s  total= 0.106s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              0.041s  total= 0.147s  trace=ts  parsed=1 facts=59225 routers=0 scans=0 derived=1",
+      "[graph-profile] ts_compose_modules                 0.003s  total= 0.150s  trace=ts  facts=59662 records=4086 unread=0",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.010s  total= 0.010s  trace=ts  to_read=63 cached=4023",
+      "[graph-profile] ts_graphql_grpc_index              0.104s  total= 0.115s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              0.316s  total= 0.430s  trace=ts  parsed=11 facts=59225 routers=0 scans=117 derived=7",
+      "[graph-profile] ts_compose_modules                 0.002s  total= 0.433s  trace=ts  facts=59662 records=4086 unread=0",
+      "[graph-profile] ts_frozen_preview                  0.745s  total= 0.788s  trace=session  dirty=12 err=false",
+      "[graph-profile] invalidation_plan                  0.194s  total= 0.982s  trace=session  reason=frozen scope: prior file-to-file dependency closure whole=false extra=0",
+      "[graph-profile] revalidate_before_begin            0.003s  n=71 superseded=false",
+      "[graph-profile] begin_publish                      0.073s  total= 1.055s  trace=session  scope=12",
+      "[graph-profile] ts_dirty_scope                     0.104s  total= 1.159s  trace=session  dirty=12 scope=12 force=false",
+      "[graph-profile] ts_extract_session                 0.000s  total= 1.160s  trace=session  parsed=12 cached=4022 facts=59662 records=4086",
+      "[graph-profile] assemble_new_files                 0.179s  total= 1.338s  trace=session  new=4086 ts_noop=false non_ts_need=false skip=false facts=59662",
+      "[graph-profile] index_group_owners                 0.098s  total= 1.437s  trace=session  facts=59225 owners=4034",
+      "[graph-profile] publish_scope                      0.000s  total= 1.437s  trace=session  scope=12",
+      "[graph-profile] encode_append_owners               0.005s  total= 1.442s  trace=session  published=12",
+      "[graph-profile] publish_resolved                   0.072s  total= 1.513s  trace=session  owners=12",
+      "[graph-profile] revalidate_ts_records              0.156s  total= 1.669s  trace=session  n=4086",
+      "[graph-profile] ts_config_inputs                   0.137s  n=83",
+      "[graph-profile] state_json_marshal                 0.175s  bytes=56635523 files=4086",
+      "[graph-profile] state_fingerprint                  0.024s  write bytes=56635523",
+      "[graph-profile] state_proof_written                0.042s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19879791",
+      "[graph-profile] write_pending_state                0.449s  total= 2.118s  trace=session",
+      "[graph-profile] end_flush_ack                      0.041s  total= 2.159s  trace=session",
+      "[graph-profile] state_proof_promoted               0.005s",
+      "[graph-profile] promote_compact_state              0.077s  total= 2.236s  trace=session  parsed=12 published=12",
+      "[graph-profile] graph_session_run                  3.415s  total= 3.759s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=12",
+      "[graph-profile] cli_complete                       0.000s  total= 3.759s  trace=cli  results=1"
+    ],
+    "pinned": {
+      "state_proof_bound": [
+        "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634804"
+      ],
+      "runtime_inputs_reused": [
+        "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+      ],
+      "runtime_inputs_reusable": [
+        "[graph-profile] runtime_inputs_reusable            0.302s  total= 1.142s  trace=reconcile  targets=4105"
+      ],
+      "state_proof_refused": [
+        "[graph-profile] state_proof_refused                0.745s  total= 0.840s  trace=reconcile  inventory scan digest moved"
+      ],
+      "state_proof_written": [
+        "[graph-profile] state_proof_written                0.042s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19879791"
+      ],
+      "state_proof_promoted": [
+        "[graph-profile] state_proof_promoted               0.005s"
+      ],
+      "state_proof_fallback_decode": [
+        "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+      ],
+      "state_json_unmarshal": [
+        "[graph-profile] state_json_unmarshal               0.251s  files=4086"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.175s  bytes=56635523 files=4086"
+      ],
+      "state_read_bytes": [
+        "[graph-profile] state_read_bytes                   0.012s  state.json bytes=56634804",
+        "[graph-profile] state_read_bytes                   0.017s  state.json bytes=56634804"
+      ],
+      "state_fingerprint": [
+        "[graph-profile] state_fingerprint                  0.025s  bytes=56634804",
+        "[graph-profile] state_fingerprint                  0.024s  bytes=56634804",
+        "[graph-profile] state_fingerprint                  0.024s  write bytes=56635523"
+      ],
+      "load_state": [
+        "[graph-profile] load_state                         0.037s  total= 0.038s  trace=open  deferred owners=4086"
+      ],
+      "select_hash_targets": [
+        "[graph-profile] select_hash_targets                0.006s  total= 0.139s  trace=inputs  targets=4105"
+      ],
+      "hash_content_inputs": [
+        "[graph-profile] hash_content_inputs                0.156s  total= 0.295s  trace=inputs  targets=4105"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.449s  total= 2.118s  trace=session"
+      ],
+      "promote_compact_state": [
+        "[graph-profile] promote_compact_state              0.077s  total= 2.236s  trace=session  parsed=12 published=12"
+      ],
+      "end_flush_ack": [
+        "[graph-profile] end_flush_ack                      0.041s  total= 2.159s  trace=session"
+      ],
+      "graph_session_run": [
+        "[graph-profile] graph_session_run                  3.415s  total= 3.759s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=12"
+      ],
+      "cli_complete": [
+        "[graph-profile] cli_complete                       0.000s  total= 3.759s  trace=cli  results=1"
+      ]
+    },
+    "seed": {
+      "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790325323029335000",
+      "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+      "base_generation": 1,
+      "target_generation": 2,
+      "state_files": 10,
+      "state_sha256": "ff37aadfe1be3cf74a4875a6445e5c742bbb60aa53040ae395c111578962481a",
+      "proof_sha256": "9bc91c80feb7030824ec788f3f68745bce82f11a0e2310ed566b4b979d618e1e"
+    },
+    "fallbacks": [
+      "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+    ],
+    "process_real_s": 3.78,
+    "rss_bytes": 643465216.0,
+    "user_s": 3.83,
+    "sys_s": 0.91,
+    "graph_hash": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666",
+    "wire_run_id": "stage21-ablate-product-stage21-ablate-seed-3-1790325329124285000",
+    "wire_applied_generation": 3,
+    "gate_observations": {
+      "exit_zero": true,
+      "generation_advanced": true,
+      "proof_bound": true,
+      "capture_reused": true,
+      "proof_written": true,
+      "proof_promoted": true,
+      "proof_unavailable": false,
+      "parsed_files": 12,
+      "owners_published": 12,
+      "graph_hash_present": true,
+      "wire_run_id_matches_result": true
+    },
+    "restored_state_manifest": {
+      "acks.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "commit.json": {
+        "sha256": "ea7eda19d39ec5c031d9f501e23941f78d232c75668b0c5ddf04ff8236ff5ab8",
+        "bytes": 220
+      },
+      "fences.jsonl": {
+        "sha256": "a5148993cfc0028b1dfe9e2e302e00e62a8efd6a5850b8e18e9a1030d7e69316",
+        "bytes": 156
+      },
+      "identity.json": {
+        "sha256": "484cd44558ff809c8f6b213cc445b27d7800c83c3463991c38808b884410d86b",
+        "bytes": 220
+      },
+      "payloads.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "protocol": {
+        "sha256": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+        "bytes": 14
+      },
+      "session.lock": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "state-proof.json": {
+        "sha256": "9bc91c80feb7030824ec788f3f68745bce82f11a0e2310ed566b4b979d618e1e",
+        "bytes": 10952
+      },
+      "state.json": {
+        "sha256": "ff37aadfe1be3cf74a4875a6445e5c742bbb60aa53040ae395c111578962481a",
+        "bytes": 56634804
+      },
+      "tombstones.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "observer": {
+      "phase": 6,
+      "pid": 94055,
+      "stderr": "observer-6.stderr"
+    },
+    "replay": {
+      "replayed_frames": 2,
+      "matched": {
+        "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790325323029335000",
+        "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+        "base_generation": 1,
+        "applied_generation": 2
+      }
+    },
+    "stream_last_seq_before_delta": 1980
+  },
+  {
+    "label": "structural-ablated",
+    "arm": "ablated",
+    "scenario": "structural",
+    "measured": true,
+    "mode": "delta",
+    "binary": "/tmp/enola-stage21-ablate/enola-ablate-noproof2",
+    "binary_sha256": "4c6cb04fa773b42fe39223f37d5ebb4e5efffd3b87cb72cc5ab226681977c4e5",
+    "context": "stage21-ablate-seed",
+    "wall_seconds": 3.5195379169890657,
+    "exit": 0,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "resolution": 11,
+          "source content": 1
+        }
+      },
+      "RunID": "stage21-ablate-product-stage21-ablate-seed-3-1790325335050672000",
+      "BaseGeneration": 2,
+      "TargetGeneration": 3,
+      "Stats": {
+        "files_read": 116,
+        "files_parsed": 12,
+        "cached_files": 4022,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 117,
+        "derived_indexes": 8,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "changed files and reverse file dependents",
+          "reason": "frozen scope: prior file-to-file dependency closure"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 12,
+      "ParsedFiles": 12,
+      "EarlyLocal": 0
+    },
+    "phases": [
+      "[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=delta",
+      "[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml",
+      "[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2",
+      "[graph-profile] discover_git                       0.035s  total= 0.035s  trace=graphinput_build  repo=true dirs=2",
+      "[graph-profile] declare_git_control                0.005s  total= 0.040s  trace=graphinput_build  deps=6",
+      "[graph-profile] git_ls_files                       0.056s  total= 0.096s  trace=graphinput_build  tracked=45105 dirs=5818",
+      "[graph-profile] walk_tree                          0.126s  total= 0.222s  trace=graphinput_build  names=11635 ignorefiles=4",
+      "[graph-profile] check_ignore_setup                 0.014s  total= 0.236s  trace=graphinput_build",
+      "[graph-profile] check_ignore_run                   0.063s  total= 0.299s  trace=graphinput_build  names=11635 ignored=0",
+      "[graph-profile] declare_ignore_files               0.000s  total= 0.299s  trace=graphinput_build  deps=9",
+      "[graph-profile] compute_identities                 0.036s  total= 0.335s  trace=graphinput_build  deps=9 entries=11635",
+      "[graph-profile] graphinput_build                   0.336s  total= 0.336s  trace=graph_engine  configpaths=2",
+      "[graph-profile] engine_new                         0.000s  total= 0.336s  trace=graph_engine",
+      "[graph-profile] register_plugins                   0.000s  total= 0.336s  trace=graph_engine",
+      "[graph-profile] config_recheck                     0.000s  total= 0.336s  trace=graph_engine",
+      "[graph-profile] resolve_graph_target               0.337s  total= 0.337s  trace=cli  repos=1",
+      "[graph-profile] connect_sink                       0.001s  total= 0.338s  trace=cli  nats=true",
+      "[graph-profile] session_options                    0.000s  total= 0.338s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product",
+      "[graph-profile] lock                               0.000s  total= 0.000s  trace=open",
+      "[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open",
+      "[graph-profile] open_journal                       0.000s  total= 0.000s  trace=open",
+      "[graph-profile] replay_unacked                     0.000s  total= 0.000s  trace=open",
+      "[graph-profile] state_read_bytes                   0.009s  state.json bytes=56634804",
+      "[graph-profile] state_fingerprint                  0.025s  bytes=56634804",
+      "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634804",
+      "[graph-profile] load_state                         0.034s  total= 0.034s  trace=open  deferred owners=4086",
+      "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false",
+      "[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2",
+      "[graph-profile] graph_inputs_proven                0.092s  total= 0.092s  trace=reconcile",
+      "[graph-profile] effective_config                   0.000s  total= 0.092s  trace=reconcile  files=2 fast=false",
+      "[graph-profile] reconcile_complete                 0.000s  total= 0.092s  trace=reconcile  reloaded=false",
+      "[graph-profile] engine_walk_repo                   0.118s  files=10965 tests=0 all_names=10965",
+      "[graph-profile] inventory                          0.118s  total= 0.118s  trace=inputs  files=10965 all_names=10965",
+      "[graph-profile] detect_typescript                  0.001s",
+      "[graph-profile] detect_extractors                  0.001s  total= 0.119s  trace=inputs  detected=1",
+      "[graph-profile] select_hash_targets                0.006s  total= 0.125s  trace=inputs  targets=4105",
+      "[graph-profile] engine_hash_files                  0.157s  n=4105 hashed=4105 bytes=45822424",
+      "[graph-profile] hash_content_inputs                0.157s  total= 0.282s  trace=inputs  targets=4105",
+      "[graph-profile] capture_contexts                   0.000s  total= 0.282s  trace=inputs  contexts=0",
+      "[graph-profile] ts_config_inputs                   0.142s  n=83",
+      "[graph-profile] analysis_fingerprint               0.144s  total= 0.427s  trace=inputs  cfg_files=59",
+      "[graph-profile] angular_probe                      0.003s  total= 0.430s  trace=inputs  angular=false",
+      "[graph-profile] policy_identity                    0.000s  total= 0.430s  trace=inputs",
+      "[graph-profile] engine_context_fingerprint         0.000s  total= 0.430s  trace=inputs",
+      "[graph-profile] ts_disc_nuxt_packages              0.122s  pkgs=0",
+      "[graph-profile] ts_disc_package_gates              0.000s",
+      "[graph-profile] ts_disc_package_names              0.000s  names=30",
+      "[graph-profile] ts_disc_alias_roots                0.082s  roots=1",
+      "[graph-profile] ts_disc_package_exports            0.000s  packages=30",
+      "[graph-profile] ts_discovery_build                 0.216s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59",
+      "[graph-profile] ts_discovery                       0.216s  total= 0.646s  trace=inputs  names=0 bytes=0 dirs=0",
+      "[graph-profile] ts_session_context                 0.056s  total= 0.702s  trace=inputs  files=4086",
+      "[graph-profile] runtime_inputs_complete            0.000s  total= 0.702s  trace=inputs",
+      "[graph-profile] state_proof_refused                0.722s  total= 0.814s  trace=reconcile  inventory scan digest moved",
+      "[graph-profile] state_read_bytes                   0.018s  state.json bytes=56634804",
+      "[graph-profile] state_fingerprint                  0.024s  bytes=56634804",
+      "[graph-profile] state_json_unmarshal               0.252s  files=4086",
+      "[graph-profile] state_proof_fallback_decode        0.000s  files=4086",
+      "[graph-profile] runtime_inputs_reusable            0.304s  total= 1.118s  trace=reconcile  targets=4105",
+      "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0",
+      "[graph-profile] clone_file_state_copy              0.000s  n=4086",
+      "[graph-profile] extractor_need                     0.028s  total= 0.028s  trace=session  non_ts_need=false detected=1 neutral=0",
+      "[graph-profile] changed_terms                      0.018s  total= 0.046s  trace=session  initial=false force=false non_ts=false scan=true raw_cfg=false policy=false neutral_scan=false neutral_cfg=false",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.006s  total= 0.007s  trace=ts  to_read=53 cached=4033",
+      "[graph-profile] ts_graphql_grpc_index              0.099s  total= 0.106s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              0.043s  total= 0.149s  trace=ts  parsed=1 facts=59225 routers=0 scans=0 derived=1",
+      "[graph-profile] ts_compose_modules                 0.002s  total= 0.151s  trace=ts  facts=59662 records=4086 unread=0",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.005s  total= 0.006s  trace=ts  to_read=63 cached=4023",
+      "[graph-profile] ts_graphql_grpc_index              0.103s  total= 0.108s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              0.303s  total= 0.411s  trace=ts  parsed=11 facts=59225 routers=0 scans=117 derived=7",
+      "[graph-profile] ts_compose_modules                 0.003s  total= 0.414s  trace=ts  facts=59662 records=4086 unread=0",
+      "[graph-profile] ts_frozen_preview                  0.725s  total= 0.771s  trace=session  dirty=12 err=false",
+      "[graph-profile] invalidation_plan                  0.174s  total= 0.945s  trace=session  reason=frozen scope: prior file-to-file dependency closure whole=false extra=0",
+      "[graph-profile] revalidate_before_begin            0.002s  n=71 superseded=false",
+      "[graph-profile] begin_publish                      0.081s  total= 1.027s  trace=session  scope=12",
+      "[graph-profile] ts_dirty_scope                     0.103s  total= 1.130s  trace=session  dirty=12 scope=12 force=false",
+      "[graph-profile] ts_extract_session                 0.000s  total= 1.130s  trace=session  parsed=12 cached=4022 facts=59662 records=4086",
+      "[graph-profile] assemble_new_files                 0.171s  total= 1.301s  trace=session  new=4086 ts_noop=false non_ts_need=false skip=false facts=59662",
+      "[graph-profile] index_group_owners                 0.084s  total= 1.385s  trace=session  facts=59225 owners=4034",
+      "[graph-profile] publish_scope                      0.000s  total= 1.385s  trace=session  scope=12",
+      "[graph-profile] encode_append_owners               0.004s  total= 1.390s  trace=session  published=12",
+      "[graph-profile] publish_resolved                   0.045s  total= 1.435s  trace=session  owners=12",
+      "[graph-profile] revalidate_ts_records              0.106s  total= 1.540s  trace=session  n=4086",
+      "[graph-profile] ts_config_inputs                   0.131s  n=83",
+      "[graph-profile] state_json_marshal                 0.161s  bytes=56635523 files=4086",
+      "[graph-profile] state_fingerprint                  0.025s  write bytes=56635523",
+      "[graph-profile] state_proof_unavailable            0.000s  diagnostic ablation: proof production disabled",
+      "[graph-profile] ablation_proof_cleanup_stage       0.004s  where=1",
+      "[graph-profile] write_pending_state                0.360s  total= 1.900s  trace=session",
+      "[graph-profile] end_flush_ack                      0.032s  total= 1.933s  trace=session",
+      "[graph-profile] state_proof_unavailable            0.000s  diagnostic ablation: proof production disabled",
+      "[graph-profile] ablation_proof_cleanup_promote     0.004s",
+      "[graph-profile] promote_compact_state              0.068s  total= 2.000s  trace=session  parsed=12 published=12",
+      "[graph-profile] graph_session_run                  3.153s  total= 3.490s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=12",
+      "[graph-profile] cli_complete                       0.000s  total= 3.491s  trace=cli  results=1"
+    ],
+    "pinned": {
+      "state_proof_bound": [
+        "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634804"
+      ],
+      "runtime_inputs_reused": [
+        "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+      ],
+      "runtime_inputs_reusable": [
+        "[graph-profile] runtime_inputs_reusable            0.304s  total= 1.118s  trace=reconcile  targets=4105"
+      ],
+      "state_proof_refused": [
+        "[graph-profile] state_proof_refused                0.722s  total= 0.814s  trace=reconcile  inventory scan digest moved"
+      ],
+      "state_proof_unavailable": [
+        "[graph-profile] state_proof_unavailable            0.000s  diagnostic ablation: proof production disabled",
+        "[graph-profile] state_proof_unavailable            0.000s  diagnostic ablation: proof production disabled"
+      ],
+      "ablation_proof_cleanup_stage": [
+        "[graph-profile] ablation_proof_cleanup_stage       0.004s  where=1"
+      ],
+      "ablation_proof_cleanup_promote": [
+        "[graph-profile] ablation_proof_cleanup_promote     0.004s"
+      ],
+      "state_proof_fallback_decode": [
+        "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+      ],
+      "state_json_unmarshal": [
+        "[graph-profile] state_json_unmarshal               0.252s  files=4086"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.161s  bytes=56635523 files=4086"
+      ],
+      "state_read_bytes": [
+        "[graph-profile] state_read_bytes                   0.009s  state.json bytes=56634804",
+        "[graph-profile] state_read_bytes                   0.018s  state.json bytes=56634804"
+      ],
+      "state_fingerprint": [
+        "[graph-profile] state_fingerprint                  0.025s  bytes=56634804",
+        "[graph-profile] state_fingerprint                  0.024s  bytes=56634804",
+        "[graph-profile] state_fingerprint                  0.025s  write bytes=56635523"
+      ],
+      "load_state": [
+        "[graph-profile] load_state                         0.034s  total= 0.034s  trace=open  deferred owners=4086"
+      ],
+      "select_hash_targets": [
+        "[graph-profile] select_hash_targets                0.006s  total= 0.125s  trace=inputs  targets=4105"
+      ],
+      "hash_content_inputs": [
+        "[graph-profile] hash_content_inputs                0.157s  total= 0.282s  trace=inputs  targets=4105"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.360s  total= 1.900s  trace=session"
+      ],
+      "promote_compact_state": [
+        "[graph-profile] promote_compact_state              0.068s  total= 2.000s  trace=session  parsed=12 published=12"
+      ],
+      "end_flush_ack": [
+        "[graph-profile] end_flush_ack                      0.032s  total= 1.933s  trace=session"
+      ],
+      "graph_session_run": [
+        "[graph-profile] graph_session_run                  3.153s  total= 3.490s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=12"
+      ],
+      "cli_complete": [
+        "[graph-profile] cli_complete                       0.000s  total= 3.491s  trace=cli  results=1"
+      ]
+    },
+    "seed": {
+      "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790325323029335000",
+      "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+      "base_generation": 1,
+      "target_generation": 2,
+      "state_files": 10,
+      "state_sha256": "ff37aadfe1be3cf74a4875a6445e5c742bbb60aa53040ae395c111578962481a",
+      "proof_sha256": "9bc91c80feb7030824ec788f3f68745bce82f11a0e2310ed566b4b979d618e1e"
+    },
+    "fallbacks": [
+      "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+    ],
+    "process_real_s": 3.51,
+    "rss_bytes": 631635968.0,
+    "user_s": 3.73,
+    "sys_s": 0.8,
+    "graph_hash": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666",
+    "wire_run_id": "stage21-ablate-product-stage21-ablate-seed-3-1790325335050672000",
+    "wire_applied_generation": 3,
+    "gate_observations": {
+      "exit_zero": true,
+      "generation_advanced": true,
+      "proof_bound": true,
+      "capture_reused": true,
+      "proof_written": false,
+      "proof_promoted": false,
+      "proof_unavailable": true,
+      "parsed_files": 12,
+      "owners_published": 12,
+      "graph_hash_present": true,
+      "wire_run_id_matches_result": true
+    },
+    "restored_state_manifest": {
+      "acks.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "commit.json": {
+        "sha256": "ea7eda19d39ec5c031d9f501e23941f78d232c75668b0c5ddf04ff8236ff5ab8",
+        "bytes": 220
+      },
+      "fences.jsonl": {
+        "sha256": "a5148993cfc0028b1dfe9e2e302e00e62a8efd6a5850b8e18e9a1030d7e69316",
+        "bytes": 156
+      },
+      "identity.json": {
+        "sha256": "484cd44558ff809c8f6b213cc445b27d7800c83c3463991c38808b884410d86b",
+        "bytes": 220
+      },
+      "payloads.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "protocol": {
+        "sha256": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+        "bytes": 14
+      },
+      "session.lock": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "state-proof.json": {
+        "sha256": "9bc91c80feb7030824ec788f3f68745bce82f11a0e2310ed566b4b979d618e1e",
+        "bytes": 10952
+      },
+      "state.json": {
+        "sha256": "ff37aadfe1be3cf74a4875a6445e5c742bbb60aa53040ae395c111578962481a",
+        "bytes": 56634804
+      },
+      "tombstones.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "observer": {
+      "phase": 7,
+      "pid": 94677,
+      "stderr": "observer-7.stderr"
+    },
+    "replay": {
+      "replayed_frames": 2,
+      "matched": {
+        "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790325323029335000",
+        "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+        "base_generation": 1,
+        "applied_generation": 2
+      }
+    },
+    "stream_last_seq_before_delta": 1980
+  },
+  {
+    "label": "structural-baseline",
+    "arm": "baseline",
+    "scenario": "structural",
+    "measured": true,
+    "mode": "delta",
+    "binary": "/tmp/enola-stage21-root-review/enola-stage20-baseline",
+    "binary_sha256": "99162b12e148c995c0a6e91ff73ffea05f2fb978ec004887f89e35a337006f60",
+    "context": "stage21-ablate-seed",
+    "wall_seconds": 3.270098999957554,
+    "exit": 0,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "resolution": 11,
+          "source content": 1
+        }
+      },
+      "RunID": "stage21-ablate-product-stage21-ablate-seed-3-1790325340591553000",
+      "BaseGeneration": 2,
+      "TargetGeneration": 3,
+      "Stats": {
+        "files_read": 116,
+        "files_parsed": 12,
+        "cached_files": 4022,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 117,
+        "derived_indexes": 8,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "changed files and reverse file dependents",
+          "reason": "frozen scope: prior file-to-file dependency closure"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 12,
+      "ParsedFiles": 12,
+      "EarlyLocal": 0
+    },
+    "phases": [
+      "[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=delta",
+      "[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml",
+      "[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2",
+      "[graph-profile] discover_git                       0.032s  total= 0.032s  trace=graphinput_build  repo=true dirs=2",
+      "[graph-profile] declare_git_control                0.005s  total= 0.037s  trace=graphinput_build  deps=6",
+      "[graph-profile] git_ls_files                       0.054s  total= 0.092s  trace=graphinput_build  tracked=45105 dirs=5818",
+      "[graph-profile] walk_tree                          0.118s  total= 0.210s  trace=graphinput_build  names=11635 ignorefiles=4",
+      "[graph-profile] check_ignore_setup                 0.014s  total= 0.224s  trace=graphinput_build",
+      "[graph-profile] check_ignore_run                   0.056s  total= 0.280s  trace=graphinput_build  names=11635 ignored=0",
+      "[graph-profile] declare_ignore_files               0.000s  total= 0.280s  trace=graphinput_build  deps=9",
+      "[graph-profile] compute_identities                 0.032s  total= 0.312s  trace=graphinput_build  deps=9 entries=11635",
+      "[graph-profile] graphinput_build                   0.313s  total= 0.313s  trace=graph_engine  configpaths=2",
+      "[graph-profile] engine_new                         0.000s  total= 0.313s  trace=graph_engine",
+      "[graph-profile] register_plugins                   0.000s  total= 0.313s  trace=graph_engine",
+      "[graph-profile] config_recheck                     0.000s  total= 0.313s  trace=graph_engine",
+      "[graph-profile] resolve_graph_target               0.313s  total= 0.313s  trace=cli  repos=1",
+      "[graph-profile] connect_sink                       0.001s  total= 0.314s  trace=cli  nats=true",
+      "[graph-profile] session_options                    0.000s  total= 0.314s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product",
+      "[graph-profile] lock                               0.000s  total= 0.000s  trace=open",
+      "[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open",
+      "[graph-profile] open_journal                       0.000s  total= 0.000s  trace=open",
+      "[graph-profile] replay_unacked                     0.000s  total= 0.000s  trace=open",
+      "[graph-profile] state_read_bytes                   0.013s  state.json bytes=56634804",
+      "[graph-profile] state_fingerprint                  0.023s  bytes=56634804",
+      "[graph-profile] state_json_unmarshal               0.240s  files=4086",
+      "[graph-profile] load_state                         0.276s  total= 0.276s  trace=open  files=4086",
+      "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false",
+      "[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2",
+      "[graph-profile] graph_inputs_proven                0.086s  total= 0.086s  trace=reconcile",
+      "[graph-profile] effective_config                   0.000s  total= 0.086s  trace=reconcile  files=2 fast=false",
+      "[graph-profile] reconcile_complete                 0.000s  total= 0.086s  trace=reconcile  reloaded=false",
+      "[graph-profile] engine_walk_repo                   0.107s  files=10965 tests=0 all_names=10965",
+      "[graph-profile] inventory                          0.107s  total= 0.107s  trace=inputs  files=10965 all_names=10965",
+      "[graph-profile] detect_typescript                  0.001s",
+      "[graph-profile] detect_extractors                  0.001s  total= 0.108s  trace=inputs  detected=1",
+      "[graph-profile] select_hash_targets                0.010s  total= 0.118s  trace=inputs  targets=4105",
+      "[graph-profile] engine_hash_files                  0.148s  n=4105 hashed=4105 bytes=45822424",
+      "[graph-profile] hash_content_inputs                0.148s  total= 0.266s  trace=inputs  targets=4105",
+      "[graph-profile] capture_contexts                   0.000s  total= 0.266s  trace=inputs  contexts=0",
+      "[graph-profile] ts_config_inputs                   0.129s  n=83",
+      "[graph-profile] analysis_fingerprint               0.131s  total= 0.397s  trace=inputs  cfg_files=59",
+      "[graph-profile] angular_probe                      0.003s  total= 0.400s  trace=inputs  angular=false",
+      "[graph-profile] policy_identity                    0.000s  total= 0.400s  trace=inputs",
+      "[graph-profile] engine_context_fingerprint         0.000s  total= 0.400s  trace=inputs",
+      "[graph-profile] ts_disc_nuxt_packages              0.111s  pkgs=0",
+      "[graph-profile] ts_disc_package_gates              0.001s",
+      "[graph-profile] ts_disc_package_names              0.000s  names=30",
+      "[graph-profile] ts_disc_alias_roots                0.074s  roots=1",
+      "[graph-profile] ts_disc_package_exports            0.000s  packages=30",
+      "[graph-profile] ts_discovery_build                 0.196s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59",
+      "[graph-profile] ts_discovery                       0.196s  total= 0.595s  trace=inputs  names=0 bytes=0 dirs=0",
+      "[graph-profile] ts_session_context                 0.055s  total= 0.651s  trace=inputs  files=4086",
+      "[graph-profile] runtime_inputs_complete            0.000s  total= 0.651s  trace=inputs",
+      "[graph-profile] clone_file_state_copy              0.000s  n=4086",
+      "[graph-profile] extractor_need                     0.681s  total= 0.681s  trace=session  non_ts_need=false detected=1 neutral=0",
+      "[graph-profile] changed_terms                      0.015s  total= 0.697s  trace=session  initial=false force=false non_ts=false scan=true raw_cfg=false policy=false neutral_scan=false neutral_cfg=false",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.005s  total= 0.005s  trace=ts  to_read=53 cached=4033",
+      "[graph-profile] ts_graphql_grpc_index              0.096s  total= 0.101s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              0.035s  total= 0.136s  trace=ts  parsed=1 facts=59225 routers=0 scans=0 derived=1",
+      "[graph-profile] ts_compose_modules                 0.002s  total= 0.138s  trace=ts  facts=59662 records=4086 unread=0",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.011s  total= 0.011s  trace=ts  to_read=63 cached=4023",
+      "[graph-profile] ts_graphql_grpc_index              0.100s  total= 0.111s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              0.290s  total= 0.401s  trace=ts  parsed=11 facts=59225 routers=0 scans=117 derived=7",
+      "[graph-profile] ts_compose_modules                 0.002s  total= 0.404s  trace=ts  facts=59662 records=4086 unread=0",
+      "[graph-profile] ts_frozen_preview                  0.688s  total= 1.384s  trace=session  dirty=12 err=false",
+      "[graph-profile] invalidation_plan                  0.166s  total= 1.551s  trace=session  reason=frozen scope: prior file-to-file dependency closure whole=false extra=0",
+      "[graph-profile] revalidate_before_begin            0.001s  n=71 superseded=false",
+      "[graph-profile] begin_publish                      0.058s  total= 1.609s  trace=session  scope=12",
+      "[graph-profile] ts_dirty_scope                     0.099s  total= 1.708s  trace=session  dirty=12 scope=12 force=false",
+      "[graph-profile] ts_extract_session                 0.000s  total= 1.709s  trace=session  parsed=12 cached=4022 facts=59662 records=4086",
+      "[graph-profile] assemble_new_files                 0.166s  total= 1.875s  trace=session  new=4086 ts_noop=false non_ts_need=false skip=false facts=59662",
+      "[graph-profile] index_group_owners                 0.082s  total= 1.956s  trace=session  facts=59225 owners=4034",
+      "[graph-profile] publish_scope                      0.000s  total= 1.957s  trace=session  scope=12",
+      "[graph-profile] encode_append_owners               0.004s  total= 1.961s  trace=session  published=12",
+      "[graph-profile] publish_resolved                   0.045s  total= 2.006s  trace=session  owners=12",
+      "[graph-profile] revalidate_ts_records              0.109s  total= 2.115s  trace=session  n=4086",
+      "[graph-profile] ts_config_inputs                   0.131s  n=83",
+      "[graph-profile] state_json_marshal                 0.160s  bytes=56635523 files=4086",
+      "[graph-profile] state_fingerprint                  0.025s  write bytes=56635523",
+      "[graph-profile] write_pending_state                0.356s  total= 2.471s  trace=session",
+      "[graph-profile] end_flush_ack                      0.035s  total= 2.505s  trace=session",
+      "[graph-profile] promote_compact_state              0.064s  total= 2.569s  trace=session  parsed=12 published=12",
+      "[graph-profile] graph_session_run                  2.932s  total= 3.246s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=12",
+      "[graph-profile] cli_complete                       0.000s  total= 3.246s  trace=cli  results=1"
+    ],
+    "pinned": {
+      "state_json_unmarshal": [
+        "[graph-profile] state_json_unmarshal               0.240s  files=4086"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.160s  bytes=56635523 files=4086"
+      ],
+      "state_read_bytes": [
+        "[graph-profile] state_read_bytes                   0.013s  state.json bytes=56634804"
+      ],
+      "state_fingerprint": [
+        "[graph-profile] state_fingerprint                  0.023s  bytes=56634804",
+        "[graph-profile] state_fingerprint                  0.025s  write bytes=56635523"
+      ],
+      "load_state": [
+        "[graph-profile] load_state                         0.276s  total= 0.276s  trace=open  files=4086"
+      ],
+      "select_hash_targets": [
+        "[graph-profile] select_hash_targets                0.010s  total= 0.118s  trace=inputs  targets=4105"
+      ],
+      "hash_content_inputs": [
+        "[graph-profile] hash_content_inputs                0.148s  total= 0.266s  trace=inputs  targets=4105"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.356s  total= 2.471s  trace=session"
+      ],
+      "promote_compact_state": [
+        "[graph-profile] promote_compact_state              0.064s  total= 2.569s  trace=session  parsed=12 published=12"
+      ],
+      "end_flush_ack": [
+        "[graph-profile] end_flush_ack                      0.035s  total= 2.505s  trace=session"
+      ],
+      "graph_session_run": [
+        "[graph-profile] graph_session_run                  2.932s  total= 3.246s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=12"
+      ],
+      "cli_complete": [
+        "[graph-profile] cli_complete                       0.000s  total= 3.246s  trace=cli  results=1"
+      ]
+    },
+    "seed": {
+      "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790325323029335000",
+      "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+      "base_generation": 1,
+      "target_generation": 2,
+      "state_files": 10,
+      "state_sha256": "ff37aadfe1be3cf74a4875a6445e5c742bbb60aa53040ae395c111578962481a",
+      "proof_sha256": "9bc91c80feb7030824ec788f3f68745bce82f11a0e2310ed566b4b979d618e1e"
+    },
+    "fallbacks": [
+      "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+    ],
+    "process_real_s": 3.26,
+    "rss_bytes": 510115840.0,
+    "user_s": 3.72,
+    "sys_s": 0.72,
+    "graph_hash": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666",
+    "wire_run_id": "stage21-ablate-product-stage21-ablate-seed-3-1790325340591553000",
+    "wire_applied_generation": 3,
+    "gate_observations": {
+      "exit_zero": true,
+      "generation_advanced": true,
+      "proof_bound": false,
+      "capture_reused": false,
+      "proof_written": false,
+      "proof_promoted": false,
+      "proof_unavailable": false,
+      "parsed_files": 12,
+      "owners_published": 12,
+      "graph_hash_present": true,
+      "wire_run_id_matches_result": true
+    },
+    "restored_state_manifest": {
+      "acks.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "commit.json": {
+        "sha256": "ea7eda19d39ec5c031d9f501e23941f78d232c75668b0c5ddf04ff8236ff5ab8",
+        "bytes": 220
+      },
+      "fences.jsonl": {
+        "sha256": "a5148993cfc0028b1dfe9e2e302e00e62a8efd6a5850b8e18e9a1030d7e69316",
+        "bytes": 156
+      },
+      "identity.json": {
+        "sha256": "484cd44558ff809c8f6b213cc445b27d7800c83c3463991c38808b884410d86b",
+        "bytes": 220
+      },
+      "payloads.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "protocol": {
+        "sha256": "fa0f549352b3f8848ce39d5b541d9d81d3dd427e87867a09e585051f2ab065b1",
+        "bytes": 14
+      },
+      "session.lock": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "state-proof.json": {
+        "sha256": "9bc91c80feb7030824ec788f3f68745bce82f11a0e2310ed566b4b979d618e1e",
+        "bytes": 10952
+      },
+      "state.json": {
+        "sha256": "ff37aadfe1be3cf74a4875a6445e5c742bbb60aa53040ae395c111578962481a",
+        "bytes": 56634804
+      },
+      "tombstones.jsonl": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    "observer": {
+      "phase": 8,
+      "pid": 94907,
+      "stderr": "observer-8.stderr"
+    },
+    "replay": {
+      "replayed_frames": 2,
+      "matched": {
+        "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790325323029335000",
+        "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+        "base_generation": 1,
+        "applied_generation": 2
+      }
+    },
+    "stream_last_seq_before_delta": 1980
+  },
+  {
+    "label": "cold-body",
+    "arm": null,
+    "scenario": "body",
+    "measured": false,
+    "mode": "analyze",
+    "binary": "/tmp/enola-stage21-root-review/enola-proof-diagnostic3",
+    "binary_sha256": "6553bf7c8c847b9eddb22ce4a63c65c96b4d1cf383c89b2d330c5c6bd51fc705",
+    "context": "stage21-ablate-cold-body",
+    "wall_seconds": 8.417799834045582,
+    "exit": 0,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4034
+        }
+      },
+      "RunID": "stage21-ablate-product-stage21-ablate-cold-body-1-1790325343948341000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4086,
+        "files_parsed": 4034,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 1717,
+        "derived_indexes": 2276,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "all prior/current file owners",
+          "reason": "frozen scope: global name-resolution domain"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 4034,
+      "ParsedFiles": 4034,
+      "EarlyLocal": 0
+    },
+    "phases": [
+      "[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=analyze",
+      "[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml",
+      "[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2",
+      "[graph-profile] discover_git                       0.032s  total= 0.032s  trace=graphinput_build  repo=true dirs=2",
+      "[graph-profile] declare_git_control                0.005s  total= 0.037s  trace=graphinput_build  deps=6",
+      "[graph-profile] git_ls_files                       0.054s  total= 0.091s  trace=graphinput_build  tracked=45105 dirs=5818",
+      "[graph-profile] walk_tree                          0.119s  total= 0.210s  trace=graphinput_build  names=11635 ignorefiles=4",
+      "[graph-profile] check_ignore_setup                 0.014s  total= 0.224s  trace=graphinput_build",
+      "[graph-profile] check_ignore_run                   0.056s  total= 0.280s  trace=graphinput_build  names=11635 ignored=0",
+      "[graph-profile] declare_ignore_files               0.000s  total= 0.280s  trace=graphinput_build  deps=9",
+      "[graph-profile] compute_identities                 0.033s  total= 0.314s  trace=graphinput_build  deps=9 entries=11635",
+      "[graph-profile] graphinput_build                   0.314s  total= 0.314s  trace=graph_engine  configpaths=2",
+      "[graph-profile] engine_new                         0.000s  total= 0.314s  trace=graph_engine",
+      "[graph-profile] register_plugins                   0.000s  total= 0.314s  trace=graph_engine",
+      "[graph-profile] config_recheck                     0.000s  total= 0.315s  trace=graph_engine",
+      "[graph-profile] resolve_graph_target               0.315s  total= 0.315s  trace=cli  repos=1",
+      "[graph-profile] connect_sink                       0.001s  total= 0.316s  trace=cli  nats=true",
+      "[graph-profile] session_options                    0.000s  total= 0.316s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product",
+      "[graph-profile] lock                               0.000s  total= 0.000s  trace=open",
+      "[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open",
+      "[graph-profile] open_journal                       0.000s  total= 0.000s  trace=open",
+      "[graph-profile] replay_unacked                     0.004s  total= 0.005s  trace=open",
+      "[graph-profile] load_state                         0.000s  total= 0.005s  trace=open  files=0",
+      "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false",
+      "[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2",
+      "[graph-profile] graph_inputs_proven                0.085s  total= 0.085s  trace=reconcile",
+      "[graph-profile] effective_config                   0.000s  total= 0.085s  trace=reconcile  files=2 fast=false",
+      "[graph-profile] reconcile_complete                 0.000s  total= 0.085s  trace=reconcile  reloaded=false",
+      "[graph-profile] engine_walk_repo                   0.111s  files=10965 tests=0 all_names=10965",
+      "[graph-profile] inventory                          0.111s  total= 0.111s  trace=inputs  files=10965 all_names=10965",
+      "[graph-profile] detect_typescript                  0.001s",
+      "[graph-profile] detect_extractors                  0.001s  total= 0.112s  trace=inputs  detected=1",
+      "[graph-profile] select_hash_targets                0.005s  total= 0.117s  trace=inputs  targets=4105",
+      "[graph-profile] engine_hash_files                  0.139s  n=4105 hashed=4105 bytes=45822335",
+      "[graph-profile] hash_content_inputs                0.139s  total= 0.257s  trace=inputs  targets=4105",
+      "[graph-profile] capture_contexts                   0.000s  total= 0.257s  trace=inputs  contexts=0",
+      "[graph-profile] ts_config_inputs                   0.131s  n=83",
+      "[graph-profile] analysis_fingerprint               0.133s  total= 0.389s  trace=inputs  cfg_files=59",
+      "[graph-profile] angular_probe                      0.003s  total= 0.392s  trace=inputs  angular=false",
+      "[graph-profile] policy_identity                    0.000s  total= 0.392s  trace=inputs",
+      "[graph-profile] engine_context_fingerprint         0.000s  total= 0.392s  trace=inputs",
+      "[graph-profile] ts_disc_nuxt_packages              0.113s  pkgs=0",
+      "[graph-profile] ts_disc_package_gates              0.000s",
+      "[graph-profile] ts_disc_package_names              0.000s  names=30",
+      "[graph-profile] ts_disc_alias_roots                0.076s  roots=1",
+      "[graph-profile] ts_disc_package_exports            0.000s  packages=30",
+      "[graph-profile] ts_discovery_build                 0.200s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59",
+      "[graph-profile] ts_discovery                       0.200s  total= 0.592s  trace=inputs  names=0 bytes=0 dirs=0",
+      "[graph-profile] ts_session_context                 0.053s  total= 0.645s  trace=inputs  files=4086",
+      "[graph-profile] runtime_inputs_complete            0.000s  total= 0.645s  trace=inputs",
+      "[graph-profile] clone_file_state_copy              0.000s  n=0",
+      "[graph-profile] extractor_need                     0.662s  total= 0.662s  trace=session  non_ts_need=false detected=1 neutral=0",
+      "[graph-profile] changed_terms                      0.007s  total= 0.669s  trace=session  initial=true force=true non_ts=false scan=false raw_cfg=false policy=true neutral_scan=false neutral_cfg=false",
+      "[graph-profile] invalidation_plan                  0.015s  total= 0.683s  trace=session  reason=frozen scope: global name-resolution domain whole=true extra=0",
+      "[graph-profile] revalidate_before_begin            0.001s  n=59 superseded=false",
+      "[graph-profile] begin_publish                      0.048s  total= 0.732s  trace=session  scope=8483",
+      "[graph-profile] ts_dirty_scope                     0.001s  total= 0.733s  trace=session  dirty=0 scope=4086 force=true",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.056s  total= 0.056s  trace=ts  to_read=4086 cached=0",
+      "[graph-profile] ts_graphql_grpc_index              0.378s  total= 0.434s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              3.990s  total= 4.424s  trace=ts  parsed=4034 facts=59224 routers=0 scans=1717 derived=2276",
+      "[graph-profile] ts_compose_modules                 0.003s  total= 4.427s  trace=ts  facts=59661 records=4086 unread=0",
+      "[graph-profile] ts_extract_session                 4.429s  total= 5.162s  trace=session  parsed=4034 cached=0 facts=59661 records=4086",
+      "[graph-profile] assemble_new_files                 0.116s  total= 5.278s  trace=session  new=4086 ts_noop=false non_ts_need=false skip=false facts=59661",
+      "[graph-profile] index_group_owners                 0.015s  total= 5.292s  trace=session  facts=59224 owners=4034",
+      "[graph-profile] publish_scope                      0.001s  total= 5.294s  trace=session  scope=8483",
+      "[graph-profile] encode_append_owners               2.002s  total= 7.296s  trace=session  published=4034",
+      "[graph-profile] publish_resolved                   0.037s  total= 7.333s  trace=session  owners=4034",
+      "[graph-profile] revalidate_ts_records              0.108s  total= 7.441s  trace=session  n=4086",
+      "[graph-profile] ts_config_inputs                   0.128s  n=83",
+      "[graph-profile] state_json_marshal                 0.176s  bytes=56634925 files=4086",
+      "[graph-profile] state_fingerprint                  0.024s  write bytes=56634925",
+      "[graph-profile] state_proof_written                0.029s  bytes=10962 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19348417",
+      "[graph-profile] write_pending_state                0.405s  total= 7.846s  trace=session",
+      "[graph-profile] end_flush_ack                      0.062s  total= 7.908s  trace=session",
+      "[graph-profile] state_proof_promoted               0.003s",
+      "[graph-profile] promote_compact_state              0.074s  total= 7.982s  trace=session  parsed=4034 published=4034",
+      "[graph-profile] graph_session_run                  8.071s  total= 8.387s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=4034",
+      "[graph-profile] cli_complete                       0.000s  total= 8.388s  trace=cli  results=1"
+    ],
+    "pinned": {
+      "state_proof_written": [
+        "[graph-profile] state_proof_written                0.029s  bytes=10962 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19348417"
+      ],
+      "state_proof_promoted": [
+        "[graph-profile] state_proof_promoted               0.003s"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.176s  bytes=56634925 files=4086"
+      ],
+      "state_fingerprint": [
+        "[graph-profile] state_fingerprint                  0.024s  write bytes=56634925"
+      ],
+      "load_state": [
+        "[graph-profile] load_state                         0.000s  total= 0.005s  trace=open  files=0"
+      ],
+      "select_hash_targets": [
+        "[graph-profile] select_hash_targets                0.005s  total= 0.117s  trace=inputs  targets=4105"
+      ],
+      "hash_content_inputs": [
+        "[graph-profile] hash_content_inputs                0.139s  total= 0.257s  trace=inputs  targets=4105"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.405s  total= 7.846s  trace=session"
+      ],
+      "promote_compact_state": [
+        "[graph-profile] promote_compact_state              0.074s  total= 7.982s  trace=session  parsed=4034 published=4034"
+      ],
+      "end_flush_ack": [
+        "[graph-profile] end_flush_ack                      0.062s  total= 7.908s  trace=session"
+      ],
+      "graph_session_run": [
+        "[graph-profile] graph_session_run                  8.071s  total= 8.387s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=4034"
+      ],
+      "cli_complete": [
+        "[graph-profile] cli_complete                       0.000s  total= 8.388s  trace=cli  results=1"
+      ]
+    },
+    "seed": null,
+    "fallbacks": [
+      "graph: all prior/current file owners (frozen scope: global name-resolution domain)"
+    ],
+    "process_real_s": 8.41,
+    "rss_bytes": 929759232.0,
+    "user_s": 33.73,
+    "sys_s": 1.43,
+    "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+    "wire_run_id": "stage21-ablate-product-stage21-ablate-cold-body-1-1790325343948341000",
+    "wire_applied_generation": 1,
+    "gate_observations": {
+      "exit_zero": true,
+      "generation_advanced": true,
+      "proof_bound": false,
+      "capture_reused": false,
+      "proof_written": true,
+      "proof_promoted": true,
+      "proof_unavailable": false,
+      "parsed_files": 4034,
+      "owners_published": 4034,
+      "graph_hash_present": true,
+      "wire_run_id_matches_result": true
+    }
+  },
+  {
+    "label": "cold-structural",
+    "arm": null,
+    "scenario": "structural",
+    "measured": false,
+    "mode": "analyze",
+    "binary": "/tmp/enola-stage21-root-review/enola-proof-diagnostic3",
+    "binary_sha256": "6553bf7c8c847b9eddb22ce4a63c65c96b4d1cf383c89b2d330c5c6bd51fc705",
+    "context": "stage21-ablate-cold-structural",
+    "wall_seconds": 9.136582416947931,
+    "exit": 0,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 4034
+        }
+      },
+      "RunID": "stage21-ablate-product-stage21-ablate-cold-structural-1-1790325352623834000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 4086,
+        "files_parsed": 4034,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 1731,
+        "derived_indexes": 2262,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "all prior/current file owners",
+          "reason": "frozen scope: global name-resolution domain"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 4034,
+      "ParsedFiles": 4034,
+      "EarlyLocal": 0
+    },
+    "phases": [
+      "[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=analyze",
+      "[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml",
+      "[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2",
+      "[graph-profile] discover_git                       0.031s  total= 0.031s  trace=graphinput_build  repo=true dirs=2",
+      "[graph-profile] declare_git_control                0.005s  total= 0.036s  trace=graphinput_build  deps=6",
+      "[graph-profile] git_ls_files                       0.053s  total= 0.089s  trace=graphinput_build  tracked=45105 dirs=5818",
+      "[graph-profile] walk_tree                          0.110s  total= 0.200s  trace=graphinput_build  names=11635 ignorefiles=4",
+      "[graph-profile] check_ignore_setup                 0.014s  total= 0.214s  trace=graphinput_build",
+      "[graph-profile] check_ignore_run                   0.056s  total= 0.270s  trace=graphinput_build  names=11635 ignored=0",
+      "[graph-profile] declare_ignore_files               0.000s  total= 0.271s  trace=graphinput_build  deps=9",
+      "[graph-profile] compute_identities                 0.035s  total= 0.306s  trace=graphinput_build  deps=9 entries=11635",
+      "[graph-profile] graphinput_build                   0.307s  total= 0.307s  trace=graph_engine  configpaths=2",
+      "[graph-profile] engine_new                         0.000s  total= 0.307s  trace=graph_engine",
+      "[graph-profile] register_plugins                   0.000s  total= 0.307s  trace=graph_engine",
+      "[graph-profile] config_recheck                     0.000s  total= 0.307s  trace=graph_engine",
+      "[graph-profile] resolve_graph_target               0.307s  total= 0.307s  trace=cli  repos=1",
+      "[graph-profile] connect_sink                       0.001s  total= 0.308s  trace=cli  nats=true",
+      "[graph-profile] session_options                    0.000s  total= 0.308s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product",
+      "[graph-profile] lock                               0.000s  total= 0.000s  trace=open",
+      "[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open",
+      "[graph-profile] open_journal                       0.000s  total= 0.000s  trace=open",
+      "[graph-profile] replay_unacked                     0.006s  total= 0.006s  trace=open",
+      "[graph-profile] load_state                         0.000s  total= 0.006s  trace=open  files=0",
+      "[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false",
+      "[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2",
+      "[graph-profile] graph_inputs_proven                0.082s  total= 0.082s  trace=reconcile",
+      "[graph-profile] effective_config                   0.000s  total= 0.082s  trace=reconcile  files=2 fast=false",
+      "[graph-profile] reconcile_complete                 0.000s  total= 0.082s  trace=reconcile  reloaded=false",
+      "[graph-profile] engine_walk_repo                   0.110s  files=10965 tests=0 all_names=10965",
+      "[graph-profile] inventory                          0.110s  total= 0.110s  trace=inputs  files=10965 all_names=10965",
+      "[graph-profile] detect_typescript                  0.001s",
+      "[graph-profile] detect_extractors                  0.001s  total= 0.111s  trace=inputs  detected=1",
+      "[graph-profile] select_hash_targets                0.006s  total= 0.116s  trace=inputs  targets=4105",
+      "[graph-profile] engine_hash_files                  0.138s  n=4105 hashed=4105 bytes=45822424",
+      "[graph-profile] hash_content_inputs                0.138s  total= 0.254s  trace=inputs  targets=4105",
+      "[graph-profile] capture_contexts                   0.000s  total= 0.254s  trace=inputs  contexts=0",
+      "[graph-profile] ts_config_inputs                   0.130s  n=83",
+      "[graph-profile] analysis_fingerprint               0.132s  total= 0.386s  trace=inputs  cfg_files=59",
+      "[graph-profile] angular_probe                      0.003s  total= 0.388s  trace=inputs  angular=false",
+      "[graph-profile] policy_identity                    0.000s  total= 0.388s  trace=inputs",
+      "[graph-profile] engine_context_fingerprint         0.000s  total= 0.388s  trace=inputs",
+      "[graph-profile] ts_disc_nuxt_packages              0.113s  pkgs=0",
+      "[graph-profile] ts_disc_package_gates              0.000s",
+      "[graph-profile] ts_disc_package_names              0.000s  names=30",
+      "[graph-profile] ts_disc_alias_roots                0.076s  roots=1",
+      "[graph-profile] ts_disc_package_exports            0.000s  packages=30",
+      "[graph-profile] ts_discovery_build                 0.200s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59",
+      "[graph-profile] ts_discovery                       0.200s  total= 0.589s  trace=inputs  names=0 bytes=0 dirs=0",
+      "[graph-profile] ts_session_context                 0.053s  total= 0.642s  trace=inputs  files=4086",
+      "[graph-profile] runtime_inputs_complete            0.000s  total= 0.642s  trace=inputs",
+      "[graph-profile] clone_file_state_copy              0.000s  n=0",
+      "[graph-profile] extractor_need                     0.658s  total= 0.658s  trace=session  non_ts_need=false detected=1 neutral=0",
+      "[graph-profile] changed_terms                      0.007s  total= 0.665s  trace=session  initial=true force=true non_ts=false scan=false raw_cfg=false policy=true neutral_scan=false neutral_cfg=false",
+      "[graph-profile] invalidation_plan                  0.015s  total= 0.680s  trace=session  reason=frozen scope: global name-resolution domain whole=true extra=0",
+      "[graph-profile] revalidate_before_begin            0.001s  n=59 superseded=false",
+      "[graph-profile] begin_publish                      0.059s  total= 0.739s  trace=session  scope=8483",
+      "[graph-profile] ts_dirty_scope                     0.001s  total= 0.740s  trace=session  dirty=0 scope=4086 force=true",
+      "[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true",
+      "[graph-profile] ts_disc_package_aliases            0.000s  aliases=21",
+      "[graph-profile] ts_read_dirty                      0.049s  total= 0.049s  trace=ts  to_read=4086 cached=0",
+      "[graph-profile] ts_graphql_grpc_index              0.379s  total= 0.427s  trace=ts  ts_files=4086",
+      "[graph-profile] ts_mapfiles_aggregate              4.156s  total= 4.584s  trace=ts  parsed=4034 facts=59225 routers=0 scans=1731 derived=2262",
+      "[graph-profile] ts_compose_modules                 0.003s  total= 4.586s  trace=ts  facts=59662 records=4086 unread=0",
+      "[graph-profile] ts_extract_session                 4.592s  total= 5.332s  trace=session  parsed=4034 cached=0 facts=59662 records=4086",
+      "[graph-profile] assemble_new_files                 0.124s  total= 5.456s  trace=session  new=4086 ts_noop=false non_ts_need=false skip=false facts=59662",
+      "[graph-profile] index_group_owners                 0.022s  total= 5.478s  trace=session  facts=59225 owners=4034",
+      "[graph-profile] publish_scope                      0.001s  total= 5.479s  trace=session  scope=8483",
+      "[graph-profile] encode_append_owners               2.407s  total= 7.887s  trace=session  published=4034",
+      "[graph-profile] publish_resolved                   0.041s  total= 7.928s  trace=session  owners=4034",
+      "[graph-profile] revalidate_ts_records              0.164s  total= 8.092s  trace=session  n=4086",
+      "[graph-profile] ts_config_inputs                   0.156s  n=83",
+      "[graph-profile] state_json_marshal                 0.181s  bytes=56635219 files=4086",
+      "[graph-profile] state_fingerprint                  0.025s  write bytes=56635219",
+      "[graph-profile] state_proof_written                0.039s  bytes=10974 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19887750",
+      "[graph-profile] write_pending_state                0.459s  total= 8.551s  trace=session",
+      "[graph-profile] end_flush_ack                      0.071s  total= 8.622s  trace=session",
+      "[graph-profile] state_proof_promoted               0.005s",
+      "[graph-profile] promote_compact_state              0.085s  total= 8.707s  trace=session  parsed=4034 published=4034",
+      "[graph-profile] graph_session_run                  8.795s  total= 9.103s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=4034",
+      "[graph-profile] cli_complete                       0.000s  total= 9.104s  trace=cli  results=1"
+    ],
+    "pinned": {
+      "state_proof_written": [
+        "[graph-profile] state_proof_written                0.039s  bytes=10974 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19887750"
+      ],
+      "state_proof_promoted": [
+        "[graph-profile] state_proof_promoted               0.005s"
+      ],
+      "state_json_marshal": [
+        "[graph-profile] state_json_marshal                 0.181s  bytes=56635219 files=4086"
+      ],
+      "state_fingerprint": [
+        "[graph-profile] state_fingerprint                  0.025s  write bytes=56635219"
+      ],
+      "load_state": [
+        "[graph-profile] load_state                         0.000s  total= 0.006s  trace=open  files=0"
+      ],
+      "select_hash_targets": [
+        "[graph-profile] select_hash_targets                0.006s  total= 0.116s  trace=inputs  targets=4105"
+      ],
+      "hash_content_inputs": [
+        "[graph-profile] hash_content_inputs                0.138s  total= 0.254s  trace=inputs  targets=4105"
+      ],
+      "write_pending_state": [
+        "[graph-profile] write_pending_state                0.459s  total= 8.551s  trace=session"
+      ],
+      "promote_compact_state": [
+        "[graph-profile] promote_compact_state              0.085s  total= 8.707s  trace=session  parsed=4034 published=4034"
+      ],
+      "end_flush_ack": [
+        "[graph-profile] end_flush_ack                      0.071s  total= 8.622s  trace=session"
+      ],
+      "graph_session_run": [
+        "[graph-profile] graph_session_run                  8.795s  total= 9.103s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=4034"
+      ],
+      "cli_complete": [
+        "[graph-profile] cli_complete                       0.000s  total= 9.104s  trace=cli  results=1"
+      ]
+    },
+    "seed": null,
+    "fallbacks": [
+      "graph: all prior/current file owners (frozen scope: global name-resolution domain)"
+    ],
+    "process_real_s": 9.13,
+    "rss_bytes": 956514304.0,
+    "user_s": 33.75,
+    "sys_s": 1.54,
+    "graph_hash": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666",
+    "wire_run_id": "stage21-ablate-product-stage21-ablate-cold-structural-1-1790325352623834000",
+    "wire_applied_generation": 1,
+    "gate_observations": {
+      "exit_zero": true,
+      "generation_advanced": true,
+      "proof_bound": false,
+      "capture_reused": false,
+      "proof_written": true,
+      "proof_promoted": true,
+      "proof_unavailable": false,
+      "parsed_files": 4034,
+      "owners_published": 4034,
+      "graph_hash_present": true,
+      "wire_run_id_matches_result": true
+    }
+  }
+]

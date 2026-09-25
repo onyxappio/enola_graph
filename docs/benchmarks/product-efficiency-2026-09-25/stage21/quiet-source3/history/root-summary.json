@@ -1,0 +1,140 @@
+{
+  "transitions": [
+    {
+      "commit": "07fb4a41",
+      "parsed": 5,
+      "published_owners": 5,
+      "reasons": {
+        "resolution": 3,
+        "source content": 2
+      },
+      "manifest_changes": [
+        "packages/tracking-client/package.json"
+      ],
+      "tsconfig_changes": [],
+      "accepted": true
+    },
+    {
+      "commit": "fec1eac3",
+      "parsed": 513,
+      "published_owners": 1149,
+      "reasons": {
+        "added source": 4,
+        "resolution": 417,
+        "source content": 92
+      },
+      "manifest_changes": [],
+      "tsconfig_changes": [],
+      "accepted": true
+    },
+    {
+      "commit": "9fc7ae5b",
+      "parsed": 25,
+      "published_owners": 1662,
+      "reasons": {
+        "added source": 2,
+        "resolution": 9,
+        "source content": 14
+      },
+      "manifest_changes": [],
+      "tsconfig_changes": [],
+      "accepted": true
+    },
+    {
+      "commit": "1c260747",
+      "parsed": 431,
+      "published_owners": 554,
+      "reasons": {
+        "added source": 2,
+        "resolution": 400,
+        "source content": 29
+      },
+      "manifest_changes": [],
+      "tsconfig_changes": [],
+      "accepted": true
+    },
+    {
+      "commit": "599575d0",
+      "parsed": 7,
+      "published_owners": 9,
+      "reasons": {
+        "source content": 7
+      },
+      "manifest_changes": [],
+      "tsconfig_changes": [],
+      "accepted": true
+    },
+    {
+      "commit": "ae233c5f",
+      "parsed": 92,
+      "published_owners": 345,
+      "reasons": {
+        "added source": 7,
+        "resolution": 72,
+        "source content": 13
+      },
+      "manifest_changes": [
+        "packages/database/package.json"
+      ],
+      "tsconfig_changes": [],
+      "accepted": true
+    },
+    {
+      "commit": "4168360e",
+      "parsed": 111,
+      "published_owners": 150,
+      "reasons": {
+        "added source": 1,
+        "file semantic context": 26,
+        "resolution": 77,
+        "source content": 7
+      },
+      "manifest_changes": [
+        "packages/clickhouse/package.json"
+      ],
+      "tsconfig_changes": [],
+      "accepted": true
+    },
+    {
+      "commit": "a6f1f3a9",
+      "parsed": 80,
+      "published_owners": 80,
+      "reasons": {
+        "resolution": 76,
+        "source content": 4
+      },
+      "manifest_changes": [],
+      "tsconfig_changes": [],
+      "accepted": true
+    },
+    {
+      "commit": "5dfb2c8f",
+      "parsed": 43,
+      "published_owners": 126,
+      "reasons": {
+        "added source": 3,
+        "resolution": 38,
+        "source content": 2
+      },
+      "manifest_changes": [],
+      "tsconfig_changes": [],
+      "accepted": true
+    },
+    {
+      "commit": "a609c19f",
+      "parsed": 37,
+      "published_owners": 46,
+      "reasons": {
+        "added source": 3,
+        "resolution": 30,
+        "source content": 4
+      },
+      "manifest_changes": [],
+      "tsconfig_changes": [],
+      "accepted": true
+    }
+  ],
+  "manifest_transitions": 3,
+  "tsconfig_transitions": 0,
+  "scope_note": "published owners and parsed files are distinct; full Begin owner count not derived here"
+}

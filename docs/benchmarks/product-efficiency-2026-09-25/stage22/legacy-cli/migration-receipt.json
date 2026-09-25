@@ -1,0 +1,70 @@
+[
+  {
+    "label": "old-delta",
+    "exit": 0,
+    "wall_s": 0.2852146669756621,
+    "argv": [
+      "/tmp/enola-stage21-root-review/enola-stage20-baseline",
+      "graph",
+      "delta",
+      "--authoritative-scope",
+      "--events",
+      "/tmp/enola-stage22-legacy-cli/old-initial.events.jsonl",
+      "--state-dir",
+      "/tmp/enola-stage22-legacy-cli/state",
+      "--summary-json",
+      "/tmp/enola-stage22-legacy-cli/repo"
+    ]
+  },
+  {
+    "label": "new-noop",
+    "exit": 0,
+    "wall_s": 0.0832867919234559,
+    "argv": [
+      "/tmp/enola-stage22-root-acceptance/enola-stage22-experimental",
+      "graph",
+      "delta",
+      "--authoritative-scope",
+      "--events",
+      "/tmp/enola-stage22-legacy-cli/old-initial.events.jsonl",
+      "--state-dir",
+      "/tmp/enola-stage22-legacy-cli/state",
+      "--summary-json",
+      "/tmp/enola-stage22-legacy-cli/repo"
+    ]
+  },
+  {
+    "label": "new-delta",
+    "exit": 0,
+    "wall_s": 0.27775979100260884,
+    "argv": [
+      "/tmp/enola-stage22-root-acceptance/enola-stage22-experimental",
+      "graph",
+      "delta",
+      "--authoritative-scope",
+      "--events",
+      "/tmp/enola-stage22-legacy-cli/old-initial.events.jsonl",
+      "--state-dir",
+      "/tmp/enola-stage22-legacy-cli/state",
+      "--summary-json",
+      "/tmp/enola-stage22-legacy-cli/repo"
+    ]
+  },
+  {
+    "label": "new-noop2",
+    "exit": 0,
+    "wall_s": 0.08776966703590006,
+    "argv": [
+      "/tmp/enola-stage22-root-acceptance/enola-stage22-experimental",
+      "graph",
+      "delta",
+      "--authoritative-scope",
+      "--events",
+      "/tmp/enola-stage22-legacy-cli/old-initial.events.jsonl",
+      "--state-dir",
+      "/tmp/enola-stage22-legacy-cli/state",
+      "--summary-json",
+      "/tmp/enola-stage22-legacy-cli/repo"
+    ]
+  }
+]

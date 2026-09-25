@@ -1,0 +1,10 @@
+=== RUN   TestFrozenBeginPrecedesParsingAndNeverGrows
+--- PASS: TestFrozenBeginPrecedesParsingAndNeverGrows (0.60s)
+=== RUN   TestReviewMinifiedNoop
+2026/09/25 14:27:16 [ts-extractor] skipping minified/bundled file bundle.js
+--- PASS: TestReviewMinifiedNoop (0.18s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	1.344s
+real 5.48
+user 12.33
+sys 2.50

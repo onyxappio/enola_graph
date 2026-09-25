@@ -1,0 +1,77 @@
+[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=delta
+[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml
+[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2
+[graph-profile] discover_git                       0.042s  total= 0.042s  trace=graphinput_build  repo=true dirs=2
+[graph-profile] declare_git_control                0.005s  total= 0.047s  trace=graphinput_build  deps=6
+[graph-profile] git_ls_files                       0.059s  total= 0.106s  trace=graphinput_build  tracked=45105 dirs=5818
+[graph-profile] walk_tree                          0.117s  total= 0.223s  trace=graphinput_build  names=11635 ignorefiles=4
+[graph-profile] check_ignore_setup                 0.018s  total= 0.241s  trace=graphinput_build
+[graph-profile] check_ignore_run                   0.060s  total= 0.301s  trace=graphinput_build  names=11635 ignored=0
+[graph-profile] declare_ignore_files               0.000s  total= 0.302s  trace=graphinput_build  deps=9
+[graph-profile] compute_identities                 0.035s  total= 0.337s  trace=graphinput_build  deps=9 entries=11635
+[graph-profile] graphinput_build                   0.338s  total= 0.338s  trace=graph_engine  configpaths=2
+[graph-profile] engine_new                         0.000s  total= 0.338s  trace=graph_engine
+[graph-profile] register_plugins                   0.000s  total= 0.338s  trace=graph_engine
+[graph-profile] config_recheck                     0.000s  total= 0.338s  trace=graph_engine
+[graph-profile] resolve_graph_target               0.338s  total= 0.338s  trace=cli  repos=1
+enola graph: config /private/tmp/enola-stage22-hop-profile/diag/cli-pairs/instrumented-1/config.yaml
+[graph-profile] connect_sink                       0.001s  total= 0.339s  trace=cli  nats=true
+[graph-profile] session_options                    0.000s  total= 0.339s  trace=cli  repo=/private/tmp/enola-stage22-hop-profile/diag/cli-pairs/instrumented-1/product
+[graph-profile] lock                               0.000s  total= 0.000s  trace=open
+[graph-profile] bind_identity                      0.001s  total= 0.001s  trace=open
+[graph-profile] open_journal                       0.000s  total= 0.001s  trace=open
+[graph-profile] replay_unacked                     0.000s  total= 0.001s  trace=open
+[graph-profile] state_read_bytes                   0.013s  state.json bytes=56633192
+[graph-profile] state_fingerprint                  0.024s  bytes=56633192
+[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10977 state_bytes=56633192
+[graph-profile] load_state                         0.037s  total= 0.038s  trace=open  deferred owners=4086
+[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false
+[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2
+[graph-profile] graph_inputs_proven                0.100s  total= 0.100s  trace=reconcile
+[graph-profile] effective_config                   0.000s  total= 0.100s  trace=reconcile  files=2 fast=false
+[graph-profile] reconcile_complete                 0.000s  total= 0.100s  trace=reconcile  reloaded=false
+[graph-profile] engine_walk_repo                   0.121s  files=10965 tests=0 all_names=10965
+[graph-profile] inventory                          0.121s  total= 0.121s  trace=inputs  files=10965 all_names=10965
+[graph-profile] detect_typescript                  0.001s
+[graph-profile] detect_extractors                  0.001s  total= 0.122s  trace=inputs  detected=1
+[graph-profile] select_hash_targets                0.006s  total= 0.128s  trace=inputs  targets=4105
+[graph-profile] engine_hash_files                  0.147s  n=4105 hashed=4105 bytes=45822317
+[graph-profile] hash_content_inputs                0.147s  total= 0.275s  trace=inputs  targets=4105
+[graph-profile] capture_contexts                   0.000s  total= 0.275s  trace=inputs  contexts=0
+[graph-profile] ts_config_inputs                   0.150s  n=83
+[graph-profile] analysis_fingerprint               0.152s  total= 0.427s  trace=inputs  cfg_files=59
+[graph-profile] angular_probe                      0.003s  total= 0.430s  trace=inputs  angular=false
+[graph-profile] policy_identity                    0.000s  total= 0.430s  trace=inputs
+[graph-profile] engine_context_fingerprint         0.000s  total= 0.430s  trace=inputs
+[graph-profile] ts_disc_nuxt_packages              0.122s  pkgs=0
+[graph-profile] ts_disc_package_gates              0.000s
+[graph-profile] ts_disc_package_names              0.000s  names=30
+[graph-profile] ts_disc_alias_roots                0.083s  roots=1
+[graph-profile] ts_disc_package_exports            0.000s  packages=30
+[graph-profile] ts_discovery_build                 0.215s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59
+[graph-profile] ts_discovery                       0.215s  total= 0.645s  trace=inputs  names=0 bytes=0 dirs=0
+[graph-profile] ts_session_context                 0.054s  total= 0.699s  trace=inputs  files=4086
+[graph-profile] runtime_inputs_complete            0.000s  total= 0.699s  trace=inputs
+[graph-profile] ts_config_inputs                   0.145s  n=83
+[graph-profile] state_proof_admitted               0.878s  total= 0.978s  trace=reconcile  generation=1 owners=4086 hash_inputs=4105
+[graph-profile] graph_session_run                  1.017s  total= 1.356s  trace=cli  repo=/private/tmp/enola-stage22-hop-profile/diag/cli-pairs/instrumented-1/product parsed=0
+[graph] /private/tmp/enola-stage22-hop-profile/diag/cli-pairs/instrumented-1/product: generation 1→1 parsed=0 cached=4086 early_local=0 fallbacks=0
+[graph-profile] cli_complete                       0.000s  total= 1.356s  trace=cli  results=1
+        1.37 real         0.94 user         0.44 sys
+           178028544  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               26699  page reclaims
+                 251  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   4  messages sent
+                   3  messages received
+                 217  signals received
+                  64  voluntary context switches
+                3368  involuntary context switches
+         13530997143  instructions retired
+          3868852717  cycles elapsed
+           161253440  peak memory footprint

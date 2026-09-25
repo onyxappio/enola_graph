@@ -1,0 +1,248 @@
+Stage21 acceptance tree: exact diff against the pinned root originals
+tree: /tmp/enola-stage21-retain/acceptance (fresh; original source3 evidence untouched)
+
+== byte-identical copies (no edits) ==
+IDENTICAL  cli-pairs/cli.py
+IDENTICAL  cli-pairs/harness_support.py
+IDENTICAL  cli-pairs/validate_results.py
+IDENTICAL  summarize-timing.py
+IDENTICAL  run-timing-series.py
+IDENTICAL  test-timing-summary.py
+
+== edited: cli-pairs/run-arm.py (host sampling only) ==
+--- /tmp/enola-stage21-root-review/cli-pairs/run-arm.py	2026-09-25 04:42:02
++++ cli-pairs/run-arm.py	2026-09-25 12:51:45
+@@ -1,19 +1,39 @@
+ from validate_results import validate
+-import argparse,importlib.util,pathlib,subprocess,os,json,time,threading,hashlib
+-def competitors():
+-    import re
+-    raw=subprocess.check_output(['ps','-axo','pid=,ppid=,command='],text=True).splitlines()
++import argparse,importlib.util,pathlib,re,subprocess,os,json,time,threading,hashlib
++PS_FORMAT='pid=,ppid=,%cpu=,rss=,command='
++def ps_scan():
++    """One bounded ps scan, shared by the competitor check and the host-load log.
++
++    The columns are the FSM ones root named (pid, ppid, %cpu, rss, command), and
++    this is the only process either path spawns: the host log is a second reading
++    of the same scan, not a second sampler.
++    """
++    # Bounded so a stuck ps cannot hang the monitor's final join.
++    raw=subprocess.check_output(['ps','-axo',PS_FORMAT],text=True,timeout=2)
+     rows=[]
+-    for line in raw:
+-        fields=line.strip().split(None,2)
+-        if len(fields)==3: rows.append((int(fields[0]),int(fields[1]),fields[2]))
++    for line in raw.splitlines():
++        fields=line.strip().split(None,4)
++        if len(fields)!=5: continue
++        try: rows.append((int(fields[0]),int(fields[1]),float(fields[2]),int(fields[3]),fields[4]))
++        except ValueError: continue
++    return raw,rows
++
++def competitors(rows=None):
++    """Recognized competing workloads only.
++
++    This list is unchanged: Go builds and tests, toolchain processes, Enola
++    runtimes, the observer and the named history scripts. An empty result means
++    no recognized competitor was seen, and nothing about the rest of the machine;
++    that is what the host-load log is for.
++    """
++    if rows is None: _,rows=ps_scan()
+     owned={os.getpid()}
+     while True:
+-        more={pid for pid,parent,_ in rows if parent in owned}
++        more={pid for pid,parent,_,_,_ in rows if parent in owned}
+         if more <= owned: break
+         owned |= more
+     hits=[]
+-    for pid,parent,command in rows:
++    for pid,parent,cpu,rss,command in rows:
+         if pid in owned: continue
+         executable=command.split(None,1)[0]
+         name=pathlib.Path(executable).name
+@@ -50,11 +70,31 @@
+ subprocess.run(['cp','-cR',str(source),str(repo)],check=True)
+ port=eff.free_port();conf=eff.write_nats_conf(work,port);url=f'nats://127.0.0.1:{port}'
+ observer=pathlib.Path('/tmp/enola-stage9-product-watch-control/bin/benchobserver')
+-stop=threading.Event();samples=[]
++stop=threading.Event();samples=[];host_log=work/'host-load.jsonl';host_written=[];host_errors=[]
+ def monitor():
+- while not stop.wait(1):
+-  hits=competitors()
+-  if hits:samples.append(hits)
++ """Competitor check every second, whole-host ps sample every second tick.
++
++ The host log keeps every process ps reported, not only the recognized ones, so
++ unrelated CPU work - a browser, an indexer - is visible to a reader instead of
++ being assumed absent. It records the conditions; it does not prove them quiet.
++ Both arms run this identical loop.
++ """
++ tick=0
++ with host_log.open('w') as out:
++  while not stop.wait(1):
++   tick+=1
++   try:
++    raw,rows=ps_scan()
++   except Exception as e:
++    # A failed scan is recorded, never silently treated as an idle host.
++    err={'time':time.time(),'error':str(e)};host_errors.append(err)
++    out.write(json.dumps(err)+'\n');out.flush();continue
++   if tick%2==0:
++    now=time.time()
++    out.write(json.dumps({'time':now,'loadavg':os.getloadavg(),'processes':raw})+'\n');out.flush()
++    host_written.append(now)
++   hits=competitors(rows)
++   if hits:samples.append(hits)
+ thread=threading.Thread(target=monitor);server=None;obs=None;result=None
+ try:
+  with (work/'nats.log').open('w') as log:server=subprocess.Popen([str(eff.NATS_SERVER),'-c',str(conf)],stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
+@@ -73,6 +113,6 @@
+  try:
+   validated=validate(json.loads((work/'metrics.json').read_text()),json.loads((work/'checks.json').read_text()))
+  except Exception as e: validation_error=str(e)
+- receipt={'validation_error':validation_error,'all_checks_validated':validated,'arm':a.arm,'repeat':a.repeat,'quiet_ack_message_id':a.quiet_message_id,'exit':result.returncode if result else None,'competing_samples':samples,'correctness_only':a.correctness_only,'run_succeeded':bool(result and result.returncode==0 and validated),'timing_eligible':bool(not a.correctness_only and result and result.returncode==0 and validated and not samples),'binary_sha256':hashlib.sha256(binary.read_bytes()).hexdigest()}
++ receipt={'validation_error':validation_error,'all_checks_validated':validated,'arm':a.arm,'repeat':a.repeat,'quiet_ack_message_id':a.quiet_message_id,'exit':result.returncode if result else None,'competing_samples':samples,'host_load_log':str(host_log),'host_load_samples':len(host_written),'host_sample_errors':host_errors,'correctness_only':a.correctness_only,'run_succeeded':bool(result and result.returncode==0 and validated),'timing_eligible':bool(not a.correctness_only and result and result.returncode==0 and validated and not samples and not host_errors and len(host_written)>0),'binary_sha256':hashlib.sha256(binary.read_bytes()).hexdigest()}
+  (work/'pair-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt),flush=True)
+ if not receipt['run_succeeded'] or (not a.correctness_only and not receipt['timing_eligible']):raise SystemExit('CLI run not accepted; inspect evidence')
+
+== edited: cli-pairs/pins.json (candidate pin + acceptance copy paths) ==
+--- /tmp/enola-stage21-root-review/cli-pairs/pins.json	2026-09-25 10:20:24
++++ cli-pairs/pins.json	2026-09-25 12:51:45
+@@ -2,20 +2,20 @@
+   "product_path": "/tmp/enola-stage16-root-review/product-source",
+   "product_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+   "files": {
+-    "/tmp/enola-stage21-root-review/cli-pairs/cli.py": "94cb4e07996ab45f1a804a260ec6c3f1686f34d78718d9ece2d32466f41826f3",
+-    "/tmp/enola-stage21-root-review/cli-pairs/harness_support.py": "95d70a9e3e3a0986fd8a1684524a8c9f2205df5529786979d08376abb46e4cac",
++    "/tmp/enola-stage21-retain/acceptance/cli-pairs/cli.py": "94cb4e07996ab45f1a804a260ec6c3f1686f34d78718d9ece2d32466f41826f3",
++    "/tmp/enola-stage21-retain/acceptance/cli-pairs/harness_support.py": "95d70a9e3e3a0986fd8a1684524a8c9f2205df5529786979d08376abb46e4cac",
+     "/tmp/enola-stage14-watch-pairs/watch.py": "629fae95963c62b83df4acdc2ea5d6438dd114d67bbca2425b96416eda7538cb",
+     "/tmp/enola-stage9-product-watch-control/bin/benchobserver": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+     "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/run.py": "94caf3654e6283630dca8fbaa558c447d2cb1aade55f7b1bfc406cfba9d14c79",
+     "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/product-graph-scope.yaml": "b81b19598dd74c63084ae11488cb7f4fa7df783b0887d2c42dcf61dc67890bf7",
+     "/tmp/enola-toolchain/bin/nats-server": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af",
+-    "/tmp/enola-stage21-root-review/cli-pairs/validate_results.py": "7e4846646167653d6d3de7d3d5d805a02aa889dfe09e4d0b42a61d19173e7b02",
+-    "/tmp/enola-stage21-root-review/cli-pairs/run-arm.py": "e3a449d73bb37f3ebbb70716ac890a9504a2e8711ef4bb35d52f588cf4cc94a3",
+-    "/tmp/enola-stage21-root-review/summarize-timing.py": "e7bbbc45ec5fcc1a98a6b4015bfe2776f0e3313df23875aed69f87313b827ae2",
+-    "/tmp/enola-stage21-root-review/run-timing-series.py": "694d8831a795535fac88d86be03a5e52f189543356003160e1d925364181c7fb",
+-    "/tmp/enola-stage21-root-review/test-timing-summary.py": "08a9317348a32f0ea00dcd43713eee69cebd64028ab805129c7d5ae0a11819d5",
++    "/tmp/enola-stage21-retain/acceptance/cli-pairs/validate_results.py": "7e4846646167653d6d3de7d3d5d805a02aa889dfe09e4d0b42a61d19173e7b02",
++    "/tmp/enola-stage21-retain/acceptance/cli-pairs/run-arm.py": "5c12fbabf0e988b31262e8c997b36c4c3dc15bcb5b720efd8d34bdcc1645ae1b",
++    "/tmp/enola-stage21-retain/acceptance/summarize-timing.py": "e7bbbc45ec5fcc1a98a6b4015bfe2776f0e3313df23875aed69f87313b827ae2",
++    "/tmp/enola-stage21-retain/acceptance/run-timing-series.py": "694d8831a795535fac88d86be03a5e52f189543356003160e1d925364181c7fb",
++    "/tmp/enola-stage21-retain/acceptance/test-timing-summary.py": "08a9317348a32f0ea00dcd43713eee69cebd64028ab805129c7d5ae0a11819d5",
+     "/tmp/enola-stage21-root-review/freeze-root-review.json": "b021d2a8909750b91f64a6963a793f347b14972d4890e3023faf331eebbcfa07",
+-    "/tmp/enola-stage21-root-review/final-candidate-acceptance.json": "cb8c590a559f65dbf2a5ef44a6116aced983d6682b6ee5fb64a1781194550ce9"
++    "/tmp/enola-stage21-retain/acceptance/final-candidate-acceptance.json": "aada1d85e25e961826c0ae4e47d6a5834a912a79c5b9b4fe3ea5c810f77c9914"
+   },
+   "binaries": {
+     "baseline": {
+@@ -23,12 +23,12 @@
+       "sha256": "99162b12e148c995c0a6e91ff73ffea05f2fb978ec004887f89e35a337006f60"
+     },
+     "candidate": {
+-      "path": "/tmp/enola-stage21-root-review/enola-proof-diagnostic3",
+-      "sha256": "6553bf7c8c847b9eddb22ce4a63c65c96b4d1cf383c89b2d330c5c6bd51fc705"
++      "path": "/tmp/enola-stage21-root-review/enola-retain-final1",
++      "sha256": "d3229b4a5d622d1e9986565782a8c0cab7c078821775d361cb85809927c0aef6"
+     }
+   },
+   "baseline_revision": "6db3ed834daab2adf8083ac46dc15ac21b670eb2",
+   "baseline_runtime": "a1dec99086fc1ace834e5616bd31c39ddce0b39b",
+-  "experimental_checkpoint": "Stage21 frozen patch9029305036bfbd4152641e545af02381a60898bdd9b2ac95403cc34fab186b37; source3 production exact; correctness accepted for timing comparison",
++  "experimental_checkpoint": "Stage21 option C retain candidate; source /tmp/enola-stage21-retain/src, patch 2e07fc13dad3dd57c72845eee8eaa4e534e38ef9dc84110bb5aba49fde382a85, binary built by root as enola-retain-final1; correctness accepted for timing comparison only per final-candidate-acceptance.json",
+   "not_final_acceptance": true
+ }
+
+== new: final-candidate-acceptance.json ==
+{
+  "correctness_accepted": true,
+  "source_revision": "Stage21 source3 freeze patch 9029305036bfbd4152641e545af02381a60898bdd9b2ac95403cc34fab186b37 (itself over main 6db3ed834daab2adf8083ac46dc15ac21b670eb2 / runtime a1dec99086fc1ace834e5616bd31c39ddce0b39b) + option C retain patch 2e07fc13dad3dd57c72845eee8eaa4e534e38ef9dc84110bb5aba49fde382a85",
+  "binary_sha256": "d3229b4a5d622d1e9986565782a8c0cab7c078821775d361cb85809927c0aef6",
+  "binary_path": "/tmp/enola-stage21-root-review/enola-retain-final1",
+  "binary_provenance": "built by root; worker has not rebuilt it",
+  "candidate": "option C: retain the first-read committed-state buffer, reread and bytes.Equal at materializeDeferred, then decode the retained buffer and reuse its proven fingerprint. Removes the second SHA-256; the second disk read remains.",
+  "source_tree": "/tmp/enola-stage21-retain/src",
+  "diff": {
+    "path": "/tmp/enola-stage21-retain/optionC.diff",
+    "sha256": "2e07fc13dad3dd57c72845eee8eaa4e534e38ef9dc84110bb5aba49fde382a85",
+    "relative_to": "Stage21 source3 freeze 9029305036bfbd4152641e545af02381a60898bdd9b2ac95403cc34fab186b37, not main"
+  },
+  "review_notes": {
+    "path": "/tmp/enola-stage21-retain/REVIEW_NOTES.md",
+    "sha256": "3ae557968878f09cc82358176b79520b144705ea9ac2ba79439ed9e478cf5cb8"
+  },
+  "focused_gate": {
+    "result": "8 tests / 11 cases, 4.172s, exit 0"
+  },
+  "package_final": {
+    "log": "/tmp/s21-retain-pkg-final.log",
+    "result": "ok github.com/enola-labs/enola/internal/graphsession 500.393s, exit 0",
+    "earlier_failing_run_retained_at": "/tmp/s21-retain-pkg.log (477.805s FAIL, kept as evidence)"
+  },
+  "work8": {
+    "outputs": "/tmp/enola-stage21-ablate/work8",
+    "receipt": "cohort-receipt.json",
+    "comparison": "cohort-comparison.json",
+    "gates": "FULL_COHORT_INTERPRETABLE true, zero failed gates, three arms (stage20 baseline / frozen proof / retain)",
+    "counts_retain": {
+      "committed_state_reads": 2,
+      "fingerprints_total": 2,
+      "fingerprints_read": 1,
+      "fingerprints_write": 1,
+      "decodes": 1,
+      "byte_comparisons": 1
+    },
+    "counts_frozen": {
+      "committed_state_reads": 2,
+      "fingerprints_total": 3,
+      "fingerprints_read": 2,
+      "fingerprints_write": 1,
+      "decodes": 1,
+      "byte_comparisons": 0
+    },
+    "counts_stage20_baseline": {
+      "committed_state_reads": 1,
+      "fingerprints_total": 2,
+      "fingerprints_read": 1,
+      "fingerprints_write": 1,
+      "decodes": 1,
+      "byte_comparisons": 0
+    },
+    "label": "diagnostic; not a speed claim"
+  },
+  "profile1": {
+    "outputs": "/tmp/enola-stage21-retain/profile-retain1",
+    "verdict": "correctness-verdict.json, 16/16 checks PASS, exit 0",
+    "receipt": "diagnostic-receipt.json",
+    "label": "diagnostic; not a speed claim"
+  },
+  "meaning": "eligible for performance comparison only; not production acceptance and not a performance acceptance",
+  "not_claimed": [
+    "no latency or speed acceptance for option C",
+    "the body-cell whole-wall outlier of the first retain execution is unexplained; cause unresolved",
+    "the measured memory cost (+43.4MB body, +43.8MB structural peak RSS over frozen) is not accepted or excused"
+  ],
+  "remaining": [
+    "repeated unchanged paired end-to-end timing and RSS, candidate vs Stage20, in a coordinated quiet window",
+    "allocation and object lifetime characterization",
+    "integration, hooks and push - root owns these"
+  ]
+}
+
+== deliberately absent ==
+timing-window.json  (root coordinates holds; run-timing-series.py fails closed without it - verified)
+timing-series.json  (no timing run has happened)
+
+== hash manifest of the acceptance tree ==
+95c53c23239196d01ed0cb36f76006742d96eae24f0af7067bb15cf4d6978a1e  ./ACCEPTANCE_DIFF.txt
+94cb4e07996ab45f1a804a260ec6c3f1686f34d78718d9ece2d32466f41826f3  ./cli-pairs/cli.py
+95d70a9e3e3a0986fd8a1684524a8c9f2205df5529786979d08376abb46e4cac  ./cli-pairs/harness_support.py
+b1168eef05065c28f81a7e5b9fec73c558da6845183e2279048062a267caa210  ./cli-pairs/pins.json
+5c12fbabf0e988b31262e8c997b36c4c3dc15bcb5b720efd8d34bdcc1645ae1b  ./cli-pairs/run-arm.py
+7e4846646167653d6d3de7d3d5d805a02aa889dfe09e4d0b42a61d19173e7b02  ./cli-pairs/validate_results.py
+aada1d85e25e961826c0ae4e47d6a5834a912a79c5b9b4fe3ea5c810f77c9914  ./final-candidate-acceptance.json
+694d8831a795535fac88d86be03a5e52f189543356003160e1d925364181c7fb  ./run-timing-series.py
+e7bbbc45ec5fcc1a98a6b4015bfe2776f0e3313df23875aed69f87313b827ae2  ./summarize-timing.py
+08a9317348a32f0ea00dcd43713eee69cebd64028ab805129c7d5ae0a11819d5  ./test-timing-summary.py

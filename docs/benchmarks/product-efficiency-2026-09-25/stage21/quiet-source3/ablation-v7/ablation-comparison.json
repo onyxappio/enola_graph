@@ -1,0 +1,3172 @@
+{
+  "unmeasured_runs": [
+    "seed-body-analyze",
+    "seed-structural-analyze",
+    "seed-structural-body",
+    "cold-body",
+    "cold-structural"
+  ],
+  "scenarios": {
+    "body": {
+      "gates": {
+        "both_arms_exit_zero": true,
+        "both_arms_generation_advanced": true,
+        "both_arms_bound_their_seed_proof": true,
+        "both_arms_reused_capture": true,
+        "seeds_byte_identical_across_arms": true,
+        "both_arms_replayed_the_seed_graph": true,
+        "base_generation_equal": true,
+        "target_generation_equal": true,
+        "parsed_files_equal": true,
+        "owners_published_equal": true,
+        "full_result_equal_except_run_id": true,
+        "each_arm_wire_run_id_matches_its_result": true,
+        "arms_have_distinct_run_ids": true,
+        "arms_agree_on_graph": true,
+        "frozen_delta_equals_cold_graph": true,
+        "ablated_delta_equals_cold_graph": true,
+        "frozen_produced_and_promoted_a_proof": true,
+        "ablated_produced_no_proof": true
+      },
+      "failed_gates": [],
+      "interpretable": true,
+      "seed": {
+        "frozen": {
+          "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790325288904244000",
+          "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+          "base_generation": 0,
+          "target_generation": 1,
+          "state_files": 10,
+          "state_sha256": "91cd3ee4c361e108181a85f82126bcc18e50509eaaa11e8a6d7ff6a0ca91b668",
+          "proof_sha256": "fe4824cbea0472ece581135be8a1d9ea7d93e6075033039d369cada043b831bc"
+        },
+        "ablated": {
+          "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790325288904244000",
+          "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+          "base_generation": 0,
+          "target_generation": 1,
+          "state_files": 10,
+          "state_sha256": "91cd3ee4c361e108181a85f82126bcc18e50509eaaa11e8a6d7ff6a0ca91b668",
+          "proof_sha256": "fe4824cbea0472ece581135be8a1d9ea7d93e6075033039d369cada043b831bc"
+        }
+      },
+      "restored_state_manifest_equal": true,
+      "replay": {
+        "frozen": {
+          "replayed_frames": 1,
+          "matched": {
+            "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790325288904244000",
+            "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+            "base_generation": 0,
+            "applied_generation": 1
+          }
+        },
+        "ablated": {
+          "replayed_frames": 1,
+          "matched": {
+            "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790325288904244000",
+            "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+            "base_generation": 0,
+            "applied_generation": 1
+          }
+        }
+      },
+      "run_ids": {
+        "frozen": "stage21-ablate-product-stage21-ablate-seed-2-1790325299972080000",
+        "ablated": "stage21-ablate-product-stage21-ablate-seed-2-1790325305468783000",
+        "frozen_wire": "stage21-ablate-product-stage21-ablate-seed-2-1790325299972080000",
+        "ablated_wire": "stage21-ablate-product-stage21-ablate-seed-2-1790325305468783000"
+      },
+      "results": {
+        "frozen": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 10,
+              "source content": 1
+            }
+          },
+          "RunID": "stage21-ablate-product-stage21-ablate-seed-2-1790325299972080000",
+          "BaseGeneration": 1,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 115,
+            "files_parsed": 11,
+            "cached_files": 4023,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 117,
+            "derived_indexes": 8,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 11,
+          "ParsedFiles": 11,
+          "EarlyLocal": 0
+        },
+        "ablated": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 10,
+              "source content": 1
+            }
+          },
+          "RunID": "stage21-ablate-product-stage21-ablate-seed-2-1790325305468783000",
+          "BaseGeneration": 1,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 115,
+            "files_parsed": 11,
+            "cached_files": 4023,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 117,
+            "derived_indexes": 8,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 11,
+          "ParsedFiles": 11,
+          "EarlyLocal": 0
+        }
+      },
+      "graph_hashes": {
+        "frozen": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+        "ablated": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+        "cold": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784"
+      },
+      "fallbacks": {
+        "frozen": [
+          "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+        ],
+        "ablated": [
+          "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+        ]
+      },
+      "wall_seconds": {
+        "frozen": 3.4895,
+        "ablated": 3.4701,
+        "delta_s": -0.0194
+      },
+      "process_real_s": {
+        "frozen": 3.48,
+        "ablated": 3.46
+      },
+      "rss_bytes": {
+        "frozen": 615563264.0,
+        "ablated": 622755840.0
+      },
+      "costs_that_disappear_with_the_ablation": {
+        "state_proof_promoted": {
+          "frozen_s": [
+            0.003
+          ],
+          "ablated_s": [],
+          "frozen_total_s": 0.003,
+          "ablated_total_s": 0,
+          "delta_s": -0.003,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 0,
+          "only_on": "frozen"
+        },
+        "state_proof_written": {
+          "frozen_s": [
+            0.028
+          ],
+          "ablated_s": [],
+          "frozen_total_s": 0.028,
+          "ablated_total_s": 0,
+          "delta_s": -0.028,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 0,
+          "only_on": "frozen"
+        }
+      },
+      "marks_only_on_the_ablated_arm": {
+        "ablation_proof_cleanup_promote": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.005
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.005,
+          "delta_s": 0.005,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 1,
+          "only_on": "ablated"
+        },
+        "ablation_proof_cleanup_stage": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.005
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.005,
+          "delta_s": 0.005,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 1,
+          "only_on": "ablated"
+        },
+        "state_proof_unavailable": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.0,
+            0.0
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.0,
+          "delta_s": 0.0,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 2,
+          "only_on": "ablated"
+        }
+      },
+      "marks_on_both_arms_differing_by_5ms_or_more": {
+        "begin_publish": {
+          "frozen_s": [
+            0.057
+          ],
+          "ablated_s": [
+            0.062
+          ],
+          "frozen_total_s": 0.057,
+          "ablated_total_s": 0.062,
+          "delta_s": 0.005,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "graph_session_run": {
+          "frozen_s": [
+            3.147
+          ],
+          "ablated_s": [
+            3.044
+          ],
+          "frozen_total_s": 3.147,
+          "ablated_total_s": 3.044,
+          "delta_s": -0.103,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "graphinput_build": {
+          "frozen_s": [
+            0.316
+          ],
+          "ablated_s": [
+            0.325
+          ],
+          "frozen_total_s": 0.316,
+          "ablated_total_s": 0.325,
+          "delta_s": 0.009,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "publish_resolved": {
+          "frozen_s": [
+            0.051
+          ],
+          "ablated_s": [
+            0.056
+          ],
+          "frozen_total_s": 0.051,
+          "ablated_total_s": 0.056,
+          "delta_s": 0.005,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "resolve_graph_target": {
+          "frozen_s": [
+            0.316
+          ],
+          "ablated_s": [
+            0.327
+          ],
+          "frozen_total_s": 0.316,
+          "ablated_total_s": 0.327,
+          "delta_s": 0.011,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "state_json_marshal": {
+          "frozen_s": [
+            0.161
+          ],
+          "ablated_s": [
+            0.17
+          ],
+          "frozen_total_s": 0.161,
+          "ablated_total_s": 0.17,
+          "delta_s": 0.009,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "ts_frozen_preview": {
+          "frozen_s": [
+            0.691
+          ],
+          "ablated_s": [
+            0.713
+          ],
+          "frozen_total_s": 0.691,
+          "ablated_total_s": 0.713,
+          "delta_s": 0.022,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "ts_graphql_grpc_index": {
+          "frozen_s": [
+            0.096,
+            0.1
+          ],
+          "ablated_s": [
+            0.099,
+            0.103
+          ],
+          "frozen_total_s": 0.196,
+          "ablated_total_s": 0.202,
+          "delta_s": 0.006,
+          "frozen_occurrences": 2,
+          "ablated_occurrences": 2,
+          "only_on": null
+        },
+        "ts_mapfiles_aggregate": {
+          "frozen_s": [
+            0.038,
+            0.291
+          ],
+          "ablated_s": [
+            0.043,
+            0.297
+          ],
+          "frozen_total_s": 0.329,
+          "ablated_total_s": 0.34,
+          "delta_s": 0.011,
+          "frozen_occurrences": 2,
+          "ablated_occurrences": 2,
+          "only_on": null
+        },
+        "walk_tree": {
+          "frozen_s": [
+            0.115
+          ],
+          "ablated_s": [
+            0.122
+          ],
+          "frozen_total_s": 0.115,
+          "ablated_total_s": 0.122,
+          "delta_s": 0.007,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "write_pending_state": {
+          "frozen_s": [
+            0.502
+          ],
+          "ablated_s": [
+            0.38
+          ],
+          "frozen_total_s": 0.502,
+          "ablated_total_s": 0.38,
+          "delta_s": -0.122,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        }
+      },
+      "occurrence_count_differences": {
+        "ablation_proof_cleanup_promote": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.005
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.005,
+          "delta_s": 0.005,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 1,
+          "only_on": "ablated"
+        },
+        "ablation_proof_cleanup_stage": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.005
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.005,
+          "delta_s": 0.005,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 1,
+          "only_on": "ablated"
+        },
+        "state_proof_promoted": {
+          "frozen_s": [
+            0.003
+          ],
+          "ablated_s": [],
+          "frozen_total_s": 0.003,
+          "ablated_total_s": 0,
+          "delta_s": -0.003,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 0,
+          "only_on": "frozen"
+        },
+        "state_proof_unavailable": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.0,
+            0.0
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.0,
+          "delta_s": 0.0,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 2,
+          "only_on": "ablated"
+        },
+        "state_proof_written": {
+          "frozen_s": [
+            0.028
+          ],
+          "ablated_s": [],
+          "frozen_total_s": 0.028,
+          "ablated_total_s": 0,
+          "delta_s": -0.028,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 0,
+          "only_on": "frozen"
+        }
+      },
+      "pinned": {
+        "frozen": {
+          "state_proof_bound": [
+            "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634916"
+          ],
+          "runtime_inputs_reused": [
+            "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+          ],
+          "runtime_inputs_reusable": [
+            "[graph-profile] runtime_inputs_reusable            0.293s  total= 1.053s  trace=reconcile  targets=4105"
+          ],
+          "state_proof_refused": [
+            "[graph-profile] state_proof_refused                0.666s  total= 0.760s  trace=reconcile  inventory scan digest moved"
+          ],
+          "state_proof_written": [
+            "[graph-profile] state_proof_written                0.028s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19158792"
+          ],
+          "state_proof_promoted": [
+            "[graph-profile] state_proof_promoted               0.003s"
+          ],
+          "state_proof_fallback_decode": [
+            "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+          ],
+          "state_json_unmarshal": [
+            "[graph-profile] state_json_unmarshal               0.241s  files=4086"
+          ],
+          "state_json_marshal": [
+            "[graph-profile] state_json_marshal                 0.161s  bytes=56634916 files=4086"
+          ],
+          "state_read_bytes": [
+            "[graph-profile] state_read_bytes                   0.008s  state.json bytes=56634916",
+            "[graph-profile] state_read_bytes                   0.019s  state.json bytes=56634916"
+          ],
+          "state_fingerprint": [
+            "[graph-profile] state_fingerprint                  0.025s  bytes=56634916",
+            "[graph-profile] state_fingerprint                  0.023s  bytes=56634916",
+            "[graph-profile] state_fingerprint                  0.024s  write bytes=56634916"
+          ],
+          "load_state": [
+            "[graph-profile] load_state                         0.034s  total= 0.034s  trace=open  deferred owners=4086"
+          ],
+          "select_hash_targets": [
+            "[graph-profile] select_hash_targets                0.006s  total= 0.123s  trace=inputs  targets=4105"
+          ],
+          "hash_content_inputs": [
+            "[graph-profile] hash_content_inputs                0.139s  total= 0.263s  trace=inputs  targets=4105"
+          ],
+          "write_pending_state": [
+            "[graph-profile] write_pending_state                0.502s  total= 1.956s  trace=session"
+          ],
+          "promote_compact_state": [
+            "[graph-profile] promote_compact_state              0.071s  total= 2.060s  trace=session  parsed=11 published=11"
+          ],
+          "end_flush_ack": [
+            "[graph-profile] end_flush_ack                      0.033s  total= 1.989s  trace=session"
+          ],
+          "graph_session_run": [
+            "[graph-profile] graph_session_run                  3.147s  total= 3.465s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=11"
+          ],
+          "cli_complete": [
+            "[graph-profile] cli_complete                       0.000s  total= 3.465s  trace=cli  results=1"
+          ]
+        },
+        "ablated": {
+          "state_proof_bound": [
+            "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634916"
+          ],
+          "runtime_inputs_reused": [
+            "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+          ],
+          "runtime_inputs_reusable": [
+            "[graph-profile] runtime_inputs_reusable            0.293s  total= 1.047s  trace=reconcile  targets=4105"
+          ],
+          "state_proof_refused": [
+            "[graph-profile] state_proof_refused                0.663s  total= 0.754s  trace=reconcile  inventory scan digest moved"
+          ],
+          "state_proof_unavailable": [
+            "[graph-profile] state_proof_unavailable            0.000s  diagnostic ablation: proof production disabled",
+            "[graph-profile] state_proof_unavailable            0.000s  diagnostic ablation: proof production disabled"
+          ],
+          "ablation_proof_cleanup_stage": [
+            "[graph-profile] ablation_proof_cleanup_stage       0.005s  where=1"
+          ],
+          "ablation_proof_cleanup_promote": [
+            "[graph-profile] ablation_proof_cleanup_promote     0.005s"
+          ],
+          "state_proof_fallback_decode": [
+            "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+          ],
+          "state_json_unmarshal": [
+            "[graph-profile] state_json_unmarshal               0.243s  files=4086"
+          ],
+          "state_json_marshal": [
+            "[graph-profile] state_json_marshal                 0.170s  bytes=56634916 files=4086"
+          ],
+          "state_read_bytes": [
+            "[graph-profile] state_read_bytes                   0.008s  state.json bytes=56634916",
+            "[graph-profile] state_read_bytes                   0.018s  state.json bytes=56634916"
+          ],
+          "state_fingerprint": [
+            "[graph-profile] state_fingerprint                  0.025s  bytes=56634916",
+            "[graph-profile] state_fingerprint                  0.024s  bytes=56634916",
+            "[graph-profile] state_fingerprint                  0.024s  write bytes=56634916"
+          ],
+          "load_state": [
+            "[graph-profile] load_state                         0.034s  total= 0.035s  trace=open  deferred owners=4086"
+          ],
+          "select_hash_targets": [
+            "[graph-profile] select_hash_targets                0.006s  total= 0.120s  trace=inputs  targets=4105"
+          ],
+          "hash_content_inputs": [
+            "[graph-profile] hash_content_inputs                0.135s  total= 0.255s  trace=inputs  targets=4105"
+          ],
+          "write_pending_state": [
+            "[graph-profile] write_pending_state                0.380s  total= 1.864s  trace=session"
+          ],
+          "promote_compact_state": [
+            "[graph-profile] promote_compact_state              0.067s  total= 1.963s  trace=session  parsed=11 published=11"
+          ],
+          "end_flush_ack": [
+            "[graph-profile] end_flush_ack                      0.032s  total= 1.896s  trace=session"
+          ],
+          "graph_session_run": [
+            "[graph-profile] graph_session_run                  3.044s  total= 3.376s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=11"
+          ],
+          "cli_complete": [
+            "[graph-profile] cli_complete                       0.000s  total= 3.376s  trace=cli  results=1"
+          ]
+        }
+      },
+      "baseline": {
+        "gates": {
+          "baseline_exit_zero": true,
+          "baseline_generation_advanced": true,
+          "baseline_restored_the_same_seed_bytes": true,
+          "baseline_replayed_the_seed_graph": true,
+          "baseline_base_generation_equal": true,
+          "baseline_target_generation_equal": true,
+          "baseline_parsed_files_equal": true,
+          "baseline_owners_published_equal": true,
+          "baseline_full_result_equal_except_run_id": true,
+          "baseline_wire_run_id_matches_result": true,
+          "baseline_run_id_distinct_from_candidate": true,
+          "baseline_delta_equals_cold_graph": true
+        },
+        "failed_gates": [],
+        "interpretable": true,
+        "inapplicable_proof_observations": {
+          "baseline_bound_a_proof": false,
+          "baseline_reused_capture": false,
+          "baseline_produced_a_proof": false
+        },
+        "phase_call_counts": {
+          "ablation_proof_cleanup_promote": {
+            "baseline": 0,
+            "frozen": 0,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0,
+            "ablated_total_s": 0.005
+          },
+          "ablation_proof_cleanup_stage": {
+            "baseline": 0,
+            "frozen": 0,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0,
+            "ablated_total_s": 0.005
+          },
+          "analysis_fingerprint": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.133,
+            "frozen_total_s": 0.13,
+            "ablated_total_s": 0.131
+          },
+          "angular_probe": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.003,
+            "frozen_total_s": 0.003,
+            "ablated_total_s": 0.003
+          },
+          "assemble_new_files": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.166,
+            "frozen_total_s": 0.165,
+            "ablated_total_s": 0.165
+          },
+          "begin_publish": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.057,
+            "frozen_total_s": 0.057,
+            "ablated_total_s": 0.062
+          },
+          "bind_identity": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "capture_contexts": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "changed_terms": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.015,
+            "frozen_total_s": 0.017,
+            "ablated_total_s": 0.016
+          },
+          "check_ignore_run": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.055,
+            "frozen_total_s": 0.057,
+            "ablated_total_s": 0.054
+          },
+          "check_ignore_setup": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.015,
+            "frozen_total_s": 0.014,
+            "ablated_total_s": 0.014
+          },
+          "cli_complete": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "clone_file_state_copy": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "compute_identities": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.034,
+            "frozen_total_s": 0.037,
+            "ablated_total_s": 0.038
+          },
+          "config_load": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "config_recheck": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "connect_sink": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.002,
+            "frozen_total_s": 0.001,
+            "ablated_total_s": 0.005
+          },
+          "declare_config_deps": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "declare_git_control": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.006,
+            "frozen_total_s": 0.005,
+            "ablated_total_s": 0.005
+          },
+          "declare_ignore_files": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "detect_extractors": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.001,
+            "frozen_total_s": 0.001,
+            "ablated_total_s": 0.002
+          },
+          "detect_typescript": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.001,
+            "frozen_total_s": 0.001,
+            "ablated_total_s": 0.001
+          },
+          "discover_git": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.033,
+            "frozen_total_s": 0.033,
+            "ablated_total_s": 0.036
+          },
+          "effective_config": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "effective_config_before": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "encode_append_owners": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.004,
+            "frozen_total_s": 0.004,
+            "ablated_total_s": 0.004
+          },
+          "end_flush_ack": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.032,
+            "frozen_total_s": 0.033,
+            "ablated_total_s": 0.032
+          },
+          "engine_context_fingerprint": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "engine_hash_files": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.144,
+            "frozen_total_s": 0.139,
+            "ablated_total_s": 0.135
+          },
+          "engine_new": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "engine_walk_repo": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.111,
+            "frozen_total_s": 0.116,
+            "ablated_total_s": 0.113
+          },
+          "extractor_need": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.69,
+            "frozen_total_s": 0.024,
+            "ablated_total_s": 0.025
+          },
+          "flags_parsed": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "git_ls_files": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.055,
+            "frozen_total_s": 0.054,
+            "ablated_total_s": 0.054
+          },
+          "graph_inputs_proven": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.085,
+            "frozen_total_s": 0.094,
+            "ablated_total_s": 0.09
+          },
+          "graph_session_run": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 2.944,
+            "frozen_total_s": 3.147,
+            "ablated_total_s": 3.044
+          },
+          "graphinput_build": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.318,
+            "frozen_total_s": 0.316,
+            "ablated_total_s": 0.325
+          },
+          "hash_content_inputs": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.144,
+            "frozen_total_s": 0.139,
+            "ablated_total_s": 0.135
+          },
+          "index_group_owners": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.083,
+            "frozen_total_s": 0.08,
+            "ablated_total_s": 0.081
+          },
+          "invalidation_plan": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.166,
+            "frozen_total_s": 0.16,
+            "ablated_total_s": 0.16
+          },
+          "inventory": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.111,
+            "frozen_total_s": 0.116,
+            "ablated_total_s": 0.113
+          },
+          "load_state": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.274,
+            "frozen_total_s": 0.034,
+            "ablated_total_s": 0.034
+          },
+          "lock": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "open_journal": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "policy_identity": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "promote_compact_state": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.067,
+            "frozen_total_s": 0.071,
+            "ablated_total_s": 0.067
+          },
+          "publish_resolved": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.051,
+            "frozen_total_s": 0.051,
+            "ablated_total_s": 0.056
+          },
+          "publish_scope": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "reconcile_complete": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "register_plugins": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "replay_unacked": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "resolve_graph_target": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.319,
+            "frozen_total_s": 0.316,
+            "ablated_total_s": 0.327
+          },
+          "revalidate_before_begin": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.002,
+            "frozen_total_s": 0.001,
+            "ablated_total_s": 0.001
+          },
+          "revalidate_ts_records": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.109,
+            "frozen_total_s": 0.107,
+            "ablated_total_s": 0.103
+          },
+          "runtime_inputs_complete": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "runtime_inputs_reusable": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.293,
+            "ablated_total_s": 0.293
+          },
+          "runtime_inputs_reused": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "select_hash_targets": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.009,
+            "frozen_total_s": 0.006,
+            "ablated_total_s": 0.006
+          },
+          "session_options": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "state_fingerprint": {
+            "baseline": 2,
+            "frozen": 3,
+            "ablated": 3,
+            "baseline_total_s": 0.048,
+            "frozen_total_s": 0.072,
+            "ablated_total_s": 0.073
+          },
+          "state_json_marshal": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.159,
+            "frozen_total_s": 0.161,
+            "ablated_total_s": 0.17
+          },
+          "state_json_unmarshal": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.238,
+            "frozen_total_s": 0.241,
+            "ablated_total_s": 0.243
+          },
+          "state_proof_bound": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "state_proof_fallback_decode": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "state_proof_promoted": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 0,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.003,
+            "ablated_total_s": 0
+          },
+          "state_proof_refused": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.666,
+            "ablated_total_s": 0.663
+          },
+          "state_proof_unavailable": {
+            "baseline": 0,
+            "frozen": 0,
+            "ablated": 2,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0,
+            "ablated_total_s": 0.0
+          },
+          "state_proof_written": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 0,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.028,
+            "ablated_total_s": 0
+          },
+          "state_read_bytes": {
+            "baseline": 1,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.013,
+            "frozen_total_s": 0.027,
+            "ablated_total_s": 0.026
+          },
+          "transaction_enter": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "ts_compose_modules": {
+            "baseline": 2,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.006,
+            "frozen_total_s": 0.004,
+            "ablated_total_s": 0.005
+          },
+          "ts_config_inputs": {
+            "baseline": 2,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.256,
+            "frozen_total_s": 0.256,
+            "ablated_total_s": 0.256
+          },
+          "ts_detect_frameworks": {
+            "baseline": 2,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "ts_dirty_scope": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.097,
+            "frozen_total_s": 0.099,
+            "ablated_total_s": 0.098
+          },
+          "ts_disc_alias_roots": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.077,
+            "frozen_total_s": 0.075,
+            "ablated_total_s": 0.078
+          },
+          "ts_disc_nuxt_packages": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.113,
+            "frozen_total_s": 0.112,
+            "ablated_total_s": 0.112
+          },
+          "ts_disc_package_aliases": {
+            "baseline": 2,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "ts_disc_package_exports": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "ts_disc_package_gates": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.001,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.001
+          },
+          "ts_disc_package_names": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "ts_discovery": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.201,
+            "frozen_total_s": 0.198,
+            "ablated_total_s": 0.2
+          },
+          "ts_discovery_build": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.201,
+            "frozen_total_s": 0.198,
+            "ablated_total_s": 0.2
+          },
+          "ts_extract_session": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "ts_frozen_preview": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.698,
+            "frozen_total_s": 0.691,
+            "ablated_total_s": 0.713
+          },
+          "ts_graphql_grpc_index": {
+            "baseline": 2,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.2,
+            "frozen_total_s": 0.196,
+            "ablated_total_s": 0.202
+          },
+          "ts_mapfiles_aggregate": {
+            "baseline": 2,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.337,
+            "frozen_total_s": 0.329,
+            "ablated_total_s": 0.34
+          },
+          "ts_read_dirty": {
+            "baseline": 2,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.011,
+            "frozen_total_s": 0.01,
+            "ablated_total_s": 0.011
+          },
+          "ts_session_context": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.056,
+            "frozen_total_s": 0.054,
+            "ablated_total_s": 0.056
+          },
+          "walk_tree": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.119,
+            "frozen_total_s": 0.115,
+            "ablated_total_s": 0.122
+          },
+          "write_pending_state": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.349,
+            "frozen_total_s": 0.502,
+            "ablated_total_s": 0.38
+          }
+        },
+        "marks_absent_from_baseline": {
+          "runtime_inputs_reusable": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.293,
+            "ablated_total_s": 0.293
+          },
+          "runtime_inputs_reused": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "state_proof_bound": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "state_proof_fallback_decode": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "state_proof_promoted": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 0,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.003,
+            "ablated_total_s": 0
+          },
+          "state_proof_refused": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.666,
+            "ablated_total_s": 0.663
+          },
+          "state_proof_written": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 0,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.028,
+            "ablated_total_s": 0
+          }
+        },
+        "marks_the_candidate_calls_more_often": {
+          "state_fingerprint": {
+            "baseline": 2,
+            "frozen": 3,
+            "ablated": 3,
+            "baseline_total_s": 0.048,
+            "frozen_total_s": 0.072,
+            "ablated_total_s": 0.073
+          },
+          "state_read_bytes": {
+            "baseline": 1,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.013,
+            "frozen_total_s": 0.027,
+            "ablated_total_s": 0.026
+          }
+        },
+        "marks_absent_from_candidate": {},
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 10,
+              "source content": 1
+            }
+          },
+          "RunID": "stage21-ablate-product-stage21-ablate-seed-2-1790325310743964000",
+          "BaseGeneration": 1,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 115,
+            "files_parsed": 11,
+            "cached_files": 4023,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 117,
+            "derived_indexes": 8,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 11,
+          "ParsedFiles": 11,
+          "EarlyLocal": 0
+        },
+        "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+        "wall_seconds": 3.3321,
+        "process_real_s": 3.32,
+        "rss_bytes": 599703552.0,
+        "pinned": {
+          "state_json_unmarshal": [
+            "[graph-profile] state_json_unmarshal               0.238s  files=4086"
+          ],
+          "state_json_marshal": [
+            "[graph-profile] state_json_marshal                 0.159s  bytes=56634916 files=4086"
+          ],
+          "state_read_bytes": [
+            "[graph-profile] state_read_bytes                   0.013s  state.json bytes=56634916"
+          ],
+          "state_fingerprint": [
+            "[graph-profile] state_fingerprint                  0.023s  bytes=56634916",
+            "[graph-profile] state_fingerprint                  0.025s  write bytes=56634916"
+          ],
+          "load_state": [
+            "[graph-profile] load_state                         0.274s  total= 0.274s  trace=open  files=4086"
+          ],
+          "select_hash_targets": [
+            "[graph-profile] select_hash_targets                0.009s  total= 0.121s  trace=inputs  targets=4105"
+          ],
+          "hash_content_inputs": [
+            "[graph-profile] hash_content_inputs                0.144s  total= 0.265s  trace=inputs  targets=4105"
+          ],
+          "write_pending_state": [
+            "[graph-profile] write_pending_state                0.349s  total= 2.486s  trace=session"
+          ],
+          "promote_compact_state": [
+            "[graph-profile] promote_compact_state              0.067s  total= 2.584s  trace=session  parsed=11 published=11"
+          ],
+          "end_flush_ack": [
+            "[graph-profile] end_flush_ack                      0.032s  total= 2.517s  trace=session"
+          ],
+          "graph_session_run": [
+            "[graph-profile] graph_session_run                  2.944s  total= 3.264s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=11"
+          ],
+          "cli_complete": [
+            "[graph-profile] cli_complete                       0.000s  total= 3.265s  trace=cli  results=1"
+          ]
+        }
+      },
+      "arms_present": [
+        "ablated",
+        "baseline",
+        "frozen"
+      ],
+      "full_cohort_interpretable": true
+    },
+    "structural": {
+      "gates": {
+        "both_arms_exit_zero": true,
+        "both_arms_generation_advanced": true,
+        "both_arms_bound_their_seed_proof": true,
+        "both_arms_reused_capture": true,
+        "seeds_byte_identical_across_arms": true,
+        "both_arms_replayed_the_seed_graph": true,
+        "base_generation_equal": true,
+        "target_generation_equal": true,
+        "parsed_files_equal": true,
+        "owners_published_equal": true,
+        "full_result_equal_except_run_id": true,
+        "each_arm_wire_run_id_matches_its_result": true,
+        "arms_have_distinct_run_ids": true,
+        "arms_agree_on_graph": true,
+        "frozen_delta_equals_cold_graph": true,
+        "ablated_delta_equals_cold_graph": true,
+        "frozen_produced_and_promoted_a_proof": true,
+        "ablated_produced_no_proof": true
+      },
+      "failed_gates": [],
+      "interpretable": true,
+      "seed": {
+        "frozen": {
+          "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790325323029335000",
+          "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+          "base_generation": 1,
+          "target_generation": 2,
+          "state_files": 10,
+          "state_sha256": "ff37aadfe1be3cf74a4875a6445e5c742bbb60aa53040ae395c111578962481a",
+          "proof_sha256": "9bc91c80feb7030824ec788f3f68745bce82f11a0e2310ed566b4b979d618e1e"
+        },
+        "ablated": {
+          "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790325323029335000",
+          "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+          "base_generation": 1,
+          "target_generation": 2,
+          "state_files": 10,
+          "state_sha256": "ff37aadfe1be3cf74a4875a6445e5c742bbb60aa53040ae395c111578962481a",
+          "proof_sha256": "9bc91c80feb7030824ec788f3f68745bce82f11a0e2310ed566b4b979d618e1e"
+        }
+      },
+      "restored_state_manifest_equal": true,
+      "replay": {
+        "frozen": {
+          "replayed_frames": 2,
+          "matched": {
+            "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790325323029335000",
+            "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+            "base_generation": 1,
+            "applied_generation": 2
+          }
+        },
+        "ablated": {
+          "replayed_frames": 2,
+          "matched": {
+            "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790325323029335000",
+            "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+            "base_generation": 1,
+            "applied_generation": 2
+          }
+        }
+      },
+      "run_ids": {
+        "frozen": "stage21-ablate-product-stage21-ablate-seed-3-1790325329124285000",
+        "ablated": "stage21-ablate-product-stage21-ablate-seed-3-1790325335050672000",
+        "frozen_wire": "stage21-ablate-product-stage21-ablate-seed-3-1790325329124285000",
+        "ablated_wire": "stage21-ablate-product-stage21-ablate-seed-3-1790325335050672000"
+      },
+      "results": {
+        "frozen": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 11,
+              "source content": 1
+            }
+          },
+          "RunID": "stage21-ablate-product-stage21-ablate-seed-3-1790325329124285000",
+          "BaseGeneration": 2,
+          "TargetGeneration": 3,
+          "Stats": {
+            "files_read": 116,
+            "files_parsed": 12,
+            "cached_files": 4022,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 117,
+            "derived_indexes": 8,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 12,
+          "ParsedFiles": 12,
+          "EarlyLocal": 0
+        },
+        "ablated": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 11,
+              "source content": 1
+            }
+          },
+          "RunID": "stage21-ablate-product-stage21-ablate-seed-3-1790325335050672000",
+          "BaseGeneration": 2,
+          "TargetGeneration": 3,
+          "Stats": {
+            "files_read": 116,
+            "files_parsed": 12,
+            "cached_files": 4022,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 117,
+            "derived_indexes": 8,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 12,
+          "ParsedFiles": 12,
+          "EarlyLocal": 0
+        }
+      },
+      "graph_hashes": {
+        "frozen": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666",
+        "ablated": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666",
+        "cold": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666"
+      },
+      "fallbacks": {
+        "frozen": [
+          "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+        ],
+        "ablated": [
+          "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+        ]
+      },
+      "wall_seconds": {
+        "frozen": 3.7881,
+        "ablated": 3.5195,
+        "delta_s": -0.2686
+      },
+      "process_real_s": {
+        "frozen": 3.78,
+        "ablated": 3.51
+      },
+      "rss_bytes": {
+        "frozen": 643465216.0,
+        "ablated": 631635968.0
+      },
+      "costs_that_disappear_with_the_ablation": {
+        "state_proof_promoted": {
+          "frozen_s": [
+            0.005
+          ],
+          "ablated_s": [],
+          "frozen_total_s": 0.005,
+          "ablated_total_s": 0,
+          "delta_s": -0.005,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 0,
+          "only_on": "frozen"
+        },
+        "state_proof_written": {
+          "frozen_s": [
+            0.042
+          ],
+          "ablated_s": [],
+          "frozen_total_s": 0.042,
+          "ablated_total_s": 0,
+          "delta_s": -0.042,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 0,
+          "only_on": "frozen"
+        }
+      },
+      "marks_only_on_the_ablated_arm": {
+        "ablation_proof_cleanup_promote": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.004
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.004,
+          "delta_s": 0.004,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 1,
+          "only_on": "ablated"
+        },
+        "ablation_proof_cleanup_stage": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.004
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.004,
+          "delta_s": 0.004,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 1,
+          "only_on": "ablated"
+        },
+        "state_proof_unavailable": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.0,
+            0.0
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.0,
+          "delta_s": 0.0,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 2,
+          "only_on": "ablated"
+        }
+      },
+      "marks_on_both_arms_differing_by_5ms_or_more": {
+        "assemble_new_files": {
+          "frozen_s": [
+            0.179
+          ],
+          "ablated_s": [
+            0.171
+          ],
+          "frozen_total_s": 0.179,
+          "ablated_total_s": 0.171,
+          "delta_s": -0.008,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "begin_publish": {
+          "frozen_s": [
+            0.073
+          ],
+          "ablated_s": [
+            0.081
+          ],
+          "frozen_total_s": 0.073,
+          "ablated_total_s": 0.081,
+          "delta_s": 0.008,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "end_flush_ack": {
+          "frozen_s": [
+            0.041
+          ],
+          "ablated_s": [
+            0.032
+          ],
+          "frozen_total_s": 0.041,
+          "ablated_total_s": 0.032,
+          "delta_s": -0.009,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "engine_walk_repo": {
+          "frozen_s": [
+            0.132
+          ],
+          "ablated_s": [
+            0.118
+          ],
+          "frozen_total_s": 0.132,
+          "ablated_total_s": 0.118,
+          "delta_s": -0.014,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "graph_session_run": {
+          "frozen_s": [
+            3.415
+          ],
+          "ablated_s": [
+            3.153
+          ],
+          "frozen_total_s": 3.415,
+          "ablated_total_s": 3.153,
+          "delta_s": -0.262,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "graphinput_build": {
+          "frozen_s": [
+            0.342
+          ],
+          "ablated_s": [
+            0.336
+          ],
+          "frozen_total_s": 0.342,
+          "ablated_total_s": 0.336,
+          "delta_s": -0.006,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "index_group_owners": {
+          "frozen_s": [
+            0.098
+          ],
+          "ablated_s": [
+            0.084
+          ],
+          "frozen_total_s": 0.098,
+          "ablated_total_s": 0.084,
+          "delta_s": -0.014,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "invalidation_plan": {
+          "frozen_s": [
+            0.194
+          ],
+          "ablated_s": [
+            0.174
+          ],
+          "frozen_total_s": 0.194,
+          "ablated_total_s": 0.174,
+          "delta_s": -0.02,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "inventory": {
+          "frozen_s": [
+            0.132
+          ],
+          "ablated_s": [
+            0.118
+          ],
+          "frozen_total_s": 0.132,
+          "ablated_total_s": 0.118,
+          "delta_s": -0.014,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "promote_compact_state": {
+          "frozen_s": [
+            0.077
+          ],
+          "ablated_s": [
+            0.068
+          ],
+          "frozen_total_s": 0.077,
+          "ablated_total_s": 0.068,
+          "delta_s": -0.009,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "publish_resolved": {
+          "frozen_s": [
+            0.072
+          ],
+          "ablated_s": [
+            0.045
+          ],
+          "frozen_total_s": 0.072,
+          "ablated_total_s": 0.045,
+          "delta_s": -0.027,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "resolve_graph_target": {
+          "frozen_s": [
+            0.342
+          ],
+          "ablated_s": [
+            0.337
+          ],
+          "frozen_total_s": 0.342,
+          "ablated_total_s": 0.337,
+          "delta_s": -0.005,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "revalidate_ts_records": {
+          "frozen_s": [
+            0.156
+          ],
+          "ablated_s": [
+            0.106
+          ],
+          "frozen_total_s": 0.156,
+          "ablated_total_s": 0.106,
+          "delta_s": -0.05,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "state_json_marshal": {
+          "frozen_s": [
+            0.175
+          ],
+          "ablated_s": [
+            0.161
+          ],
+          "frozen_total_s": 0.175,
+          "ablated_total_s": 0.161,
+          "delta_s": -0.014,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "state_proof_refused": {
+          "frozen_s": [
+            0.745
+          ],
+          "ablated_s": [
+            0.722
+          ],
+          "frozen_total_s": 0.745,
+          "ablated_total_s": 0.722,
+          "delta_s": -0.023,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "ts_config_inputs": {
+          "frozen_s": [
+            0.145,
+            0.137
+          ],
+          "ablated_s": [
+            0.142,
+            0.131
+          ],
+          "frozen_total_s": 0.282,
+          "ablated_total_s": 0.273,
+          "delta_s": -0.009,
+          "frozen_occurrences": 2,
+          "ablated_occurrences": 2,
+          "only_on": null
+        },
+        "ts_discovery": {
+          "frozen_s": [
+            0.224
+          ],
+          "ablated_s": [
+            0.216
+          ],
+          "frozen_total_s": 0.224,
+          "ablated_total_s": 0.216,
+          "delta_s": -0.008,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "ts_discovery_build": {
+          "frozen_s": [
+            0.224
+          ],
+          "ablated_s": [
+            0.216
+          ],
+          "frozen_total_s": 0.224,
+          "ablated_total_s": 0.216,
+          "delta_s": -0.008,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "ts_frozen_preview": {
+          "frozen_s": [
+            0.745
+          ],
+          "ablated_s": [
+            0.725
+          ],
+          "frozen_total_s": 0.745,
+          "ablated_total_s": 0.725,
+          "delta_s": -0.02,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "ts_mapfiles_aggregate": {
+          "frozen_s": [
+            0.041,
+            0.316
+          ],
+          "ablated_s": [
+            0.043,
+            0.303
+          ],
+          "frozen_total_s": 0.357,
+          "ablated_total_s": 0.346,
+          "delta_s": -0.011,
+          "frozen_occurrences": 2,
+          "ablated_occurrences": 2,
+          "only_on": null
+        },
+        "ts_read_dirty": {
+          "frozen_s": [
+            0.006,
+            0.01
+          ],
+          "ablated_s": [
+            0.006,
+            0.005
+          ],
+          "frozen_total_s": 0.016,
+          "ablated_total_s": 0.011,
+          "delta_s": -0.005,
+          "frozen_occurrences": 2,
+          "ablated_occurrences": 2,
+          "only_on": null
+        },
+        "write_pending_state": {
+          "frozen_s": [
+            0.449
+          ],
+          "ablated_s": [
+            0.36
+          ],
+          "frozen_total_s": 0.449,
+          "ablated_total_s": 0.36,
+          "delta_s": -0.089,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        }
+      },
+      "occurrence_count_differences": {
+        "ablation_proof_cleanup_promote": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.004
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.004,
+          "delta_s": 0.004,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 1,
+          "only_on": "ablated"
+        },
+        "ablation_proof_cleanup_stage": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.004
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.004,
+          "delta_s": 0.004,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 1,
+          "only_on": "ablated"
+        },
+        "state_proof_promoted": {
+          "frozen_s": [
+            0.005
+          ],
+          "ablated_s": [],
+          "frozen_total_s": 0.005,
+          "ablated_total_s": 0,
+          "delta_s": -0.005,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 0,
+          "only_on": "frozen"
+        },
+        "state_proof_unavailable": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.0,
+            0.0
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.0,
+          "delta_s": 0.0,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 2,
+          "only_on": "ablated"
+        },
+        "state_proof_written": {
+          "frozen_s": [
+            0.042
+          ],
+          "ablated_s": [],
+          "frozen_total_s": 0.042,
+          "ablated_total_s": 0,
+          "delta_s": -0.042,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 0,
+          "only_on": "frozen"
+        }
+      },
+      "pinned": {
+        "frozen": {
+          "state_proof_bound": [
+            "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634804"
+          ],
+          "runtime_inputs_reused": [
+            "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+          ],
+          "runtime_inputs_reusable": [
+            "[graph-profile] runtime_inputs_reusable            0.302s  total= 1.142s  trace=reconcile  targets=4105"
+          ],
+          "state_proof_refused": [
+            "[graph-profile] state_proof_refused                0.745s  total= 0.840s  trace=reconcile  inventory scan digest moved"
+          ],
+          "state_proof_written": [
+            "[graph-profile] state_proof_written                0.042s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19879791"
+          ],
+          "state_proof_promoted": [
+            "[graph-profile] state_proof_promoted               0.005s"
+          ],
+          "state_proof_fallback_decode": [
+            "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+          ],
+          "state_json_unmarshal": [
+            "[graph-profile] state_json_unmarshal               0.251s  files=4086"
+          ],
+          "state_json_marshal": [
+            "[graph-profile] state_json_marshal                 0.175s  bytes=56635523 files=4086"
+          ],
+          "state_read_bytes": [
+            "[graph-profile] state_read_bytes                   0.012s  state.json bytes=56634804",
+            "[graph-profile] state_read_bytes                   0.017s  state.json bytes=56634804"
+          ],
+          "state_fingerprint": [
+            "[graph-profile] state_fingerprint                  0.025s  bytes=56634804",
+            "[graph-profile] state_fingerprint                  0.024s  bytes=56634804",
+            "[graph-profile] state_fingerprint                  0.024s  write bytes=56635523"
+          ],
+          "load_state": [
+            "[graph-profile] load_state                         0.037s  total= 0.038s  trace=open  deferred owners=4086"
+          ],
+          "select_hash_targets": [
+            "[graph-profile] select_hash_targets                0.006s  total= 0.139s  trace=inputs  targets=4105"
+          ],
+          "hash_content_inputs": [
+            "[graph-profile] hash_content_inputs                0.156s  total= 0.295s  trace=inputs  targets=4105"
+          ],
+          "write_pending_state": [
+            "[graph-profile] write_pending_state                0.449s  total= 2.118s  trace=session"
+          ],
+          "promote_compact_state": [
+            "[graph-profile] promote_compact_state              0.077s  total= 2.236s  trace=session  parsed=12 published=12"
+          ],
+          "end_flush_ack": [
+            "[graph-profile] end_flush_ack                      0.041s  total= 2.159s  trace=session"
+          ],
+          "graph_session_run": [
+            "[graph-profile] graph_session_run                  3.415s  total= 3.759s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=12"
+          ],
+          "cli_complete": [
+            "[graph-profile] cli_complete                       0.000s  total= 3.759s  trace=cli  results=1"
+          ]
+        },
+        "ablated": {
+          "state_proof_bound": [
+            "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634804"
+          ],
+          "runtime_inputs_reused": [
+            "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+          ],
+          "runtime_inputs_reusable": [
+            "[graph-profile] runtime_inputs_reusable            0.304s  total= 1.118s  trace=reconcile  targets=4105"
+          ],
+          "state_proof_refused": [
+            "[graph-profile] state_proof_refused                0.722s  total= 0.814s  trace=reconcile  inventory scan digest moved"
+          ],
+          "state_proof_unavailable": [
+            "[graph-profile] state_proof_unavailable            0.000s  diagnostic ablation: proof production disabled",
+            "[graph-profile] state_proof_unavailable            0.000s  diagnostic ablation: proof production disabled"
+          ],
+          "ablation_proof_cleanup_stage": [
+            "[graph-profile] ablation_proof_cleanup_stage       0.004s  where=1"
+          ],
+          "ablation_proof_cleanup_promote": [
+            "[graph-profile] ablation_proof_cleanup_promote     0.004s"
+          ],
+          "state_proof_fallback_decode": [
+            "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+          ],
+          "state_json_unmarshal": [
+            "[graph-profile] state_json_unmarshal               0.252s  files=4086"
+          ],
+          "state_json_marshal": [
+            "[graph-profile] state_json_marshal                 0.161s  bytes=56635523 files=4086"
+          ],
+          "state_read_bytes": [
+            "[graph-profile] state_read_bytes                   0.009s  state.json bytes=56634804",
+            "[graph-profile] state_read_bytes                   0.018s  state.json bytes=56634804"
+          ],
+          "state_fingerprint": [
+            "[graph-profile] state_fingerprint                  0.025s  bytes=56634804",
+            "[graph-profile] state_fingerprint                  0.024s  bytes=56634804",
+            "[graph-profile] state_fingerprint                  0.025s  write bytes=56635523"
+          ],
+          "load_state": [
+            "[graph-profile] load_state                         0.034s  total= 0.034s  trace=open  deferred owners=4086"
+          ],
+          "select_hash_targets": [
+            "[graph-profile] select_hash_targets                0.006s  total= 0.125s  trace=inputs  targets=4105"
+          ],
+          "hash_content_inputs": [
+            "[graph-profile] hash_content_inputs                0.157s  total= 0.282s  trace=inputs  targets=4105"
+          ],
+          "write_pending_state": [
+            "[graph-profile] write_pending_state                0.360s  total= 1.900s  trace=session"
+          ],
+          "promote_compact_state": [
+            "[graph-profile] promote_compact_state              0.068s  total= 2.000s  trace=session  parsed=12 published=12"
+          ],
+          "end_flush_ack": [
+            "[graph-profile] end_flush_ack                      0.032s  total= 1.933s  trace=session"
+          ],
+          "graph_session_run": [
+            "[graph-profile] graph_session_run                  3.153s  total= 3.490s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=12"
+          ],
+          "cli_complete": [
+            "[graph-profile] cli_complete                       0.000s  total= 3.491s  trace=cli  results=1"
+          ]
+        }
+      },
+      "baseline": {
+        "gates": {
+          "baseline_exit_zero": true,
+          "baseline_generation_advanced": true,
+          "baseline_restored_the_same_seed_bytes": true,
+          "baseline_replayed_the_seed_graph": true,
+          "baseline_base_generation_equal": true,
+          "baseline_target_generation_equal": true,
+          "baseline_parsed_files_equal": true,
+          "baseline_owners_published_equal": true,
+          "baseline_full_result_equal_except_run_id": true,
+          "baseline_wire_run_id_matches_result": true,
+          "baseline_run_id_distinct_from_candidate": true,
+          "baseline_delta_equals_cold_graph": true
+        },
+        "failed_gates": [],
+        "interpretable": true,
+        "inapplicable_proof_observations": {
+          "baseline_bound_a_proof": false,
+          "baseline_reused_capture": false,
+          "baseline_produced_a_proof": false
+        },
+        "phase_call_counts": {
+          "ablation_proof_cleanup_promote": {
+            "baseline": 0,
+            "frozen": 0,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0,
+            "ablated_total_s": 0.004
+          },
+          "ablation_proof_cleanup_stage": {
+            "baseline": 0,
+            "frozen": 0,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0,
+            "ablated_total_s": 0.004
+          },
+          "analysis_fingerprint": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.131,
+            "frozen_total_s": 0.148,
+            "ablated_total_s": 0.144
+          },
+          "angular_probe": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.003,
+            "frozen_total_s": 0.004,
+            "ablated_total_s": 0.003
+          },
+          "assemble_new_files": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.166,
+            "frozen_total_s": 0.179,
+            "ablated_total_s": 0.171
+          },
+          "begin_publish": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.058,
+            "frozen_total_s": 0.073,
+            "ablated_total_s": 0.081
+          },
+          "bind_identity": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "capture_contexts": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "changed_terms": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.015,
+            "frozen_total_s": 0.017,
+            "ablated_total_s": 0.018
+          },
+          "check_ignore_run": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.056,
+            "frozen_total_s": 0.065,
+            "ablated_total_s": 0.063
+          },
+          "check_ignore_setup": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.014,
+            "frozen_total_s": 0.014,
+            "ablated_total_s": 0.014
+          },
+          "cli_complete": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "clone_file_state_copy": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "compute_identities": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.032,
+            "frozen_total_s": 0.038,
+            "ablated_total_s": 0.036
+          },
+          "config_load": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "config_recheck": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "connect_sink": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.001,
+            "frozen_total_s": 0.001,
+            "ablated_total_s": 0.001
+          },
+          "declare_config_deps": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "declare_git_control": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.005,
+            "frozen_total_s": 0.005,
+            "ablated_total_s": 0.005
+          },
+          "declare_ignore_files": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "detect_extractors": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.001,
+            "frozen_total_s": 0.001,
+            "ablated_total_s": 0.001
+          },
+          "detect_typescript": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.001,
+            "frozen_total_s": 0.001,
+            "ablated_total_s": 0.001
+          },
+          "discover_git": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.032,
+            "frozen_total_s": 0.032,
+            "ablated_total_s": 0.035
+          },
+          "effective_config": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "effective_config_before": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "encode_append_owners": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.004,
+            "frozen_total_s": 0.005,
+            "ablated_total_s": 0.004
+          },
+          "end_flush_ack": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.035,
+            "frozen_total_s": 0.041,
+            "ablated_total_s": 0.032
+          },
+          "engine_context_fingerprint": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "engine_hash_files": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.148,
+            "frozen_total_s": 0.156,
+            "ablated_total_s": 0.157
+          },
+          "engine_new": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "engine_walk_repo": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.107,
+            "frozen_total_s": 0.132,
+            "ablated_total_s": 0.118
+          },
+          "extractor_need": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.681,
+            "frozen_total_s": 0.026,
+            "ablated_total_s": 0.028
+          },
+          "flags_parsed": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "git_ls_files": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.054,
+            "frozen_total_s": 0.058,
+            "ablated_total_s": 0.056
+          },
+          "graph_inputs_proven": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.086,
+            "frozen_total_s": 0.095,
+            "ablated_total_s": 0.092
+          },
+          "graph_session_run": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 2.932,
+            "frozen_total_s": 3.415,
+            "ablated_total_s": 3.153
+          },
+          "graphinput_build": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.313,
+            "frozen_total_s": 0.342,
+            "ablated_total_s": 0.336
+          },
+          "hash_content_inputs": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.148,
+            "frozen_total_s": 0.156,
+            "ablated_total_s": 0.157
+          },
+          "index_group_owners": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.082,
+            "frozen_total_s": 0.098,
+            "ablated_total_s": 0.084
+          },
+          "invalidation_plan": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.166,
+            "frozen_total_s": 0.194,
+            "ablated_total_s": 0.174
+          },
+          "inventory": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.107,
+            "frozen_total_s": 0.132,
+            "ablated_total_s": 0.118
+          },
+          "load_state": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.276,
+            "frozen_total_s": 0.037,
+            "ablated_total_s": 0.034
+          },
+          "lock": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "open_journal": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "policy_identity": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "promote_compact_state": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.064,
+            "frozen_total_s": 0.077,
+            "ablated_total_s": 0.068
+          },
+          "publish_resolved": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.045,
+            "frozen_total_s": 0.072,
+            "ablated_total_s": 0.045
+          },
+          "publish_scope": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "reconcile_complete": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "register_plugins": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "replay_unacked": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "resolve_graph_target": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.313,
+            "frozen_total_s": 0.342,
+            "ablated_total_s": 0.337
+          },
+          "revalidate_before_begin": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.001,
+            "frozen_total_s": 0.003,
+            "ablated_total_s": 0.002
+          },
+          "revalidate_ts_records": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.109,
+            "frozen_total_s": 0.156,
+            "ablated_total_s": 0.106
+          },
+          "runtime_inputs_complete": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "runtime_inputs_reusable": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.302,
+            "ablated_total_s": 0.304
+          },
+          "runtime_inputs_reused": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "select_hash_targets": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.01,
+            "frozen_total_s": 0.006,
+            "ablated_total_s": 0.006
+          },
+          "session_options": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "state_fingerprint": {
+            "baseline": 2,
+            "frozen": 3,
+            "ablated": 3,
+            "baseline_total_s": 0.048,
+            "frozen_total_s": 0.073,
+            "ablated_total_s": 0.074
+          },
+          "state_json_marshal": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.16,
+            "frozen_total_s": 0.175,
+            "ablated_total_s": 0.161
+          },
+          "state_json_unmarshal": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.24,
+            "frozen_total_s": 0.251,
+            "ablated_total_s": 0.252
+          },
+          "state_proof_bound": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "state_proof_fallback_decode": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "state_proof_promoted": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 0,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.005,
+            "ablated_total_s": 0
+          },
+          "state_proof_refused": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.745,
+            "ablated_total_s": 0.722
+          },
+          "state_proof_unavailable": {
+            "baseline": 0,
+            "frozen": 0,
+            "ablated": 2,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0,
+            "ablated_total_s": 0.0
+          },
+          "state_proof_written": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 0,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.042,
+            "ablated_total_s": 0
+          },
+          "state_read_bytes": {
+            "baseline": 1,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.013,
+            "frozen_total_s": 0.029,
+            "ablated_total_s": 0.027
+          },
+          "transaction_enter": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "ts_compose_modules": {
+            "baseline": 2,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.004,
+            "frozen_total_s": 0.005,
+            "ablated_total_s": 0.005
+          },
+          "ts_config_inputs": {
+            "baseline": 2,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.26,
+            "frozen_total_s": 0.282,
+            "ablated_total_s": 0.273
+          },
+          "ts_detect_frameworks": {
+            "baseline": 2,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "ts_dirty_scope": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.099,
+            "frozen_total_s": 0.104,
+            "ablated_total_s": 0.103
+          },
+          "ts_disc_alias_roots": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.074,
+            "frozen_total_s": 0.082,
+            "ablated_total_s": 0.082
+          },
+          "ts_disc_nuxt_packages": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.111,
+            "frozen_total_s": 0.123,
+            "ablated_total_s": 0.122
+          },
+          "ts_disc_package_aliases": {
+            "baseline": 2,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "ts_disc_package_exports": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "ts_disc_package_gates": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.001,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "ts_disc_package_names": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "ts_discovery": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.196,
+            "frozen_total_s": 0.224,
+            "ablated_total_s": 0.216
+          },
+          "ts_discovery_build": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.196,
+            "frozen_total_s": 0.224,
+            "ablated_total_s": 0.216
+          },
+          "ts_extract_session": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "ts_frozen_preview": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.688,
+            "frozen_total_s": 0.745,
+            "ablated_total_s": 0.725
+          },
+          "ts_graphql_grpc_index": {
+            "baseline": 2,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.196,
+            "frozen_total_s": 0.204,
+            "ablated_total_s": 0.202
+          },
+          "ts_mapfiles_aggregate": {
+            "baseline": 2,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.325,
+            "frozen_total_s": 0.357,
+            "ablated_total_s": 0.346
+          },
+          "ts_read_dirty": {
+            "baseline": 2,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.016,
+            "frozen_total_s": 0.016,
+            "ablated_total_s": 0.011
+          },
+          "ts_session_context": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.055,
+            "frozen_total_s": 0.054,
+            "ablated_total_s": 0.056
+          },
+          "walk_tree": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.118,
+            "frozen_total_s": 0.128,
+            "ablated_total_s": 0.126
+          },
+          "write_pending_state": {
+            "baseline": 1,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0.356,
+            "frozen_total_s": 0.449,
+            "ablated_total_s": 0.36
+          }
+        },
+        "marks_absent_from_baseline": {
+          "runtime_inputs_reusable": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.302,
+            "ablated_total_s": 0.304
+          },
+          "runtime_inputs_reused": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "state_proof_bound": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "state_proof_fallback_decode": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "ablated_total_s": 0.0
+          },
+          "state_proof_promoted": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 0,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.005,
+            "ablated_total_s": 0
+          },
+          "state_proof_refused": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.745,
+            "ablated_total_s": 0.722
+          },
+          "state_proof_written": {
+            "baseline": 0,
+            "frozen": 1,
+            "ablated": 0,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.042,
+            "ablated_total_s": 0
+          }
+        },
+        "marks_the_candidate_calls_more_often": {
+          "state_fingerprint": {
+            "baseline": 2,
+            "frozen": 3,
+            "ablated": 3,
+            "baseline_total_s": 0.048,
+            "frozen_total_s": 0.073,
+            "ablated_total_s": 0.074
+          },
+          "state_read_bytes": {
+            "baseline": 1,
+            "frozen": 2,
+            "ablated": 2,
+            "baseline_total_s": 0.013,
+            "frozen_total_s": 0.029,
+            "ablated_total_s": 0.027
+          }
+        },
+        "marks_absent_from_candidate": {},
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 11,
+              "source content": 1
+            }
+          },
+          "RunID": "stage21-ablate-product-stage21-ablate-seed-3-1790325340591553000",
+          "BaseGeneration": 2,
+          "TargetGeneration": 3,
+          "Stats": {
+            "files_read": 116,
+            "files_parsed": 12,
+            "cached_files": 4022,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 117,
+            "derived_indexes": 8,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 12,
+          "ParsedFiles": 12,
+          "EarlyLocal": 0
+        },
+        "graph_hash": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666",
+        "wall_seconds": 3.2701,
+        "process_real_s": 3.26,
+        "rss_bytes": 510115840.0,
+        "pinned": {
+          "state_json_unmarshal": [
+            "[graph-profile] state_json_unmarshal               0.240s  files=4086"
+          ],
+          "state_json_marshal": [
+            "[graph-profile] state_json_marshal                 0.160s  bytes=56635523 files=4086"
+          ],
+          "state_read_bytes": [
+            "[graph-profile] state_read_bytes                   0.013s  state.json bytes=56634804"
+          ],
+          "state_fingerprint": [
+            "[graph-profile] state_fingerprint                  0.023s  bytes=56634804",
+            "[graph-profile] state_fingerprint                  0.025s  write bytes=56635523"
+          ],
+          "load_state": [
+            "[graph-profile] load_state                         0.276s  total= 0.276s  trace=open  files=4086"
+          ],
+          "select_hash_targets": [
+            "[graph-profile] select_hash_targets                0.010s  total= 0.118s  trace=inputs  targets=4105"
+          ],
+          "hash_content_inputs": [
+            "[graph-profile] hash_content_inputs                0.148s  total= 0.266s  trace=inputs  targets=4105"
+          ],
+          "write_pending_state": [
+            "[graph-profile] write_pending_state                0.356s  total= 2.471s  trace=session"
+          ],
+          "promote_compact_state": [
+            "[graph-profile] promote_compact_state              0.064s  total= 2.569s  trace=session  parsed=12 published=12"
+          ],
+          "end_flush_ack": [
+            "[graph-profile] end_flush_ack                      0.035s  total= 2.505s  trace=session"
+          ],
+          "graph_session_run": [
+            "[graph-profile] graph_session_run                  2.932s  total= 3.246s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work5/product parsed=12"
+          ],
+          "cli_complete": [
+            "[graph-profile] cli_complete                       0.000s  total= 3.246s  trace=cli  results=1"
+          ]
+        }
+      },
+      "arms_present": [
+        "ablated",
+        "baseline",
+        "frozen"
+      ],
+      "full_cohort_interpretable": true
+    }
+  },
+  "full_cohort_interpretable": true
+}

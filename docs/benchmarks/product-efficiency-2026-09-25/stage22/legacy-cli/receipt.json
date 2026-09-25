@@ -1,0 +1,36 @@
+[
+  {
+    "label": "old-initial",
+    "exit": 0,
+    "wall_s": 0.3913978749187663,
+    "argv": [
+      "/tmp/enola-stage21-root-review/enola-stage20-baseline",
+      "graph",
+      "analyze",
+      "--authoritative-scope",
+      "--events",
+      "/tmp/enola-stage22-legacy-cli/old-initial.events.jsonl",
+      "--state-dir",
+      "/tmp/enola-stage22-legacy-cli/state",
+      "--summary-json",
+      "/tmp/enola-stage22-legacy-cli/repo"
+    ]
+  },
+  {
+    "label": "old-delta",
+    "exit": 2,
+    "wall_s": 0.06794687500223517,
+    "argv": [
+      "/tmp/enola-stage21-root-review/enola-stage20-baseline",
+      "graph",
+      "delta",
+      "--authoritative-scope",
+      "--events",
+      "/tmp/enola-stage22-legacy-cli/old-delta.events.jsonl",
+      "--state-dir",
+      "/tmp/enola-stage22-legacy-cli/state",
+      "--summary-json",
+      "/tmp/enola-stage22-legacy-cli/repo"
+    ]
+  }
+]

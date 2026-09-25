@@ -1,0 +1,45 @@
+[
+  {
+    "Invalidation": {
+      "RawConfigChanged": false,
+      "PolicyReconciled": false,
+      "AddedSources": 0,
+      "RemovedSources": 0,
+      "ContextAffectedSources": 0,
+      "ContextReasons": null,
+      "ParsedByReason": {
+        "initial": 2
+      }
+    },
+    "RunID": "/tmp/enola-stage22-legacy-cli/repo-default-1-1790336678130900000",
+    "BaseGeneration": 0,
+    "TargetGeneration": 1,
+    "Stats": {
+      "files_read": 3,
+      "files_parsed": 2,
+      "cached_files": 0,
+      "graphql_parsed": 1,
+      "sfc_parsed": 0,
+      "summary_scans": 1,
+      "derived_indexes": 1,
+      "discovery_passes": 0
+    },
+    "Fallbacks": [
+      {
+        "extractor": "graph",
+        "scope": "all prior/current file owners",
+        "reason": "frozen scope: global name-resolution domain"
+      },
+      {
+        "extractor": "manifests",
+        "scope": "all files owned by extractor",
+        "reason": "no per-file incremental session; whole-extractor re-run"
+      }
+    ],
+    "Unreadable": null,
+    "OwnersPublished": 2,
+    "ParsedFiles": 2,
+    "EarlyLocal": 0,
+    "Facts": null
+  }
+]

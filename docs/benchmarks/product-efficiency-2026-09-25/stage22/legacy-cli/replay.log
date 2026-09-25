@@ -1,0 +1,5 @@
+=== RUN   TestRootStage22ActualLegacyCLIReplay
+    root_stage22_legacy_replay_test.go:9: three-generation old-to-new replay equals cold, including GraphQL route
+--- PASS: TestRootStage22ActualLegacyCLIReplay (0.00s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	0.563s

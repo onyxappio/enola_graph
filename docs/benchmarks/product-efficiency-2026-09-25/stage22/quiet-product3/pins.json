@@ -1,0 +1,32 @@
+{
+  "product_path": "/tmp/enola-stage16-root-review/product-source",
+  "product_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "files": {
+    "/tmp/enola-stage22-root-acceptance/cli-pairs/cli.py": "94cb4e07996ab45f1a804a260ec6c3f1686f34d78718d9ece2d32466f41826f3",
+    "/tmp/enola-stage22-root-acceptance/cli-pairs/harness_support.py": "95d70a9e3e3a0986fd8a1684524a8c9f2205df5529786979d08376abb46e4cac",
+    "/tmp/enola-stage14-watch-pairs/watch.py": "629fae95963c62b83df4acdc2ea5d6438dd114d67bbca2425b96416eda7538cb",
+    "/tmp/enola-stage9-product-watch-control/bin/benchobserver": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+    "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/run.py": "94caf3654e6283630dca8fbaa558c447d2cb1aade55f7b1bfc406cfba9d14c79",
+    "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/product-graph-scope.yaml": "b81b19598dd74c63084ae11488cb7f4fa7df783b0887d2c42dcf61dc67890bf7",
+    "/tmp/enola-toolchain/bin/nats-server": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af",
+    "/tmp/enola-stage22-root-acceptance/cli-pairs/validate_results.py": "7e4846646167653d6d3de7d3d5d805a02aa889dfe09e4d0b42a61d19173e7b02",
+    "/tmp/enola-stage22-root-acceptance/cli-pairs/run-arm.py": "5c12fbabf0e988b31262e8c997b36c4c3dc15bcb5b720efd8d34bdcc1645ae1b",
+    "/tmp/enola-stage22-root-acceptance/run-timing-series.py": "28f8de7e8e39e8008a56650099c1dc728dcd3d8c82cab12f13f4f7590ff72d68",
+    "/tmp/enola-stage22-root-acceptance/summarize-timing.py": "e96ccec6b8402d7ad0a814eae60d4c39d00f1b132181835876efcc745677b69e",
+    "/tmp/enola-stage22-root-acceptance/test-timing-summary.py": "27f716c868659da27a58370fecd0d02baf7aeec6cadc7ee62fb2c354eed4bc6b"
+  },
+  "binaries": {
+    "baseline": {
+      "path": "/tmp/enola-stage21-root-review/enola-stage20-baseline",
+      "sha256": "99162b12e148c995c0a6e91ff73ffea05f2fb978ec004887f89e35a337006f60"
+    },
+    "candidate": {
+      "path": "/tmp/enola-stage22-root-acceptance/enola-stage22-experimental",
+      "sha256": "a3c19dc902f80248cc14d0e7669bf8c0067d779bd6709741ab756ac7146986d1"
+    }
+  },
+  "baseline_revision": "6db3ed834daab2adf8083ac46dc15ac21b670eb2",
+  "baseline_runtime": "a1dec99086fc1ace834e5616bd31c39ddce0b39b",
+  "experimental_checkpoint": "Stage22 snapshot f06556a0: 13 focused extractor tests passed; experimental Product correctness only, graphsession acceptance pending.",
+  "not_final_acceptance": true
+}

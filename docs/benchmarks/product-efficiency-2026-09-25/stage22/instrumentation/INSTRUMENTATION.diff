@@ -1,0 +1,309 @@
+--- /tmp/enola-stage21-retain/src/internal/extractors/tsextractor/session.go	2026-09-25 07:40:50
++++ internal/extractors/tsextractor/session.go	2026-09-25 13:29:20
+@@ -13,6 +13,7 @@
+ 	"slices"
+ 	"sort"
+ 	"strings"
++	"sync/atomic"
+ 	"time"
+ 
+ 	"github.com/enola-labs/enola/internal/extractors/extcoverage"
+@@ -312,10 +313,28 @@
+ 	}
+ 
+ 	var stats ExtractStats
++	// SCRATCH INSTRUMENTATION. A prior record with Minified set left NuxtScope
++	// empty, which need() reads as "must reparse"; this counts that population
++	// directly rather than inferring it from the skip log.
++	hopNeedMinified := 0
++	hopNeedNoRecord := 0
++	// fillRecord runs after the minified early return, so a minified record
++	// should carry no framework contribution at all. Counted rather than
++	// asserted, because it is the reason a minified file cannot simply be
++	// treated as cached.
++	hopMinifiedWithFramework := 0
+ 	toRead := make([]string, 0, len(tsFiles))
+ 	readSet := make(map[string]bool, len(tsFiles))
+ 	for _, rel := range tsFiles {
+ 		if need(rel) {
++			if rec := prev[rel]; rec == nil {
++				hopNeedNoRecord++
++			} else if rec.Minified {
++				hopNeedMinified++
++				if rec.GraphQLServer || len(rec.GraphQLSDL) > 0 || rec.GRPC != nil {
++					hopMinifiedWithFramework++
++				}
++			}
+ 			toRead = append(toRead, rel)
+ 			readSet[filepath.ToSlash(rel)] = true
+ 		}
+@@ -439,13 +458,19 @@
+ 		}
+ 	}
+ 	tr.Mark("ts_read_dirty", fmt.Sprintf("to_read=%d cached=%d", len(toRead), stats.CachedFiles))
++	graphprofile.Log("hop_need_classification", 0, fmt.Sprintf("to_read=%d prior_minified=%d prior_minified_with_framework=%d no_prior_record=%d all_dirty=%v", len(toRead), hopNeedMinified, hopMinifiedWithFramework, hopNeedNoRecord, allDirty))
+ 
+ 	// GraphQL + gRPC indexes from cached summaries plus newly read files.
+ 	graphqlServer := graphqlServerContext{sdlDocuments: map[string]bool{}}
+ 	grpcIdx := newGRPCStubIndex()
+ 	freshGQL := make(map[string]graphqlFileContribution, len(toRead))
+ 	freshGRPC := make(map[string]*GRPCRecord, len(toRead))
++	// SCRATCH INSTRUMENTATION (Stage22 hop profile). Not for production.
++	var hopCollectNanos, hopMergeNanos, hopCollectMinifiedNanos int64
++	var hopCollectBytes, hopCollectMinifiedBytes int64
++	var hopCollectFiles, hopMergeFiles, hopMergeAbsent, hopCollectMinifiedFiles int
+ 	for _, rel := range tsFiles {
++		hopStage := time.Now()
+ 		if src, ok := sources[rel]; ok {
+ 			g := collectGraphQLContribution(rel, src)
+ 			if possibleGraphQLServerSignal(src) && !isGraphQLDocFile(rel) && !facts.IsTestPath(rel) {
+@@ -461,6 +486,18 @@
+ 			rec := grpcFileContribution(src)
+ 			freshGRPC[rel] = rec
+ 			grpcIdx.mergeFile(rec)
++			hopCollectElapsed := time.Since(hopStage)
++			hopCollectNanos += int64(hopCollectElapsed)
++			hopCollectFiles++
++			hopCollectBytes += int64(len(src))
++			// Framework contribution is collected before isMinifiedSource is ever
++			// consulted, so a minified file pays for it on every hop that rereads
++			// it. Charged separately here, not removed.
++			if rec := prev[rel]; rec != nil && rec.Minified {
++				hopCollectMinifiedNanos += int64(hopCollectElapsed)
++				hopCollectMinifiedBytes += int64(len(src))
++				hopCollectMinifiedFiles++
++			}
+ 			continue
+ 		}
+ 		if rec := prev[rel]; rec != nil {
+@@ -471,12 +508,20 @@
+ 				graphqlServer.sdlDocuments[s] = true
+ 			}
+ 			grpcIdx.mergeFile(rec.GRPC)
++		} else {
++			hopMergeAbsent++
+ 		}
++		hopMergeNanos += int64(time.Since(hopStage))
++		hopMergeFiles++
+ 	}
++	graphprofile.Log("hop_fw_summary_collect", time.Duration(hopCollectNanos), fmt.Sprintf("files=%d of=%d bytes=%d", hopCollectFiles, len(tsFiles), hopCollectBytes))
++	graphprofile.Log("hop_fw_summary_collect_minified", time.Duration(hopCollectMinifiedNanos), fmt.Sprintf("files=%d bytes=%d note=prior_record_minified", hopCollectMinifiedFiles, hopCollectMinifiedBytes))
++	graphprofile.Log("hop_fw_summary_merge", time.Duration(hopMergeNanos), fmt.Sprintf("files=%d of=%d no_prev_record=%d", hopMergeFiles, len(tsFiles), hopMergeAbsent))
+ 	if grpcIdx.empty() {
+ 		grpcIdx = nil
+ 	}
+ 
++	hopNuxt := time.Now()
+ 	if isNuxt {
+ 		aliasRoots = withNuxtRuntimeAliases(aliasRoots, sources, knownFiles, func(rel string) []byte {
+ 			if b, ok := sources[rel]; ok {
+@@ -494,26 +539,49 @@
+ 	for _, p := range nuxtPkgs {
+ 		nuxtAutoByPkg[p] = nuxtAutoComponentIndex(knownFiles, p, nuxtPkgs, pkgDirSet)
+ 	}
++	graphprofile.Log("hop_nuxt_indexes", time.Since(hopNuxt), fmt.Sprintf("nuxt=%v pkgs=%d known_files=%d", isNuxt, len(nuxtPkgs), len(knownFiles)))
+ 
+ 	type fileOut struct {
+ 		res tsFileResult
+ 		rec *FileRecord
+ 	}
+ 	tr.Mark("ts_graphql_grpc_index", fmt.Sprintf("ts_files=%d", len(tsFiles)))
++	// SCRATCH INSTRUMENTATION. The nanos below are summed across goroutines and
++	// are not wall time; hop_mapfiles_wall is the only wall figure here.
++	var hopCachedNanos, hopNeededNanos, hopSurfaceIndexNanos, hopSurfacePeekNanos atomic.Int64
++	var hopCachedFiles, hopNeededFiles, hopSurfaceIndexCalls, hopSurfacePeekCalls atomic.Int64
++	var hopMinifiedSkips, hopMinifiedSkipBytes, hopMinifiedHashNanos atomic.Int64
++	hopMap := time.Now()
++	var hopMapElapsed time.Duration
+ 	perFile := parallel.MapFiles(ctx, tsFiles, func(relFile string) fileOut {
++		hopFile := time.Now()
+ 		if !need(relFile) {
+ 			rec := prev[relFile]
+-			return fileOut{res: resultFromRecord(rec), rec: rec}
++			out := fileOut{res: resultFromRecord(rec), rec: rec}
++			hopCachedNanos.Add(int64(time.Since(hopFile)))
++			hopCachedFiles.Add(1)
++			return out
+ 		}
++		// Everything need() selected, which includes the minified and unreadable
++		// early returns as well as real parses. Not a parse count.
++		defer func() {
++			hopNeededNanos.Add(int64(time.Since(hopFile)))
++			hopNeededFiles.Add(1)
++		}()
+ 		src := sources[relFile]
+ 		rec := &FileRecord{File: relFile}
+ 		if src == nil {
+ 			rec.Unreadable = true
+ 			return fileOut{rec: rec}
+ 		}
++		hopHash := time.Now()
+ 		sum := sha256.Sum256(src)
+ 		rec.Hash = hex.EncodeToString(sum[:])
++		hopHashed := time.Since(hopHash)
+ 		if isMinifiedSource(src) {
++			hopMinifiedSkips.Add(1)
++			hopMinifiedSkipBytes.Add(int64(len(src)))
++			hopMinifiedHashNanos.Add(int64(hopHashed))
+ 			log.Printf("[ts-extractor] skipping minified/bundled file %s", relFile)
+ 			rec.Minified = true
+ 			return fileOut{rec: rec}
+@@ -590,10 +658,13 @@
+ 		// any scan is counted in SummaryScans like every other. Indexing
+ 		// independently would have hidden both - a second full parse per file,
+ 		// uncounted, and a second answer nothing reconciles.
++		hopExport := time.Now()
+ 		if rec.BindsNoImports() {
+ 			rec.ExportSurface = exportCache.index(relFile, readSrc, aliases, knownFiles).surface()
+ 			rec.ExportSurfaceRecorded = true
+ 			rec.ExportSurfaceContextFree = exportCache.peek(relFile).isContextFree()
++			hopSurfaceIndexNanos.Add(int64(time.Since(hopExport)))
++			hopSurfaceIndexCalls.Add(1)
+ 		} else if idx := exportCache.peek(relFile); idx.isContextFree() {
+ 			// A file that binds imports of its own is still worth a recorded
+ 			// surface when its export index names no module: every name a
+@@ -607,6 +678,8 @@
+ 			rec.ExportSurface = idx.surface()
+ 			rec.ExportSurfaceRecorded = true
+ 			rec.ExportSurfaceContextFree = true
++			hopSurfacePeekNanos.Add(int64(time.Since(hopExport)))
++			hopSurfacePeekCalls.Add(1)
+ 		}
+ 		if hooks.OnFileLocal != nil {
+ 			hooks.OnFileLocal(rec)
+@@ -614,6 +687,19 @@
+ 		return fileOut{res: res, rec: rec}
+ 	})
+ 
++	hopMapElapsed = time.Since(hopMap)
++	graphprofile.Log("hop_minified_skipped", time.Duration(hopMinifiedHashNanos.Load()), fmt.Sprintf("files=%d bytes=%d note=hash_only_summed_goroutine", hopMinifiedSkips.Load(), hopMinifiedSkipBytes.Load()))
++	graphprofile.Log("hop_mapfiles_wall", hopMapElapsed, fmt.Sprintf("files=%d cached=%d needed_uncached=%d cached_summed_ns=%d needed_summed_ns=%d note=needed_includes_minified_and_unreadable", len(tsFiles), hopCachedFiles.Load(), hopNeededFiles.Load(), hopCachedNanos.Load(), hopNeededNanos.Load()))
++	// The whole scan cost, taken where a scan actually happens, so it covers
++	// index() callers during extraction as well as the surface branch below.
++	graphprofile.Log("hop_export_scan_total", time.Duration(exportCache.scanNanosTotal()), fmt.Sprintf("scans=%d derived=%d summed_goroutine=true scope=all_index_callers", exportCache.summaryScans(), exportCache.derivedIndexes()))
++	// The post-extraction surface branch only. This is a subset of the scans
++	// above, not an accounting of them.
++	graphprofile.Log("hop_export_surface_index", time.Duration(hopSurfaceIndexNanos.Load()), fmt.Sprintf("calls=%d summed_goroutine=true scope=post_extraction_surface_branch_only", hopSurfaceIndexCalls.Load()))
++	graphprofile.Log("hop_export_surface_peek", time.Duration(hopSurfacePeekNanos.Load()), fmt.Sprintf("calls=%d summed_goroutine=true scope=post_extraction_surface_branch_only", hopSurfacePeekCalls.Load()))
++	hopAgg := time.Now()
++	var hopCloneNanos int64
++	var hopClonedFacts int
+ 	records := make(map[string]*FileRecord, len(tsFiles))
+ 	var allFacts []facts.Fact
+ 	modules := make(map[string]bool)
+@@ -659,13 +745,18 @@
+ 		if len(res.facts) == 0 {
+ 			continue
+ 		}
++		hopClone := time.Now()
+ 		allFacts = append(allFacts, cloneFactSlice(res.facts)...)
++		hopCloneNanos += int64(time.Since(hopClone))
++		hopClonedFacts += len(res.facts)
+ 		modules[factpath.Dir(rel)] = true
+ 	}
+ 	stats.FilesParsed = parsed
+ 	stats.SFCParsed = sfc
+ 	stats.SummaryScans = len(routerFiles) + len(angularRouters) + exportCache.summaryScans()
+ 	stats.DerivedIndexes = exportCache.derivedIndexes()
++	graphprofile.Log("hop_aggregate_serial", time.Since(hopAgg), fmt.Sprintf("files=%d facts=%d routers=%d", len(perFile), len(allFacts), len(routerFiles)))
++	graphprofile.Log("hop_fact_clone", time.Duration(hopCloneNanos), fmt.Sprintf("facts=%d", hopClonedFacts))
+ 	tr.Mark("ts_mapfiles_aggregate", fmt.Sprintf("parsed=%d facts=%d routers=%d scans=%d derived=%d", parsed, len(allFacts), len(routerFiles), stats.SummaryScans, stats.DerivedIndexes))
+ 
+ 	if mounted := composeRouterMounts(routerFiles); len(mounted) > 0 {
+--- /tmp/enola-stage21-retain/src/internal/extractors/tsextractor/reexport_resolve.go	2026-09-25 07:40:50
++++ internal/extractors/tsextractor/reexport_resolve.go	2026-09-25 13:29:20
+@@ -6,6 +6,7 @@
+ 	"strings"
+ 	"sync"
+ 	"sync/atomic"
++	"time"
+ 
+ 	"github.com/enola-labs/enola/internal/extractors/tsutil"
+ 	"github.com/enola-labs/enola/internal/factpath"
+@@ -19,6 +20,10 @@
+ 	byFile  map[string]*namedExportEntry
+ 	scans   *atomic.Int32
+ 	derived *atomic.Int32
++	// SCRATCH INSTRUMENTATION (Stage22). Summed parse time at the single place a
++	// summary scan actually happens, so the figure covers every index() caller
++	// rather than one branch. Summed across goroutines, not wall time.
++	scanNanos *atomic.Int64
+ }
+ 
+ // namedExportEntry is one file's index, parsed once however many goroutines ask
+@@ -51,7 +56,7 @@
+ }
+ 
+ func newNamedExportCache() *namedExportCache {
+-	return &namedExportCache{byFile: map[string]*namedExportEntry{}, scans: &atomic.Int32{}, derived: &atomic.Int32{}}
++	return &namedExportCache{byFile: map[string]*namedExportEntry{}, scans: &atomic.Int32{}, derived: &atomic.Int32{}, scanNanos: &atomic.Int64{}}
+ }
+ 
+ func (c *namedExportCache) summaryScans() int {
+@@ -59,6 +64,15 @@
+ 		return 0
+ 	}
+ 	return int(c.scans.Load())
++}
++
++// scanNanosTotal is scratch instrumentation: summed goroutine time inside the
++// single flight that performs a summary scan.
++func (c *namedExportCache) scanNanosTotal() int64 {
++	if c == nil || c.scanNanos == nil {
++		return 0
++	}
++	return c.scanNanos.Load()
+ }
+ 
+ // derivedIndexes counts entries filled from a tree the extractor had already
+@@ -120,8 +134,12 @@
+ 	}
+ 	c.mu.Unlock()
+ 	entry.once.Do(func() {
++		tScan := time.Now()
+ 		entry.idx = parseNamedExportIndex(file, readSrc, aliases, knownFiles)
+ 		entry.ready.Store(entry.idx)
++		if c.scanNanos != nil {
++			c.scanNanos.Add(int64(time.Since(tScan)))
++		}
+ 		if c.scans != nil {
+ 			c.scans.Add(1)
+ 		}
+--- /tmp/enola-stage21-retain/src/internal/graphsession/persist.go	2026-09-25 09:35:55
++++ internal/graphsession/persist.go	2026-09-25 13:25:34
+@@ -207,6 +207,10 @@
+ 	graphprofile.Since("state_json_marshal", tJSON, fmt.Sprintf("bytes=%d files=%d", len(b), len(st.Files)))
+ 	path := pendingStatePath(dir)
+ 	tmp := path + ".tmp"
++	// SCRATCH INSTRUMENTATION (Stage22 hop profile). Splits the durability
++	// syscalls, which carry no mark in the pinned candidate, from marshal and
++	// from the write-side hash. Not for production.
++	tCreateWrite := time.Now()
+ 	f, err := os.Create(tmp)
+ 	if err != nil {
+ 		return stateFingerprint{}, err
+@@ -216,6 +220,8 @@
+ 		os.Remove(tmp)
+ 		return stateFingerprint{}, err
+ 	}
++	graphprofile.Since("hop_state_create_write", tCreateWrite, fmt.Sprintf("bytes=%d", len(b)))
++	tSync := time.Now()
+ 	if err := f.Sync(); err != nil {
+ 		f.Close()
+ 		os.Remove(tmp)
+@@ -225,12 +231,15 @@
+ 		os.Remove(tmp)
+ 		return stateFingerprint{}, err
+ 	}
++	graphprofile.Since("hop_state_fsync_close", tSync, fmt.Sprintf("bytes=%d", len(b)))
++	tRename := time.Now()
+ 	if err := os.Rename(tmp, path); err != nil {
+ 		return stateFingerprint{}, err
+ 	}
+ 	if err := fsyncDir(dir); err != nil {
+ 		return stateFingerprint{}, err
+ 	}
++	graphprofile.Since("hop_state_rename_dirfsync", tRename, "")
+ 	// The write path digests too, and pays for it. It has no WorkCounters to
+ 	// report into - a checkpoint is written from places that do not own a run's
+ 	// counters - so the cost is left as a trace mark rather than going unrecorded.

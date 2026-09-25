@@ -1,0 +1,302 @@
+{
+  "label": "bounded causal diagnostic; shared load; NOT acceptance timing and NOT a speed claim",
+  "protocol": "one canonical Product path/config/state-dir/context; seed produced once per scenario with the frozen binary; broker stopped, full state dir and JetStream store snapshotted together at rest; each arm restores both to the same paths, starts a fresh broker and a fresh pinned replay observer over an empty output file, and waits for the retained stream to be replayed into a consumer graph whose run id, normalized hash and applied generation equal the seed before its one measured delta",
+  "frozen_binary": "/tmp/enola-stage21-root-review/enola-proof-diagnostic3",
+  "frozen_sha256": "6553bf7c8c847b9eddb22ce4a63c65c96b4d1cf383c89b2d330c5c6bd51fc705",
+  "ablated_binary": "/tmp/enola-stage21-ablate/enola-ablate-noproof2",
+  "ablated_sha256": "4c6cb04fa773b42fe39223f37d5ebb4e5efffd3b87cb72cc5ab226681977c4e5",
+  "ablation_diff": "/tmp/enola-stage21-ablate/ablation2.diff",
+  "ablation_diff_sha256": "5d0ed805bf2d22fe693f2f9c0741b39a047393e4bd06d4bf864434c47d54a950",
+  "product_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "profile": "ts + product-graph-scope.yaml overlay",
+  "observer": "/tmp/enola-stage21-startup-profile/replayobserver",
+  "observer_sha256": "bf5e4ba171d59c80137d63c9f09b0049f4c6d2294c2748ad9a68b7c4e2b4067b",
+  "observer_diff": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-25/stage21/replayobs-source.diff",
+  "seeds": {
+    "seed-body": {
+      "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790324481430933000",
+      "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+      "base_generation": 0,
+      "target_generation": 1,
+      "state_files": 10,
+      "state_sha256": "b75f953d5bf16763ebe93937580cf9472c96bc90432d034c284dbcd2da240151",
+      "proof_sha256": "bf7d276fc9619d0b6180e343255c0a8eeb7b46c179f1ea15b5e97d80770e4989"
+    },
+    "seed-structural": {
+      "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790324513847237000",
+      "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+      "base_generation": 1,
+      "target_generation": 2,
+      "state_files": 10,
+      "state_sha256": "05aab42e30a89b277c2a09ec1537b1d8c27ba8e2bcfd26a6454df3e509da042a",
+      "proof_sha256": "30268a80696066a567ac68e9b894dd80aa19a760c9ddcf5b2b70c9407f28c7a5"
+    }
+  },
+  "runs_executed": 9,
+  "competing_samples": [
+    {
+      "at": 1790324480.983544,
+      "procs": [
+        "65517 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324482.045631,
+      "procs": [
+        "65517 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324483.091282,
+      "procs": [
+        "65517 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324484.1444778,
+      "procs": [
+        "65517 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324485.196081,
+      "procs": [
+        "65517 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324486.245489,
+      "procs": [
+        "65517 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324487.296012,
+      "procs": [
+        "65517 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324488.3372958,
+      "procs": [
+        "65517 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324489.3795142,
+      "procs": [
+        "65517 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324491.477368,
+      "procs": [
+        "66298 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324492.521742,
+      "procs": [
+        "66332 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324493.563067,
+      "procs": [
+        "66332 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324494.608789,
+      "procs": [
+        "66332 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324495.66469,
+      "procs": [
+        "66332 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324496.7068648,
+      "procs": [
+        "66332 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324497.754355,
+      "procs": [
+        "66332 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324498.79809,
+      "procs": [
+        "66332 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324499.8414998,
+      "procs": [
+        "66332 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324500.8908422,
+      "procs": [
+        "66332 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324501.937862,
+      "procs": [
+        "66332 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324502.9877849,
+      "procs": [
+        "66332 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324504.033761,
+      "procs": [
+        "66332 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324505.076693,
+      "procs": [
+        "66332 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324506.1549098,
+      "procs": [
+        "66332 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v1-cold-state --max-begin-bytes 4194304 /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324508.278398,
+      "procs": [
+        "66782 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324509.327987,
+      "procs": [
+        "66782 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324510.3701959,
+      "procs": [
+        "66782 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324511.412977,
+      "procs": [
+        "66782 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324512.461705,
+      "procs": [
+        "66782 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324513.51201,
+      "procs": [
+        "66782 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324514.562909,
+      "procs": [
+        "66782 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324515.610537,
+      "procs": [
+        "66782 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324516.656969,
+      "procs": [
+        "66782 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324517.700542,
+      "procs": [
+        "66782 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324519.795456,
+      "procs": [
+        "67191 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324520.845185,
+      "procs": [
+        "67363 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324521.890273,
+      "procs": [
+        "67363 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324522.931335,
+      "procs": [
+        "67363 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324523.982823,
+      "procs": [
+        "67363 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324525.032875,
+      "procs": [
+        "67363 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324526.0821068,
+      "procs": [
+        "67363 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324527.126092,
+      "procs": [
+        "67363 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324528.1671839,
+      "procs": [
+        "67363 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    },
+    {
+      "at": 1790324529.211489,
+      "procs": [
+        "67363 /private/tmp/enola-fsm-primary-acceptance/index-final-2ecbd8f/enola-v322 graph analyze --config /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold.yaml --summary-json --events /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state-events.jsonl --repo-id landings --context fsm-acceptance --state-dir /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-v2-cold-state --max-begin-bytes 4194304 --authoritative-scope /private/tmp/enola-fsm-primary-acceptance/index-final-corpus-2ecbd8f/landings-source"
+      ]
+    }
+  ]
+}

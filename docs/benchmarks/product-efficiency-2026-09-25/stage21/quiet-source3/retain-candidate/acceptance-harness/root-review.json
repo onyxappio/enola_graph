@@ -1,0 +1,21 @@
+{
+  "reviewed_at_utc": "2026-09-25T09:58:39.746646+00:00",
+  "pin_checks": 16,
+  "pin_failures": 0,
+  "baseline_preflight_exit": 0,
+  "candidate_preflight_exit": 0,
+  "timing_started": false,
+  "scope": "Harness and comparison eligibility only; no performance acceptance",
+  "files": {
+    "ACCEPTANCE_DIFF.txt": "9b1a8d84f3903e7768680fda9a953faf985912232163cfe1f5b8303c250aa579",
+    "final-candidate-acceptance.json": "aada1d85e25e961826c0ae4e47d6a5834a912a79c5b9b4fe3ea5c810f77c9914",
+    "run-timing-series.py": "694d8831a795535fac88d86be03a5e52f189543356003160e1d925364181c7fb",
+    "summarize-timing.py": "e7bbbc45ec5fcc1a98a6b4015bfe2776f0e3313df23875aed69f87313b827ae2",
+    "test-timing-summary.py": "08a9317348a32f0ea00dcd43713eee69cebd64028ab805129c7d5ae0a11819d5",
+    "cli-pairs/run-arm.py": "5c12fbabf0e988b31262e8c997b36c4c3dc15bcb5b720efd8d34bdcc1645ae1b",
+    "cli-pairs/pins.json": "b1168eef05065c28f81a7e5b9fec73c558da6845183e2279048062a267caa210",
+    "cli-pairs/cli.py": "94cb4e07996ab45f1a804a260ec6c3f1686f34d78718d9ece2d32466f41826f3",
+    "cli-pairs/harness_support.py": "95d70a9e3e3a0986fd8a1684524a8c9f2205df5529786979d08376abb46e4cac",
+    "cli-pairs/validate_results.py": "7e4846646167653d6d3de7d3d5d805a02aa889dfe09e4d0b42a61d19173e7b02"
+  }
+}

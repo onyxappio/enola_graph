@@ -1,0 +1,34 @@
+=== RUN   TestMinifiedRecordCarriesFrameworkSummary
+2026/09/25 14:21:07 [ts-extractor] skipping minified/bundled file gen/users/v1/users.client.ts
+--- PASS: TestMinifiedRecordCarriesFrameworkSummary (0.01s)
+=== RUN   TestMinifiedGraphQLProducerRecordCarriesSDL
+2026/09/25 14:21:07 [ts-extractor] skipping minified/bundled file src/server.ts
+--- PASS: TestMinifiedGraphQLProducerRecordCarriesSDL (0.01s)
+=== RUN   TestCompositionSignatureCachedEqualsColdForMinifiedGRPCProducer
+2026/09/25 14:21:07 [ts-extractor] skipping minified/bundled file gen/users/v1/users.client.ts
+--- PASS: TestCompositionSignatureCachedEqualsColdForMinifiedGRPCProducer (0.01s)
+=== RUN   TestCompositionSignatureCachedEqualsColdForMinifiedGraphQLProducer
+2026/09/25 14:21:07 [ts-extractor] skipping minified/bundled file src/server.ts
+--- PASS: TestCompositionSignatureCachedEqualsColdForMinifiedGraphQLProducer (0.02s)
+=== RUN   TestCompositionSignatureRereadsLegacyMinifiedRecord
+--- PASS: TestCompositionSignatureRereadsLegacyMinifiedRecord (0.00s)
+=== RUN   TestCompositionSignatureMinifiedAmbiguityMatchesCold
+--- FAIL: TestCompositionSignatureMinifiedAmbiguityMatchesCold (0.00s)
+panic: runtime error: invalid memory address or nil pointer dereference [recovered, repanicked]
+[signal SIGSEGV: segmentation violation code=0x2 addr=0x18 pc=0x1006d55f4]
+
+goroutine 42 [running]:
+testing.tRunner.func1.2({0x100dbd200, 0x100e0db00})
+	/opt/homebrew/Cellar/go/1.27.1/libexec/src/testing/testing.go:2123 +0x1a0
+testing.tRunner.func1()
+	/opt/homebrew/Cellar/go/1.27.1/libexec/src/testing/testing.go:2126 +0x2c8
+panic({0x100dbd200?, 0x100e0db00?})
+	/opt/homebrew/Cellar/go/1.27.1/libexec/src/runtime/panic.go:859 +0x120
+github.com/enola-labs/enola/internal/extractors/tsextractor.TestCompositionSignatureMinifiedAmbiguityMatchesCold(0x3fb12b7ec248)
+	/private/tmp/enola-stage22-candidate/src/internal/extractors/tsextractor/minified_framework_summary_test.go:210 +0x1c4
+testing.tRunner(0x3fb12b7ec248, 0x100df1e98)
+	/opt/homebrew/Cellar/go/1.27.1/libexec/src/testing/testing.go:2193 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/Cellar/go/1.27.1/libexec/src/testing/testing.go:2258 +0x3b8
+FAIL	github.com/enola-labs/enola/internal/extractors/tsextractor	0.383s
+FAIL

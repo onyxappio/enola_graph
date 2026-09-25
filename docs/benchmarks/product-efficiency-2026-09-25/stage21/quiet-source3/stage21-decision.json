@@ -1,0 +1,19 @@
+{
+  "stage": 21,
+  "candidate_freeze_sha256": "9029305036bfbd4152641e545af02381a60898bdd9b2ac95403cc34fab186b37",
+  "baseline_commit": "6db3ed834daab2adf8083ac46dc15ac21b670eb2",
+  "correctness_accepted": true,
+  "timing_cohort_complete": true,
+  "integration_accepted": false,
+  "reason": "No-op improved18.96%, but body1.36% and structural2.80% slower; changed-file cost investigation remains.",
+  "quiet_release_utc": "2026-09-25T07:29:59Z",
+  "quiet_release_messages": [
+    "msg_75fc8220b3f3",
+    "msg_adee7129aa6b",
+    "msg_718cc2cd9db1"
+  ],
+  "followup_dispatch": "ctx_6b66f230a801",
+  "followup_message": "msg_209f2b411f5e",
+  "allocation_limit": "Earlier4086-target build+stage sample excludes both selections and promotion; exact4105-target full boundary pending.",
+  "goal_complete": false
+}

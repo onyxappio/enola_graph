@@ -1,0 +1,16 @@
+2026/09/25 14:37:09 [ts-extractor] skipping minified/bundled file gen/users/v1/users.client.ts
+--- FAIL: TestMinifiedRecordCarriesFrameworkSummary (0.01s)
+    stage22_review_test.go:135: minified record lost the gRPC contribution: <nil>
+--- FAIL: TestCompositionSignatureRereadsLegacyMinifiedRecord (0.00s)
+    stage22_review_test.go:258: a legacy minified record was consumed as empty:
+         cold  =e12d5ec316a67cd5b52b4df5a8fa87a89f5e1c564c00c425023f5718f9501650
+         cached=df2b1412bf7ddb21df519d15129c243ec1f4dcb8e6a63128b9be6edec5b5527f
+2026/09/25 14:37:09 [ts-extractor] skipping minified/bundled file gen/users/v1/users.client.ts
+--- FAIL: TestMinifiedGRPCStubStillResolvesConsumerAfterReuse (0.01s)
+    stage22_review_test.go:333: the fixture stub is not a minified gRPC producer: &{File:gen/users/v1/users.client.ts Hash:ada764fe6b440ba1fbe823d0f2e48d2fc1e9519a31a8f3df9acc61563cd03dcb Unreadable:false Minified:true Facts:[] ImportSpecs:[] ResolutionSpecs:[] ResolvedFiles:[] Declared:[] Referenced:[] Reexports:[] UnresolvedSpecs:[] ImportComplete:false SideReads:[] SideReadHashes:map[] ExportSurface:[] ExportSurfaceRecorded:false ExportSurfaceContextFree:false DefaultExportName: DefaultExportRecorded:false GraphQLServer:false GraphQLSDL:[] GraphQLParsed:false GRPC:<nil> Router:<nil> ParseKind: AutoImportDirs:[] NuxtAliases:[] NuxtScope:}
+2026/09/25 14:37:09 [ts-extractor] skipping minified/bundled file server.ts
+--- FAIL: TestMinifiedGraphQLServerStillShapesConsumerAfterReuse (0.01s)
+    stage22_review_test.go:380: the fixture producer is not a minified GraphQL server: &{File:server.ts Hash:a5b9a0ae6e1a5fe6883eccb20c83822273296907207b0860d159c59368c7b32b Unreadable:false Minified:true Facts:[] ImportSpecs:[] ResolutionSpecs:[] ResolvedFiles:[] Declared:[] Referenced:[] Reexports:[] UnresolvedSpecs:[] ImportComplete:false SideReads:[] SideReadHashes:map[] ExportSurface:[] ExportSurfaceRecorded:false ExportSurfaceContextFree:false DefaultExportName: DefaultExportRecorded:false GraphQLServer:false GraphQLSDL:[] GraphQLParsed:false GRPC:<nil> Router:<nil> ParseKind: AutoImportDirs:[] NuxtAliases:[] NuxtScope:}
+FAIL
+FAIL	github.com/enola-labs/enola/internal/extractors/tsextractor	0.458s
+FAIL

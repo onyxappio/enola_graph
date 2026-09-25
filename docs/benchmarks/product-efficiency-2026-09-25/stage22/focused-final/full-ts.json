@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-overlay",
+    "/tmp/enola-stage22-root-signature/final-extractor-overlay.json",
+    "-count=1",
+    "./internal/extractors/tsextractor"
+  ],
+  "exit": 0,
+  "wall_s": 21.256538334069774
+}

@@ -1,0 +1,55 @@
+--- /tmp/enola-stage21-proof/src/internal/graphsession/stateproof_commit.go	2026-09-25 08:55:57
++++ src/internal/graphsession/stateproof_commit.go	2026-09-25 11:15:00
+@@ -37,6 +37,21 @@
+ // those are different lists. The next startup meets these keys, so these are the
+ // keys the recorded stability has to be about.
+ func (s *session) commitProof(st *State, fp stateFingerprint, inv engine.RepoInventory, detected map[string]bool, hashes map[string]string, where proofDisposition) {
++	if ablateProofProduction {
++		// Diagnostic ablation only. Nothing is produced, and the run takes the
++		// same optional-proof-unavailable path a real refusal takes, so any
++		// sidecar left by an earlier generation is discarded rather than left to
++		// be trusted against a state it no longer describes.
++		//
++		// The cleanup is timed explicitly because state_proof_unavailable logs a
++		// zero duration: the discard still fsyncs its directory, and without a
++		// mark that cost would be invisible and the frozen arm's whole production
++		// cost would read as saved time.
++		cleanup := time.Now()
++		s.proofUnavailable(where, "diagnostic ablation: proof production disabled")
++		graphprofile.Log("ablation_proof_cleanup_stage", time.Since(cleanup), fmt.Sprintf("where=%v", where))
++		return
++	}
+ 	dir := s.opts.StateDir
+ 	// start covers everything this function does, so a refusal is charged for
+ 	// whatever it spent before refusing rather than reported as free.
+@@ -104,6 +119,15 @@
+ // so the staging duration commitProof recorded is not the whole cost of that
+ // proof and is not reported as if it were.
+ func (s *session) promoteProof() {
++	if ablateProofProduction {
++		// Nothing was staged, so there is nothing to install. The committed
++		// sidecar is discarded for the same reason as above.
++		// Timed for the same reason as the staging cleanup above.
++		cleanup := time.Now()
++		s.proofUnavailable(proofForCommitted, "diagnostic ablation: proof production disabled")
++		graphprofile.Log("ablation_proof_cleanup_promote", time.Since(cleanup), "")
++		return
++	}
+ 	start := time.Now()
+ 	reject := promotePendingProof(s.opts.StateDir)
+ 	if reject != "" {
+--- /dev/null	2026-09-25 11:20:30
++++ src/internal/graphsession/zz_ablation.go	2026-09-25 10:47:00
+@@ -0,0 +1,12 @@
++package graphsession
++
++// ablateProofProduction removes the new proof production this stage adds to the
++// commit path, and nothing else. Startup proof reading, the predicate, capture
++// reuse, typed state persistence, every fence, Begin/End/ACK and recovery are
++// untouched, so a run on this binary still proves and publishes exactly what the
++// frozen candidate does; it simply leaves no sidecar behind for the next run.
++//
++// This file exists only in the diagnostic ablation tree
++// /tmp/enola-stage21-ablate/src. It is not in the frozen candidate, not in
++// stage21-proof-capture.patch, and is not proposed for production.
++const ablateProofProduction = true

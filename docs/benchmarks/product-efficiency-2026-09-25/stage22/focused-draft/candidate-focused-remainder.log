@@ -1,0 +1,21 @@
+=== RUN   TestCompositionSignatureUnreadableRecordIsNotReread
+--- PASS: TestCompositionSignatureUnreadableRecordIsNotReread (0.00s)
+=== RUN   TestMinifiedRecordIsNotRereadOnUnchangedSecondExtract
+2026/09/25 14:21:59 [ts-extractor] skipping minified/bundled file gen/users/v1/users.client.ts
+--- PASS: TestMinifiedRecordIsNotRereadOnUnchangedSecondExtract (0.02s)
+=== RUN   TestLegacyMinifiedRecordRefreshesOnceThenIsSkipped
+2026/09/25 14:21:59 [ts-extractor] skipping minified/bundled file gen/users/v1/users.client.ts
+--- PASS: TestLegacyMinifiedRecordRefreshesOnceThenIsSkipped (0.01s)
+=== RUN   TestMinifiedRecordRereadWhenBytesChange
+2026/09/25 14:21:59 [ts-extractor] skipping minified/bundled file gen/dra.ts
+2026/09/25 14:21:59 [ts-extractor] skipping minified/bundled file gen/dra.ts
+--- PASS: TestMinifiedRecordRereadWhenBytesChange (0.01s)
+=== RUN   TestMinifiedBoundaryTransitionsBothWays
+2026/09/25 14:21:59 [ts-extractor] skipping minified/bundled file src/lib.ts
+--- PASS: TestMinifiedBoundaryTransitionsBothWays (0.01s)
+=== RUN   TestMinifiedRecordRereadWhenNuxtScopeMoves
+2026/09/25 14:21:59 [ts-extractor] skipping minified/bundled file apps/web/gen/dra.ts
+2026/09/25 14:21:59 [ts-extractor] skipping minified/bundled file apps/web/gen/dra.ts
+--- PASS: TestMinifiedRecordRereadWhenNuxtScopeMoves (0.02s)
+PASS
+ok  	github.com/enola-labs/enola/internal/extractors/tsextractor	0.400s

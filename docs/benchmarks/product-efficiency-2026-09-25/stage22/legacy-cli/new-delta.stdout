@@ -1,0 +1,46 @@
+[
+  {
+    "Invalidation": {
+      "RawConfigChanged": false,
+      "PolicyReconciled": false,
+      "AddedSources": 0,
+      "RemovedSources": 0,
+      "ContextAffectedSources": 0,
+      "ContextReasons": null,
+      "ParsedByReason": {
+        "global fallback": 1,
+        "source content": 1
+      }
+    },
+    "RunID": "/tmp/enola-stage22-legacy-cli/repo-default-3-1790336590631323000",
+    "BaseGeneration": 2,
+    "TargetGeneration": 3,
+    "Stats": {
+      "files_read": 3,
+      "files_parsed": 2,
+      "cached_files": 0,
+      "graphql_parsed": 1,
+      "sfc_parsed": 0,
+      "summary_scans": 1,
+      "derived_indexes": 1,
+      "discovery_passes": 0
+    },
+    "Fallbacks": [
+      {
+        "extractor": "typescript",
+        "scope": "all owned files",
+        "reason": "graphql/grpc/nuxt composition context changed; re-extracting affected TypeScript files"
+      },
+      {
+        "extractor": "graph",
+        "scope": "all prior/current file owners",
+        "reason": "frozen scope: global name-resolution domain"
+      }
+    ],
+    "Unreadable": null,
+    "OwnersPublished": 2,
+    "ParsedFiles": 2,
+    "EarlyLocal": 0,
+    "Facts": null
+  }
+]

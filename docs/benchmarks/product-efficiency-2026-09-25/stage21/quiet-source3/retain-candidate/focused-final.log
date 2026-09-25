@@ -1,0 +1,26 @@
+=== RUN   TestDeferredDecodeRefusesEveryShapeOfRewrite
+=== RUN   TestDeferredDecodeRefusesEveryShapeOfRewrite/same_length_in_place,_timestamps_restored
+=== RUN   TestDeferredDecodeRefusesEveryShapeOfRewrite/replaced_with_a_different_state
+=== RUN   TestDeferredDecodeRefusesEveryShapeOfRewrite/truncated
+=== RUN   TestDeferredDecodeRefusesEveryShapeOfRewrite/removed
+--- PASS: TestDeferredDecodeRefusesEveryShapeOfRewrite (1.16s)
+    --- PASS: TestDeferredDecodeRefusesEveryShapeOfRewrite/same_length_in_place,_timestamps_restored (0.32s)
+    --- PASS: TestDeferredDecodeRefusesEveryShapeOfRewrite/replaced_with_a_different_state (0.27s)
+    --- PASS: TestDeferredDecodeRefusesEveryShapeOfRewrite/truncated (0.29s)
+    --- PASS: TestDeferredDecodeRefusesEveryShapeOfRewrite/removed (0.28s)
+=== RUN   TestRetryAfterARefusedDecodeStillSeesTheRewrite
+--- PASS: TestRetryAfterARefusedDecodeStillSeesTheRewrite (0.29s)
+=== RUN   TestAdmittedProofReleasesTheBytesAndTheNextRefusalStillDecodes
+--- PASS: TestAdmittedProofReleasesTheBytesAndTheNextRefusalStillDecodes (0.54s)
+=== RUN   TestCloseBeforeAnyTransactionReleasesTheRetainedState
+--- PASS: TestCloseBeforeAnyTransactionReleasesTheRetainedState (0.27s)
+=== RUN   TestRefusedDeferralDigestsTheStateOnce
+--- PASS: TestRefusedDeferralDigestsTheStateOnce (0.51s)
+=== RUN   TestTransactionRefusesARewrittenStateWithoutPublishing
+--- PASS: TestTransactionRefusesARewrittenStateWithoutPublishing (0.55s)
+=== RUN   TestFailureBeforeTheDecodeReleasesTheBytesAndRetryStillWorks
+--- PASS: TestFailureBeforeTheDecodeReleasesTheBytesAndRetryStillWorks (0.32s)
+=== RUN   TestRecheckCommittedDoesNotTouchTheRetainedBuffer
+--- PASS: TestRecheckCommittedDoesNotTouchTheRetainedBuffer (0.00s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	4.172s

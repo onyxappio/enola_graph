@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "go",
+    "build",
+    "-overlay",
+    "/tmp/enola-stage22-root-signature/final-extractor-overlay.json",
+    "-o",
+    "/tmp/enola-stage22-root-acceptance/enola-stage22-experimental",
+    "./cmd/enola"
+  ],
+  "exit": 0,
+  "wall_s": 4.85131945903413,
+  "revision": "6db3ed834daab2adf8083ac46dc15ac21b670eb2",
+  "production_source_sha256": "f06556a0e96ca71dc07e318f119130f0e80f5ff031b14dccadead2be9fb57797",
+  "experimental": true,
+  "binary_sha256": "a3c19dc902f80248cc14d0e7669bf8c0067d779bd6709741ab756ac7146986d1"
+}

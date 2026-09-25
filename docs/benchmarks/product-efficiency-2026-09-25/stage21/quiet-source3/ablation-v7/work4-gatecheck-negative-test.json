@@ -1,0 +1,1358 @@
+{
+  "unmeasured_runs": [
+    "seed-body-analyze",
+    "seed-structural-analyze",
+    "seed-structural-body",
+    "cold-body",
+    "cold-structural"
+  ],
+  "scenarios": {
+    "body": {
+      "gates": {
+        "both_arms_exit_zero": true,
+        "both_arms_generation_advanced": true,
+        "both_arms_bound_their_seed_proof": true,
+        "both_arms_reused_capture": true,
+        "seeds_byte_identical_across_arms": true,
+        "both_arms_replayed_the_seed_graph": true,
+        "base_generation_equal": true,
+        "target_generation_equal": true,
+        "parsed_files_equal": true,
+        "owners_published_equal": true,
+        "full_result_equal_except_run_id": true,
+        "each_arm_wire_run_id_matches_its_result": true,
+        "arms_have_distinct_run_ids": true,
+        "arms_agree_on_graph": true,
+        "frozen_delta_equals_cold_graph": true,
+        "ablated_delta_equals_cold_graph": true,
+        "frozen_produced_and_promoted_a_proof": true,
+        "ablated_produced_no_proof": true
+      },
+      "failed_gates": [],
+      "interpretable": true,
+      "seed": {
+        "frozen": {
+          "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790324481430933000",
+          "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+          "base_generation": 0,
+          "target_generation": 1,
+          "state_files": 10,
+          "state_sha256": "b75f953d5bf16763ebe93937580cf9472c96bc90432d034c284dbcd2da240151",
+          "proof_sha256": "bf7d276fc9619d0b6180e343255c0a8eeb7b46c179f1ea15b5e97d80770e4989"
+        },
+        "ablated": {
+          "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790324481430933000",
+          "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+          "base_generation": 0,
+          "target_generation": 1,
+          "state_files": 10,
+          "state_sha256": "b75f953d5bf16763ebe93937580cf9472c96bc90432d034c284dbcd2da240151",
+          "proof_sha256": "bf7d276fc9619d0b6180e343255c0a8eeb7b46c179f1ea15b5e97d80770e4989"
+        }
+      },
+      "restored_state_manifest_equal": true,
+      "replay": {
+        "frozen": {
+          "replayed_frames": 1,
+          "matched": {
+            "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790324481430933000",
+            "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+            "base_generation": 0,
+            "applied_generation": 1
+          }
+        },
+        "ablated": {
+          "replayed_frames": 1,
+          "matched": {
+            "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790324481430933000",
+            "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+            "base_generation": 0,
+            "applied_generation": 1
+          }
+        }
+      },
+      "run_ids": {
+        "frozen": "stage21-ablate-product-stage21-ablate-seed-2-1790324494521040000",
+        "ablated": "stage21-ablate-product-stage21-ablate-seed-2-1790324500786108000",
+        "frozen_wire": "stage21-ablate-product-stage21-ablate-seed-2-1790324494521040000",
+        "ablated_wire": "stage21-ablate-product-stage21-ablate-seed-2-1790324500786108000"
+      },
+      "results": {
+        "frozen": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 10,
+              "source content": 1
+            }
+          },
+          "RunID": "stage21-ablate-product-stage21-ablate-seed-2-1790324494521040000",
+          "BaseGeneration": 1,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 115,
+            "files_parsed": 11,
+            "cached_files": 4023,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 117,
+            "derived_indexes": 8,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 11,
+          "ParsedFiles": 11,
+          "EarlyLocal": 0
+        },
+        "ablated": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 10,
+              "source content": 1
+            }
+          },
+          "RunID": "stage21-ablate-product-stage21-ablate-seed-2-1790324500786108000",
+          "BaseGeneration": 1,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 115,
+            "files_parsed": 11,
+            "cached_files": 4023,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 117,
+            "derived_indexes": 8,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 11,
+          "ParsedFiles": 11,
+          "EarlyLocal": 0
+        }
+      },
+      "graph_hashes": {
+        "frozen": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+        "ablated": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+        "cold": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784"
+      },
+      "fallbacks": {
+        "frozen": [
+          "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+        ],
+        "ablated": [
+          "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+        ]
+      },
+      "wall_seconds": {
+        "frozen": 3.5449,
+        "ablated": 4.4434,
+        "delta_s": 0.8985
+      },
+      "process_real_s": {
+        "frozen": 3.54,
+        "ablated": 4.43
+      },
+      "rss_bytes": {
+        "frozen": 594706432.0,
+        "ablated": 645464064.0
+      },
+      "costs_that_disappear_with_the_ablation": {
+        "state_proof_promoted": {
+          "frozen_s": [
+            0.005
+          ],
+          "ablated_s": [],
+          "frozen_total_s": 0.005,
+          "ablated_total_s": 0,
+          "delta_s": -0.005,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 0,
+          "only_on": "frozen"
+        },
+        "state_proof_written": {
+          "frozen_s": [
+            0.029
+          ],
+          "ablated_s": [],
+          "frozen_total_s": 0.029,
+          "ablated_total_s": 0,
+          "delta_s": -0.029,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 0,
+          "only_on": "frozen"
+        }
+      },
+      "marks_only_on_the_ablated_arm": {
+        "ablation_proof_cleanup_promote": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.005
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.005,
+          "delta_s": 0.005,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 1,
+          "only_on": "ablated"
+        },
+        "ablation_proof_cleanup_stage": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.005
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.005,
+          "delta_s": 0.005,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 1,
+          "only_on": "ablated"
+        },
+        "state_proof_unavailable": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.0,
+            0.0
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.0,
+          "delta_s": 0.0,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 2,
+          "only_on": "ablated"
+        }
+      },
+      "marks_on_both_arms_differing_by_5ms_or_more": {
+        "assemble_new_files": {
+          "frozen_s": [
+            0.174
+          ],
+          "ablated_s": [
+            0.169
+          ],
+          "frozen_total_s": 0.174,
+          "ablated_total_s": 0.169,
+          "delta_s": -0.005,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "begin_publish": {
+          "frozen_s": [
+            0.071
+          ],
+          "ablated_s": [
+            0.09
+          ],
+          "frozen_total_s": 0.071,
+          "ablated_total_s": 0.09,
+          "delta_s": 0.019,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "discover_git": {
+          "frozen_s": [
+            0.038
+          ],
+          "ablated_s": [
+            0.032
+          ],
+          "frozen_total_s": 0.038,
+          "ablated_total_s": 0.032,
+          "delta_s": -0.006,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "git_ls_files": {
+          "frozen_s": [
+            0.06
+          ],
+          "ablated_s": [
+            0.053
+          ],
+          "frozen_total_s": 0.06,
+          "ablated_total_s": 0.053,
+          "delta_s": -0.007,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "graph_session_run": {
+          "frozen_s": [
+            3.183
+          ],
+          "ablated_s": [
+            3.221
+          ],
+          "frozen_total_s": 3.183,
+          "ablated_total_s": 3.221,
+          "delta_s": 0.038,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "graphinput_build": {
+          "frozen_s": [
+            0.332
+          ],
+          "ablated_s": [
+            0.316
+          ],
+          "frozen_total_s": 0.332,
+          "ablated_total_s": 0.316,
+          "delta_s": -0.016,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "promote_compact_state": {
+          "frozen_s": [
+            0.09
+          ],
+          "ablated_s": [
+            0.114
+          ],
+          "frozen_total_s": 0.09,
+          "ablated_total_s": 0.114,
+          "delta_s": 0.024,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "resolve_graph_target": {
+          "frozen_s": [
+            0.332
+          ],
+          "ablated_s": [
+            0.317
+          ],
+          "frozen_total_s": 0.332,
+          "ablated_total_s": 0.317,
+          "delta_s": -0.015,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "revalidate_ts_records": {
+          "frozen_s": [
+            0.108
+          ],
+          "ablated_s": [
+            0.114
+          ],
+          "frozen_total_s": 0.108,
+          "ablated_total_s": 0.114,
+          "delta_s": 0.006,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "state_proof_refused": {
+          "frozen_s": [
+            0.688
+          ],
+          "ablated_s": [
+            0.676
+          ],
+          "frozen_total_s": 0.688,
+          "ablated_total_s": 0.676,
+          "delta_s": -0.012,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "ts_discovery": {
+          "frozen_s": [
+            0.21
+          ],
+          "ablated_s": [
+            0.203
+          ],
+          "frozen_total_s": 0.21,
+          "ablated_total_s": 0.203,
+          "delta_s": -0.007,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "ts_discovery_build": {
+          "frozen_s": [
+            0.21
+          ],
+          "ablated_s": [
+            0.203
+          ],
+          "frozen_total_s": 0.21,
+          "ablated_total_s": 0.203,
+          "delta_s": -0.007,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "write_pending_state": {
+          "frozen_s": [
+            0.395
+          ],
+          "ablated_s": [
+            0.403
+          ],
+          "frozen_total_s": 0.395,
+          "ablated_total_s": 0.403,
+          "delta_s": 0.008,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        }
+      },
+      "occurrence_count_differences": {
+        "ablation_proof_cleanup_promote": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.005
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.005,
+          "delta_s": 0.005,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 1,
+          "only_on": "ablated"
+        },
+        "ablation_proof_cleanup_stage": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.005
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.005,
+          "delta_s": 0.005,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 1,
+          "only_on": "ablated"
+        },
+        "state_proof_promoted": {
+          "frozen_s": [
+            0.005
+          ],
+          "ablated_s": [],
+          "frozen_total_s": 0.005,
+          "ablated_total_s": 0,
+          "delta_s": -0.005,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 0,
+          "only_on": "frozen"
+        },
+        "state_proof_unavailable": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.0,
+            0.0
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.0,
+          "delta_s": 0.0,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 2,
+          "only_on": "ablated"
+        },
+        "state_proof_written": {
+          "frozen_s": [
+            0.029
+          ],
+          "ablated_s": [],
+          "frozen_total_s": 0.029,
+          "ablated_total_s": 0,
+          "delta_s": -0.029,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 0,
+          "only_on": "frozen"
+        }
+      },
+      "pinned": {
+        "frozen": {
+          "state_proof_bound": [
+            "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634804"
+          ],
+          "runtime_inputs_reused": [
+            "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+          ],
+          "runtime_inputs_reusable": [
+            "[graph-profile] runtime_inputs_reusable            0.301s  total= 1.074s  trace=reconcile  targets=4105"
+          ],
+          "state_proof_refused": [
+            "[graph-profile] state_proof_refused                0.688s  total= 0.773s  trace=reconcile  inventory scan digest moved"
+          ],
+          "state_proof_written": [
+            "[graph-profile] state_proof_written                0.029s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19679291"
+          ],
+          "state_proof_promoted": [
+            "[graph-profile] state_proof_promoted               0.005s"
+          ],
+          "state_proof_fallback_decode": [
+            "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+          ],
+          "state_json_unmarshal": [
+            "[graph-profile] state_json_unmarshal               0.247s  files=4086"
+          ],
+          "state_json_marshal": [
+            "[graph-profile] state_json_marshal                 0.165s  bytes=56634804 files=4086"
+          ],
+          "state_read_bytes": [
+            "[graph-profile] state_read_bytes                   0.013s  state.json bytes=56634804",
+            "[graph-profile] state_read_bytes                   0.018s  state.json bytes=56634804"
+          ],
+          "state_fingerprint": [
+            "[graph-profile] state_fingerprint                  0.024s  bytes=56634804",
+            "[graph-profile] state_fingerprint                  0.024s  bytes=56634804",
+            "[graph-profile] state_fingerprint                  0.024s  write bytes=56634804"
+          ],
+          "load_state": [
+            "[graph-profile] load_state                         0.040s  total= 0.040s  trace=open  deferred owners=4086"
+          ],
+          "select_hash_targets": [
+            "[graph-profile] select_hash_targets                0.006s  total= 0.123s  trace=inputs  targets=4105"
+          ],
+          "hash_content_inputs": [
+            "[graph-profile] hash_content_inputs                0.143s  total= 0.266s  trace=inputs  targets=4105"
+          ],
+          "write_pending_state": [
+            "[graph-profile] write_pending_state                0.395s  total= 1.946s  trace=session"
+          ],
+          "promote_compact_state": [
+            "[graph-profile] promote_compact_state              0.090s  total= 2.069s  trace=session  parsed=11 published=11"
+          ],
+          "end_flush_ack": [
+            "[graph-profile] end_flush_ack                      0.032s  total= 1.979s  trace=session"
+          ],
+          "graph_session_run": [
+            "[graph-profile] graph_session_run                  3.183s  total= 3.516s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work4/product parsed=11"
+          ],
+          "cli_complete": [
+            "[graph-profile] cli_complete                       0.000s  total= 3.516s  trace=cli  results=1"
+          ]
+        },
+        "ablated": {
+          "state_proof_bound": [
+            "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634804"
+          ],
+          "runtime_inputs_reused": [
+            "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+          ],
+          "runtime_inputs_reusable": [
+            "[graph-profile] runtime_inputs_reusable            0.300s  total= 1.062s  trace=reconcile  targets=4105"
+          ],
+          "state_proof_refused": [
+            "[graph-profile] state_proof_refused                0.676s  total= 0.761s  trace=reconcile  inventory scan digest moved"
+          ],
+          "state_proof_unavailable": [
+            "[graph-profile] state_proof_unavailable            0.000s  diagnostic ablation: proof production disabled",
+            "[graph-profile] state_proof_unavailable            0.000s  diagnostic ablation: proof production disabled"
+          ],
+          "ablation_proof_cleanup_stage": [
+            "[graph-profile] ablation_proof_cleanup_stage       0.005s  where=1"
+          ],
+          "ablation_proof_cleanup_promote": [
+            "[graph-profile] ablation_proof_cleanup_promote     0.005s"
+          ],
+          "state_proof_fallback_decode": [
+            "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+          ],
+          "state_json_unmarshal": [
+            "[graph-profile] state_json_unmarshal               0.247s  files=4086"
+          ],
+          "state_json_marshal": [
+            "[graph-profile] state_json_marshal                 0.167s  bytes=56634804 files=4086"
+          ],
+          "state_read_bytes": [
+            "[graph-profile] state_read_bytes                   0.013s  state.json bytes=56634804",
+            "[graph-profile] state_read_bytes                   0.019s  state.json bytes=56634804"
+          ],
+          "state_fingerprint": [
+            "[graph-profile] state_fingerprint                  0.024s  bytes=56634804",
+            "[graph-profile] state_fingerprint                  0.024s  bytes=56634804",
+            "[graph-profile] state_fingerprint                  0.026s  write bytes=56634804"
+          ],
+          "load_state": [
+            "[graph-profile] load_state                         0.037s  total= 0.038s  trace=open  deferred owners=4086"
+          ],
+          "select_hash_targets": [
+            "[graph-profile] select_hash_targets                0.006s  total= 0.121s  trace=inputs  targets=4105"
+          ],
+          "hash_content_inputs": [
+            "[graph-profile] hash_content_inputs                0.139s  total= 0.260s  trace=inputs  targets=4105"
+          ],
+          "write_pending_state": [
+            "[graph-profile] write_pending_state                0.403s  total= 1.971s  trace=session"
+          ],
+          "promote_compact_state": [
+            "[graph-profile] promote_compact_state              0.114s  total= 2.120s  trace=session  parsed=11 published=11"
+          ],
+          "end_flush_ack": [
+            "[graph-profile] end_flush_ack                      0.035s  total= 2.006s  trace=session"
+          ],
+          "graph_session_run": [
+            "[graph-profile] graph_session_run                  3.221s  total= 3.540s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work4/product parsed=11"
+          ],
+          "cli_complete": [
+            "[graph-profile] cli_complete                       0.000s  total= 3.540s  trace=cli  results=1"
+          ]
+        }
+      },
+      "baseline": null,
+      "arms_present": [
+        "ablated",
+        "frozen"
+      ],
+      "full_cohort_interpretable": false
+    },
+    "structural": {
+      "gates": {
+        "both_arms_exit_zero": true,
+        "both_arms_generation_advanced": true,
+        "both_arms_bound_their_seed_proof": true,
+        "both_arms_reused_capture": true,
+        "seeds_byte_identical_across_arms": true,
+        "both_arms_replayed_the_seed_graph": true,
+        "base_generation_equal": true,
+        "target_generation_equal": true,
+        "parsed_files_equal": true,
+        "owners_published_equal": true,
+        "full_result_equal_except_run_id": true,
+        "each_arm_wire_run_id_matches_its_result": true,
+        "arms_have_distinct_run_ids": true,
+        "arms_agree_on_graph": true,
+        "frozen_delta_equals_cold_graph": true,
+        "ablated_delta_equals_cold_graph": true,
+        "frozen_produced_and_promoted_a_proof": true,
+        "ablated_produced_no_proof": true
+      },
+      "failed_gates": [],
+      "interpretable": true,
+      "seed": {
+        "frozen": {
+          "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790324513847237000",
+          "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+          "base_generation": 1,
+          "target_generation": 2,
+          "state_files": 10,
+          "state_sha256": "05aab42e30a89b277c2a09ec1537b1d8c27ba8e2bcfd26a6454df3e509da042a",
+          "proof_sha256": "30268a80696066a567ac68e9b894dd80aa19a760c9ddcf5b2b70c9407f28c7a5"
+        },
+        "ablated": {
+          "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790324513847237000",
+          "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+          "base_generation": 1,
+          "target_generation": 2,
+          "state_files": 10,
+          "state_sha256": "05aab42e30a89b277c2a09ec1537b1d8c27ba8e2bcfd26a6454df3e509da042a",
+          "proof_sha256": "30268a80696066a567ac68e9b894dd80aa19a760c9ddcf5b2b70c9407f28c7a5"
+        }
+      },
+      "restored_state_manifest_equal": true,
+      "replay": {
+        "frozen": {
+          "replayed_frames": 2,
+          "matched": {
+            "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790324513847237000",
+            "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+            "base_generation": 1,
+            "applied_generation": 2
+          }
+        },
+        "ablated": {
+          "replayed_frames": 2,
+          "matched": {
+            "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790324513847237000",
+            "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+            "base_generation": 1,
+            "applied_generation": 2
+          }
+        }
+      },
+      "run_ids": {
+        "frozen": "stage21-ablate-product-stage21-ablate-seed-3-1790324519797564000",
+        "ablated": "stage21-ablate-product-stage21-ablate-seed-3-1790324525477521000",
+        "frozen_wire": "stage21-ablate-product-stage21-ablate-seed-3-1790324519797564000",
+        "ablated_wire": "stage21-ablate-product-stage21-ablate-seed-3-1790324525477521000"
+      },
+      "results": {
+        "frozen": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 11,
+              "source content": 1
+            }
+          },
+          "RunID": "stage21-ablate-product-stage21-ablate-seed-3-1790324519797564000",
+          "BaseGeneration": 2,
+          "TargetGeneration": 3,
+          "Stats": {
+            "files_read": 116,
+            "files_parsed": 12,
+            "cached_files": 4022,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 117,
+            "derived_indexes": 8,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 12,
+          "ParsedFiles": 12,
+          "EarlyLocal": 0
+        },
+        "ablated": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 11,
+              "source content": 1
+            }
+          },
+          "RunID": "stage21-ablate-product-stage21-ablate-seed-3-1790324525477521000",
+          "BaseGeneration": 2,
+          "TargetGeneration": 3,
+          "Stats": {
+            "files_read": 116,
+            "files_parsed": 12,
+            "cached_files": 4022,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 117,
+            "derived_indexes": 8,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 12,
+          "ParsedFiles": 12,
+          "EarlyLocal": 0
+        }
+      },
+      "graph_hashes": {
+        "frozen": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666",
+        "ablated": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666",
+        "cold": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666"
+      },
+      "fallbacks": {
+        "frozen": [
+          "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+        ],
+        "ablated": [
+          "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+        ]
+      },
+      "wall_seconds": {
+        "frozen": 3.5151,
+        "ablated": 3.6046,
+        "delta_s": 0.0895
+      },
+      "process_real_s": {
+        "frozen": 3.51,
+        "ablated": 3.6
+      },
+      "rss_bytes": {
+        "frozen": 546504704.0,
+        "ablated": 647823360.0
+      },
+      "costs_that_disappear_with_the_ablation": {
+        "state_proof_promoted": {
+          "frozen_s": [
+            0.005
+          ],
+          "ablated_s": [],
+          "frozen_total_s": 0.005,
+          "ablated_total_s": 0,
+          "delta_s": -0.005,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 0,
+          "only_on": "frozen"
+        },
+        "state_proof_written": {
+          "frozen_s": [
+            0.028
+          ],
+          "ablated_s": [],
+          "frozen_total_s": 0.028,
+          "ablated_total_s": 0,
+          "delta_s": -0.028,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 0,
+          "only_on": "frozen"
+        }
+      },
+      "marks_only_on_the_ablated_arm": {
+        "ablation_proof_cleanup_promote": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.006
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.006,
+          "delta_s": 0.006,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 1,
+          "only_on": "ablated"
+        },
+        "ablation_proof_cleanup_stage": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.004
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.004,
+          "delta_s": 0.004,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 1,
+          "only_on": "ablated"
+        },
+        "state_proof_unavailable": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.0,
+            0.0
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.0,
+          "delta_s": 0.0,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 2,
+          "only_on": "ablated"
+        }
+      },
+      "marks_on_both_arms_differing_by_5ms_or_more": {
+        "analysis_fingerprint": {
+          "frozen_s": [
+            0.144
+          ],
+          "ablated_s": [
+            0.135
+          ],
+          "frozen_total_s": 0.144,
+          "ablated_total_s": 0.135,
+          "delta_s": -0.009,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "assemble_new_files": {
+          "frozen_s": [
+            0.165
+          ],
+          "ablated_s": [
+            0.172
+          ],
+          "frozen_total_s": 0.165,
+          "ablated_total_s": 0.172,
+          "delta_s": 0.007,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "begin_publish": {
+          "frozen_s": [
+            0.058
+          ],
+          "ablated_s": [
+            0.094
+          ],
+          "frozen_total_s": 0.058,
+          "ablated_total_s": 0.094,
+          "delta_s": 0.036,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "encode_append_owners": {
+          "frozen_s": [
+            0.005
+          ],
+          "ablated_s": [
+            0.012
+          ],
+          "frozen_total_s": 0.005,
+          "ablated_total_s": 0.012,
+          "delta_s": 0.007,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "end_flush_ack": {
+          "frozen_s": [
+            0.038
+          ],
+          "ablated_s": [
+            0.061
+          ],
+          "frozen_total_s": 0.038,
+          "ablated_total_s": 0.061,
+          "delta_s": 0.023,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "engine_hash_files": {
+          "frozen_s": [
+            0.147
+          ],
+          "ablated_s": [
+            0.138
+          ],
+          "frozen_total_s": 0.147,
+          "ablated_total_s": 0.138,
+          "delta_s": -0.009,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "graph_inputs_proven": {
+          "frozen_s": [
+            0.093
+          ],
+          "ablated_s": [
+            0.084
+          ],
+          "frozen_total_s": 0.093,
+          "ablated_total_s": 0.084,
+          "delta_s": -0.009,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "graph_session_run": {
+          "frozen_s": [
+            3.154
+          ],
+          "ablated_s": [
+            3.255
+          ],
+          "frozen_total_s": 3.154,
+          "ablated_total_s": 3.255,
+          "delta_s": 0.101,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "graphinput_build": {
+          "frozen_s": [
+            0.332
+          ],
+          "ablated_s": [
+            0.321
+          ],
+          "frozen_total_s": 0.332,
+          "ablated_total_s": 0.321,
+          "delta_s": -0.011,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "hash_content_inputs": {
+          "frozen_s": [
+            0.147
+          ],
+          "ablated_s": [
+            0.138
+          ],
+          "frozen_total_s": 0.147,
+          "ablated_total_s": 0.138,
+          "delta_s": -0.009,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "index_group_owners": {
+          "frozen_s": [
+            0.087
+          ],
+          "ablated_s": [
+            0.079
+          ],
+          "frozen_total_s": 0.087,
+          "ablated_total_s": 0.079,
+          "delta_s": -0.008,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "promote_compact_state": {
+          "frozen_s": [
+            0.067
+          ],
+          "ablated_s": [
+            0.114
+          ],
+          "frozen_total_s": 0.067,
+          "ablated_total_s": 0.114,
+          "delta_s": 0.047,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "publish_resolved": {
+          "frozen_s": [
+            0.046
+          ],
+          "ablated_s": [
+            0.086
+          ],
+          "frozen_total_s": 0.046,
+          "ablated_total_s": 0.086,
+          "delta_s": 0.04,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "resolve_graph_target": {
+          "frozen_s": [
+            0.334
+          ],
+          "ablated_s": [
+            0.321
+          ],
+          "frozen_total_s": 0.334,
+          "ablated_total_s": 0.321,
+          "delta_s": -0.013,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "revalidate_ts_records": {
+          "frozen_s": [
+            0.138
+          ],
+          "ablated_s": [
+            0.111
+          ],
+          "frozen_total_s": 0.138,
+          "ablated_total_s": 0.111,
+          "delta_s": -0.027,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "state_json_marshal": {
+          "frozen_s": [
+            0.166
+          ],
+          "ablated_s": [
+            0.16
+          ],
+          "frozen_total_s": 0.166,
+          "ablated_total_s": 0.16,
+          "delta_s": -0.006,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "state_proof_refused": {
+          "frozen_s": [
+            0.7
+          ],
+          "ablated_s": [
+            0.678
+          ],
+          "frozen_total_s": 0.7,
+          "ablated_total_s": 0.678,
+          "delta_s": -0.022,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "ts_frozen_preview": {
+          "frozen_s": [
+            0.712
+          ],
+          "ablated_s": [
+            0.724
+          ],
+          "frozen_total_s": 0.712,
+          "ablated_total_s": 0.724,
+          "delta_s": 0.012,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        },
+        "ts_mapfiles_aggregate": {
+          "frozen_s": [
+            0.042,
+            0.296
+          ],
+          "ablated_s": [
+            0.047,
+            0.296
+          ],
+          "frozen_total_s": 0.338,
+          "ablated_total_s": 0.343,
+          "delta_s": 0.005,
+          "frozen_occurrences": 2,
+          "ablated_occurrences": 2,
+          "only_on": null
+        },
+        "write_pending_state": {
+          "frozen_s": [
+            0.391
+          ],
+          "ablated_s": [
+            0.379
+          ],
+          "frozen_total_s": 0.391,
+          "ablated_total_s": 0.379,
+          "delta_s": -0.012,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 1,
+          "only_on": null
+        }
+      },
+      "occurrence_count_differences": {
+        "ablation_proof_cleanup_promote": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.006
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.006,
+          "delta_s": 0.006,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 1,
+          "only_on": "ablated"
+        },
+        "ablation_proof_cleanup_stage": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.004
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.004,
+          "delta_s": 0.004,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 1,
+          "only_on": "ablated"
+        },
+        "state_proof_promoted": {
+          "frozen_s": [
+            0.005
+          ],
+          "ablated_s": [],
+          "frozen_total_s": 0.005,
+          "ablated_total_s": 0,
+          "delta_s": -0.005,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 0,
+          "only_on": "frozen"
+        },
+        "state_proof_unavailable": {
+          "frozen_s": [],
+          "ablated_s": [
+            0.0,
+            0.0
+          ],
+          "frozen_total_s": 0,
+          "ablated_total_s": 0.0,
+          "delta_s": 0.0,
+          "frozen_occurrences": 0,
+          "ablated_occurrences": 2,
+          "only_on": "ablated"
+        },
+        "state_proof_written": {
+          "frozen_s": [
+            0.028
+          ],
+          "ablated_s": [],
+          "frozen_total_s": 0.028,
+          "ablated_total_s": 0,
+          "delta_s": -0.028,
+          "frozen_occurrences": 1,
+          "ablated_occurrences": 0,
+          "only_on": "frozen"
+        }
+      },
+      "pinned": {
+        "frozen": {
+          "state_proof_bound": [
+            "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634478"
+          ],
+          "runtime_inputs_reused": [
+            "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+          ],
+          "runtime_inputs_reusable": [
+            "[graph-profile] runtime_inputs_reusable            0.298s  total= 1.091s  trace=reconcile  targets=4105"
+          ],
+          "state_proof_refused": [
+            "[graph-profile] state_proof_refused                0.700s  total= 0.793s  trace=reconcile  inventory scan digest moved"
+          ],
+          "state_proof_written": [
+            "[graph-profile] state_proof_written                0.028s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=20285500"
+          ],
+          "state_proof_promoted": [
+            "[graph-profile] state_proof_promoted               0.005s"
+          ],
+          "state_proof_fallback_decode": [
+            "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+          ],
+          "state_json_unmarshal": [
+            "[graph-profile] state_json_unmarshal               0.246s  files=4086"
+          ],
+          "state_json_marshal": [
+            "[graph-profile] state_json_marshal                 0.166s  bytes=56635197 files=4086"
+          ],
+          "state_read_bytes": [
+            "[graph-profile] state_read_bytes                   0.012s  state.json bytes=56634478",
+            "[graph-profile] state_read_bytes                   0.018s  state.json bytes=56634478"
+          ],
+          "state_fingerprint": [
+            "[graph-profile] state_fingerprint                  0.025s  bytes=56634478",
+            "[graph-profile] state_fingerprint                  0.024s  bytes=56634478",
+            "[graph-profile] state_fingerprint                  0.025s  write bytes=56635197"
+          ],
+          "load_state": [
+            "[graph-profile] load_state                         0.037s  total= 0.038s  trace=open  deferred owners=4086"
+          ],
+          "select_hash_targets": [
+            "[graph-profile] select_hash_targets                0.006s  total= 0.123s  trace=inputs  targets=4105"
+          ],
+          "hash_content_inputs": [
+            "[graph-profile] hash_content_inputs                0.147s  total= 0.270s  trace=inputs  targets=4105"
+          ],
+          "write_pending_state": [
+            "[graph-profile] write_pending_state                0.391s  total= 1.921s  trace=session"
+          ],
+          "promote_compact_state": [
+            "[graph-profile] promote_compact_state              0.067s  total= 2.026s  trace=session  parsed=12 published=12"
+          ],
+          "end_flush_ack": [
+            "[graph-profile] end_flush_ack                      0.038s  total= 1.959s  trace=session"
+          ],
+          "graph_session_run": [
+            "[graph-profile] graph_session_run                  3.154s  total= 3.489s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work4/product parsed=12"
+          ],
+          "cli_complete": [
+            "[graph-profile] cli_complete                       0.000s  total= 3.489s  trace=cli  results=1"
+          ]
+        },
+        "ablated": {
+          "state_proof_bound": [
+            "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634478"
+          ],
+          "runtime_inputs_reused": [
+            "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+          ],
+          "runtime_inputs_reusable": [
+            "[graph-profile] runtime_inputs_reusable            0.299s  total= 1.061s  trace=reconcile  targets=4105"
+          ],
+          "state_proof_refused": [
+            "[graph-profile] state_proof_refused                0.678s  total= 0.762s  trace=reconcile  inventory scan digest moved"
+          ],
+          "state_proof_unavailable": [
+            "[graph-profile] state_proof_unavailable            0.000s  diagnostic ablation: proof production disabled",
+            "[graph-profile] state_proof_unavailable            0.000s  diagnostic ablation: proof production disabled"
+          ],
+          "ablation_proof_cleanup_stage": [
+            "[graph-profile] ablation_proof_cleanup_stage       0.004s  where=1"
+          ],
+          "ablation_proof_cleanup_promote": [
+            "[graph-profile] ablation_proof_cleanup_promote     0.006s"
+          ],
+          "state_proof_fallback_decode": [
+            "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+          ],
+          "state_json_unmarshal": [
+            "[graph-profile] state_json_unmarshal               0.246s  files=4086"
+          ],
+          "state_json_marshal": [
+            "[graph-profile] state_json_marshal                 0.160s  bytes=56635197 files=4086"
+          ],
+          "state_read_bytes": [
+            "[graph-profile] state_read_bytes                   0.012s  state.json bytes=56634478",
+            "[graph-profile] state_read_bytes                   0.019s  state.json bytes=56634478"
+          ],
+          "state_fingerprint": [
+            "[graph-profile] state_fingerprint                  0.024s  bytes=56634478",
+            "[graph-profile] state_fingerprint                  0.024s  bytes=56634478",
+            "[graph-profile] state_fingerprint                  0.025s  write bytes=56635197"
+          ],
+          "load_state": [
+            "[graph-profile] load_state                         0.037s  total= 0.037s  trace=open  deferred owners=4086"
+          ],
+          "select_hash_targets": [
+            "[graph-profile] select_hash_targets                0.006s  total= 0.120s  trace=inputs  targets=4105"
+          ],
+          "hash_content_inputs": [
+            "[graph-profile] hash_content_inputs                0.138s  total= 0.257s  trace=inputs  targets=4105"
+          ],
+          "write_pending_state": [
+            "[graph-profile] write_pending_state                0.379s  total= 1.982s  trace=session"
+          ],
+          "promote_compact_state": [
+            "[graph-profile] promote_compact_state              0.114s  total= 2.156s  trace=session  parsed=12 published=12"
+          ],
+          "end_flush_ack": [
+            "[graph-profile] end_flush_ack                      0.061s  total= 2.042s  trace=session"
+          ],
+          "graph_session_run": [
+            "[graph-profile] graph_session_run                  3.255s  total= 3.577s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work4/product parsed=12"
+          ],
+          "cli_complete": [
+            "[graph-profile] cli_complete                       0.000s  total= 3.578s  trace=cli  results=1"
+          ]
+        }
+      },
+      "baseline": null,
+      "arms_present": [
+        "ablated",
+        "frozen"
+      ],
+      "full_cohort_interpretable": false
+    }
+  },
+  "full_cohort_interpretable": false
+}

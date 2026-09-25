@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "/tmp/enola-stage22-root-acceptance/enola-stage22-experimental",
+    "graph",
+    "analyze",
+    "--authoritative-scope",
+    "--events",
+    "/tmp/enola-stage22-legacy-cli/cold.events.jsonl",
+    "--state-dir",
+    "/tmp/enola-stage22-legacy-cli/cold-state",
+    "--summary-json",
+    "/tmp/enola-stage22-legacy-cli/repo"
+  ],
+  "exit": 0,
+  "wall_s": 0.29428504093084484
+}

@@ -1,0 +1,13 @@
+{
+  "checks": {
+    "r1-new-initial": true,
+    "r1-new-noop": true,
+    "r1-new-body": true,
+    "r1-new-structural": true,
+    "cold-structural": true,
+    "cold-body": true,
+    "cold-original": true
+  },
+  "all_passed": true,
+  "note": "normalized graph hash equality plus each-arm cold/noop validators; no performance claim"
+}

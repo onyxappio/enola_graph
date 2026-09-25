@@ -1,0 +1,27 @@
+=== RUN   TestCommitProofAllocBoundary
+    zz_scratch_commit_proof_alloc_test.go:119: state_bytes=56633618 owner_records=4086 inventory_files=10965 all_names=10965 detected=1
+    zz_scratch_commit_proof_alloc_test.go:121: nil_prior_targets=4105 with_prior_targets=4105 hashes=4105
+    zz_scratch_commit_proof_alloc_test.go:129: targets_absent_from_state=19
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=docs/feedback-fixes/t261-mobile-regression-test-guide.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=docs/reports/pr379-journey-business-coverage.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=apps/architect-console/index.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=apps/marketing-web/index.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=docs/architecture/state-machine-kernel-concept.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=docs/architecture/state-machine-kernel-flow.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=docs/deployment-flow.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=docs/plans/2026-05-14-environment-promotion-visualization.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=docs/plans/2026-08-08-t259-cancel-subscription-overview.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=apps/mobile/storybook-static/iframe.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=apps/safari-extension/scripts/real-browser/underlying-page-fixture.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=docs/feedback-fixes/t261-fixed-cases-verification-guide.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=docs/workflows.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=apps/mobile/storybook-static/index.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=docs/browser-protection-execution-flow.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=docs/current-state-roadmap.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=apps/behavior-visualizer/index.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=apps/mobile/pwa/index.html
+    zz_scratch_commit_proof_alloc_test.go:131:   extra_target=docs/feedback-fixes/t261-mobile-feedback-master-backlog.html
+    zz_scratch_commit_proof_alloc_test.go:139: proof_writes=1 proof_write_bytes=10966
+--- PASS: TestCommitProofAllocBoundary (0.96s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	1.718s

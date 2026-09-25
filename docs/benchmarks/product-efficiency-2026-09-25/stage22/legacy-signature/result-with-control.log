@@ -1,0 +1,13 @@
+=== RUN   TestRootStage22LegacyMinifiedSignature
+=== RUN   TestRootStage22LegacyMinifiedSignature/legacy_incomplete
+    root_stage22_signature_test.go:13: legacy minified signature differs: cold=e12d5ec316a67cd5b52b4df5a8fa87a89f5e1c564c00c425023f5718f9501650 cached=df2b1412bf7ddb21df519d15129c243ec1f4dcb8e6a63128b9be6edec5b5527f
+=== RUN   TestRootStage22LegacyMinifiedSignature/complete_metadata
+--- FAIL: TestRootStage22LegacyMinifiedSignature (0.00s)
+    --- FAIL: TestRootStage22LegacyMinifiedSignature/legacy_incomplete (0.00s)
+    --- PASS: TestRootStage22LegacyMinifiedSignature/complete_metadata (0.00s)
+FAIL
+FAIL	github.com/enola-labs/enola/internal/extractors/tsextractor	0.458s
+FAIL
+real 2.66
+user 5.80
+sys 0.77

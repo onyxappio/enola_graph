@@ -1,0 +1,14 @@
+{
+  "correctness_accepted": true,
+  "source_revision": "6db3ed834daab2adf8083ac46dc15ac21b670eb2",
+  "production_overlay_sha256": "f06556a0e96ca71dc07e318f119130f0e80f5ff031b14dccadead2be9fb57797",
+  "binary_sha256": "a3c19dc902f80248cc14d0e7669bf8c0067d779bd6709741ab756ac7146986d1",
+  "scope": "Stage22 minified framework metadata reuse; performance acceptance pending",
+  "evidence": {
+    "full_suite": "/tmp/enola-stage22-root-signature/full-suite.json",
+    "full_suite_passed_packages": 110,
+    "final_session": "/tmp/enola-stage22-root-signature/final-session.json",
+    "product": "/tmp/enola-stage22-root-acceptance/cli-pairs/correctness-candidate-1/pair-receipt.json",
+    "actual_legacy_replay": "/tmp/enola-stage22-legacy-cli/replay-receipt.json"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "label": "bounded causal diagnostic; shared load; NOT acceptance timing and NOT a speed claim",
+  "protocol": "one canonical Product path/config/state-dir/context; seed produced once per scenario with the frozen binary; broker stopped, full state dir and JetStream store snapshotted together at rest; each arm restores both to the same paths, starts a fresh broker and a fresh pinned replay observer over an empty output file, and waits for the retained stream to be replayed into a consumer graph whose run id, normalized hash and applied generation equal the seed before its one measured delta",
+  "frozen_binary": "/tmp/enola-stage21-root-review/enola-proof-diagnostic3",
+  "frozen_sha256": "6553bf7c8c847b9eddb22ce4a63c65c96b4d1cf383c89b2d330c5c6bd51fc705",
+  "ablated_binary": "/tmp/enola-stage21-ablate/enola-ablate-noproof2",
+  "ablated_sha256": "4c6cb04fa773b42fe39223f37d5ebb4e5efffd3b87cb72cc5ab226681977c4e5",
+  "baseline_binary": "/tmp/enola-stage21-root-review/enola-stage20-baseline",
+  "baseline_sha256": "99162b12e148c995c0a6e91ff73ffea05f2fb978ec004887f89e35a337006f60",
+  "ablation_diff": "/tmp/enola-stage21-ablate/ablation2.diff",
+  "ablation_diff_sha256": "5d0ed805bf2d22fe693f2f9c0741b39a047393e4bd06d4bf864434c47d54a950",
+  "product_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "profile": "ts + product-graph-scope.yaml overlay",
+  "observer": "/tmp/enola-stage21-startup-profile/replayobserver",
+  "observer_sha256": "bf5e4ba171d59c80137d63c9f09b0049f4c6d2294c2748ad9a68b7c4e2b4067b",
+  "observer_diff": "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-25/stage21/replayobs-source.diff",
+  "seeds": {
+    "seed-body": {
+      "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790325288904244000",
+      "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+      "base_generation": 0,
+      "target_generation": 1,
+      "state_files": 10,
+      "state_sha256": "91cd3ee4c361e108181a85f82126bcc18e50509eaaa11e8a6d7ff6a0ca91b668",
+      "proof_sha256": "fe4824cbea0472ece581135be8a1d9ea7d93e6075033039d369cada043b831bc"
+    },
+    "seed-structural": {
+      "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790325323029335000",
+      "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+      "base_generation": 1,
+      "target_generation": 2,
+      "state_files": 10,
+      "state_sha256": "ff37aadfe1be3cf74a4875a6445e5c742bbb60aa53040ae395c111578962481a",
+      "proof_sha256": "9bc91c80feb7030824ec788f3f68745bce82f11a0e2310ed566b4b979d618e1e"
+    }
+  },
+  "runs_executed": 11,
+  "competing_samples": []
+}

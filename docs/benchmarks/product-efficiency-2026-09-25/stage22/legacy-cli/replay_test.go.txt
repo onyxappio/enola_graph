@@ -1,0 +1,10 @@
+package graphsession
+import("os";"strings";"testing";"github.com/enola-labs/enola/internal/graphstream")
+func TestRootStage22ActualLegacyCLIReplay(t *testing.T) {
+ read:=func(path string)*Consumer { raw,err:=os.ReadFile(path);if err!=nil{t.Fatal(err)};c:=NewConsumer();for _,line:=range strings.Split(strings.TrimSpace(string(raw)),"\n"){p:=strings.SplitN(line," ",3);if len(p)!=3{t.Fatal("bad event")};if err:=c.Apply(graphstream.Recorded{Subject:p[0],MsgID:p[1],Payload:[]byte(p[2])});err!=nil{t.Fatal(err)}};if !c.complete(){t.Fatal("incomplete replacement")};return c }
+ old:=read("/tmp/enola-stage22-legacy-cli/old-initial.events.jsonl");cold:=read("/tmp/enola-stage22-legacy-cli/cold.events.jsonl")
+ if old.LastGeneration!=3 || cold.LastGeneration!=1 {t.Fatalf("unexpected generations %d %d",old.LastGeneration,cold.LastGeneration)}
+ if old.Canonical()!=cold.Canonical(){t.Fatalf("migration graph differs from cold\n%s\n%s",old.Canonical(),cold.Canonical())}
+ found:=false;for _,nodes:=range old.Owners{for _,n:=range nodes{if n.Name=="Query.real" && string(n.Kind)=="route"{found=true}}};if !found{t.Fatal("missing real GraphQL route")}
+ t.Log("three-generation old-to-new replay equals cold, including GraphQL route")
+}

@@ -1,0 +1,14 @@
+{
+  "checked_at": "2026-09-25T09:24:24.381365+00:00",
+  "status": "source review accepted; runs pending FSM timing release",
+  "manifest_sha256": "1a02b9a5cf9697fdefa98100fd8e7fd3ea349b2928225365ccef038052b0e3dc",
+  "reviewed": [
+    "v7 snapshot/replay protocol retained",
+    "proof production required for retained arm",
+    "two reads, one read digest plus one write digest, one byte comparison",
+    "one decode per measured arm",
+    "duplicate measured arms rejected",
+    "four profile runs required, both noops silent with unchanged state/generation"
+  ],
+  "timing_acceptance": false
+}

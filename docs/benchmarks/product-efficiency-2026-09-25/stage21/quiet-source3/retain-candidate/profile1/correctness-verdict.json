@@ -1,0 +1,55 @@
+{
+  "correctness": "PASS",
+  "checks": {
+    "o1-initial_present_exactly_once": true,
+    "o1-initial_exit_zero": true,
+    "o2-noop_present_exactly_once": true,
+    "o2-noop_exit_zero": true,
+    "o3-noop_present_exactly_once": true,
+    "o3-noop_exit_zero": true,
+    "o4-body_present_exactly_once": true,
+    "o4-body_exit_zero": true,
+    "o2-noop_parsed_no_files": true,
+    "o2-noop_generation_unchanged": true,
+    "o2-noop_published_no_wire_messages": true,
+    "o2-noop_state_bytes_unchanged": true,
+    "o3-noop_parsed_no_files": true,
+    "o3-noop_generation_unchanged": true,
+    "o3-noop_published_no_wire_messages": true,
+    "o3-noop_state_bytes_unchanged": true
+  },
+  "failed_checks": [],
+  "runs_seen": {
+    "o1-initial": 1,
+    "o2-noop": 1,
+    "o3-noop": 1,
+    "o4-body": 1
+  },
+  "diagnostic_observations_not_part_of_the_verdict": {
+    "o1-initial": {
+      "wall_seconds": 8.7769,
+      "process_real_s": 8.77,
+      "rss_bytes": 833863680.0,
+      "parsed_files": 4034
+    },
+    "o2-noop": {
+      "wall_seconds": 1.2917,
+      "process_real_s": 1.28,
+      "rss_bytes": 186548224.0,
+      "parsed_files": 0
+    },
+    "o3-noop": {
+      "wall_seconds": 1.2817,
+      "process_real_s": 1.27,
+      "rss_bytes": 186138624.0,
+      "parsed_files": 0
+    },
+    "o4-body": {
+      "wall_seconds": 3.3677,
+      "process_real_s": 3.36,
+      "rss_bytes": 596590592.0,
+      "parsed_files": 11
+    }
+  },
+  "load": "shared host; see competing_samples in diagnostic-receipt.json, which counts recognized Go/test/Enola/observer processes only and is not a quiet-host claim"
+}

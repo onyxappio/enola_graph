@@ -1,0 +1,10 @@
+repo: /tmp/enola-stage22-product-watch/product-live
+extractors: [typescript]
+explainers: []
+renderers: []
+
+# Overlay without repo. Paths are relative to the Product checkout.
+graph_inputs:
+  exclude:
+    - "apps/mobile/e2e/artifacts/**"
+    - "worker-reports/**"

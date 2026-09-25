@@ -1,0 +1,15 @@
+package tsextractor
+import ("os"; "path/filepath"; "strings"; "testing")
+func TestRootStage22LegacyMinifiedSignature(t *testing.T) {
+ root:=t.TempDir(); rel:="bundle.ts"
+ src:=[]byte(genUsersClient+"\nexport const pad=["+strings.Repeat("0,",1600)+"0];\n")
+ if !isMinifiedSource(src) {t.Fatal("fixture is not minified")}
+ contribution:=grpcFileContribution(src)
+ if contribution==nil || len(contribution.Methods)==0 {t.Fatal("fixture lacks grpc contribution")}
+ if err:=os.WriteFile(filepath.Join(root,rel),src,0600);err!=nil {t.Fatal(err)}
+ cold,err:=CompositionSignature(root,[]string{rel},nil,nil,nil);if err!=nil {t.Fatal(err)}
+ legacy:=map[string]*FileRecord{rel:{File:rel,Minified:true}}
+ cached,err:=CompositionSignature(root,[]string{rel},legacy,map[string]bool{},nil);if err!=nil {t.Fatal(err)}
+ t.Run("legacy_incomplete",func(t *testing.T){if cold!=cached {t.Errorf("legacy minified signature differs: cold=%s cached=%s",cold,cached)}})
+ t.Run("complete_metadata",func(t *testing.T){legacy[rel].GRPC=contribution;legacy[rel].NuxtScope="-"; got,err:=CompositionSignature(root,[]string{rel},legacy,map[string]bool{},nil);if err!=nil {t.Fatal(err)};if got!=cold {t.Fatalf("complete metadata signature differs: cold=%s cached=%s",cold,got)}})
+}

@@ -1,0 +1,818 @@
+[
+  {
+    "repeat": 1,
+    "scenario": "initial",
+    "same_work_counters": false,
+    "counts": {
+      "baseline": {
+        "Stats": {
+          "files_read": 4086,
+          "files_parsed": 4034,
+          "cached_files": 0,
+          "graphql_parsed": 2,
+          "sfc_parsed": 17,
+          "summary_scans": 1695,
+          "derived_indexes": 2298,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 4034,
+        "OwnersPublished": 4034,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "initial": 4034
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "all prior/current file owners",
+            "reason": "frozen scope: global name-resolution domain"
+          }
+        ]
+      },
+      "candidate": {
+        "Stats": {
+          "files_read": 4086,
+          "files_parsed": 4034,
+          "cached_files": 0,
+          "graphql_parsed": 2,
+          "sfc_parsed": 17,
+          "summary_scans": 1704,
+          "derived_indexes": 2289,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 4034,
+        "OwnersPublished": 4034,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "initial": 4034
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "all prior/current file owners",
+            "reason": "frozen scope: global name-resolution domain"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "repeat": 1,
+    "scenario": "noop",
+    "same_work_counters": true,
+    "counts": {
+      "baseline": {
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 4086,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0,
+          "derived_indexes": 0,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 0,
+        "OwnersPublished": 0,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {}
+        },
+        "Fallbacks": null
+      },
+      "candidate": {
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 4086,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0,
+          "derived_indexes": 0,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 0,
+        "OwnersPublished": 0,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {}
+        },
+        "Fallbacks": null
+      }
+    }
+  },
+  {
+    "repeat": 1,
+    "scenario": "body",
+    "same_work_counters": true,
+    "counts": {
+      "baseline": {
+        "Stats": {
+          "files_read": 115,
+          "files_parsed": 11,
+          "cached_files": 4023,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 117,
+          "derived_indexes": 8,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 11,
+        "OwnersPublished": 11,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 10,
+            "source content": 1
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ]
+      },
+      "candidate": {
+        "Stats": {
+          "files_read": 115,
+          "files_parsed": 11,
+          "cached_files": 4023,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 117,
+          "derived_indexes": 8,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 11,
+        "OwnersPublished": 11,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 10,
+            "source content": 1
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "repeat": 1,
+    "scenario": "structural",
+    "same_work_counters": true,
+    "counts": {
+      "baseline": {
+        "Stats": {
+          "files_read": 116,
+          "files_parsed": 12,
+          "cached_files": 4022,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 117,
+          "derived_indexes": 8,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 12,
+        "OwnersPublished": 12,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 11,
+            "source content": 1
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ]
+      },
+      "candidate": {
+        "Stats": {
+          "files_read": 116,
+          "files_parsed": 12,
+          "cached_files": 4022,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 117,
+          "derived_indexes": 8,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 12,
+        "OwnersPublished": 12,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 11,
+            "source content": 1
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "repeat": 2,
+    "scenario": "initial",
+    "same_work_counters": false,
+    "counts": {
+      "baseline": {
+        "Stats": {
+          "files_read": 4086,
+          "files_parsed": 4034,
+          "cached_files": 0,
+          "graphql_parsed": 2,
+          "sfc_parsed": 17,
+          "summary_scans": 1710,
+          "derived_indexes": 2283,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 4034,
+        "OwnersPublished": 4034,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "initial": 4034
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "all prior/current file owners",
+            "reason": "frozen scope: global name-resolution domain"
+          }
+        ]
+      },
+      "candidate": {
+        "Stats": {
+          "files_read": 4086,
+          "files_parsed": 4034,
+          "cached_files": 0,
+          "graphql_parsed": 2,
+          "sfc_parsed": 17,
+          "summary_scans": 1729,
+          "derived_indexes": 2264,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 4034,
+        "OwnersPublished": 4034,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "initial": 4034
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "all prior/current file owners",
+            "reason": "frozen scope: global name-resolution domain"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "repeat": 2,
+    "scenario": "noop",
+    "same_work_counters": true,
+    "counts": {
+      "baseline": {
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 4086,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0,
+          "derived_indexes": 0,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 0,
+        "OwnersPublished": 0,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {}
+        },
+        "Fallbacks": null
+      },
+      "candidate": {
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 4086,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0,
+          "derived_indexes": 0,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 0,
+        "OwnersPublished": 0,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {}
+        },
+        "Fallbacks": null
+      }
+    }
+  },
+  {
+    "repeat": 2,
+    "scenario": "body",
+    "same_work_counters": true,
+    "counts": {
+      "baseline": {
+        "Stats": {
+          "files_read": 115,
+          "files_parsed": 11,
+          "cached_files": 4023,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 117,
+          "derived_indexes": 8,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 11,
+        "OwnersPublished": 11,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 10,
+            "source content": 1
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ]
+      },
+      "candidate": {
+        "Stats": {
+          "files_read": 115,
+          "files_parsed": 11,
+          "cached_files": 4023,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 117,
+          "derived_indexes": 8,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 11,
+        "OwnersPublished": 11,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 10,
+            "source content": 1
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "repeat": 2,
+    "scenario": "structural",
+    "same_work_counters": true,
+    "counts": {
+      "baseline": {
+        "Stats": {
+          "files_read": 116,
+          "files_parsed": 12,
+          "cached_files": 4022,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 117,
+          "derived_indexes": 8,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 12,
+        "OwnersPublished": 12,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 11,
+            "source content": 1
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ]
+      },
+      "candidate": {
+        "Stats": {
+          "files_read": 116,
+          "files_parsed": 12,
+          "cached_files": 4022,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 117,
+          "derived_indexes": 8,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 12,
+        "OwnersPublished": 12,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 11,
+            "source content": 1
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "repeat": 3,
+    "scenario": "initial",
+    "same_work_counters": false,
+    "counts": {
+      "baseline": {
+        "Stats": {
+          "files_read": 4086,
+          "files_parsed": 4034,
+          "cached_files": 0,
+          "graphql_parsed": 2,
+          "sfc_parsed": 17,
+          "summary_scans": 1692,
+          "derived_indexes": 2301,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 4034,
+        "OwnersPublished": 4034,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "initial": 4034
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "all prior/current file owners",
+            "reason": "frozen scope: global name-resolution domain"
+          }
+        ]
+      },
+      "candidate": {
+        "Stats": {
+          "files_read": 4086,
+          "files_parsed": 4034,
+          "cached_files": 0,
+          "graphql_parsed": 2,
+          "sfc_parsed": 17,
+          "summary_scans": 1693,
+          "derived_indexes": 2300,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 4034,
+        "OwnersPublished": 4034,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "initial": 4034
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "all prior/current file owners",
+            "reason": "frozen scope: global name-resolution domain"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "repeat": 3,
+    "scenario": "noop",
+    "same_work_counters": true,
+    "counts": {
+      "baseline": {
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 4086,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0,
+          "derived_indexes": 0,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 0,
+        "OwnersPublished": 0,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {}
+        },
+        "Fallbacks": null
+      },
+      "candidate": {
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 4086,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0,
+          "derived_indexes": 0,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 0,
+        "OwnersPublished": 0,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {}
+        },
+        "Fallbacks": null
+      }
+    }
+  },
+  {
+    "repeat": 3,
+    "scenario": "body",
+    "same_work_counters": true,
+    "counts": {
+      "baseline": {
+        "Stats": {
+          "files_read": 115,
+          "files_parsed": 11,
+          "cached_files": 4023,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 117,
+          "derived_indexes": 8,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 11,
+        "OwnersPublished": 11,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 10,
+            "source content": 1
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ]
+      },
+      "candidate": {
+        "Stats": {
+          "files_read": 115,
+          "files_parsed": 11,
+          "cached_files": 4023,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 117,
+          "derived_indexes": 8,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 11,
+        "OwnersPublished": 11,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 10,
+            "source content": 1
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "repeat": 3,
+    "scenario": "structural",
+    "same_work_counters": true,
+    "counts": {
+      "baseline": {
+        "Stats": {
+          "files_read": 116,
+          "files_parsed": 12,
+          "cached_files": 4022,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 117,
+          "derived_indexes": 8,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 12,
+        "OwnersPublished": 12,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 11,
+            "source content": 1
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ]
+      },
+      "candidate": {
+        "Stats": {
+          "files_read": 116,
+          "files_parsed": 12,
+          "cached_files": 4022,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 117,
+          "derived_indexes": 8,
+          "discovery_passes": 0
+        },
+        "ParsedFiles": 12,
+        "OwnersPublished": 12,
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 11,
+            "source content": 1
+          }
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ]
+      }
+    }
+  }
+]

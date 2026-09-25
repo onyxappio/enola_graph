@@ -1,0 +1,18 @@
+{
+  "accepted_single_transition": true,
+  "not_ten_transition_acceptance": true,
+  "original_harness_exit": 1,
+  "original_receipt_sha256": "1bb1b3b2c189aeb38dbc5f89e2499387329adf70f1905a79df231fbc1e265537",
+  "original_refusal": [
+    "expected exactly 11 pinned commits, got 2",
+    "expected 10 first-parent transitions, got 1"
+  ],
+  "expected_commits": [
+    "d0fbbf855af5f4a33c364885f85805d71f9fac7c",
+    "a2ac71af8a22471c27059a9b318ef4880caa50cb"
+  ],
+  "checks": "All original source/tool/clean-tree/cold/noop gates rechecked, exact2-revision1-transition shape, three negative audit controls rejected",
+  "delta_parsed_files": 6,
+  "delta_published_owners": 8,
+  "limitations": "Config addition plus source/manifests, not isolated existing-tsconfig mutation; correctness only, no timing claim"
+}

@@ -1,0 +1,45 @@
+--- /tmp/enola-stage21-root-review/product-proof-profile3.py	2026-09-25 09:54:54
++++ product-retain-profile1.py	2026-09-25 12:23:13
+@@ -1,13 +1,29 @@
+-"""Experimental Stage21 compact-proof snapshot diagnostic. Shared load; NOT acceptance timing.
+-Authorized budget: 1 initial setup + 2 no-op observations + 1 body-edit check."""
++"""Stage21 option C retain candidate on Product: correctness, profile and RSS.
++
++Identical protocol, parameters and budget to product-proof-profile3.py - same flags,
++same repo-id, same context, same 1 initial + 2 no-op + 1 body-edit - so the rows can be
++read beside that run's. The one difference is the binary.
++
++Shared load; NOT acceptance timing. Any comparison with the earlier diagnostic3 rows is
++a diagnostic observation between two separately loaded runs. The competing-sample count
++in each receipt recognizes Go builds and tests, test binaries, toolchain processes, Enola
++runtimes and the observer - and nothing else, so a count of zero means no recognized
++competitor was sampled, not that the host was quiet: browsers, indexers and any other CPU
++or IO load are invisible to it.
++
++The no-op fields this harness records are observations, not assertions. The correctness
++verdict is taken by retain-noop-verdict.py, which fails closed on a missing field or a
++missing run."""
+ import argparse, hashlib, importlib.util, json, os, pathlib, re, subprocess, threading, time
+ 
+-BIN = '/tmp/enola-stage21-root-review/enola-proof-diagnostic3'
++BIN = '/tmp/enola-stage21-root-review/enola-retain-final1'
++BIN_SHA = 'd3229b4a5d622d1e9986565782a8c0cab7c078821775d361cb85809927c0aef6'
+ PRODUCT = '/tmp/enola-stage16-root-review/product-source'
+ PRODUCT_SHA = 'a609c19f3861971930fae7b33dcb2950598953c5'
+ OBSERVER = '/tmp/enola-stage9-product-watch-control/bin/benchobserver'
+ 
+ ap = argparse.ArgumentParser(); ap.add_argument('--work', required=True); a = ap.parse_args()
++assert hashlib.sha256(pathlib.Path(BIN).read_bytes()).hexdigest() == BIN_SHA, 'not the pinned retain binary'
+ work = pathlib.Path(a.work); assert not work.exists(), 'work dir must be fresh'
+ 
+ spec = importlib.util.spec_from_file_location('watch', '/tmp/enola-stage14-watch-pairs/watch.py')
+@@ -120,7 +136,8 @@
+     eff.stop_process(obs); eff.stop_process(server)
+     (work / 'diagnostic-receipt.json').write_text(json.dumps({
+         'label': 'diagnostic only; shared load; not a timing measurement',
+-        'enola_source': 'experimental compact-proof snapshot; see ../product-smoke-source3-manifest.json',
++        'enola_source': 'option C retain candidate /tmp/enola-stage21-retain/src; see REVIEW_NOTES.md and optionC.diff',
++        'comparable_with': 'product-proof-profile3.py rows, same flags and budget, different load',
+         'binary_sha256': hashlib.sha256(pathlib.Path(BIN).read_bytes()).hexdigest(),
+         'product_sha': PRODUCT_SHA, 'profile': 'ts + product-graph-scope.yaml overlay',
+         'authorized_runs': '1 initial + 2 no-op + 1 body-edit', 'runs_executed': len(rows),

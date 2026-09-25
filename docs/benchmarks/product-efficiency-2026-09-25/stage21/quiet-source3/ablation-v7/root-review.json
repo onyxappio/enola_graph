@@ -1,0 +1,52 @@
+{
+  "classification": "single fixed-order diagnostic on shared host without reserved quiet window; zero competing samples observed; extra work established, accepted wall savings not established",
+  "scenarios": {
+    "body": {
+      "gates": "pass",
+      "phase_counts": {
+        "frozen": {
+          "state_read_bytes": 2,
+          "state_fingerprint": 3,
+          "state_json_unmarshal": 1
+        },
+        "ablated": {
+          "state_read_bytes": 2,
+          "state_fingerprint": 3,
+          "state_json_unmarshal": 1
+        },
+        "baseline": {
+          "state_read_bytes": 1,
+          "state_fingerprint": 2,
+          "state_json_unmarshal": 1
+        }
+      },
+      "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+      "parsed": 11,
+      "owners": 11
+    },
+    "structural": {
+      "gates": "pass",
+      "phase_counts": {
+        "frozen": {
+          "state_read_bytes": 2,
+          "state_fingerprint": 3,
+          "state_json_unmarshal": 1
+        },
+        "ablated": {
+          "state_read_bytes": 2,
+          "state_fingerprint": 3,
+          "state_json_unmarshal": 1
+        },
+        "baseline": {
+          "state_read_bytes": 1,
+          "state_fingerprint": 2,
+          "state_json_unmarshal": 1
+        }
+      },
+      "graph_hash": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666",
+      "parsed": 12,
+      "owners": 12
+    }
+  },
+  "observed_competing_samples": 0
+}

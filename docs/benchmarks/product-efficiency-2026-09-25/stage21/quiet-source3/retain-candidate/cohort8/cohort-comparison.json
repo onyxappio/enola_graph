@@ -1,0 +1,3094 @@
+{
+  "unmeasured_runs": [
+    "seed-body-analyze",
+    "seed-structural-analyze",
+    "seed-structural-body",
+    "cold-body",
+    "cold-structural"
+  ],
+  "scenarios": {
+    "body": {
+      "gates": {
+        "both_arms_exit_zero": true,
+        "both_arms_generation_advanced": true,
+        "both_arms_bound_their_seed_proof": true,
+        "both_arms_reused_capture": true,
+        "seeds_byte_identical_across_arms": true,
+        "both_arms_replayed_the_seed_graph": true,
+        "base_generation_equal": true,
+        "target_generation_equal": true,
+        "parsed_files_equal": true,
+        "owners_published_equal": true,
+        "full_result_equal_except_run_id": true,
+        "each_arm_wire_run_id_matches_its_result": true,
+        "arms_have_distinct_run_ids": true,
+        "arms_agree_on_graph": true,
+        "frozen_delta_equals_cold_graph": true,
+        "retain_delta_equals_cold_graph": true,
+        "frozen_produced_and_promoted_a_proof": true,
+        "retain_produced_and_promoted_a_proof": true,
+        "retain_delta_read_committed_state_twice": true,
+        "frozen_delta_read_committed_state_twice": true,
+        "retain_delta_fingerprinted_twice_one_read_one_write": true,
+        "frozen_delta_fingerprinted_three_times_two_read_one_write": true,
+        "retain_delta_compared_bytes_once": true,
+        "frozen_delta_compared_no_bytes": true,
+        "frozen_delta_decoded_the_state_exactly_once": true,
+        "retain_delta_decoded_the_state_exactly_once": true,
+        "frozen_and_retain_each_have_exactly_one_measured_row": true
+      },
+      "failed_gates": [],
+      "interpretable": true,
+      "seed": {
+        "frozen": {
+          "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790328754619235000",
+          "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+          "base_generation": 0,
+          "target_generation": 1,
+          "state_files": 10,
+          "state_sha256": "5d838dfff27b7f2858d3a2bd9c66cc7ac418b6ccdb971c7cb477e3cf7f242747",
+          "proof_sha256": "8baf195cbf46c54ad18d1700553f20ca787a807f91d37f787c67572d15e7e46a"
+        },
+        "retain": {
+          "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790328754619235000",
+          "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+          "base_generation": 0,
+          "target_generation": 1,
+          "state_files": 10,
+          "state_sha256": "5d838dfff27b7f2858d3a2bd9c66cc7ac418b6ccdb971c7cb477e3cf7f242747",
+          "proof_sha256": "8baf195cbf46c54ad18d1700553f20ca787a807f91d37f787c67572d15e7e46a"
+        }
+      },
+      "restored_state_manifest_equal": true,
+      "replay": {
+        "frozen": {
+          "replayed_frames": 1,
+          "matched": {
+            "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790328754619235000",
+            "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+            "base_generation": 0,
+            "applied_generation": 1
+          }
+        },
+        "retain": {
+          "replayed_frames": 1,
+          "matched": {
+            "run_id": "stage21-ablate-product-stage21-ablate-seed-1-1790328754619235000",
+            "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+            "base_generation": 0,
+            "applied_generation": 1
+          }
+        }
+      },
+      "run_ids": {
+        "frozen": "stage21-ablate-product-stage21-ablate-seed-2-1790328765449607000",
+        "retain": "stage21-ablate-product-stage21-ablate-seed-2-1790328771525870000",
+        "frozen_wire": "stage21-ablate-product-stage21-ablate-seed-2-1790328765449607000",
+        "retain_wire": "stage21-ablate-product-stage21-ablate-seed-2-1790328771525870000"
+      },
+      "results": {
+        "frozen": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 10,
+              "source content": 1
+            }
+          },
+          "RunID": "stage21-ablate-product-stage21-ablate-seed-2-1790328765449607000",
+          "BaseGeneration": 1,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 115,
+            "files_parsed": 11,
+            "cached_files": 4023,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 117,
+            "derived_indexes": 8,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 11,
+          "ParsedFiles": 11,
+          "EarlyLocal": 0
+        },
+        "retain": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 10,
+              "source content": 1
+            }
+          },
+          "RunID": "stage21-ablate-product-stage21-ablate-seed-2-1790328771525870000",
+          "BaseGeneration": 1,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 115,
+            "files_parsed": 11,
+            "cached_files": 4023,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 117,
+            "derived_indexes": 8,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 11,
+          "ParsedFiles": 11,
+          "EarlyLocal": 0
+        }
+      },
+      "graph_hashes": {
+        "frozen": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+        "retain": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+        "cold": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784"
+      },
+      "fallbacks": {
+        "frozen": [
+          "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+        ],
+        "retain": [
+          "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+        ]
+      },
+      "wall_seconds": {
+        "frozen": 3.4023,
+        "retain": 4.2254,
+        "delta_s": 0.8231
+      },
+      "process_real_s": {
+        "frozen": 3.39,
+        "retain": 4.22
+      },
+      "rss_bytes": {
+        "frozen": 618070016.0,
+        "retain": 661504000.0
+      },
+      "marks_only_on_the_frozen_arm": {},
+      "marks_only_on_the_retain_arm": {
+        "state_bytes_compared": {
+          "frozen_s": [],
+          "retain_s": [
+            0.002
+          ],
+          "frozen_total_s": 0,
+          "retain_total_s": 0.002,
+          "delta_s": 0.002,
+          "frozen_occurrences": 0,
+          "retain_occurrences": 1,
+          "only_on": "retain"
+        }
+      },
+      "marks_on_both_arms_differing_by_5ms_or_more": {
+        "check_ignore_run": {
+          "frozen_s": [
+            0.059
+          ],
+          "retain_s": [
+            0.054
+          ],
+          "frozen_total_s": 0.059,
+          "retain_total_s": 0.054,
+          "delta_s": -0.005,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "graph_inputs_proven": {
+          "frozen_s": [
+            0.092
+          ],
+          "retain_s": [
+            0.082
+          ],
+          "frozen_total_s": 0.092,
+          "retain_total_s": 0.082,
+          "delta_s": -0.01,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "graph_session_run": {
+          "frozen_s": [
+            3.044
+          ],
+          "retain_s": [
+            2.989
+          ],
+          "frozen_total_s": 3.044,
+          "retain_total_s": 2.989,
+          "delta_s": -0.055,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "graphinput_build": {
+          "frozen_s": [
+            0.332
+          ],
+          "retain_s": [
+            0.318
+          ],
+          "frozen_total_s": 0.332,
+          "retain_total_s": 0.318,
+          "delta_s": -0.014,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "index_group_owners": {
+          "frozen_s": [
+            0.08
+          ],
+          "retain_s": [
+            0.071
+          ],
+          "frozen_total_s": 0.08,
+          "retain_total_s": 0.071,
+          "delta_s": -0.009,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "promote_compact_state": {
+          "frozen_s": [
+            0.078
+          ],
+          "retain_s": [
+            0.069
+          ],
+          "frozen_total_s": 0.078,
+          "retain_total_s": 0.069,
+          "delta_s": -0.009,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "resolve_graph_target": {
+          "frozen_s": [
+            0.332
+          ],
+          "retain_s": [
+            0.319
+          ],
+          "frozen_total_s": 0.332,
+          "retain_total_s": 0.319,
+          "delta_s": -0.013,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "runtime_inputs_reusable": {
+          "frozen_s": [
+            0.293
+          ],
+          "retain_s": [
+            0.254
+          ],
+          "frozen_total_s": 0.293,
+          "retain_total_s": 0.254,
+          "delta_s": -0.039,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "state_fingerprint": {
+          "frozen_s": [
+            0.024,
+            0.024,
+            0.024
+          ],
+          "retain_s": [
+            0.023,
+            0.025
+          ],
+          "frozen_total_s": 0.072,
+          "retain_total_s": 0.048,
+          "delta_s": -0.024,
+          "frozen_occurrences": 3,
+          "retain_occurrences": 2,
+          "only_on": null
+        },
+        "state_json_marshal": {
+          "frozen_s": [
+            0.161
+          ],
+          "retain_s": [
+            0.166
+          ],
+          "frozen_total_s": 0.161,
+          "retain_total_s": 0.166,
+          "delta_s": 0.005,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "state_json_unmarshal": {
+          "frozen_s": [
+            0.242
+          ],
+          "retain_s": [
+            0.235
+          ],
+          "frozen_total_s": 0.242,
+          "retain_total_s": 0.235,
+          "delta_s": -0.007,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "state_read_bytes": {
+          "frozen_s": [
+            0.008,
+            0.018
+          ],
+          "retain_s": [
+            0.013,
+            0.008
+          ],
+          "frozen_total_s": 0.026,
+          "retain_total_s": 0.021,
+          "delta_s": -0.005,
+          "frozen_occurrences": 2,
+          "retain_occurrences": 2,
+          "only_on": null
+        },
+        "ts_config_inputs": {
+          "frozen_s": [
+            0.133,
+            0.129
+          ],
+          "retain_s": [
+            0.135,
+            0.132
+          ],
+          "frozen_total_s": 0.262,
+          "retain_total_s": 0.267,
+          "delta_s": 0.005,
+          "frozen_occurrences": 2,
+          "retain_occurrences": 2,
+          "only_on": null
+        },
+        "ts_frozen_preview": {
+          "frozen_s": [
+            0.689
+          ],
+          "retain_s": [
+            0.7
+          ],
+          "frozen_total_s": 0.689,
+          "retain_total_s": 0.7,
+          "delta_s": 0.011,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "ts_mapfiles_aggregate": {
+          "frozen_s": [
+            0.039,
+            0.292
+          ],
+          "retain_s": [
+            0.041,
+            0.297
+          ],
+          "frozen_total_s": 0.331,
+          "retain_total_s": 0.338,
+          "delta_s": 0.007,
+          "frozen_occurrences": 2,
+          "retain_occurrences": 2,
+          "only_on": null
+        },
+        "walk_tree": {
+          "frozen_s": [
+            0.125
+          ],
+          "retain_s": [
+            0.115
+          ],
+          "frozen_total_s": 0.125,
+          "retain_total_s": 0.115,
+          "delta_s": -0.01,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        }
+      },
+      "occurrence_count_differences": {
+        "state_bytes_compared": {
+          "frozen_s": [],
+          "retain_s": [
+            0.002
+          ],
+          "frozen_total_s": 0,
+          "retain_total_s": 0.002,
+          "delta_s": 0.002,
+          "frozen_occurrences": 0,
+          "retain_occurrences": 1,
+          "only_on": "retain"
+        },
+        "state_fingerprint": {
+          "frozen_s": [
+            0.024,
+            0.024,
+            0.024
+          ],
+          "retain_s": [
+            0.023,
+            0.025
+          ],
+          "frozen_total_s": 0.072,
+          "retain_total_s": 0.048,
+          "delta_s": -0.024,
+          "frozen_occurrences": 3,
+          "retain_occurrences": 2,
+          "only_on": null
+        }
+      },
+      "pinned": {
+        "frozen": {
+          "state_proof_bound": [
+            "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634804"
+          ],
+          "runtime_inputs_reused": [
+            "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+          ],
+          "runtime_inputs_reusable": [
+            "[graph-profile] runtime_inputs_reusable            0.293s  total= 1.068s  trace=reconcile  targets=4105"
+          ],
+          "state_proof_refused": [
+            "[graph-profile] state_proof_refused                0.683s  total= 0.775s  trace=reconcile  inventory scan digest moved"
+          ],
+          "state_proof_written": [
+            "[graph-profile] state_proof_written                0.028s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19188125"
+          ],
+          "state_proof_promoted": [
+            "[graph-profile] state_proof_promoted               0.005s"
+          ],
+          "state_proof_fallback_decode": [
+            "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+          ],
+          "state_json_unmarshal": [
+            "[graph-profile] state_json_unmarshal               0.242s  files=4086"
+          ],
+          "state_json_marshal": [
+            "[graph-profile] state_json_marshal                 0.161s  bytes=56634804 files=4086"
+          ],
+          "state_read_bytes": [
+            "[graph-profile] state_read_bytes                   0.008s  state.json bytes=56634804",
+            "[graph-profile] state_read_bytes                   0.018s  state.json bytes=56634804"
+          ],
+          "state_fingerprint": [
+            "[graph-profile] state_fingerprint                  0.024s  bytes=56634804",
+            "[graph-profile] state_fingerprint                  0.024s  bytes=56634804",
+            "[graph-profile] state_fingerprint                  0.024s  write bytes=56634804"
+          ],
+          "load_state": [
+            "[graph-profile] load_state                         0.033s  total= 0.033s  trace=open  deferred owners=4086"
+          ],
+          "select_hash_targets": [
+            "[graph-profile] select_hash_targets                0.006s  total= 0.120s  trace=inputs  targets=4105"
+          ],
+          "hash_content_inputs": [
+            "[graph-profile] hash_content_inputs                0.146s  total= 0.266s  trace=inputs  targets=4105"
+          ],
+          "write_pending_state": [
+            "[graph-profile] write_pending_state                0.390s  total= 1.833s  trace=session"
+          ],
+          "promote_compact_state": [
+            "[graph-profile] promote_compact_state              0.078s  total= 1.943s  trace=session  parsed=11 published=11"
+          ],
+          "end_flush_ack": [
+            "[graph-profile] end_flush_ack                      0.032s  total= 1.865s  trace=session"
+          ],
+          "graph_session_run": [
+            "[graph-profile] graph_session_run                  3.044s  total= 3.377s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work8/product parsed=11"
+          ],
+          "cli_complete": [
+            "[graph-profile] cli_complete                       0.000s  total= 3.378s  trace=cli  results=1"
+          ]
+        },
+        "retain": {
+          "state_proof_bound": [
+            "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634804"
+          ],
+          "runtime_inputs_reused": [
+            "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+          ],
+          "runtime_inputs_reusable": [
+            "[graph-profile] runtime_inputs_reusable            0.254s  total= 1.016s  trace=reconcile  targets=4105"
+          ],
+          "state_proof_refused": [
+            "[graph-profile] state_proof_refused                0.680s  total= 0.762s  trace=reconcile  inventory scan digest moved"
+          ],
+          "state_proof_written": [
+            "[graph-profile] state_proof_written                0.029s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19154167"
+          ],
+          "state_proof_promoted": [
+            "[graph-profile] state_proof_promoted               0.005s"
+          ],
+          "state_proof_fallback_decode": [
+            "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+          ],
+          "state_json_unmarshal": [
+            "[graph-profile] state_json_unmarshal               0.235s  files=4086"
+          ],
+          "state_json_marshal": [
+            "[graph-profile] state_json_marshal                 0.166s  bytes=56634804 files=4086"
+          ],
+          "state_read_bytes": [
+            "[graph-profile] state_read_bytes                   0.013s  state.json bytes=56634804",
+            "[graph-profile] state_read_bytes                   0.008s  state.json bytes=56634804"
+          ],
+          "state_fingerprint": [
+            "[graph-profile] state_fingerprint                  0.023s  bytes=56634804",
+            "[graph-profile] state_fingerprint                  0.025s  write bytes=56634804"
+          ],
+          "state_bytes_compared": [
+            "[graph-profile] state_bytes_compared               0.002s  bytes=56634804 same=true"
+          ],
+          "load_state": [
+            "[graph-profile] load_state                         0.037s  total= 0.037s  trace=open  deferred owners=4086"
+          ],
+          "select_hash_targets": [
+            "[graph-profile] select_hash_targets                0.006s  total= 0.115s  trace=inputs  targets=4105"
+          ],
+          "hash_content_inputs": [
+            "[graph-profile] hash_content_inputs                0.144s  total= 0.260s  trace=inputs  targets=4105"
+          ],
+          "write_pending_state": [
+            "[graph-profile] write_pending_state                0.392s  total= 1.834s  trace=session"
+          ],
+          "promote_compact_state": [
+            "[graph-profile] promote_compact_state              0.069s  total= 1.935s  trace=session  parsed=11 published=11"
+          ],
+          "end_flush_ack": [
+            "[graph-profile] end_flush_ack                      0.033s  total= 1.867s  trace=session"
+          ],
+          "graph_session_run": [
+            "[graph-profile] graph_session_run                  2.989s  total= 3.310s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work8/product parsed=11"
+          ],
+          "cli_complete": [
+            "[graph-profile] cli_complete                       0.000s  total= 3.310s  trace=cli  results=1"
+          ]
+        }
+      },
+      "state_work": {
+        "frozen": {
+          "committed_state_reads": 2,
+          "fingerprints_total_read_write": [
+            3,
+            2,
+            1
+          ],
+          "byte_comparisons": 0,
+          "state_decodes": 1
+        },
+        "retain": {
+          "committed_state_reads": 2,
+          "fingerprints_total_read_write": [
+            2,
+            1,
+            1
+          ],
+          "byte_comparisons": 1,
+          "state_decodes": 1
+        }
+      },
+      "baseline": {
+        "gates": {
+          "baseline_exit_zero": true,
+          "baseline_generation_advanced": true,
+          "baseline_restored_the_same_seed_bytes": true,
+          "baseline_replayed_the_seed_graph": true,
+          "baseline_base_generation_equal": true,
+          "baseline_target_generation_equal": true,
+          "baseline_parsed_files_equal": true,
+          "baseline_owners_published_equal": true,
+          "baseline_full_result_equal_except_run_id": true,
+          "baseline_wire_run_id_matches_result": true,
+          "baseline_run_id_distinct_from_candidate": true,
+          "baseline_delta_equals_cold_graph": true,
+          "baseline_has_exactly_one_measured_row": true,
+          "baseline_decoded_the_state_exactly_once": true
+        },
+        "failed_gates": [],
+        "interpretable": true,
+        "inapplicable_proof_observations": {
+          "baseline_bound_a_proof": false,
+          "baseline_reused_capture": false,
+          "baseline_produced_a_proof": false
+        },
+        "phase_call_counts": {
+          "analysis_fingerprint": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.136,
+            "frozen_total_s": 0.135,
+            "retain_total_s": 0.137
+          },
+          "angular_probe": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.003,
+            "frozen_total_s": 0.003,
+            "retain_total_s": 0.003
+          },
+          "assemble_new_files": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.158,
+            "frozen_total_s": 0.167,
+            "retain_total_s": 0.163
+          },
+          "begin_publish": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.068,
+            "frozen_total_s": 0.055,
+            "retain_total_s": 0.059
+          },
+          "bind_identity": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "capture_contexts": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "changed_terms": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.016,
+            "frozen_total_s": 0.015,
+            "retain_total_s": 0.017
+          },
+          "check_ignore_run": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.055,
+            "frozen_total_s": 0.059,
+            "retain_total_s": 0.054
+          },
+          "check_ignore_setup": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.014,
+            "frozen_total_s": 0.014,
+            "retain_total_s": 0.014
+          },
+          "cli_complete": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "clone_file_state_copy": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "compute_identities": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.034,
+            "frozen_total_s": 0.037,
+            "retain_total_s": 0.035
+          },
+          "config_load": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "config_recheck": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "connect_sink": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.002,
+            "frozen_total_s": 0.001,
+            "retain_total_s": 0.002
+          },
+          "declare_config_deps": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "declare_git_control": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.005,
+            "frozen_total_s": 0.005,
+            "retain_total_s": 0.005
+          },
+          "declare_ignore_files": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "detect_extractors": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.001,
+            "frozen_total_s": 0.001,
+            "retain_total_s": 0.001
+          },
+          "detect_typescript": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.001,
+            "frozen_total_s": 0.001,
+            "retain_total_s": 0.001
+          },
+          "discover_git": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.03,
+            "frozen_total_s": 0.036,
+            "retain_total_s": 0.039
+          },
+          "effective_config": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "effective_config_before": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "encode_append_owners": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.004,
+            "frozen_total_s": 0.004,
+            "retain_total_s": 0.004
+          },
+          "end_flush_ack": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.037,
+            "frozen_total_s": 0.032,
+            "retain_total_s": 0.033
+          },
+          "engine_context_fingerprint": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "engine_hash_files": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.145,
+            "frozen_total_s": 0.146,
+            "retain_total_s": 0.144
+          },
+          "engine_new": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "engine_walk_repo": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.108,
+            "frozen_total_s": 0.113,
+            "retain_total_s": 0.109
+          },
+          "extractor_need": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.7,
+            "frozen_total_s": 0.024,
+            "retain_total_s": 0.025
+          },
+          "flags_parsed": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "git_ls_files": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.053,
+            "frozen_total_s": 0.054,
+            "retain_total_s": 0.054
+          },
+          "graph_inputs_proven": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.084,
+            "frozen_total_s": 0.092,
+            "retain_total_s": 0.082
+          },
+          "graph_session_run": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 2.951,
+            "frozen_total_s": 3.044,
+            "retain_total_s": 2.989
+          },
+          "graphinput_build": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.31,
+            "frozen_total_s": 0.332,
+            "retain_total_s": 0.318
+          },
+          "hash_content_inputs": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.146,
+            "frozen_total_s": 0.146,
+            "retain_total_s": 0.144
+          },
+          "index_group_owners": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.076,
+            "frozen_total_s": 0.08,
+            "retain_total_s": 0.071
+          },
+          "invalidation_plan": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.149,
+            "frozen_total_s": 0.155,
+            "retain_total_s": 0.152
+          },
+          "inventory": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.108,
+            "frozen_total_s": 0.113,
+            "retain_total_s": 0.109
+          },
+          "load_state": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.276,
+            "frozen_total_s": 0.033,
+            "retain_total_s": 0.037
+          },
+          "lock": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "open_journal": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "policy_identity": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "promote_compact_state": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.069,
+            "frozen_total_s": 0.078,
+            "retain_total_s": 0.069
+          },
+          "publish_resolved": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.046,
+            "frozen_total_s": 0.049,
+            "retain_total_s": 0.045
+          },
+          "publish_scope": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "reconcile_complete": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "register_plugins": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "replay_unacked": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "resolve_graph_target": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.311,
+            "frozen_total_s": 0.332,
+            "retain_total_s": 0.319
+          },
+          "revalidate_before_begin": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.002,
+            "frozen_total_s": 0.002,
+            "retain_total_s": 0.002
+          },
+          "revalidate_ts_records": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.108,
+            "frozen_total_s": 0.104,
+            "retain_total_s": 0.107
+          },
+          "runtime_inputs_complete": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "runtime_inputs_reusable": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.293,
+            "retain_total_s": 0.254
+          },
+          "runtime_inputs_reused": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "select_hash_targets": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.008,
+            "frozen_total_s": 0.006,
+            "retain_total_s": 0.006
+          },
+          "session_options": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "state_bytes_compared": {
+            "baseline": 0,
+            "frozen": 0,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0,
+            "retain_total_s": 0.002
+          },
+          "state_fingerprint": {
+            "baseline": 2,
+            "frozen": 3,
+            "retain": 2,
+            "baseline_total_s": 0.047,
+            "frozen_total_s": 0.072,
+            "retain_total_s": 0.048
+          },
+          "state_json_marshal": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.161,
+            "frozen_total_s": 0.161,
+            "retain_total_s": 0.166
+          },
+          "state_json_unmarshal": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.239,
+            "frozen_total_s": 0.242,
+            "retain_total_s": 0.235
+          },
+          "state_proof_bound": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "state_proof_fallback_decode": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "state_proof_promoted": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.005,
+            "retain_total_s": 0.005
+          },
+          "state_proof_refused": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.683,
+            "retain_total_s": 0.68
+          },
+          "state_proof_written": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.028,
+            "retain_total_s": 0.029
+          },
+          "state_read_bytes": {
+            "baseline": 1,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.013,
+            "frozen_total_s": 0.026,
+            "retain_total_s": 0.021
+          },
+          "transaction_enter": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "ts_compose_modules": {
+            "baseline": 2,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.005,
+            "frozen_total_s": 0.005,
+            "retain_total_s": 0.006
+          },
+          "ts_config_inputs": {
+            "baseline": 2,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.264,
+            "frozen_total_s": 0.262,
+            "retain_total_s": 0.267
+          },
+          "ts_detect_frameworks": {
+            "baseline": 2,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "ts_dirty_scope": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.097,
+            "frozen_total_s": 0.098,
+            "retain_total_s": 0.097
+          },
+          "ts_disc_alias_roots": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.081,
+            "frozen_total_s": 0.077,
+            "retain_total_s": 0.081
+          },
+          "ts_disc_nuxt_packages": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.118,
+            "frozen_total_s": 0.116,
+            "retain_total_s": 0.118
+          },
+          "ts_disc_package_aliases": {
+            "baseline": 2,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "ts_disc_package_exports": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "ts_disc_package_gates": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "ts_disc_package_names": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "ts_discovery": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.21,
+            "frozen_total_s": 0.205,
+            "retain_total_s": 0.209
+          },
+          "ts_discovery_build": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.21,
+            "frozen_total_s": 0.205,
+            "retain_total_s": 0.209
+          },
+          "ts_extract_session": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "ts_frozen_preview": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.706,
+            "frozen_total_s": 0.689,
+            "retain_total_s": 0.7
+          },
+          "ts_graphql_grpc_index": {
+            "baseline": 2,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.196,
+            "frozen_total_s": 0.195,
+            "retain_total_s": 0.196
+          },
+          "ts_mapfiles_aggregate": {
+            "baseline": 2,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.329,
+            "frozen_total_s": 0.331,
+            "retain_total_s": 0.338
+          },
+          "ts_read_dirty": {
+            "baseline": 2,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.027,
+            "frozen_total_s": 0.01,
+            "retain_total_s": 0.011
+          },
+          "ts_session_context": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.056,
+            "frozen_total_s": 0.056,
+            "retain_total_s": 0.052
+          },
+          "walk_tree": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.118,
+            "frozen_total_s": 0.125,
+            "retain_total_s": 0.115
+          },
+          "write_pending_state": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.355,
+            "frozen_total_s": 0.39,
+            "retain_total_s": 0.392
+          }
+        },
+        "marks_absent_from_baseline": {
+          "runtime_inputs_reusable": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.293,
+            "retain_total_s": 0.254
+          },
+          "runtime_inputs_reused": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "state_proof_bound": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "state_proof_fallback_decode": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "state_proof_promoted": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.005,
+            "retain_total_s": 0.005
+          },
+          "state_proof_refused": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.683,
+            "retain_total_s": 0.68
+          },
+          "state_proof_written": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.028,
+            "retain_total_s": 0.029
+          }
+        },
+        "marks_the_candidate_calls_more_often": {
+          "state_fingerprint": {
+            "baseline": 2,
+            "frozen": 3,
+            "retain": 2,
+            "baseline_total_s": 0.047,
+            "frozen_total_s": 0.072,
+            "retain_total_s": 0.048
+          },
+          "state_read_bytes": {
+            "baseline": 1,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.013,
+            "frozen_total_s": 0.026,
+            "retain_total_s": 0.021
+          }
+        },
+        "marks_absent_from_candidate": {},
+        "state_work": {
+          "committed_state_reads": 1,
+          "fingerprints_total_read_write": [
+            2,
+            1,
+            1
+          ],
+          "byte_comparisons": 0,
+          "state_decodes": 1
+        },
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 10,
+              "source content": 1
+            }
+          },
+          "RunID": "stage21-ablate-product-stage21-ablate-seed-2-1790328776747645000",
+          "BaseGeneration": 1,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 115,
+            "files_parsed": 11,
+            "cached_files": 4023,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 117,
+            "derived_indexes": 8,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 11,
+          "ParsedFiles": 11,
+          "EarlyLocal": 0
+        },
+        "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+        "wall_seconds": 3.3255,
+        "process_real_s": 3.32,
+        "rss_bytes": 605339648.0,
+        "pinned": {
+          "state_json_unmarshal": [
+            "[graph-profile] state_json_unmarshal               0.239s  files=4086"
+          ],
+          "state_json_marshal": [
+            "[graph-profile] state_json_marshal                 0.161s  bytes=56634804 files=4086"
+          ],
+          "state_read_bytes": [
+            "[graph-profile] state_read_bytes                   0.013s  state.json bytes=56634804"
+          ],
+          "state_fingerprint": [
+            "[graph-profile] state_fingerprint                  0.023s  bytes=56634804",
+            "[graph-profile] state_fingerprint                  0.024s  write bytes=56634804"
+          ],
+          "load_state": [
+            "[graph-profile] load_state                         0.276s  total= 0.276s  trace=open  files=4086"
+          ],
+          "select_hash_targets": [
+            "[graph-profile] select_hash_targets                0.008s  total= 0.117s  trace=inputs  targets=4105"
+          ],
+          "hash_content_inputs": [
+            "[graph-profile] hash_content_inputs                0.146s  total= 0.263s  trace=inputs  targets=4105"
+          ],
+          "write_pending_state": [
+            "[graph-profile] write_pending_state                0.355s  total= 2.485s  trace=session"
+          ],
+          "promote_compact_state": [
+            "[graph-profile] promote_compact_state              0.069s  total= 2.591s  trace=session  parsed=11 published=11"
+          ],
+          "end_flush_ack": [
+            "[graph-profile] end_flush_ack                      0.037s  total= 2.522s  trace=session"
+          ],
+          "graph_session_run": [
+            "[graph-profile] graph_session_run                  2.951s  total= 3.264s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work8/product parsed=11"
+          ],
+          "cli_complete": [
+            "[graph-profile] cli_complete                       0.000s  total= 3.264s  trace=cli  results=1"
+          ]
+        }
+      },
+      "arms_present": [
+        "baseline",
+        "frozen",
+        "retain"
+      ],
+      "duplicate_measured_rows": {},
+      "full_cohort_interpretable": true
+    },
+    "structural": {
+      "gates": {
+        "both_arms_exit_zero": true,
+        "both_arms_generation_advanced": true,
+        "both_arms_bound_their_seed_proof": true,
+        "both_arms_reused_capture": true,
+        "seeds_byte_identical_across_arms": true,
+        "both_arms_replayed_the_seed_graph": true,
+        "base_generation_equal": true,
+        "target_generation_equal": true,
+        "parsed_files_equal": true,
+        "owners_published_equal": true,
+        "full_result_equal_except_run_id": true,
+        "each_arm_wire_run_id_matches_its_result": true,
+        "arms_have_distinct_run_ids": true,
+        "arms_agree_on_graph": true,
+        "frozen_delta_equals_cold_graph": true,
+        "retain_delta_equals_cold_graph": true,
+        "frozen_produced_and_promoted_a_proof": true,
+        "retain_produced_and_promoted_a_proof": true,
+        "retain_delta_read_committed_state_twice": true,
+        "frozen_delta_read_committed_state_twice": true,
+        "retain_delta_fingerprinted_twice_one_read_one_write": true,
+        "frozen_delta_fingerprinted_three_times_two_read_one_write": true,
+        "retain_delta_compared_bytes_once": true,
+        "frozen_delta_compared_no_bytes": true,
+        "frozen_delta_decoded_the_state_exactly_once": true,
+        "retain_delta_decoded_the_state_exactly_once": true,
+        "frozen_and_retain_each_have_exactly_one_measured_row": true
+      },
+      "failed_gates": [],
+      "interpretable": true,
+      "seed": {
+        "frozen": {
+          "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790328789252719000",
+          "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+          "base_generation": 1,
+          "target_generation": 2,
+          "state_files": 10,
+          "state_sha256": "7c7959ce8ea33d1c4fe70c7e0030f8cd335f81d55eb5114241e4ab3e6090a078",
+          "proof_sha256": "6f5372be40bb1168f023b0a2e7dd058d342d99387ba3e075629e16babcd99c78"
+        },
+        "retain": {
+          "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790328789252719000",
+          "graph_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+          "base_generation": 1,
+          "target_generation": 2,
+          "state_files": 10,
+          "state_sha256": "7c7959ce8ea33d1c4fe70c7e0030f8cd335f81d55eb5114241e4ab3e6090a078",
+          "proof_sha256": "6f5372be40bb1168f023b0a2e7dd058d342d99387ba3e075629e16babcd99c78"
+        }
+      },
+      "restored_state_manifest_equal": true,
+      "replay": {
+        "frozen": {
+          "replayed_frames": 2,
+          "matched": {
+            "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790328789252719000",
+            "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+            "base_generation": 1,
+            "applied_generation": 2
+          }
+        },
+        "retain": {
+          "replayed_frames": 2,
+          "matched": {
+            "run_id": "stage21-ablate-product-stage21-ablate-seed-2-1790328789252719000",
+            "normalized_hash": "c2e54147b5379bfbbe28a2419017b172e0cdd1f89b6ef2294d717c6a97889784",
+            "base_generation": 1,
+            "applied_generation": 2
+          }
+        }
+      },
+      "run_ids": {
+        "frozen": "stage21-ablate-product-stage21-ablate-seed-3-1790328794922780000",
+        "retain": "stage21-ablate-product-stage21-ablate-seed-3-1790328800434249000",
+        "frozen_wire": "stage21-ablate-product-stage21-ablate-seed-3-1790328794922780000",
+        "retain_wire": "stage21-ablate-product-stage21-ablate-seed-3-1790328800434249000"
+      },
+      "results": {
+        "frozen": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 11,
+              "source content": 1
+            }
+          },
+          "RunID": "stage21-ablate-product-stage21-ablate-seed-3-1790328794922780000",
+          "BaseGeneration": 2,
+          "TargetGeneration": 3,
+          "Stats": {
+            "files_read": 116,
+            "files_parsed": 12,
+            "cached_files": 4022,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 117,
+            "derived_indexes": 8,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 12,
+          "ParsedFiles": 12,
+          "EarlyLocal": 0
+        },
+        "retain": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 11,
+              "source content": 1
+            }
+          },
+          "RunID": "stage21-ablate-product-stage21-ablate-seed-3-1790328800434249000",
+          "BaseGeneration": 2,
+          "TargetGeneration": 3,
+          "Stats": {
+            "files_read": 116,
+            "files_parsed": 12,
+            "cached_files": 4022,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 117,
+            "derived_indexes": 8,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 12,
+          "ParsedFiles": 12,
+          "EarlyLocal": 0
+        }
+      },
+      "graph_hashes": {
+        "frozen": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666",
+        "retain": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666",
+        "cold": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666"
+      },
+      "fallbacks": {
+        "frozen": [
+          "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+        ],
+        "retain": [
+          "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+        ]
+      },
+      "wall_seconds": {
+        "frozen": 3.4373,
+        "retain": 3.3447,
+        "delta_s": -0.0927
+      },
+      "process_real_s": {
+        "frozen": 3.43,
+        "retain": 3.33
+      },
+      "rss_bytes": {
+        "frozen": 622804992.0,
+        "retain": 666632192.0
+      },
+      "marks_only_on_the_frozen_arm": {},
+      "marks_only_on_the_retain_arm": {
+        "state_bytes_compared": {
+          "frozen_s": [],
+          "retain_s": [
+            0.002
+          ],
+          "frozen_total_s": 0,
+          "retain_total_s": 0.002,
+          "delta_s": 0.002,
+          "frozen_occurrences": 0,
+          "retain_occurrences": 1,
+          "only_on": "retain"
+        }
+      },
+      "marks_on_both_arms_differing_by_5ms_or_more": {
+        "compute_identities": {
+          "frozen_s": [
+            0.038
+          ],
+          "retain_s": [
+            0.033
+          ],
+          "frozen_total_s": 0.038,
+          "retain_total_s": 0.033,
+          "delta_s": -0.005,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "graph_session_run": {
+          "frozen_s": [
+            3.081
+          ],
+          "retain_s": [
+            3.002
+          ],
+          "frozen_total_s": 3.081,
+          "retain_total_s": 3.002,
+          "delta_s": -0.079,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "graphinput_build": {
+          "frozen_s": [
+            0.33
+          ],
+          "retain_s": [
+            0.313
+          ],
+          "frozen_total_s": 0.33,
+          "retain_total_s": 0.313,
+          "delta_s": -0.017,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "invalidation_plan": {
+          "frozen_s": [
+            0.177
+          ],
+          "retain_s": [
+            0.172
+          ],
+          "frozen_total_s": 0.177,
+          "retain_total_s": 0.172,
+          "delta_s": -0.005,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "load_state": {
+          "frozen_s": [
+            0.038
+          ],
+          "retain_s": [
+            0.032
+          ],
+          "frozen_total_s": 0.038,
+          "retain_total_s": 0.032,
+          "delta_s": -0.006,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "resolve_graph_target": {
+          "frozen_s": [
+            0.33
+          ],
+          "retain_s": [
+            0.313
+          ],
+          "frozen_total_s": 0.33,
+          "retain_total_s": 0.313,
+          "delta_s": -0.017,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "runtime_inputs_reusable": {
+          "frozen_s": [
+            0.295
+          ],
+          "retain_s": [
+            0.252
+          ],
+          "frozen_total_s": 0.295,
+          "retain_total_s": 0.252,
+          "delta_s": -0.043,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "state_fingerprint": {
+          "frozen_s": [
+            0.024,
+            0.023,
+            0.025
+          ],
+          "retain_s": [
+            0.024,
+            0.025
+          ],
+          "frozen_total_s": 0.072,
+          "retain_total_s": 0.049,
+          "delta_s": -0.023,
+          "frozen_occurrences": 3,
+          "retain_occurrences": 2,
+          "only_on": null
+        },
+        "state_json_marshal": {
+          "frozen_s": [
+            0.171
+          ],
+          "retain_s": [
+            0.16
+          ],
+          "frozen_total_s": 0.171,
+          "retain_total_s": 0.16,
+          "delta_s": -0.011,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "state_json_unmarshal": {
+          "frozen_s": [
+            0.243
+          ],
+          "retain_s": [
+            0.233
+          ],
+          "frozen_total_s": 0.243,
+          "retain_total_s": 0.233,
+          "delta_s": -0.01,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "state_proof_refused": {
+          "frozen_s": [
+            0.685
+          ],
+          "retain_s": [
+            0.67
+          ],
+          "frozen_total_s": 0.685,
+          "retain_total_s": 0.67,
+          "delta_s": -0.015,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "state_read_bytes": {
+          "frozen_s": [
+            0.013,
+            0.02
+          ],
+          "retain_s": [
+            0.008,
+            0.008
+          ],
+          "frozen_total_s": 0.033,
+          "retain_total_s": 0.016,
+          "delta_s": -0.017,
+          "frozen_occurrences": 2,
+          "retain_occurrences": 2,
+          "only_on": null
+        },
+        "ts_discovery": {
+          "frozen_s": [
+            0.205
+          ],
+          "retain_s": [
+            0.2
+          ],
+          "frozen_total_s": 0.205,
+          "retain_total_s": 0.2,
+          "delta_s": -0.005,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "ts_discovery_build": {
+          "frozen_s": [
+            0.205
+          ],
+          "retain_s": [
+            0.2
+          ],
+          "frozen_total_s": 0.205,
+          "retain_total_s": 0.2,
+          "delta_s": -0.005,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "ts_frozen_preview": {
+          "frozen_s": [
+            0.693
+          ],
+          "retain_s": [
+            0.698
+          ],
+          "frozen_total_s": 0.693,
+          "retain_total_s": 0.698,
+          "delta_s": 0.005,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "ts_mapfiles_aggregate": {
+          "frozen_s": [
+            0.04,
+            0.291
+          ],
+          "retain_s": [
+            0.039,
+            0.299
+          ],
+          "frozen_total_s": 0.331,
+          "retain_total_s": 0.338,
+          "delta_s": 0.007,
+          "frozen_occurrences": 2,
+          "retain_occurrences": 2,
+          "only_on": null
+        },
+        "ts_session_context": {
+          "frozen_s": [
+            0.055
+          ],
+          "retain_s": [
+            0.05
+          ],
+          "frozen_total_s": 0.055,
+          "retain_total_s": 0.05,
+          "delta_s": -0.005,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "walk_tree": {
+          "frozen_s": [
+            0.128
+          ],
+          "retain_s": [
+            0.118
+          ],
+          "frozen_total_s": 0.128,
+          "retain_total_s": 0.118,
+          "delta_s": -0.01,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        },
+        "write_pending_state": {
+          "frozen_s": [
+            0.39
+          ],
+          "retain_s": [
+            0.383
+          ],
+          "frozen_total_s": 0.39,
+          "retain_total_s": 0.383,
+          "delta_s": -0.007,
+          "frozen_occurrences": 1,
+          "retain_occurrences": 1,
+          "only_on": null
+        }
+      },
+      "occurrence_count_differences": {
+        "state_bytes_compared": {
+          "frozen_s": [],
+          "retain_s": [
+            0.002
+          ],
+          "frozen_total_s": 0,
+          "retain_total_s": 0.002,
+          "delta_s": 0.002,
+          "frozen_occurrences": 0,
+          "retain_occurrences": 1,
+          "only_on": "retain"
+        },
+        "state_fingerprint": {
+          "frozen_s": [
+            0.024,
+            0.023,
+            0.025
+          ],
+          "retain_s": [
+            0.024,
+            0.025
+          ],
+          "frozen_total_s": 0.072,
+          "retain_total_s": 0.049,
+          "delta_s": -0.023,
+          "frozen_occurrences": 3,
+          "retain_occurrences": 2,
+          "only_on": null
+        }
+      },
+      "pinned": {
+        "frozen": {
+          "state_proof_bound": [
+            "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634915"
+          ],
+          "runtime_inputs_reused": [
+            "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+          ],
+          "runtime_inputs_reusable": [
+            "[graph-profile] runtime_inputs_reusable            0.295s  total= 1.065s  trace=reconcile  targets=4105"
+          ],
+          "state_proof_refused": [
+            "[graph-profile] state_proof_refused                0.685s  total= 0.770s  trace=reconcile  inventory scan digest moved"
+          ],
+          "state_proof_written": [
+            "[graph-profile] state_proof_written                0.028s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19157709"
+          ],
+          "state_proof_promoted": [
+            "[graph-profile] state_proof_promoted               0.004s"
+          ],
+          "state_proof_fallback_decode": [
+            "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+          ],
+          "state_json_unmarshal": [
+            "[graph-profile] state_json_unmarshal               0.243s  files=4086"
+          ],
+          "state_json_marshal": [
+            "[graph-profile] state_json_marshal                 0.171s  bytes=56635634 files=4086"
+          ],
+          "state_read_bytes": [
+            "[graph-profile] state_read_bytes                   0.013s  state.json bytes=56634915",
+            "[graph-profile] state_read_bytes                   0.020s  state.json bytes=56634915"
+          ],
+          "state_fingerprint": [
+            "[graph-profile] state_fingerprint                  0.024s  bytes=56634915",
+            "[graph-profile] state_fingerprint                  0.023s  bytes=56634915",
+            "[graph-profile] state_fingerprint                  0.025s  write bytes=56635634"
+          ],
+          "load_state": [
+            "[graph-profile] load_state                         0.038s  total= 0.038s  trace=open  deferred owners=4086"
+          ],
+          "select_hash_targets": [
+            "[graph-profile] select_hash_targets                0.006s  total= 0.116s  trace=inputs  targets=4105"
+          ],
+          "hash_content_inputs": [
+            "[graph-profile] hash_content_inputs                0.146s  total= 0.262s  trace=inputs  targets=4105"
+          ],
+          "write_pending_state": [
+            "[graph-profile] write_pending_state                0.390s  total= 1.870s  trace=session"
+          ],
+          "promote_compact_state": [
+            "[graph-profile] promote_compact_state              0.075s  total= 1.977s  trace=session  parsed=12 published=12"
+          ],
+          "end_flush_ack": [
+            "[graph-profile] end_flush_ack                      0.032s  total= 1.903s  trace=session"
+          ],
+          "graph_session_run": [
+            "[graph-profile] graph_session_run                  3.081s  total= 3.412s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work8/product parsed=12"
+          ],
+          "cli_complete": [
+            "[graph-profile] cli_complete                       0.000s  total= 3.412s  trace=cli  results=1"
+          ]
+        },
+        "retain": {
+          "state_proof_bound": [
+            "[graph-profile] state_proof_bound                  0.000s  owners=4086 hash_inputs=4105 proof_bytes=10952 state_bytes=56634915"
+          ],
+          "runtime_inputs_reused": [
+            "[graph-profile] runtime_inputs_reused              0.000s  total= 0.000s  trace=session  targets=4105 contexts=0"
+          ],
+          "runtime_inputs_reusable": [
+            "[graph-profile] runtime_inputs_reusable            0.252s  total= 1.006s  trace=reconcile  targets=4105"
+          ],
+          "state_proof_refused": [
+            "[graph-profile] state_proof_refused                0.670s  total= 0.753s  trace=reconcile  inventory scan digest moved"
+          ],
+          "state_proof_written": [
+            "[graph-profile] state_proof_written                0.029s  bytes=10952 owners=4086 hash_inputs=4105 prior_keys=4086 stable=true staged=true build_ns=19210833"
+          ],
+          "state_proof_promoted": [
+            "[graph-profile] state_proof_promoted               0.005s"
+          ],
+          "state_proof_fallback_decode": [
+            "[graph-profile] state_proof_fallback_decode        0.000s  files=4086"
+          ],
+          "state_json_unmarshal": [
+            "[graph-profile] state_json_unmarshal               0.233s  files=4086"
+          ],
+          "state_json_marshal": [
+            "[graph-profile] state_json_marshal                 0.160s  bytes=56635634 files=4086"
+          ],
+          "state_read_bytes": [
+            "[graph-profile] state_read_bytes                   0.008s  state.json bytes=56634915",
+            "[graph-profile] state_read_bytes                   0.008s  state.json bytes=56634915"
+          ],
+          "state_fingerprint": [
+            "[graph-profile] state_fingerprint                  0.024s  bytes=56634915",
+            "[graph-profile] state_fingerprint                  0.025s  write bytes=56635634"
+          ],
+          "state_bytes_compared": [
+            "[graph-profile] state_bytes_compared               0.002s  bytes=56634915 same=true"
+          ],
+          "load_state": [
+            "[graph-profile] load_state                         0.032s  total= 0.032s  trace=open  deferred owners=4086"
+          ],
+          "select_hash_targets": [
+            "[graph-profile] select_hash_targets                0.006s  total= 0.118s  trace=inputs  targets=4105"
+          ],
+          "hash_content_inputs": [
+            "[graph-profile] hash_content_inputs                0.143s  total= 0.261s  trace=inputs  targets=4105"
+          ],
+          "write_pending_state": [
+            "[graph-profile] write_pending_state                0.383s  total= 1.859s  trace=session"
+          ],
+          "promote_compact_state": [
+            "[graph-profile] promote_compact_state              0.073s  total= 1.964s  trace=session  parsed=12 published=12"
+          ],
+          "end_flush_ack": [
+            "[graph-profile] end_flush_ack                      0.032s  total= 1.891s  trace=session"
+          ],
+          "graph_session_run": [
+            "[graph-profile] graph_session_run                  3.002s  total= 3.317s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work8/product parsed=12"
+          ],
+          "cli_complete": [
+            "[graph-profile] cli_complete                       0.000s  total= 3.317s  trace=cli  results=1"
+          ]
+        }
+      },
+      "state_work": {
+        "frozen": {
+          "committed_state_reads": 2,
+          "fingerprints_total_read_write": [
+            3,
+            2,
+            1
+          ],
+          "byte_comparisons": 0,
+          "state_decodes": 1
+        },
+        "retain": {
+          "committed_state_reads": 2,
+          "fingerprints_total_read_write": [
+            2,
+            1,
+            1
+          ],
+          "byte_comparisons": 1,
+          "state_decodes": 1
+        }
+      },
+      "baseline": {
+        "gates": {
+          "baseline_exit_zero": true,
+          "baseline_generation_advanced": true,
+          "baseline_restored_the_same_seed_bytes": true,
+          "baseline_replayed_the_seed_graph": true,
+          "baseline_base_generation_equal": true,
+          "baseline_target_generation_equal": true,
+          "baseline_parsed_files_equal": true,
+          "baseline_owners_published_equal": true,
+          "baseline_full_result_equal_except_run_id": true,
+          "baseline_wire_run_id_matches_result": true,
+          "baseline_run_id_distinct_from_candidate": true,
+          "baseline_delta_equals_cold_graph": true,
+          "baseline_has_exactly_one_measured_row": true,
+          "baseline_decoded_the_state_exactly_once": true
+        },
+        "failed_gates": [],
+        "interpretable": true,
+        "inapplicable_proof_observations": {
+          "baseline_bound_a_proof": false,
+          "baseline_reused_capture": false,
+          "baseline_produced_a_proof": false
+        },
+        "phase_call_counts": {
+          "analysis_fingerprint": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.136,
+            "frozen_total_s": 0.138,
+            "retain_total_s": 0.137
+          },
+          "angular_probe": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.003,
+            "frozen_total_s": 0.003,
+            "retain_total_s": 0.003
+          },
+          "assemble_new_files": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.164,
+            "frozen_total_s": 0.169,
+            "retain_total_s": 0.167
+          },
+          "begin_publish": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.062,
+            "frozen_total_s": 0.061,
+            "retain_total_s": 0.059
+          },
+          "bind_identity": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "capture_contexts": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "changed_terms": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.015,
+            "frozen_total_s": 0.016,
+            "retain_total_s": 0.017
+          },
+          "check_ignore_run": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.055,
+            "frozen_total_s": 0.059,
+            "retain_total_s": 0.057
+          },
+          "check_ignore_setup": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.014,
+            "frozen_total_s": 0.015,
+            "retain_total_s": 0.014
+          },
+          "cli_complete": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "clone_file_state_copy": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "compute_identities": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.032,
+            "frozen_total_s": 0.038,
+            "retain_total_s": 0.033
+          },
+          "config_load": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "config_recheck": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "connect_sink": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.001,
+            "frozen_total_s": 0.001,
+            "retain_total_s": 0.001
+          },
+          "declare_config_deps": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "declare_git_control": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.005,
+            "frozen_total_s": 0.005,
+            "retain_total_s": 0.005
+          },
+          "declare_ignore_files": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "detect_extractors": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.001,
+            "frozen_total_s": 0.001,
+            "retain_total_s": 0.001
+          },
+          "detect_typescript": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.001,
+            "frozen_total_s": 0.001,
+            "retain_total_s": 0.001
+          },
+          "discover_git": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.033,
+            "frozen_total_s": 0.032,
+            "retain_total_s": 0.032
+          },
+          "effective_config": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "effective_config_before": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "encode_append_owners": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.004,
+            "frozen_total_s": 0.004,
+            "retain_total_s": 0.004
+          },
+          "end_flush_ack": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.033,
+            "frozen_total_s": 0.032,
+            "retain_total_s": 0.032
+          },
+          "engine_context_fingerprint": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "engine_hash_files": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.16,
+            "frozen_total_s": 0.146,
+            "retain_total_s": 0.143
+          },
+          "engine_new": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "engine_walk_repo": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.115,
+            "frozen_total_s": 0.109,
+            "retain_total_s": 0.111
+          },
+          "extractor_need": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.713,
+            "frozen_total_s": 0.025,
+            "retain_total_s": 0.025
+          },
+          "flags_parsed": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "git_ls_files": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.053,
+            "frozen_total_s": 0.053,
+            "retain_total_s": 0.053
+          },
+          "graph_inputs_proven": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.087,
+            "frozen_total_s": 0.085,
+            "retain_total_s": 0.083
+          },
+          "graph_session_run": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 3.014,
+            "frozen_total_s": 3.081,
+            "retain_total_s": 3.002
+          },
+          "graphinput_build": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.313,
+            "frozen_total_s": 0.33,
+            "retain_total_s": 0.313
+          },
+          "hash_content_inputs": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.16,
+            "frozen_total_s": 0.146,
+            "retain_total_s": 0.143
+          },
+          "index_group_owners": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.082,
+            "frozen_total_s": 0.084,
+            "retain_total_s": 0.083
+          },
+          "invalidation_plan": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.176,
+            "frozen_total_s": 0.177,
+            "retain_total_s": 0.172
+          },
+          "inventory": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.116,
+            "frozen_total_s": 0.11,
+            "retain_total_s": 0.111
+          },
+          "load_state": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.278,
+            "frozen_total_s": 0.038,
+            "retain_total_s": 0.032
+          },
+          "lock": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "open_journal": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "policy_identity": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "promote_compact_state": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.069,
+            "frozen_total_s": 0.075,
+            "retain_total_s": 0.073
+          },
+          "publish_resolved": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.05,
+            "frozen_total_s": 0.048,
+            "retain_total_s": 0.046
+          },
+          "publish_scope": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "reconcile_complete": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "register_plugins": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "replay_unacked": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "resolve_graph_target": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.313,
+            "frozen_total_s": 0.33,
+            "retain_total_s": 0.313
+          },
+          "revalidate_before_begin": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.002,
+            "frozen_total_s": 0.002,
+            "retain_total_s": 0.002
+          },
+          "revalidate_ts_records": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.109,
+            "frozen_total_s": 0.104,
+            "retain_total_s": 0.104
+          },
+          "runtime_inputs_complete": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "runtime_inputs_reusable": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.295,
+            "retain_total_s": 0.252
+          },
+          "runtime_inputs_reused": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "select_hash_targets": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.01,
+            "frozen_total_s": 0.006,
+            "retain_total_s": 0.006
+          },
+          "session_options": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "state_bytes_compared": {
+            "baseline": 0,
+            "frozen": 0,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0,
+            "retain_total_s": 0.002
+          },
+          "state_fingerprint": {
+            "baseline": 2,
+            "frozen": 3,
+            "retain": 2,
+            "baseline_total_s": 0.047,
+            "frozen_total_s": 0.072,
+            "retain_total_s": 0.049
+          },
+          "state_json_marshal": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.164,
+            "frozen_total_s": 0.171,
+            "retain_total_s": 0.16
+          },
+          "state_json_unmarshal": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.241,
+            "frozen_total_s": 0.243,
+            "retain_total_s": 0.233
+          },
+          "state_proof_bound": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "state_proof_fallback_decode": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "state_proof_promoted": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.004,
+            "retain_total_s": 0.005
+          },
+          "state_proof_refused": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.685,
+            "retain_total_s": 0.67
+          },
+          "state_proof_written": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.028,
+            "retain_total_s": 0.029
+          },
+          "state_read_bytes": {
+            "baseline": 1,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.013,
+            "frozen_total_s": 0.033,
+            "retain_total_s": 0.016
+          },
+          "transaction_enter": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "ts_compose_modules": {
+            "baseline": 2,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.005,
+            "frozen_total_s": 0.004,
+            "retain_total_s": 0.006
+          },
+          "ts_config_inputs": {
+            "baseline": 2,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.268,
+            "frozen_total_s": 0.264,
+            "retain_total_s": 0.264
+          },
+          "ts_detect_frameworks": {
+            "baseline": 2,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "ts_dirty_scope": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.099,
+            "frozen_total_s": 0.097,
+            "retain_total_s": 0.099
+          },
+          "ts_disc_alias_roots": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.077,
+            "frozen_total_s": 0.077,
+            "retain_total_s": 0.076
+          },
+          "ts_disc_nuxt_packages": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.113,
+            "frozen_total_s": 0.117,
+            "retain_total_s": 0.114
+          },
+          "ts_disc_package_aliases": {
+            "baseline": 2,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "ts_disc_package_exports": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "ts_disc_package_gates": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "ts_disc_package_names": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "ts_discovery": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.201,
+            "frozen_total_s": 0.205,
+            "retain_total_s": 0.2
+          },
+          "ts_discovery_build": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.201,
+            "frozen_total_s": 0.205,
+            "retain_total_s": 0.2
+          },
+          "ts_extract_session": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "ts_frozen_preview": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.71,
+            "frozen_total_s": 0.693,
+            "retain_total_s": 0.698
+          },
+          "ts_graphql_grpc_index": {
+            "baseline": 2,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.204,
+            "frozen_total_s": 0.197,
+            "retain_total_s": 0.196
+          },
+          "ts_mapfiles_aggregate": {
+            "baseline": 2,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.34,
+            "frozen_total_s": 0.331,
+            "retain_total_s": 0.338
+          },
+          "ts_read_dirty": {
+            "baseline": 2,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.011,
+            "frozen_total_s": 0.011,
+            "retain_total_s": 0.01
+          },
+          "ts_session_context": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.056,
+            "frozen_total_s": 0.055,
+            "retain_total_s": 0.05
+          },
+          "walk_tree": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.119,
+            "frozen_total_s": 0.128,
+            "retain_total_s": 0.118
+          },
+          "write_pending_state": {
+            "baseline": 1,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0.361,
+            "frozen_total_s": 0.39,
+            "retain_total_s": 0.383
+          }
+        },
+        "marks_absent_from_baseline": {
+          "runtime_inputs_reusable": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.295,
+            "retain_total_s": 0.252
+          },
+          "runtime_inputs_reused": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "state_proof_bound": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "state_proof_fallback_decode": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.0,
+            "retain_total_s": 0.0
+          },
+          "state_proof_promoted": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.004,
+            "retain_total_s": 0.005
+          },
+          "state_proof_refused": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.685,
+            "retain_total_s": 0.67
+          },
+          "state_proof_written": {
+            "baseline": 0,
+            "frozen": 1,
+            "retain": 1,
+            "baseline_total_s": 0,
+            "frozen_total_s": 0.028,
+            "retain_total_s": 0.029
+          }
+        },
+        "marks_the_candidate_calls_more_often": {
+          "state_fingerprint": {
+            "baseline": 2,
+            "frozen": 3,
+            "retain": 2,
+            "baseline_total_s": 0.047,
+            "frozen_total_s": 0.072,
+            "retain_total_s": 0.049
+          },
+          "state_read_bytes": {
+            "baseline": 1,
+            "frozen": 2,
+            "retain": 2,
+            "baseline_total_s": 0.013,
+            "frozen_total_s": 0.033,
+            "retain_total_s": 0.016
+          }
+        },
+        "marks_absent_from_candidate": {},
+        "state_work": {
+          "committed_state_reads": 1,
+          "fingerprints_total_read_write": [
+            2,
+            1,
+            1
+          ],
+          "byte_comparisons": 0,
+          "state_decodes": 1
+        },
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 11,
+              "source content": 1
+            }
+          },
+          "RunID": "stage21-ablate-product-stage21-ablate-seed-3-1790328805930587000",
+          "BaseGeneration": 2,
+          "TargetGeneration": 3,
+          "Stats": {
+            "files_read": 116,
+            "files_parsed": 12,
+            "cached_files": 4022,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 117,
+            "derived_indexes": 8,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: prior file-to-file dependency closure"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 12,
+          "ParsedFiles": 12,
+          "EarlyLocal": 0
+        },
+        "graph_hash": "df4ca9abae08c5e1c62242fff8b64dd64b7b61e38136e2a299585c4260a82666",
+        "wall_seconds": 3.3538,
+        "process_real_s": 3.34,
+        "rss_bytes": 627490816.0,
+        "pinned": {
+          "state_json_unmarshal": [
+            "[graph-profile] state_json_unmarshal               0.241s  files=4086"
+          ],
+          "state_json_marshal": [
+            "[graph-profile] state_json_marshal                 0.164s  bytes=56635634 files=4086"
+          ],
+          "state_read_bytes": [
+            "[graph-profile] state_read_bytes                   0.013s  state.json bytes=56634915"
+          ],
+          "state_fingerprint": [
+            "[graph-profile] state_fingerprint                  0.023s  bytes=56634915",
+            "[graph-profile] state_fingerprint                  0.024s  write bytes=56635634"
+          ],
+          "load_state": [
+            "[graph-profile] load_state                         0.278s  total= 0.278s  trace=open  files=4086"
+          ],
+          "select_hash_targets": [
+            "[graph-profile] select_hash_targets                0.010s  total= 0.126s  trace=inputs  targets=4105"
+          ],
+          "hash_content_inputs": [
+            "[graph-profile] hash_content_inputs                0.160s  total= 0.286s  trace=inputs  targets=4105"
+          ],
+          "write_pending_state": [
+            "[graph-profile] write_pending_state                0.361s  total= 2.547s  trace=session"
+          ],
+          "promote_compact_state": [
+            "[graph-profile] promote_compact_state              0.069s  total= 2.649s  trace=session  parsed=12 published=12"
+          ],
+          "end_flush_ack": [
+            "[graph-profile] end_flush_ack                      0.033s  total= 2.580s  trace=session"
+          ],
+          "graph_session_run": [
+            "[graph-profile] graph_session_run                  3.014s  total= 3.329s  trace=cli  repo=/private/tmp/enola-stage21-ablate/work8/product parsed=12"
+          ],
+          "cli_complete": [
+            "[graph-profile] cli_complete                       0.000s  total= 3.329s  trace=cli  results=1"
+          ]
+        }
+      },
+      "arms_present": [
+        "baseline",
+        "frozen",
+        "retain"
+      ],
+      "duplicate_measured_rows": {},
+      "full_cohort_interpretable": true
+    }
+  },
+  "full_cohort_interpretable": true
+}

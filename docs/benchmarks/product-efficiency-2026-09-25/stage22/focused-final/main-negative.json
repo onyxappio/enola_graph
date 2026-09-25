@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-overlay",
+    "/tmp/enola-stage22-root-signature/main-negative-overlay.json",
+    "-count=1",
+    "-run",
+    "^(TestMinifiedRecordCarriesFrameworkSummary|TestCompositionSignatureRereadsLegacyMinifiedRecord|TestMinifiedGRPCStubStillResolvesConsumerAfterReuse|TestMinifiedGraphQLServerStillShapesConsumerAfterReuse)$",
+    "./internal/extractors/tsextractor"
+  ],
+  "exit": 1,
+  "wall_s": 2.2239599579479545,
+  "purpose": "Negative control on unchanged main; failure expected"
+}

@@ -1,0 +1,15 @@
+{
+  "changed_go_files_vs_frozen": [
+    "internal/graphsession/stateproof_persist.go",
+    "internal/graphsession/resident.go",
+    "internal/graphsession/stateproof_startup.go",
+    "internal/graphsession/stateproof_retain_test.go"
+  ],
+  "manifest_verified": true,
+  "focused_log": "/tmp/s21-retain-focused.log",
+  "focused_top_level_tests": 8,
+  "focused_leaf_cases": 11,
+  "focused_seconds": 4.172,
+  "full_suite": "running PID69141; /tmp/s21-retain-pkg-final.log",
+  "review": "exact byte equality and fingerprint fallback preserved; buffer cleared for all transaction exits and Close; counters fold late; transaction refusal/retry and predecode failure tested"
+}

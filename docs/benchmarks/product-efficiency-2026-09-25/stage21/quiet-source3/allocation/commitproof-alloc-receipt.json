@@ -1,0 +1,97 @@
+{
+  "scope": "Exact full 4105-target end-to-end commitProof allocation boundary, authorized by msg_adee7129aa6b",
+  "not_acceptance": "Allocation characterization only. Not a latency measurement, not a speed claim, not production acceptance. ns/op is recorded for ordering only and is not a result: 5 iterations on a shared host.",
+  "host": "darwin/arm64 Apple M1 Pro, go1.27.1, -benchtime=5x -count=1",
+  "probe": {
+    "file": "/tmp/enola-stage21-proof/src/internal/graphsession/zz_scratch_commit_proof_alloc_test.go",
+    "build_tag": "scratchprobe",
+    "in_patch": false,
+    "in_manifest": false,
+    "production_files_changed": 0
+  },
+  "fixture": {
+    "product_checkout": "/tmp/enola-stage21-proof/alloc/product",
+    "product_source": "/tmp/enola-stage16-root-review/product-source (root-owned, read-only; APFS cp -cR clone, never written)",
+    "product_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+    "worktree_clean": "git status --porcelain --untracked-files=all: 0 lines",
+    "config": "/tmp/enola-stage21-proof/alloc/product-config.yaml, identical to /tmp/enola-stage21-root-review/product-proof-run3/config.yaml except the repo line",
+    "engine": "pkg/bootstrap.NewGraphEngine with ConfigPath and an out-of-checkout StateDir, i.e. the production construction path, not a hand-assembled engine",
+    "state": "/tmp/enola-stage21-proof/alloc/product-state.json, 56633618 bytes, copied read-only from /tmp/enola-stage21-root-review/product-proof-run3/state1",
+    "inventory_files": 10965,
+    "all_names": 10965,
+    "detected_extractors": 1,
+    "owner_records": 4086,
+    "nil_prior_targets": 4105,
+    "with_prior_targets": 4105,
+    "targets_absent_from_state": 19,
+    "extras_are": "all 19 are .html files under apps/ and docs/, enumerated in /tmp/s21-alloc-boundary-1.log",
+    "proof_write_bytes": 10966,
+    "fidelity": "10966 bytes matches root's real Product run marker exactly (state_proof_written bytes=10966 owners=4086 hash_inputs=4105 prior_keys=4086), so this is the real payload and not an approximation of it"
+  },
+  "boundary": {
+    "inside": [
+      "filesToHash(eng, inv, nil, detected)",
+      "filesToHash(eng, inv, st.Files, detected)",
+      "buildStateProof(st, fp, nilPrior, withPrior, hashes, detected)",
+      "writePendingProof(dir, p)",
+      "promotePendingProof(dir)"
+    ],
+    "outside": [
+      "reading and JSON-decoding the 56MB state (setup decode, excluded explicitly as instructed)",
+      "engine and graph-input policy construction",
+      "eng.Inventory and eng.DetectExtractors",
+      "eng.FileHashes over all 4105 targets"
+    ]
+  },
+  "results_bytes_and_allocs_per_op": {
+    "log": "/tmp/s21-alloc-commitproof-1.log",
+    "CommitProofWhole_committed": {"B_per_op": 2719539, "allocs_per_op": 29062, "ns_per_op_not_a_result": 45013933},
+    "CommitProofStaged_pending": {"B_per_op": 2718155, "allocs_per_op": 29050, "ns_per_op_not_a_result": 39102333},
+    "SelectNilPrior": {"B_per_op": 676392, "allocs_per_op": 61},
+    "SelectWithPrior": {"B_per_op": 676392, "allocs_per_op": 61},
+    "Build": {"B_per_op": 1340972, "allocs_per_op": 28852},
+    "Stage": {"B_per_op": 24270, "allocs_per_op": 70},
+    "Promote": {"B_per_op": 1345, "allocs_per_op": 11}
+  },
+  "attribution": {
+    "component_sum": {"B_per_op": 2719371, "allocs_per_op": 29055},
+    "whole": {"B_per_op": 2719539, "allocs_per_op": 29062},
+    "residual": {"B_per_op": 168, "allocs_per_op": 7},
+    "residual_meaning": "0.006% of bytes. The components are separately measured calls that sum to the separately measured whole, so this is measured attribution, not summed phase marks.",
+    "share_of_whole": {
+      "two_filesToHash_selections": {"bytes": "49.74%", "allocs": "0.42%"},
+      "buildStateProof": {"bytes": "49.31%", "allocs": "99.28%"},
+      "writePendingProof": {"bytes": "0.89%", "allocs": "0.24%"},
+      "promotePendingProof": {"bytes": "0.05%", "allocs": "0.04%"}
+    },
+    "promotion_delta": "committed minus staged = 1384 B/op and 12 allocs/op, consistent with the standalone promote benchmark's 1345 B/op and 11 allocs/op"
+  },
+  "correction_to_prior_incomplete_figure": {
+    "prior": "1364157 B/op and 28891 allocs/op, reported in msg_9c983f3cec87 and bounded by msg_08500f785c1c as build+stage only on a 4086 state-owner fixture",
+    "actual_full_boundary": "2719539 B/op and 29062 allocs/op",
+    "prior_was": "50.16% of actual bytes, 99.41% of actual allocations",
+    "where_the_bytes_were": "entirely in the two omitted filesToHash selections, 1352784 B/op combined for only 122 allocs/op",
+    "effect_of_the_19_HTML_targets_and_real_inventory": "build+stage at the real 4105-target inventory is 1365242 B/op and 28922 allocs/op, within 0.08% of bytes and 0.11% of allocations of the 4086-owner fixture. The understatement was the omitted selections, not the missing targets. This replaces the unmeasured extrapolation withdrawn in msg_69e7858b7a95 with a measurement."
+  },
+  "reference_comparison": {
+    "log": "/tmp/s21-alloc-ref-1.log",
+    "same_pass": "CommitProofWhole 2719507 B/op 29062 allocs/op; StateMarshalProductSize 129557440 B/op 652841 allocs/op; StateWriteProductSize 129562747 B/op 652866 allocs/op",
+    "ratio_same_pass": {"bytes": "2.10%", "allocs": "4.45%"},
+    "instability_disclosed": "State marshal bytes/op is not stable across iteration counts: 171514784 B/op at -benchtime=3x versus 129557440 B/op at 5x, while allocs/op moved only 652859 to 652841. Encoder buffer growth amortizes differently, so the bytes ratio is a range of roughly 1.6% to 2.1% rather than one number. Allocation ratio is stable at about 4.45%.",
+    "reading": "commitProof is an allocation-count cost concentrated in buildStateProof, plus a byte cost that is half selection slices and half proof build, to produce 10966 output bytes."
+  },
+  "limitations": [
+    "Bytes and allocations only. No latency acceptance, no comparison against the Stage20 baseline, no claim about the measured body or structural regressions.",
+    "Shared host, 5 iterations per benchmark, no repeat series.",
+    "The state is a fixed decoded snapshot reused across iterations; a real commit builds it in the same run, so state construction cost is outside this boundary by design.",
+    "filesToHash reads inventory and policy only, so both selections are pure recomputation here; in a real run they follow a fresh Inventory whose cost is outside this boundary.",
+    "Promotion is measured with the stage re-done outside the timer each iteration, because promotePendingProof consumes the staged file.",
+    "Root's own in-run marks (proof written 31ms, build 19.8ms nested, promote 5ms on o4-body) remain the authoritative timing evidence; nothing here supersedes them."
+  ],
+  "freeze_state": {
+    "patch_sha256": "9029305036bfbd4152641e545af02381a60898bdd9b2ac95403cc34fab186b37",
+    "unchanged": true,
+    "production_files_touched": 0,
+    "scratch_excluded_now_three": ["zz_scratch_membership_probe_test.go", "zz_scratch_proof_alloc_bench_test.go", "zz_scratch_commit_proof_alloc_test.go"]
+  }
+}

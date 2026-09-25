@@ -1,0 +1,34 @@
+{
+  "product_path": "/tmp/enola-stage16-root-review/product-source",
+  "product_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "files": {
+    "/tmp/enola-stage21-retain/acceptance/cli-pairs/cli.py": "94cb4e07996ab45f1a804a260ec6c3f1686f34d78718d9ece2d32466f41826f3",
+    "/tmp/enola-stage21-retain/acceptance/cli-pairs/harness_support.py": "95d70a9e3e3a0986fd8a1684524a8c9f2205df5529786979d08376abb46e4cac",
+    "/tmp/enola-stage14-watch-pairs/watch.py": "629fae95963c62b83df4acdc2ea5d6438dd114d67bbca2425b96416eda7538cb",
+    "/tmp/enola-stage9-product-watch-control/bin/benchobserver": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+    "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/run.py": "94caf3654e6283630dca8fbaa558c447d2cb1aade55f7b1bfc406cfba9d14c79",
+    "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/product-graph-scope.yaml": "b81b19598dd74c63084ae11488cb7f4fa7df783b0887d2c42dcf61dc67890bf7",
+    "/tmp/enola-toolchain/bin/nats-server": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af",
+    "/tmp/enola-stage21-retain/acceptance/cli-pairs/validate_results.py": "7e4846646167653d6d3de7d3d5d805a02aa889dfe09e4d0b42a61d19173e7b02",
+    "/tmp/enola-stage21-retain/acceptance/cli-pairs/run-arm.py": "5c12fbabf0e988b31262e8c997b36c4c3dc15bcb5b720efd8d34bdcc1645ae1b",
+    "/tmp/enola-stage21-retain/acceptance/summarize-timing.py": "e7bbbc45ec5fcc1a98a6b4015bfe2776f0e3313df23875aed69f87313b827ae2",
+    "/tmp/enola-stage21-retain/acceptance/run-timing-series.py": "694d8831a795535fac88d86be03a5e52f189543356003160e1d925364181c7fb",
+    "/tmp/enola-stage21-retain/acceptance/test-timing-summary.py": "08a9317348a32f0ea00dcd43713eee69cebd64028ab805129c7d5ae0a11819d5",
+    "/tmp/enola-stage21-root-review/freeze-root-review.json": "b021d2a8909750b91f64a6963a793f347b14972d4890e3023faf331eebbcfa07",
+    "/tmp/enola-stage21-retain/acceptance/final-candidate-acceptance.json": "aada1d85e25e961826c0ae4e47d6a5834a912a79c5b9b4fe3ea5c810f77c9914"
+  },
+  "binaries": {
+    "baseline": {
+      "path": "/tmp/enola-stage21-root-review/enola-stage20-baseline",
+      "sha256": "99162b12e148c995c0a6e91ff73ffea05f2fb978ec004887f89e35a337006f60"
+    },
+    "candidate": {
+      "path": "/tmp/enola-stage21-root-review/enola-retain-final1",
+      "sha256": "d3229b4a5d622d1e9986565782a8c0cab7c078821775d361cb85809927c0aef6"
+    }
+  },
+  "baseline_revision": "6db3ed834daab2adf8083ac46dc15ac21b670eb2",
+  "baseline_runtime": "a1dec99086fc1ace834e5616bd31c39ddce0b39b",
+  "experimental_checkpoint": "Stage21 option C retain candidate; source /tmp/enola-stage21-retain/src, patch 2e07fc13dad3dd57c72845eee8eaa4e534e38ef9dc84110bb5aba49fde382a85, binary built by root as enola-retain-final1; correctness accepted for timing comparison only per final-candidate-acceptance.json",
+  "not_final_acceptance": true
+}

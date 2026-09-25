@@ -1,0 +1,40 @@
+{
+  "product_path": "/tmp/enola-stage16-root-review/product-source",
+  "product_sha": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "files": {
+    "/tmp/enola-stage22-hop-profile/diag/cli-pairs/cli.py": "94cb4e07996ab45f1a804a260ec6c3f1686f34d78718d9ece2d32466f41826f3",
+    "/tmp/enola-stage22-hop-profile/diag/cli-pairs/harness_support.py": "95d70a9e3e3a0986fd8a1684524a8c9f2205df5529786979d08376abb46e4cac",
+    "/tmp/enola-stage22-hop-profile/diag/cli-pairs/validate_results.py": "7e4846646167653d6d3de7d3d5d805a02aa889dfe09e4d0b42a61d19173e7b02",
+    "/tmp/enola-stage14-watch-pairs/watch.py": "629fae95963c62b83df4acdc2ea5d6438dd114d67bbca2425b96416eda7538cb",
+    "/tmp/enola-stage9-product-watch-control/bin/benchobserver": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+    "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/run.py": "94caf3654e6283630dca8fbaa558c447d2cb1aade55f7b1bfc406cfba9d14c79",
+    "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/product-graph-scope.yaml": "b81b19598dd74c63084ae11488cb7f4fa7df783b0887d2c42dcf61dc67890bf7",
+    "/tmp/enola-toolchain/bin/nats-server": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af",
+    "/tmp/enola-stage22-hop-profile/diag/cli-pairs/run-diag-arm.py": "7bb3bb1dd64d706b629df4ad15e3fe11f4916a1f75d6d56bcbc3ea63de45236f",
+    "/tmp/enola-stage22-hop-profile/INSTRUMENTATION.diff": "3d7f76bef65cfe2db7dddeb1262fcf435684ce0cc3f891c0235bbb4290a646a9",
+    "/tmp/enola-stage22-hop-profile/PLAN.md": "3ecaf49114b6cea61c54d1d15c946bd3bbcbd92e67deb74402cd56417aaf9ab6"
+  },
+  "binaries": {
+    "control": {
+      "path": "/tmp/enola-stage21-root-review/enola-retain-final1",
+      "sha256": "d3229b4a5d622d1e9986565782a8c0cab7c078821775d361cb85809927c0aef6",
+      "graph_profile": null,
+      "provenance": "root-built Stage21 option C retain candidate; uninstrumented counterpart, not rebuilt here"
+    },
+    "instrumented": {
+      "path": "/tmp/enola-stage22-hop-profile/enola-hop-instrumented",
+      "sha256": "c6d37a34be46d0262f96a422fb13ddbcda978a101301fd372da2b2628c81d299",
+      "graph_profile": "1",
+      "provenance": "Stage22 scratch build of /tmp/enola-stage22-hop-profile/src = retain source plus INSTRUMENTATION.diff; scratch instrumentation only, never a production candidate"
+    }
+  },
+  "harness_source": "/tmp/enola-stage21-retain/acceptance/cli-pairs",
+  "harness_copies_are_byte_identical": {
+    "cli.py": "94cb4e07996ab45f1a804a260ec6c3f1686f34d78718d9ece2d32466f41826f3",
+    "harness_support.py": "95d70a9e3e3a0986fd8a1684524a8c9f2205df5529786979d08376abb46e4cac",
+    "validate_results.py": "7e4846646167653d6d3de7d3d5d805a02aa889dfe09e4d0b42a61d19173e7b02"
+  },
+  "purpose": "Stage22 diagnostic per-hop profiling only",
+  "not_final_acceptance": true,
+  "not_a_timing_comparison": "shared host, no quiet hold, asymmetric instrumentation; no causal overhead or acceptance claim may be derived"
+}

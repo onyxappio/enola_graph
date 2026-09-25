@@ -1,0 +1,44 @@
+=== RUN   TestMinifiedRecordCarriesFrameworkSummary
+2026/09/25 14:37:33 [ts-extractor] skipping minified/bundled file gen/users/v1/users.client.ts
+--- PASS: TestMinifiedRecordCarriesFrameworkSummary (0.01s)
+=== RUN   TestMinifiedGraphQLProducerRecordCarriesServerAndSDL
+2026/09/25 14:37:33 [ts-extractor] skipping minified/bundled file src/server.ts
+--- PASS: TestMinifiedGraphQLProducerRecordCarriesServerAndSDL (0.02s)
+=== RUN   TestCompositionSignatureCachedEqualsColdForMinifiedGRPCProducer
+2026/09/25 14:37:33 [ts-extractor] skipping minified/bundled file gen/users/v1/users.client.ts
+--- PASS: TestCompositionSignatureCachedEqualsColdForMinifiedGRPCProducer (0.01s)
+=== RUN   TestCompositionSignatureCachedEqualsColdForMinifiedGraphQLProducer
+2026/09/25 14:37:33 [ts-extractor] skipping minified/bundled file src/server.ts
+--- PASS: TestCompositionSignatureCachedEqualsColdForMinifiedGraphQLProducer (0.02s)
+=== RUN   TestCompositionSignatureRereadsLegacyMinifiedRecord
+--- PASS: TestCompositionSignatureRereadsLegacyMinifiedRecord (0.00s)
+=== RUN   TestCompositionSignatureMinifiedAmbiguityMatchesCold
+2026/09/25 14:37:33 [ts-extractor] skipping minified/bundled file gen/v1/dra.ts
+2026/09/25 14:37:33 [ts-extractor] skipping minified/bundled file gen/v1/node.ts
+2026/09/25 14:37:33 [ts-extractor] skipping minified/bundled file gen/v1beta1/dra.ts
+--- PASS: TestCompositionSignatureMinifiedAmbiguityMatchesCold (0.02s)
+=== RUN   TestMinifiedGRPCStubStillResolvesConsumerAfterReuse
+2026/09/25 14:37:33 [ts-extractor] skipping minified/bundled file gen/users/v1/users.client.ts
+--- PASS: TestMinifiedGRPCStubStillResolvesConsumerAfterReuse (0.01s)
+=== RUN   TestMinifiedGraphQLServerStillShapesConsumerAfterReuse
+2026/09/25 14:37:33 [ts-extractor] skipping minified/bundled file server.ts
+--- PASS: TestMinifiedGraphQLServerStillShapesConsumerAfterReuse (0.01s)
+=== RUN   TestMinifiedRecordIsNotRereadOnUnchangedSecondExtract
+2026/09/25 14:37:33 [ts-extractor] skipping minified/bundled file gen/users/v1/users.client.ts
+--- PASS: TestMinifiedRecordIsNotRereadOnUnchangedSecondExtract (0.01s)
+=== RUN   TestLegacyMinifiedRecordRefreshesOnceThenIsSkipped
+2026/09/25 14:37:33 [ts-extractor] skipping minified/bundled file gen/users/v1/users.client.ts
+--- PASS: TestLegacyMinifiedRecordRefreshesOnceThenIsSkipped (0.01s)
+=== RUN   TestMinifiedRecordRereadWhenBytesChange
+2026/09/25 14:37:33 [ts-extractor] skipping minified/bundled file gen/dra.ts
+2026/09/25 14:37:33 [ts-extractor] skipping minified/bundled file gen/dra.ts
+--- PASS: TestMinifiedRecordRereadWhenBytesChange (0.01s)
+=== RUN   TestMinifiedBoundaryTransitionsBothWays
+2026/09/25 14:37:33 [ts-extractor] skipping minified/bundled file src/lib.ts
+--- PASS: TestMinifiedBoundaryTransitionsBothWays (0.01s)
+=== RUN   TestMinifiedRecordRereadWhenStoredScopeDoesNotMatchLayout
+2026/09/25 14:37:33 [ts-extractor] skipping minified/bundled file apps/web/gen/dra.ts
+2026/09/25 14:37:33 [ts-extractor] skipping minified/bundled file apps/web/gen/dra.ts
+--- PASS: TestMinifiedRecordRereadWhenStoredScopeDoesNotMatchLayout (0.02s)
+PASS
+ok  	github.com/enola-labs/enola/internal/extractors/tsextractor	0.524s

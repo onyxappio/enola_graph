@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "./internal/extractors/tsextractor",
+    "-run",
+    "^(TestCompositionSignatureUnreadableRecordIsNotReread|TestMinifiedRecordIsNotRereadOnUnchangedSecondExtract|TestLegacyMinifiedRecordRefreshesOnceThenIsSkipped|TestMinifiedRecordRereadWhenBytesChange|TestMinifiedBoundaryTransitionsBothWays|TestMinifiedRecordRereadWhenNuxtScopeMoves)$",
+    "-count=1",
+    "-v"
+  ],
+  "exit": 0,
+  "wall_seconds": 0.8452839170349762,
+  "names": [
+    "TestCompositionSignatureUnreadableRecordIsNotReread",
+    "TestMinifiedRecordIsNotRereadOnUnchangedSecondExtract",
+    "TestLegacyMinifiedRecordRefreshesOnceThenIsSkipped",
+    "TestMinifiedRecordRereadWhenBytesChange",
+    "TestMinifiedBoundaryTransitionsBothWays",
+    "TestMinifiedRecordRereadWhenNuxtScopeMoves"
+  ],
+  "preliminary": true
+}

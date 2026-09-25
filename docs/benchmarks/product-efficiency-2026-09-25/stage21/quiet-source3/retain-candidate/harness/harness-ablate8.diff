@@ -1,0 +1,108 @@
+--- /tmp/enola-stage21-ablate/ablate-profile7.py	2026-09-25 11:33:53
++++ /tmp/enola-stage21-ablate/ablate-profile8.py	2026-09-25 12:17:34
+@@ -1,4 +1,4 @@
+-"""Stage21 bounded causal diagnostic: frozen candidate vs proof-production ablation.
++"""Stage21 bounded causal diagnostic: frozen proof candidate vs option C retain candidate.
+ 
+ One paired diagnostic per scenario (body, structural) under declared shared load.
+ NOT acceptance timing, not a quiet window, not a speed claim.
+@@ -36,21 +36,35 @@
+ Seed production, broker and observer startup, snapshot, restore and replay all sit
+ outside every measured delta. Exactly one measured delta per restored seed.
+ 
+-v7 adds the pinned Stage20 pre-proof baseline as a third arm per scenario, so the
+-candidate's added phases can be counted against a run that never had them rather
+-than only against an ablation that keeps the consumption path intact.
++v8 keeps the v7 protocol exactly and swaps one arm: the retain candidate takes the
++ablated arm's place, so the cohort is frozen (proof, double digest), retain (proof,
++single digest plus a byte comparison) and the pre-proof Stage20 baseline. Nothing about
++the seeding, restore, replay or measured-delta protocol changes, and the ablated
++no-proof binary is not run here - this cohort is not measuring whether the proof is
++worth producing, it is measuring what the retained buffer changes about consuming it.
++
++The retain arm produces and promotes a proof like the frozen arm does; the absent-proof
++gate the ablated arm carried does not apply to it and is not reused (root msg_3551ecaf8af8).
++
++v7 added the pinned Stage20 pre-proof baseline as a third arm per scenario, so the
++candidate's added phases can be counted against a run that never had them. That arm is
++kept here unchanged: it is what says whether the retain candidate's remaining state work
++is back to what a pre-proof run did, or still above it.
+ """
+ import argparse, hashlib, importlib.util, json, os, pathlib, re, shutil, subprocess, threading, time
+ 
+ FROZEN = '/tmp/enola-stage21-root-review/enola-proof-diagnostic3'
+-ABLATED = '/tmp/enola-stage21-ablate/enola-ablate-noproof2'
++# The option C candidate, built and pinned by root (msg_d37d79fcf12a). Not rebuilt here.
++RETAIN = '/tmp/enola-stage21-root-review/enola-retain-final1'
++RETAIN_SHA = 'd3229b4a5d622d1e9986565782a8c0cab7c078821775d361cb85809927c0aef6'
+ # The pre-proof Stage20 binary, root-pinned (msg_6c89ad2fc0d6). It is the reference the
+ # candidate's added work is measured against: it emits state_read_bytes,
+ # state_fingerprint and state_json_unmarshal like the candidate, and no state_proof_*
+ # mark at all, so a difference in occurrence counts is a difference in work done.
+ BASELINE = '/tmp/enola-stage21-root-review/enola-stage20-baseline'
+ BASELINE_SHA = '99162b12e148c995c0a6e91ff73ffea05f2fb978ec004887f89e35a337006f60'
+-ABLATION_DIFF = '/tmp/enola-stage21-ablate/ablation2.diff'
++RETAIN_DIFF = '/tmp/enola-stage21-retain/optionC.diff'
++RETAIN_MANIFEST = '/tmp/enola-stage21-retain/SOURCE_MANIFEST.txt'
+ PRODUCT = '/tmp/enola-stage16-root-review/product-source'
+ PRODUCT_SHA = 'a609c19f3861971930fae7b33dcb2950598953c5'
+ OBSERVER = '/tmp/enola-stage21-startup-profile/replayobserver'
+@@ -70,6 +84,7 @@
+ 
+ assert sha(OBSERVER) == OBSERVER_SHA, 'replay observer is not the pinned binary'
+ assert sha(BASELINE) == BASELINE_SHA, 'Stage20 baseline is not the pinned binary'
++assert sha(RETAIN) == RETAIN_SHA, 'retain arm is not the pinned root-built candidate'
+ 
+ def competitors():
+     raw = subprocess.check_output(['ps', '-axo', 'pid=,ppid=,command='], text=True).splitlines()
+@@ -123,14 +138,14 @@
+ thread = threading.Thread(target=monitor)
+ 
+ rows = []; server = obs = None; phase = [0]
+-def save(): (work / 'ablation-metrics.json').write_text(json.dumps(rows, indent=2) + '\n')
++def save(): (work / 'cohort-metrics.json').write_text(json.dumps(rows, indent=2) + '\n')
+ 
+ MARK = re.compile(r'^\[graph-profile\]')
+ PINS = ['state_proof_bound', 'runtime_inputs_reused', 'runtime_inputs_reusable', 'state_proof_refused',
+         'state_proof_unavailable', 'state_proof_written', 'state_proof_promoted',
+         'ablation_proof_cleanup_stage', 'ablation_proof_cleanup_promote',
+         'state_proof_fallback_decode', 'state_json_unmarshal', 'state_json_marshal',
+-        'state_read_bytes', 'state_fingerprint', 'load_state', 'select_hash_targets',
++        'state_read_bytes', 'state_fingerprint', 'state_bytes_compared', 'load_state', 'select_hash_targets',
+         'hash_content_inputs', 'write_pending_state', 'promote_compact_state', 'end_flush_ack',
+         'graph_session_run', 'cli_complete']
+ 
+@@ -339,7 +354,7 @@
+         # state-proof.json it knows nothing about; the sidecar is inert to it, and
+         # state.go is byte-identical between the two trees, so the typed state it
+         # decodes is the same state the other two arms decode.
+-        for arm, binary in [('frozen', FROZEN), ('ablated', ABLATED), ('baseline', BASELINE)]:
++        for arm, binary in [('frozen', FROZEN), ('retain', RETAIN), ('baseline', BASELINE)]:
+             tag = f'{scenario}-{arm}'
+             ident = restore(scenario, snap)
+             start_broker()
+@@ -370,8 +385,8 @@
+     if thread.ident: thread.join()
+     stop_all()
+     save()
+-    (work / 'ablation-receipt.json').write_text(json.dumps({
+-        'label': 'bounded causal diagnostic; shared load; NOT acceptance timing and NOT a speed claim',
++    (work / 'cohort-receipt.json').write_text(json.dumps({
++        'label': 'bounded retain-vs-frozen-vs-baseline diagnostic; shared load; NOT acceptance timing and NOT a speed claim',
+         'protocol': 'one canonical Product path/config/state-dir/context; seed produced once per '
+                     'scenario with the frozen binary; broker stopped, full state dir and JetStream '
+                     'store snapshotted together at rest; each arm restores both to the same paths, '
+@@ -380,9 +395,11 @@
+                     'whose run id, normalized hash and applied generation equal the seed before its '
+                     'one measured delta',
+         'frozen_binary': FROZEN, 'frozen_sha256': sha(FROZEN),
+-        'ablated_binary': ABLATED, 'ablated_sha256': sha(ABLATED),
++        'retain_binary': RETAIN, 'retain_sha256': sha(RETAIN),
++        'retain_built_by': 'root (msg_b42fbd555990, msg_d37d79fcf12a); not rebuilt here',
+         'baseline_binary': BASELINE, 'baseline_sha256': sha(BASELINE),
+-        'ablation_diff': ABLATION_DIFF, 'ablation_diff_sha256': sha(ABLATION_DIFF),
++        'retain_diff': RETAIN_DIFF, 'retain_diff_sha256': sha(RETAIN_DIFF),
++        'retain_source_manifest': RETAIN_MANIFEST, 'retain_source_manifest_sha256': sha(RETAIN_MANIFEST),
+         'product_sha': PRODUCT_SHA, 'profile': 'ts + product-graph-scope.yaml overlay',
+         'observer': OBSERVER, 'observer_sha256': sha(OBSERVER), 'observer_diff': OBSERVER_DIFF,
+         'seeds': receipt_extra,

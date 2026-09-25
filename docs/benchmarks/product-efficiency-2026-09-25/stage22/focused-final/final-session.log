@@ -1,0 +1,22 @@
+=== RUN   TestMinifiedFrameworkProducerDeltaAndNoopMatchCold
+2026/09/25 14:52:01 [ts-extractor] skipping minified/bundled file gen/users.client.ts
+    stage22_review_session_test.go:151: delta parsed=1 fallbacks=[{graph changed files and reverse file dependents frozen scope: reverse-close plus owners that reference added or removed fact names}]
+2026/09/25 14:52:02 [ts-extractor] skipping minified/bundled file gen/users.client.ts
+--- PASS: TestMinifiedFrameworkProducerDeltaAndNoopMatchCold (1.06s)
+=== RUN   TestMinifiedFrameworkProducerFollowsNuxtLayoutChange
+2026/09/25 14:52:02 [ts-extractor] skipping minified/bundled file gen/users.client.ts
+2026/09/25 14:52:03 [ts-extractor] skipping minified/bundled file gen/users.client.ts
+    stage22_review_session_test.go:210: layout change parsed=4 fallbacks=[{typescript all owned files repo analysis inputs (tsconfig/package/clients) changed} {graph all prior/current file owners frozen scope: global name-resolution domain}]
+2026/09/25 14:52:03 [ts-extractor] skipping minified/bundled file gen/users.client.ts
+--- PASS: TestMinifiedFrameworkProducerFollowsNuxtLayoutChange (0.83s)
+=== RUN   TestMinifiedBytesRewrittenAfterFreezeFailTheRun
+2026/09/25 14:52:03 [ts-extractor] skipping minified/bundled file gen/users.client.ts
+--- PASS: TestMinifiedBytesRewrittenAfterFreezeFailTheRun (0.46s)
+=== RUN   TestLegacyMinifiedStateUpgradesOnFirstChangedRun
+2026/09/25 14:52:04 [ts-extractor] skipping minified/bundled file gen/users.client.ts
+2026/09/25 14:52:04 [ts-extractor] skipping minified/bundled file gen/users.client.ts
+    stage22_review_session_test.go:365: legacy upgrade parsed=2 fallbacks=[{typescript all owned files graphql/grpc/nuxt composition context changed; re-extracting affected TypeScript files} {graph all prior/current file owners frozen scope: global name-resolution domain}]
+2026/09/25 14:52:04 [ts-extractor] skipping minified/bundled file gen/users.client.ts
+--- PASS: TestLegacyMinifiedStateUpgradesOnFirstChangedRun (0.97s)
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	3.795s

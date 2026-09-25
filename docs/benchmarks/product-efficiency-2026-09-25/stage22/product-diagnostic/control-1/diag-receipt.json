@@ -1,0 +1,26 @@
+{
+  "validation_error": null,
+  "all_checks_validated": true,
+  "arm": "control",
+  "repeat": 1,
+  "note": "shared-host-diagnostic",
+  "exit": 0,
+  "competing_samples": [],
+  "competitors_before_start": [
+    "78368 go test -p 1 -count=1 -timeout 30m -json ./internal/graphsession -run ^TestPrimaryFSMBinaryMigration$",
+    "78392 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2108020595/b001/graphsession.test -test.paniconexit0 -test.v=test2json -test.count=1 -test.timeout=30m0s -test.run=^TestPrimaryFSMBinaryMigration$",
+    "78501 /private/tmp/enola-fsm-primary-acceptance/constructor-final-cb884c5/enola-v322 graph analyze --config /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestPrimaryFSMBinaryMigrationv321-to-v322v2=false764678298/002/cold-config.yaml --state-dir /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestPrimaryFSMBinaryMigrationv321-to-v322v2=false764678298/002/cold-state --events /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestPrimaryFSMBinaryMigrationv321-to-v322v2=false764678298/002/cold-events.jsonl --repo-id primary-fsm-migration --context primary-fsm-migration --summary-json"
+  ],
+  "host_load_log": "/private/tmp/enola-stage22-hop-profile/diag/cli-pairs/control-1/host-load.jsonl",
+  "host_load_samples": 24,
+  "host_sample_errors": [],
+  "correctness_only": false,
+  "run_succeeded": true,
+  "binary_sha256": "d3229b4a5d622d1e9986565782a8c0cab7c078821775d361cb85809927c0aef6",
+  "graph_profile_env": null,
+  "graph_profile_logs": [],
+  "purpose": "diagnostic per-hop profiling",
+  "timing_eligible": false,
+  "timing_ineligible_because": "diagnostic run: shared host with no quiet hold, and one arm carries scratch instrumentation the other does not",
+  "no_acceptance_claim": "durations here are not an acceptance measurement and the arm difference is not a measured instrumentation overhead"
+}

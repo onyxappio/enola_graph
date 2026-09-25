@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-overlay",
+    "/tmp/enola-stage22-root-signature/final-session-overlay.json",
+    "-count=1",
+    "-v",
+    "-run",
+    "^(TestMinifiedFrameworkProducerDeltaAndNoopMatchCold|TestMinifiedFrameworkProducerFollowsNuxtLayoutChange|TestMinifiedBytesRewrittenAfterFreezeFailTheRun|TestLegacyMinifiedStateUpgradesOnFirstChangedRun)$",
+    "./internal/graphsession"
+  ],
+  "exit": 0,
+  "wall_s": 5.780402999953367,
+  "test_sha256": "c83a6635fbbc8fe961f874867c53c530fd43881427d37d511385df973b5b8b43"
+}
