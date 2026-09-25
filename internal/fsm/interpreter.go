@@ -768,10 +768,7 @@ func guardConditions(path []pathCondition, eventParam, snapshotParam string) []s
 		if p.Branch == "case" {
 			continue
 		}
-		if eventParam != "" && strings.Contains(p.Text, eventParam+".type") {
-			continue
-		}
-		if snapshotParam != "" && (strings.Contains(p.Text, snapshotParam+".matches") || strings.Contains(p.Text, snapshotParam+".value")) {
+		if selectorOnlyCondition(p.Text, eventParam, snapshotParam) {
 			continue
 		}
 		if strings.HasPrefix(p.Text, "!(") && strings.HasSuffix(p.Text, ")") {
@@ -783,6 +780,80 @@ func guardConditions(path []pathCondition, eventParam, snapshotParam string) []s
 		out = append(out, p.Text)
 	}
 	return unique(out)
+}
+
+// Mixed predicates retain their complete expression: removing selector terms
+// from an OR or negation would change the meaning of the remaining guard.
+func selectorOnlyCondition(condition, eventParam, snapshotParam string) bool {
+	source := []byte(condition)
+	root, kinds, closeTree := parse("condition.ts", source)
+	if root == nil {
+		return false
+	}
+	defer closeTree()
+	var literal func(*sitter.Node) bool
+	literal = func(n *sitter.Node) bool {
+		if n == nil {
+			return false
+		}
+		switch kinds.Of(n) {
+		case "string", "number", "true", "false", "null":
+			return true
+		case "object":
+			for _, pair := range namedChildren(n) {
+				if kinds.Of(pair) != "pair" || !literal(pair.ChildByFieldName("value")) {
+					return false
+				}
+			}
+			return true
+		}
+		return false
+	}
+	selector := func(n *sitter.Node) bool {
+		if n == nil || kinds.Of(n) != "member_expression" {
+			return false
+		}
+		object, property := n.ChildByFieldName("object"), n.ChildByFieldName("property")
+		if kinds.Of(object) != "identifier" {
+			return false
+		}
+		return (eventParam != "" && text(object, source) == eventParam && text(property, source) == "type") ||
+			(snapshotParam != "" && text(object, source) == snapshotParam && text(property, source) == "value")
+	}
+	var only func(*sitter.Node) bool
+	only = func(n *sitter.Node) bool {
+		if n == nil {
+			return false
+		}
+		switch kinds.Of(n) {
+		case "program", "expression_statement", "parenthesized_expression":
+			children := namedChildren(n)
+			return len(children) == 1 && only(children[0])
+		case "unary_expression":
+			return text(n.ChildByFieldName("operator"), source) == "!" && only(n.ChildByFieldName("argument"))
+		case "binary_expression":
+			left, right := n.ChildByFieldName("left"), n.ChildByFieldName("right")
+			switch binaryOperator(n) {
+			case "&&", "||":
+				return only(left) && only(right)
+			case "===", "!==", "==", "!=":
+				return (selector(left) && literal(right)) || (literal(left) && selector(right))
+			}
+		case "call_expression":
+			fn := n.ChildByFieldName("function")
+			if fn == nil || kinds.Of(fn) != "member_expression" || snapshotParam == "" {
+				return false
+			}
+			object := fn.ChildByFieldName("object")
+			if kinds.Of(object) != "identifier" || text(object, source) != snapshotParam || text(fn.ChildByFieldName("property"), source) != "matches" {
+				return false
+			}
+			args := callArguments(n, kinds)
+			return len(args) == 1 && literal(args[0])
+		}
+		return false
+	}
+	return only(root)
 }
 
 func transitionTarget(call *sitter.Node, spec Spec, from string, src []byte, kinds *tsutil.KindTable) string {
