@@ -56,3 +56,5 @@ Keep the candidate separate while investigating the body-delta memory increase a
 ## Artifacts
 
 [Comparison](stage19/timing-comparison.json), [assessment](stage19/stage19-assessment.json), [history](stage19/history/FINAL-RESULTS.md), [source identity](stage19/product-final-source-equivalence.json), [quiet preflight](stage19/quiet-preflight.json), and [artifact hashes](stage19/artifact-sha256.json). Harness scripts and per-arm metrics, checks and receipts are retained under `stage19/`; their absolute paths preserve the original local setup and require that setup to replay.
+
+Follow-up: [body-delta allocation diagnostic](STAGE19_RSS_DIAGNOSTIC.md) records a controlled shared-snapshot pair, a baseline cache nondeterminism finding, and the decision to park Stage19 integration. It does not supersede this timing assessment or close the RSS concern.

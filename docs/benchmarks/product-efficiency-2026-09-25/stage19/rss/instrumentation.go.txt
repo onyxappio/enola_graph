@@ -1,0 +1,125 @@
+// Package graphprofile is env-gated wall-time tracing for graphsession delta/noop.
+// Enable with ENOLA_GRAPH_PROFILE=1. It is a measurement aid, not a public API.
+package graphprofile
+
+import (
+	"fmt"
+	"os"
+	"runtime"
+	"sync"
+	"time"
+)
+
+// memStatsOn caches the allocator-sampling gate so a mark that is not
+// sampling costs one bool load rather than a getenv.
+var memStatsOn = MemStatsEnabled()
+
+// Enabled reports whether phase tracing is on.
+func Enabled() bool {
+	v := os.Getenv("ENOLA_GRAPH_PROFILE")
+	return v != "" && v != "0" && v != "false"
+}
+
+// Log writes one phase line to stderr when enabled.
+func Log(phase string, d time.Duration, extra string) {
+	if !Enabled() {
+		return
+	}
+	if extra == "" {
+		fmt.Fprintf(os.Stderr, "[graph-profile] %-32s %7.3fs\n", phase, d.Seconds())
+		return
+	}
+	fmt.Fprintf(os.Stderr, "[graph-profile] %-32s %7.3fs  %s\n", phase, d.Seconds(), extra)
+}
+
+// Trace is a sequential phase timer from a single start point. A process runs
+// several of these at once and they nest, so every Mark line carries the name
+// of the trace it belongs to: only the Marks of one trace partition that
+// trace's window, and summing across names double counts the nested ones.
+type Trace struct {
+	mu   sync.Mutex
+	name string
+	t0   time.Time
+	last time.Time
+}
+
+// Start begins an unnamed trace. Returns nil when profiling is off so calls
+// stay cheap.
+func Start() *Trace { return StartNamed("") }
+
+// StartNamed begins a trace that labels its Mark lines with name.
+func StartNamed(name string) *Trace {
+	if !Enabled() {
+		return nil
+	}
+	now := time.Now()
+	sampleMemStats("trace_start", name)
+	return &Trace{name: name, t0: now, last: now}
+}
+
+// Mark records elapsed time since the previous Mark (or Start).
+func (t *Trace) Mark(phase string, extra string) {
+	if t == nil {
+		return
+	}
+	sampleMemStats(phase, t.name)
+	now := time.Now()
+	t.mu.Lock()
+	dt := now.Sub(t.last)
+	total := now.Sub(t.t0)
+	t.last = now
+	t.mu.Unlock()
+	name := t.name
+	if name == "" {
+		name = "unnamed"
+	}
+	if extra == "" {
+		fmt.Fprintf(os.Stderr, "[graph-profile] %-32s %7.3fs  total=%6.3fs  trace=%s\n", phase, dt.Seconds(), total.Seconds(), name)
+		return
+	}
+	fmt.Fprintf(os.Stderr, "[graph-profile] %-32s %7.3fs  total=%6.3fs  trace=%s  %s\n", phase, dt.Seconds(), total.Seconds(), name, extra)
+}
+
+// Since logs a duration measured by the caller.
+func Since(phase string, start time.Time, extra string) {
+	Log(phase, time.Since(start), extra)
+}
+
+// --- EXPERIMENTAL Stage19 RSS diagnostic overlay. Not for production. ---
+//
+// Second env gate, independent of ENOLA_GRAPH_PROFILE's wall-time lines, that
+// samples the runtime allocator at the phase boundaries the trace already has.
+// Sampling calls runtime.ReadMemStats, which stops the world for the read but
+// does not force a collection, so the numbers are a point sample of allocator
+// state at the mark, never a peak and never comparable to maxrss.
+//
+// Output goes on its own [graph-memstats] line so existing [graph-profile]
+// parsers see byte-identical input to before.
+
+// MemStatsEnabled reports whether allocator sampling is on. It is independent
+// of Enabled: sampling requires ENOLA_GRAPH_MEMSTATS and a live trace.
+func MemStatsEnabled() bool {
+	v := os.Getenv("ENOLA_GRAPH_MEMSTATS")
+	return v != "" && v != "0" && v != "false"
+}
+
+// sampleMemStats emits one allocator sample tagged with the phase it follows.
+// The read happens before any formatting so the line's own allocations land in
+// the next phase rather than the one being reported; instrumentation
+// allocations still accumulate across a run and are not subtracted anywhere.
+func sampleMemStats(phase, trace string) {
+	if !memStatsOn {
+		return
+	}
+	var ms runtime.MemStats
+	runtime.ReadMemStats(&ms)
+	if trace == "" {
+		trace = "unnamed"
+	}
+	fmt.Fprintf(os.Stderr,
+		"[graph-memstats] phase=%s trace=%s total_alloc=%d mallocs=%d frees=%d heap_alloc=%d heap_inuse=%d heap_sys=%d heap_released=%d next_gc=%d num_gc=%d stack_inuse=%d\n",
+		phase, trace,
+		ms.TotalAlloc, ms.Mallocs, ms.Frees,
+		ms.HeapAlloc, ms.HeapInuse, ms.HeapSys, ms.HeapReleased,
+		ms.NextGC, ms.NumGC, ms.StackInuse)
+}

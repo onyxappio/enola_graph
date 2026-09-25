@@ -1,0 +1,45 @@
+{
+  "baseline": {
+    "last_sample": {
+      "phase": "cli_complete",
+      "trace": "cli",
+      "total_alloc": 2071670784,
+      "mallocs": 8920642,
+      "frees": 7253948,
+      "heap_alloc": 382528648,
+      "heap_inuse": 405299200,
+      "heap_sys": 636551168,
+      "heap_released": 129949696,
+      "next_gc": 504292346,
+      "num_gc": 23,
+      "stack_inuse": 983040
+    },
+    "rss_bytes": 679510016,
+    "sample_count": 77,
+    "gc_trace_count": 23
+  },
+  "candidate": {
+    "last_sample": {
+      "phase": "cli_complete",
+      "trace": "cli",
+      "total_alloc": 2060483328,
+      "mallocs": 8920834,
+      "frees": 7254191,
+      "heap_alloc": 382534328,
+      "heap_inuse": 404742144,
+      "heap_sys": 644874240,
+      "heap_released": 60071936,
+      "next_gc": 503682986,
+      "num_gc": 23,
+      "stack_inuse": 1048576
+    },
+    "rss_bytes": 678330368,
+    "sample_count": 77,
+    "gc_trace_count": 23
+  },
+  "limits": [
+    "One diagnostic pair, not timing acceptance.",
+    "Samples and instrumentation perturb runtime; sampled heap is not continuous peak.",
+    "Same byte-identical state snapshot; independent broker seeding graph equivalence required."
+  ]
+}

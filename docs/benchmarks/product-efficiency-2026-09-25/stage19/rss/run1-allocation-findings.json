@@ -1,0 +1,64 @@
+{
+  "scope": "baseline only; candidate delta did not run",
+  "timing_eligible": false,
+  "cumulative_total_alloc_bytes": 2069584368,
+  "last_sample_heap_alloc_bytes": 382764008,
+  "largest_intervals": [
+    {
+      "trace": "session",
+      "phase": "write_pending_state",
+      "allocated_since_previous_sample_bytes": 423407456
+    },
+    {
+      "trace": "session",
+      "phase": "index_group_owners",
+      "allocated_since_previous_sample_bytes": 307554280
+    },
+    {
+      "trace": "session",
+      "phase": "invalidation_plan",
+      "allocated_since_previous_sample_bytes": 196235600
+    },
+    {
+      "trace": "session",
+      "phase": "assemble_new_files",
+      "allocated_since_previous_sample_bytes": 190654848
+    },
+    {
+      "trace": "open",
+      "phase": "load_state",
+      "allocated_since_previous_sample_bytes": 186304664
+    },
+    {
+      "trace": "ts",
+      "phase": "ts_mapfiles_aggregate",
+      "allocated_since_previous_sample_bytes": 178033560
+    },
+    {
+      "trace": "ts",
+      "phase": "ts_mapfiles_aggregate",
+      "allocated_since_previous_sample_bytes": 81080392
+    },
+    {
+      "trace": "inputs",
+      "phase": "hash_content_inputs",
+      "allocated_since_previous_sample_bytes": 62463704
+    },
+    {
+      "trace": "inputs",
+      "phase": "ts_session_context",
+      "allocated_since_previous_sample_bytes": 52596816
+    },
+    {
+      "trace": "session",
+      "phase": "revalidate_ts_records",
+      "allocated_since_previous_sample_bytes": 48386328
+    }
+  ],
+  "limits": [
+    "Process-global allocation counters between phase marks; concurrent work may contribute.",
+    "Cumulative allocated bytes are not RSS, live memory, or peak.",
+    "One experimental run; no causal or comparative Stage19 conclusion.",
+    "Cache input mismatch unresolved."
+  ]
+}

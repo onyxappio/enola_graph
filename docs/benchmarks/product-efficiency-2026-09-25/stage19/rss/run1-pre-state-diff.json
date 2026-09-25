@@ -1,0 +1,82 @@
+{
+  "count": 13,
+  "kinds": {
+    "permutation-only": 9,
+    "membership": 3,
+    "value": 1
+  },
+  "differences": [
+    [
+      "/files/apps/architect-console/package.json/facts",
+      "permutation-only",
+      8,
+      8
+    ],
+    [
+      "/files/apps/behavior-visualizer/package.json/facts",
+      "permutation-only",
+      4,
+      4
+    ],
+    [
+      "/files/apps/behavior-visualizer/src/components/InspectorDrawer.vue/ts/export_surface",
+      "membership"
+    ],
+    [
+      "/files/apps/behavior-visualizer/src/components/InspectorDrawer.vue/ts/export_surface_context_free",
+      "membership"
+    ],
+    [
+      "/files/apps/behavior-visualizer/src/components/InspectorDrawer.vue/ts/export_surface_recorded",
+      "membership"
+    ],
+    [
+      "/files/apps/mobile/package.json/facts",
+      "permutation-only",
+      70,
+      70
+    ],
+    [
+      "/files/apps/safari-extension/package.json/facts",
+      "permutation-only",
+      4,
+      4
+    ],
+    [
+      "/files/infra/pulumi/package.json/facts",
+      "permutation-only",
+      4,
+      4
+    ],
+    [
+      "/files/packages/scan-engine/package.json/facts",
+      "permutation-only",
+      5,
+      5
+    ],
+    [
+      "/files/services/admin-api/package.json/facts",
+      "permutation-only",
+      3,
+      3
+    ],
+    [
+      "/files/services/marketing-api/package.json/facts",
+      "permutation-only",
+      8,
+      8
+    ],
+    [
+      "/files/services/product-api/package.json/facts",
+      "permutation-only",
+      3,
+      3
+    ],
+    [
+      "/last_run_id",
+      "value",
+      "stage15-cli-product-stage19-rss-diagnostic-1-1790298360804039000",
+      "stage15-cli-product-stage19-rss-diagnostic-1-1790298383832523000"
+    ]
+  ]
+}

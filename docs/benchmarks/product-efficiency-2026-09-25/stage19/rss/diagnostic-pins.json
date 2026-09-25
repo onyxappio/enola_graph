@@ -1,0 +1,65 @@
+{
+  "purpose": "Stage19 experimental allocator-sampling diagnostic. Not a timing artifact. Not production.",
+  "overlay_file": "internal/graphprofile/profile.go",
+  "overlay_sha256_both_arms": "034794b47263f678353afb7ad677c5d01a31a0272bb8e477d60e1192ceb4876f",
+  "overlay_identical": true,
+  "arms": {
+    "baseline": {
+      "commit": "5e145dd82fa2420b96f1c9ca78e4815d38180d15",
+      "src": "/tmp/enola-stage19-rss-diag/baseline",
+      "binary": "/tmp/enola-stage19-rss-diag/enola-diag-baseline",
+      "binary_sha256": "3920723a9b7270bfd716ef081b444dcd961ad338a30bd37a83e3ed38c87184ee",
+      "buildinfo": [
+        "enola-diag-baseline: go1.27.1",
+        "build\t-trimpath=true",
+        "build\tDefaultGODEBUG=tracebacklabels=0,x509sslcertoverrideplatform=0",
+        "build\tCGO_ENABLED=1",
+        "build\tGOARCH=arm64",
+        "build\tGOOS=darwin",
+        "build\tvcs=git",
+        "build\tvcs.revision=5e145dd82fa2420b96f1c9ca78e4815d38180d15",
+        "build\tvcs.time=2026-09-24T23:42:00Z",
+        "build\tvcs.modified=true"
+      ]
+    },
+    "candidate": {
+      "commit": "7b03158a2ca8da1858030acdca4d0a3cedefbc1f",
+      "src": "/tmp/enola-stage19-rss-diag/candidate",
+      "binary": "/tmp/enola-stage19-rss-diag/enola-diag-candidate",
+      "binary_sha256": "29e9b01a5178b9ed21048c98478bed6857a016d3d7af7ab690877e52d7805893",
+      "buildinfo": [
+        "enola-diag-candidate: go1.27.1",
+        "build\t-trimpath=true",
+        "build\tDefaultGODEBUG=tracebacklabels=0,x509sslcertoverrideplatform=0",
+        "build\tCGO_ENABLED=1",
+        "build\tGOARCH=arm64",
+        "build\tGOOS=darwin",
+        "build\tvcs=git",
+        "build\tvcs.revision=7b03158a2ca8da1858030acdca4d0a3cedefbc1f",
+        "build\tvcs.time=2026-09-25T00:26:38Z",
+        "build\tvcs.modified=true"
+      ]
+    }
+  },
+  "build_cmd": "go build -trimpath -o <out> ./cmd/enola",
+  "modified_files_vs_frozen_commit": [
+    "internal/graphprofile/profile.go"
+  ],
+  "gate": {
+    "env": "ENOLA_GRAPH_MEMSTATS",
+    "requires_also": "ENOLA_GRAPH_PROFILE for the trace to exist",
+    "smoke": {
+      "memstats_lines_off": 0,
+      "memstats_lines_on": 19,
+      "graph_profile_lines_off": 16,
+      "graph_profile_lines_on": 16,
+      "note": "existing [graph-profile] output unchanged when sampling on; smoke exit=2 is the toy fixture correctly refusing to advance state without --events/--nats, not an instrumentation fault"
+    }
+  },
+  "limits": [
+    "runtime.ReadMemStats stops the world for the read; it does not force a collection, but it perturbs wall time, so no timing may be read off these binaries",
+    "samples are point-in-time allocator state at a phase boundary, never a peak, and never comparable to maxrss",
+    "instrumentation's own fmt allocations accumulate into later phases and are not subtracted",
+    "these binaries are not the frozen timing binaries; conclusions are about code paths, not about the accepted timing artifacts"
+  ]
+}

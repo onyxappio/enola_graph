@@ -1,0 +1,29 @@
+{
+  "at": "2026-09-25T01:03:18.575944+00:00",
+  "checks": {
+    "baseline": {
+      "head": "5e145dd82fa2420b96f1c9ca78e4815d38180d15",
+      "head_matches": true,
+      "changed": [
+        "internal/graphprofile/profile.go"
+      ],
+      "untracked": [],
+      "only_overlay": true,
+      "binary_sha_matches": true,
+      "overlay_sha_matches": true
+    },
+    "candidate": {
+      "head": "7b03158a2ca8da1858030acdca4d0a3cedefbc1f",
+      "head_matches": true,
+      "changed": [
+        "internal/graphprofile/profile.go"
+      ],
+      "untracked": [],
+      "only_overlay": true,
+      "binary_sha_matches": true,
+      "overlay_sha_matches": true
+    },
+    "identical_overlay": true
+  },
+  "scope": "Independent source and artifact pin verification only; Product diagnostic not run; no performance acceptance"
+}

@@ -1,0 +1,332 @@
+gc 1 @0.003s 2%: 0.022+0.75+0.030 ms clock, 0.22+0.063/0.69/0.13+0.30 ms cpu, 3->4->1 MB, 4 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-memstats] phase=trace_start trace=cli total_alloc=3688320 mallocs=32147 frees=15232 heap_alloc=2106288 heap_inuse=4628480 heap_sys=12058624 heap_released=6930432 next_gc=4194304 num_gc=1 stack_inuse=524288
+[graph-memstats] phase=flags_parsed trace=cli total_alloc=3690864 mallocs=32168 frees=15236 heap_alloc=2108832 heap_inuse=4628480 heap_sys=12058624 heap_released=6930432 next_gc=4194304 num_gc=1 stack_inuse=524288
+[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=delta
+[graph-memstats] phase=trace_start trace=graph_engine total_alloc=3723784 mallocs=32397 frees=15252 heap_alloc=2141752 heap_inuse=4636672 heap_sys=12058624 heap_released=6922240 next_gc=4194304 num_gc=1 stack_inuse=524288
+[graph-memstats] phase=config_load trace=graph_engine total_alloc=3753424 mallocs=32595 frees=15267 heap_alloc=2171392 heap_inuse=4636672 heap_sys=12058624 heap_released=6922240 next_gc=4194304 num_gc=1 stack_inuse=524288
+[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml
+[graph-memstats] phase=trace_start trace=graphinput_build total_alloc=3755736 mallocs=32616 frees=15272 heap_alloc=2173704 heap_inuse=4644864 heap_sys=12058624 heap_released=6914048 next_gc=4194304 num_gc=1 stack_inuse=524288
+[graph-memstats] phase=declare_config_deps trace=graphinput_build total_alloc=3769832 mallocs=32667 frees=15277 heap_alloc=2187800 heap_inuse=4669440 heap_sys=12058624 heap_released=6889472 next_gc=4194304 num_gc=1 stack_inuse=524288
+[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2
+[graph-memstats] phase=discover_git trace=graphinput_build total_alloc=3938000 mallocs=33065 frees=15283 heap_alloc=2355968 heap_inuse=4808704 heap_sys=12058624 heap_released=6799360 next_gc=4194304 num_gc=1 stack_inuse=524288
+[graph-profile] discover_git                       0.040s  total= 0.040s  trace=graphinput_build  repo=true dirs=2
+gc 2 @0.045s 0%: 0.046+0.88+0.003 ms clock, 0.46+0/1.7/0.99+0.038 ms cpu, 9->9->9 MB, 9 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-memstats] phase=declare_git_control trace=graphinput_build total_alloc=19424752 mallocs=33160 frees=17836 heap_alloc=17547840 heap_inuse=20103168 heap_sys=28770304 heap_released=8044544 next_gc=20015130 num_gc=2 stack_inuse=589824
+[graph-profile] declare_git_control                0.009s  total= 0.050s  trace=graphinput_build  deps=10
+gc 3 @0.072s 0%: 0.11+0.83+0.007 ms clock, 1.1+0/2.1/1.8+0.070 ms cpu, 18->19->3 MB, 19 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 4 @0.074s 1%: 0.018+0.82+0.008 ms clock, 0.18+0/1.3/0.41+0.086 ms cpu, 9->9->8 MB, 9 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 5 @0.078s 1%: 0.024+1.0+0.006 ms clock, 0.24+0/1.5/0.63+0.063 ms cpu, 16->16->14 MB, 16 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-memstats] phase=git_ls_files trace=graphinput_build total_alloc=45416088 mallocs=33674 frees=18016 heap_alloc=23851568 heap_inuse=26443776 heap_sys=32866304 heap_released=6021120 next_gc=29821786 num_gc=5 stack_inuse=688128
+[graph-profile] git_ls_files                       0.056s  total= 0.105s  trace=graphinput_build  tracked=45105 dirs=5818
+gc 6 @0.156s 0%: 0.045+0.54+0.020 ms clock, 0.45+0.019/1.0/0.90+0.20 ms cpu, 27->27->9 MB, 28 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-memstats] phase=walk_tree trace=graphinput_build total_alloc=55978952 mallocs=126663 frees=53707 heap_alloc=15500128 heap_inuse=17629184 heap_sys=37060608 heap_released=6275072 next_gc=19401034 num_gc=6 stack_inuse=688128
+[graph-profile] walk_tree                          0.113s  total= 0.218s  trace=graphinput_build  names=11635 ignorefiles=4
+[graph-memstats] phase=check_ignore_setup trace=graphinput_build total_alloc=56035632 mallocs=126811 frees=53712 heap_alloc=15556808 heap_inuse=17670144 heap_sys=37060608 heap_released=6242304 next_gc=19401034 num_gc=6 stack_inuse=688128
+[graph-profile] check_ignore_setup                 0.018s  total= 0.237s  trace=graphinput_build
+gc 7 @0.242s 0%: 0.12+2.4+0.015 ms clock, 1.2+0/5.7/1.7+0.15 ms cpu, 16->16->11 MB, 18 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-memstats] phase=check_ignore_run trace=graphinput_build total_alloc=57813752 mallocs=126967 frees=99703 heap_alloc=11617880 heap_inuse=14344192 heap_sys=37060608 heap_released=11026432 next_gc=23634746 num_gc=7 stack_inuse=688128
+[graph-profile] check_ignore_run                   0.049s  total= 0.286s  trace=graphinput_build  names=11635 ignored=0
+[graph-memstats] phase=declare_ignore_files trace=graphinput_build total_alloc=57817944 mallocs=127016 frees=99709 heap_alloc=11622072 heap_inuse=14344192 heap_sys=37060608 heap_released=11026432 next_gc=23634746 num_gc=7 stack_inuse=688128
+[graph-profile] declare_ignore_files               0.000s  total= 0.286s  trace=graphinput_build  deps=13
+gc 8 @0.306s 0%: 0.062+0.88+0.013 ms clock, 0.62+0/1.8/1.6+0.13 ms cpu, 20->20->12 MB, 22 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-memstats] phase=compute_identities trace=graphinput_build total_alloc=74067976 mallocs=164599 frees=129161 heap_alloc=20150632 heap_inuse=22814720 heap_sys=37060608 heap_released=9109504 next_gc=27148186 num_gc=8 stack_inuse=688128
+[graph-profile] compute_identities                 0.033s  total= 0.319s  trace=graphinput_build  deps=13 entries=11635
+[graph-memstats] phase=graphinput_build trace=graph_engine total_alloc=74078400 mallocs=164698 frees=129185 heap_alloc=20161056 heap_inuse=22822912 heap_sys=37060608 heap_released=9109504 next_gc=27148186 num_gc=8 stack_inuse=688128
+[graph-profile] graphinput_build                   0.320s  total= 0.320s  trace=graph_engine  configpaths=2
+[graph-memstats] phase=engine_new trace=graph_engine total_alloc=74079272 mallocs=164728 frees=129190 heap_alloc=20161928 heap_inuse=22822912 heap_sys=37060608 heap_released=9109504 next_gc=27148186 num_gc=8 stack_inuse=688128
+[graph-profile] engine_new                         0.000s  total= 0.320s  trace=graph_engine
+[graph-memstats] phase=register_plugins trace=graph_engine total_alloc=74089392 mallocs=164818 frees=129196 heap_alloc=20172048 heap_inuse=22822912 heap_sys=37060608 heap_released=9109504 next_gc=27148186 num_gc=8 stack_inuse=688128
+[graph-profile] register_plugins                   0.000s  total= 0.320s  trace=graph_engine
+[graph-memstats] phase=config_recheck trace=graph_engine total_alloc=74090504 mallocs=164839 frees=129201 heap_alloc=20173160 heap_inuse=22822912 heap_sys=37060608 heap_released=9109504 next_gc=27148186 num_gc=8 stack_inuse=688128
+[graph-profile] config_recheck                     0.000s  total= 0.320s  trace=graph_engine
+[graph-memstats] phase=resolve_graph_target trace=cli total_alloc=74090752 mallocs=164858 frees=129207 heap_alloc=20173408 heap_inuse=22822912 heap_sys=37060608 heap_released=9109504 next_gc=27148186 num_gc=8 stack_inuse=688128
+[graph-profile] resolve_graph_target               0.320s  total= 0.320s  trace=cli  repos=1
+enola graph: config /tmp/enola-stage19-root-review/rss-run2/config.yaml
+[graph-memstats] phase=connect_sink trace=cli total_alloc=74245416 mallocs=165951 frees=129332 heap_alloc=20328072 heap_inuse=22945792 heap_sys=37027840 heap_released=9109504 next_gc=27148186 num_gc=8 stack_inuse=720896
+[graph-profile] connect_sink                       0.001s  total= 0.321s  trace=cli  nats=true
+[graph-memstats] phase=session_options trace=cli total_alloc=74245944 mallocs=165970 frees=129337 heap_alloc=20328600 heap_inuse=22953984 heap_sys=37027840 heap_released=9109504 next_gc=27148186 num_gc=8 stack_inuse=720896
+[graph-profile] session_options                    0.000s  total= 0.321s  trace=cli  repo=/tmp/enola-stage19-root-review/rss-run1/product
+[graph-memstats] phase=trace_start trace=open total_alloc=74246120 mallocs=165986 frees=129342 heap_alloc=20328776 heap_inuse=22953984 heap_sys=37027840 heap_released=9109504 next_gc=27148186 num_gc=8 stack_inuse=720896
+[graph-memstats] phase=lock trace=open total_alloc=74246872 mallocs=166006 frees=129346 heap_alloc=20329528 heap_inuse=22953984 heap_sys=37027840 heap_released=9109504 next_gc=27148186 num_gc=8 stack_inuse=720896
+[graph-profile] lock                               0.000s  total= 0.000s  trace=open
+[graph-memstats] phase=bind_identity trace=open total_alloc=74250768 mallocs=166072 frees=129356 heap_alloc=20333424 heap_inuse=22953984 heap_sys=37027840 heap_released=9109504 next_gc=27148186 num_gc=8 stack_inuse=720896
+[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open
+[graph-memstats] phase=open_journal trace=open total_alloc=74262840 mallocs=166228 frees=129372 heap_alloc=20345496 heap_inuse=22953984 heap_sys=37027840 heap_released=9109504 next_gc=27148186 num_gc=8 stack_inuse=720896
+[graph-profile] open_journal                       0.000s  total= 0.000s  trace=open
+[graph-memstats] phase=replay_unacked trace=open total_alloc=74263952 mallocs=166249 frees=129377 heap_alloc=20346608 heap_inuse=22953984 heap_sys=37027840 heap_released=9109504 next_gc=27148186 num_gc=8 stack_inuse=720896
+[graph-profile] replay_unacked                     0.000s  total= 0.000s  trace=open
+gc 9 @0.326s 0%: 0.037+0.76+0.017 ms clock, 0.37+0/1.6/1.0+0.17 ms cpu, 78->78->70 MB, 78 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] state_read_bytes                   0.014s  state.json bytes=61917814
+[graph-profile] state_fingerprint                  0.026s  bytes=61917814
+gc 10 @0.537s 0%: 0.044+3.1+0.012 ms clock, 0.44+0.027/8.5/16+0.12 ms cpu, 137->138->116 MB, 140 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] state_json_unmarshal               0.269s  files=5032
+[graph-memstats] phase=load_state trace=open total_alloc=260569544 mallocs=1955977 frees=648529 heap_alloc=177571752 heap_inuse=183156736 heap_sys=187990016 heap_released=4833280 next_gc=245311002 num_gc=10 stack_inuse=753664
+[graph-profile] load_state                         0.309s  total= 0.310s  trace=open  files=5032
+[graph-memstats] phase=trace_start trace=reconcile total_alloc=260571192 mallocs=1955996 frees=648534 heap_alloc=177573400 heap_inuse=183156736 heap_sys=187990016 heap_released=4833280 next_gc=245311002 num_gc=10 stack_inuse=753664
+[graph-memstats] phase=transaction_enter trace=reconcile total_alloc=260571408 mallocs=1956009 frees=648538 heap_alloc=177573616 heap_inuse=183156736 heap_sys=187990016 heap_released=4833280 next_gc=245311002 num_gc=10 stack_inuse=753664
+[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false
+[graph-memstats] phase=effective_config_before trace=reconcile total_alloc=260573272 mallocs=1956038 frees=648545 heap_alloc=177575480 heap_inuse=183156736 heap_sys=187990016 heap_released=4833280 next_gc=245311002 num_gc=10 stack_inuse=753664
+[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2
+[graph-memstats] phase=graph_inputs_proven trace=reconcile total_alloc=282364528 mallocs=2011565 frees=649194 heap_alloc=199366736 heap_inuse=204668928 heap_sys=208928768 heap_released=4227072 next_gc=245311002 num_gc=10 stack_inuse=786432
+[graph-profile] graph_inputs_proven                0.110s  total= 0.110s  trace=reconcile
+[graph-memstats] phase=effective_config trace=reconcile total_alloc=282367320 mallocs=2011599 frees=649200 heap_alloc=199369528 heap_inuse=204668928 heap_sys=208928768 heap_released=4227072 next_gc=245311002 num_gc=10 stack_inuse=786432
+[graph-profile] effective_config                   0.000s  total= 0.110s  trace=reconcile  files=2 fast=false
+[graph-memstats] phase=reconcile_complete trace=reconcile total_alloc=282367512 mallocs=2011616 frees=649205 heap_alloc=199369720 heap_inuse=204668928 heap_sys=208928768 heap_released=4227072 next_gc=245311002 num_gc=10 stack_inuse=786432
+[graph-profile] reconcile_complete                 0.000s  total= 0.110s  trace=reconcile  reloaded=false
+[graph-memstats] phase=trace_start trace=session total_alloc=282367688 mallocs=2011632 frees=649210 heap_alloc=199369896 heap_inuse=204668928 heap_sys=208928768 heap_released=4227072 next_gc=245311002 num_gc=10 stack_inuse=786432
+[graph-memstats] phase=trace_start trace=inputs total_alloc=282369192 mallocs=2011646 frees=649214 heap_alloc=199371400 heap_inuse=204668928 heap_sys=208928768 heap_released=4227072 next_gc=245311002 num_gc=10 stack_inuse=786432
+[graph-profile] engine_walk_repo                   0.110s  files=10965 tests=0 all_names=10965
+[graph-memstats] phase=inventory trace=inputs total_alloc=290350184 mallocs=2081327 frees=649866 heap_alloc=207352392 heap_inuse=212328448 heap_sys=217317376 heap_released=4988928 next_gc=245311002 num_gc=10 stack_inuse=786432
+[graph-profile] inventory                          0.110s  total= 0.110s  trace=inputs  files=10965 all_names=10965
+[graph-profile] detect_go                          0.000s
+[graph-profile] detect_manifests                   0.000s
+[graph-profile] detect_mdintent                    0.000s
+[graph-profile] detect_dotnet                      0.004s
+[graph-profile] detect_cpp                         0.005s
+[graph-profile] detect_hcl                         0.001s
+[graph-profile] detect_ansible                     0.001s
+[graph-profile] detect_java                        0.003s
+[graph-profile] detect_kotlin                      0.004s
+[graph-profile] detect_php                         0.000s
+[graph-profile] detect_python                      0.000s
+[graph-profile] detect_typescript                  0.001s
+[graph-profile] detect_swift                       0.001s
+[graph-profile] detect_ruby                        0.002s
+[graph-profile] detect_rust                        0.001s
+[graph-profile] detect_scala                       0.005s
+[graph-profile] detect_dart                        0.001s
+gc 11 @0.884s 0%: 0.17+10+0.024 ms clock, 1.7+0.91/28/28+0.24 ms cpu, 228->230->98 MB, 233 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] detect_grpc                        0.067s
+[graph-profile] detect_openapi                     0.069s
+[graph-profile] detect_asyncapi                    0.122s
+[graph-memstats] phase=detect_extractors trace=inputs total_alloc=333966672 mallocs=2477128 frees=1278709 heap_alloc=118474048 heap_inuse=138944512 heap_sys=250839040 heap_released=5898240 next_gc=207528474 num_gc=11 stack_inuse=819200
+[graph-profile] detect_extractors                  0.122s  total= 0.232s  trace=inputs  detected=6
+[graph-memstats] phase=select_hash_targets trace=inputs total_alloc=335717992 mallocs=2490529 frees=1278715 heap_alloc=120225368 heap_inuse=140140544 heap_sys=250839040 heap_released=5898240 next_gc=207528474 num_gc=11 stack_inuse=819200
+[graph-profile] select_hash_targets                0.016s  total= 0.248s  trace=inputs  targets=5051
+[graph-profile] engine_hash_files                  0.170s  n=5051 hashed=5051 bytes=56129351
+[graph-memstats] phase=hash_content_inputs trace=inputs total_alloc=398182128 mallocs=2530986 frees=1278723 heap_alloc=182689504 heap_inuse=202719232 heap_sys=250839040 heap_released=5898240 next_gc=207528474 num_gc=11 stack_inuse=819200
+[graph-profile] hash_content_inputs                0.171s  total= 0.418s  trace=inputs  targets=5051
+[graph-memstats] phase=capture_contexts trace=inputs total_alloc=404655560 mallocs=2591593 frees=1279502 heap_alloc=189162936 heap_inuse=208281600 heap_sys=250839040 heap_released=5898240 next_gc=207528474 num_gc=11 stack_inuse=819200
+[graph-profile] capture_contexts                   0.067s  total= 0.485s  trace=inputs  contexts=2
+gc 12 @1.311s 0%: 0.060+5.4+0.015 ms clock, 0.60+0.034/15/28+0.15 ms cpu, 188->189->98 MB, 197 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] ts_config_inputs                   0.135s  n=83
+[graph-memstats] phase=analysis_fingerprint trace=inputs total_alloc=417456600 mallocs=2724052 frees=1589174 heap_alloc=107933968 heap_inuse=127950848 heap_sys=250839040 heap_released=15663104 next_gc=206356794 num_gc=12 stack_inuse=819200
+[graph-profile] analysis_fingerprint               0.141s  total= 0.627s  trace=inputs  cfg_files=59
+[graph-memstats] phase=angular_probe trace=inputs total_alloc=418158544 mallocs=2732418 frees=1589489 heap_alloc=108635912 heap_inuse=128253952 heap_sys=250839040 heap_released=15663104 next_gc=206356794 num_gc=12 stack_inuse=819200
+[graph-profile] angular_probe                      0.003s  total= 0.629s  trace=inputs  angular=false
+[graph-memstats] phase=policy_identity trace=inputs total_alloc=418159008 mallocs=2732435 frees=1589494 heap_alloc=108636376 heap_inuse=128253952 heap_sys=250839040 heap_released=15663104 next_gc=206356794 num_gc=12 stack_inuse=819200
+[graph-profile] policy_identity                    0.000s  total= 0.630s  trace=inputs
+[graph-memstats] phase=engine_context_fingerprint trace=inputs total_alloc=418159504 mallocs=2732456 frees=1589499 heap_alloc=108636872 heap_inuse=128253952 heap_sys=250839040 heap_released=15663104 next_gc=206356794 num_gc=12 stack_inuse=819200
+[graph-profile] engine_context_fingerprint         0.000s  total= 0.630s  trace=inputs
+[graph-profile] ts_disc_nuxt_packages              0.115s  pkgs=0
+[graph-profile] ts_disc_package_gates              0.000s
+[graph-profile] ts_disc_package_names              0.000s  names=30
+[graph-profile] ts_disc_alias_roots                0.080s  roots=1
+[graph-profile] ts_disc_package_exports            0.000s  packages=30
+[graph-profile] ts_discovery_build                 0.206s  side_reads=1965 stat_reads=1977 walked_dirs=655 captured=59
+[graph-memstats] phase=ts_discovery trace=inputs total_alloc=443128064 mallocs=2934286 frees=1592231 heap_alloc=133605432 heap_inuse=148504576 heap_sys=250839040 heap_released=15663104 next_gc=206356794 num_gc=12 stack_inuse=819200
+[graph-profile] ts_discovery                       0.206s  total= 0.836s  trace=inputs  names=0 bytes=0 dirs=0
+[graph-memstats] phase=ts_session_context trace=inputs total_alloc=495727072 mallocs=3215086 frees=1599248 heap_alloc=186204440 heap_inuse=200376320 heap_sys=250839040 heap_released=15663104 next_gc=206356794 num_gc=12 stack_inuse=819200
+[graph-profile] ts_session_context                 0.050s  total= 0.886s  trace=inputs  files=4086
+[graph-memstats] phase=runtime_inputs_complete trace=inputs total_alloc=495727248 mallocs=3215102 frees=1599253 heap_alloc=186204616 heap_inuse=200376320 heap_sys=250839040 heap_released=15663104 next_gc=206356794 num_gc=12 stack_inuse=819200
+[graph-profile] runtime_inputs_complete            0.000s  total= 0.886s  trace=inputs
+gc 13 @1.654s 0%: 0.061+5.0+0.012 ms clock, 0.61+0/14/24+0.12 ms cpu, 187->188->101 MB, 196 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] clone_file_state_copy              0.000s  n=5032
+[graph-memstats] phase=extractor_need trace=session total_alloc=512803296 mallocs=3310109 frees=2148075 heap_alloc=115505144 heap_inuse=137396224 heap_sys=250773504 heap_released=15663104 next_gc=213715642 num_gc=13 stack_inuse=884736
+[graph-profile] extractor_need                     0.943s  total= 0.943s  trace=session  non_ts_need=false detected=6 neutral=0
+[graph-memstats] phase=changed_terms trace=session total_alloc=516447088 mallocs=3320327 frees=2148080 heap_alloc=119148936 heap_inuse=140836864 heap_sys=250773504 heap_released=15663104 next_gc=213715642 num_gc=13 stack_inuse=884736
+[graph-profile] changed_terms                      0.017s  total= 0.960s  trace=session  initial=false force=false non_ts=false scan=true raw_cfg=false policy=false neutral_scan=false neutral_cfg=false
+[graph-memstats] phase=trace_start trace=ts total_alloc=538088312 mallocs=3413437 frees=2149098 heap_alloc=140790160 heap_inuse=157204480 heap_sys=250740736 heap_released=15663104 next_gc=213715642 num_gc=13 stack_inuse=917504
+[graph-memstats] phase=ts_detect_frameworks trace=ts total_alloc=538119208 mallocs=3413862 frees=2149103 heap_alloc=140821056 heap_inuse=157229056 heap_sys=250740736 heap_released=15663104 next_gc=213715642 num_gc=13 stack_inuse=917504
+[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true
+[graph-profile] ts_disc_package_aliases            0.000s  aliases=21
+[graph-memstats] phase=ts_read_dirty trace=ts total_alloc=551543200 mallocs=3422660 frees=2149111 heap_alloc=154245048 heap_inuse=171278336 heap_sys=250740736 heap_released=15663104 next_gc=213715642 num_gc=13 stack_inuse=917504
+[graph-profile] ts_read_dirty                      0.005s  total= 0.006s  trace=ts  to_read=53 cached=4033
+[graph-memstats] phase=ts_graphql_grpc_index trace=ts total_alloc=551553536 mallocs=3422749 frees=2149117 heap_alloc=154255384 heap_inuse=171302912 heap_sys=250740736 heap_released=15663104 next_gc=213715642 num_gc=13 stack_inuse=917504
+[graph-profile] ts_graphql_grpc_index              0.098s  total= 0.103s  trace=ts  ts_files=4086
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/GetStartedScreen-DiHBSXQR.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/Color-23OOGO2C-CFyZFonx.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/PointsCard-UPQ-OhXY.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/MainAppShell-DykjRsCQ.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/DeepScan-DHvM5dCJ.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/GetStartedFreeScreen-BnD4gdvs.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProfileScreen-aoCBlYSa.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/LeakedLogo-DG0KS9dA.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/PricingContentContext-ENjeFjYN.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/DocsRenderer-LL677BLK-BuIR6bZY.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/OnboardingFirstSessionScreen-Ccla2iGl.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProtectFreeScreen-4DLtefNg.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenContentTransition-Bs4S8klL.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/RiskIndicatorDropMessage-f1IgdUCx.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/SubscriptionInfoCard-CX9utM5L.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenFigmaComparisonPanel-CvcgEIaM.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProjectedFigmaScreen-B-0ULYBe.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/chunk-3LY4VQVK-DCoUZ6n4.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenCompositionHost-WK6OxeVJ.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/TabBar-vMBrgBKe.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/chunk-LITCR56V-JVUNf0OC.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/StatusBadge-DGggXXdu.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/deepscan-components.stories-DuUlNjuO.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProtectSurface-CtgJS1RL.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/WithTooltip-65CFNBJE-B3RsNAAg.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/getStartedDataSlotSource-Rr5d3rz_.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/legalLinks-CB7C40_C.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/onboardingDataSlotSource-qPx6fUNU.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/figma-components.stories-LvwegD9L.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/pricingFixtures.generated-CEiD1ca2.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/profile.stories-DlPoX8YC.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/Toast-DoOWktSp.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/protect-task.stories-dOTaLEMy.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/components-BtTjbzAC.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/screenBackgroundMorph-RdKWbQdJ.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/syntaxhighlighter-W7WJGI2T-BKWqXrBS.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/react-18-BfUV1oqG.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/screenReviewStoryKit-Dt_Rkzsv.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/generatedFigmaComponents-DmjMpYnh.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-addons/docs-1/manager-bundle.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/onyxStoryMetadata-Bq_5Th--.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/theming-BRkukHDK.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/train.stories-Dz3ntN8J.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/vite-inject-mocker-entry.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/screenStructureStoryKit-ComKfaDB.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/figmaScreenStructures.generated-JjgbhcQt.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenBackgroundBlur-DBMfPfhN.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-addons/storybook-core-server-presets-0/common-manager-bundle.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/iframe-D-RxKruK.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file scripts/deploy/t013-pulumi-role-handoff.mjs
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-manager/runtime.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-manager/globals-runtime.js
+gc 14 @1.946s 0%: 0.066+6.4+0.015 ms clock, 0.66+0/17/33+0.15 ms cpu, 198->202->142 MB, 203 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-memstats] phase=ts_mapfiles_aggregate trace=ts total_alloc=632632328 mallocs=3641414 frees=2351284 heap_alloc=176688320 heap_inuse=201424896 heap_sys=271712256 heap_released=13877248 next_gc=298785658 num_gc=14 stack_inuse=917504
+[graph-profile] ts_mapfiles_aggregate              0.040s  total= 0.143s  trace=ts  parsed=1 facts=59224 routers=0 scans=0 derived=1
+[graph-memstats] phase=ts_compose_modules trace=ts total_alloc=632786776 mallocs=3642745 frees=2351290 heap_alloc=176842768 heap_inuse=201580544 heap_sys=271712256 heap_released=13877248 next_gc=298785658 num_gc=14 stack_inuse=917504
+[graph-profile] ts_compose_modules                 0.003s  total= 0.146s  trace=ts  facts=59661 records=4086 unread=0
+[graph-memstats] phase=trace_start trace=ts total_alloc=644772632 mallocs=3667327 frees=2351295 heap_alloc=188828624 heap_inuse=210747392 heap_sys=271712256 heap_released=13877248 next_gc=298785658 num_gc=14 stack_inuse=917504
+[graph-memstats] phase=ts_detect_frameworks trace=ts total_alloc=644803528 mallocs=3667752 frees=2351300 heap_alloc=188859520 heap_inuse=210747392 heap_sys=271712256 heap_released=13877248 next_gc=298785658 num_gc=14 stack_inuse=917504
+[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4086 shared_discovery=true
+[graph-profile] ts_disc_package_aliases            0.000s  aliases=21
+[graph-memstats] phase=ts_read_dirty trace=ts total_alloc=658232312 mallocs=3676567 frees=2351312 heap_alloc=202288304 heap_inuse=222978048 heap_sys=271646720 heap_released=13877248 next_gc=298785658 num_gc=14 stack_inuse=983040
+[graph-profile] ts_read_dirty                      0.005s  total= 0.005s  trace=ts  to_read=62 cached=4024
+[graph-memstats] phase=ts_graphql_grpc_index trace=ts total_alloc=658248280 mallocs=3676663 frees=2351318 heap_alloc=202304272 heap_inuse=222978048 heap_sys=271646720 heap_released=13877248 next_gc=298785658 num_gc=14 stack_inuse=983040
+[graph-profile] ts_graphql_grpc_index              0.100s  total= 0.105s  trace=ts  ts_files=4086
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/DeepScan-DHvM5dCJ.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/PointsCard-UPQ-OhXY.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/PricingContentContext-ENjeFjYN.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/MainAppShell-DykjRsCQ.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/GetStartedScreen-DiHBSXQR.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProtectFreeScreen-4DLtefNg.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/OnboardingFirstSessionScreen-Ccla2iGl.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/GetStartedFreeScreen-BnD4gdvs.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/Color-23OOGO2C-CFyZFonx.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/DocsRenderer-LL677BLK-BuIR6bZY.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenFigmaComparisonPanel-CvcgEIaM.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/LeakedLogo-DG0KS9dA.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProfileScreen-aoCBlYSa.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/SubscriptionInfoCard-CX9utM5L.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenContentTransition-Bs4S8klL.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/TabBar-vMBrgBKe.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/RiskIndicatorDropMessage-f1IgdUCx.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/chunk-3LY4VQVK-DCoUZ6n4.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenCompositionHost-WK6OxeVJ.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProjectedFigmaScreen-B-0ULYBe.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/StatusBadge-DGggXXdu.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/deepscan-components.stories-DuUlNjuO.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/WithTooltip-65CFNBJE-B3RsNAAg.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProtectSurface-CtgJS1RL.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/chunk-LITCR56V-JVUNf0OC.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/Toast-DoOWktSp.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/figma-components.stories-LvwegD9L.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/getStartedDataSlotSource-Rr5d3rz_.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/components-BtTjbzAC.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/onboardingDataSlotSource-qPx6fUNU.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/legalLinks-CB7C40_C.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/generatedFigmaComponents-DmjMpYnh.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/profile.stories-DlPoX8YC.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/pricingFixtures.generated-CEiD1ca2.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/screenReviewStoryKit-Dt_Rkzsv.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/screenBackgroundMorph-RdKWbQdJ.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/protect-task.stories-dOTaLEMy.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/react-18-BfUV1oqG.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/syntaxhighlighter-W7WJGI2T-BKWqXrBS.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/theming-BRkukHDK.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/train.stories-Dz3ntN8J.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-addons/docs-1/manager-bundle.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/vite-inject-mocker-entry.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/onyxStoryMetadata-Bq_5Th--.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenBackgroundBlur-DBMfPfhN.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/figmaScreenStructures.generated-JjgbhcQt.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/screenStructureStoryKit-ComKfaDB.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-addons/storybook-core-server-presets-0/common-manager-bundle.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/iframe-D-RxKruK.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file scripts/deploy/t013-pulumi-role-handoff.mjs
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-manager/runtime.js
+2026/09/25 04:10:32 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-manager/globals-runtime.js
+gc 15 @2.266s 0%: 0.077+6.6+0.035 ms clock, 0.77+0.018/19/27+0.35 ms cpu, 271->272->117 MB, 284 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-memstats] phase=ts_mapfiles_aggregate trace=ts total_alloc=836330328 mallocs=4940406 frees=3123929 heap_alloc=222962128 heap_inuse=243613696 heap_sys=321978368 heap_released=10977280 next_gc=245844634 num_gc=15 stack_inuse=983040
+[graph-profile] ts_mapfiles_aggregate              0.285s  total= 0.390s  trace=ts  parsed=10 facts=59224 routers=0 scans=117 derived=7
+[graph-memstats] phase=ts_compose_modules trace=ts total_alloc=836484392 mallocs=4941736 frees=3123935 heap_alloc=223116192 heap_inuse=243752960 heap_sys=321978368 heap_released=10977280 next_gc=245844634 num_gc=15 stack_inuse=983040
+[graph-profile] ts_compose_modules                 0.003s  total= 0.393s  trace=ts  facts=59661 records=4086 unread=0
+gc 16 @2.388s 0%: 0.062+6.9+0.013 ms clock, 0.62+0.082/20/37+0.13 ms cpu, 225->226->138 MB, 234 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-memstats] phase=ts_frozen_preview trace=session total_alloc=851653760 mallocs=4979234 frees=3671962 heap_alloc=149301544 heap_inuse=176201728 heap_sys=321978368 heap_released=10969088 next_gc=291651226 num_gc=16 stack_inuse=983040
+[graph-profile] ts_frozen_preview                  0.695s  total= 1.655s  trace=session  dirty=11 err=false
+gc 17 @2.428s 0%: 0.073+9.4+0.013 ms clock, 0.73+0.027/27/52+0.13 ms cpu, 269->276->192 MB, 278 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-memstats] phase=invalidation_plan trace=session total_alloc=1047895808 mallocs=5466746 frees=3695549 heap_alloc=260319304 heap_inuse=277430272 heap_sys=355532800 heap_released=3506176 next_gc=403808154 num_gc=17 stack_inuse=983040
+[graph-profile] invalidation_plan                  0.156s  total= 1.811s  trace=session  reason=frozen scope: prior file-to-file dependency closure whole=false extra=0
+[graph-profile] revalidate_before_begin            0.001s  n=70 superseded=false
+[graph-memstats] phase=begin_publish trace=session total_alloc=1049110712 mallocs=5467657 frees=3695599 heap_alloc=261534208 heap_inuse=278560768 heap_sys=355467264 heap_released=3506176 next_gc=403808154 num_gc=17 stack_inuse=1048576
+[graph-profile] begin_publish                      0.032s  total= 1.843s  trace=session  scope=11
+[graph-memstats] phase=ts_dirty_scope trace=session total_alloc=1090937280 mallocs=5618422 frees=3696632 heap_alloc=303360776 heap_inuse=316088320 heap_sys=355467264 heap_released=3506176 next_gc=403808154 num_gc=17 stack_inuse=1048576
+[graph-profile] ts_dirty_scope                     0.126s  total= 1.969s  trace=session  dirty=11 scope=11 force=false
+[graph-memstats] phase=ts_extract_session trace=session total_alloc=1091377528 mallocs=5618521 frees=3696639 heap_alloc=303801024 heap_inuse=316522496 heap_sys=355467264 heap_released=3506176 next_gc=403808154 num_gc=17 stack_inuse=1048576
+[graph-profile] ts_extract_session                 0.000s  total= 1.969s  trace=session  parsed=11 cached=4023 facts=59661 records=4086
+gc 18 @2.749s 0%: 0.060+8.2+0.011 ms clock, 0.60+0.035/23/44+0.11 ms cpu, 363->369->170 MB, 385 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-memstats] phase=assemble_new_files trace=session total_alloc=1284163472 mallocs=6121380 frees=4348830 heap_alloc=291858096 heap_inuse=312901632 heap_sys=405831680 heap_released=7888896 next_gc=357616090 num_gc=18 stack_inuse=1015808
+[graph-profile] assemble_new_files                 0.172s  total= 2.141s  trace=session  new=5032 ts_noop=false non_ts_need=false skip=false facts=71448
+gc 19 @2.899s 0%: 0.079+8.3+0.014 ms clock, 0.79+0.15/24/46+0.14 ms cpu, 322->335->169 MB, 341 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 20 @2.954s 0%: 0.052+9.6+0.015 ms clock, 0.52+0.030/28/51+0.15 ms cpu, 298->306->195 MB, 339 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-memstats] phase=index_group_owners trace=session total_alloc=1591727224 mallocs=7896233 frees=5370313 heap_alloc=315480360 heap_inuse=332685312 heap_sys=405864448 heap_released=10051584 next_gc=410349498 num_gc=20 stack_inuse=983040
+[graph-profile] index_group_owners                 0.177s  total= 2.318s  trace=session  facts=70110 owners=4969
+[graph-memstats] phase=publish_scope trace=session total_alloc=1591892768 mallocs=7896268 frees=5370319 heap_alloc=315645904 heap_inuse=332849152 heap_sys=405864448 heap_released=10051584 next_gc=410349498 num_gc=20 stack_inuse=983040
+[graph-profile] publish_scope                      0.000s  total= 2.318s  trace=session  scope=11
+[graph-memstats] phase=encode_append_owners trace=session total_alloc=1597799064 mallocs=7916860 frees=5371110 heap_alloc=321552200 heap_inuse=338288640 heap_sys=405831680 heap_released=10051584 next_gc=410349498 num_gc=20 stack_inuse=1015808
+[graph-profile] encode_append_owners               0.009s  total= 2.327s  trace=session  published=11
+[graph-memstats] phase=publish_resolved trace=session total_alloc=1599022072 mallocs=7917894 frees=5371122 heap_alloc=322775208 heap_inuse=339632128 heap_sys=405569536 heap_released=10051584 next_gc=410349498 num_gc=20 stack_inuse=1277952
+[graph-profile] publish_resolved                   0.047s  total= 2.375s  trace=session  owners=11
+gc 21 @3.187s 0%: 0.055+9.0+0.005 ms clock, 0.55+0.022/26/42+0.051 ms cpu, 339->344->158 MB, 391 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-memstats] phase=revalidate_ts_records trace=session total_alloc=1647408880 mallocs=7950614 frees=6588067 heap_alloc=180090616 heap_inuse=206209024 heap_sys=405733376 heap_released=31776768 next_gc=332682378 num_gc=21 stack_inuse=1114112
+[graph-profile] revalidate_ts_records              0.108s  total= 2.483s  trace=session  n=4086
+[graph-profile] ts_config_inputs                   0.129s  n=83
+gc 22 @3.469s 0%: 0.074+9.9+0.010 ms clock, 0.74+0/23/44+0.10 ms cpu, 287->287->181 MB, 317 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 23 @3.550s 0%: 0.061+16+0.023 ms clock, 0.61+0/31/44+0.23 ms cpu, 347->347->240 MB, 364 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] state_json_marshal                 0.196s  bytes=61917814 files=5032
+[graph-profile] state_fingerprint                  0.027s  write bytes=61917814
+[graph-memstats] phase=write_pending_state trace=session total_alloc=2070799384 mallocs=8919740 frees=7253888 heap_alloc=381657248 heap_inuse=404480000 heap_sys=636551168 heap_released=129949696 next_gc=504292346 num_gc=23 stack_inuse=983040
+[graph-profile] write_pending_state                0.472s  total= 2.955s  trace=session
+[graph-memstats] phase=end_flush_ack trace=session total_alloc=2070832696 mallocs=8920063 frees=7253911 heap_alloc=381690560 heap_inuse=404488192 heap_sys=636485632 heap_released=129949696 next_gc=504292346 num_gc=23 stack_inuse=1048576
+[graph-profile] end_flush_ack                      0.034s  total= 2.989s  trace=session
+[graph-memstats] phase=promote_compact_state trace=session total_alloc=2071645656 mallocs=8920356 frees=7253917 heap_alloc=382503520 heap_inuse=405282816 heap_sys=636485632 heap_released=129949696 next_gc=504292346 num_gc=23 stack_inuse=1048576
+[graph-profile] promote_compact_state              0.068s  total= 3.057s  trace=session  parsed=11 published=11
+[graph-memstats] phase=graph_session_run trace=cli total_alloc=2071646424 mallocs=8920378 frees=7253922 heap_alloc=382504288 heap_inuse=405299200 heap_sys=636551168 heap_released=129949696 next_gc=504292346 num_gc=23 stack_inuse=983040
+[graph-profile] graph_session_run                  3.477s  total= 3.798s  trace=cli  repo=/tmp/enola-stage19-root-review/rss-run1/product parsed=11
+[graph] /tmp/enola-stage19-root-review/rss-run1/product: generation 1→2 parsed=11 cached=4023 early_local=0 fallbacks=1
+[graph] fallback graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)
+[graph-memstats] phase=cli_complete trace=cli total_alloc=2071670784 mallocs=8920642 frees=7253948 heap_alloc=382528648 heap_inuse=405299200 heap_sys=636551168 heap_released=129949696 next_gc=504292346 num_gc=23 stack_inuse=983040
+[graph-profile] cli_complete                       0.000s  total= 3.798s  trace=cli  results=1
+        3.82 real         4.31 user         1.15 sys
+           679510016  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               68417  page reclaims
+                 241  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                  30  messages sent
+                  16  messages received
+                 569  signals received
+                 316  voluntary context switches
+               12729  involuntary context switches
+         54278395058  instructions retired
+         16364444105  cycles elapsed
+           544394496  peak memory footprint
