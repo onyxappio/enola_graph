@@ -61,3 +61,9 @@ a live focused integration test (message msg_21d3518c2751), not an orphan proces
 its completion ETA was unknown. Prior container boundary snapshots were near
 idle (0.03–0.46%); the separate audit preserves exact excerpts and source hashes.
 Those snapshots cannot rule out intervening bursts or explain prior swap events.
+
+Topology follow-up: local Docker context is `colima`, using the local Unix socket,
+with no DOCKER_HOST/DOCKER_CONTEXT override. Codata reports a GCP tunnel for its
+integration test. Until the coordinator resolves that discrepancy, do not infer
+that its test causes the local container CPU load merely from a matching name.
+Local VM CPU and container CPU are observed; precise workload ownership is pending.
