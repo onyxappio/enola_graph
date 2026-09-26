@@ -130,3 +130,7 @@ Copied the exact frozen Stage23/24 runtime and corrected focused fixtures into t
 ## Combined source full repository validation
 
 The Stage23/24 discovery changes integrated with 3599a8f passed `go test ./...` (exit 0). See `combined-full-repository.log`. No repeated acceptance timing or main publication is claimed by this correctness result.
+
+## Repeated full-profile timing outcome
+
+Nine cyclic arms completed inside the confirmed hold with exact graph parity and silent no-op. The combined candidate improved measured median time but failed the preregistered initial RSS limit (+7.66%, allowed +5%); shared desktop load also varied. It is not accepted for main publication. See [the full results](timing-20260926/RESULTS.md), including all spreads, ablations and absent first-batch reporting caveat.

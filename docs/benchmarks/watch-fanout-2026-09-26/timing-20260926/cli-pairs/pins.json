@@ -1,0 +1,44 @@
+{
+  "product_path": "/tmp/enola-fanout-current-20260926/candidate-product",
+  "product_sha": "01baa6eb0cc2ea74018eafc07e230a29d4efa8f4",
+  "files": {
+    "/tmp/enola-stage14-watch-pairs/watch.py": "629fae95963c62b83df4acdc2ea5d6438dd114d67bbca2425b96416eda7538cb",
+    "/tmp/enola-stage9-product-watch-control/bin/benchobserver": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+    "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/run.py": "94caf3654e6283630dca8fbaa558c447d2cb1aade55f7b1bfc406cfba9d14c79",
+    "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/product-graph-scope.yaml": "b81b19598dd74c63084ae11488cb7f4fa7df783b0887d2c42dcf61dc67890bf7",
+    "/tmp/enola-toolchain/bin/nats-server": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af",
+    "/tmp/enola-fanout-nats-acceptance/cli-pairs/run-arm.py": "406a9c25a6f422dfe061ffd039da574eaff09212e1dec71ea5b45d928cb33097",
+    "/tmp/enola-fanout-nats-acceptance/cli-pairs/cli.py": "fa6bc70b8f996879083e257c8a2adde8cf2739467ea2db5a46e7c6890ffff72a",
+    "/tmp/enola-fanout-nats-acceptance/cli-pairs/harness_support.py": "95d70a9e3e3a0986fd8a1684524a8c9f2205df5529786979d08376abb46e4cac",
+    "/tmp/enola-fanout-nats-acceptance/cli-pairs/validate_results.py": "7e4846646167653d6d3de7d3d5d805a02aa889dfe09e4d0b42a61d19173e7b02",
+    "/tmp/enola-fanout-nats-acceptance/run-timing-series.py": "bb76c69f0889139e63ddc103d9adec89284d200dd9b011afdaa4e08fa0d24f8a",
+    "/tmp/enola-fanout-nats-acceptance/summarize-timing.py": "e53aa19e9b24f2f73a63be8b45c1f51438b5947af4bdcc038fd27a12c47027e8",
+    "/tmp/enola-fanout-nats-acceptance/test-timing-summary.py": "ae11af726bf82bfdf46f053c8cedee98a9ae090b6f3bbf7b3833afc2d0358ddb",
+    "/tmp/enola-fanout-nats-acceptance/background_gate.py": "f2f0cad3d42f42f8a242b33d16293b5e9c79877dc385f0a91050ffa8d280ffbf",
+    "/tmp/enola-fanout-nats-acceptance/timing_gate.py": "27b101af267fcc3a05d70a6271d85ba8c3bab1deabe321c1cc2502481a1f233a",
+    "/tmp/enola-fanout-nats-acceptance/test_background_gate.py": "7cc6921f2044d58d14a44d24f9edddebb8218ac119ac544efe5a6a9e47e5ffef",
+    "/tmp/enola-fanout-nats-acceptance/collect-background-preflight.py": "99edb1fd96b76e11cd16f331e189f2411c42c1a60bd3142f655be7cb259aece2",
+    "/tmp/enola-fanout-nats-acceptance/PROMOTION_RULE.md": "1eac16872d43adea6cc424748e8e1b9c480f25d460a1a61fad736160caa1a1a7",
+    "/tmp/enola-fanout-nats-acceptance/test-current-roster.py": "00af796f25902dadd01ba774bb22d0e26fa813fa9e438e373bf0feaccf41b8b2"
+  },
+  "binaries": {
+    "baseline": {
+      "path": "/tmp/enola-stage22-root-acceptance/enola-stage22-experimental",
+      "sha256": "a3c19dc902f80248cc14d0e7669bf8c0067d779bd6709741ab756ac7146986d1"
+    },
+    "candidate": {
+      "path": "/tmp/enola-fanout-stage24-combined/enola-combined-experimental",
+      "sha256": "1a6ef346bfbbdd78050e92694eee9f375bc21c933f296a199742f757d85efaf1"
+    },
+    "control": {
+      "path": "/tmp/enola-watch-fanout-3599a8f",
+      "sha256": "e32679e5133532ccdbe80a89467a179c7b744471d950122dfb88db7b039575db"
+    }
+  },
+  "baseline_revision": "674cf84",
+  "baseline_runtime": "c75e33e",
+  "experimental_checkpoint": "Full-profile Product: Stage22 baseline / 3599a8f fanout control / Stage23+24 combined overlay candidate; not accepted",
+  "not_final_acceptance": true,
+  "nats_max_payload": 8388608,
+  "combined_source_revision": "63c037d"
+}

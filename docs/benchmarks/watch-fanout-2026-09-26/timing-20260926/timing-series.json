@@ -1,0 +1,205 @@
+{
+  "hold": {
+    "mode": "current-roster",
+    "combined_authorized": true,
+    "worker_message": "msg_d67414b84a65",
+    "start_utc": "2026-09-26T17:05:00+00:00",
+    "end_utc": "2026-09-26T17:30:00+00:00",
+    "participants": [
+      {
+        "handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+        "status": "held",
+        "message_id": "msg_d67414b84a65",
+        "evidence_path": "/tmp/enola-fanout-nats-acceptance/coordination/msg_d67414b84a65.json",
+        "sha256": "abfcf10e52fddc79e01ec91b996744ebc940e97a025affb30ba5c2441a238b07"
+      },
+      {
+        "handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "status": "held",
+        "message_id": "msg_3fc865040fe4",
+        "evidence_path": "/tmp/enola-fanout-nats-acceptance/coordination/msg_3fc865040fe4.json",
+        "sha256": "749ed1a1c99486714b4de819847583cb477fc3fcae725920c0f871ef87830935"
+      },
+      {
+        "handle": "term_f6d0d3d8-2dce-47a2-81db-44fd6bb8a1a8",
+        "status": "held",
+        "message_id": "msg_d750430d2f22",
+        "evidence_path": "/tmp/enola-fanout-nats-acceptance/coordination/msg_d750430d2f22.json",
+        "sha256": "39476edb9e70b0a75d11ae7594800342e521cf17aa00c5e7d7518c905feb201d"
+      },
+      {
+        "handle": "term_b4d33c66-3033-42d6-8870-0852aa948bfd",
+        "status": "exited",
+        "evidence_path": "/tmp/enola-fanout-nats-acceptance/coordination/closed-coordinator.json",
+        "sha256": "7ec21198d91be1ab216b1528dd50416c5cb72dfbda241a9f28abfad726b761ad"
+      }
+    ],
+    "root_full_suite_exit": 0,
+    "root_commit": "63c037d",
+    "host_note": "Old accuracy Chrome processes retained; snapshot ~1.65 GiB RSS; audit whole-host samples before acceptance."
+  },
+  "runs": [
+    {
+      "arm": "baseline",
+      "repeat": 1,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-fanout-nats-acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "msg_d67414b84a65"
+      ],
+      "start_utc": "2026-09-26T17:07:48.080894+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-26T17:09:51.366007+00:00"
+    },
+    {
+      "arm": "control",
+      "repeat": 1,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-fanout-nats-acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "control",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "msg_d67414b84a65"
+      ],
+      "start_utc": "2026-09-26T17:09:51.366773+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-26T17:11:51.707662+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 1,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-fanout-nats-acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "msg_d67414b84a65"
+      ],
+      "start_utc": "2026-09-26T17:11:51.708431+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-26T17:13:44.928829+00:00"
+    },
+    {
+      "arm": "control",
+      "repeat": 2,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-fanout-nats-acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "control",
+        "--repeat",
+        "2",
+        "--quiet-message-id",
+        "msg_d67414b84a65"
+      ],
+      "start_utc": "2026-09-26T17:13:44.929560+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-26T17:15:48.514448+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 2,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-fanout-nats-acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "2",
+        "--quiet-message-id",
+        "msg_d67414b84a65"
+      ],
+      "start_utc": "2026-09-26T17:15:48.515040+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-26T17:17:38.707913+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 2,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-fanout-nats-acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "2",
+        "--quiet-message-id",
+        "msg_d67414b84a65"
+      ],
+      "start_utc": "2026-09-26T17:17:38.708350+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-26T17:19:41.769490+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 3,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-fanout-nats-acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "3",
+        "--quiet-message-id",
+        "msg_d67414b84a65"
+      ],
+      "start_utc": "2026-09-26T17:19:41.770294+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-26T17:21:31.091135+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 3,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-fanout-nats-acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "3",
+        "--quiet-message-id",
+        "msg_d67414b84a65"
+      ],
+      "start_utc": "2026-09-26T17:21:31.091625+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-26T17:23:31.674622+00:00"
+    },
+    {
+      "arm": "control",
+      "repeat": 3,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-fanout-nats-acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "control",
+        "--repeat",
+        "3",
+        "--quiet-message-id",
+        "msg_d67414b84a65"
+      ],
+      "start_utc": "2026-09-26T17:23:31.675369+00:00",
+      "exit": 0,
+      "end_utc": "2026-09-26T17:25:32.495257+00:00"
+    }
+  ]
+}

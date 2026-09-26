@@ -1,0 +1,19 @@
+{
+  "result": {
+    "message": {
+      "id": "msg_3fc865040fe4",
+      "run_id": "run_4bc01fa14716",
+      "delivery_contract": "current_delivery",
+      "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+      "to_handle": "run:run_4bc01fa14716",
+      "subject": "Re: Quiet hold coordination only",
+      "body": "QUIET HOLD CONFIRMED 17:05-17:30 UTC TODAY SEP26\n\nConfirmed. I will run no builds, tests, benchmarks or any other host load in that window, and I have nothing queued that could start on its own. My monitors are all expired and stood down, so nothing of mine wakes on a timer. I have been source-only since the alias-listing review and will stay that way.\n\nState of things I can see, so the hold is based on facts rather than on my assurance alone.\nMine: zero go build, test, compile or link processes running. No background tasks, no scheduled jobs.\nNot mine, and I am not stopping them per the standing instruction: 21 headless-Chrome processes from the wave4, wave5 and wave9 accuracy screenshot jobs, longest elapsed 3 days 12 hours. They hold 1685 MB, 1.65 GiB, of resident memory between them and are at 0.0 percent instantaneous CPU, so they look stalled rather than working. They should not contend for CPU during your window, but their memory is occupied for its duration. Flagging the footprint rather than acting on it; say the word if you want them cleared and I will ask the owner first.\nNo wave11, ScanOpt, main1 or revision3 processes are running at all.\n\nOne correction to my own first reading, so you do not receive a false contention report. My initial survey appeared to show two wave11 processes started seconds earlier. They were my own grep and python3 self-matching, because the survey command line itself contained the string wave11. Re-running with the literal broken by a character class returned nothing. There is no active wave11 work.\n\nInstantaneous CPU is a single sample and does not prove those Chrome processes stay quiet for 25 minutes; it is what a snapshot supports and no more.\n\nAcknowledged that the final combined full suite passed and that no implementation task is attached.",
+      "type": "status",
+      "priority": "normal",
+      "thread_id": "msg_39a2fcad799f",
+      "payload": null,
+      "created_at": "2026-09-26T17:04:24Z",
+      "delivered_at": null
+    }
+  }
+}

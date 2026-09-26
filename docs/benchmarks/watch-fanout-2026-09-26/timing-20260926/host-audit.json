@@ -1,0 +1,392 @@
+{
+  "note": "ps %CPU observations are decayed process CPU percentages, not interval CPU deltas. Includes OS/UI/editor/agent processes; no claim of an unloaded machine. Chrome RSS is summed per process and can double count shared pages.",
+  "arms": {
+    "baseline-1": {
+      "samples": 52,
+      "foreign_ps_cpu_sum_median": 83.3,
+      "foreign_ps_cpu_sum_max": 320.8,
+      "chrome_rss_kib_min": 7986704,
+      "chrome_rss_kib_max": 9303200,
+      "top_foreign_executables": [
+        {
+          "name": "com.apple.Virtualization.VirtualMachine",
+          "max_ps_cpu": 96.6
+        },
+        {
+          "name": "Google",
+          "max_ps_cpu": 95.3
+        },
+        {
+          "name": "PerfPowerServices",
+          "max_ps_cpu": 51.8
+        },
+        {
+          "name": "WindowServer",
+          "max_ps_cpu": 47.9
+        },
+        {
+          "name": "Telegram",
+          "max_ps_cpu": 33.1
+        },
+        {
+          "name": "codex",
+          "max_ps_cpu": 31.1
+        },
+        {
+          "name": "cpa-manager-plus",
+          "max_ps_cpu": 19.6
+        },
+        {
+          "name": "sysmond",
+          "max_ps_cpu": 17.6
+        }
+      ],
+      "recognized_competing_samples": 0,
+      "sample_errors": []
+    },
+    "control-1": {
+      "samples": 50,
+      "foreign_ps_cpu_sum_median": 95.85,
+      "foreign_ps_cpu_sum_max": 349.5,
+      "chrome_rss_kib_min": 7822320,
+      "chrome_rss_kib_max": 8685008,
+      "top_foreign_executables": [
+        {
+          "name": "Telegram",
+          "max_ps_cpu": 50.1
+        },
+        {
+          "name": "mds_stores",
+          "max_ps_cpu": 38.6
+        },
+        {
+          "name": "Google",
+          "max_ps_cpu": 35.5
+        },
+        {
+          "name": "WindowServer",
+          "max_ps_cpu": 29.4
+        },
+        {
+          "name": "cpa-manager-plus",
+          "max_ps_cpu": 28.2
+        },
+        {
+          "name": "sysmond",
+          "max_ps_cpu": 25.7
+        },
+        {
+          "name": "Activity",
+          "max_ps_cpu": 22.3
+        },
+        {
+          "name": "launchd",
+          "max_ps_cpu": 19.9
+        }
+      ],
+      "recognized_competing_samples": 0,
+      "sample_errors": []
+    },
+    "candidate-1": {
+      "samples": 47,
+      "foreign_ps_cpu_sum_median": 122.9,
+      "foreign_ps_cpu_sum_max": 345.2,
+      "chrome_rss_kib_min": 7416848,
+      "chrome_rss_kib_max": 8024128,
+      "top_foreign_executables": [
+        {
+          "name": "com.apple.Virtualization.VirtualMachine",
+          "max_ps_cpu": 87.1
+        },
+        {
+          "name": "Telegram",
+          "max_ps_cpu": 65.4
+        },
+        {
+          "name": "Google",
+          "max_ps_cpu": 61.9
+        },
+        {
+          "name": "Orca",
+          "max_ps_cpu": 61.8
+        },
+        {
+          "name": "WindowServer",
+          "max_ps_cpu": 45.2
+        },
+        {
+          "name": "1Password",
+          "max_ps_cpu": 34.0
+        },
+        {
+          "name": "(ps)",
+          "max_ps_cpu": 32.4
+        },
+        {
+          "name": "launchd",
+          "max_ps_cpu": 30.5
+        }
+      ],
+      "recognized_competing_samples": 0,
+      "sample_errors": []
+    },
+    "baseline-2": {
+      "samples": 52,
+      "foreign_ps_cpu_sum_median": 155.9,
+      "foreign_ps_cpu_sum_max": 272.0,
+      "chrome_rss_kib_min": 7586992,
+      "chrome_rss_kib_max": 8134864,
+      "top_foreign_executables": [
+        {
+          "name": "com.apple.Virtualization.VirtualMachine",
+          "max_ps_cpu": 96.7
+        },
+        {
+          "name": "mobileassetd",
+          "max_ps_cpu": 84.2
+        },
+        {
+          "name": "triald",
+          "max_ps_cpu": 66.2
+        },
+        {
+          "name": "Telegram",
+          "max_ps_cpu": 59.9
+        },
+        {
+          "name": "Software",
+          "max_ps_cpu": 46.5
+        },
+        {
+          "name": "WindowServer",
+          "max_ps_cpu": 35.1
+        },
+        {
+          "name": "cpa-manager-plus",
+          "max_ps_cpu": 22.5
+        },
+        {
+          "name": "com.apple.WebKit.WebContent",
+          "max_ps_cpu": 22.4
+        }
+      ],
+      "recognized_competing_samples": 0,
+      "sample_errors": []
+    },
+    "control-2": {
+      "samples": 52,
+      "foreign_ps_cpu_sum_median": 107.25,
+      "foreign_ps_cpu_sum_max": 373.1,
+      "chrome_rss_kib_min": 7567680,
+      "chrome_rss_kib_max": 7933840,
+      "top_foreign_executables": [
+        {
+          "name": "Orca",
+          "max_ps_cpu": 145.1
+        },
+        {
+          "name": "com.apple.Virtualization.VirtualMachine",
+          "max_ps_cpu": 85.9
+        },
+        {
+          "name": "claude",
+          "max_ps_cpu": 49.3
+        },
+        {
+          "name": "Telegram",
+          "max_ps_cpu": 45.3
+        },
+        {
+          "name": "WindowServer",
+          "max_ps_cpu": 44.6
+        },
+        {
+          "name": "launchd",
+          "max_ps_cpu": 43.1
+        },
+        {
+          "name": "PerfPowerServices",
+          "max_ps_cpu": 41.8
+        },
+        {
+          "name": "Google",
+          "max_ps_cpu": 36.7
+        }
+      ],
+      "recognized_competing_samples": 0,
+      "sample_errors": []
+    },
+    "candidate-2": {
+      "samples": 46,
+      "foreign_ps_cpu_sum_median": 101.5,
+      "foreign_ps_cpu_sum_max": 214.1,
+      "chrome_rss_kib_min": 7762336,
+      "chrome_rss_kib_max": 8070864,
+      "top_foreign_executables": [
+        {
+          "name": "Telegram",
+          "max_ps_cpu": 92.7
+        },
+        {
+          "name": "com.apple.Virtualization.VirtualMachine",
+          "max_ps_cpu": 74.9
+        },
+        {
+          "name": "Orca",
+          "max_ps_cpu": 53.5
+        },
+        {
+          "name": "WindowServer",
+          "max_ps_cpu": 47.1
+        },
+        {
+          "name": "launchd",
+          "max_ps_cpu": 44.0
+        },
+        {
+          "name": "Google",
+          "max_ps_cpu": 39.7
+        },
+        {
+          "name": "cliproxyapi",
+          "max_ps_cpu": 25.1
+        },
+        {
+          "name": "cpa-manager-plus",
+          "max_ps_cpu": 25.1
+        }
+      ],
+      "recognized_competing_samples": 0,
+      "sample_errors": []
+    },
+    "baseline-3": {
+      "samples": 51,
+      "foreign_ps_cpu_sum_median": 72.1,
+      "foreign_ps_cpu_sum_max": 465.5,
+      "chrome_rss_kib_min": 7170848,
+      "chrome_rss_kib_max": 8239440,
+      "top_foreign_executables": [
+        {
+          "name": "com.apple.Virtualization.VirtualMachine",
+          "max_ps_cpu": 81.3
+        },
+        {
+          "name": "Orca",
+          "max_ps_cpu": 62.0
+        },
+        {
+          "name": "codex",
+          "max_ps_cpu": 46.1
+        },
+        {
+          "name": "sysmond",
+          "max_ps_cpu": 31.6
+        },
+        {
+          "name": "cpa-manager-plus",
+          "max_ps_cpu": 30.0
+        },
+        {
+          "name": "cliproxyapi",
+          "max_ps_cpu": 25.5
+        },
+        {
+          "name": "WindowServer",
+          "max_ps_cpu": 25.4
+        },
+        {
+          "name": "Google",
+          "max_ps_cpu": 23.2
+        }
+      ],
+      "recognized_competing_samples": 0,
+      "sample_errors": []
+    },
+    "control-3": {
+      "samples": 51,
+      "foreign_ps_cpu_sum_median": 103.9,
+      "foreign_ps_cpu_sum_max": 483.3,
+      "chrome_rss_kib_min": 7239024,
+      "chrome_rss_kib_max": 7709936,
+      "top_foreign_executables": [
+        {
+          "name": "PerfPowerServices",
+          "max_ps_cpu": 64.7
+        },
+        {
+          "name": "grok",
+          "max_ps_cpu": 56.5
+        },
+        {
+          "name": "codex",
+          "max_ps_cpu": 51.8
+        },
+        {
+          "name": "ClearVPN",
+          "max_ps_cpu": 45.6
+        },
+        {
+          "name": "com.apple.Virtualization.VirtualMachine",
+          "max_ps_cpu": 35.4
+        },
+        {
+          "name": "sysmond",
+          "max_ps_cpu": 35.1
+        },
+        {
+          "name": "WindowServer",
+          "max_ps_cpu": 29.2
+        },
+        {
+          "name": "Google",
+          "max_ps_cpu": 28.5
+        }
+      ],
+      "recognized_competing_samples": 0,
+      "sample_errors": []
+    },
+    "candidate-3": {
+      "samples": 46,
+      "foreign_ps_cpu_sum_median": 95.65,
+      "foreign_ps_cpu_sum_max": 345.2,
+      "chrome_rss_kib_min": 7480016,
+      "chrome_rss_kib_max": 8068432,
+      "top_foreign_executables": [
+        {
+          "name": "com.apple.Virtualization.VirtualMachine",
+          "max_ps_cpu": 93.5
+        },
+        {
+          "name": "duetexpertd",
+          "max_ps_cpu": 72.5
+        },
+        {
+          "name": "Orca",
+          "max_ps_cpu": 63.2
+        },
+        {
+          "name": "ClearVPN",
+          "max_ps_cpu": 49.2
+        },
+        {
+          "name": "Telegram",
+          "max_ps_cpu": 44.6
+        },
+        {
+          "name": "Google",
+          "max_ps_cpu": 37.6
+        },
+        {
+          "name": "claude",
+          "max_ps_cpu": 37.1
+        },
+        {
+          "name": "WindowServer",
+          "max_ps_cpu": 34.9
+        }
+      ],
+      "recognized_competing_samples": 0,
+      "sample_errors": []
+    }
+  }
+}

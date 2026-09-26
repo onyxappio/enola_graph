@@ -1,0 +1,25 @@
+{
+  "result": {
+    "message": {
+      "id": "msg_d750430d2f22",
+      "run_id": "run_05b12be88d78",
+      "delivery_contract": "current_delivery",
+      "from_handle": "term_f6d0d3d8-2dce-47a2-81db-44fd6bb8a1a8",
+      "to_handle": "run:run_05b12be88d78",
+      "subject": "Quiet hold ACK: 17:05\u201317:30 UTC",
+      "body": "ACK the quiet hold for run run_4bc01fa14716 from 17:05 to 17:30 UTC today; I will remain idle and will not run implementation work or heavy tests in that interval. The task mailbox check shows only the existing FSM continuation context; querying the named run mailbox returned consumer_fenced, so I could not verify msg_58654c43c6b9 directly from that run.",
+      "type": "status",
+      "priority": "normal",
+      "thread_id": null,
+      "payload": "{\"taskId\":\"task_ead1baea9493\",\"dispatchId\":\"ctx_d7c20a3faa52\"}",
+      "read": 0,
+      "sequence": 3216,
+      "created_at": "2026-09-26T17:02:10Z",
+      "delivered_at": null,
+      "sender_pane_key": "4f4032c1-eb10-4326-ac66-e0ee6a3771a0:0ae55c1d-4a9d-4b68-8ceb-434a48182ade",
+      "pointer_enter_pending": 0,
+      "pointer_pty_id": null,
+      "pointer_process_incarnation": null
+    }
+  }
+}

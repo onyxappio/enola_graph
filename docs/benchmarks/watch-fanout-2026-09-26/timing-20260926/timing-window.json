@@ -1,0 +1,39 @@
+{
+  "mode": "current-roster",
+  "combined_authorized": true,
+  "worker_message": "msg_d67414b84a65",
+  "start_utc": "2026-09-26T17:05:00+00:00",
+  "end_utc": "2026-09-26T17:30:00+00:00",
+  "participants": [
+    {
+      "handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+      "status": "held",
+      "message_id": "msg_d67414b84a65",
+      "evidence_path": "/tmp/enola-fanout-nats-acceptance/coordination/msg_d67414b84a65.json",
+      "sha256": "abfcf10e52fddc79e01ec91b996744ebc940e97a025affb30ba5c2441a238b07"
+    },
+    {
+      "handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+      "status": "held",
+      "message_id": "msg_3fc865040fe4",
+      "evidence_path": "/tmp/enola-fanout-nats-acceptance/coordination/msg_3fc865040fe4.json",
+      "sha256": "749ed1a1c99486714b4de819847583cb477fc3fcae725920c0f871ef87830935"
+    },
+    {
+      "handle": "term_f6d0d3d8-2dce-47a2-81db-44fd6bb8a1a8",
+      "status": "held",
+      "message_id": "msg_d750430d2f22",
+      "evidence_path": "/tmp/enola-fanout-nats-acceptance/coordination/msg_d750430d2f22.json",
+      "sha256": "39476edb9e70b0a75d11ae7594800342e521cf17aa00c5e7d7518c905feb201d"
+    },
+    {
+      "handle": "term_b4d33c66-3033-42d6-8870-0852aa948bfd",
+      "status": "exited",
+      "evidence_path": "/tmp/enola-fanout-nats-acceptance/coordination/closed-coordinator.json",
+      "sha256": "7ec21198d91be1ab216b1528dd50416c5cb72dfbda241a9f28abfad726b761ad"
+    }
+  ],
+  "root_full_suite_exit": 0,
+  "root_commit": "63c037d",
+  "host_note": "Old accuracy Chrome processes retained; snapshot ~1.65 GiB RSS; audit whole-host samples before acceptance."
+}
