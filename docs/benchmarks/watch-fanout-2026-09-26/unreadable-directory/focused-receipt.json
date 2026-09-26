@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-p",
+    "1",
+    "./internal/extractors/tsextractor",
+    "-run",
+    "Test(Discovery|AliasListing)",
+    "-count=1",
+    "-v"
+  ],
+  "exit": 0,
+  "wall_seconds": 1.381036667036824,
+  "performance_evidence": false
+}

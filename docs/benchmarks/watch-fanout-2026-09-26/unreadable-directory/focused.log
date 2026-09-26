@@ -1,0 +1,50 @@
+=== RUN   TestAliasListingHandlesFilesystemShapes
+=== RUN   TestAliasListingHandlesFilesystemShapes/empty
+=== RUN   TestAliasListingHandlesFilesystemShapes/config
+=== RUN   TestAliasListingHandlesFilesystemShapes/symlink
+=== RUN   TestAliasListingHandlesFilesystemShapes/capture
+=== RUN   TestAliasListingHandlesFilesystemShapes/read-error
+=== RUN   TestAliasListingHandlesFilesystemShapes/testdata
+--- PASS: TestAliasListingHandlesFilesystemShapes (0.00s)
+    --- PASS: TestAliasListingHandlesFilesystemShapes/empty (0.00s)
+    --- PASS: TestAliasListingHandlesFilesystemShapes/config (0.00s)
+    --- PASS: TestAliasListingHandlesFilesystemShapes/symlink (0.00s)
+    --- PASS: TestAliasListingHandlesFilesystemShapes/capture (0.00s)
+    --- PASS: TestAliasListingHandlesFilesystemShapes/read-error (0.00s)
+    --- PASS: TestAliasListingHandlesFilesystemShapes/testdata (0.00s)
+=== RUN   TestAliasListingWalkPreservesObservationLedger
+=== RUN   TestAliasListingWalkPreservesObservationLedger/missing
+=== RUN   TestAliasListingWalkPreservesObservationLedger/captured-missing
+=== RUN   TestAliasListingWalkPreservesObservationLedger/policy-excluded
+=== RUN   TestAliasListingWalkPreservesObservationLedger/dangling-link
+=== RUN   TestAliasListingWalkPreservesObservationLedger/invalid-primary
+=== RUN   TestAliasListingWalkPreservesObservationLedger/directory-name
+=== RUN   TestAliasListingWalkPreservesObservationLedger/testdata
+=== RUN   TestAliasListingWalkPreservesObservationLedger/unlistable
+--- PASS: TestAliasListingWalkPreservesObservationLedger (0.38s)
+    --- PASS: TestAliasListingWalkPreservesObservationLedger/missing (0.05s)
+    --- PASS: TestAliasListingWalkPreservesObservationLedger/captured-missing (0.05s)
+    --- PASS: TestAliasListingWalkPreservesObservationLedger/policy-excluded (0.05s)
+    --- PASS: TestAliasListingWalkPreservesObservationLedger/dangling-link (0.05s)
+    --- PASS: TestAliasListingWalkPreservesObservationLedger/invalid-primary (0.05s)
+    --- PASS: TestAliasListingWalkPreservesObservationLedger/directory-name (0.05s)
+    --- PASS: TestAliasListingWalkPreservesObservationLedger/testdata (0.05s)
+    --- PASS: TestAliasListingWalkPreservesObservationLedger/unlistable (0.05s)
+=== RUN   TestAliasListingPreservesInventoryVisits
+=== RUN   TestAliasListingPreservesInventoryVisits/all
+=== RUN   TestAliasListingPreservesInventoryVisits/excluded-package
+--- PASS: TestAliasListingPreservesInventoryVisits (0.11s)
+    --- PASS: TestAliasListingPreservesInventoryVisits/all (0.06s)
+    --- PASS: TestAliasListingPreservesInventoryVisits/excluded-package (0.06s)
+=== RUN   TestDiscoveryUsesCapturedPackageReaders
+--- PASS: TestDiscoveryUsesCapturedPackageReaders (0.00s)
+=== RUN   TestDiscoveryReuseTurnsOnCapturedBytesNotOnHavingASnapshot
+--- PASS: TestDiscoveryReuseTurnsOnCapturedBytesNotOnHavingASnapshot (0.00s)
+=== RUN   TestDiscoveryReuseIgnoresUnconsultedFilesAndRefusesAppearingOnes
+--- PASS: TestDiscoveryReuseIgnoresUnconsultedFilesAndRefusesAppearingOnes (0.00s)
+=== RUN   TestDiscoveryReuseRequiresTheCapturedBytesItWasTakenOver
+--- PASS: TestDiscoveryReuseRequiresTheCapturedBytesItWasTakenOver (0.01s)
+=== RUN   TestDiscoveryWalkIgnoredReadErrorDoesNotProveEmptyDirectory
+--- PASS: TestDiscoveryWalkIgnoredReadErrorDoesNotProveEmptyDirectory (0.00s)
+PASS
+ok  	github.com/enola-labs/enola/internal/extractors/tsextractor	0.799s

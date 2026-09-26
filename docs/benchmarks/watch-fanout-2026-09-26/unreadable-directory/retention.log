@@ -1,0 +1,41 @@
+=== RUN   TestRetainedDiscoveryRefusesUncapturedObservationChange
+=== RUN   TestRetainedDiscoveryRefusesUncapturedObservationChange/live_package_bytes_change
+    discovery_retention_test.go:139: live package bytes change: refused after names=13 bytes=3 dirs=0
+=== RUN   TestRetainedDiscoveryRefusesUncapturedObservationChange/external_extends_target_changes
+    discovery_retention_test.go:139: external extends target changes: refused after names=13 bytes=3 dirs=0
+=== RUN   TestRetainedDiscoveryRefusesUncapturedObservationChange/package_appears_in_a_directory_the_snapshot_walked
+    discovery_retention_test.go:139: package appears in a directory the snapshot walked: refused after names=13 bytes=6 dirs=2
+=== RUN   TestRetainedDiscoveryRefusesUncapturedObservationChange/entry_the_snapshot_listed_as_a_file_becomes_a_directory
+    discovery_retention_test.go:139: entry the snapshot listed as a file becomes a directory: refused after names=13 bytes=6 dirs=1
+--- PASS: TestRetainedDiscoveryRefusesUncapturedObservationChange (0.01s)
+    --- PASS: TestRetainedDiscoveryRefusesUncapturedObservationChange/live_package_bytes_change (0.00s)
+    --- PASS: TestRetainedDiscoveryRefusesUncapturedObservationChange/external_extends_target_changes (0.00s)
+    --- PASS: TestRetainedDiscoveryRefusesUncapturedObservationChange/package_appears_in_a_directory_the_snapshot_walked (0.00s)
+    --- PASS: TestRetainedDiscoveryRefusesUncapturedObservationChange/entry_the_snapshot_listed_as_a_file_becomes_a_directory (0.00s)
+=== RUN   TestRetainedDiscoveryProvesUnchangedTree
+    discovery_retention_test.go:168: proof cost on an unchanged tree: names=13 bytes=6 dirs=2
+--- PASS: TestRetainedDiscoveryProvesUnchangedTree (0.00s)
+=== RUN   TestSessionContextFromSharedDiscoveryMatchesDirectReads
+--- PASS: TestSessionContextFromSharedDiscoveryMatchesDirectReads (0.00s)
+=== RUN   TestSharedDiscoveryWalkMatchesPerCollectorWalks
+--- PASS: TestSharedDiscoveryWalkMatchesPerCollectorWalks (0.01s)
+=== RUN   TestSharedDiscoveryWalkRecordsTheSameDirectories
+--- PASS: TestSharedDiscoveryWalkRecordsTheSameDirectories (0.01s)
+=== RUN   TestSharedDiscoveryWalkWithoutCacheStillEnumerates
+--- PASS: TestSharedDiscoveryWalkWithoutCacheStillEnumerates (0.00s)
+=== RUN   TestSharedDiscoveryWalkKeepsRetentionFence
+=== RUN   TestSharedDiscoveryWalkKeepsRetentionFence/unchanged_tree_stays_reusable
+=== RUN   TestSharedDiscoveryWalkKeepsRetentionFence/package_added_to_a_walked_directory
+=== RUN   TestSharedDiscoveryWalkKeepsRetentionFence/package_deleted_from_a_walked_directory
+=== RUN   TestSharedDiscoveryWalkKeepsRetentionFence/package_directory_renamed
+=== RUN   TestSharedDiscoveryWalkKeepsRetentionFence/nuxt_config_added_beside_a_package
+--- PASS: TestSharedDiscoveryWalkKeepsRetentionFence (0.04s)
+    --- PASS: TestSharedDiscoveryWalkKeepsRetentionFence/unchanged_tree_stays_reusable (0.01s)
+    --- PASS: TestSharedDiscoveryWalkKeepsRetentionFence/package_added_to_a_walked_directory (0.01s)
+    --- PASS: TestSharedDiscoveryWalkKeepsRetentionFence/package_deleted_from_a_walked_directory (0.01s)
+    --- PASS: TestSharedDiscoveryWalkKeepsRetentionFence/package_directory_renamed (0.01s)
+    --- PASS: TestSharedDiscoveryWalkKeepsRetentionFence/nuxt_config_added_beside_a_package (0.01s)
+=== RUN   TestSharedDiscoveryWalkEnumeratesHiddenRepositoryRoot
+--- PASS: TestSharedDiscoveryWalkEnumeratesHiddenRepositoryRoot (0.00s)
+PASS
+ok  	github.com/enola-labs/enola/internal/extractors/tsextractor	0.407s

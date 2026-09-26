@@ -97,6 +97,13 @@ func overlayWalkDir(ctx context.Context, root string, inputScope *inputscope.Sco
 			set[d.Name()] = entryKind(d)
 		}
 		ret := fn(path, d, walkErr)
+		// WalkDir first visits a directory before reading it, then calls back
+		// again if reading its children fails. A callback may deliberately
+		// ignore that error to continue discovery. The earlier visit must not
+		// then become a successful empty-directory observation.
+		if walkErr != nil {
+			delete(enumerated, absOverlayKey(path))
+		}
 		switch {
 		case ret == nil:
 			if d != nil && d.IsDir() && walkErr == nil {

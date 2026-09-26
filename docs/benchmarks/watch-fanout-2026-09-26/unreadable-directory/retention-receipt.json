@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-p",
+    "1",
+    "./internal/extractors/tsextractor",
+    "-run",
+    "Test(SharedDiscovery|RetainedDiscovery|SessionContextFromSharedDiscovery)",
+    "-count=1",
+    "-v"
+  ],
+  "exit": 0,
+  "wall_seconds": 0.9573399579385296,
+  "performance_evidence": false
+}
