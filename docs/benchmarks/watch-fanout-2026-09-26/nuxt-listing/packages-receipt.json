@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-p",
+    "1",
+    "./internal/extractors/tsextractor",
+    "./internal/graphsession",
+    "-count=1"
+  ],
+  "exit": 0,
+  "wall_seconds": 406.8343841659371,
+  "performance_evidence": false
+}

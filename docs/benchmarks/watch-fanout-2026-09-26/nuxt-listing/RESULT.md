@@ -20,11 +20,12 @@ directory is never treated as empty. Source hashes and raw receipts accompany
 this record. These are correctness results, not performance acceptance.
 
 An earlier full TS + graphsession command was launched before the folded-case
-adjustment; its first package passed in 22.671 s and graphsession was still live
-when this record was written. That command must not be described as full-suite
+adjustment; both packages passed (406.834 s including build/invocation overhead). That command must not be described as full-suite
 validation of the final source. A full final-source run, Product cold/delta
 checks, measurements and publication are still pending.
 
 The pending six-pair harness still pins 9c7359f. A benchmark of this new candidate
 requires a new source/binary pin and correctness receipt before timing; do not
 silently attribute the older candidate's results to this change.
+
+Product NATS correctness on 7c4651d passed all four gates (silent no-op and three cold graph comparisons). All seven scenario hashes also match the pinned Stage22 reference. This correctness-only run is explicitly ineligible for timing acceptance. The final-source full repository suite and repeated timing remain pending.

@@ -1,0 +1,19 @@
+{
+  "correctness_accepted": true,
+  "source_revision": "7c4651daa9fac651f349de4466e7ea1c7e6df90f",
+  "binary_sha256": "354df3445b03dc105d9033c2a8ef212085105132762bcefb88b1188b18678efe",
+  "cross_build_graph_hashes": {
+    "r1-new-initial": "d9005bfe64c9406465e470f809d067ddfef636d029bf8ddbd184f7cff1775ebc",
+    "r1-new-noop": "d9005bfe64c9406465e470f809d067ddfef636d029bf8ddbd184f7cff1775ebc",
+    "r1-new-body": "d9005bfe64c9406465e470f809d067ddfef636d029bf8ddbd184f7cff1775ebc",
+    "r1-new-structural": "2ab368479ca1be6ee5b9039682cc673d84c09d2be6b4cf4422eca65dcef3eecd",
+    "cold-structural": "2ab368479ca1be6ee5b9039682cc673d84c09d2be6b4cf4422eca65dcef3eecd",
+    "cold-body": "d9005bfe64c9406465e470f809d067ddfef636d029bf8ddbd184f7cff1775ebc",
+    "cold-original": "d9005bfe64c9406465e470f809d067ddfef636d029bf8ddbd184f7cff1775ebc"
+  },
+  "reference_metrics": "/tmp/enola-fanout-state-encode-clean-host/cli-pairs/baseline-1/metrics.json",
+  "reference_sha256": "11d25e80dd05ac47a9cab169c7bad4611f79a4c8447de1746a6130a411bb6c03",
+  "correctness_directory": "/tmp/enola-fanout-nuxt-balanced/cli-pairs/correctness-candidate-1",
+  "timing_accepted": false,
+  "final_source_full_suite_pending": true
+}
