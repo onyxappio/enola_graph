@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-p",
+    "1",
+    "./internal/extractors/tsextractor",
+    "-run",
+    "Test(NuxtListing|AliasListing|Discovery|SharedDiscovery|RetainedDiscovery|SessionContextFromSharedDiscovery)",
+    "-count=1",
+    "-v"
+  ],
+  "exit": 0,
+  "wall_seconds": 7.119889457942918,
+  "performance_evidence": false
+}

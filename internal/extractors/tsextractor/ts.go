@@ -6605,7 +6605,9 @@ func aliasesAtDirFromListing(ctx context.Context, dir string, entries []fs.DirEn
 	present := [len(tsAliasConfigNames)]bool{}
 	for _, entry := range entries {
 		for i, name := range tsAliasConfigNames {
-			if entry.Name() == name {
+			// A differently cased name can satisfy the real reader on a
+			// case-insensitive filesystem. Defer folded matches to that reader.
+			if strings.EqualFold(entry.Name(), name) {
 				present[i] = true
 			}
 		}

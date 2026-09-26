@@ -14,7 +14,7 @@ import (
 )
 
 func TestAliasListingHandlesFilesystemShapes(t *testing.T) {
-	for _, name := range []string{"empty", "config", "symlink", "capture", "read-error", "testdata"} {
+	for _, name := range []string{"empty", "config", "mixed-case", "symlink", "capture", "read-error", "testdata"} {
 		t.Run(name, func(t *testing.T) {
 			root := t.TempDir()
 			dir := root
@@ -30,6 +30,9 @@ func TestAliasListingHandlesFilesystemShapes(t *testing.T) {
 				ctx = withFileOverlay(ctx, newFileOverlay(dir, map[string][]byte{"tsconfig.json": cfg}))
 			} else if name != "empty" {
 				target := filepath.Join(dir, "tsconfig.json")
+				if name == "mixed-case" {
+					target = filepath.Join(dir, "TsCoNfIg.JsOn")
+				}
 				if name == "symlink" {
 					target = filepath.Join(root, "actual.json")
 				}

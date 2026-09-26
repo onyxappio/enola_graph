@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-p",
+    "1",
+    "-overlay",
+    "/tmp/enola-nuxt-listing-proof/before-case-overlay.json",
+    "./internal/extractors/tsextractor",
+    "-run",
+    "^TestAliasListingHandlesFilesystemShapes$/mixed-case$",
+    "-count=1",
+    "-v"
+  ],
+  "exit": 1,
+  "wall_seconds": 4.151873333961703,
+  "expected_failure": true
+}

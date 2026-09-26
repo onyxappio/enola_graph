@@ -1,0 +1,123 @@
+=== RUN   TestAliasListingHandlesFilesystemShapes
+=== RUN   TestAliasListingHandlesFilesystemShapes/empty
+=== RUN   TestAliasListingHandlesFilesystemShapes/config
+=== RUN   TestAliasListingHandlesFilesystemShapes/mixed-case
+=== RUN   TestAliasListingHandlesFilesystemShapes/symlink
+=== RUN   TestAliasListingHandlesFilesystemShapes/capture
+=== RUN   TestAliasListingHandlesFilesystemShapes/read-error
+=== RUN   TestAliasListingHandlesFilesystemShapes/testdata
+--- PASS: TestAliasListingHandlesFilesystemShapes (0.02s)
+    --- PASS: TestAliasListingHandlesFilesystemShapes/empty (0.00s)
+    --- PASS: TestAliasListingHandlesFilesystemShapes/config (0.01s)
+    --- PASS: TestAliasListingHandlesFilesystemShapes/mixed-case (0.00s)
+    --- PASS: TestAliasListingHandlesFilesystemShapes/symlink (0.00s)
+    --- PASS: TestAliasListingHandlesFilesystemShapes/capture (0.00s)
+    --- PASS: TestAliasListingHandlesFilesystemShapes/read-error (0.00s)
+    --- PASS: TestAliasListingHandlesFilesystemShapes/testdata (0.01s)
+=== RUN   TestAliasListingWalkPreservesObservationLedger
+=== RUN   TestAliasListingWalkPreservesObservationLedger/missing
+=== RUN   TestAliasListingWalkPreservesObservationLedger/captured-missing
+=== RUN   TestAliasListingWalkPreservesObservationLedger/policy-excluded
+=== RUN   TestAliasListingWalkPreservesObservationLedger/dangling-link
+=== RUN   TestAliasListingWalkPreservesObservationLedger/invalid-primary
+=== RUN   TestAliasListingWalkPreservesObservationLedger/directory-name
+=== RUN   TestAliasListingWalkPreservesObservationLedger/testdata
+=== RUN   TestAliasListingWalkPreservesObservationLedger/unlistable
+--- PASS: TestAliasListingWalkPreservesObservationLedger (0.59s)
+    --- PASS: TestAliasListingWalkPreservesObservationLedger/missing (0.08s)
+    --- PASS: TestAliasListingWalkPreservesObservationLedger/captured-missing (0.07s)
+    --- PASS: TestAliasListingWalkPreservesObservationLedger/policy-excluded (0.07s)
+    --- PASS: TestAliasListingWalkPreservesObservationLedger/dangling-link (0.06s)
+    --- PASS: TestAliasListingWalkPreservesObservationLedger/invalid-primary (0.08s)
+    --- PASS: TestAliasListingWalkPreservesObservationLedger/directory-name (0.09s)
+    --- PASS: TestAliasListingWalkPreservesObservationLedger/testdata (0.07s)
+    --- PASS: TestAliasListingWalkPreservesObservationLedger/unlistable (0.07s)
+=== RUN   TestAliasListingPreservesInventoryVisits
+=== RUN   TestAliasListingPreservesInventoryVisits/all
+=== RUN   TestAliasListingPreservesInventoryVisits/excluded-package
+--- PASS: TestAliasListingPreservesInventoryVisits (0.21s)
+    --- PASS: TestAliasListingPreservesInventoryVisits/all (0.09s)
+    --- PASS: TestAliasListingPreservesInventoryVisits/excluded-package (0.11s)
+=== RUN   TestDiscoveryUsesCapturedPackageReaders
+--- PASS: TestDiscoveryUsesCapturedPackageReaders (0.01s)
+=== RUN   TestDiscoveryReuseTurnsOnCapturedBytesNotOnHavingASnapshot
+--- PASS: TestDiscoveryReuseTurnsOnCapturedBytesNotOnHavingASnapshot (0.01s)
+=== RUN   TestDiscoveryReuseIgnoresUnconsultedFilesAndRefusesAppearingOnes
+--- PASS: TestDiscoveryReuseIgnoresUnconsultedFilesAndRefusesAppearingOnes (0.00s)
+=== RUN   TestRetainedDiscoveryRefusesUncapturedObservationChange
+=== RUN   TestRetainedDiscoveryRefusesUncapturedObservationChange/live_package_bytes_change
+    discovery_retention_test.go:139: live package bytes change: refused after names=13 bytes=2 dirs=0
+=== RUN   TestRetainedDiscoveryRefusesUncapturedObservationChange/external_extends_target_changes
+    discovery_retention_test.go:139: external extends target changes: refused after names=13 bytes=6 dirs=0
+=== RUN   TestRetainedDiscoveryRefusesUncapturedObservationChange/package_appears_in_a_directory_the_snapshot_walked
+    discovery_retention_test.go:139: package appears in a directory the snapshot walked: refused after names=13 bytes=6 dirs=2
+=== RUN   TestRetainedDiscoveryRefusesUncapturedObservationChange/entry_the_snapshot_listed_as_a_file_becomes_a_directory
+    discovery_retention_test.go:139: entry the snapshot listed as a file becomes a directory: refused after names=13 bytes=6 dirs=1
+--- PASS: TestRetainedDiscoveryRefusesUncapturedObservationChange (0.04s)
+    --- PASS: TestRetainedDiscoveryRefusesUncapturedObservationChange/live_package_bytes_change (0.01s)
+    --- PASS: TestRetainedDiscoveryRefusesUncapturedObservationChange/external_extends_target_changes (0.01s)
+    --- PASS: TestRetainedDiscoveryRefusesUncapturedObservationChange/package_appears_in_a_directory_the_snapshot_walked (0.01s)
+    --- PASS: TestRetainedDiscoveryRefusesUncapturedObservationChange/entry_the_snapshot_listed_as_a_file_becomes_a_directory (0.01s)
+=== RUN   TestRetainedDiscoveryProvesUnchangedTree
+    discovery_retention_test.go:168: proof cost on an unchanged tree: names=13 bytes=6 dirs=2
+--- PASS: TestRetainedDiscoveryProvesUnchangedTree (0.01s)
+=== RUN   TestDiscoveryReuseRequiresTheCapturedBytesItWasTakenOver
+--- PASS: TestDiscoveryReuseRequiresTheCapturedBytesItWasTakenOver (0.02s)
+=== RUN   TestSessionContextFromSharedDiscoveryMatchesDirectReads
+--- PASS: TestSessionContextFromSharedDiscoveryMatchesDirectReads (0.01s)
+=== RUN   TestSharedDiscoveryWalkMatchesPerCollectorWalks
+--- PASS: TestSharedDiscoveryWalkMatchesPerCollectorWalks (0.03s)
+=== RUN   TestSharedDiscoveryWalkRecordsTheSameDirectories
+--- PASS: TestSharedDiscoveryWalkRecordsTheSameDirectories (0.03s)
+=== RUN   TestSharedDiscoveryWalkWithoutCacheStillEnumerates
+--- PASS: TestSharedDiscoveryWalkWithoutCacheStillEnumerates (0.02s)
+=== RUN   TestSharedDiscoveryWalkKeepsRetentionFence
+=== RUN   TestSharedDiscoveryWalkKeepsRetentionFence/unchanged_tree_stays_reusable
+=== RUN   TestSharedDiscoveryWalkKeepsRetentionFence/package_added_to_a_walked_directory
+=== RUN   TestSharedDiscoveryWalkKeepsRetentionFence/package_deleted_from_a_walked_directory
+=== RUN   TestSharedDiscoveryWalkKeepsRetentionFence/package_directory_renamed
+=== RUN   TestSharedDiscoveryWalkKeepsRetentionFence/nuxt_config_added_beside_a_package
+--- PASS: TestSharedDiscoveryWalkKeepsRetentionFence (0.16s)
+    --- PASS: TestSharedDiscoveryWalkKeepsRetentionFence/unchanged_tree_stays_reusable (0.01s)
+    --- PASS: TestSharedDiscoveryWalkKeepsRetentionFence/package_added_to_a_walked_directory (0.04s)
+    --- PASS: TestSharedDiscoveryWalkKeepsRetentionFence/package_deleted_from_a_walked_directory (0.04s)
+    --- PASS: TestSharedDiscoveryWalkKeepsRetentionFence/package_directory_renamed (0.03s)
+    --- PASS: TestSharedDiscoveryWalkKeepsRetentionFence/nuxt_config_added_beside_a_package (0.04s)
+=== RUN   TestSharedDiscoveryWalkEnumeratesHiddenRepositoryRoot
+--- PASS: TestSharedDiscoveryWalkEnumeratesHiddenRepositoryRoot (0.00s)
+=== RUN   TestNuxtListingPreservesPresenceAndLedger
+=== RUN   TestNuxtListingPreservesPresenceAndLedger/empty
+=== RUN   TestNuxtListingPreservesPresenceAndLedger/js
+=== RUN   TestNuxtListingPreservesPresenceAndLedger/ts
+=== RUN   TestNuxtListingPreservesPresenceAndLedger/mjs
+=== RUN   TestNuxtListingPreservesPresenceAndLedger/mixed-case
+=== RUN   TestNuxtListingPreservesPresenceAndLedger/manifest
+=== RUN   TestNuxtListingPreservesPresenceAndLedger/captured-config
+=== RUN   TestNuxtListingPreservesPresenceAndLedger/captured-manifest
+=== RUN   TestNuxtListingPreservesPresenceAndLedger/directory
+=== RUN   TestNuxtListingPreservesPresenceAndLedger/link
+=== RUN   TestNuxtListingPreservesPresenceAndLedger/broken-link
+=== RUN   TestNuxtListingPreservesPresenceAndLedger/excluded
+=== RUN   TestNuxtListingPreservesPresenceAndLedger/unlistable
+--- PASS: TestNuxtListingPreservesPresenceAndLedger (0.93s)
+    --- PASS: TestNuxtListingPreservesPresenceAndLedger/empty (0.07s)
+    --- PASS: TestNuxtListingPreservesPresenceAndLedger/js (0.06s)
+    --- PASS: TestNuxtListingPreservesPresenceAndLedger/ts (0.07s)
+    --- PASS: TestNuxtListingPreservesPresenceAndLedger/mjs (0.07s)
+    --- PASS: TestNuxtListingPreservesPresenceAndLedger/mixed-case (0.08s)
+    --- PASS: TestNuxtListingPreservesPresenceAndLedger/manifest (0.07s)
+    --- PASS: TestNuxtListingPreservesPresenceAndLedger/captured-config (0.07s)
+    --- PASS: TestNuxtListingPreservesPresenceAndLedger/captured-manifest (0.07s)
+    --- PASS: TestNuxtListingPreservesPresenceAndLedger/directory (0.07s)
+    --- PASS: TestNuxtListingPreservesPresenceAndLedger/link (0.07s)
+    --- PASS: TestNuxtListingPreservesPresenceAndLedger/broken-link (0.07s)
+    --- PASS: TestNuxtListingPreservesPresenceAndLedger/excluded (0.07s)
+    --- PASS: TestNuxtListingPreservesPresenceAndLedger/unlistable (0.08s)
+=== RUN   TestNuxtListingAppearanceInvalidatesRetainedDiscovery
+--- PASS: TestNuxtListingAppearanceInvalidatesRetainedDiscovery (0.09s)
+=== RUN   TestNuxtListingNeedsCompleteGraphObservation
+--- PASS: TestNuxtListingNeedsCompleteGraphObservation (0.06s)
+=== RUN   TestDiscoveryWalkIgnoredReadErrorDoesNotProveEmptyDirectory
+--- PASS: TestDiscoveryWalkIgnoredReadErrorDoesNotProveEmptyDirectory (0.00s)
+PASS
+ok  	github.com/enola-labs/enola/internal/extractors/tsextractor	2.723s

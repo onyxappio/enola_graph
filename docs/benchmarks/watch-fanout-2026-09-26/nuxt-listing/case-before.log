@@ -1,0 +1,8 @@
+=== RUN   TestAliasListingHandlesFilesystemShapes
+=== RUN   TestAliasListingHandlesFilesystemShapes/mixed-case
+    alias_listing_equivalence_test.go:56: mismatch want map[@x/:{src/  false}]/true got map[]/false
+--- FAIL: TestAliasListingHandlesFilesystemShapes (0.00s)
+    --- FAIL: TestAliasListingHandlesFilesystemShapes/mixed-case (0.00s)
+FAIL
+FAIL	github.com/enola-labs/enola/internal/extractors/tsextractor	0.445s
+FAIL

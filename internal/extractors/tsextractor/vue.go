@@ -110,11 +110,56 @@ func detectNuxt(ctx context.Context, repoPath string, inputScopes ...*inputscope
 func detectNuxtAt(ctx context.Context, dir string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
 	for _, name := range []string{"nuxt.config.js", "nuxt.config.ts", "nuxt.config.mjs"} {
-		if _, err := overlayStat(ctx, filepath.Join(dir, name), inputScope); err == nil {
+		path := filepath.Join(dir, name)
+		if nuxtConfigAbsentFromListing(ctx, path, inputScope) {
+			continue
+		}
+		if _, err := overlayStat(ctx, path, inputScope); err == nil {
 			return true
 		}
 	}
 	return hasPkgDependency(ctx, dir, "nuxt", inputScope)
+}
+
+// Reuse only completed directory observations in the graph profile. The existing
+// discovery ledger already retains these names and reobserves them before reuse;
+// no second name index is built. Present entries still require Stat (a symlink
+// may be broken), and unreadable/unobserved directories prove nothing. Unlike a
+// byte read, this presence probe does not treat captured content as a live file.
+func nuxtConfigAbsentFromListing(ctx context.Context, path string, scope *inputscope.Scope) bool {
+	if scope == nil || scope.Policy == nil || !scope.Allowed(path, false) {
+		return false
+	}
+	probe := probeFrom(ctx)
+	if probe == nil {
+		return false
+	}
+	key := absOverlayKey(path)
+	parent := absOverlayKey(filepath.Dir(path))
+	base := filepath.Base(path)
+	probe.mu.Lock()
+	defer probe.mu.Unlock()
+	names, complete := probe.dirs[parent]
+	if !complete {
+		return false
+	}
+	if _, present := names[base]; present {
+		return false
+	}
+	// On case-insensitive filesystems a differently cased directory entry can
+	// still satisfy Stat. Conservatively defer all folded matches to the real
+	// filesystem, also on case-sensitive hosts where they simply miss.
+	for name := range names {
+		if strings.EqualFold(name, base) {
+			return false
+		}
+	}
+	// Preserve the same absence ledger as overlayStat, including first-read
+	// semantics, so retained-discovery invalidation is unchanged.
+	if _, recorded := probe.stat[key]; !recorded {
+		probe.stat[key] = observedStatMissing
+	}
+	return true
 }
 
 // collectNuxtPackages lists every directory that declares Nuxt (nuxt.config.* or
