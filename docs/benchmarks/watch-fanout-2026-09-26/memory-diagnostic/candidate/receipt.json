@@ -1,0 +1,35 @@
+{
+  "arm": "candidate",
+  "exit": 0,
+  "seconds": 15.24841854092665,
+  "binary": {
+    "path": "/tmp/enola-fanout-stage24-combined/enola-combined-experimental",
+    "sha256": "1a6ef346bfbbdd78050e92694eee9f375bc21c933f296a199742f757d85efaf1"
+  },
+  "diagnostic": true,
+  "env": {
+    "GODEBUG": "gctrace=1",
+    "ENOLA_GRAPH_PROFILE": "1"
+  },
+  "argv": [
+    "/usr/bin/time",
+    "-l",
+    "/tmp/enola-fanout-stage24-combined/enola-combined-experimental",
+    "graph",
+    "analyze",
+    "--authoritative-scope",
+    "--changed-owner-scope",
+    "--max-begin-bytes",
+    "8000000",
+    "--repo-id",
+    "stage15-cli-product",
+    "--summary-json",
+    "--nats",
+    "nats://127.0.0.1:56052",
+    "--state-dir",
+    "/private/tmp/enola-fanout-memory-20260926/candidate/state",
+    "--context",
+    "memory-candidate",
+    "/private/tmp/enola-fanout-memory-20260926/candidate/config.yaml"
+  ]
+}

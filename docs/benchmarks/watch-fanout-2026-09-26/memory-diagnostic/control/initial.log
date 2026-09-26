@@ -1,0 +1,255 @@
+gc 1 @0.003s 2%: 0.027+0.40+0.022 ms clock, 0.27+0.010/0.84/0.21+0.22 ms cpu, 3->4->1 MB, 4 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=analyze
+[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml
+[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2
+[graph-profile] discover_git                       0.045s  total= 0.045s  trace=graphinput_build  repo=true dirs=2
+gc 2 @0.050s 0%: 0.066+1.0+0.004 ms clock, 0.66+0/2.4/1.4+0.048 ms cpu, 10->10->9 MB, 10 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] declare_git_control                0.010s  total= 0.054s  trace=graphinput_build  deps=10
+gc 3 @0.078s 0%: 0.095+0.73+0.008 ms clock, 0.95+0/1.6/0.91+0.088 ms cpu, 19->19->3 MB, 19 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 4 @0.080s 0%: 0.018+0.84+0.004 ms clock, 0.18+0/1.3/0.58+0.041 ms cpu, 9->9->8 MB, 9 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 5 @0.086s 1%: 0.042+0.78+0.011 ms clock, 0.42+0/1.2/0.55+0.11 ms cpu, 20->20->6 MB, 20 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] git_ls_files                       0.059s  total= 0.113s  trace=graphinput_build  tracked=45453 dirs=5852
+gc 6 @0.140s 0%: 0.068+0.59+0.003 ms clock, 0.68+0.045/1.3/0.89+0.032 ms cpu, 12->12->8 MB, 12 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 7 @0.243s 0%: 0.055+0.58+0.011 ms clock, 0.55+0.019/1.3/0.76+0.11 ms cpu, 17->17->10 MB, 17 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 8 @0.339s 0%: 0.044+0.55+0.011 ms clock, 0.44+0.041/1.4/0.66+0.11 ms cpu, 20->20->12 MB, 20 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 9 @0.472s 0%: 0.054+0.75+0.005 ms clock, 0.54+0.021/1.6/0.77+0.050 ms cpu, 25->25->15 MB, 25 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 10 @0.656s 0%: 0.046+1.3+0.003 ms clock, 0.46+0/2.5/1.2+0.032 ms cpu, 30->30->18 MB, 31 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] walk_tree                          0.556s  total= 0.669s  trace=graphinput_build  names=48606 ignorefiles=7
+[graph-profile] check_ignore_setup                 0.018s  total= 0.687s  trace=graphinput_build
+[graph-profile] check_ignore_run                   0.247s  total= 0.935s  trace=graphinput_build  names=48606 ignored=128
+[graph-profile] declare_ignore_files               0.000s  total= 0.935s  trace=graphinput_build  deps=16
+gc 11 @0.954s 0%: 0.14+2.3+0.014 ms clock, 1.4+0/4.9/1.7+0.14 ms cpu, 37->37->20 MB, 37 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 12 @0.974s 0%: 0.065+1.4+0.018 ms clock, 0.65+0/3.1/1.9+0.18 ms cpu, 41->41->27 MB, 41 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] compute_identities                 0.089s  total= 1.024s  trace=graphinput_build  deps=16 entries=48606
+[graph-profile] graphinput_build                   1.025s  total= 1.025s  trace=graph_engine  configpaths=2
+[graph-profile] engine_new                         0.000s  total= 1.025s  trace=graph_engine
+[graph-profile] register_plugins                   0.000s  total= 1.025s  trace=graph_engine
+[graph-profile] config_recheck                     0.000s  total= 1.025s  trace=graph_engine
+[graph-profile] resolve_graph_target               1.025s  total= 1.025s  trace=cli  repos=1
+enola graph: config /private/tmp/enola-fanout-memory-20260926/control/config.yaml
+[graph-profile] connect_sink                       0.001s  total= 1.026s  trace=cli  nats=true
+[graph-profile] session_options                    0.000s  total= 1.026s  trace=cli  repo=/tmp/enola-fanout-current-20260926/candidate-product
+[graph-profile] lock                               0.000s  total= 0.000s  trace=open
+[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open
+[graph-profile] open_journal                       0.000s  total= 0.001s  trace=open
+[graph-profile] replay_unacked                     0.006s  total= 0.007s  trace=open
+[graph-profile] load_state                         0.000s  total= 0.007s  trace=open  files=0
+[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false
+[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2
+gc 13 @1.042s 0%: 0.065+0.98+0.003 ms clock, 0.65+0/1.8/1.4+0.032 ms cpu, 56->56->29 MB, 56 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] graph_inputs_proven                0.349s  total= 0.349s  trace=reconcile
+[graph-profile] effective_config                   0.000s  total= 0.349s  trace=reconcile  files=2 fast=false
+[graph-profile] reconcile_complete                 0.000s  total= 0.349s  trace=reconcile  reloaded=false
+gc 14 @1.409s 0%: 0.14+1.2+0.003 ms clock, 1.4+0.055/2.5/1.3+0.035 ms cpu, 58->59->17 MB, 60 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 15 @1.656s 0%: 0.057+1.3+0.003 ms clock, 0.57+0.15/2.9/1.3+0.031 ms cpu, 35->36->22 MB, 36 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] engine_walk_repo                   0.512s  files=42754 tests=0 all_names=42754
+[graph-profile] inventory                          0.512s  total= 0.512s  trace=inputs  files=42754 all_names=42754
+[graph-profile] detect_go                          0.001s
+[graph-profile] detect_manifests                   0.000s
+[graph-profile] detect_mdintent                    0.000s
+gc 16 @1.902s 0%: 0.089+1.3+0.025 ms clock, 0.89+0.71/3.3/1.4+0.25 ms cpu, 45->46->26 MB, 46 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] detect_dotnet                      0.019s
+gc 17 @1.919s 0%: 0.076+1.2+0.043 ms clock, 0.76+0.30/2.9/1.6+0.43 ms cpu, 50->52->26 MB, 53 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] detect_cpp                         0.024s
+[graph-profile] detect_hcl                         0.006s
+[graph-profile] detect_ansible                     0.006s
+gc 18 @1.934s 0%: 0.065+1.7+0.026 ms clock, 0.65+0.19/3.9/1.5+0.26 ms cpu, 51->52->26 MB, 53 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] detect_java                        0.014s
+[graph-profile] detect_kotlin                      0.016s
+[graph-profile] detect_php                         0.001s
+[graph-profile] detect_python                      0.000s
+[graph-profile] detect_typescript                  0.001s
+gc 19 @1.962s 0%: 0.066+1.2+0.031 ms clock, 0.66+0.24/2.7/1.8+0.31 ms cpu, 52->53->26 MB, 54 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] detect_swift                       0.021s
+[graph-profile] detect_ruby                        0.008s
+[graph-profile] detect_rust                        0.006s
+gc 20 @1.994s 0%: 0.070+1.3+0.041 ms clock, 0.70+0.22/3.4/1.5+0.41 ms cpu, 50->51->26 MB, 53 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] detect_scala                       0.019s
+[graph-profile] detect_dart                        0.006s
+gc 21 @2.074s 0%: 0.081+1.2+0.016 ms clock, 0.81+0.17/2.4/2.5+0.16 ms cpu, 50->51->25 MB, 53 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 22 @2.213s 0%: 0.072+1.3+0.013 ms clock, 0.72+0.27/3.3/1.6+0.13 ms cpu, 49->50->25 MB, 51 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] detect_grpc                        0.392s
+[graph-profile] detect_openapi                     0.388s
+gc 23 @2.329s 0%: 0.064+1.0+0.029 ms clock, 0.64+0.22/2.3/1.7+0.29 ms cpu, 49->49->25 MB, 52 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 24 @2.540s 0%: 0.086+0.89+0.003 ms clock, 0.86+0.14/2.2/1.9+0.032 ms cpu, 49->49->25 MB, 51 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 25 @2.845s 0%: 0.066+1.1+0.004 ms clock, 0.66+0.21/2.8/2.1+0.049 ms cpu, 49->49->25 MB, 51 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] detect_asyncapi                    1.034s
+[graph-profile] detect_extractors                  1.034s  total= 1.545s  trace=inputs  detected=6
+[graph-profile] select_hash_targets                0.041s  total= 1.586s  trace=inputs  targets=6393
+gc 26 @3.164s 0%: 0.059+1.2+0.004 ms clock, 0.59+0/2.9/2.1+0.040 ms cpu, 50->50->25 MB, 51 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 27 @3.410s 0%: 0.073+1.7+0.004 ms clock, 0.73+0.038/3.2/1.9+0.041 ms cpu, 51->51->26 MB, 52 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 28 @3.563s 0%: 0.054+1.2+0.008 ms clock, 0.54+0/2.9/2.1+0.080 ms cpu, 51->51->26 MB, 52 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] engine_hash_files                  0.627s  n=6393 hashed=6393 bytes=63880349
+[graph-profile] hash_content_inputs                0.627s  total= 2.213s  trace=inputs  targets=6393
+gc 29 @3.884s 0%: 0.064+1.2+0.010 ms clock, 0.64+0.038/3.0/3.8+0.10 ms cpu, 52->52->32 MB, 53 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] capture_contexts                   0.353s  total= 2.566s  trace=inputs  contexts=2
+gc 30 @4.310s 0%: 0.060+1.0+0.003 ms clock, 0.60+0.031/2.5/2.5+0.034 ms cpu, 63->63->26 MB, 64 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 31 @4.658s 0%: 0.062+0.96+0.004 ms clock, 0.62+0.023/2.5/3.6+0.042 ms cpu, 51->51->26 MB, 52 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] ts_config_inputs                   0.860s  n=83
+[graph-profile] analysis_fingerprint               0.870s  total= 3.436s  trace=inputs  cfg_files=59
+[graph-profile] angular_probe                      0.005s  total= 3.441s  trace=inputs  angular=false
+[graph-profile] policy_identity                    0.000s  total= 3.441s  trace=inputs
+[graph-profile] engine_context_fingerprint         0.000s  total= 3.441s  trace=inputs
+gc 32 @4.928s 0%: 0.048+0.98+0.027 ms clock, 0.48+0.020/2.4/3.1+0.27 ms cpu, 51->52->29 MB, 53 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 33 @5.188s 0%: 0.043+2.9+0.012 ms clock, 0.43+0.040/6.2/3.3+0.12 ms cpu, 59->60->42 MB, 60 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] ts_disc_nuxt_packages              0.920s  pkgs=0
+[graph-profile] ts_disc_package_gates              0.001s
+[graph-profile] ts_disc_package_names              0.000s  names=30
+gc 34 @5.770s 0%: 0.058+1.8+0.022 ms clock, 0.58+0.022/4.4/6.7+0.22 ms cpu, 84->84->46 MB, 86 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] ts_disc_alias_roots                0.572s  roots=1
+[graph-profile] ts_disc_package_exports            0.000s  packages=30
+gc 35 @6.336s 0%: 0.051+2.5+0.017 ms clock, 0.51+0.46/5.1/3.3+0.17 ms cpu, 91->92->42 MB, 93 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] ts_discovery_build                 1.511s  side_reads=17442 stat_reads=17454 walked_dirs=5837 captured=59
+[graph-profile] ts_discovery                       1.511s  total= 4.953s  trace=inputs  names=0 bytes=0 dirs=0
+gc 36 @6.381s 0%: 0.055+2.0+0.015 ms clock, 0.55+0.023/5.0/4.4+0.15 ms cpu, 83->84->41 MB, 85 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] ts_session_context                 0.057s  total= 5.009s  trace=inputs  files=4146
+[graph-profile] runtime_inputs_complete            0.000s  total= 5.009s  trace=inputs
+[graph-profile] clone_file_state_copy              0.000s  n=0
+gc 37 @6.514s 0%: 0.079+2.0+0.016 ms clock, 0.79+0.025/5.1/5.2+0.16 ms cpu, 81->83->43 MB, 83 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] extractor_need                     5.145s  total= 5.145s  trace=session  non_ts_need=true detected=6 neutral=0
+[graph-profile] changed_terms                      0.041s  total= 5.186s  trace=session  initial=true force=true non_ts=true scan=false raw_cfg=false policy=true neutral_scan=false neutral_cfg=false
+[graph-profile] invalidation_plan                  0.066s  total= 5.252s  trace=session  reason=frozen scope: global name-resolution domain whole=true extra=0
+[graph-profile] revalidate_before_begin            0.002s  n=59 superseded=false
+gc 38 @6.648s 0%: 0.082+2.9+0.012 ms clock, 0.82+0/6.3/6.0+0.12 ms cpu, 84->85->51 MB, 87 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] begin_publish                      0.065s  total= 5.317s  trace=session  scope=22406
+[graph-profile] non_ts_extract                     0.332s  manifests facts=133
+[graph-profile] non_ts_fingerprint                 0.000s  manifests
+gc 39 @7.042s 0%: 0.068+2.1+0.050 ms clock, 0.68+0.81/5.4/7.0+0.50 ms cpu, 100->102->64 MB, 103 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 40 @7.184s 0%: 0.055+3.0+0.010 ms clock, 0.55+0.023/7.4/8.8+0.10 ms cpu, 124->126->79 MB, 129 MB goal, 0 MB stacks, 0 MB globals, 10 P
+2026/09/26 20:31:38 [mdintent] 2154 document(s), 23839 section(s), 6625 link(s) resolved on disk, 12402 not
+[graph-profile] non_ts_extract                     0.260s  mdintent facts=25994
+gc 41 @7.319s 0%: 0.086+2.9+0.014 ms clock, 0.86+0.038/7.9/9.5+0.14 ms cpu, 151->152->93 MB, 159 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] non_ts_fingerprint                 0.055s  mdintent
+[graph-profile] non_ts_extract                     0.001s  hcl facts=10
+[graph-profile] non_ts_fingerprint                 0.000s  hcl
+[graph-profile] non_ts_extract                     0.035s  python facts=210
+[graph-profile] non_ts_fingerprint                 0.000s  python
+[graph-profile] ts_dirty_scope                     0.728s  total= 6.045s  trace=session  dirty=0 scope=4146 force=true
+[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=4146 shared_discovery=true
+[graph-profile] ts_disc_package_aliases            0.000s  aliases=21
+gc 42 @7.459s 0%: 0.10+5.4+0.093 ms clock, 1.0+0.43/13/2.7+0.93 ms cpu, 179->183->120 MB, 188 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] ts_read_dirty                      0.054s  total= 0.054s  trace=ts  to_read=4146 cached=0
+[graph-profile] ts_graphql_grpc_index              0.386s  total= 0.440s  trace=ts  ts_files=4146
+gc 43 @7.933s 0%: 0.10+4.9+0.11 ms clock, 1.0+0.39/12/9.0+1.1 ms cpu, 230->235->153 MB, 240 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 44 @8.109s 0%: 0.16+10+0.16 ms clock, 1.6+0.45/28/0+1.6 ms cpu, 295->299->153 MB, 307 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 45 @8.268s 0%: 0.17+10+0.19 ms clock, 1.7+0.63/26/0+1.9 ms cpu, 298->303->159 MB, 307 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 46 @8.439s 0%: 0.23+9.3+0.20 ms clock, 2.3+0.28/23/0+2.0 ms cpu, 308->311->159 MB, 318 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 47 @8.625s 0%: 0.16+20+0.13 ms clock, 1.6+0.065/36/0+1.3 ms cpu, 308->320->175 MB, 319 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 48 @8.831s 0%: 0.22+11+0.15 ms clock, 2.2+0.27/29/0+1.5 ms cpu, 340->345->171 MB, 352 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 49 @9.013s 0%: 0.17+11+0.11 ms clock, 1.7+2.6/31/0+1.1 ms cpu, 329->345->190 MB, 342 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 50 @9.180s 0%: 0.23+14+0.15 ms clock, 2.3+0.85/40/0+1.5 ms cpu, 363->369->186 MB, 380 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 51 @9.336s 0%: 0.18+13+0.11 ms clock, 1.8+0.15/36/0+1.1 ms cpu, 354->359->191 MB, 373 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 52 @9.543s 0%: 0.24+19+0.14 ms clock, 2.4+0.24/52/0+1.4 ms cpu, 362->370->201 MB, 382 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 53 @9.711s 0%: 0.19+19+0.12 ms clock, 1.9+0.67/54/0+1.2 ms cpu, 381->394->214 MB, 403 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 54 @9.926s 0%: 0.12+25+0.15 ms clock, 1.2+0.18/59/1.8+1.5 ms cpu, 406->417->220 MB, 430 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 55 @10.196s 0%: 0.23+25+0.16 ms clock, 2.3+3.3/70/0+1.6 ms cpu, 428->441->228 MB, 442 MB goal, 0 MB stacks, 0 MB globals, 10 P
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/Color-23OOGO2C-CFyZFonx.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/DeepScan-DHvM5dCJ.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/DocsRenderer-LL677BLK-BuIR6bZY.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/GetStartedFreeScreen-BnD4gdvs.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/GetStartedScreen-DiHBSXQR.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/LeakedLogo-DG0KS9dA.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/OnboardingFirstSessionScreen-Ccla2iGl.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/PointsCard-UPQ-OhXY.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/PricingContentContext-ENjeFjYN.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProfileScreen-aoCBlYSa.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProjectedFigmaScreen-B-0ULYBe.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/MainAppShell-DykjRsCQ.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProtectFreeScreen-4DLtefNg.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ProtectSurface-CtgJS1RL.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/RiskIndicatorDropMessage-f1IgdUCx.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenCompositionHost-WK6OxeVJ.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenContentTransition-Bs4S8klL.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenFigmaComparisonPanel-CvcgEIaM.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/StatusBadge-DGggXXdu.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/SubscriptionInfoCard-CX9utM5L.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/TabBar-vMBrgBKe.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/Toast-DoOWktSp.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/WithTooltip-65CFNBJE-B3RsNAAg.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/ScreenBackgroundBlur-DBMfPfhN.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/chunk-3LY4VQVK-DCoUZ6n4.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/chunk-LITCR56V-JVUNf0OC.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/components-BtTjbzAC.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/deepscan-components.stories-DuUlNjuO.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/figma-components.stories-LvwegD9L.js
+2026/09/26 20:31:41 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/figmaScreenStructures.generated-JjgbhcQt.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/generatedFigmaComponents-DmjMpYnh.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/getStartedDataSlotSource-Rr5d3rz_.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/iframe-D-RxKruK.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/legalLinks-CB7C40_C.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/onboardingDataSlotSource-qPx6fUNU.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/onyxStoryMetadata-Bq_5Th--.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/pricingFixtures.generated-CEiD1ca2.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/profile.stories-DlPoX8YC.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/protect-task.stories-dOTaLEMy.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/react-18-BfUV1oqG.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/screenBackgroundMorph-RdKWbQdJ.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/screenReviewStoryKit-Dt_Rkzsv.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/screenStructureStoryKit-ComKfaDB.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/syntaxhighlighter-W7WJGI2T-BKWqXrBS.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/theming-BRkukHDK.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/assets/train.stories-Dz3ntN8J.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-addons/docs-1/manager-bundle.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-addons/storybook-core-server-presets-0/common-manager-bundle.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/vite-inject-mocker-entry.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-manager/runtime.js
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file apps/mobile/storybook-static/sb-manager/globals-runtime.js
+gc 56 @10.945s 0%: 0.20+21+0.10 ms clock, 2.0+0.32/57/0+1.0 ms cpu, 443->456->236 MB, 457 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 57 @11.249s 0%: 0.22+30+0.10 ms clock, 2.2+0.026/74/0+1.0 ms cpu, 457->470->244 MB, 472 MB goal, 0 MB stacks, 0 MB globals, 10 P
+2026/09/26 20:31:42 [ts-extractor] skipping minified/bundled file scripts/deploy/t013-pulumi-role-handoff.mjs
+gc 58 @11.568s 0%: 0.20+36+0.12 ms clock, 2.0+0.83/97/0+1.2 ms cpu, 473->491->256 MB, 489 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 59 @11.909s 0%: 0.084+13+0.027 ms clock, 0.84+8.3/31/63+0.27 ms cpu, 495->503->276 MB, 514 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] ts_mapfiles_aggregate              4.052s  total= 4.492s  trace=ts  parsed=4094 facts=60516 routers=0 scans=1734 derived=2319
+[graph-profile] ts_compose_modules                 0.003s  total= 4.495s  trace=ts  facts=60971 records=4146 unread=0
+[graph-profile] ts_extract_session                 4.503s  total=10.548s  trace=session  parsed=4094 cached=0 facts=60971 records=4146
+[graph-profile] non_ts_extract                     0.015s  swift facts=27
+[graph-profile] non_ts_fingerprint                 0.000s  swift
+[graph-profile] assemble_new_files                 0.777s  total=11.325s  trace=session  new=6364 ts_noop=false non_ts_need=true skip=false facts=87345
+[graph-profile] index_group_owners                 0.026s  total=11.351s  trace=session  facts=84725 owners=6301
+[graph-profile] publish_scope                      0.003s  total=11.354s  trace=session  scope=22406
+gc 60 @12.757s 0%: 3.9+19+0.024 ms clock, 39+1.1/44/68+0.24 ms cpu, 525->548->244 MB, 553 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 61 @12.888s 0%: 1.0+12+0.012 ms clock, 10+0.061/36/60+0.12 ms cpu, 438->453->255 MB, 490 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 62 @13.079s 0%: 0.86+19+0.013 ms clock, 8.6+0.26/36/53+0.13 ms cpu, 458->474->274 MB, 510 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 63 @13.424s 0%: 0.092+19+0.084 ms clock, 0.92+0.42/46/80+0.84 ms cpu, 497->505->263 MB, 549 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 64 @13.742s 0%: 1.0+12+0.004 ms clock, 10+0.13/35/65+0.045 ms cpu, 476->479->284 MB, 528 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 65 @14.129s 0%: 2.5+14+0.027 ms clock, 25+0.047/31/54+0.27 ms cpu, 517->521->285 MB, 569 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 66 @14.429s 0%: 1.0+21+0.25 ms clock, 10+0.35/46/75+2.5 ms cpu, 528->538->320 MB, 570 MB goal, 0 MB stacks, 0 MB globals, 10 P
+gc 67 @14.942s 0%: 3.6+13+0.019 ms clock, 36+0.24/38/58+0.19 ms cpu, 608->613->322 MB, 640 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] encode_append_owners               2.286s  total=13.640s  trace=session  published=6301
+[graph-profile] publish_resolved                   0.044s  total=13.684s  trace=session  owners=6301
+[graph-profile] revalidate_ts_records              0.158s  total=13.843s  trace=session  n=4146
+[graph-profile] ts_config_inputs                   0.850s  n=83
+gc 68 @16.496s 0%: 0.068+13+0.011 ms clock, 0.68+0/33/63+0.11 ms cpu, 629->630->344 MB, 645 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] state_json_marshal                 0.287s  bytes=71077517 files=6364
+gc 69 @16.687s 0%: 0.17+49+0.005 ms clock, 1.7+4.1/38/100+0.055 ms cpu, 699->699->450 MB, 699 MB goal, 0 MB stacks, 0 MB globals, 10 P
+[graph-profile] state_fingerprint                  0.030s  write bytes=71077517
+[graph-profile] write_pending_state                1.614s  total=15.457s  trace=session
+[graph-profile] end_flush_ack                      0.080s  total=15.537s  trace=session
+[graph-profile] promote_compact_state              0.069s  total=15.606s  trace=session  parsed=4094 published=6301
+[graph-profile] graph_session_run                 15.962s  total=16.989s  trace=cli  repo=/tmp/enola-fanout-current-20260926/candidate-product parsed=4094
+[graph] /tmp/enola-fanout-current-20260926/candidate-product: generation 0→1 parsed=4094 cached=0 early_local=0 fallbacks=6
+[graph] fallback graph: all prior/current file owners (frozen scope: global name-resolution domain)
+[graph] fallback manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)
+[graph] fallback mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)
+[graph] fallback hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)
+[graph] fallback python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)
+[graph] fallback swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)
+[graph-profile] cli_complete                       0.000s  total=16.989s  trace=cli  results=1
+       17.03 real        39.76 user         5.88 sys
+          1321582592  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              102053  page reclaims
+                 241  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                2248  messages sent
+                 685  messages received
+                4451  signals received
+               25328  voluntary context switches
+              133660  involuntary context switches
+        488811811408  instructions retired
+        134494546731  cycles elapsed
+          1199329664  peak memory footprint

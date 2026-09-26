@@ -192,23 +192,20 @@ func writePendingStateFP(dir string, st *State) (stateFingerprint, error) {
 	if st.ExtractorSynthetic == nil {
 		st.ExtractorSynthetic = map[string]map[string][]facts.Fact{}
 	}
-	tJSON := time.Now()
-	b, err := json.Marshal(st)
-	if err != nil {
-		return stateFingerprint{}, err
-	}
-	graphprofile.Since("state_json_marshal", tJSON, fmt.Sprintf("bytes=%d files=%d", len(b), len(st.Files)))
 	path := pendingStatePath(dir)
 	tmp := path + ".tmp"
 	f, err := os.Create(tmp)
 	if err != nil {
 		return stateFingerprint{}, err
 	}
-	if _, err := f.Write(b); err != nil {
+	tJSON := time.Now()
+	fp, err := encodeStateJSON(f, st)
+	if err != nil {
 		f.Close()
 		os.Remove(tmp)
 		return stateFingerprint{}, err
 	}
+	graphprofile.Since("state_json_encode_write", tJSON, fmt.Sprintf("bytes=%d files=%d", fp.size, len(st.Files)))
 	if err := f.Sync(); err != nil {
 		f.Close()
 		os.Remove(tmp)
@@ -224,12 +221,6 @@ func writePendingStateFP(dir string, st *State) (stateFingerprint, error) {
 	if err := fsyncDir(dir); err != nil {
 		return stateFingerprint{}, err
 	}
-	// The write path digests too, and pays for it. It has no WorkCounters to
-	// report into - a checkpoint is written from places that do not own a run's
-	// counters - so the cost is left as a trace mark rather than going unrecorded.
-	tFP := time.Now()
-	fp := fingerprintStateBytes(b)
-	graphprofile.Since("state_fingerprint", tFP, fmt.Sprintf("write bytes=%d", len(b)))
 	return fp, nil
 }
 

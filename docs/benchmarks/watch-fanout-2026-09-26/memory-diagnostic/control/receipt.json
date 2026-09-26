@@ -1,0 +1,35 @@
+{
+  "arm": "control",
+  "exit": 0,
+  "seconds": 17.041047291946597,
+  "binary": {
+    "path": "/tmp/enola-watch-fanout-3599a8f",
+    "sha256": "e32679e5133532ccdbe80a89467a179c7b744471d950122dfb88db7b039575db"
+  },
+  "diagnostic": true,
+  "env": {
+    "GODEBUG": "gctrace=1",
+    "ENOLA_GRAPH_PROFILE": "1"
+  },
+  "argv": [
+    "/usr/bin/time",
+    "-l",
+    "/tmp/enola-watch-fanout-3599a8f",
+    "graph",
+    "analyze",
+    "--authoritative-scope",
+    "--changed-owner-scope",
+    "--max-begin-bytes",
+    "8000000",
+    "--repo-id",
+    "stage15-cli-product",
+    "--summary-json",
+    "--nats",
+    "nats://127.0.0.1:55948",
+    "--state-dir",
+    "/private/tmp/enola-fanout-memory-20260926/control/state",
+    "--context",
+    "memory-control",
+    "/private/tmp/enola-fanout-memory-20260926/control/config.yaml"
+  ]
+}

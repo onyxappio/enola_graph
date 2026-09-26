@@ -1,0 +1,65 @@
+[
+  {
+    "Invalidation": {
+      "RawConfigChanged": false,
+      "PolicyReconciled": false,
+      "AddedSources": 0,
+      "RemovedSources": 0,
+      "ContextAffectedSources": 0,
+      "ContextReasons": null,
+      "ParsedByReason": {
+        "initial": 4094
+      }
+    },
+    "RunID": "stage15-cli-product-memory-control-1-1790443897972988000",
+    "BaseGeneration": 0,
+    "TargetGeneration": 1,
+    "Stats": {
+      "files_read": 4146,
+      "files_parsed": 4094,
+      "cached_files": 0,
+      "graphql_parsed": 2,
+      "sfc_parsed": 17,
+      "summary_scans": 1734,
+      "derived_indexes": 2319,
+      "discovery_passes": 0
+    },
+    "Fallbacks": [
+      {
+        "extractor": "graph",
+        "scope": "all prior/current file owners",
+        "reason": "frozen scope: global name-resolution domain"
+      },
+      {
+        "extractor": "manifests",
+        "scope": "all files owned by extractor",
+        "reason": "no per-file incremental session; whole-extractor re-run"
+      },
+      {
+        "extractor": "mdintent",
+        "scope": "all files owned by extractor",
+        "reason": "no per-file incremental session; whole-extractor re-run"
+      },
+      {
+        "extractor": "hcl",
+        "scope": "all files owned by extractor",
+        "reason": "no per-file incremental session; whole-extractor re-run"
+      },
+      {
+        "extractor": "python",
+        "scope": "all files owned by extractor",
+        "reason": "no per-file incremental session; whole-extractor re-run"
+      },
+      {
+        "extractor": "swift",
+        "scope": "all files owned by extractor",
+        "reason": "no per-file incremental session; whole-extractor re-run"
+      }
+    ],
+    "Unreadable": null,
+    "OwnersPublished": 6301,
+    "ParsedFiles": 4094,
+    "EarlyLocal": 0,
+    "Facts": null
+  }
+]
