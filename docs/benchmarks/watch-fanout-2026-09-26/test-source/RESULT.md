@@ -7,3 +7,5 @@ Tests prove conventional names across eight language/path examples enter invento
 Full config/bootstrap packages passed in96.611 s before the final added migration/language assertions. Final focused assertions passed in6.933 s. Test-framework-specific cases/assertions and execution/coverage are not added; this activates normal source extraction. Existing test-path guards against treating fixtures as production framework routes remain.
 
 Product correctness and performance must be repeated with an explicitly identical test-inclusive scope in baseline and candidate. The prior old-scope cohort was interrupted and cannot be used for acceptance. This commit is local, not published to main.
+
+Product test-inclusive candidate correctness completed exit0: all seven CLI calls succeeded and all four gates passed (silent no-op and initial/body/structural cold graph equality). Initial parsed 6752 files, no-op 0, body 21, structural 22. Prepush checks passed in 36.563 s. This run overlapped checks and is not performance acceptance. Same-scope baseline correctness and final whole-repository suite remain in progress.

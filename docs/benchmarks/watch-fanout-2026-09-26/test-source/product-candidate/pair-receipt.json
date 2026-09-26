@@ -1,0 +1,136 @@
+{
+  "background_owner_pid": 85823,
+  "background_mode": null,
+  "background_errors": [],
+  "background_vectors": [],
+  "background_evidence": null,
+  "validation_error": null,
+  "all_checks_validated": true,
+  "arm": "candidate",
+  "repeat": 1,
+  "quiet_ack_message_id": null,
+  "exit": 0,
+  "competing_samples": [
+    [
+      "87626 go test -count=1 -run TestCacheVersionCoverage ./internal/cachecov/",
+      "87638 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2151073108/b001/cachecov.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2151073108/b001/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=ashN1R0dtYbiBBLuoj_o/byrkPd__lFudcYv1XAA1/lqu1oZyp9aspsMM5j07L/ashN1R0dtYbiBBLuoj_o -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/fa/fa967e09ea46237aba97f6d1b61346710e4d893eb5591b757319757dbf0fad2e-d"
+    ],
+    [
+      "87654 go test -count=1 ./internal/docslint/",
+      "87679 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2378297241/b001/docslint.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2378297241/b001/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=z6TDYmM6ieYzJf2m1PJ3/7sAhtHb0rtn3mIEVCpEn/3Xj2GK1C6k58D1Hd-LsA/z6TDYmM6ieYzJf2m1PJ3 -X testing.testBinary=1 -extld=cc /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2378297241/b001/_pkg_.a"
+    ],
+    [
+      "87654 go test -count=1 ./internal/docslint/"
+    ],
+    [
+      "87654 go test -count=1 ./internal/docslint/",
+      "87717 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2378297241/b001/docslint.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "87654 go test -count=1 ./internal/docslint/",
+      "87717 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2378297241/b001/docslint.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/..."
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/..."
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "87834 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/compile -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b373/_pkg_.a -trimpath /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b373=> -p github.com/enola-labs/enola/internal/server -lang=go1.26 -complete -buildid nnjfXelg08_Dln4rZKCz/nnjfXelg08_Dln4rZKCz -goversion go1.27.1 -c=2 -shared -nolocalimports -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b373/importcfg -pack /Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-watch-fanout/internal/server/autocluster.go /Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-watch-fanout/internal/server/history.go /Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-watch-fanout/internal/server/scopedquery.go /Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-watch-fanout/internal/server/server.go"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/..."
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88064 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=40qjd18Zot8qhu_ROxdc/MWf-9hDKGlU53Qof-jY7/ITiqLwE6GMg4J9lWkDk-/40qjd18Zot8qhu_ROxdc -X testing.testBinary=1 -extld=cc /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/_pkg_.a"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88064 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=40qjd18Zot8qhu_ROxdc/MWf-9hDKGlU53Qof-jY7/ITiqLwE6GMg4J9lWkDk-/40qjd18Zot8qhu_ROxdc -X testing.testBinary=1 -extld=cc /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/_pkg_.a"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/..."
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/...",
+      "88287 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2562954715/b001/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1 -test.run=TestGolden|TestDeterminism"
+    ],
+    [
+      "87736 go test -count=1 -run TestGolden|TestDeterminism ./internal/engine/..."
+    ]
+  ],
+  "host_load_log": "/private/tmp/enola-test-inclusive-correctness/cli-pairs/correctness-candidate-1/host-load.jsonl",
+  "host_load_samples": 96,
+  "host_sample_errors": [],
+  "correctness_only": true,
+  "run_succeeded": true,
+  "timing_eligible": false,
+  "binary_sha256": "da6ab61d9f54d72d8e623fe14c7839e78d74cb8a5586fd407fbbabf7f198e819"
+}
