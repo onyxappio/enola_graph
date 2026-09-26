@@ -1,0 +1,60 @@
+{
+  "action": "SIGTERM of six orphaned dedicated screenshot browsers only; no artifact deletion",
+  "roots": [
+    {
+      "pid": 19435,
+      "profile": "/tmp/enola-wave5-report-chrome-compact",
+      "screenshots": [
+        "/tmp/enola-wave5-report-compact.png"
+      ],
+      "parent": 1,
+      "rss_kib": 123376
+    },
+    {
+      "pid": 51489,
+      "profile": "/tmp/enola-wave4-report-chrome",
+      "screenshots": [
+        "/tmp/enola-wave4-report-mobile.png"
+      ],
+      "parent": 1,
+      "rss_kib": 123840
+    },
+    {
+      "pid": 53251,
+      "profile": "/tmp/enola-wave4-report-chrome-final",
+      "screenshots": [
+        "/tmp/enola-wave4-report-mobile.png"
+      ],
+      "parent": 1,
+      "rss_kib": 123264
+    },
+    {
+      "pid": 55481,
+      "profile": "/tmp/enola-wave4-report-chrome-500",
+      "screenshots": [
+        "/tmp/enola-wave4-report-500.png"
+      ],
+      "parent": 1,
+      "rss_kib": 122944
+    },
+    {
+      "pid": 76368,
+      "profile": "/tmp/enola-wave9-final-report-render",
+      "screenshots": [
+        "/tmp/enola-wave9-final-card44.png"
+      ],
+      "parent": 1,
+      "rss_kib": 123200
+    },
+    {
+      "pid": 94078,
+      "profile": "/tmp/enola-shiki-preview-browser",
+      "screenshots": [
+        "/tmp/enola-shiki-preview.png"
+      ],
+      "parent": 1,
+      "rss_kib": 122864
+    }
+  ],
+  "time": 1790445431.337065
+}

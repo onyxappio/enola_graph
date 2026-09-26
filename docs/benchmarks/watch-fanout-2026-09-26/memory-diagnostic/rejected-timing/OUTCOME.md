@@ -1,0 +1,5 @@
+# Cohort rejected before candidate measurement
+
+Baseline-1 and control-1 completed the seven-call correctness harness with exit 0. The series process then exited 1: control-1 increased Swapins from 533446 to 533450 (four 16 KiB pages, 64 KiB); Swapouts stayed 888281. This violates the explicitly preregistered zero-swap gate, despite the small amount. No severity or measurable latency effect is inferred from 64 KiB alone. Candidate was not measured, no comparative speed/RSS conclusion is drawn, and no missing arm was refilled.
+
+A later environment intervention terminated six verified orphan headless single-shot screenshot roots. All had PPID 1, dedicated Enola temporary profiles, saved nonempty screenshots and no remote-debugging endpoint; they had been running for more than three days. Root identity was rechecked before SIGTERM; matching descendants were verified absent. All screenshot/report files were preserved. This permits consideration of a separately recorded fresh cohort after new coordination and idle-memory observations, with the same runtime binaries and numerical gates. It does not change this failed cohort.

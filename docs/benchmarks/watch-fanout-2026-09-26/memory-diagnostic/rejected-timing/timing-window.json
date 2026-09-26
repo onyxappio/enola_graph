@@ -1,0 +1,39 @@
+{
+  "mode": "current-roster",
+  "combined_authorized": true,
+  "worker_message": "msg_1748972f32d6",
+  "start_utc": "2026-09-26T17:50:00+00:00",
+  "end_utc": "2026-09-26T18:15:00+00:00",
+  "participants": [
+    {
+      "handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+      "status": "held",
+      "message_id": "msg_1748972f32d6",
+      "evidence_path": "/tmp/enola-fanout-state-encode-acceptance/coordination/msg_1748972f32d6.json",
+      "sha256": "65b6d5e701e615f45fa6fe5a9263245b4c80c06f5bc8aa71387cd0f1b1dc1178"
+    },
+    {
+      "handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+      "status": "held",
+      "message_id": "msg_1c90c631005b",
+      "evidence_path": "/tmp/enola-fanout-state-encode-acceptance/coordination/msg_1c90c631005b.json",
+      "sha256": "87bae4df6a77be4e40b89fb77a6211fd27f9497e346910d8468f363a267abfd3"
+    },
+    {
+      "handle": "term_f6d0d3d8-2dce-47a2-81db-44fd6bb8a1a8",
+      "status": "terminal-held",
+      "quote": "Yes. I\u2019ll remain idle and run no heavy jobs during 17:50\u201318:15 UTC today.",
+      "evidence_path": "/tmp/enola-fanout-state-encode-acceptance/coordination/fsm-terminal-hold.json",
+      "sha256": "c10a920743bf7865f585fe07ed1df0bf6a105de2e69c11c75755701497577ef7"
+    },
+    {
+      "handle": "term_b4d33c66-3033-42d6-8870-0852aa948bfd",
+      "status": "exited",
+      "evidence_path": "/tmp/enola-fanout-state-encode-acceptance/coordination/closed-coordinator.json",
+      "sha256": "1d0ddb4b709b5cbf51ae656c25306d3a90ff3d20047fa8a8ddaec580475b8c78"
+    }
+  ],
+  "root_full_suite_exit": 0,
+  "root_commit": "9c7359f",
+  "require_no_swap": true
+}
