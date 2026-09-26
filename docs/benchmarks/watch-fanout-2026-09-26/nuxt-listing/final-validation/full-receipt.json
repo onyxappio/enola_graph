@@ -1,0 +1,16 @@
+{
+  "source_revision": "d77ec47256e6924c1c8c5102574f5f9f50b55fcd",
+  "runtime_revision": "7c4651d",
+  "argv": [
+    "go",
+    "test",
+    "-p",
+    "1",
+    "./...",
+    "-count=1"
+  ],
+  "GOMAXPROCS": "2",
+  "exit": 1,
+  "wall_seconds": 651.3843708749628,
+  "performance_evidence": false
+}

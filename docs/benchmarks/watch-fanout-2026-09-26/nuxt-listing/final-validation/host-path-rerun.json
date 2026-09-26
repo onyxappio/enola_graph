@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-p",
+    "1",
+    "./internal/facts",
+    "-count=1"
+  ],
+  "exit": 0,
+  "wall_seconds": 3.55430245900061,
+  "source_revision": "f0e158c0f212b5c9103fe8633bb65d96702a8d51",
+  "change": "comment-only factpath:host marker; no runtime behavior change"
+}

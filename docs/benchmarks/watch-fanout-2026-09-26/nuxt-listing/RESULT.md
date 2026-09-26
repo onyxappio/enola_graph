@@ -21,11 +21,8 @@ this record. These are correctness results, not performance acceptance.
 
 An earlier full TS + graphsession command was launched before the folded-case
 adjustment; both packages passed (406.834 s including build/invocation overhead). That command must not be described as full-suite
-validation of the final source. A full final-source run, Product cold/delta
-checks, measurements and publication are still pending.
+validation of the final source. Subsequent final-source checks are recorded below.
 
-The pending six-pair harness still pins 9c7359f. A benchmark of this new candidate
-requires a new source/binary pin and correctness receipt before timing; do not
-silently attribute the older candidate's results to this change.
+The new prospective six-pair harness pins 7c4651d with its own binary and Product correctness receipt. The earlier 9c7359f balanced harness was never timed; no earlier samples are reused.
 
-Product NATS correctness on 7c4651d passed all four gates (silent no-op and three cold graph comparisons). All seven scenario hashes also match the pinned Stage22 reference. This correctness-only run is explicitly ineligible for timing acceptance. The final-source full repository suite and repeated timing remain pending.
+Product NATS correctness on 7c4651d passed all four gates (silent no-op and three cold graph comparisons). All seven scenario hashes also match the pinned Stage22 reference. This correctness-only run is explicitly ineligible for timing acceptance. The full repository run completed in 651.384 seconds with 109 passing packages and one source-policy failure (host-path annotation). Comment-only f0e158c fixes that failure; the facts package rerun passed, as did all applicable pre-push checks in 11.524 seconds. Original exit1 evidence remains in final-validation/. Timing and publication remain pending; the proposed window was released because Codata could not confirm its full duration.
