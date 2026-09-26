@@ -1,0 +1,1 @@
+Prospective six-pair protocol, frozen before timing. Runnable harness: /tmp/enola-fanout-state-encode-balanced. No timing data exists yet. Prior cohorts remain rejected. Synthetic summary tests and four pressure-monitor tests pass. Full source and binary hashes are in pins.json; external paths are intentional provenance.
