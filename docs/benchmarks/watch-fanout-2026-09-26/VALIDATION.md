@@ -108,3 +108,25 @@ Prepared a new independent NATS harness under /tmp/enola-fanout-nats-acceptance:
 ## NATS harness payload correction
 
 First full-profile NATS initial failed before extraction publication with `nats: maximum payload exceeded`. The inherited TS-only harness capped broker payload at 1 MiB; full-profile file-owner Begin exceeds it. Failed evidence is retained. Set the dedicated test broker's max_payload to 8 MiB for every arm, matching the explicit 8,000,000-byte producer Begin ceiling; no runtime correctness or performance claim follows from this environment correction. Started fresh correctness-candidate-2 rather than overwriting attempt 1. Production consumers/brokers must support the chosen initial manifest size; this configuration requirement is explicit.
+
+## NATS candidate passed
+
+Combined candidate correctness-candidate-2 completed exit 0: all seven CLI calls and four correctness gates validated, no missing metrics, graph equality/no-op proofs passed, broker/observer cleaned by harness finally. Timing eligible=false by design. Receipt, checks, complete metrics and provenance archived under nats-candidate/. Baseline full-profile correctness run started separately; control remains pending. A fresh quiet-window availability request was sent to accuracy coordinator run_05b12be88d78 as msg_3b29e3bc16b8; no acknowledgment or hold is assumed.
+
+A separate full-profile promotion rule was fixed before timing: combined-versus-published initial median gain >=2%, all three paired initial ratios below 1, secondary scenario regression <=2%, peak-process median RSS growth <=5%, plus aggregate ratios/seconds nonincrease and exact correctness/no-op. Control is an ablation comparison. This does not alter the standalone Stage23/24 rule or claim the larger goal is complete.
+
+## NATS baseline parity
+
+Published Stage22 full-profile correctness-baseline-1 completed exit 0, all seven calls/four gates validated. Every normalized graph hash matches the combined candidate's corresponding scenario. Baseline receipts and cross-arm parity assertion archived under nats-baseline/. Started control (3599a8f, no Stage23/24 overlay) correctness-control-1. Timing coordination inbox still has no reply; worker fleet reports a stale/unverifiable active accuracy dispatch, so no team-idle acknowledgment is inferred from that projection.
+
+## All-arm correctness and source integration checkpoint
+
+Control NATS suite completed exit 0; all seven normalized graph hashes match both published baseline and combined candidate, with all four gates in each arm passing. Archived nats-control/ evidence. No timing acceptance yet.
+
+The prior accuracy coordinator terminal was positively observed exited; its stale run route cannot establish a fresh quiet hold. Plugin peer terminal is live. One direct coordination prompt was accepted (request 8984c4c3-b6c7-4335-a93e-1c6dac48884c), but replayed observation still reports no turn start; no acknowledgment is inferred and no duplicate prompt sent.
+
+Copied the exact frozen Stage23/24 runtime and corrected focused fixtures into the working branch (original worktree untouched). Final combined-source `go test ./...` is running; the previously passing full suite covered the fanout-only source, so it is not substituted for this final combination.
+
+## Combined source full repository validation
+
+The Stage23/24 discovery changes integrated with 3599a8f passed `go test ./...` (exit 0). See `combined-full-repository.log`. No repeated acceptance timing or main publication is claimed by this correctness result.

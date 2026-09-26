@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/enola-labs/enola/internal/extractors/extcoverage"
 	"github.com/enola-labs/enola/internal/extractors/tsutil"
+	"io/fs"
 	"log"
 
 	"path/filepath"
@@ -3254,8 +3255,14 @@ func collectTSAliasRoots(ctx context.Context, repoPath string, inputScopes ...*i
 }
 
 func walkTSAliasRoots(ctx context.Context, repoPath, dir string, out *[]tsAliasRoot, inputScopes ...*inputscope.Scope) {
-	inputScope := inputscope.First(inputScopes)
-	if aliases, ok := aliasesAtDir(ctx, dir, inputScope); ok {
+	walkTSAliasRootsVisit(ctx, repoPath, dir, out, nil, inputscope.First(inputScopes))
+}
+
+// visit shares directory listings with configuration inventory. Both consumers
+// prune hidden directories and tsSkipDirs, but retain testdata.
+func walkTSAliasRootsVisit(ctx context.Context, repoPath, dir string, out *[]tsAliasRoot, visit func(string, []fs.DirEntry), inputScope *inputscope.Scope) {
+	entries, listingErr := overlayReadDir(ctx, dir, inputScope)
+	if aliases, ok := aliasesAtDirFromListing(ctx, dir, entries, listingErr, inputScope); ok {
 		rel, err := filepath.Rel(repoPath, dir)
 		if err != nil || rel == "." {
 			rel = ""
@@ -3277,23 +3284,27 @@ func walkTSAliasRoots(ctx context.Context, repoPath, dir string, out *[]tsAliasR
 		}
 		*out = append(*out, tsAliasRoot{dir: rel, aliases: qualified})
 	}
-	entries, err := overlayReadDir(ctx, dir, inputScope)
-	if err != nil {
+	if listingErr != nil {
 		return
+	}
+	if visit != nil {
+		visit(dir, entries)
 	}
 	for _, entry := range entries {
 		if !entry.IsDir() || strings.HasPrefix(entry.Name(), ".") || tsSkipDirs[entry.Name()] {
 			continue
 		}
-		walkTSAliasRoots(ctx, repoPath, filepath.Join(dir, entry.Name()), out, inputScope)
+		walkTSAliasRootsVisit(ctx, repoPath, filepath.Join(dir, entry.Name()), out, visit, inputScope)
 	}
 }
 
 // aliasesAtDir tries tsconfig.json then tsconfig.base.json at dir, returning
 // the first one that declares a non-empty paths map.
+var tsAliasConfigNames = [...]string{"tsconfig.json", "tsconfig.base.json"}
+
 func aliasesAtDir(ctx context.Context, dir string, inputScopes ...*inputscope.Scope) (map[string]tsAlias, bool) {
 	inputScope := inputscope.First(inputScopes)
-	for _, name := range []string{"tsconfig.json", "tsconfig.base.json"} {
+	for _, name := range tsAliasConfigNames {
 		if aliases, ok := tryParseTSConfigAliases(ctx, filepath.Join(dir, name), inputScope); ok {
 			return aliases, true
 		}
@@ -6582,3 +6593,45 @@ func tsGrammarLanguage(isTSX bool) *sitter.Language {
 
 // NewGraph binds an immutable graph input snapshot; New retains legacy behavior.
 func NewGraph(scope *inputscope.Scope) *TSExtractor { return &TSExtractor{inputScope: scope} }
+
+// aliasesAtDirFromListing skips only names absent from a completed listing.
+// A failed listing retains the old read path: individual configs may remain
+// readable even when their parent cannot be enumerated. Captured bytes win over
+// live absence, and any present entry (including a symlink) uses the real reader.
+func aliasesAtDirFromListing(ctx context.Context, dir string, entries []fs.DirEntry, listingErr error, scope *inputscope.Scope) (map[string]tsAlias, bool) {
+	if listingErr != nil {
+		return aliasesAtDir(ctx, dir, scope)
+	}
+	present := [len(tsAliasConfigNames)]bool{}
+	for _, entry := range entries {
+		for i, name := range tsAliasConfigNames {
+			if entry.Name() == name {
+				present[i] = true
+			}
+		}
+	}
+	var ov *fileOverlay
+	if ctx != nil {
+		ov, _ = ctx.Value(overlayKey{}).(*fileOverlay)
+	}
+	probe := probeFrom(ctx)
+	for i, name := range tsAliasConfigNames {
+		path := filepath.Join(dir, name)
+		var captured bool
+		if ov != nil {
+			_, captured = ov.byAbs[absOverlayKey(path)]
+		}
+		if !present[i] && !captured {
+			// Keep the prior absence ledger so retained discovery semantics and its
+			// existing observation oracles are unchanged by this first optimization.
+			if probe != nil && scope.Allowed(path, false) {
+				probe.record(absOverlayKey(path), observedMissing)
+			}
+			continue
+		}
+		if aliases, ok := tryParseTSConfigAliases(ctx, path, scope); ok {
+			return aliases, true
+		}
+	}
+	return nil, false
+}

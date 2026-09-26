@@ -1257,40 +1257,57 @@ func tsConfigInputs(ctx context.Context, repoPath string, inputScopes ...*inputs
 			}
 		}
 	}
-	// Match the actual alias reader's roots, including inherited tsconfig paths.
-	// The repository-root fallback is already represented by names above.
-	for _, root := range collectTSAliasRoots(ctx, repoPath, inputScope) {
-		for _, name := range []string{"svelte.config.js", "svelte.config.ts", "svelte.config.mjs"} {
-			add(factpath.Join(root.dir, name))
-		}
-	}
+	// Alias discovery and config inventory use the same directory prune rules.
+	// Collect names from those listings rather than walking the tree again.
+	var roots []tsAliasRoot
+	var configs []string
+	// Preserve WalkDir's root semantics (including symlinks and policy refusal)
+	// without enumerating the tree. A non-directory root named like a config
+	// contributed "." in the original traversal and still must do so.
+	enumerateConfigs := false
 	_ = overlayWalkDir(ctx, repoPath, inputScope, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return nil
 		}
 		if d.IsDir() {
-			name := d.Name()
-			if strings.HasPrefix(name, ".") || tsSkipDirs[name] {
-				if path != repoPath {
-					return filepath.SkipDir
-				}
-			}
-			return nil
+			enumerateConfigs = true
+			return filepath.SkipDir
 		}
 		switch d.Name() {
 		case "tsconfig.json", "tsconfig.base.json", "jsconfig.json", "package.json":
-			rel, relErr := filepath.Rel(repoPath, path)
-			if relErr != nil {
-				return nil
-			}
-			rel = factpath.Slash(rel)
-			add(rel)
-			if d.Name() != "package.json" {
-				followTSConfigExtends(repoPath, path, add, inputScope)
-			}
+			configs = append(configs, path)
 		}
 		return nil
 	})
+	walkTSAliasRootsVisit(ctx, repoPath, repoPath, &roots, func(dir string, entries []fs.DirEntry) {
+		if !enumerateConfigs {
+			return
+		}
+		for _, entry := range entries {
+			if entry.IsDir() {
+				continue
+			}
+			switch entry.Name() {
+			case "tsconfig.json", "tsconfig.base.json", "jsconfig.json", "package.json":
+				configs = append(configs, filepath.Join(dir, entry.Name()))
+			}
+		}
+	}, inputScope)
+	for _, root := range roots {
+		for _, name := range []string{"svelte.config.js", "svelte.config.ts", "svelte.config.mjs"} {
+			add(factpath.Join(root.dir, name))
+		}
+	}
+	for _, path := range configs {
+		rel, err := filepath.Rel(repoPath, path)
+		if err != nil {
+			continue
+		}
+		add(factpath.Slash(rel))
+		if filepath.Base(path) != "package.json" {
+			followTSConfigExtends(repoPath, path, add, inputScope)
+		}
+	}
 	sort.Strings(out)
 	graphprofile.Since("ts_config_inputs", tCfg, fmt.Sprintf("n=%d", len(out)))
 	return out
