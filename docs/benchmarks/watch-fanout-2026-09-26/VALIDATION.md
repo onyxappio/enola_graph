@@ -80,3 +80,31 @@ New Product direct-reader binary SHA-256: f11cf44bb97caf2f0c7a910d588baf61fda2a4
 The v3 re-exported deletion passed full-field cold equality with 346 parses instead of v2's 2,406 (85.6% fewer). Reasons: 1 changed import resolution, 343 dependency invalidation, 2 subsequent resolution. Published scope stays two owners. Observed single-run times (17.17 s vs 15.04 s) are under concurrent correctness workloads, not accepted speed evidence.
 
 The revised complete package run passed: graphsession 496.484 s, graphstream 25.208 s, command 7.772 s. Later tests/trace marker have their separate results above. Full `go test ./...` is now running against current source; v3 awaits final no-op and independent consumer replay before completion.
+
+## V3 complete and profiling preparation
+
+V3 completed all ten scenarios; independent reference consumer replay passed (15.53 s), including nine cold graph comparisons and final unchanged-input no-op. Complete results and comparison are archived in direct-readers/.
+
+Implementation checkpoint committed locally as 3599a8f on experimental branch; no main publication. Full repository suite remains live. Built /tmp/enola-watch-fanout-3599a8f from the committed source and started a separate initial/no-op/export profile with ENOLA_GRAPH_PROFILE=1 plus /usr/bin/time -l (peak RSS). This run is diagnostic under shared host load, not a performance acceptance cohort. It uses the same pinned isolated Product fixture, a fresh state, and restores source in finally.
+
+## Profile of committed source (diagnostic only)
+
+Archived profile-3599a8f includes traces, summaries and binary-pinned receipt for initial/no-op/export. No-op preserved state bytes, event size and zero parses. Fresh CLI no-op 8.259 s (shared load): input discovery 1.612 s, extractor detection 1.183 s, configuration input scans about 0.95 s twice, graph-input policy build 1.041 s; trace groups nest and must not be summed indiscriminately. This is not resident no-op latency and is far from the target.
+
+Export comparison of encoded owner contributions took 0.078 s; frozen preview 2.187 s; pending-state write 1.671 s. Peak process RSS: no-op 397,426,688 bytes, export 931,790,848 bytes. These are single-run absolute RSS values for the whole process, not attributed fingerprint memory or a baseline/candidate regression comparison. Prior Stage23/24 configuration/discovery experiments remain relevant; they are not incorporated into this branch or performance-accepted yet.
+
+## Stage23/24 combined overlay diagnostic
+
+Verified retained Stage23 session.go and Stage24 ts.go hashes match prior acceptance preparation. Remapped a frozen copy onto 3599a8f with three focused test files. The previously unrerun visitor fixture failed because expected root directories were absolute while the reference contract uses relative paths (root is empty string); corrected only that expectation, retaining exact callback/alias/ledger comparisons and real alias-root count checks. Focused suite then passed (1.379 s). Archived runtime patch and test sources under stage24-combined/; implementation remains overlay-only.
+
+Same target/state sequential diagnostic no-op pair: baseline 7.672 s, combined 7.300 s, both zero parsed/events and byte-identical state. Two config enumeration phases: 0.909/0.852 s -> 0.348/0.369 s; discovery 1.666 -> 1.443 s. RSS 393,969,664 -> 395,575,296 bytes. This one pair under concurrent tests does not establish performance acceptance; phase savings do not translate into an equal wall-time reduction under this load. Full repository test session still pertains to 3599a8f, not the overlay.
+
+## Full repository and combined input-fence checkpoint
+
+Full `go test ./...` completed exit 0 on 3599a8f runtime (graphsession 446.668 s, TypeScript extractor 39.110 s); complete log archived. Combined Stage23/24 overlay passed retained mutation-fence tests (7.204 s), including uncaptured config changes, added pruned config, scoped resident mutation fences and discovery retention.
+
+Prepared a new independent NATS harness under /tmp/enola-fanout-nats-acceptance: pinned full-profile Product 6042744 archive reconstruction, Stage22 baseline, 3599a8f control, combined overlay candidate. Unlike earlier Stage23/24 harness it uses full extraction profile rather than TS scope; baseline keeps old flag behavior, both new arms use changed-owner scope. Pin/clean-source preflight passed. Candidate correctness-only seven-call NATS suite is running; no quiet timing window or performance acceptance is claimed.
+
+## NATS harness payload correction
+
+First full-profile NATS initial failed before extraction publication with `nats: maximum payload exceeded`. The inherited TS-only harness capped broker payload at 1 MiB; full-profile file-owner Begin exceeds it. Failed evidence is retained. Set the dedicated test broker's max_payload to 8 MiB for every arm, matching the explicit 8,000,000-byte producer Begin ceiling; no runtime correctness or performance claim follows from this environment correction. Started fresh correctness-candidate-2 rather than overwriting attempt 1. Production consumers/brokers must support the chosen initial manifest size; this configuration requirement is explicit.

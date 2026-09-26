@@ -1,0 +1,8 @@
+--- FAIL: TestAliasListingPreservesInventoryVisits (0.14s)
+    --- FAIL: TestAliasListingPreservesInventoryVisits/all (0.08s)
+        alias_listing_visit_test.go:83: unexpected or empty alias root: { map[@root/:{src/  false}]}
+    --- FAIL: TestAliasListingPreservesInventoryVisits/excluded-package (0.07s)
+        alias_listing_visit_test.go:83: unexpected or empty alias root: { map[@root/:{src/  false}]}
+FAIL
+FAIL	github.com/enola-labs/enola/internal/extractors/tsextractor	1.448s
+FAIL

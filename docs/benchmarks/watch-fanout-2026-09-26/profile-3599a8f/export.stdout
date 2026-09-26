@@ -1,0 +1,41 @@
+[
+  {
+    "Invalidation": {
+      "RawConfigChanged": false,
+      "PolicyReconciled": false,
+      "AddedSources": 0,
+      "RemovedSources": 0,
+      "ContextAffectedSources": 0,
+      "ContextReasons": null,
+      "ParsedByReason": {
+        "resolution": 345,
+        "source content": 1
+      }
+    },
+    "RunID": "product-profile-2-1790440741325049000",
+    "BaseGeneration": 1,
+    "TargetGeneration": 2,
+    "Stats": {
+      "files_read": 346,
+      "files_parsed": 346,
+      "cached_files": 3800,
+      "graphql_parsed": 0,
+      "sfc_parsed": 0,
+      "summary_scans": 978,
+      "derived_indexes": 200,
+      "discovery_passes": 0
+    },
+    "Fallbacks": [
+      {
+        "extractor": "graph",
+        "scope": "changed files and reverse file dependents",
+        "reason": "frozen scope: prior file-to-file dependency closure"
+      }
+    ],
+    "Unreadable": null,
+    "OwnersPublished": 1,
+    "ParsedFiles": 346,
+    "EarlyLocal": 0,
+    "Facts": null
+  }
+]
