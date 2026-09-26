@@ -1,0 +1,1 @@
+Prepared before timing for runtime7c4651d (new Nuxt candidate), /tmp/enola-fanout-nuxt-balanced. Product correctness accepted separately; no timing arms started at archival. Same six-pair thresholds as61efbda; candidate source/binary is explicitly changed before collecting any data.19:00–19:35 UTC window still requires Codata actual idle and no-heavy-work confirmation.
