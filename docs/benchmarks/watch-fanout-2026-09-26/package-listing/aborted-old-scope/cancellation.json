@@ -1,0 +1,7 @@
+{
+  "time": "2026-09-26T19:46:44.225560+00:00",
+  "reason": "old-scope series superseded by explicit user request to include tests; first baseline also exceeded planned reserve under elevated host load",
+  "driver_pid": 61857,
+  "command": "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python -B /private/tmp/enola-package-listing-balanced/cli-pairs/cli.py --binary /tmp/enola-package-listing-proof/enola-package-listing-experimental --root /private/tmp/enola-package-listing-balanced/cli-pairs/candidate-1 --source /private/tmp/enola-package-listing-balanced/cli-pairs/candidate-1/product --nats nats://127.0.0.1:54563 --observer /tmp/enola-stage9-product-watch-control/bin/benchobserver --repeat 1 --profile full --changed-owner-scope",
+  "timing_accepted": false
+}

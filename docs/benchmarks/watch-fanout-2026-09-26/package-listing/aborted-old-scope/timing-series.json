@@ -1,0 +1,112 @@
+{
+  "hold": {
+    "mode": "current-roster",
+    "start_utc": "2026-09-26T19:40:00+00:00",
+    "end_utc": "2026-09-26T20:15:00+00:00",
+    "combined_authorized": true,
+    "worker_message": "msg_84b03ffc22b6",
+    "participants": [
+      {
+        "handle": "term_1f93c68e-62be-45e4-8643-7b8c7df9d177",
+        "status": "held",
+        "message_id": "msg_578dc9dbf486",
+        "evidence_path": "/tmp/enola-package-listing-balanced/coordination/codata-relay-hold.json",
+        "sha256": "86cf5011907c729292ed9c6a361f81d2bdd383e9f351a6342a83e47820e481c6"
+      },
+      {
+        "handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "status": "held",
+        "message_id": "msg_84b03ffc22b6",
+        "evidence_path": "/tmp/enola-package-listing-balanced/coordination/msg_84b03ffc22b6.json",
+        "sha256": "2775823bd94ed5e683791420c6f3865f8fdb09cb5370890130571c8ac1a77384"
+      },
+      {
+        "handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+        "status": "held",
+        "message_id": "msg_d373c6428640",
+        "evidence_path": "/tmp/enola-package-listing-balanced/coordination/msg_d373c6428640.json",
+        "sha256": "b8ef5cd137013cf868ccb38d913ee637fc464d02783bbe33d165e0dc77568f6e"
+      },
+      {
+        "handle": "term_f6d0d3d8-2dce-47a2-81db-44fd6bb8a1a8",
+        "status": "terminal-held",
+        "quote": "Confirmed: no heavy work from 19:40\u201320:15 UTC today.",
+        "evidence_path": "/tmp/enola-package-listing-balanced/coordination/fsm-hold.json",
+        "sha256": "33112ce4c77a34881127df28cc124cbe850c29f122d79eb8ff1ba0eff4d9c44c"
+      },
+      {
+        "handle": "term_b4d33c66-3033-42d6-8870-0852aa948bfd",
+        "status": "exited",
+        "evidence_path": "/tmp/enola-package-listing-balanced/coordination/closed-coordinator.json",
+        "sha256": "c1a8b06358c5898feb3f23691dd55858185711a009e473b79e90752027a67464"
+      }
+    ],
+    "codata_provenance": "explicit owner hold relayed by term_1f93c68e; owner route currently redirects through old run; supplementary finished-unit update msg_7f3a052c4115 retained"
+  },
+  "runs": [
+    {
+      "arm": "baseline",
+      "repeat": 1,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-package-listing-balanced/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "msg_84b03ffc22b6"
+      ],
+      "start_utc": "2026-09-26T19:40:47.693962+00:00",
+      "monotonic_start": 938612.711781666,
+      "monotonic_end": 938921.75862175,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 16,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 1202,
+          "max_gap_seconds": 0.2816985419485718
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-26T19:45:58.905456+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 1,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-package-listing-balanced/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "msg_84b03ffc22b6"
+      ],
+      "start_utc": "2026-09-26T19:45:58.905965+00:00",
+      "monotonic_start": 938923.99562625,
+      "monotonic_end": 938967.614644833,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 4,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 171,
+          "max_gap_seconds": 0.27091562491841614
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "exit": 1,
+      "error": null,
+      "end_utc": "2026-09-26T19:46:44.761385+00:00"
+    }
+  ]
+}

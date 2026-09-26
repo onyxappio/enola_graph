@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-p",
+    "1",
+    "./internal/config",
+    "./pkg/bootstrap",
+    "-run",
+    "Test(GraphDefaults|LoadGraph|GraphTestSources|GraphDefault|GraphTestScope)",
+    "-count=1"
+  ],
+  "exit": 0,
+  "wall_seconds": 6.933438207954168
+}

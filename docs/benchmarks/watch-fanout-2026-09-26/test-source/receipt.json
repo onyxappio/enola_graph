@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-p",
+    "1",
+    "./internal/config",
+    "./pkg/bootstrap",
+    "-count=1"
+  ],
+  "exit": 0,
+  "wall_seconds": 96.61115541693289
+}
