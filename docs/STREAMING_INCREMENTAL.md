@@ -291,3 +291,23 @@ Preview counters distinguish `changed import resolution`, `dependency invalidati
 and actual `file semantic context` changes. Earlier builds labeled every unchanged
 preview seed as semantic context, including deletion's reverse dependency closure;
 those older counts cannot be interpreted as a count of configuration changes.
+
+## Test source in graph analysis
+
+The graph CLI (initial, delta and watch) includes test source files by default,
+including conventional `*.test.ts`, `*.spec.ts`, `*_test.go` and language-specific
+test source trees. They use the normal supported source extractors: symbols,
+imports and direct calls are part of file-owned graph contributions. Test edits,
+renames and removals participate in the same replacement and cold-equivalence
+contract as other source files. An identical test-file notification remains silent.
+
+Repository `ignore` and `graph_inputs.exclude` choices still apply, as do Git input
+policy and unrelated generated/vendor/fixture exclusions. A repository config
+that explicitly lists test exclusions must remove those entries to include them.
+The graph defaults differ intentionally from the legacy architecture command's
+reference-only test policy. Existing extractor rules that prevent test fixtures
+from being interpreted as production framework routes are retained; including
+source does not execute tests, report coverage or add a test-run result schema.
+
+Performance comparisons must pin the same test-inclusive scope for both versions;
+old test-excluding measurements do not establish acceptance for the new default.

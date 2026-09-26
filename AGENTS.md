@@ -173,3 +173,12 @@ complete equivalence. Review changed contracts and add coverage for relevant gap
 This policy describes future updates; it does not itself request an upstream sync.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for build and validation instructions.
+
+## Test source inputs
+
+The user requires test source files in graph analysis by default. Graph initial,
+delta and watch must include conventional test filenames and supported language
+test source trees; do not inherit the legacy default test exclusions. Explicit
+repository exclusions still apply. Verify test-to-source relationships, file
+changes/removal, scope reconciliation and exact delta/cold equivalence. Compare
+performance on the same test-inclusive scope for baseline and candidate.

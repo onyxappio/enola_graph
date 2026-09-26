@@ -34,3 +34,21 @@ func (cfg *Config) GraphInputOptions(stateDirs ...string) graphinput.Options {
 	o.StateDirs = append(o.StateDirs, dir)
 	return o
 }
+
+// GraphDefault analyzes test source as ordinary source. Legacy Default keeps its
+// reference-only test policy; explicit repository exclusions remain authoritative.
+func GraphDefault() *Config {
+	cfg := Default()
+	tests := make(map[string]bool, len(cfg.TestGlobs))
+	for _, pattern := range cfg.TestGlobs {
+		tests[pattern] = true
+	}
+	ignore := make([]string, 0, len(cfg.Ignore))
+	for _, pattern := range cfg.Ignore {
+		if !tests[pattern] {
+			ignore = append(ignore, pattern)
+		}
+	}
+	cfg.Ignore = ignore
+	return cfg
+}

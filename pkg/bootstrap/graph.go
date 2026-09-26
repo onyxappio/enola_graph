@@ -56,9 +56,9 @@ func NewGraphEngine(opts GraphOptions) (*Engine, error) {
 	if readErr != nil && !os.IsNotExist(readErr) {
 		return nil, readErr
 	}
-	cfg := config.Default()
+	cfg := config.GraphDefault()
 	if _, err = os.Stat(path); err == nil {
-		cfg, err = config.Load(path)
+		cfg, err = config.LoadGraph(path)
 		if err != nil {
 			return nil, err
 		}

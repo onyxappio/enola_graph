@@ -572,12 +572,20 @@ func Default() *Config {
 // Load reads a configuration file from the given path.
 // Missing fields are filled with defaults.
 func Load(path string) (*Config, error) {
+	return loadWithDefaults(path, Default())
+}
+
+// LoadGraph includes test source by default; explicit ignore lists still replace defaults.
+func LoadGraph(path string) (*Config, error) {
+	return loadWithDefaults(path, GraphDefault())
+}
+
+func loadWithDefaults(path string, cfg *Config) (*Config, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("reading config %s: %w", path, err)
 	}
 
-	cfg := Default()
 	if err := yaml.Unmarshal(data, cfg); err != nil {
 		return nil, fmt.Errorf("parsing config %s: %w", path, err)
 	}
