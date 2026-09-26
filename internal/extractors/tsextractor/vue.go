@@ -135,7 +135,7 @@ func nuxtConfigAbsentFromListing(ctx context.Context, path string, scope *inputs
 		return false
 	}
 	key := absOverlayKey(path)
-	parent := absOverlayKey(filepath.Dir(path))
+	parent := absOverlayKey(filepath.Dir(path)) //factpath:host
 	base := filepath.Base(path)
 	probe.mu.Lock()
 	defer probe.mu.Unlock()
