@@ -39,3 +39,5 @@ full spread, ratios, paging context and failures; no automatic cohort refill.
 Median thresholds use the ratio of medians, explicitly median(candidate)/median(baseline), not median(within-pair ratios). Every within-pair initial ratio must separately be less than one. All ratios are reported. This preserves the previous harness definition.
 
 This new root pins7c4651d before any data. The earlier balanced9c7359f root never started a timing arm (preflight found local Codata workload); it remains unchanged. No samples are transferred. The complete bundle is compared to Stage22; no isolated Nuxt speedup is inferred.
+
+All twelve arms must complete inside one contiguous explicitly acknowledged quiet window. Do not split, resume, or combine a cohort across separate windows; retain an interrupted cohort as incomplete evidence.
