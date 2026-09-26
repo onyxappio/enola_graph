@@ -363,6 +363,21 @@ type peekableSource interface {
 // Watch holds one resident writer and runs only in response to events. WatchEvery
 // is a debounce ceiling, not a polling interval or a disk-equality barrier.
 func Watch(ctx context.Context, eng *engine.Engine, repoPath string, sink graphstream.Sink, opts Options) error {
+	delay := opts.WatchEvery
+	if delay <= 0 {
+		delay = DefaultWatchEvery
+	}
+	if opts.WatchQuiet < 0 || opts.WatchMaxWait < 0 {
+		return fmt.Errorf("watch durations must not be negative")
+	}
+	if opts.WatchQuiet > 0 {
+		if opts.WatchMaxWait > 0 {
+			delay = opts.WatchMaxWait
+		}
+		if opts.WatchQuiet > delay {
+			return fmt.Errorf("watch quiet period exceeds maximum wait")
+		}
+	}
 	r, err := OpenSession(ctx, eng, repoPath, sink, opts)
 	if err != nil {
 		return err
@@ -393,11 +408,7 @@ func Watch(ctx context.Context, eng *engine.Engine, repoPath string, sink graphs
 	if err = apply(batch); err != nil {
 		return err
 	}
-	delay := opts.WatchEvery
-	if delay <= 0 {
-		delay = DefaultWatchEvery
-	}
-	return watchLoop(ctx, r, source, delay, apply)
+	return watchLoopWithQuiet(ctx, r, source, delay, opts.WatchQuiet, apply)
 }
 
 // watchLoop waits for the source to become ready, collects for the fixed window
@@ -407,6 +418,10 @@ func Watch(ctx context.Context, eng *engine.Engine, repoPath string, sink graphs
 // without a transaction, and if it might, the window it gets is still the one
 // that started when the source became ready.
 func watchLoop(ctx context.Context, r *Resident, source ChangeSource, delay time.Duration, apply func(ChangeBatch) error) error {
+	return watchLoopWithQuiet(ctx, r, source, delay, 0, apply)
+}
+
+func watchLoopWithQuiet(ctx context.Context, r *Resident, source ChangeSource, delay, quiet time.Duration, apply func(ChangeBatch) error) error {
 	prober, peekable := source.(peekableSource)
 	for {
 		select {
@@ -428,12 +443,8 @@ func watchLoop(ctx context.Context, r *Resident, source ChangeSource, delay time
 				continue
 			}
 		}
-		timer := time.NewTimer(time.Until(deadline))
-		select {
-		case <-ctx.Done():
-			timer.Stop()
-			return ctx.Err()
-		case <-timer.C:
+		if err := waitWatchWindow(ctx, source.Ready(), deadline, quiet); err != nil {
+			return err
 		}
 		batch := source.Drain()
 		if !batch.Covered {
@@ -716,4 +727,34 @@ func unchangedControlBytes(policy *graphinput.Policy, path string) bool {
 		return hex.EncodeToString(sum[:]) == dep.Digest
 	}
 	return false
+}
+
+// Readiness notifications coalesce, while the source retains the union of paths.
+// Continuous saves cannot postpone the next cycle beyond the fixed deadline.
+func waitWatchWindow(ctx context.Context, ready <-chan struct{}, deadline time.Time, quiet time.Duration) error {
+	for {
+		due := deadline
+		if quiet > 0 {
+			if candidate := time.Now().Add(quiet); candidate.Before(due) {
+				due = candidate
+			}
+		}
+		timer := time.NewTimer(time.Until(due))
+		var changes <-chan struct{}
+		if quiet > 0 {
+			changes = ready
+		}
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return ctx.Err()
+		case <-timer.C:
+			return nil
+		case <-changes:
+			timer.Stop()
+			if !time.Now().Before(deadline) {
+				return nil
+			}
+		}
+	}
 }

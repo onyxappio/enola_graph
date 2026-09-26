@@ -41,7 +41,10 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 	fs := flag.NewFlagSet("graph "+mode, flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
 	var (
+		watchQuiet    = fs.Duration("watch-quiet", 0, "with watch: quiet period after the last event; 0 preserves the fixed --watch-every window")
+		watchMaxWait  = fs.Duration("watch-max-wait", 0, "with --watch-quiet: maximum collection duration from first event; 0 uses --watch-every")
 		watchEvery    = fs.Duration("watch-every", graphsession.DefaultWatchEvery, "with watch: fixed change-collection window after the first event (positive duration, e.g. 5s or 10s)")
+		changedOwners = fs.Bool("changed-owner-scope", false, "with --authoritative-scope: analyze delta before Begin and publish only changed owner contributions")
 		authoritative = fs.Bool("authoritative-scope", false, "use frozen file-owner BeginReplace manifest (v2 protocol)")
 		maxBeginBytes = fs.Int("max-begin-bytes", 0, "maximum BeginReplace payload bytes (0 = 256KiB, or 512KiB with --authoritative-scope). Frozen v2 refuses oversized manifests; it does not chunk owner scope. Must fit the broker max_payload.")
 		natsURL       = fs.String("nats", "", "NATS URL (JetStream)")
@@ -72,8 +75,21 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 	if err := fs.Parse(args[1:]); err != nil {
 		os.Exit(2)
 	}
+	if *watchQuiet < 0 || *watchMaxWait < 0 {
+		r.cmdFatal("graph", "watch durations must not be negative")
+	}
+	maxWait := *watchEvery
+	if *watchMaxWait > 0 {
+		maxWait = *watchMaxWait
+	}
+	if *watchQuiet > maxWait {
+		r.cmdFatal("graph", "--watch-quiet must not exceed maximum wait")
+	}
 	if *watchEvery <= 0 {
 		r.cmdFatal("graph", "--watch-every must be a positive duration")
+	}
+	if *changedOwners && !*authoritative {
+		r.cmdFatal("graph", "--changed-owner-scope requires --authoritative-scope")
 	}
 	if *maxBeginBytes < 0 {
 		r.cmdFatal("graph", "--max-begin-bytes must be >= 0")
@@ -166,8 +182,11 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 	optsFor := func(repo string) graphsession.Options {
 		opts := graphsession.Options{
 			AuthoritativeFiles: *authoritative,
+			ChangedOwnersOnly:  *changedOwners,
 			MaxBeginBytes:      *maxBeginBytes,
 			WatchEvery:         *watchEvery,
+			WatchQuiet:         *watchQuiet,
+			WatchMaxWait:       *watchMaxWait,
 			ContextID:          *contextID,
 			StateDir:           *stateDir,
 			RepoID:             *repoID,

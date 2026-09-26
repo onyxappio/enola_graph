@@ -74,9 +74,9 @@ func invalidateTS(dirty map[string]bool, prev map[string]*tsextractor.FileRecord
 		}
 	}
 
-	// Deleted files always reverse-close importers. Content-only dirty files
-	// wait until extraction shows a changed import/export surface.
-	for p, d := range reverseClose(deleted, prev) {
+	// Seed direct readers of deleted files. Further hops are decided by the
+	// existing observed-surface/side-read closure after these readers reparse.
+	for p, d := range directReaders(deleted, prev) {
 		if d {
 			dirty[p] = true
 		}
@@ -172,6 +172,41 @@ func importRebound(spec string, priorKnown, known map[string]bool) bool {
 	after, hasAfter := tsextractor.NormalizeImportTarget(spec, known)
 	before, hadBefore := tsextractor.NormalizeImportTarget(spec, priorKnown)
 	return hadBefore != hasAfter || before != after
+}
+
+// directReaders seeds reparsing, not the frozen replacement scope. It deliberately
+// includes both imports and side reads. Unknown consumer behavior is broadened by
+// the existing fixed-point surface/side-read rules after each parse hop.
+func directReaders(seeds map[string]bool, recs map[string]*tsextractor.FileRecord) map[string]bool {
+	out := map[string]bool{}
+	// Framework composition has additional dependencies beyond module bindings.
+	// Keep its reached records conservative until a narrower proof exists.
+	for path := range reverseClose(seeds, recs) {
+		rec := recs[path]
+		if rec != nil && (!replayableDependent(rec) || (rec.NuxtScope != "" && rec.NuxtScope != "-")) {
+			out[path] = true
+		}
+	}
+
+	for p, dirty := range seeds {
+		if dirty {
+			out[filepath.ToSlash(p)] = true
+		}
+	}
+	for path, rec := range recs {
+		if rec == nil {
+			continue
+		}
+		for _, deps := range [][]string{rec.ResolvedFiles, rec.SideReads} {
+			for _, dep := range deps {
+				if seeds[filepath.ToSlash(dep)] {
+					out[filepath.ToSlash(path)] = true
+					break
+				}
+			}
+		}
+	}
+	return out
 }
 
 func reverseClose(seeds map[string]bool, recs map[string]*tsextractor.FileRecord) map[string]bool {

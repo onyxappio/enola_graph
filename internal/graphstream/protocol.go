@@ -135,14 +135,16 @@ type Batch struct {
 // Completeness is declared on EndReplace. Seeing an end marker without this
 // metadata does not prove the replacement finished successfully.
 type Completeness struct {
-	Status          string     `json:"status"`
-	FilesAnalyzed   int        `json:"files_analyzed"`
-	FilesUnreadable []string   `json:"files_unreadable,omitempty"`
-	ParsedFiles     int        `json:"parsed_files"`
-	CachedFiles     int        `json:"cached_files"`
-	SummaryScans    int        `json:"summary_scans"`
-	EarlyLocal      bool       `json:"early_local"`
-	Fallbacks       []Fallback `json:"fallbacks,omitempty"`
+	// ParsedByReason counts extraction work, not changed or published owners.
+	ParsedByReason  map[string]int `json:"parsed_by_reason,omitempty"`
+	Status          string         `json:"status"`
+	FilesAnalyzed   int            `json:"files_analyzed"`
+	FilesUnreadable []string       `json:"files_unreadable,omitempty"`
+	ParsedFiles     int            `json:"parsed_files"`
+	CachedFiles     int            `json:"cached_files"`
+	SummaryScans    int            `json:"summary_scans"`
+	EarlyLocal      bool           `json:"early_local"`
+	Fallbacks       []Fallback     `json:"fallbacks,omitempty"`
 }
 
 // Fallback records an extractor or feature that could not do file-granularity

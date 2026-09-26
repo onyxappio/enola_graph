@@ -1,0 +1,538 @@
+[
+  {
+    "label": "00-initial",
+    "wall_s": 27.902115916949697,
+    "summary": [
+      {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "initial": 4094
+          }
+        },
+        "RunID": "product-perf-1-1790439465415065000",
+        "BaseGeneration": 0,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 4146,
+          "files_parsed": 4094,
+          "cached_files": 0,
+          "graphql_parsed": 2,
+          "sfc_parsed": 17,
+          "summary_scans": 1707,
+          "derived_indexes": 2346,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "all prior/current file owners",
+            "reason": "frozen scope: global name-resolution domain"
+          },
+          {
+            "extractor": "manifests",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "hcl",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "python",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "swift",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 6301,
+        "ParsedFiles": 4094,
+        "EarlyLocal": 0,
+        "Facts": null
+      }
+    ],
+    "full_field_graph_equal": true,
+    "owners": 22406,
+    "batches": 2433,
+    "nodes": 84725,
+    "edges": 155400,
+    "unchanged": 16105,
+    "changed": 6301,
+    "event_bytes": 87863338
+  },
+  {
+    "label": "01-literal",
+    "wall_s": 13.257083458011039,
+    "summary": [
+      {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 343,
+            "source content": 1
+          }
+        },
+        "RunID": "product-perf-2-1790439527327702000",
+        "BaseGeneration": 1,
+        "TargetGeneration": 2,
+        "Stats": {
+          "files_read": 344,
+          "files_parsed": 344,
+          "cached_files": 3802,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 976,
+          "derived_indexes": 202,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 344,
+        "EarlyLocal": 0,
+        "Facts": null
+      }
+    ],
+    "full_field_graph_equal": true,
+    "owners": 0,
+    "batches": 0,
+    "nodes": 0,
+    "edges": 0,
+    "unchanged": 0,
+    "changed": 0,
+    "event_bytes": 1197
+  },
+  {
+    "label": "02-export",
+    "wall_s": 12.992598959011957,
+    "summary": [
+      {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 345,
+            "source content": 1
+          }
+        },
+        "RunID": "product-perf-3-1790439571141770000",
+        "BaseGeneration": 2,
+        "TargetGeneration": 3,
+        "Stats": {
+          "files_read": 346,
+          "files_parsed": 346,
+          "cached_files": 3800,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 975,
+          "derived_indexes": 203,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 1,
+        "ParsedFiles": 346,
+        "EarlyLocal": 0,
+        "Facts": null
+      }
+    ],
+    "full_field_graph_equal": true,
+    "owners": 1,
+    "batches": 1,
+    "nodes": 6,
+    "edges": 5,
+    "unchanged": 0,
+    "changed": 1,
+    "event_bytes": 4437
+  },
+  {
+    "label": "03-add-barrel",
+    "wall_s": 14.358129790984094,
+    "summary": [
+      {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 1,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "added source": 1,
+            "resolution": 345,
+            "source content": 1
+          }
+        },
+        "RunID": "product-perf-4-1790439616614717000",
+        "BaseGeneration": 3,
+        "TargetGeneration": 4,
+        "Stats": {
+          "files_read": 347,
+          "files_parsed": 347,
+          "cached_files": 3800,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 984,
+          "derived_indexes": 200,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files, resolution-rebound importers and reverse file dependents",
+            "reason": "add/delete/rename: reverse-close plus owners whose cached import resolution changes"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 2,
+        "ParsedFiles": 347,
+        "EarlyLocal": 0,
+        "Facts": null
+      }
+    ],
+    "full_field_graph_equal": true,
+    "owners": 2,
+    "batches": 1,
+    "nodes": 28,
+    "edges": 26,
+    "unchanged": 0,
+    "changed": 2,
+    "event_bytes": 19245
+  },
+  {
+    "label": "04-remove-barrel",
+    "wall_s": 12.998518207925372,
+    "summary": [
+      {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 345,
+            "source content": 1
+          }
+        },
+        "RunID": "product-perf-5-1790439661803382000",
+        "BaseGeneration": 4,
+        "TargetGeneration": 5,
+        "Stats": {
+          "files_read": 346,
+          "files_parsed": 346,
+          "cached_files": 3801,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 982,
+          "derived_indexes": 200,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 1,
+        "ParsedFiles": 346,
+        "EarlyLocal": 0,
+        "Facts": null
+      }
+    ],
+    "full_field_graph_equal": true,
+    "owners": 1,
+    "batches": 1,
+    "nodes": 25,
+    "edges": 24,
+    "unchanged": 0,
+    "changed": 1,
+    "event_bytes": 17642
+  },
+  {
+    "label": "05-delete-unreferenced",
+    "wall_s": 13.77302979095839,
+    "summary": [
+      {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 1,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {}
+        },
+        "RunID": "product-perf-6-1790439709923483000",
+        "BaseGeneration": 5,
+        "TargetGeneration": 6,
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 4146,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0,
+          "derived_indexes": 0,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files, resolution-rebound importers and reverse file dependents",
+            "reason": "add/delete/rename: reverse-close plus owners whose cached import resolution changes"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 0,
+        "EarlyLocal": 0,
+        "Facts": null
+      }
+    ],
+    "full_field_graph_equal": true,
+    "owners": 1,
+    "batches": 0,
+    "nodes": 0,
+    "edges": 0,
+    "unchanged": 0,
+    "changed": 1,
+    "event_bytes": 1272
+  },
+  {
+    "label": "06a-restore-barrel",
+    "wall_s": 14.992716209031641,
+    "summary": [
+      {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 1,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "added source": 1,
+            "resolution": 345,
+            "source content": 1
+          }
+        },
+        "RunID": "product-perf-7-1790439759233955000",
+        "BaseGeneration": 6,
+        "TargetGeneration": 7,
+        "Stats": {
+          "files_read": 347,
+          "files_parsed": 347,
+          "cached_files": 3800,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 984,
+          "derived_indexes": 200,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files, resolution-rebound importers and reverse file dependents",
+            "reason": "add/delete/rename: reverse-close plus owners whose cached import resolution changes"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 2,
+        "ParsedFiles": 347,
+        "EarlyLocal": 0,
+        "Facts": null
+      }
+    ],
+    "full_field_graph_equal": true,
+    "owners": 2,
+    "batches": 1,
+    "nodes": 28,
+    "edges": 26,
+    "unchanged": 0,
+    "changed": 2,
+    "event_bytes": 19245
+  },
+  {
+    "label": "06b-delete-reexported",
+    "wall_s": 17.169405582943,
+    "summary": [
+      {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 1,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "file semantic context": 2406
+          }
+        },
+        "RunID": "product-perf-8-1790439810412375000",
+        "BaseGeneration": 7,
+        "TargetGeneration": 8,
+        "Stats": {
+          "files_read": 2406,
+          "files_parsed": 2406,
+          "cached_files": 1740,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 1753,
+          "derived_indexes": 1471,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files, resolution-rebound importers and reverse file dependents",
+            "reason": "add/delete/rename: reverse-close plus owners whose cached import resolution changes"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 1,
+        "ParsedFiles": 2406,
+        "EarlyLocal": 0,
+        "Facts": null
+      }
+    ],
+    "full_field_graph_equal": true,
+    "owners": 2,
+    "batches": 1,
+    "nodes": 26,
+    "edges": 25,
+    "unchanged": 0,
+    "changed": 2,
+    "event_bytes": 18371
+  },
+  {
+    "label": "07-add-standalone",
+    "wall_s": 11.876346999895759,
+    "summary": [
+      {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 1,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "added source": 1
+          }
+        },
+        "RunID": "product-perf-9-1790439863333766000",
+        "BaseGeneration": 8,
+        "TargetGeneration": 9,
+        "Stats": {
+          "files_read": 1,
+          "files_parsed": 1,
+          "cached_files": 4146,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0,
+          "derived_indexes": 1,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files, resolution-rebound importers and reverse file dependents",
+            "reason": "add/delete/rename: reverse-close plus owners whose cached import resolution changes"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 1,
+        "ParsedFiles": 1,
+        "EarlyLocal": 0,
+        "Facts": null
+      }
+    ],
+    "full_field_graph_equal": true,
+    "owners": 1,
+    "batches": 1,
+    "nodes": 2,
+    "edges": 1,
+    "unchanged": 0,
+    "changed": 1,
+    "event_bytes": 2407
+  },
+  {
+    "label": "08-noop",
+    "wall_s": 7.0730205830186605,
+    "summary": [
+      {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {}
+        },
+        "RunID": "",
+        "BaseGeneration": 9,
+        "TargetGeneration": 9,
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 4147,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0,
+          "derived_indexes": 0,
+          "discovery_passes": 0
+        },
+        "Fallbacks": null,
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 0,
+        "EarlyLocal": 0,
+        "Facts": null
+      }
+    ],
+    "event_bytes": 0,
+    "state_unchanged": true
+  }
+]

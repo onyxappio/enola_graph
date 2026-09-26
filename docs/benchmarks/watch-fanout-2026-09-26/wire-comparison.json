@@ -1,0 +1,238 @@
+{
+  "kind": "correctness-and-wire-diagnostic",
+  "timing_accepted": false,
+  "baseline": "/tmp/enola-fanout-current-20260926/results.json",
+  "candidate": "/tmp/enola-fanout-current-20260926/candidate-results-v2/results.json",
+  "scenarios": [
+    {
+      "label": "00-initial",
+      "owners": {
+        "baseline": 22406,
+        "candidate": 22406
+      },
+      "event_bytes": {
+        "baseline": 87863302,
+        "candidate": 87863338
+      },
+      "batches": {
+        "baseline": 2433,
+        "candidate": 2433
+      },
+      "ParsedFiles": {
+        "baseline": 4094,
+        "candidate": 4094
+      },
+      "OwnersPublished": {
+        "baseline": 6301,
+        "candidate": 6301
+      }
+    },
+    {
+      "label": "01-literal",
+      "owners": {
+        "baseline": 344,
+        "candidate": 0
+      },
+      "event_bytes": {
+        "baseline": 10075309,
+        "candidate": 1197
+      },
+      "batches": {
+        "baseline": 346,
+        "candidate": 0
+      },
+      "ParsedFiles": {
+        "baseline": 344,
+        "candidate": 344
+      },
+      "OwnersPublished": {
+        "baseline": 344,
+        "candidate": 0
+      }
+    },
+    {
+      "label": "02-export",
+      "owners": {
+        "baseline": 346,
+        "candidate": 1
+      },
+      "event_bytes": {
+        "baseline": 10222709,
+        "candidate": 4437
+      },
+      "batches": {
+        "baseline": 350,
+        "candidate": 1
+      },
+      "ParsedFiles": {
+        "baseline": 346,
+        "candidate": 346
+      },
+      "OwnersPublished": {
+        "baseline": 346,
+        "candidate": 1
+      }
+    },
+    {
+      "label": "03-add-barrel",
+      "owners": {
+        "baseline": 347,
+        "candidate": 2
+      },
+      "event_bytes": {
+        "baseline": 10258401,
+        "candidate": 19245
+      },
+      "batches": {
+        "baseline": 352,
+        "candidate": 1
+      },
+      "ParsedFiles": {
+        "baseline": 347,
+        "candidate": 347
+      },
+      "OwnersPublished": {
+        "baseline": 347,
+        "candidate": 2
+      }
+    },
+    {
+      "label": "04-remove-barrel",
+      "owners": {
+        "baseline": 346,
+        "candidate": 1
+      },
+      "event_bytes": {
+        "baseline": 10256795,
+        "candidate": 17642
+      },
+      "batches": {
+        "baseline": 352,
+        "candidate": 1
+      },
+      "ParsedFiles": {
+        "baseline": 346,
+        "candidate": 346
+      },
+      "OwnersPublished": {
+        "baseline": 346,
+        "candidate": 1
+      }
+    },
+    {
+      "label": "05-delete-unreferenced",
+      "owners": {
+        "baseline": 1,
+        "candidate": 1
+      },
+      "event_bytes": {
+        "baseline": 1272,
+        "candidate": 1272
+      },
+      "batches": {
+        "baseline": 0,
+        "candidate": 0
+      },
+      "ParsedFiles": {
+        "baseline": 0,
+        "candidate": 0
+      },
+      "OwnersPublished": {
+        "baseline": 0,
+        "candidate": 0
+      }
+    },
+    {
+      "label": "06a-restore-barrel",
+      "owners": {
+        "baseline": 347,
+        "candidate": 2
+      },
+      "event_bytes": {
+        "baseline": 10258401,
+        "candidate": 19245
+      },
+      "batches": {
+        "baseline": 352,
+        "candidate": 1
+      },
+      "ParsedFiles": {
+        "baseline": 347,
+        "candidate": 347
+      },
+      "OwnersPublished": {
+        "baseline": 347,
+        "candidate": 2
+      }
+    },
+    {
+      "label": "06b-delete-reexported",
+      "owners": {
+        "baseline": 2407,
+        "candidate": 2
+      },
+      "event_bytes": {
+        "baseline": 40404846,
+        "candidate": 18371
+      },
+      "batches": {
+        "baseline": 1229,
+        "candidate": 1
+      },
+      "ParsedFiles": {
+        "baseline": 2406,
+        "candidate": 2406
+      },
+      "OwnersPublished": {
+        "baseline": 2406,
+        "candidate": 1
+      }
+    },
+    {
+      "label": "07-add-standalone",
+      "owners": {
+        "baseline": 1,
+        "candidate": 1
+      },
+      "event_bytes": {
+        "baseline": 2369,
+        "candidate": 2407
+      },
+      "batches": {
+        "baseline": 1,
+        "candidate": 1
+      },
+      "ParsedFiles": {
+        "baseline": 1,
+        "candidate": 1
+      },
+      "OwnersPublished": {
+        "baseline": 1,
+        "candidate": 1
+      }
+    },
+    {
+      "label": "08-noop",
+      "owners": {
+        "baseline": 0,
+        "candidate": 0
+      },
+      "event_bytes": {
+        "baseline": 0,
+        "candidate": 0
+      },
+      "batches": {
+        "baseline": 0,
+        "candidate": 0
+      },
+      "ParsedFiles": {
+        "baseline": 0,
+        "candidate": 0
+      },
+      "OwnersPublished": {
+        "baseline": 0,
+        "candidate": 0
+      }
+    }
+  ]
+}

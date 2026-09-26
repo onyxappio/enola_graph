@@ -32,6 +32,8 @@ var ErrInputsChanged = errors.New("inputs changed during transaction")
 type Options struct {
 	// AuthoritativeFiles selects the v2 frozen file-owner contract.
 	AuthoritativeFiles bool
+	// ChangedOwnersOnly computes delta contributions before freezing publication scope.
+	ChangedOwnersOnly bool
 	// ReloadEngine reconstructs registrations and effective config after a config edit.
 	ReloadEngine func(context.Context) (*engine.Engine, error)
 	// ConfigPaths includes external and missing configuration-selection candidates.
@@ -45,6 +47,9 @@ type Options struct {
 	// WatchEvery is a fixed collection window, not a timer reset on every edit.
 	// Non-positive values use DefaultWatchEvery. Baseline analysis starts immediately.
 	WatchEvery time.Duration
+	// WatchQuiet enables a sliding quiet period capped by WatchMaxWait.
+	WatchQuiet   time.Duration
+	WatchMaxWait time.Duration
 	// WatchIgnore must contain only non-input output artifacts (for example the event sink).
 	WatchIgnore  []string
 	ForceInitial bool
@@ -481,6 +486,7 @@ func identityOK(st *State, opts Options, abs string) error {
 }
 
 type session struct {
+	deferBegin bool
 	// retained is the snapshot the resident's last committed run proved, and
 	// retainedFor the policy identity it was proven under. Both are an offer,
 	// never an answer: nothing is used until this run proves it again.
@@ -584,6 +590,10 @@ func (s *session) delta(ctx context.Context) (*Result, error) {
 }
 
 func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
+	if s.opts.ChangedOwnersOnly && !s.opts.AuthoritativeFiles {
+		return nil, fmt.Errorf("changed-owner scope requires authoritative file scope")
+	}
+	s.deferBegin = s.opts.ChangedOwnersOnly && !initial && !s.opts.ForceInitial && s.state != nil
 	tr := s.prof
 	// A run that failed between preview and consumption must not hand its
 	// extraction to the next one: the tree has moved on since.
@@ -1028,6 +1038,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				}
 				if !wholeDomain {
 					dirty := map[string]bool{}
+					seedReasons := map[string]string{}
 					for _, f := range current {
 						st := lookupState(prevFiles, f)
 						h, ok := lookupHash(hashes, f)
@@ -1050,11 +1061,15 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 								continue
 							}
 							dirty[filepath.ToSlash(f)] = true
+							seedReasons[filepath.ToSlash(f)] = "file semantic context"
 							extraOwners = append(extraOwners, filepath.ToSlash(f))
 						}
 					}
 					for _, f := range membership.rebound {
 						dirty[f] = true
+						if seedReasons[f] == "" {
+							seedReasons[f] = "changed import resolution"
+						}
 					}
 					// Retired identities carry an old contribution and no new one.
 					// They are absent from the owned set, so the planning extract
@@ -1067,17 +1082,22 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 						retired[f] = true
 						dirty[f] = true
 					}
-					// Deleting a file changes what its importers see, and that reaches
-					// further than one edge: invalidateTS reverse-closes the same seeds
-					// at extraction time. Closing here too keeps the previewed parse set
-					// equal to the one extraction will ask for, so the planning extract
-					// stays reusable instead of being recomputed on every delete.
+					// Seed the same direct readers extraction will request. The preview
+					// then expands through observed changes before Begin; replacement
+					// planning still computes its conservative full file-owner scope.
+					// Publication remains conservative even when unchanged transitive
+					// consumers no longer need their source parsed again.
 					for p, d := range reverseClose(retired, tsRecordsFromState(prevFiles)) {
+						if d {
+							extraOwners = append(extraOwners, p)
+						}
+					}
+					for p, d := range directReaders(retired, tsRecordsFromState(prevFiles)) {
 						if d {
 							dirty[p] = true
 						}
 					}
-					previewFacts, previewProof, perr := s.prepareFrozenTS(ctx, prevFiles, inv.Files, hashes, dirty, retired, angular)
+					previewFacts, previewProof, perr := s.prepareFrozenTS(ctx, prevFiles, inv.Files, hashes, dirty, retired, seedReasons, angular)
 					// The planning extract is a full TS session of its own; without
 					// its own mark its cost hides inside the gap between load_state
 					// and ts_extract_session.
@@ -1351,7 +1371,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				if err := s.fileLocalErr(); err != nil {
 					return nil, err
 				}
-				if !s.began {
+				if !s.began && !s.deferBegin {
 					return nil, fmt.Errorf("frozen Begin was not published before analysis")
 				}
 			} else {
@@ -1845,7 +1865,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		newFiles[path] = st
 	}
 
-	if !initial && (tsNoop || !hadTS) && !nonTSNeed && !s.began {
+	if !initial && (tsNoop || !hadTS) && !nonTSNeed && !s.began && !(s.deferBegin && len(s.replaceScope) > 0) {
 		s.skipPublish = true
 	}
 	tr.Mark("assemble_new_files", fmt.Sprintf("new=%d ts_noop=%v non_ts_need=%v skip=%v facts=%d", len(newFiles), tsNoop, nonTSNeed, s.skipPublish, len(allFacts)))
@@ -1989,18 +2009,31 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	if err := s.fileLocalErr(); err != nil {
 		return nil, err
 	}
+	ownerDigests := map[string]string{}
+	if s.opts.ChangedOwnersOnly && s.state != nil && s.state.OwnerDigestVersion == ownerDigestVersion {
+		for key, value := range s.state.OwnerDigests {
+			ownerDigests[key] = value
+		}
+	}
+	if s.deferBegin {
+		if err := s.narrowPublishedOwners(grouped, idx, ownerDigests); err != nil {
+			return nil, err
+		}
+		tr.Mark("compare_owner_contributions", fmt.Sprintf("scope=%d", len(s.replaceScope)))
+	}
 	inScope := map[string]bool{}
 	for _, o := range s.replaceScope {
 		inScope[o.String()] = true
 	}
 	if !s.began {
-		if s.opts.AuthoritativeFiles {
+		if s.opts.AuthoritativeFiles && !s.deferBegin {
 			return nil, fmt.Errorf("frozen Begin was not published before analysis")
 		}
 		phase := graphstream.PhaseResolved
 		if forceAll || initial {
 			phase = graphstream.PhaseEpoch
 		}
+		s.deferBegin = false
 		if err := s.begin(ctx, runID, repoID, base, target, phase, graphstream.ScopeModeComplete, s.replaceScope); err != nil {
 			return nil, err
 		}
@@ -2024,6 +2057,13 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			continue
 		}
 		nodes, edges := encodeOwner(g, idx, false)
+		if s.opts.ChangedOwnersOnly {
+			digest, err := resolvedOwnerDigest(nodes, edges)
+			if err != nil {
+				return nil, err
+			}
+			ownerDigests[g.Owner.String()] = digest
+		}
 		if len(nodes) == 0 && len(edges) == 0 {
 			continue
 		}
@@ -2053,6 +2093,22 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	next := newState(repoID, s.opts.ContextID, s.abs, engine.ExtractorVersion())
 	if s.opts.AuthoritativeFiles {
 		next.Protocol = graphstream.FrozenSchemaVersion
+	}
+	if s.opts.ChangedOwnersOnly {
+		currentOwners := map[string]bool{}
+		for path := range newFiles {
+			currentOwners[(graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: filepath.ToSlash(path)}).String()] = true
+		}
+		for _, g := range grouped {
+			currentOwners[g.Owner.String()] = true
+		}
+		for key := range ownerDigests {
+			if !currentOwners[key] {
+				delete(ownerDigests, key)
+			}
+		}
+		next.OwnerDigestVersion = ownerDigestVersion
+		next.OwnerDigests = ownerDigests
 	}
 	next.Generation = target
 	next.ConfigHash = cfgHash
@@ -2117,14 +2173,22 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		s.work.CheckpointBytes = st.Size()
 	}
 	tr.Mark("write_pending_state", "")
+	classified := 0
+	for _, n := range invalidation.ParsedByReason {
+		classified += n
+	}
+	if remainder := stats.FilesParsed - classified; remainder > 0 {
+		invalidation.ParsedByReason["specialized extraction"] = remainder
+	}
 	if err := s.end(ctx, runID, s.seq, s.replaceScope, graphstream.Completeness{
-		Status:        "success",
-		FilesAnalyzed: len(inv.Files),
-		ParsedFiles:   stats.FilesParsed,
-		CachedFiles:   stats.CachedFiles,
-		SummaryScans:  stats.SummaryScans,
-		EarlyLocal:    earlyLocal > 0,
-		Fallbacks:     fallbacks,
+		ParsedByReason: invalidation.ParsedByReason,
+		Status:         "success",
+		FilesAnalyzed:  len(inv.Files),
+		ParsedFiles:    stats.FilesParsed,
+		CachedFiles:    stats.CachedFiles,
+		SummaryScans:   stats.SummaryScans,
+		EarlyLocal:     earlyLocal > 0,
+		Fallbacks:      fallbacks,
 	}); err != nil {
 		return nil, err
 	}
@@ -2147,13 +2211,6 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	s.stateFP = pendingFP
 	tr.Mark("promote_compact_state", fmt.Sprintf("parsed=%d published=%d", stats.FilesParsed, published))
 
-	classified := 0
-	for _, n := range invalidation.ParsedByReason {
-		classified += n
-	}
-	if remainder := stats.FilesParsed - classified; remainder > 0 {
-		invalidation.ParsedByReason["specialized extraction"] = remainder
-	}
 	return &Result{
 		Invalidation:     invalidation,
 		RunID:            runID,
@@ -2199,6 +2256,9 @@ func chunkOwner(nodes []graphstream.Node, edges []graphstream.Edge, limit int) [
 }
 
 func (s *session) begin(ctx context.Context, runID, repoID string, base, target int64, phase, scopeMode string, owners []graphstream.OwnerRef) error {
+	if s.deferBegin {
+		return nil
+	}
 	if s.opts.AuthoritativeFiles && s.began {
 		return s.fileLocalErr()
 	}
@@ -2990,7 +3050,7 @@ type frozenPreview struct {
 // reads source bytes and the fixed session filename context, never another
 // file's record, so a file parsed in an early hop needs no reparse when a cycle
 // partner changes surface later.
-func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*FileState, files []string, hashes map[string]string, dirty, retired map[string]bool, angular bool) (map[string][]facts.Fact, *frozenPreview, error) {
+func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*FileState, files []string, hashes map[string]string, dirty, retired map[string]bool, seedReasons map[string]string, angular bool) (map[string][]facts.Fact, *frozenPreview, error) {
 	out := map[string][]facts.Fact{}
 	if len(dirty) == 0 {
 		return out, nil, nil
@@ -3034,8 +3094,11 @@ func (s *session) prepareFrozenTS(ctx context.Context, prevFiles map[string]*Fil
 		if h, _ := lookupHash(hashes, id); prev.Hash != h {
 			return "source content"
 		}
+		if reason := seedReasons[id]; reason != "" {
+			return reason
+		}
 		if seed[id] {
-			return "file semantic context"
+			return "dependency invalidation"
 		}
 		return "resolution"
 	}

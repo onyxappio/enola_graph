@@ -1,0 +1,82 @@
+# Experimental changed-owner scope and quiet watch
+
+Status: experimental candidate branch; no Product speed acceptance and no publication to main.
+Base: 674cf84dadc07e745f502eb0d004a877feb6e02b.
+
+## Correctness evidence
+
+- Existing selective suite for changed-owner filtering, parse-reason accounting and default frozen Begin ordering passed (graphsession 3.406 s).
+- `TestChangedOwnerScopeMigratesLegacyAndRenames` passed (package 4.549 s): legacy fingerprints are unknown and publish conservatively; subsequent comment-only edit announces zero owners; identical inputs publish nothing and do not advance generation; rename plus rewritten importer includes removed/new/importer contributions. Applied graph equals fresh analysis after each edit.
+- Negative control: same migration test with ChangedOwnersOnly disabled through a Go overlay failed as expected: `neutral edit published 1 owners` (package 2.834 s). Source runtime was unchanged for this control.
+- `go test ./internal/graphsession -run '^TestWatchQuiet' -count=1` passed (package 0.751 s): quiet-window reset, fixed maximum wait under continuous saves, cancellation, and collection of repeated/multiple saves during active apply into the following batch with contiguous sequence coverage.
+- `git diff --check` passed.
+
+These durations are test package runtimes, not Product latency measurements. The three-package full test command was still live at this checkpoint; new migration and apply-boundary tests were added after its compilation and are covered by the separate commands above.
+
+## Remaining acceptance
+
+Sink failure/replay/state promotion and profile/config transition coverage; Product frozen-scope and exact cold equality replay; actual bytes/owners/parses and repeated latency/memory measurements; delete/rename semantic-context profiling and safe reparse reduction; complete repository validation and cumulative report before publication.
+
+Publication filtering alone does not reduce analysis scope or prove a faster delta. The experimental option defers delta Begin until resolved contributions are known; default authoritative behavior retains Begin before analysis. Graph-neutral changed inputs may emit an empty generation; identical-input no-op must remain completely silent.
+
+## Delivery and package checkpoint
+
+- `TestChangedOwnerScopeEndFailureKeepsConfirmedDigests` passed (package 2.414 s): injected End delivery failure leaves confirmed state bytes unchanged and pending checkpoint present; retry replays the identical End payload/ID; applied graph equals cold; subsequent no-op remains silent.
+- Three-package full command completed exit 0: graphsession 541.962 s, graphstream 24.545 s, command 8.110 s. Migration, apply-boundary, and End-failure tests added during that run were validated separately as noted above.
+- Experimental binary built successfully at `/tmp/enola-watch-fanout-experimental` for the Product correctness/fanout diagnostic. This is not an acceptance timing run.
+
+## Parse-reason correction and Product diagnostic
+
+The deletion preview labeled every unchanged seed `file semantic context`, including reverse-closed dependencies. The archived Product deletion had ContextAffectedSources=0 but 2,406 parses with that label. This is misleading attribution, not evidence that every file's configuration changed. The candidate now preserves explicit semantic-context and changed-import-resolution seed reasons and labels other preclosed seeds `dependency invalidation`. Planning and parse membership are unchanged by this reporting fix.
+
+`go test ./internal/graphsession -run '^Test(DeleteParseReasons|ChangedOwnerScope|StreamReportsActualParseReason)' -count=1` passed (6.337 s). The new delete fixture verifies no false semantic-context claim in Result or End and exact cold graph equality.
+
+Product diagnostic binary SHA-256: `f0d99f47b80f5d98133763e4f1ee58904fbe0f79fff5ff380ac0eceaa2888d86`. It predates the reporting-only correction above. Source fixture tree `ef25879298f8dfa14e2bc2f70f6a26a5aad46359` was copied cleanly to an isolated candidate-product directory.
+
+First harness attempt: initial full-field cold parity passed; harness then failed with KeyError on omitted empty owner_scope for a graph-neutral literal change. Evidence retained in candidate-results. Corrected harness interprets absent/null scope as empty, consistent with protocol omission, and starts a fresh independent chain in candidate-results-v2. No runtime fix was needed for this harness failure. The replacement harness remains a diagnostic, not a quiet performance acceptance series.
+
+Negative control for reason attribution restored the old seed label via overlay and failed as intended (`dependency work mislabeled: map[file semantic context:2]`, package 2.124 s).
+
+First completed Product delta in v2: literal edit publishes zero owners/batches/facts, 1,197 event bytes (Begin/End); exact full-field cold parity passes. Prior same-fixture baseline published 344 unchanged owner contributions. This proves wire reduction for this scenario, not timing acceptance or reduced parsing.
+
+## Direct-reader delete seed experiment
+
+The delete path previously reverse-closed all dependents before the preview could compare observed surfaces. Both the preview seed and extraction invalidator now seed direct imports/side readers, then use the existing fixed-point surface, name-resolution and side-read checks to grow work. The file-owner replacement planner remains conservative. No new durable relationship index is introduced.
+
+`TestDeleteKeepsUnchangedTransitiveConsumerCached` passed (1.578 s): deleting a source reparses its one direct importer but reuses an unchanged transitive consumer, with exact cold graph equality. Reinstating the previous reverse-closure seed through an overlay makes this test fail (two parses; package 1.293 s). Expanded deletion/rename/membership/frozen/rebind/side-read regression command is running; this experiment is not yet accepted or present in the running Product binary.
+
+Additional Product v2 wire results (binary before reason/delete-seed changes), all exact full-field cold parity passed: new export 1 owner/4,437 bytes; add barrel entry and source 2 owners/19,245 bytes; remove barrel entry 1 owner/17,642 bytes; delete unreferenced source 1 empty replacement/1,272 bytes.
+
+State storage snapshot after these cases: 6,301 digest entries, compact JSON 898,250 bytes (~0.857 MiB); complete state file 70,755,436 bytes. This is serialized storage, not resident or peak-memory measurement. Keys include owner identities; digests do not encode adjacency lists or version history.
+
+## Completed Product wire diagnostic
+
+All 10 rows completed, nine exact cold comparisons passed, final no-op parsed/published zero and retained state bytes/generation. The independently compiled reference consumer replay passed all ten rows too; archived results.json and reference-consumer-audit.json accompany this report.
+
+Same-fixture wire comparison: export 346 -> 1 owner and 10,222,709 -> 4,437 bytes; deletion while still re-exported 2,407 -> 2 owners and 40,404,846 -> 18,371 bytes. Deletion still parsed 2,406 files in this binary: no parse-speed claim.
+
+Expanded direct-reader experiment initially failed two existing regressions (168.147 s): rename conservative scope lost top.ts and Nuxt composition fallback was absent. Fixed by retaining reverse-closed owner scope independently of parse scope, plus conservative reached framework/nonreplayable parse seeds. Both regressions and the one-direct-reader reduction test now pass together (2.413 s). A new complete three-package test run is live; no acceptance yet for this source revision.
+
+## Comparison and digest checks
+
+`wire-comparison.json` records completed baseline/candidate scenario counters using compare.py, which rejects incomplete chains, failed cold parity or non-silent no-op. It deliberately excludes timing acceptance claims.
+
+`TestOwnerDigestPreservesWireDifferences` passed (0.468 s): properties, source location, resolved target/status, occurrence and multiplicity affect the digest; record ordering alone does not. A negative-control overlay stripping properties failed specifically on the property case (0.494 s).
+
+Added an optional `ENOLA_GRAPH_PROFILE` phase marker `compare_owner_contributions` to separate fingerprint comparison from late Begin publication. This instrumentation line was added after the current full package run and v3 binary compilation; their evidence applies to the prior runtime without that marker. No extraction/planning behavior changed with the marker.
+
+## Source review and mode-transition coverage
+
+Retained Astra reviewer performed source-only review (no heavy commands or edits): no confirmed blocker in digest recovery or narrowed deletion planning; requested mode ON/OFF/ON and framework deletion parity coverage. Empty changed-input graph-neutral generations remain an explicitly documented design limitation, not an identical-input no-op claim.
+
+`TestChangedOwnerModeToggleDiscardsStaleDigests` passed (2.192 s): enabled initial -> disabled publication of an added export -> enabled restoration of original source. The disabled publication clears fingerprint proof, so the restored graph is not incorrectly suppressed against an obsolete digest; cold equality and subsequent silent no-op pass.
+
+Profile-marker smoke check with ENOLA_GRAPH_PROFILE=1 and TestChangedOwnerScopeSkipsIdenticalDependents passed (5.065 s); compare_owner_contributions is emitted for delta comparison. The rounded 0.000 s fixture values are not a Product cost bound.
+
+New Product direct-reader binary SHA-256: f11cf44bb97caf2f0c7a910d588baf61fda2a48f1fc8ac4df1e4844142eed26e. It excludes the later profiling marker and added tests; functional extraction/delivery source corresponds to the full package run currently in progress.
+
+## Direct-reader Product checkpoint
+
+The v3 re-exported deletion passed full-field cold equality with 346 parses instead of v2's 2,406 (85.6% fewer). Reasons: 1 changed import resolution, 343 dependency invalidation, 2 subsequent resolution. Published scope stays two owners. Observed single-run times (17.17 s vs 15.04 s) are under concurrent correctness workloads, not accepted speed evidence.
+
+The revised complete package run passed: graphsession 496.484 s, graphstream 25.208 s, command 7.772 s. Later tests/trace marker have their separate results above. Full `go test ./...` is now running against current source; v3 awaits final no-op and independent consumer replay before completion.

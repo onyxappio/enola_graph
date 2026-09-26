@@ -1,0 +1,62 @@
+[
+  {
+    "canonical_sha256": "d2316af8e4936754b738d779016d7d4aa2fc7cbf73f9079e51d27033ffaf90a4",
+    "generation": 1,
+    "label": "00-initial",
+    "pass": true
+  },
+  {
+    "canonical_sha256": "d2316af8e4936754b738d779016d7d4aa2fc7cbf73f9079e51d27033ffaf90a4",
+    "generation": 2,
+    "label": "01-literal",
+    "pass": true
+  },
+  {
+    "canonical_sha256": "a4878e4d2d30cfc8b9b437bee37899370297837b01da7524d90e069d2ef1bd8b",
+    "generation": 3,
+    "label": "02-export",
+    "pass": true
+  },
+  {
+    "canonical_sha256": "a9e0bef174337ba4d8dde4e2b94e5d68444836c607a75a00bcb171498f34aab0",
+    "generation": 4,
+    "label": "03-add-barrel",
+    "pass": true
+  },
+  {
+    "canonical_sha256": "0206a387a7acd1331404c132efae9aca1b96d58cac1edb41a5ae368b2293f86b",
+    "generation": 5,
+    "label": "04-remove-barrel",
+    "pass": true
+  },
+  {
+    "canonical_sha256": "a4878e4d2d30cfc8b9b437bee37899370297837b01da7524d90e069d2ef1bd8b",
+    "generation": 6,
+    "label": "05-delete-unreferenced",
+    "pass": true
+  },
+  {
+    "canonical_sha256": "a9e0bef174337ba4d8dde4e2b94e5d68444836c607a75a00bcb171498f34aab0",
+    "generation": 7,
+    "label": "06a-restore-barrel",
+    "pass": true
+  },
+  {
+    "canonical_sha256": "52901cbbe55dbcbf571b1d33b9f520d54ad59fecf1818aa3e95e969a6800893a",
+    "generation": 8,
+    "label": "06b-delete-reexported",
+    "pass": true
+  },
+  {
+    "canonical_sha256": "fc7685134d12c923e2cca4626c5f90b70098346d14e9e7e3296234dcf92fdb88",
+    "generation": 9,
+    "label": "07-add-standalone",
+    "pass": true
+  },
+  {
+    "canonical_sha256": "fc7685134d12c923e2cca4626c5f90b70098346d14e9e7e3296234dcf92fdb88",
+    "generation": 9,
+    "label": "08-noop",
+    "pass": true
+  }
+]

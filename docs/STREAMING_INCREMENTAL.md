@@ -244,3 +244,50 @@ pending completed generation before deriving a subsequent delta from it.
 Use a deliberately slow sink to prove that extraction and delivery overlap within
 bounded memory/disk limits. The completion barrier must still wait for all broker
 acknowledgments and propagate delivery errors.
+
+### Experimental changed-owner delta scope
+
+`--authoritative-scope --changed-owner-scope` keeps the v2 wire envelope but
+changes delta ordering: finish analysis/resolution, compare complete encoded
+owner contributions, then freeze the changed-owner manifest on Begin. Initial
+analysis retains the existing ordering. The default authoritative mode still
+announces the conservative plan before extraction.
+
+Analysis scope and publication scope are distinct. The conservative planner
+still bounds extraction and resolution; it is not weakened by this option.
+Fingerprints include every encoded node and edge field, including occurrence,
+properties and resolved targets, and ignore only record ordering. They are saved
+in the same pending generation as analysis state and promoted only after End is
+acknowledged. Unknown or versionless fingerprints do not prove equality and
+therefore conservatively publish that owner. A removed contribution is an empty
+replacement. An input edit with an unchanged graph can currently publish an empty
+Begin/End generation; identical inputs remain fully silent.
+
+This changes when a consumer first sees Begin for a delta; it does not add an
+`unchanged` opcode or permit omitted content for an announced owner. Initial
+streaming, durable replay, pending-state recovery and bounded publication remain
+required acceptance checks. This mode is experimental until full validation and
+real Product fan-out measurements complete.
+
+Successful End completeness now optionally includes `parsed_by_reason`, the same
+aggregate extraction counters as the CLI result. These count parsing work, not
+per-owner publication reasons, changed facts or database writes.
+
+For watch, `--watch-quiet 250ms --watch-max-wait 2s` enables a quiet period reset by
+new change notifications, capped from the first notification. With quiet disabled,
+`--watch-every` retains its fixed collection window. Without an explicit max wait,
+quiet mode uses `--watch-every` as its cap. Events are drained as a union; changes
+arriving during a running transaction remain queued for the next cycle.
+
+Deletion reparsing seeds direct importers and recorded side readers, then expands
+through the existing observed-surface and resolution checks until stable. This is
+not a one-hop invalidation limit: subsequent changes and unproven consumers still
+expand work. Reached framework composition records retain conservative reparsing.
+The replacement planner separately retains the reverse-closed file-owner domain;
+only the opt-in contribution comparison can narrow the published manifest after
+complete analysis. No additional durable symbol or relationship index is added.
+
+Preview counters distinguish `changed import resolution`, `dependency invalidation`
+and actual `file semantic context` changes. Earlier builds labeled every unchanged
+preview seed as semantic context, including deletion's reverse dependency closure;
+those older counts cannot be interpreted as a count of configuration changes.

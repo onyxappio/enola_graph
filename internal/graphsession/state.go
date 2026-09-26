@@ -19,18 +19,20 @@ const claimedScanVersion = "claimed-v1"
 
 // State is durable analysis state for one (repo, context) pair.
 type State struct {
-	Protocol          string            `json:"protocol,omitempty"`
-	Schema            string            `json:"schema"`
-	ExtractorVersion  string            `json:"extractor_version"`
-	RepoID            string            `json:"repo_id"`
-	ContextID         string            `json:"context_id"`
-	Checkout          string            `json:"checkout"`
-	SinkID            string            `json:"sink_id,omitempty"`
-	Generation        int64             `json:"generation"`
-	ConfigHash        string            `json:"config_hash,omitempty"`
-	EngineContextHash string            `json:"engine_context_hash,omitempty"`
-	TSContext         map[string]string `json:"ts_context,omitempty"`
-	TSFileContext     map[string]string `json:"ts_file_context,omitempty"`
+	OwnerDigestVersion string            `json:"owner_digest_version,omitempty"`
+	OwnerDigests       map[string]string `json:"owner_digests,omitempty"`
+	Protocol           string            `json:"protocol,omitempty"`
+	Schema             string            `json:"schema"`
+	ExtractorVersion   string            `json:"extractor_version"`
+	RepoID             string            `json:"repo_id"`
+	ContextID          string            `json:"context_id"`
+	Checkout           string            `json:"checkout"`
+	SinkID             string            `json:"sink_id,omitempty"`
+	Generation         int64             `json:"generation"`
+	ConfigHash         string            `json:"config_hash,omitempty"`
+	EngineContextHash  string            `json:"engine_context_hash,omitempty"`
+	TSContext          map[string]string `json:"ts_context,omitempty"`
+	TSFileContext      map[string]string `json:"ts_file_context,omitempty"`
 	// TSFileBase is the part of each file's TypeScript context that does not
 	// depend on the alias declarations, which are answered per key instead. It
 	// is meaningful only alongside TSAliasMeta: an absent map is indistinguishable
