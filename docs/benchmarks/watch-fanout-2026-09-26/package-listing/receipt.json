@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-p",
+    "1",
+    "./internal/extractors/tsextractor",
+    "./internal/facts",
+    "-count=1"
+  ],
+  "exit": 0,
+  "wall_seconds": 29.62530583294574
+}

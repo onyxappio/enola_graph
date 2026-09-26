@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "go",
+    "test",
+    "-p",
+    "1",
+    "./internal/graphsession",
+    "-run",
+    "Test.*(Nuxt|Manifest|Discovery|Package)",
+    "-count=1"
+  ],
+  "exit": 0,
+  "wall_seconds": 81.96027733304072
+}
