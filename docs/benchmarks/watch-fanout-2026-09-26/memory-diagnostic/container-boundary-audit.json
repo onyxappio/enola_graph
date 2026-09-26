@@ -1,0 +1,89 @@
+{
+  "limitations": "Boundary observations only; do not establish continuous idleness or attribute swap events. Prior rejection verdicts unchanged.",
+  "observations": [
+    {
+      "cohort": "enola-fanout-nats-acceptance",
+      "file": "baseline-1-containers.log",
+      "source_sha256": "d5f179acf36b3732fcb76f0b6a43ee7222e7f48d5654dc835919e8eade1076bf",
+      "observation": "codata-memgraph-17689 0.07% 741.7MiB / 11.65GiB"
+    },
+    {
+      "cohort": "enola-fanout-nats-acceptance",
+      "file": "baseline-2-containers.log",
+      "source_sha256": "ef268e27031b9f5bd48350e539bd5f955a91939292c1b352fe955bd62250f798",
+      "observation": "codata-memgraph-17689 0.07% 741.7MiB / 11.65GiB"
+    },
+    {
+      "cohort": "enola-fanout-nats-acceptance",
+      "file": "baseline-3-containers.log",
+      "source_sha256": "e378649225e0929eb8546d76005fd97dd335fb3149a8a4d12854a76d8ba02a63",
+      "observation": "codata-memgraph-17689 0.08% 741.7MiB / 11.65GiB"
+    },
+    {
+      "cohort": "enola-fanout-nats-acceptance",
+      "file": "candidate-1-containers.log",
+      "source_sha256": "e9f578600a751213ac8b046a9b5356fa902a411718d223350cdfd208a2ff2bf0",
+      "observation": "codata-memgraph-17689 0.06% 741.7MiB / 11.65GiB"
+    },
+    {
+      "cohort": "enola-fanout-nats-acceptance",
+      "file": "candidate-2-containers.log",
+      "source_sha256": "0f4b022b339fbda082a7d84dc38a2e5a6e7d73f647d4c8ef59ce767a1eb5ac77",
+      "observation": "codata-memgraph-17689 0.05% 741.7MiB / 11.65GiB"
+    },
+    {
+      "cohort": "enola-fanout-nats-acceptance",
+      "file": "candidate-3-containers.log",
+      "source_sha256": "44d94d1c273b68d7c2f21c843e41cb10c975a1597f695a556b3acd635cf96d56",
+      "observation": "codata-memgraph-17689 0.04% 741.7MiB / 11.65GiB"
+    },
+    {
+      "cohort": "enola-fanout-nats-acceptance",
+      "file": "control-1-containers.log",
+      "source_sha256": "8fcba6e264c808ef2b4cd4c2f0e444a73dffb2bfcd76ea47a03096bd24a1289f",
+      "observation": "codata-memgraph-17689 0.03% 741.7MiB / 11.65GiB"
+    },
+    {
+      "cohort": "enola-fanout-nats-acceptance",
+      "file": "control-2-containers.log",
+      "source_sha256": "998fbb26dbf3470745774c6979f42d985c8f08f34a31ddbb106e3dc7339d7886",
+      "observation": "codata-memgraph-17689 0.46% 741.7MiB / 11.65GiB"
+    },
+    {
+      "cohort": "enola-fanout-nats-acceptance",
+      "file": "control-3-containers.log",
+      "source_sha256": "ad212a5cf3ec96c18b3c94ad03452d9fb4f6dcdf051a26389e507b56d0858ade",
+      "observation": "codata-memgraph-17689 0.05% 741.7MiB / 11.65GiB"
+    },
+    {
+      "cohort": "enola-fanout-state-encode-acceptance",
+      "file": "baseline-1-containers.log",
+      "source_sha256": "2568578c3293d9f66fd0fb9e8a772cb1fea51bce138a04c7d3db2a41e73a4f3b",
+      "observation": "codata-memgraph-17689 0.04% 741.7MiB / 11.65GiB"
+    },
+    {
+      "cohort": "enola-fanout-state-encode-acceptance",
+      "file": "control-1-containers.log",
+      "source_sha256": "4f8c0e7dd28600d75d20e0e3c77f8c9497328768ba0826572ed532b5834e32f4",
+      "observation": "codata-memgraph-17689 0.04% 741.7MiB / 11.65GiB"
+    },
+    {
+      "cohort": "enola-fanout-state-encode-clean-host",
+      "file": "baseline-1-containers.log",
+      "source_sha256": "23f68c5a1137d5484dfbf771d125f90d2a69941d4817669e7d45e8db9c44805a",
+      "observation": "codata-memgraph-17689 0.06% 741.7MiB / 11.65GiB"
+    },
+    {
+      "cohort": "enola-fanout-state-encode-clean-host",
+      "file": "candidate-1-containers.log",
+      "source_sha256": "5a04e73ba5bc6245e6b4c51cc71e049b185b00a8d9e630ca8e2ea02dfb6f7a67",
+      "observation": "codata-memgraph-17689 0.06% 741.7MiB / 11.65GiB"
+    },
+    {
+      "cohort": "enola-fanout-state-encode-clean-host",
+      "file": "control-1-containers.log",
+      "source_sha256": "d7daf2fe3013b7e24a780ea574d69417d9afefb55e070f8a9d947be998185b48",
+      "observation": "codata-memgraph-17689 0.07% 741.7MiB / 11.65GiB"
+    }
+  ]
+}
