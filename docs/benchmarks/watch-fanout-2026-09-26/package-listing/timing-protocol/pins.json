@@ -1,0 +1,56 @@
+{
+  "product_path": "/tmp/enola-fanout-current-20260926/candidate-product",
+  "product_sha": "01baa6eb0cc2ea74018eafc07e230a29d4efa8f4",
+  "files": {
+    "/tmp/enola-stage14-watch-pairs/watch.py": "629fae95963c62b83df4acdc2ea5d6438dd114d67bbca2425b96416eda7538cb",
+    "/tmp/enola-stage9-product-watch-control/bin/benchobserver": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+    "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/run.py": "94caf3654e6283630dca8fbaa558c447d2cb1aade55f7b1bfc406cfba9d14c79",
+    "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/product-graph-scope.yaml": "b81b19598dd74c63084ae11488cb7f4fa7df783b0887d2c42dcf61dc67890bf7",
+    "/tmp/enola-toolchain/bin/nats-server": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af",
+    "/tmp/enola-package-listing-balanced/cli-pairs/run-arm.py": "9994b16eb64e5a516100c3591e304cae8c7bf18f4816e29098996f617556259e",
+    "/tmp/enola-package-listing-balanced/cli-pairs/cli.py": "f944ff5e2bf647241e7da60cbe80126e0c59da606e09ab19d91a27e5735f052f",
+    "/tmp/enola-package-listing-balanced/cli-pairs/harness_support.py": "95d70a9e3e3a0986fd8a1684524a8c9f2205df5529786979d08376abb46e4cac",
+    "/tmp/enola-package-listing-balanced/cli-pairs/validate_results.py": "b5de7c929628e280373087ddeccd36f7946096e0c6326d9c91b4e7f4984799bf",
+    "/tmp/enola-package-listing-balanced/run-timing-series.py": "9e0140569635c1fa1e84b70930437a137d5da807a9051e61f645b44a16b3935b",
+    "/tmp/enola-package-listing-balanced/summarize-timing.py": "78cf586a0336959f822fb28892f3b7a21cad92c5c1241f7a2f4c385261e4725a",
+    "/tmp/enola-package-listing-balanced/test-timing-summary.py": "ff29065088230c4e947a5572482d763ca47e18c50f0ea5f4f3fea95d3deb1f4a",
+    "/tmp/enola-package-listing-balanced/background_gate.py": "f2f0cad3d42f42f8a242b33d16293b5e9c79877dc385f0a91050ffa8d280ffbf",
+    "/tmp/enola-package-listing-balanced/timing_gate.py": "f0451416248f8a232435f618a6ac276d632d5cba63485282d7234b55cbbdb039",
+    "/tmp/enola-package-listing-balanced/test_background_gate.py": "7cc6921f2044d58d14a44d24f9edddebb8218ac119ac544efe5a6a9e47e5ffef",
+    "/tmp/enola-package-listing-balanced/collect-background-preflight.py": "99edb1fd96b76e11cd16f331e189f2411c42c1a60bd3142f655be7cb259aece2",
+    "/tmp/enola-package-listing-balanced/PROMOTION_RULE.md": "707b0aea6bbba809d71a2b98050ea40d753139b89304a3444abccc891db98d10",
+    "/tmp/enola-package-listing-balanced/test-current-roster.py": "00af796f25902dadd01ba774bb22d0e26fa813fa9e438e373bf0feaccf41b8b2",
+    "/tmp/enola-package-listing-balanced/memory_gate.py": "13951a87e3310f2a765a0acdf670de87c866e8568049430b0d2ab56d95215208",
+    "/tmp/enola-package-listing-balanced/pressure_monitor.py": "6434d99c04785c62157cd869ef2fdd3d2914a740eaaa04cd5a1489de9051b908",
+    "/tmp/enola-package-listing-balanced/test_pressure_monitor.py": "cd8d4b31055be0699892f32a5027858db527ca8906d0b5f6e0e75960bc40cff2"
+  },
+  "binaries": {
+    "baseline": {
+      "path": "/tmp/enola-stage22-root-acceptance/enola-stage22-experimental",
+      "sha256": "a3c19dc902f80248cc14d0e7669bf8c0067d779bd6709741ab756ac7146986d1"
+    },
+    "candidate": {
+      "path": "/tmp/enola-package-listing-proof/enola-package-listing-experimental",
+      "sha256": "838b838839f78dc1b315462510926965d6b1f30419a5adc435494644846c51f3"
+    },
+    "control": {
+      "path": "/tmp/enola-fanout-stage24-combined/enola-combined-experimental",
+      "sha256": "1a6ef346bfbbdd78050e92694eee9f375bc21c933f296a199742f757d85efaf1"
+    }
+  },
+  "baseline_revision": "674cf84",
+  "baseline_runtime": "c75e33e",
+  "experimental_checkpoint": "Stage22 baseline versus bd0ef00 combined candidate; prospective six-pair timing, not accepted",
+  "not_final_acceptance": true,
+  "nats_max_payload": 8388608,
+  "combined_source_revision": "bd0ef006f4fbf702a4976e7ac093aaa4a239a6b6",
+  "binary_build_note": "Clean committed bd0ef00; separate correctness experiment, unchanged prior timing pins.",
+  "runtime_environment": {
+    "GOGC": null,
+    "GOMEMLIMIT": null,
+    "GOMAXPROCS": null,
+    "GODEBUG": null,
+    "ENOLA_GRAPH_PROFILE": null
+  },
+  "environment_change": "New prospective six-pair protocol: sampled pressure/zero Swapouts; Swapins context only. No prior samples reused."
+}
