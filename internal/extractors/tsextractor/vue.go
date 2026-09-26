@@ -310,7 +310,11 @@ func FileNuxtScope(disc *Discovery, relFile string) string {
 
 func hasPkgDependency(ctx context.Context, dir, pkg string, inputScopes ...*inputscope.Scope) bool {
 	inputScope := inputscope.First(inputScopes)
-	data, err := overlayReadFile(ctx, filepath.Join(dir, "package.json"), inputScope)
+	path := filepath.Join(dir, "package.json")
+	if packageManifestAbsentFromListing(ctx, dir, path, inputScope) {
+		return false
+	}
+	data, err := overlayReadFile(ctx, path, inputScope)
 	if err != nil {
 		return false
 	}
@@ -326,6 +330,42 @@ func hasPkgDependency(ctx context.Context, dir, pkg string, inputScopes ...*inpu
 		}
 	}
 	return false
+}
+
+// Reuse a completed discovery listing only for an uncaptured absent manifest.
+// Captured bytes, folded names, policy refusals and unknown listings retain the
+// original reader. Keep its missing-read observation for the transaction fence.
+func packageManifestAbsentFromListing(ctx context.Context, dir, path string, scope *inputscope.Scope) bool {
+	if scope == nil || scope.Policy == nil || !scope.Allowed(path, false) {
+		return false
+	}
+	probe := probeFrom(ctx)
+	if probe == nil {
+		return false
+	}
+	key := absOverlayKey(path)
+	if ctx != nil {
+		if ov, _ := ctx.Value(overlayKey{}).(*fileOverlay); ov != nil {
+			if _, captured := ov.byAbs[key]; captured {
+				return false
+			}
+		}
+	}
+	probe.mu.Lock()
+	defer probe.mu.Unlock()
+	names, complete := probe.dirs[absOverlayKey(dir)]
+	if !complete {
+		return false
+	}
+	for name := range names {
+		if strings.EqualFold(name, "package.json") {
+			return false
+		}
+	}
+	if _, recorded := probe.seen[key]; !recorded {
+		probe.seen[key] = observedMissing
+	}
+	return true
 }
 
 // detectNuxtRoute checks if a .vue file path corresponds to a Nuxt route.
