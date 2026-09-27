@@ -1,0 +1,4 @@
+package main
+import("encoding/json";"fmt";"go/scanner";"go/token";"os";"reflect")
+func tokens(p string) []string { b,e:=os.ReadFile(p);if e!=nil{panic(e)};fs:=token.NewFileSet();var s scanner.Scanner;s.Init(fs.AddFile(p,-1,len(b)),b,func(pos token.Position,msg string){panic(msg)},0);var out []string;for{_,t,l:=s.Scan();if t==token.EOF{break};out=append(out,fmt.Sprintf("%d:%s",t,l))};return out }
+func main(){if len(os.Args)!=5{panic("four paths required")};results:=map[string]bool{};for i:=1;i<5;i+=2{same:=reflect.DeepEqual(tokens(os.Args[i]),tokens(os.Args[i+1]));results[os.Args[i+1]]=same;if !same{panic("non-comment token mismatch")}};json.NewEncoder(os.Stdout).Encode(results)}
