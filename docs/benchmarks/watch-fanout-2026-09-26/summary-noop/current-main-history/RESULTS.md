@@ -10,6 +10,8 @@ Initial parsed 6,749 files. Delta parsed 14 files: four source-content changes a
 
 This demonstrates bounded actual parsing for this mixed transition; it does not imply the frozen replacement owner scope is 14 files, nor establish latency. Full receipt: receipt-recent.json.
 
-## Broad transition — running
+## Broad transition — passed
 
-The older a609c19f → fba38bab transition has 8,462 changed Git paths and six manifest paths. Its independent correctness run is in progress; no result claimed yet.
+The older a609c19f → fba38bab transition has 8,462 changed Git paths and six manifest paths. All eight CLI calls and both revision gates passed: accumulated/cold candidate/baseline graph equality, zero-event/zero-parse no-ops and byte-identical no-op state. Base initial parsed 6,716 files; target cold analysis parsed 6,749. Delta parsed 1,454 files. Detailed invalidation reasons and graph hashes are in receipt-broad.json. These parse counts do not establish a timing result.
+
+Broad delta reasons: 84 added sources, 232 content changes, 1,138 resolution dependents; 51 source removals. The frozen owner scope conservatively broadened to all prior/current owners because Python candidate names could not be bounded before Begin. Cached facts limited actual parsing; this is not a narrow replacement-scope result.

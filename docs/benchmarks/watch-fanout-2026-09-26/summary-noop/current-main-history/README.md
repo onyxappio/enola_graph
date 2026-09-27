@@ -6,4 +6,4 @@ Recent interval contains nine Git paths, including four TS source/test files, tw
 
 This harness preserves eight calls, all required pins, clean checkout, no-op, consumer and cold/baseline graph gates. The explicit pinned relation for these intervals is ancestor-endpoints: merge-base --is-ancestor must pass and endpoints must differ. It does not pretend they are adjacent first-parent commits. Older adjacent-history harness/results are unchanged.
 
-Prepared only; no history run or timing acceptance yet. Wait until no quiet timing interval is active before starting this correctness-only work.
+Both current-main history scenarios now passed, 16 CLI calls total; see RESULTS.md and the two receipts. No timing acceptance is claimed.
