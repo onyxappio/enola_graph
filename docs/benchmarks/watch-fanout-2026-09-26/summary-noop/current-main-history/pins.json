@@ -1,0 +1,20 @@
+{
+  "base": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "target": "fba38bab93c76a4da8df58cf45fd6847a468c315",
+  "base_tree": "b0308e5af59ec2ca97850f2a6da3ea1d38b6e190",
+  "target_tree": "aeb009e96c29b0758ee7dfe835e3dae80e2fb776",
+  "changed_paths": 8462,
+  "configuration_paths": [
+    "infra/pulumi/package.json",
+    "packages/checkout-vue/package.json",
+    "packages/observability/package.json",
+    "packages/tracking-client/package.json",
+    "services/payment-api/package.json",
+    "services/product-api/package.json"
+  ],
+  "source_head": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "source_clean": true,
+  "remote": "https://github.com/onyxappio/product",
+  "remote_ref": "refs/heads/main",
+  "ancestry": true
+}
