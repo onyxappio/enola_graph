@@ -1,0 +1,19 @@
+{
+  "result": {
+    "message": {
+      "id": "msg_4be56160f217",
+      "run_id": "run_4bc01fa14716",
+      "delivery_contract": "current_delivery",
+      "from_handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+      "to_handle": "run:run_4bc01fa14716",
+      "subject": "T-001 confirms new hold 15:50-16:55 UTC",
+      "body": "T-001 confirms no-heavy-work coverage for 2026-09-27 15:50-16:55 UTC. The Grok and Luna role terminals are idle; I have sent them the hold. No T-001 heavy job is active, and none will be started during the interval.",
+      "type": "status",
+      "priority": "normal",
+      "thread_id": null,
+      "payload": null,
+      "created_at": "2026-09-27T15:42:27Z",
+      "delivered_at": null
+    }
+  }
+}

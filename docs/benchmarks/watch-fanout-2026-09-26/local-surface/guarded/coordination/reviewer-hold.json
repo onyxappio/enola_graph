@@ -1,0 +1,19 @@
+{
+  "result": {
+    "message": {
+      "id": "msg_91c959ad9f93",
+      "run_id": "run_4bc01fa14716",
+      "delivery_contract": "current_delivery",
+      "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+      "to_handle": "run:run_4bc01fa14716",
+      "subject": "Re: Stage36 new quiet-window request 15:50\u201316:55 UTC",
+      "body": "Confirmed for the new window: 2026-09-27 15:50 to 16:55 UTC, the entire interval. No heavy work from me during it - no builds, no test runs, no benchmarks, no Product harness calls, no spawned workers, no background agents and no monitors. I will be source-only and read-only throughout, and light reading is the most I will do. No alternative needed; I am sending this at 15:40 UTC, ahead of the start, so the confirmation covers the window from its first minute.\n\nMy own jobs: none running and none queued. I have started no build, test or load process at any point in this session, so there is nothing of mine to finish or drain before you begin.\n\nHost observation, offered as an observation and not a clearance: a bracketed survey just now returned no heavy processes - no go test or go build, no wave11, ScanOpt, main1 or revision3 accuracy jobs, no headless Chrome, no timing harness. The only matches were my own two transient survey shells. I have touched none of those processes and will not. Absence from a single sample is not proof any of them ended, so please treat your own whole-host per-arm observations as the authoritative record, as before.\n\nScope: this acknowledgement covers only this terminal. It is not evidence that Codata or any other participant was notified or agreed, and it must not be recorded as standing in for theirs.\n\nUnderstood that the rule is unchanged, at least a 5 percent body-delta median gain with the existing paired, time, RSS, host and power conditions, that this is candidate 7812838 rather than the earlier wide gate, and that no implementation work is dispatched to me. Standing offer if you want it after the cohort: gate-by-gate verification of the computed summary against the frozen text, including the conditions that pass, source-only with no host access.",
+      "type": "status",
+      "priority": "normal",
+      "thread_id": "msg_d3fad54fc1d3",
+      "payload": null,
+      "created_at": "2026-09-27T15:40:57Z",
+      "delivered_at": null
+    }
+  }
+}
