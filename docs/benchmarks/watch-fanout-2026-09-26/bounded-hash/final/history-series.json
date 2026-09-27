@@ -1,0 +1,23 @@
+[
+  {
+    "tag": "source",
+    "scenario": "source-only",
+    "start_utc": "2026-09-27T18:07:33.892290+00:00",
+    "exit": 0,
+    "end_utc": "2026-09-27T18:09:16.309618+00:00"
+  },
+  {
+    "tag": "recent",
+    "scenario": "recent-to-current",
+    "start_utc": "2026-09-27T18:09:16.309998+00:00",
+    "exit": 0,
+    "end_utc": "2026-09-27T18:10:44.268524+00:00"
+  },
+  {
+    "tag": "broad",
+    "scenario": "history-to-current",
+    "start_utc": "2026-09-27T18:10:44.268945+00:00",
+    "exit": 0,
+    "end_utc": "2026-09-27T18:12:15.400208+00:00"
+  }
+]
