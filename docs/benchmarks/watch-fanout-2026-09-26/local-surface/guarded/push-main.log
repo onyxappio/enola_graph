@@ -1,0 +1,9 @@
+pre-push: cacheVersion coverage guard…
+ok  	github.com/enola-labs/enola/internal/cachecov	0.531s
+pre-push: documentation conformance…
+ok  	github.com/enola-labs/enola/internal/docslint	0.953s
+pre-push: golden + determinism…
+ok  	github.com/enola-labs/enola/internal/engine	3.805s
+pre-push: OK
+To https://github.com/onyxappio/enola_graph.git
+   2b11e7d..9d49f49  HEAD -> main

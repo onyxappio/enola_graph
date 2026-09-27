@@ -42,3 +42,5 @@ Timing session10341 exited0, all12 arms completed; quiet window explicitly relea
 Pre-publication check: origin/main remains 2b11e7d2; no divergent commits. Pre-push hook completed exit0 (cache coverage, docslint, golden/determinism). Independent timing review pending. Cumulative HTML now records the measured body benefit without claiming publication.
 
 Independent review msg_6bad427439cc confirms every gate and no blocker. Pair6 contention and sensitivity (-8.41% without pair6), cache-enabled suite scope and frozen stale-purpose text documented in timing RESULTS. Stage36 accepted for normal main publication; overall startup/watch goal remains open.
+
+Published accepted Stage36 to origin/main as 9d49f49 via normal fast-forward push, pre-push all green. Runtime7812838; subsequent changes tests/docs only. Ten-cycle shared-host watch soak remains live in session2298, not timing acceptance.
