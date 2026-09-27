@@ -1,0 +1,22 @@
+{
+  "source": "550e1fa",
+  "clean_build_checkout": "02df91a",
+  "binary_sha256": "15f5589549dbebb0abb315f582d19ca708de137ea3efb3993ea91b04b4aa55f7",
+  "live_sessions": {
+    "full_suite": 74147,
+    "three_histories": 39077,
+    "cli_candidate_correctness": 22139
+  },
+  "quiet_interval_requested": "2026-09-27 17:10\u201317:55 UTC",
+  "quiet_ack_files": "../coordination/{fsm-ack,plugin-ack,reviewer-ack,codata-terminal-ack}.json",
+  "timing_started": false,
+  "pending": [
+    "final source review after guard",
+    "full suite and 3 histories",
+    "CLI final correctness validation and baseline cross-hash comparison",
+    "After CLI exits, fix cli-pairs/pins.json /tmp vs /private/tmp relocation (history pins already fixed); preserve old pin file and verify executable harness hashes identical across relocation, with only PROMOTION_RULE source-revision appendix different; do not use current stale-path pins for acceptance timing.",
+    "Capture traced fresh no-op from final binary proving ts_disc_alias_roots on path (after correctness run; do not mutate live state).",
+    "Create final acceptance and window only after prerequisites; run series within interval or release."
+  ],
+  "history_first_attempt": "failed before work creation: missing policy pin due /tmp symlink mapping; log retained; corrected-history session39077 active"
+}

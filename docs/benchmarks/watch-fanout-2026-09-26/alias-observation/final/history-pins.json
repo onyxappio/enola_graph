@@ -1,0 +1,30 @@
+{
+  "purpose": "experimental candidate correctness-only histories; no timing acceptance",
+  "source_revision": "550e1fa",
+  "files": {
+    "/private/tmp/enola-alias-observation/final/history-harness/gates.py": "73556a39e048d5873caf1cfe1dbbf3edbe156539f8377450b9e189690ccf3b2e",
+    "/private/tmp/enola-alias-observation/final/history-harness/gate-tests.py": "7268e65c70755382bac44f8244eeb35b16bc8dfa66192318019338ade9484e8a",
+    "/private/tmp/enola-alias-observation/final/history-harness/run-history.py": "bee376a3991326c2ced126380708c4123612c5fde21f1a681e54ec09db22a199",
+    "/private/tmp/enola-alias-observation/final/history-harness/SCENARIOS.json": "5656fa831f61d770aaf3a35ab5f56ac8fbf7a89323623fff1c637bf0759bf36c",
+    "/private/tmp/enola-alias-observation/final/test-inclusive-scope.yaml": "d7fcc27d5290935b7a660c92e75234009e320ae765fe6f6205832daabd0c5f9d",
+    "/private/tmp/enola-stage9-product-watch-control/bin/benchobserver": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+    "/private/tmp/enola-toolchain/bin/nats-server": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af",
+    "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/run.py": "94caf3654e6283630dca8fbaa558c447d2cb1aade55f7b1bfc406cfba9d14c79"
+  },
+  "binaries": {
+    "baseline": {
+      "path": "/tmp/enola-local-surface-guarded/enola-experimental",
+      "sha256": "f69bae0951bffec1fc9976e7c2fea7548d03f2ae56c62aa934c4a8d4275d08b1"
+    },
+    "control": {
+      "path": "/tmp/enola-local-surface-guarded/enola-experimental",
+      "sha256": "f69bae0951bffec1fc9976e7c2fea7548d03f2ae56c62aa934c4a8d4275d08b1"
+    },
+    "candidate": {
+      "path": "/tmp/enola-alias-observation/final/enola-experimental",
+      "sha256": "15f5589549dbebb0abb315f582d19ca708de137ea3efb3993ea91b04b4aa55f7"
+    }
+  },
+  "combined_source_revision": "550e1fa",
+  "build_checkout": "02df91a"
+}

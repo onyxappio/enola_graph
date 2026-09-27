@@ -1,0 +1,28 @@
+{
+  "correctness_accepted": true,
+  "source_revision": "550e1fa",
+  "build_checkout": "02df91a",
+  "binary_sha256": "15f5589549dbebb0abb315f582d19ca708de137ea3efb3993ea91b04b4aa55f7",
+  "source_review_message": "msg_e17585ec2edb",
+  "source_review": "source-review.json",
+  "suite": "full-suite-receipt.json",
+  "histories": [
+    {
+      "path": "/tmp/enola-alias-observation/final/history-source/receipt-source.json",
+      "sha256": "c9c3ebded171c70bae0988d8e8e88aeee2f4557f68783a3542abf2f2f66d3e4f",
+      "delta_parses": 3
+    },
+    {
+      "path": "/tmp/enola-alias-observation/final/history-recent/receipt-recent.json",
+      "sha256": "5754704e1eb87365a10c183429eb417fb08031389e7ec3050c1053abb77a5391",
+      "delta_parses": 14
+    },
+    {
+      "path": "/tmp/enola-alias-observation/final/history-broad/receipt-broad.json",
+      "sha256": "fee1817b224cb187aff63275910d4eaa4b98ef46f9876e623a8789c693c3c3e8",
+      "delta_parses": 1453
+    }
+  ],
+  "cli": "cli-cross-arm-validation.json",
+  "scope": "correctness prerequisites only; performance acceptance pending"
+}

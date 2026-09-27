@@ -1,0 +1,59 @@
+{
+  "exit": 0,
+  "purpose": "shared-host traced fresh no-op path proof; not timing acceptance",
+  "argv": [
+    "/private/tmp/enola-alias-observation/final/enola-experimental",
+    "graph",
+    "delta",
+    "--authoritative-scope",
+    "--changed-owner-scope",
+    "--max-begin-bytes",
+    "8000000",
+    "--repo-id",
+    "stage15-cli-product",
+    "--summary-json",
+    "--nats",
+    "nats://127.0.0.1:60220",
+    "--state-dir",
+    "/private/tmp/enola-alias-observation/final/noop-profile/state",
+    "--context",
+    "correctness-candidate-1-cold-original",
+    "/private/tmp/enola-alias-observation/final/cli-pairs/correctness-candidate-1/config.yaml"
+  ],
+  "state_unchanged": true,
+  "broker_info_unchanged": true,
+  "alias_phase_observed": true,
+  "result": [
+    {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {}
+      },
+      "RunID": "",
+      "BaseGeneration": 1,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 0,
+        "files_parsed": 0,
+        "cached_files": 6801,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 0,
+        "derived_indexes": 0,
+        "discovery_passes": 0
+      },
+      "Fallbacks": null,
+      "Unreadable": null,
+      "OwnersPublished": 0,
+      "ParsedFiles": 0,
+      "EarlyLocal": 0,
+      "Facts": null
+    }
+  ],
+  "binary_sha256": "15f5589549dbebb0abb315f582d19ca708de137ea3efb3993ea91b04b4aa55f7"
+}

@@ -1,0 +1,22 @@
+{
+  "exit": 0,
+  "session_id": 74147,
+  "runtime_revision": "550e1fa",
+  "clean_build_checkout": "02df91a",
+  "packages_passed": 110,
+  "packages_cached": 99,
+  "uncached": [
+    "ok  \tgithub.com/enola-labs/enola/internal/cachecov\t0.568s",
+    "ok  \tgithub.com/enola-labs/enola/internal/docslint\t2.080s",
+    "ok  \tgithub.com/enola-labs/enola/internal/engine\t46.339s",
+    "ok  \tgithub.com/enola-labs/enola/internal/explainers/messagingcoverage\t1.117s",
+    "ok  \tgithub.com/enola-labs/enola/internal/extractors/tsextractor\t39.607s",
+    "ok  \tgithub.com/enola-labs/enola/internal/facts\t4.354s",
+    "ok  \tgithub.com/enola-labs/enola/internal/graphsession\t512.044s",
+    "ok  \tgithub.com/enola-labs/enola/internal/intent\t4.489s",
+    "ok  \tgithub.com/enola-labs/enola/internal/server\t9.798s",
+    "ok  \tgithub.com/enola-labs/enola/pkg/bootstrap\t134.449s",
+    "ok  \tgithub.com/enola-labs/enola/pkg/command\t9.122s"
+  ],
+  "log_sha256": "9dba7767ab234f2b0fcd92e62e0cb3aff81d166db3ad3d088ad15468a6a3c996"
+}

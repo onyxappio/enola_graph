@@ -1,0 +1,31 @@
+[12566] 2026/09/27 20:13:41.326195 [INF] Starting nats-server
+[12566] 2026/09/27 20:13:41.326297 [INF]   Version:  2.11.9
+[12566] 2026/09/27 20:13:41.326305 [INF]   Git:      [not set]
+[12566] 2026/09/27 20:13:41.326309 [INF]   Name:     NALTXRXF7K25NWB3AONDNPFMGY6YJHMKNJRDI4R3CZ3G7AE6V7C3XOC5
+[12566] 2026/09/27 20:13:41.326316 [INF]   Node:     4L9bkgwh
+[12566] 2026/09/27 20:13:41.326319 [INF]   ID:       NALTXRXF7K25NWB3AONDNPFMGY6YJHMKNJRDI4R3CZ3G7AE6V7C3XOC5
+[12566] 2026/09/27 20:13:41.326332 [INF] Using configuration file: /private/tmp/enola-alias-observation/final/noop-profile-baseline/nats.conf (sha256:9b68b88186d2e93891e805e2390ad9f15f1154f101964609330cb090a969cb70)
+[12566] 2026/09/27 20:13:41.326479 [INF] Starting JetStream
+[12566] 2026/09/27 20:13:41.326665 [INF]     _ ___ _____ ___ _____ ___ ___   _   __  __
+[12566] 2026/09/27 20:13:41.326670 [INF]  _ | | __|_   _/ __|_   _| _ \ __| /_\ |  \/  |
+[12566] 2026/09/27 20:13:41.326673 [INF] | || | _|  | | \__ \ | | |   / _| / _ \| |\/| |
+[12566] 2026/09/27 20:13:41.326676 [INF]  \__/|___| |_| |___/ |_| |_|_\___/_/ \_\_|  |_|
+[12566] 2026/09/27 20:13:41.326679 [INF] 
+[12566] 2026/09/27 20:13:41.326682 [INF]          https://docs.nats.io/jetstream
+[12566] 2026/09/27 20:13:41.326684 [INF] 
+[12566] 2026/09/27 20:13:41.326687 [INF] ---------------- JETSTREAM ----------------
+[12566] 2026/09/27 20:13:41.326691 [INF]   Max Memory:      24.00 GB
+[12566] 2026/09/27 20:13:41.326694 [INF]   Max Storage:     105.47 GB
+[12566] 2026/09/27 20:13:41.326697 [INF]   Store Directory: "/private/tmp/enola-alias-observation/final/noop-profile-baseline/nats-store/jetstream"
+[12566] 2026/09/27 20:13:41.326700 [INF]   API Level:       1
+[12566] 2026/09/27 20:13:41.326703 [INF] -------------------------------------------
+[12566] 2026/09/27 20:13:41.327745 [INF]   Starting restore for stream '$G > ENOLA_GRAPH'
+[12566] 2026/09/27 20:13:41.328511 [INF]   Restored 12,337 messages for stream '$G > ENOLA_GRAPH' in 1ms
+[12566] 2026/09/27 20:13:41.328560 [INF]   Recovering 1 consumers for stream - '$G > ENOLA_GRAPH'
+[12566] 2026/09/27 20:13:41.329104 [INF] Listening for client connections on 127.0.0.1:60220
+[12566] 2026/09/27 20:13:41.329120 [INF] Server is ready
+[12566] 2026/09/27 20:13:43.816812 [INF] Trapped "terminated" signal
+[12566] 2026/09/27 20:13:43.816903 [INF] Initiating Shutdown...
+[12566] 2026/09/27 20:13:43.816916 [INF] Initiating JetStream Shutdown...
+[12566] 2026/09/27 20:13:43.816983 [INF] JetStream Shutdown
+[12566] 2026/09/27 20:13:43.817078 [INF] Server Exiting..

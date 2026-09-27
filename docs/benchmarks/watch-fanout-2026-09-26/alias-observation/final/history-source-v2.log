@@ -1,0 +1,19 @@
+CLONE /private/tmp/enola-alias-observation/final/history-source/work-source/product
+STEP 00-initial-585a910d
+RAN 001-00-initial-585a910d-chain 0 -> 1 parsed 6749
+RAN 002-00-initial-585a910d-noop 1 -> 1 parsed 0
+RAN 003-00-initial-585a910d-cold-candidate 0 -> 1 parsed 6749
+RAN 004-00-initial-585a910d-cold-baseline 0 -> 1 parsed 6749
+STEP-DONE 00-initial-585a910d accepted
+STEP 01-transition-3bee95af
+RAN 005-01-transition-3bee95af-chain 1 -> 2 parsed 3
+RAN 006-01-transition-3bee95af-noop 2 -> 2 parsed 0
+RAN 007-01-transition-3bee95af-cold-candidate 0 -> 1 parsed 6749
+RAN 008-01-transition-3bee95af-cold-baseline 0 -> 1 parsed 6749
+STEP-DONE 01-transition-3bee95af accepted
+{
+  "accepted": true,
+  "problems": [],
+  "baseline_claim": "baseline and candidate cold graph hashes are equal at every commit, from the same physical checkout, policy overlay and commit",
+  "receipt": "/private/tmp/enola-alias-observation/final/history-source/receipt-source.json"
+}

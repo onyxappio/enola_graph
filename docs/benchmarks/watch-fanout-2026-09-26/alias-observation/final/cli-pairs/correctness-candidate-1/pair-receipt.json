@@ -1,0 +1,641 @@
+{
+  "background_owner_pid": 93253,
+  "background_mode": null,
+  "background_errors": [],
+  "background_vectors": [],
+  "background_evidence": null,
+  "validation_error": null,
+  "all_checks_validated": true,
+  "arm": "candidate",
+  "repeat": 1,
+  "quiet_ack_message_id": null,
+  "exit": 0,
+  "competing_samples": [
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "89531 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "89531 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "89531 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "89531 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "89531 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "89531 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "89531 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "89531 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "89531 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "89531 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "89531 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "89531 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "96624 go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIForkThenDeltaParsesOnlyChangedFile3171964909/001/enola ./cmd/enola"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "89531 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "96624 go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIForkThenDeltaParsesOnlyChangedFile3171964909/001/enola ./cmd/enola",
+      "96646 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build1603386489/b001/exe/a.out -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build1603386489/b001/importcfg.link -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=a8JbLTvcUvZ2s7ha6fHI/SBpb9C7Fc6Kq8DJwWXIz/Rq0YVpH7MPDZXjAsFmiU/a8JbLTvcUvZ2s7ha6fHI -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/cf/cf778e0bb0d31bd6fb075bc876e027256c42396a3e5e3c0ff38139de0f9da3e8-d"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "89531 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "96624 go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIForkThenDeltaParsesOnlyChangedFile3171964909/001/enola ./cmd/enola",
+      "96646 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build1603386489/b001/exe/a.out -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build1603386489/b001/importcfg.link -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=a8JbLTvcUvZ2s7ha6fHI/SBpb9C7Fc6Kq8DJwWXIz/Rq0YVpH7MPDZXjAsFmiU/a8JbLTvcUvZ2s7ha6fHI -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/cf/cf778e0bb0d31bd6fb075bc876e027256c42396a3e5e3c0ff38139de0f9da3e8-d"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "96744 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIForkThenDeltaParsesOnlyChangedFile3171964909/001/enola graph analyze --context main --state-dir /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIForkThenDeltaParsesOnlyChangedFile3171964909/003 --events /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIForkThenDeltaParsesOnlyChangedFile3171964909/004/main.jsonl --json /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIForkThenDeltaParsesOnlyChangedFile3171964909/002"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97391 go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIFrozenMaxBeginBytesPublishesNothing2948421548/001/enola ./cmd/enola"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97391 go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIFrozenMaxBeginBytesPublishesNothing2948421548/001/enola ./cmd/enola",
+      "97405 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build1673128819/b001/exe/a.out -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build1673128819/b001/importcfg.link -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=a8JbLTvcUvZ2s7ha6fHI/SBpb9C7Fc6Kq8DJwWXIz/Rq0YVpH7MPDZXjAsFmiU/a8JbLTvcUvZ2s7ha6fHI -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/cf/cf778e0bb0d31bd6fb075bc876e027256c42396a3e5e3c0ff38139de0f9da3e8-d"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97391 go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIFrozenMaxBeginBytesPublishesNothing2948421548/001/enola ./cmd/enola",
+      "97405 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build1673128819/b001/exe/a.out -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build1673128819/b001/importcfg.link -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=a8JbLTvcUvZ2s7ha6fHI/SBpb9C7Fc6Kq8DJwWXIz/Rq0YVpH7MPDZXjAsFmiU/a8JbLTvcUvZ2s7ha6fHI -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/cf/cf778e0bb0d31bd6fb075bc876e027256c42396a3e5e3c0ff38139de0f9da3e8-d"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97459 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIFrozenMaxBeginBytesPublishesNothing2948421548/001/enola graph analyze --authoritative-scope --max-begin-bytes 1 --context cli-test --state-dir /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIFrozenMaxBeginBytesPublishesNothing2948421548/003 --events /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIFrozenMaxBeginBytesPublishesNothing2948421548/004/events.jsonl --json /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIFrozenMaxBeginBytesPublishesNothing2948421548/002"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "97725 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98837 /tmp/enola-alias-observation/final/enola-experimental graph delta --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98837 /tmp/enola-alias-observation/final/enola-experimental graph delta --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98837 /tmp/enola-alias-observation/final/enola-experimental graph delta --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "98928 /tmp/enola-alias-observation/final/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-candidate-00 --context test-inclusive-history-cold-candidate-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ],
+    [
+      "89243 go test ./...",
+      "89529 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3759582011/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "97286 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:60342 /private/tmp/enola-alias-observation/final/history-source/work-source/consumer.jsonl",
+      "99956 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:60342 --state-dir /private/tmp/enola-alias-observation/final/history-source/work-source/cold-baseline-00 --context test-inclusive-history-cold-baseline-00 /private/tmp/enola-alias-observation/final/history-source/work-source/graph-config.yaml"
+    ]
+  ],
+  "host_load_log": "/private/tmp/enola-alias-observation/final/cli-pairs/correctness-candidate-1/host-load.jsonl",
+  "host_load_samples": 54,
+  "host_sample_errors": [],
+  "correctness_only": true,
+  "run_succeeded": true,
+  "timing_eligible": false,
+  "binary_sha256": "15f5589549dbebb0abb315f582d19ca708de137ea3efb3993ea91b04b4aa55f7"
+}

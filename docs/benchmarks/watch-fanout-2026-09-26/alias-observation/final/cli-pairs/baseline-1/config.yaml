@@ -1,0 +1,60 @@
+repo: /private/tmp/enola-alias-observation/final/cli-pairs/baseline-1/product
+
+graph_inputs:
+    exclude:
+        - apps/mobile/e2e/artifacts/**
+        - worker-reports/**
+ignore:
+    - '**/vendor/**'
+    - '**/node_modules/**'
+    - '**/.git/**'
+    - '**/dist/**'
+    - '**/build/**'
+    - '**/tmp/**'
+    - '**/public/assets/**'
+    - '**/testdata/**'
+    - '**/*.g.dart'
+    - '**/*.freezed.dart'
+    - '**/*.mocks.dart'
+    - '**/*.gr.dart'
+    - '**/*.config.dart'
+    - '**/*.pb.dart'
+    - '**/*.pbenum.dart'
+    - '**/*.pbjson.dart'
+    - '**/*.pbserver.dart'
+    - '**/*.pbgrpc.dart'
+    - '**/.dart_tool/**'
+    - '**/.pub-cache/**'
+    - '**/.flutter-plugins'
+    - '**/.flutter-plugins-dependencies'
+    - '**/pkg/front_end/testcases/**'
+    - '**/pkg/_fe_analyzer_shared/test/**'
+    - .enola/**
+    - '**/.enola/**'
+    - .next/**
+    - dist/**
+    - '**/build/**'
+    - out/**
+    - .vercel/**
+    - .turbo/**
+    - coverage/**
+    - .nuxt/**
+    - .svelte-kit/**
+    - '**/__pycache__/**'
+    - '**/.venv/**'
+    - '**/venv/**'
+    - '**/site-packages/**'
+    - '**/.tox/**'
+    - '**/.nox/**'
+    - '**/.eggs/**'
+    - '**/.mypy_cache/**'
+    - '**/.pytest_cache/**'
+    - '**/.ruff_cache/**'
+    - '**/Pods/**'
+    - '**/.gradle/**'
+    - '**/target/**'
+    - '**/obj/**'
+    - '**/bin/Debug/**'
+    - '**/bin/Release/**'
+    - '**/*.min.js'
+    - '**/*.bundle.js'

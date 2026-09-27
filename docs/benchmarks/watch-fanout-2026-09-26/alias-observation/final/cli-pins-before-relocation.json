@@ -1,0 +1,50 @@
+{
+  "purpose": "prospective Stage37 whole CLI validation; no acceptance yet",
+  "source_revision": "550e1fa",
+  "files": {
+    "/private/tmp/enola-alias-observation/cli-pairs/harness_support.py": "95d70a9e3e3a0986fd8a1684524a8c9f2205df5529786979d08376abb46e4cac",
+    "/private/tmp/enola-alias-observation/cli-pairs/validate_results.py": "b5de7c929628e280373087ddeccd36f7946096e0c6326d9c91b4e7f4984799bf",
+    "/private/tmp/enola-alias-observation/cli-pairs/run-arm.py": "7a4c517e389b5b5d1e50e87218273c3ee8cc0eb6a076c85d952db029b862ff8d",
+    "/private/tmp/enola-alias-observation/cli-pairs/cli.py": "f944ff5e2bf647241e7da60cbe80126e0c59da606e09ab19d91a27e5735f052f",
+    "/private/tmp/enola-alias-observation/cli-pairs/test-inclusive-scope.yaml": "d7fcc27d5290935b7a660c92e75234009e320ae765fe6f6205832daabd0c5f9d",
+    "/private/tmp/enola-alias-observation/PROMOTION_RULE.md": "9e9d32387671270a29ca4d71c6d393712ddea3356b19adb571c33749e71437fa",
+    "/private/tmp/enola-alias-observation/background_gate.py": "f2f0cad3d42f42f8a242b33d16293b5e9c79877dc385f0a91050ffa8d280ffbf",
+    "/private/tmp/enola-alias-observation/timing_gate.py": "f0451416248f8a232435f618a6ac276d632d5cba63485282d7234b55cbbdb039",
+    "/private/tmp/enola-alias-observation/memory_gate.py": "13951a87e3310f2a765a0acdf670de87c866e8568049430b0d2ab56d95215208",
+    "/private/tmp/enola-alias-observation/power_gate.py": "08a6bf4d969ffbe0c276051775c080f76bd5ef0d7be12501f5053aae5ec07932",
+    "/private/tmp/enola-alias-observation/pressure_monitor.py": "6434d99c04785c62157cd869ef2fdd3d2914a740eaaa04cd5a1489de9051b908",
+    "/private/tmp/enola-stage14-watch-pairs/watch.py": "629fae95963c62b83df4acdc2ea5d6438dd114d67bbca2425b96416eda7538cb",
+    "/private/tmp/enola-stage9-product-watch-control/bin/benchobserver": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+    "/private/tmp/enola-toolchain/bin/nats-server": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af",
+    "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/run.py": "94caf3654e6283630dca8fbaa558c447d2cb1aade55f7b1bfc406cfba9d14c79",
+    "/private/tmp/enola-alias-observation/summarize-timing.py": "30360fd59ef2c10e52a2c1b17008052806f45e0b14e59ab0a70f028f79472af0",
+    "/private/tmp/enola-alias-observation/test-timing-summary.py": "37e39fb3528b60d25eb34baffcc1df3f9910e36e7481ab12fac8a6c77bfc264a",
+    "/private/tmp/enola-alias-observation/run-timing-series.py": "2acb3e4852b740790dcc8bb727bcbc1aa054d70befdd9ea691189cde7ce3935b"
+  },
+  "binaries": {
+    "baseline": {
+      "path": "/tmp/enola-local-surface-guarded/enola-experimental",
+      "sha256": "f69bae0951bffec1fc9976e7c2fea7548d03f2ae56c62aa934c4a8d4275d08b1"
+    },
+    "control": {
+      "path": "/tmp/enola-local-surface-guarded/enola-experimental",
+      "sha256": "f69bae0951bffec1fc9976e7c2fea7548d03f2ae56c62aa934c4a8d4275d08b1"
+    },
+    "candidate": {
+      "path": "/tmp/enola-alias-observation/final/enola-experimental",
+      "sha256": "15f5589549dbebb0abb315f582d19ca708de137ea3efb3993ea91b04b4aa55f7"
+    }
+  },
+  "product_path": "/tmp/enola-local-surface-guarded/history-recent/work-recent/product",
+  "product_sha": "fba38bab93c76a4da8df58cf45fd6847a468c315",
+  "runtime_environment": {
+    "GOGC": null,
+    "GOMEMLIMIT": null,
+    "GOMAXPROCS": null,
+    "GODEBUG": null,
+    "ENOLA_GRAPH_PROFILE": null
+  },
+  "nats_max_payload": 8388608,
+  "combined_source_revision": "550e1fa",
+  "build_checkout": "02df91a"
+}
