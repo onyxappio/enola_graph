@@ -442,21 +442,32 @@ func discoverGit(root string) (gitState, []string, error) {
 // carried over, so a configuration change selecting a different index is
 // observed rather than assumed away.
 func indexNames(root string) (tracked, dirs map[string]bool, err error) {
-	tracked, dirs = map[string]bool{}, map[string]bool{}
 	out, e := runGit(root, "", nil, "ls-files", "-z", "--cached", "--", ".")
 	if e != nil {
 		return nil, nil, e
 	}
+	tracked, dirs = parseIndexNames(out)
+	return tracked, dirs, nil
+}
+
+func parseIndexNames(out []byte) (tracked, dirs map[string]bool) {
+	tracked, dirs = map[string]bool{}, map[string]bool{}
 	for _, name := range strings.Split(string(out), "\x00") {
 		if name == "" {
 			continue
 		}
 		tracked[name] = true
 		for dir := filepath.ToSlash(filepath.Dir(name)); dir != "."; dir = filepath.ToSlash(filepath.Dir(dir)) {
+			// A prior visit inserted this directory and all its ancestors.
+			// The map belongs to this index read, so this skips repeated
+			// path work without retaining any observation across runs.
+			if dirs[dir] {
+				break
+			}
 			dirs[dir] = true
 		}
 	}
-	return tracked, dirs, nil
+	return tracked, dirs
 }
 
 func Build(root string, options Options) (*Policy, error) {
