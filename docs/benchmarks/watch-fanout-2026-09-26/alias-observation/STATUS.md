@@ -17,3 +17,5 @@ Full suite session27828 exited0: 110 passing packages,99 cached, graphsession un
 All three history scenarios completed: source-only/recent/broad delta parses3/14/1453; 24 CLI calls total. Broad initial parsed6716; all endpoints candidate chain/cold and Stage36 cold hashes equal, no-ops silent with unchanged generation/state. Session36218 exited0. These are correctness-only histories, not performance evidence or exhaustive repository history coverage.
 
 CLI correctness candidate completed seven calls/four checks, independently revalidated: initial/noop/body/structural parses6749/0/1/22, exact own cold equality and silent no-op. Baseline arm remains live under session86562; cross-arm validation pending. Shared-host timings are not acceptance samples.
+
+CLI correctness session86562 exited0: both arms completed7 calls/4 checks; all seven graph hashes match cross-arm. Both no-ops prove zero parses/events, unchanged generation and exact state bytes. Source reviewer independently observed actively reading scope.go at this checkpoint; review pending, not unavailable. No heavy primary jobs remain. No timing interval requested.

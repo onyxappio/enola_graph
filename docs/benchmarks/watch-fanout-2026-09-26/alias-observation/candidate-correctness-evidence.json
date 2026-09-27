@@ -1,0 +1,15 @@
+{
+  "correctness_checks_passed": true,
+  "source_review": "pending; retained reviewer observed actively reading code",
+  "source_revision": "fca10d8",
+  "binary_sha256": "042a0c6e1580e62389913c7cb646377a05c1942b0c1acf44962c05581f4550eb",
+  "suite": "full-suite-receipt.json",
+  "cli": "cli-cross-arm-validation.json",
+  "histories": [
+    "history-source/receipt-source.json",
+    "history-recent/receipt-recent.json",
+    "history-broad/receipt-broad.json"
+  ],
+  "timing_authorized": false,
+  "note": "Do not use as final-candidate-acceptance: source review and quiet window are not complete."
+}
