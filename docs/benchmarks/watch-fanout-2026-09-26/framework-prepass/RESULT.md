@@ -42,3 +42,9 @@ updated after the new suite passed. The failed attempt is preserved in
 preflight-abort/. A fresh acceptance-v2 root corrects that one inspected hash;
 both pin preflights pass and its complete twelve-arm series is running inside
 the same acknowledged 07:25–08:00 UTC interval. No samples were transferred.
+
+Acceptance-v2 completed all12 arms, exit0, within the hold. All frozen gates
+passed; see acceptance/RESULT.md. Initial median12.365905→11.500137s (-7.00%),
+no-op2.361592→2.125511s (-10.00%). Both deltas improve, but remain approximately
+4.3s and37% of initial. This is limited combined-bundle acceptance, not full-goal
+completion. New-scope real historical validation has started; no main push yet.
