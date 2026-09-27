@@ -1,0 +1,28 @@
+{
+  "id": "277f4584-58ad-4075-a80d-ead123606ab5",
+  "ok": false,
+  "error": {
+    "code": "recipient_run_mismatch",
+    "message": "term_d0820f00-fd44-4836-9aab-7dffb4746896 belongs to Run run_6935662313d2, not explicitly requested Run run_4bc01fa14716. Orchestration mutation request ID: 22def43d-65d4-40fc-b05d-342eaf69270e.",
+    "data": {
+      "orchestrationRequestId": "22def43d-65d4-40fc-b05d-342eaf69270e",
+      "originalCommand": [
+        "orca",
+        "orchestration",
+        "send",
+        "--run",
+        "run_4bc01fa14716",
+        "--to",
+        "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+        "--subject",
+        "Stage38 START; run route stale",
+        "--body",
+        "Stage38 timing started after18:26 UTC, session20509, all four holds validated; no measurements before reviewer ACK. Preserve acknowledged no-heavy-work window through19:00 or explicit RELEASE. Runtime and pins frozen. Run address returned run_not_found so sending to your confirmed terminal.",
+        "--json"
+      ]
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}

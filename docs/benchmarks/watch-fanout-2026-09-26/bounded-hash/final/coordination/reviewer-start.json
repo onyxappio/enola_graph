@@ -1,0 +1,28 @@
+{
+  "id": "ccb91330-4973-4729-b0e5-458fa328808d",
+  "ok": true,
+  "result": {
+    "message": {
+      "id": "msg_29cee83b7388",
+      "run_id": "run_4bc01fa14716",
+      "delivery_contract": "current_delivery",
+      "from_handle": "term_023590d8-e212-427c-8aa7-27984832fd33",
+      "to_handle": "dispatch:ctx_6b66f230a801",
+      "subject": "Stage38 timing START",
+      "body": "Stage38 START now after all four explicit ACKs; no earlier timing. Frozen runtime1af548c binarye9e48eb0 vs accepted Stage37 binary15f55895. Six alternating AB/BA pairs within 2026-09-27 18:15–19:00 UTC, actual start after18:26. Source review/full-suite/final CLI/three histories passed. Current-roster pressure/power/swap/host gates; bounded shared-host claims. No source edits or heavy work during cohort. Explicit RELEASE on process exit.",
+      "type": "status",
+      "priority": "normal",
+      "thread_id": null,
+      "payload": null,
+      "created_at": "2026-09-27T18:26:50Z",
+      "delivered_at": null
+    },
+    "mutation": {
+      "requestId": "b4f0a455-e99e-45d0-88bf-1036da2d1086",
+      "replayed": false
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}

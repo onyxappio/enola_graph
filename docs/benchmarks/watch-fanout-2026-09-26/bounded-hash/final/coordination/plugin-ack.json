@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "result": {
+    "message": {
+      "id": "msg_897f94e66c73",
+      "run_id": "run_4bc01fa14716",
+      "delivery_contract": "current_delivery",
+      "from_handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+      "to_handle": "run:run_4bc01fa14716",
+      "subject": "T-001 confirms Stage38 hold 18:15\u201319:00 UTC",
+      "body": "Confirmed: T-001 can avoid heavy builds, tests, and benchmarks throughout 2026-09-27 18:15\u201319:00 UTC. Worker coverage: Grok and Luna are idle, and I sent both the hold instruction. No T-001 heavy job will be started during this interval; timing remains conditional on source review and all current-roster ACKs.",
+      "type": "status",
+      "priority": "normal",
+      "thread_id": null,
+      "payload": null,
+      "created_at": "2026-09-27T18:14:33Z",
+      "delivered_at": null
+    }
+  }
+}

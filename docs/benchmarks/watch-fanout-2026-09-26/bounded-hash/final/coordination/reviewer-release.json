@@ -1,0 +1,28 @@
+{
+  "id": "7d5d627c-5700-4599-a5e4-a7831cdeb525",
+  "ok": true,
+  "result": {
+    "message": {
+      "id": "msg_cbb52c4a28d8",
+      "run_id": "run_4bc01fa14716",
+      "delivery_contract": "current_delivery",
+      "from_handle": "term_023590d8-e212-427c-8aa7-27984832fd33",
+      "to_handle": "dispatch:ctx_6b66f230a801",
+      "subject": "Stage38 explicit RELEASE",
+      "body": "Explicit RELEASE: Stage38 session20509 exited0; all twelve arms/six AB-BA pairs completed. Harness cleanup finished; quiet hold released now. You may resume heavy work. Summary and host-load audit pending; no performance acceptance or main publication claim yet.",
+      "type": "status",
+      "priority": "normal",
+      "thread_id": null,
+      "payload": null,
+      "created_at": "2026-09-27T18:42:38Z",
+      "delivered_at": null
+    },
+    "mutation": {
+      "requestId": "05d3eb22-31fe-4620-861e-65c76cddc58b",
+      "replayed": false
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}

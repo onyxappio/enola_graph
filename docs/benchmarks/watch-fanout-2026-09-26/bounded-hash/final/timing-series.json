@@ -1,0 +1,583 @@
+{
+  "hold": {
+    "mode": "current-roster",
+    "combined_authorized": true,
+    "start_utc": "2026-09-27T18:15:00+00:00",
+    "end_utc": "2026-09-27T19:00:00+00:00",
+    "worker_message": "msg_25271ac058de",
+    "participants": [
+      {
+        "handle": "term_f6d0d3d8-2dce-47a2-81db-44fd6bb8a1a8",
+        "status": "held",
+        "message_id": "msg_073f5c7f9c14",
+        "evidence_path": "/private/tmp/enola-hash-read-diagnostic/final/coordination/fsm-ack.json",
+        "sha256": "782a2272f0fd0f92e7d248b196a661c3847f54d6f8433e631b017fccc4fe6064"
+      },
+      {
+        "handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+        "status": "held",
+        "message_id": "msg_897f94e66c73",
+        "evidence_path": "/private/tmp/enola-hash-read-diagnostic/final/coordination/plugin-ack.json",
+        "sha256": "441e4d1e4ae781fc0dc3b6173353689a89e05ad9f560169697304ef3d21a6b57"
+      },
+      {
+        "handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "status": "held",
+        "message_id": "msg_25271ac058de",
+        "evidence_path": "/private/tmp/enola-hash-read-diagnostic/final/coordination/reviewer-ack.json",
+        "sha256": "02388840e6d89e89e7e6cf3d5edc956b9eba7736658684cbe818e1dfa235cbb3"
+      },
+      {
+        "handle": "term_a8cbadf5-e45d-4154-acd4-7101cedffcdf",
+        "status": "terminal-held",
+        "quote": "\u2022 Confirmed: I\u2019ll keep 2026-09-27 18:15\u201319:00 UTC clear of builds, tests, benchmarks, and other heavy jobs. I cover T-003\u2019s coder and reviewer; both have completed and no workers\n  are scheduled during the window. I\u2019m confirming here because the cross-run send route previously rejected this dispatch; I haven\u2019t retried it.",
+        "evidence_path": "/private/tmp/enola-hash-read-diagnostic/final/coordination/codata-terminal-ack.json",
+        "sha256": "438e2f83f5186c93018b36be4f16e9335f8559e68951135e2b614d06bf4ba920"
+      }
+    ],
+    "not_before_utc": "2026-09-27T18:25:25Z",
+    "note": "No measurements before final reviewer ACK at18:25:25 UTC. Earlier reviewer source/binary hashing disclosed; no retroactive quiet claim. Actual cohort starts only after all ACKs and final preflight. Runtime unchanged."
+  },
+  "runs": [
+    {
+      "arm": "baseline",
+      "repeat": 1,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "msg_25271ac058de"
+      ],
+      "start_utc": "2026-09-27T18:26:50.884283+00:00",
+      "monotonic_start": 971162.277624583,
+      "monotonic_end": 971237.754331958,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 172,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 296,
+          "max_gap_seconds": 0.2655454589985311
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 41,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 40,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T18:28:08.571507+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 1,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "msg_25271ac058de"
+      ],
+      "start_utc": "2026-09-27T18:28:08.571763+00:00",
+      "monotonic_start": 971239.958790708,
+      "monotonic_end": 971314.517517083,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 60,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 292,
+          "max_gap_seconds": 0.27414891601074487
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 40,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 39,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T18:29:25.335436+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 2,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "2",
+        "--quiet-message-id",
+        "msg_25271ac058de"
+      ],
+      "start_utc": "2026-09-27T18:29:25.335757+00:00",
+      "monotonic_start": 971316.695761833,
+      "monotonic_end": 971391.249631375,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 40,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 292,
+          "max_gap_seconds": 0.2754874579841271
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 39,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 38,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T18:30:42.069761+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 2,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "2",
+        "--quiet-message-id",
+        "msg_25271ac058de"
+      ],
+      "start_utc": "2026-09-27T18:30:42.070068+00:00",
+      "monotonic_start": 971393.450256708,
+      "monotonic_end": 971468.912890833,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 40,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 296,
+          "max_gap_seconds": 0.263017209013924
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 38,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 38,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T18:31:59.734559+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 3,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "3",
+        "--quiet-message-id",
+        "msg_25271ac058de"
+      ],
+      "start_utc": "2026-09-27T18:31:59.734929+00:00",
+      "monotonic_start": 971471.10665275,
+      "monotonic_end": 971546.645611,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 28,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 296,
+          "max_gap_seconds": 0.2719250830123201
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 38,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 37,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T18:33:17.464178+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 3,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "3",
+        "--quiet-message-id",
+        "msg_25271ac058de"
+      ],
+      "start_utc": "2026-09-27T18:33:17.464473+00:00",
+      "monotonic_start": 971548.796017791,
+      "monotonic_end": 971623.403476375,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 32,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 292,
+          "max_gap_seconds": 0.26423212501686066
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 37,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 36,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T18:34:34.224793+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 4,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "4",
+        "--quiet-message-id",
+        "msg_25271ac058de"
+      ],
+      "start_utc": "2026-09-27T18:34:34.225083+00:00",
+      "monotonic_start": 971625.653669541,
+      "monotonic_end": 971700.262452458,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 48,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 292,
+          "max_gap_seconds": 0.26756466703955084
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 36,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 36,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T18:35:51.084854+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 4,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "4",
+        "--quiet-message-id",
+        "msg_25271ac058de"
+      ],
+      "start_utc": "2026-09-27T18:35:51.085137+00:00",
+      "monotonic_start": 971702.4062115,
+      "monotonic_end": 971777.598610625,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 224,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 294,
+          "max_gap_seconds": 0.26765283301938325
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 36,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 35,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T18:37:08.419131+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 5,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "5",
+        "--quiet-message-id",
+        "msg_25271ac058de"
+      ],
+      "start_utc": "2026-09-27T18:37:08.419450+00:00",
+      "monotonic_start": 971779.787509208,
+      "monotonic_end": 971854.838319166,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 74,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 294,
+          "max_gap_seconds": 0.27510333398822695
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 35,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 34,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T18:38:25.659636+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 5,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "5",
+        "--quiet-message-id",
+        "msg_25271ac058de"
+      ],
+      "start_utc": "2026-09-27T18:38:25.659993+00:00",
+      "monotonic_start": 971856.965567,
+      "monotonic_end": 971931.090672291,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 52,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 290,
+          "max_gap_seconds": 0.2697196250082925
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 34,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 34,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T18:39:41.912144+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 6,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "6",
+        "--quiet-message-id",
+        "msg_25271ac058de"
+      ],
+      "start_utc": "2026-09-27T18:39:41.912509+00:00",
+      "monotonic_start": 971933.254645166,
+      "monotonic_end": 972007.626302541,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 72,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 291,
+          "max_gap_seconds": 0.27290083304978907
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 34,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 33,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T18:40:58.449557+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 6,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "6",
+        "--quiet-message-id",
+        "msg_25271ac058de"
+      ],
+      "start_utc": "2026-09-27T18:40:58.449979+00:00",
+      "monotonic_start": 972009.818879583,
+      "monotonic_end": 972084.882652916,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 20,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 294,
+          "max_gap_seconds": 0.26548216701485217
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 33,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 33,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T18:42:15.704533+00:00"
+    }
+  ]
+}

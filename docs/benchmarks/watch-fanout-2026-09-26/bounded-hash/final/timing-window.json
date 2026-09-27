@@ -1,0 +1,39 @@
+{
+  "mode": "current-roster",
+  "combined_authorized": true,
+  "start_utc": "2026-09-27T18:15:00+00:00",
+  "end_utc": "2026-09-27T19:00:00+00:00",
+  "worker_message": "msg_25271ac058de",
+  "participants": [
+    {
+      "handle": "term_f6d0d3d8-2dce-47a2-81db-44fd6bb8a1a8",
+      "status": "held",
+      "message_id": "msg_073f5c7f9c14",
+      "evidence_path": "/private/tmp/enola-hash-read-diagnostic/final/coordination/fsm-ack.json",
+      "sha256": "782a2272f0fd0f92e7d248b196a661c3847f54d6f8433e631b017fccc4fe6064"
+    },
+    {
+      "handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+      "status": "held",
+      "message_id": "msg_897f94e66c73",
+      "evidence_path": "/private/tmp/enola-hash-read-diagnostic/final/coordination/plugin-ack.json",
+      "sha256": "441e4d1e4ae781fc0dc3b6173353689a89e05ad9f560169697304ef3d21a6b57"
+    },
+    {
+      "handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+      "status": "held",
+      "message_id": "msg_25271ac058de",
+      "evidence_path": "/private/tmp/enola-hash-read-diagnostic/final/coordination/reviewer-ack.json",
+      "sha256": "02388840e6d89e89e7e6cf3d5edc956b9eba7736658684cbe818e1dfa235cbb3"
+    },
+    {
+      "handle": "term_a8cbadf5-e45d-4154-acd4-7101cedffcdf",
+      "status": "terminal-held",
+      "quote": "\u2022 Confirmed: I\u2019ll keep 2026-09-27 18:15\u201319:00 UTC clear of builds, tests, benchmarks, and other heavy jobs. I cover T-003\u2019s coder and reviewer; both have completed and no workers\n  are scheduled during the window. I\u2019m confirming here because the cross-run send route previously rejected this dispatch; I haven\u2019t retried it.",
+      "evidence_path": "/private/tmp/enola-hash-read-diagnostic/final/coordination/codata-terminal-ack.json",
+      "sha256": "438e2f83f5186c93018b36be4f16e9335f8559e68951135e2b614d06bf4ba920"
+    }
+  ],
+  "not_before_utc": "2026-09-27T18:25:25Z",
+  "note": "No measurements before final reviewer ACK at18:25:25 UTC. Earlier reviewer source/binary hashing disclosed; no retroactive quiet claim. Actual cohort starts only after all ACKs and final preflight. Runtime unchanged."
+}

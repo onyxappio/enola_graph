@@ -1,0 +1,18 @@
+[
+  {
+    "check": "r1-new-noop no-op",
+    "pass": true
+  },
+  {
+    "check": "r1-new-initial cold graph equality",
+    "pass": true
+  },
+  {
+    "check": "r1-new-body cold graph equality",
+    "pass": true
+  },
+  {
+    "check": "r1-new-structural cold graph equality",
+    "pass": true
+  }
+]

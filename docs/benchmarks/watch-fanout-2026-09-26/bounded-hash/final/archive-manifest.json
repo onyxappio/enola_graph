@@ -58,5 +58,780 @@
     "source": "/tmp/enola-hash-read-diagnostic/final/final-candidate-acceptance.json",
     "archive": "final-candidate-acceptance.json",
     "sha256": "1626270aa6abbdb57be770c409ac6fe55837a1247398049986f1fad621c95f11"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/RESULTS.md",
+    "archive": "RESULTS.md",
+    "sha256": "bca3c1198c99e52f1bd25540829112a6314dc85ff57396b5eeecac6a677a6668"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/PROMOTION_RULE.md",
+    "archive": "PROMOTION_RULE.md",
+    "sha256": "56f86609eee796c6675fec459a3edab91fa0da888406a0a937a1a8912c34e736"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/timing-window.json",
+    "archive": "timing-window.json",
+    "sha256": "154147be50358b657a8ac708c4cf2fdf9da3e06984e22462994d1b5e6934c97f"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/timing-series.json",
+    "archive": "timing-series.json",
+    "sha256": "375bff65ea96e1df05244961156f9395d9d3ece9f985829d6c03a09ab7bc74b1"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/timing-comparison.json",
+    "archive": "timing-comparison.json",
+    "sha256": "04ae8091b46efbdbdca768401917b26fc2eb19b4f9171453c4dccf3450f796bc"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/release.json",
+    "archive": "release.json",
+    "sha256": "79fe3e1eca936a493d089fb8c406583772a5fae53d65c0583faaed9761f53a5c"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/primary-audit.json",
+    "archive": "primary-audit.json",
+    "sha256": "ac5cfc154b35193dabfadd58a158d72455b09bc0882e366fe198b68adde782ca"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/primary-audit.py",
+    "archive": "primary-audit.py",
+    "sha256": "0f15a76f763e51a782adcf29e3e904f3f0d0c49e77f8472dc46b2855bb8f6fc4"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/audit-host.py",
+    "archive": "audit-host.py",
+    "sha256": "beed548136184608d5b294fb8ae0c5965fa6227e3364ef3cc19d070f0e32aa42"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/host-audit.json",
+    "archive": "host-audit.json",
+    "sha256": "9ea6d6273ec3c1de8e5084184f9dc12f1ce8cb151973f327c9ca760e8fd276a8"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/run-timing-series.py",
+    "archive": "run-timing-series.py",
+    "sha256": "2acb3e4852b740790dcc8bb727bcbc1aa054d70befdd9ea691189cde7ce3935b"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/summarize-timing.py",
+    "archive": "summarize-timing.py",
+    "sha256": "7b571edcdb38d53a07295d1eae870bb642c92c09018648557f25aa719d2f98e6"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/test-timing-summary.py",
+    "archive": "test-timing-summary.py",
+    "sha256": "a211cc45c55f8ee08f7405127186ce5aadce6990a191cfec3562436489483ce0"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/summary-tests.log",
+    "archive": "summary-tests.log",
+    "sha256": "2d4e35edcc65037e870505d92fcedb65e142daaea3665d2d5ee471900fe5d158"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/pressure_monitor.py",
+    "archive": "pressure_monitor.py",
+    "sha256": "6434d99c04785c62157cd869ef2fdd3d2914a740eaaa04cd5a1489de9051b908"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/memory_gate.py",
+    "archive": "memory_gate.py",
+    "sha256": "13951a87e3310f2a765a0acdf670de87c866e8568049430b0d2ab56d95215208"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/power_gate.py",
+    "archive": "power_gate.py",
+    "sha256": "08a6bf4d969ffbe0c276051775c080f76bd5ef0d7be12501f5053aae5ec07932"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/timing_gate.py",
+    "archive": "timing_gate.py",
+    "sha256": "f0451416248f8a232435f618a6ac276d632d5cba63485282d7234b55cbbdb039"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/background_gate.py",
+    "archive": "background_gate.py",
+    "sha256": "f2f0cad3d42f42f8a242b33d16293b5e9c79877dc385f0a91050ffa8d280ffbf"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/followup-tests.log",
+    "archive": "followup-tests.log",
+    "sha256": "c6aa0655adffbcde288dc77da7ad6642518563f1dea2920dbff39be4c06a9a6a"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/buffer-test-mutation.log",
+    "archive": "buffer-test-mutation.log",
+    "sha256": "91f729827b2de5d648d3bd122e8c0a17dab7d1f5b208a986af7d668bc6678c5c"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/codata-direct-release.json",
+    "archive": "coordination/codata-direct-release.json",
+    "sha256": "d644ae28c40606afc922a06ce3246f65dc760bc8d09cd28af1302c5431741c1c"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/reviewer-start.json",
+    "archive": "coordination/reviewer-start.json",
+    "sha256": "7b827518df5bfcf2c1f0968b1a3f201bdfd7412aefdfca221f7bcefd734115a5"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/codata-start.json",
+    "archive": "coordination/codata-start.json",
+    "sha256": "98c01ac561ac19069029a7f7a0428a924609b640663245ec5bf8fe6069788532"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/codata-quote.json",
+    "archive": "coordination/codata-quote.json",
+    "sha256": "a802343e2eabd82d74fc291002bf2729f161f4cdbd40468683cb4ead369d1f64"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/plugin-ack.json",
+    "archive": "coordination/plugin-ack.json",
+    "sha256": "441e4d1e4ae781fc0dc3b6173353689a89e05ad9f560169697304ef3d21a6b57"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/acks-delivery.json",
+    "archive": "coordination/acks-delivery.json",
+    "sha256": "26066a699256edb55460926547a885a7b47295fc87d0e701f1eb0333fc0c7075"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/reviewer-ack.json",
+    "archive": "coordination/reviewer-ack.json",
+    "sha256": "02388840e6d89e89e7e6cf3d5edc956b9eba7736658684cbe818e1dfa235cbb3"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/codata-terminal-ack.json",
+    "archive": "coordination/codata-terminal-ack.json",
+    "sha256": "438e2f83f5186c93018b36be4f16e9335f8559e68951135e2b614d06bf4ba920"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/codata-terminal-start.json",
+    "archive": "coordination/codata-terminal-start.json",
+    "sha256": "a4b20317767ed71616a0c0909908db3d81ed27fa3b77b08d2bc8c36269a3adb9"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/fsm-start.json",
+    "archive": "coordination/fsm-start.json",
+    "sha256": "27b6603670217ef035fa86a39a170e5ac3b759282896f9aa09f1ec53a136fdcd"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/plugin-start.json",
+    "archive": "coordination/plugin-start.json",
+    "sha256": "27ceafbb64f66c002dd606ad03ca41e6ba97a5cabfd5212e4ff54976261277f4"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/fsm-release.json",
+    "archive": "coordination/fsm-release.json",
+    "sha256": "e3a57e227005638e742c4f186c8a3e77f3765d2aa6cb4cfb85255d93965e0c60"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/fsm-ack.json",
+    "archive": "coordination/fsm-ack.json",
+    "sha256": "782a2272f0fd0f92e7d248b196a661c3847f54d6f8433e631b017fccc4fe6064"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/source-review-delivery.json",
+    "archive": "coordination/source-review-delivery.json",
+    "sha256": "adc699c4213cd5e73d9493ae186e3eedb11a13142bca9c592b3e8af3c490eee6"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/plugin-terminal-start.json",
+    "archive": "coordination/plugin-terminal-start.json",
+    "sha256": "93972e42f4446dce27dc1d65708a24b6ee47a05f939b922e1a92f835236d9490"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/plugin-direct-release.json",
+    "archive": "coordination/plugin-direct-release.json",
+    "sha256": "40a7111217dd0ffe4e40b0cedd8c9a7d9ca25a9d4f73d6a9ce67b56634febd66"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/plugin-direct-start.json",
+    "archive": "coordination/plugin-direct-start.json",
+    "sha256": "a8863c057738b9ac1a89b4e340536bd9e46022cf77e17caaffb904c38e2a5476"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/reviewer-release.json",
+    "archive": "coordination/reviewer-release.json",
+    "sha256": "bd070d15072c1b309b27e11ce46967d0b27b7d020a1fc89bf57fbfd896840b6b"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/codata-direct-start.json",
+    "archive": "coordination/codata-direct-start.json",
+    "sha256": "cc1a61b2b1020fd02cb84e438b26fc1639651c40a855711535f92f1126b87362"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/coordination/reviewer-delivery.json",
+    "archive": "coordination/reviewer-delivery.json",
+    "sha256": "5b739778921b98bae0fc09a54e7432bdf45bc2b07e72053441ec2fa550564267"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-1-pressure.jsonl",
+    "archive": "candidate-1-pressure.jsonl",
+    "sha256": "0c5ac21320e47a7d1b57499f19312389e1ddc9056cb13437dcf9c8b93be96a03"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-6-pressure.jsonl",
+    "archive": "candidate-6-pressure.jsonl",
+    "sha256": "96539903b2e37855fc4eb24a68078d762b29b22ae0a6f31d5d3cbc5d32af6052"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-2-pressure.jsonl",
+    "archive": "candidate-2-pressure.jsonl",
+    "sha256": "1187b97011c50b5335d4821a87601b6346b9c7d1ddcbe96cc16f89d8d3e2342f"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-5-pressure.jsonl",
+    "archive": "candidate-5-pressure.jsonl",
+    "sha256": "82521cb8ba80e910e3fe06cf07e5aaadfb51bbff93afa81a25797b195690e494"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-4-pressure.jsonl",
+    "archive": "candidate-4-pressure.jsonl",
+    "sha256": "6f0660eea788efb447ad39a234f7f6360e8c0bd2cdbf9112a59eea319cf6c80a"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-3-pressure.jsonl",
+    "archive": "candidate-3-pressure.jsonl",
+    "sha256": "c047fec717cfede2e3443f0671973153d640c9a8bcd74217fa4d22c3d422e793"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-5-pressure.jsonl",
+    "archive": "baseline-5-pressure.jsonl",
+    "sha256": "249dd80ae24d492f7ba8d95da98093b2f5b4f40403a439b9fc217f1c60779069"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-2-pressure.jsonl",
+    "archive": "baseline-2-pressure.jsonl",
+    "sha256": "688c3cc486877236ea2682366cf0857dddcec5fda6bfd727ed239380f4f14a88"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-3-pressure.jsonl",
+    "archive": "baseline-3-pressure.jsonl",
+    "sha256": "ed99e699937c440cb743f833f7f88462c84cee5ee6fd3c7bdfad2f957d553828"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-4-pressure.jsonl",
+    "archive": "baseline-4-pressure.jsonl",
+    "sha256": "456dfa6baad89a28a2fdba214da8cef39bc8179858eafea31f79ea4e25e17293"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-6-pressure.jsonl",
+    "archive": "baseline-6-pressure.jsonl",
+    "sha256": "a52378eb743f384dd65cd06105e5090e9537e02f1e069226858aea19cdde4b60"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-1-pressure.jsonl",
+    "archive": "baseline-1-pressure.jsonl",
+    "sha256": "c3a4a5dafd6cc1c86b1af1828c3bf4ef2e4a6fb3604962769c8535201e7a09f1"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-3-power-after.json",
+    "archive": "baseline-3-power-after.json",
+    "sha256": "50f504824c6c4c74080d6dafdf03a5250db5f794510768dded4fd7dbce827314"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-3-power-after.json",
+    "archive": "candidate-3-power-after.json",
+    "sha256": "e06968c615d56a01468a16f05d0e74d676bf8d972a37ff1f89a2319dc759f67c"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-2-power-after.json",
+    "archive": "baseline-2-power-after.json",
+    "sha256": "61dfd32c68bedefe69f77cf8275fbba7ebf0e4bc053933d526a4ba2187df62f2"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-6-power-after.json",
+    "archive": "candidate-6-power-after.json",
+    "sha256": "29de8029ca89bb386acde7c604afb3f9e19bdaa33c067e0c81b6b87aff514144"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-2-power-after.json",
+    "archive": "candidate-2-power-after.json",
+    "sha256": "be7113b081dbf96bf12c2eaaca0d33a6888df3fe87d25f17ece482cca3470e38"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-6-power-after.json",
+    "archive": "baseline-6-power-after.json",
+    "sha256": "bb74e37c5bde670db45ba36a5c5503f20fdcdcdf6295b72ba4c397aca2276e15"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-4-power-before.json",
+    "archive": "baseline-4-power-before.json",
+    "sha256": "1f347ef97a8d8ed1edce8d83ff2eed433f5c1a5d69612072a05e27f468834be4"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-1-power-after.json",
+    "archive": "baseline-1-power-after.json",
+    "sha256": "b7770124d459e88dc5063bef1e86685c160d73f4dde2a080f4dd645b6558c714"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-5-power-after.json",
+    "archive": "candidate-5-power-after.json",
+    "sha256": "c3ddb4ba9f903ff71dc40eddfb52a451a46a7e8f494217ceb3d64c41e65ba267"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-1-power-before.json",
+    "archive": "candidate-1-power-before.json",
+    "sha256": "5d00ebd83d35d45238962b7aeb21e2ce639a8f143e5d1f8a40b730a66657dce8"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-1-power-before.json",
+    "archive": "baseline-1-power-before.json",
+    "sha256": "f5827e7d4b7d355146f842f50d5a3add6d4a714d6134344dc550b066167f3d45"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-4-power-before.json",
+    "archive": "candidate-4-power-before.json",
+    "sha256": "ad04a4b4a7d8f920e3f78787762e772b76d176d3e3a4769b4d63144f007881bb"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-5-power-before.json",
+    "archive": "baseline-5-power-before.json",
+    "sha256": "1c65e4a75158b37d5ced5810e11a9dd6ce0c677a6f970e59cf5315c00a24cb4b"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-1-power-after.json",
+    "archive": "candidate-1-power-after.json",
+    "sha256": "dbdffcd5913c0d937b3fcd340c3b620f8f8e7751447d6786a20a8ede1b0677e4"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-5-power-after.json",
+    "archive": "baseline-5-power-after.json",
+    "sha256": "31b773f559f94ee711826425977623017ea01552c38e2c49634050fa6b970f47"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-5-power-before.json",
+    "archive": "candidate-5-power-before.json",
+    "sha256": "cd4fac7c58b76f4406b2d84c83630a64e887204a937c5c0a8ab4611b08c9650b"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-6-power-before.json",
+    "archive": "baseline-6-power-before.json",
+    "sha256": "c2182ee38c8bf567b6ab2efc545152284b6ec361ec467973f684e28ee4bba37e"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-4-power-after.json",
+    "archive": "candidate-4-power-after.json",
+    "sha256": "3b1bbe907cc6817383a84b67ae57fa72ae0c3b2e71d7169205e6ea81b22d439a"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-3-power-before.json",
+    "archive": "candidate-3-power-before.json",
+    "sha256": "ddff62517b3e0319442df29c67544a929268899a3cba50f231c0826bc1cf2e0e"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-3-power-before.json",
+    "archive": "baseline-3-power-before.json",
+    "sha256": "5124afa2fd7e19d558c6d82c8cf838e980d24259ed5f86f5e43d6c5a7a31113b"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-6-power-before.json",
+    "archive": "candidate-6-power-before.json",
+    "sha256": "110a68776df03952c53057552895ce0a173e48afb627fd110303920d791df1b4"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-2-power-before.json",
+    "archive": "candidate-2-power-before.json",
+    "sha256": "8e657b6b830320d9a9c5718bf6c58227e03c5200691e6d825140a33279b48b1b"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-2-power-before.json",
+    "archive": "baseline-2-power-before.json",
+    "sha256": "6fafe9c7d917508785afaddd3c1fad72dbb0c451b074255a19a6903d1b100b03"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-4-power-after.json",
+    "archive": "baseline-4-power-after.json",
+    "sha256": "40b4ec214ed01f0ac93f49feed3f1a82983eb1befae733560ded6ab953a505bf"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-4-vm-after.txt",
+    "archive": "candidate-4-vm-after.txt",
+    "sha256": "6b233ade55fe69b116fda7d669493535ab5a3e18556b9472e95636d9c74c6deb"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-3-vm-after.txt",
+    "archive": "candidate-3-vm-after.txt",
+    "sha256": "72981973e57b73dddd93df8c552a2291f5ccb4c980f7275c6e8a62f6f96d0d79"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-3-vm-before.txt",
+    "archive": "candidate-3-vm-before.txt",
+    "sha256": "e638da6ba18af1bd2aa2c7950d6821626a862b6ff1158aacee53c9fa5bf5d854"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-4-vm-before.txt",
+    "archive": "baseline-4-vm-before.txt",
+    "sha256": "7b4543ffa96aaf5398bae39f1c72e83635387b1725252ac0e8aea90f97ada6af"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-2-vm-after.txt",
+    "archive": "candidate-2-vm-after.txt",
+    "sha256": "feefa5fbfb0ef7529e74153eb0be66b153ea906d8b3708d529aada25393305d5"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-3-vm-before.txt",
+    "archive": "baseline-3-vm-before.txt",
+    "sha256": "35c46e311fa7dcce48bd5b17788fb7babec1be79dd28f0e43e0428f7a8e96ff6"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-5-vm-after.txt",
+    "archive": "candidate-5-vm-after.txt",
+    "sha256": "02432ddb97e971689475d2601a68b6f281deda15acac7d2c57a18588c72cc6f1"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-4-vm-before.txt",
+    "archive": "candidate-4-vm-before.txt",
+    "sha256": "ad6218b6b17ef46fc1713b0f7e25e4310207d43f2477c7ab1789843df4a9efee"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-6-vm-after.txt",
+    "archive": "baseline-6-vm-after.txt",
+    "sha256": "c2d21b0e1998aad04415bd40831eacb15375e6f353eb4e2798026fdef9a0601f"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-1-vm-after.txt",
+    "archive": "baseline-1-vm-after.txt",
+    "sha256": "4c7d054ab3e2dfa4680a40f4014a739f24fc7fb86d2cd35e2a69a25b69671739"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-6-vm-before.txt",
+    "archive": "baseline-6-vm-before.txt",
+    "sha256": "f6ee9fbd5bdff575e3f36b23f9b7dfc5aeb2e928421d0ec3c6847e4d87987801"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-5-vm-before.txt",
+    "archive": "candidate-5-vm-before.txt",
+    "sha256": "784e00671273cec124ac954a79583bb09ffaef213ce2b9c3bc273eb964bd88de"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-2-vm-before.txt",
+    "archive": "baseline-2-vm-before.txt",
+    "sha256": "c2951c03d4751569f1ee68809c75bcef2b52c145e226613c07a9a8d63cb4cb02"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-1-vm-before.txt",
+    "archive": "candidate-1-vm-before.txt",
+    "sha256": "9b129a6469e0196803e8c0b528b28f6550ac7fd24285a7b9360e3cdf7fbfa824"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-3-vm-after.txt",
+    "archive": "baseline-3-vm-after.txt",
+    "sha256": "2b3552d33f44b2f81736bb5d9e35dc0002606bd5ee5c820ca8906997f086770c"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-4-vm-after.txt",
+    "archive": "baseline-4-vm-after.txt",
+    "sha256": "f5c04d8f3f5d5885f1643fa07ffb6c6ef7513ee761dd441fdb6741a139aaa044"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-1-vm-after.txt",
+    "archive": "candidate-1-vm-after.txt",
+    "sha256": "5e53eef0d3704303ff0e268120c7ac23d25078f074aa052c81a936b27a2dfd48"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-6-vm-after.txt",
+    "archive": "candidate-6-vm-after.txt",
+    "sha256": "4c337c47c6f1efb764af3b3b586b01c00f9b7fe77c187b232b72fd2ab84fa141"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-5-vm-after.txt",
+    "archive": "baseline-5-vm-after.txt",
+    "sha256": "1255d1f708a61f1e246dc29dca7df5558eea1cc4ca157f7a775b5503cce2a1c1"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-2-vm-after.txt",
+    "archive": "baseline-2-vm-after.txt",
+    "sha256": "c117a0ac33c87b30b32d85fd81b77b9e0a64b8e8d57a2d69361ee59cccb505d9"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-5-vm-before.txt",
+    "archive": "baseline-5-vm-before.txt",
+    "sha256": "b4e3d3695c9858c1976ac6a3689d920002f845d7763a3f37622f5a6c9af42f01"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-6-vm-before.txt",
+    "archive": "candidate-6-vm-before.txt",
+    "sha256": "d14253949340e61ba9c108b7b15fbc4ccb42a728bd20c2080d7e459a776ad4cd"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-1-vm-before.txt",
+    "archive": "baseline-1-vm-before.txt",
+    "sha256": "223d80295a5ea3184daf22ba2faf5d847b0e759b8ffd561862270340196c0d9e"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-2-vm-before.txt",
+    "archive": "candidate-2-vm-before.txt",
+    "sha256": "8bd50f0c1b1296712db8d59ee568afe8fc03bb0074e653a806854d83637f8bda"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-1-containers.log",
+    "archive": "baseline-1-containers.log",
+    "sha256": "e83274a15234bf33ab31e9e8eddc8581821434b747ce23c09e25b0ff9c822647"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-6-containers.log",
+    "archive": "baseline-6-containers.log",
+    "sha256": "0b1424ca35221def032a1f80db3fb2cf8704c6cb80eac1ae5857244a0bc4bfce"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-4-containers.log",
+    "archive": "baseline-4-containers.log",
+    "sha256": "747db27caf87f26bd235b57c6ad485b3be62b89231a49d8ea74debf955c94b88"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-3-containers.log",
+    "archive": "baseline-3-containers.log",
+    "sha256": "9be3563869a2c5f0e0c367acb5303fbfb1d79dcc8fa801163728e411ea46d553"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-2-containers.log",
+    "archive": "baseline-2-containers.log",
+    "sha256": "93b0cd2467a495d1b73f29c11e5b7796d02b0efb364b6cb66167a48f0e7fef91"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/baseline-5-containers.log",
+    "archive": "baseline-5-containers.log",
+    "sha256": "4bd1db66fdd07487885ea0fa0e8e4e5e6e7bc73e7b65c129b3b25b392407364e"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-3-containers.log",
+    "archive": "candidate-3-containers.log",
+    "sha256": "966cd41cd9b9f20ba524e397fa05a3cd2d65388c00787ec4af69784ee9c14658"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-4-containers.log",
+    "archive": "candidate-4-containers.log",
+    "sha256": "8b61ff4a890bde0ffc254f384c5416ef89b96effccec0c4a5c7f96b3080e25e0"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-5-containers.log",
+    "archive": "candidate-5-containers.log",
+    "sha256": "17b70361aa3da41c7baf4c988a959671b3e5c90b6f8e418f4b74fcc91cd3e3f0"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-2-containers.log",
+    "archive": "candidate-2-containers.log",
+    "sha256": "d7261cfb746f9517a1716a404a62560a7916063700192276ff36a53e4ed2ab37"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-6-containers.log",
+    "archive": "candidate-6-containers.log",
+    "sha256": "f95e0c8d04360894793eea7fcd7803b3642f489eaa14447c60fdd94867f987ec"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/candidate-1-containers.log",
+    "archive": "candidate-1-containers.log",
+    "sha256": "6e95b628a8bf0c88f75a2d6a397b257ea30e1e157a466774463c1e98283a0ae5"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/pins.json",
+    "archive": "cli-pairs/pins.json",
+    "sha256": "9b3723dc8681ae0adf93a0aca8189c2acbb6ee8360b89fad8a7cc80dfeb856bf"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/run-arm.py",
+    "archive": "cli-pairs/run-arm.py",
+    "sha256": "7a4c517e389b5b5d1e50e87218273c3ee8cc0eb6a076c85d952db029b862ff8d"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/harness_support.py",
+    "archive": "cli-pairs/harness_support.py",
+    "sha256": "95d70a9e3e3a0986fd8a1684524a8c9f2205df5529786979d08376abb46e4cac"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/validate_results.py",
+    "archive": "cli-pairs/validate_results.py",
+    "sha256": "b5de7c929628e280373087ddeccd36f7946096e0c6326d9c91b4e7f4984799bf"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/cli.py",
+    "archive": "cli-pairs/cli.py",
+    "sha256": "f944ff5e2bf647241e7da60cbe80126e0c59da606e09ab19d91a27e5735f052f"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/test-inclusive-scope.yaml",
+    "archive": "cli-pairs/test-inclusive-scope.yaml",
+    "sha256": "d7fcc27d5290935b7a660c92e75234009e320ae765fe6f6205832daabd0c5f9d"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-1/pair-receipt.json",
+    "archive": "cli-pairs/baseline-1/pair-receipt.json",
+    "sha256": "5a9b45c910f113c85b30c7efa322b429f86b29e159417af8bd548bd612177c5d"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-1/checks.json",
+    "archive": "cli-pairs/baseline-1/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-1/metrics.json",
+    "archive": "cli-pairs/baseline-1/metrics.json",
+    "sha256": "8525d9d74a8941def947ab43dbd4d4319220c6573f020261291c849979e507d1"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-2/pair-receipt.json",
+    "archive": "cli-pairs/baseline-2/pair-receipt.json",
+    "sha256": "2c58bf89fe2dc8d9f77de63210abd73472e3fc718a67e3a80d7037be84b74fbc"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-2/checks.json",
+    "archive": "cli-pairs/baseline-2/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-2/metrics.json",
+    "archive": "cli-pairs/baseline-2/metrics.json",
+    "sha256": "b04d46b7e95042f6126e22b87511347a45ef655a27f062bf242ae1f18727a7df"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-3/pair-receipt.json",
+    "archive": "cli-pairs/baseline-3/pair-receipt.json",
+    "sha256": "4d83b679e8b3e7a8d5ae6016d5f4d03dc2fd60bd53e00d79c3069117ca500064"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-3/checks.json",
+    "archive": "cli-pairs/baseline-3/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-3/metrics.json",
+    "archive": "cli-pairs/baseline-3/metrics.json",
+    "sha256": "2299acf1207e6e5d599c519066515dfdfe97ee3bbe4f02af56a30de809f6c54c"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-4/pair-receipt.json",
+    "archive": "cli-pairs/baseline-4/pair-receipt.json",
+    "sha256": "d366afbb33cd9a1bf6fa57e31faccdeb12ac1973f8b6ea24b55c59b9ae590070"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-4/checks.json",
+    "archive": "cli-pairs/baseline-4/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-4/metrics.json",
+    "archive": "cli-pairs/baseline-4/metrics.json",
+    "sha256": "2e4db6ab41eea9c3dd90da028fe505dd209f60d9013e4afe382d1bd1a6aae2af"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-5/pair-receipt.json",
+    "archive": "cli-pairs/baseline-5/pair-receipt.json",
+    "sha256": "b8abdc83211f194002297a2d1f02c725c6a0aa1aea6f3c133e12cd5d7e282e3b"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-5/checks.json",
+    "archive": "cli-pairs/baseline-5/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-5/metrics.json",
+    "archive": "cli-pairs/baseline-5/metrics.json",
+    "sha256": "75b3c6a68d66bfc73d750110fe82c4b47ef688e0152e0c211982e074eb753fd6"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-6/pair-receipt.json",
+    "archive": "cli-pairs/baseline-6/pair-receipt.json",
+    "sha256": "470044f26915a046d0cdbaded21e708657f05be0a492faa9f53acdb66492dfaf"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-6/checks.json",
+    "archive": "cli-pairs/baseline-6/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/baseline-6/metrics.json",
+    "archive": "cli-pairs/baseline-6/metrics.json",
+    "sha256": "d4830b6551cf67a31c92431b2a190278983e97a4dab25e42408486b3e77a234a"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-1/pair-receipt.json",
+    "archive": "cli-pairs/candidate-1/pair-receipt.json",
+    "sha256": "a9e2e3d18c443acc3c04859fcbadeb0f415dd90193eed830e9f7a99522c9e653"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-1/checks.json",
+    "archive": "cli-pairs/candidate-1/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-1/metrics.json",
+    "archive": "cli-pairs/candidate-1/metrics.json",
+    "sha256": "941ffa4407d2ab01c6babf5fb91629c22e71bac6300708e615294fcd48d14f21"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-2/pair-receipt.json",
+    "archive": "cli-pairs/candidate-2/pair-receipt.json",
+    "sha256": "b91b77417e52f797b0826820845f1bafb6f42d2c80199f94117230f85640dd80"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-2/checks.json",
+    "archive": "cli-pairs/candidate-2/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-2/metrics.json",
+    "archive": "cli-pairs/candidate-2/metrics.json",
+    "sha256": "cc2487afa2d8a92f7436a7c4947277716db03f67b91c4c99e0d232301c7fec51"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-3/pair-receipt.json",
+    "archive": "cli-pairs/candidate-3/pair-receipt.json",
+    "sha256": "ac347d6eb2fa6dd0564caa2b5b94aaa4c0d7ff94f2e9be1cfc5510a38caceeb4"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-3/checks.json",
+    "archive": "cli-pairs/candidate-3/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-3/metrics.json",
+    "archive": "cli-pairs/candidate-3/metrics.json",
+    "sha256": "4145d0ca2bc2da6637fb13966c14c5460152527b0b88664a1f2808475e16cd17"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-4/pair-receipt.json",
+    "archive": "cli-pairs/candidate-4/pair-receipt.json",
+    "sha256": "b143293c44e8f1183cd2b1563e671ef142cde4a542f05c0fbcd85caa96a0ed17"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-4/checks.json",
+    "archive": "cli-pairs/candidate-4/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-4/metrics.json",
+    "archive": "cli-pairs/candidate-4/metrics.json",
+    "sha256": "a25562836f8abe75a1ee4d0e4b13aaee4aff0647dede2230be4e4bceabc77969"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-5/pair-receipt.json",
+    "archive": "cli-pairs/candidate-5/pair-receipt.json",
+    "sha256": "2ae7abb5a6cb4a36a553c59a6e280e5592c27037191e82ceaa917bb48782cb46"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-5/checks.json",
+    "archive": "cli-pairs/candidate-5/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-5/metrics.json",
+    "archive": "cli-pairs/candidate-5/metrics.json",
+    "sha256": "7f1c9a0f589c736605bbf0e17587587165a4c05b4b0237f27937cb31fae64190"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-6/pair-receipt.json",
+    "archive": "cli-pairs/candidate-6/pair-receipt.json",
+    "sha256": "a7ce4882f24523331aecad2f26b9677ce12039d4a5d1a377a7d600df50cde642"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-6/checks.json",
+    "archive": "cli-pairs/candidate-6/checks.json",
+    "sha256": "ad58797e58a0ebb13d27e4364d769a179d1cb0b27351630609a68f093dd863b9"
+  },
+  {
+    "source": "/tmp/enola-hash-read-diagnostic/final/cli-pairs/candidate-6/metrics.json",
+    "archive": "cli-pairs/candidate-6/metrics.json",
+    "sha256": "82c2db90e0f46911366679dbdebb6511731f1d37b12522900afd81d153913447"
   }
 ]

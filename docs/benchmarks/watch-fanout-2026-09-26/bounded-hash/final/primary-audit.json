@@ -1,0 +1,142 @@
+{
+  "primary_arithmetic_passed": true,
+  "cli_calls": 84,
+  "graph_labels_equal_across_all_arms": 7,
+  "comparisons": {
+    "initial": {
+      "time_ratio": 0.9884459385765023,
+      "rss_ratio": 0.9842946690796601,
+      "paired_ratios": [
+        1.0256419720115437,
+        0.993739849020917,
+        0.9500208880725928,
+        0.9933846198197022,
+        0.9808805646504695,
+        0.9774703367022085
+      ]
+    },
+    "noop": {
+      "time_ratio": 0.93173615524634,
+      "rss_ratio": 1.0109992667155523,
+      "paired_ratios": [
+        0.9261217336285763,
+        0.9308259926270859,
+        0.9284782006812795,
+        0.938157354123708,
+        0.9300023426398258,
+        0.9318101892484892
+      ]
+    },
+    "body": {
+      "time_ratio": 0.9617767531390862,
+      "rss_ratio": 1.0429326905108944,
+      "paired_ratios": [
+        0.954150387552038,
+        0.961573061012624,
+        0.9610993122372826,
+        0.9655624472085671,
+        0.9888347792045393,
+        0.9542393084006693
+      ]
+    },
+    "structural": {
+      "time_ratio": 0.9661962968071504,
+      "rss_ratio": 0.9747995418098511,
+      "paired_ratios": [
+        0.9630164476404883,
+        0.9777547288461743,
+        0.9537320381967808,
+        0.9922458248820869,
+        0.9616507483246206,
+        0.9682476179243248
+      ]
+    }
+  },
+  "host_context": [
+    {
+      "arm": "baseline",
+      "repeat": 1,
+      "samples": 30,
+      "mean_foreign_cpu_percent": 101.40333333333334,
+      "max_foreign_cpu_percent": 186.4
+    },
+    {
+      "arm": "candidate",
+      "repeat": 1,
+      "samples": 30,
+      "mean_foreign_cpu_percent": 100.84,
+      "max_foreign_cpu_percent": 172.6
+    },
+    {
+      "arm": "candidate",
+      "repeat": 2,
+      "samples": 30,
+      "mean_foreign_cpu_percent": 91.91333333333333,
+      "max_foreign_cpu_percent": 177.0
+    },
+    {
+      "arm": "baseline",
+      "repeat": 2,
+      "samples": 30,
+      "mean_foreign_cpu_percent": 93.21000000000001,
+      "max_foreign_cpu_percent": 136.0
+    },
+    {
+      "arm": "baseline",
+      "repeat": 3,
+      "samples": 31,
+      "mean_foreign_cpu_percent": 94.34193548387097,
+      "max_foreign_cpu_percent": 165.9
+    },
+    {
+      "arm": "candidate",
+      "repeat": 3,
+      "samples": 30,
+      "mean_foreign_cpu_percent": 84.71,
+      "max_foreign_cpu_percent": 155.2
+    },
+    {
+      "arm": "candidate",
+      "repeat": 4,
+      "samples": 30,
+      "mean_foreign_cpu_percent": 86.42999999999999,
+      "max_foreign_cpu_percent": 138.1
+    },
+    {
+      "arm": "baseline",
+      "repeat": 4,
+      "samples": 30,
+      "mean_foreign_cpu_percent": 85.70666666666666,
+      "max_foreign_cpu_percent": 121.4
+    },
+    {
+      "arm": "baseline",
+      "repeat": 5,
+      "samples": 30,
+      "mean_foreign_cpu_percent": 93.36666666666666,
+      "max_foreign_cpu_percent": 174.1
+    },
+    {
+      "arm": "candidate",
+      "repeat": 5,
+      "samples": 30,
+      "mean_foreign_cpu_percent": 86.39666666666666,
+      "max_foreign_cpu_percent": 150.9
+    },
+    {
+      "arm": "candidate",
+      "repeat": 6,
+      "samples": 30,
+      "mean_foreign_cpu_percent": 91.42999999999999,
+      "max_foreign_cpu_percent": 172.29999999999998
+    },
+    {
+      "arm": "baseline",
+      "repeat": 6,
+      "samples": 30,
+      "mean_foreign_cpu_percent": 88.21,
+      "max_foreign_cpu_percent": 187.6
+    }
+  ],
+  "note": "Foreign CPU is descriptive, not a new acceptance threshold. Frozen host/power/pressure checks remain separately validated by summarize-timing.py. No claim of a clean host or statistical significance."
+}

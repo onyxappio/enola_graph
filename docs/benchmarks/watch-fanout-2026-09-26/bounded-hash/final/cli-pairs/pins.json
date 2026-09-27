@@ -1,0 +1,52 @@
+{
+  "purpose": "Stage38 frozen prospective six-pair acceptance; primary fresh-noop gain>=3%; runtime1af548c",
+  "product_path": "/tmp/enola-local-surface-guarded/history-recent/work-recent/product",
+  "product_sha": "fba38bab93c76a4da8df58cf45fd6847a468c315",
+  "binaries": {
+    "baseline": {
+      "path": "/private/tmp/enola-alias-observation/final/enola-experimental",
+      "sha256": "15f5589549dbebb0abb315f582d19ca708de137ea3efb3993ea91b04b4aa55f7"
+    },
+    "control": {
+      "path": "/private/tmp/enola-alias-observation/final/enola-experimental",
+      "sha256": "15f5589549dbebb0abb315f582d19ca708de137ea3efb3993ea91b04b4aa55f7"
+    },
+    "candidate": {
+      "path": "/private/tmp/enola-hash-read-diagnostic/final/enola-experimental",
+      "sha256": "e9e48eb0eaeb4e642ff6078ee4a5db0b65eda9d545b61e935ee9f330bb6e1805"
+    }
+  },
+  "files": {
+    "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/harness_support.py": "95d70a9e3e3a0986fd8a1684524a8c9f2205df5529786979d08376abb46e4cac",
+    "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/validate_results.py": "b5de7c929628e280373087ddeccd36f7946096e0c6326d9c91b4e7f4984799bf",
+    "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/run-arm.py": "7a4c517e389b5b5d1e50e87218273c3ee8cc0eb6a076c85d952db029b862ff8d",
+    "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/cli.py": "f944ff5e2bf647241e7da60cbe80126e0c59da606e09ab19d91a27e5735f052f",
+    "/private/tmp/enola-hash-read-diagnostic/final/cli-pairs/test-inclusive-scope.yaml": "d7fcc27d5290935b7a660c92e75234009e320ae765fe6f6205832daabd0c5f9d",
+    "/private/tmp/enola-hash-read-diagnostic/final/timing_gate.py": "f0451416248f8a232435f618a6ac276d632d5cba63485282d7234b55cbbdb039",
+    "/private/tmp/enola-hash-read-diagnostic/final/background_gate.py": "f2f0cad3d42f42f8a242b33d16293b5e9c79877dc385f0a91050ffa8d280ffbf",
+    "/private/tmp/enola-hash-read-diagnostic/final/PROMOTION_RULE.md": "56f86609eee796c6675fec459a3edab91fa0da888406a0a937a1a8912c34e736",
+    "/private/tmp/enola-hash-read-diagnostic/final/run-timing-series.py": "2acb3e4852b740790dcc8bb727bcbc1aa054d70befdd9ea691189cde7ce3935b",
+    "/private/tmp/enola-hash-read-diagnostic/final/summarize-timing.py": "7b571edcdb38d53a07295d1eae870bb642c92c09018648557f25aa719d2f98e6",
+    "/private/tmp/enola-hash-read-diagnostic/final/test-timing-summary.py": "a211cc45c55f8ee08f7405127186ce5aadce6990a191cfec3562436489483ce0",
+    "/private/tmp/enola-hash-read-diagnostic/final/pressure_monitor.py": "6434d99c04785c62157cd869ef2fdd3d2914a740eaaa04cd5a1489de9051b908",
+    "/private/tmp/enola-hash-read-diagnostic/final/memory_gate.py": "13951a87e3310f2a765a0acdf670de87c866e8568049430b0d2ab56d95215208",
+    "/private/tmp/enola-hash-read-diagnostic/final/power_gate.py": "08a6bf4d969ffbe0c276051775c080f76bd5ef0d7be12501f5053aae5ec07932",
+    "/private/tmp/enola-hash-read-diagnostic/final/full-suite-receipt.json": "7578a9f67b671b88482b4acfac0b81c42d76d3f4616c218a6bcd0713331afef3",
+    "/private/tmp/enola-hash-read-diagnostic/final/source-equivalence.json": "c767b6ec2d8bc9a1909c9f1e29f307536816b5202d94e6fb6ad475f07081febb",
+    "/private/tmp/enola-hash-read-diagnostic/final/cli-cross-arm-validation.json": "a1926670dd18d50c911a918bf7fbae3145c1f481673bec72dd128e3e8a379c59",
+    "/private/tmp/enola-hash-read-diagnostic/final/history-independent-validation.json": "f0a6f34c9f814ecca5dd2b9ee0cc8c0c6ec16a603b663709befa25e65d764b54",
+    "/private/tmp/enola-hash-read-diagnostic/final/baseline-correctness-acceptance.json": "79f4f7d760de6ee7e6d001538d509d2246b00aaf95a0b2d5dc586dd19ebfe4f9",
+    "/private/tmp/enola-hash-read-diagnostic/final/final-candidate-acceptance.json": "1626270aa6abbdb57be770c409ac6fe55837a1247398049986f1fad621c95f11",
+    "/private/tmp/enola-hash-read-diagnostic/final/source-review.json": "43c680ea1936ef19bf42c553e6ec23687993ac77b297b1f205be419a36cee87f",
+    "/private/tmp/enola-hash-read-diagnostic/final/timing-window.json": "154147be50358b657a8ac708c4cf2fdf9da3e06984e22462994d1b5e6934c97f",
+    "/private/tmp/enola-hash-read-diagnostic/final/coordination/fsm-ack.json": "782a2272f0fd0f92e7d248b196a661c3847f54d6f8433e631b017fccc4fe6064",
+    "/private/tmp/enola-hash-read-diagnostic/final/coordination/plugin-ack.json": "441e4d1e4ae781fc0dc3b6173353689a89e05ad9f560169697304ef3d21a6b57",
+    "/private/tmp/enola-hash-read-diagnostic/final/coordination/reviewer-ack.json": "02388840e6d89e89e7e6cf3d5edc956b9eba7736658684cbe818e1dfa235cbb3",
+    "/private/tmp/enola-hash-read-diagnostic/final/coordination/codata-terminal-ack.json": "438e2f83f5186c93018b36be4f16e9335f8559e68951135e2b614d06bf4ba920"
+  },
+  "base_checkout": "cb6a69f",
+  "combined_source_revision": "1af548c",
+  "build_checkout": "cb6a69f",
+  "baseline_runtime": "550e1fa",
+  "frozen_at_utc": "2026-09-27T18:26:25.132297+00:00"
+}

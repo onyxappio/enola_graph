@@ -1,0 +1,28 @@
+{
+  "id": "358d31f9-71f2-4ded-b152-e1f463dc82ae",
+  "ok": false,
+  "error": {
+    "code": "run_not_found",
+    "message": "Run run_0a7e84fa4d3b was not found. Orchestration mutation request ID: 45602394-8e3e-492d-9ef4-75f58ee4b93f.",
+    "data": {
+      "orchestrationRequestId": "45602394-8e3e-492d-9ef4-75f58ee4b93f",
+      "originalCommand": [
+        "orca",
+        "orchestration",
+        "send",
+        "--run",
+        "run_4bc01fa14716",
+        "--to",
+        "run:run_0a7e84fa4d3b",
+        "--subject",
+        "Stage38 timing START",
+        "--body",
+        "Stage38 START now after all four explicit ACKs; no earlier timing. Frozen runtime1af548c binarye9e48eb0 vs accepted Stage37 binary15f55895. Six alternating AB/BA pairs within 2026-09-27 18:15–19:00 UTC, actual start after18:26. Source review/full-suite/final CLI/three histories passed. Current-roster pressure/power/swap/host gates; bounded shared-host claims. No source edits or heavy work during cohort. Explicit RELEASE on process exit.",
+        "--json"
+      ]
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}

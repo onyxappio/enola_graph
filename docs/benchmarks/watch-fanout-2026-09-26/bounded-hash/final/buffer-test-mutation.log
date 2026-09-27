@@ -1,0 +1,5 @@
+--- FAIL: TestBufferedHashUsesSuppliedScratch (0.00s)
+    buffered_hash_buffer_test.go:27: readHash bypassed its bounded buffer through WriterTo
+FAIL
+FAIL	github.com/enola-labs/enola/internal/engine	0.691s
+FAIL
