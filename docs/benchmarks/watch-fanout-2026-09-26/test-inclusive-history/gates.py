@@ -120,10 +120,13 @@ def series_problems(receipt, expected_commits):
                         + str((receipt.get('error') or {}).get('message', 'unknown')))
     steps = receipt.get('steps') or []
     transitions = [s for s in steps if s.get('kind') == 'transition']
-    if len(expected_commits) != 11:
-        problems.append('expected exactly 11 pinned commits, got ' + str(len(expected_commits)))
-    if len(transitions) != 10:
-        problems.append('expected 10 first-parent transitions, got ' + str(len(transitions)))
+    if len(expected_commits) < 2 or len(set(expected_commits)) != len(expected_commits):
+        problems.append('expected at least two distinct pinned commits')
+    expected_transitions = len(expected_commits) - 1
+    if len(transitions) != expected_transitions:
+        problems.append('expected ' + str(expected_transitions) + ' first-parent transitions, got ' + str(len(transitions)))
+    if not steps or steps[0].get('kind') != 'initial':
+        problems.append('first step is not initial')
     seen = [s.get('expected_commit') for s in steps]
     if seen != list(expected_commits):
         problems.append('step commits are not the pinned first-parent chain in order')

@@ -168,9 +168,14 @@ check('one failing step fails the series',
       any('failed gates: ' in x and 'delta-equals-cold' in x for x in p))
 
 r = good_receipt()
-check('eleven pinned commits are required',
-      any('expected exactly 11 pinned commits' in x
-          for x in gates.series_problems(r, COMMITS[:10])))
+check('expected chain length is authoritative', bool(gates.series_problems(r, COMMITS[:10])))
+short = good_receipt()
+short['steps'] = short['steps'][:2]
+check('complete two-commit scenario passes', gates.series_problems(short, COMMITS[:2]) == [])
+check('short scenario cannot satisfy an eleven-commit pin', bool(gates.series_problems(short, COMMITS)))
+short['steps'][0]['kind'] = 'transition'
+check('two transitions without initial are refused', bool(gates.series_problems(short, COMMITS[:2])))
+check('empty expected chain is refused', bool(gates.series_problems({}, ())))
 
 r = good_receipt()
 r['steps'][2]['gates'] = [g for g in r['steps'][2]['gates'] if g['key'] != 'delta-equals-cold']
@@ -223,9 +228,9 @@ with tempfile.TemporaryDirectory() as tmp:
         check('rmtree_exact refuses a path that is not a directory', False)
     except RuntimeError:
         check('rmtree_exact refuses a path that is not a directory', True)
-check('the commit chain is pinned to 11 entries ending at the task head',
-      len(rh.COMMITS) == 11 and rh.COMMITS[-1] == 'a609c19f3861971930fae7b33dcb2950598953c5'
-      and len(set(rh.COMMITS)) == 11)
+selection = json.loads((HERE / 'SCENARIOS.json').read_text())
+check('three two-commit real transitions are pinned',
+      len(selection['scenarios']) == 3 and all(x['base'] != x['target'] and len(x['base']) == len(x['target']) == 40 for x in selection['scenarios']))
 
 print(json.dumps({'passed': len(PASSED), 'failed': FAILED}, indent=2))
 sys.exit(1 if FAILED else 0)

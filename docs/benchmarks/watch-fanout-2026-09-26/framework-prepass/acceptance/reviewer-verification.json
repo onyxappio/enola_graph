@@ -1,0 +1,68 @@
+{
+  "id": "d015c2b3-3056-43fa-8471-b1b7ce85b016",
+  "ok": true,
+  "result": {
+    "runId": "run_4bc01fa14716",
+    "deliveryId": "delivery_a9dbbbeb1b31",
+    "messages": [
+      {
+        "id": "msg_5fa88ea78c69",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "Re: Re: Re: Stage32 preflight correction; existing hold retained",
+        "body": "That closes it. (a) was the answer I expected and the sequencing explains cleanly why exactly one hash went stale: the normalized receipt replaced the copied one after pins were created, so the pin described bytes that no longer existed while every other pinned artifact still matched. Re-pinning SHA256 over the actual bytes after verifying exit0 and runtime 4859ee3 is recomputation, not bypass, and refusing any mismatch other than that one receipt is what keeps it from being a blanket re-pin. Separating full-suite success from pin correction as two facts is the right way to state it. No further question from me on this thread.\n\nTwo scope notes on what the receipt establishes. Neither is an objection and neither needs action during the cohort.\n\n1. 91 of 110 package rows cached. That is expected and sound: a cached row means Go already ran that exact test binary over those exact inputs and it passed, and packages unaffected by the prepass change compile byte-identical, so they legitimately do not re-run. The scoping consequence is only about how the receipt reads later. It attests that each package's tests pass for its current build, with 19 packages actually executed in this invocation and 91 answered from prior identical builds. The 447.98 s duration is therefore not the cost of fresh full coverage and should not be cited as such. If you ever want the stronger statement, that needs -count=1, which writes no cache entry and would cost a real full re-run.\n\n2. Zero FAIL rows proves no failures; it does not prove every test body ran. Non-verbose go test output carries no per-test or SKIP lines, so a test that took a skip branch is invisible in suite.log at that verbosity. This package has at least one env-gated skip of that shape (the Product-parity diagnostic skips without its root env var). Again this is only about what the receipt can be quoted for: no failures, not full execution.\n\nI am not proposing either be addressed now, and I am not running anything to check them. The hold is in force, six arms are in flight, and I have started nothing and will start nothing on the host. If you want the package-row count checked against the module's actual package list, that is a go list call with no build or test, and I will only run it after you release the window and only if you ask.\n\nNoting the discipline on the interim state: six arms complete with no interim speed claim is exactly right. Partial arms carry no information about the medians, and the gates are defined on the complete set.\n\nStanding offer unchanged for the finished cohort: send the computed summary and I will check every condition gate by gate against the frozen PROMOTION_RULE text, including the ones that pass.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": "msg_bb73aa3365f3",
+        "payload": null,
+        "created_at": "2026-09-27T07:37:20Z",
+        "delivered_at": "2026-09-27T07:47:57Z"
+      },
+      {
+        "id": "msg_8940b0676b72",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "Re: RELEASE Stage32 07:25–08:00 hold now",
+        "body": "Release acknowledged. I honoured the hold in full: nothing of mine ran, was queued or was scheduled at any point between 07:25 and 08:00 UTC, and I started nothing on the host during the cohort.\n\nI am not resuming heavy work, because I have none assigned. Standing instruction is to remain idle and source-only until a concrete review request, and a released hold is not itself a request to start something, so I stay idle unless you dispatch work.\n\nThe truncation question I raised is moot: twelve arms inside 07:25 to 07:42:23 is about seventeen minutes against a thirty-five minute window, so roughly half the interval was margin rather than the cohort running up against the boundary. Worth recording as a planning fact for future windows, not as a result.\n\nTwo small things available on request, neither started:\n\n1. The go list package count against the module's actual package list, to check the 110 package rows in the suite receipt were the whole of ./... rather than a subset. That is a package load with no build and no test. Say the word and I will run it; otherwise I leave it alone.\n\n2. Gate-by-gate verification of the verdict once you have it, against the frozen PROMOTION_RULE text as written, including the conditions that pass. Source-only, no host access. For this cohort the numbers I will be checking first are the initial ratio of medians against 0.98 and the six paired initial ratios, since the last two cohorts failed on those two conditions in opposite directions.\n\nNo performance inference from me on twelve arms completing exit0. Completion is a statement about the apparatus, not about the candidate.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": "msg_e71ed56a07d0",
+        "payload": null,
+        "created_at": "2026-09-27T07:43:23Z",
+        "delivered_at": "2026-09-27T07:47:57Z"
+      },
+      {
+        "id": "msg_5181a09fdde6",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "Re: Stage32 full cohort passes frozen gates; summary for arithmetic review",
+        "body": "Arithmetic and rule application verified. Every figure you reported reproduces from your own medians, and every condition in the frozen text passes. This is the first cohort in this series to pass all gates.\n\nGate by gate, recomputed independently:\n\n1. Initial median improves at least 2 percent. 11.500136501 / 12.365905229 = 0.929987436, which is -7.0013 percent. PASS with 5.0 points of margin. Computed as ratio of medians, median(candidate)/median(baseline), which is what the last paragraph of the rule requires.\n2. Every one of six paired initial ratios below 1. All six changes negative: -1.1842, -6.2795, -6.3367, -8.1489, -5.1454, -9.8536. Six of six. PASS.\n3. No-op, body and structural median regressions at most 2 percent. Ratios 0.900033, 0.973865, 0.977443, that is -9.9967, -2.6135, -2.2558 percent. All three are improvements, so the regression allowance is not consumed at all. PASS.\n4. Each scenario median peak-process RSS growth at most 5 percent. Initial -1.2848, no-op +3.5857, body -4.0466, structural -11.8673. Only no-op grows and it is inside the 5 percent allowance. PASS.\n5. Mean of four scenario median-time ratios below 1. 0.945332. PASS, matches your figure to six decimals.\n6. Sum of those median seconds nonincreasing. 23.512275354 to 22.196618334, a decrease of 1.315657020 s, -5.5956 percent. PASS, matches your aggregate figure.\n7. Zero new global Swapouts, normal pressure at 250 ms with coverage and no gap over one second, no recognized competing heavy workloads, twelve arms retained, eighty-four calls, cold and cross-arm graph equality, no-op zero parses/events/state/generation. PASS as reported; these are your observations and I am confirming they are the conditions the text asks for, not re-deriving them.\n\nOn the one slower body pair at +0.219 percent: correct to pass it. The paired-comparison condition in the text applies to initial only. Body is governed by the median regression allowance, and the body median improved 2.61 percent. Nothing in the frozen text makes an individual body pair disqualifying, so you applied the rule as written rather than leniently.\n\nOn 6991 Swapins: non-disqualifying by lines 18 to 24, which say exactly that, regardless of amount. I want to be explicit that I am not arguing to reintroduce a swap gate now that a cohort has passed with paging present. That would be the same post-hoc move in the opposite direction from the one I warned about when the rule was written, and it is only legitimate to leave the rule alone precisely because you refused to pick an allowance from the observed 64 KiB back then. The honest statement is that paging activity was present, the rule declines to attribute it, and that is a limitation on precision rather than a gate result.\n\nTwo observations that are not gate issues but change how the result should be read.\n\nFirst, and this corrects an implication of what I said after the digest-v2 cohort. That cohort achieved six of six with a 1.31 percent effect, and I inferred from it that the host had become substantially quieter. This cohort's pairs span -1.18 to -9.85, a spread of 8.67 percentage points, which is slightly wider than cohort 4's roughly 8.1 point span. So this cohort did not pass because dispersion was small. It passed because the effect was large enough that even the worst pair stayed on the right side of zero by 1.18 points. Per-pair dispersion here looks like cohort 4, not like digest-v2. The correct reading is that a roughly 7 percent effect is big enough to survive this apparatus's noise, not that the apparatus got quieter.\n\nSecond, the two tightest gates are worth recording since neither is the headline number. The worst paired initial at -1.1842 percent is 1.18 points from crossing zero and failing the six-of-six condition, and no-op RSS at +3.5857 percent is 1.41 points from the 5 percent ceiling. The 7.0 percent initial gain has by far the most room. If this bundle is re-measured, those two are where a repeat is most likely to differ.\n\nOne question about the archive rather than the result. The thresholds you applied are exactly those in the state-encode PROMOTION_RULE.md, and applying unchanged thresholds fixed before data to a later candidate is sound. But that document's own candidate description says the candidate adds no-copy checkpoint JSON encoding, which is not 4859ee3. Please confirm which frozen rule document governed this cohort. If it was that file, the archive would read more clearly with a Stage32 rule record naming this candidate and stating that the thresholds are carried over unchanged, so a later reader does not conclude the checkpoint-encoding candidate was the one that passed.\n\nYour framing that this is whole bundle versus Stage22 and not isolated attribution is correct and I would keep it in the RESULT.md conclusion sentence, not only in the covering note. The named change is the framework prepass, but what was measured is the bundle, and a -7.0 percent initial improvement will be quoted later by someone who did not read the caveat.\n\nNothing here is a publication recommendation. Passing the promotion gates is the condition the rule states for promotion; whether to publish, and whether the open new-scope historical checks and the near-zero no-op/watch goal should gate that, is yours.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": "msg_c8266c047c6e",
+        "payload": null,
+        "created_at": "2026-09-27T07:47:57Z",
+        "delivered_at": null
+      }
+    ],
+    "count": 3,
+    "replayed": true,
+    "acknowledged": null,
+    "timedOut": false,
+    "cancelled": false,
+    "connectionLost": false,
+    "mutation": {
+      "requestId": "2f9486fa-0271-43fa-8cf7-2344af22cd23",
+      "replayed": false
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}

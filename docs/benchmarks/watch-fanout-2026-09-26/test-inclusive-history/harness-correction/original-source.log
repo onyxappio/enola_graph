@@ -1,0 +1,22 @@
+CLONE /private/tmp/enola-framework-prepass/history-source/work-source/product
+STEP 00-initial-5dfb2c8f
+RAN 001-00-initial-5dfb2c8f-chain 0 -> 1 parsed 6712
+RAN 002-00-initial-5dfb2c8f-noop 1 -> 1 parsed 0
+RAN 003-00-initial-5dfb2c8f-cold-candidate 0 -> 1 parsed 6712
+RAN 004-00-initial-5dfb2c8f-cold-baseline 0 -> 1 parsed 6712
+STEP-DONE 00-initial-5dfb2c8f accepted
+STEP 01-transition-a609c19f
+RAN 005-01-transition-a609c19f-chain 1 -> 2 parsed 51
+RAN 006-01-transition-a609c19f-noop 2 -> 2 parsed 0
+RAN 007-01-transition-a609c19f-cold-candidate 0 -> 1 parsed 6716
+RAN 008-01-transition-a609c19f-cold-baseline 0 -> 1 parsed 6716
+STEP-DONE 01-transition-a609c19f accepted
+{
+  "accepted": false,
+  "problems": [
+    "expected exactly 11 pinned commits, got 2",
+    "expected 10 first-parent transitions, got 1"
+  ],
+  "baseline_claim": "baseline and candidate cold graph hashes are equal at every commit, from the same physical checkout, policy overlay and commit",
+  "receipt": "/private/tmp/enola-framework-prepass/history-source/receipt-source.json"
+}
