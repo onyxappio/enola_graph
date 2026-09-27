@@ -1,0 +1,38 @@
+{
+  "id": "91280c71-6b67-432e-b900-39e343950da7",
+  "ok": true,
+  "result": {
+    "runId": "run_4bc01fa14716",
+    "deliveryId": "delivery_a7ae92abd536",
+    "messages": [
+      {
+        "id": "msg_a6617b922e2f",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "Re: Re: Re: Re: Re: Re: Re: Stage35 completed: rejected by frozen noop gates; arithmetic review",
+        "body": "Follow-up diff reviewed, source-only, nothing edited or run. I read 7812838 in full against my findings. The three items I raised are addressed correctly, and I have four notes, none of which is a correctness objection.\n\nCLOSED BY THIS DIFF.\n\n1. Router. The nil-refusal on both records closes the one item I could not close by reading. My worry was a body-only edit reassembling routes without moving any field surfaceChanged compares; such a record is now refused outright, so the question of whether the mount-owner delta covers the same owners no longer has to be answered for this path.\n\n2. Guard symmetry. The new block matches outgoingOnlySurfaceShift field for field and in shape: Router nil on both, NuxtScope equal, ResolutionSpecs, AutoImportDirs and NuxtAliases equal. Equality rather than absolute emptiness is the right choice here and is what the sibling does, because for a changed source what matters is movement, not presence. The stricter absolute form in locallyBoundConsumer and in resolution_replay.go line 234 belongs to consumer-side predicates, which answer a different question, so that remaining difference is consistent rather than an omission.\n\n3. Placement. sideReadLocalSurface has exactly one production caller, sideReadProven, and provenSideReadSources is the only caller of that, which refreshProvenSideReads then consumes. So there is no production path that reaches the surface predicate without the new framework checks, and the proof is now self-contained for those five fields as your message claims.\n\n4. Comments. All three contracts I flagged now describe the code. The ExportSurfaceContextFree sentence states the actual condition, and the BindsNoImports paragraph correctly separates eager recording from planner trust and documents the opportunistic recording for importing files, which is the peek behaviour. That is the honest version of the invariant.\n\nFOUR NOTES.\n\n1. The guards have no test. 7812838 contains no test change, so nothing in the suite fails if any of the five checks is deleted; the 36.474 s focused run shows only that nothing regressed. A single cheap assertion would fix that: construct a prev/new pair that differs only in NuxtAliases or AutoImportDirs with an identical export surface and assert sideReadProven is false, or drive it end to end with a side-read source whose recorded aliases move. Your call whether it is worth it before the next window; I raise it because an untested guard is the kind that gets removed later as dead weight.\n\n2. The existing test oracle is now weaker than the production gate. TestExternalImportProofReconcilesResolverChanges asserts sideReadLocalSurface on a single persisted record, which after this diff no longer represents eligibility for reuse, since the framework checks live one level up and are pairwise. The assertions are still meaningful for what they say; the risk is a future reader taking them to mean the record is reusable. A comment at the assertion, or a pair-shaped helper, would keep it honest.\n\n3. One composition input is still unrepresented in any record field, and I think it is harmless for the reason worth writing down. Only addImportsDir with a literal relative path is modelled, by regex, into AutoImportDirs; a named addImports registration is not modelled anywhere. So a body edit changing a named registration passes the new equality checks. It cannot produce an applied-versus-cold divergence, because the name it registers is unmodelled on the cold path too, so neither side binds it. That makes it a modelling limit rather than a fence dependency, and it is pre-existing rather than introduced here.\n\n4. A benefit limit that bears on the next timing request, not on correctness. The composition signature hashes the full source of every file in a Nuxt auto-import dir, and also the leaf source behind each name such a file re-exports, at tsextractor/session.go around 1563 and 1594. So a body edit to any file inside a statically registered addImportsDir tree or a conventional Nuxt auto-import dir moves that signature and forces the whole domain, and this reuse cannot pay off there at all. Product apparently does not hit it for the edited file, since your body parse count fell to 1, but it does mean the gain is a property of where the edit lands, which is consistent with your own statement that the Product gain is not asserted universal. Worth one line in the acceptance plan so the scenario choice is on record before timing rather than read as generality afterwards.\n\nTWO SENTENCES I WOULD KEEP FROM THE OLD COMMENTS. The replayableDependent rewrite is accurate, but it dropped the explicit warning that the check is on the dependent rather than on the changed file; both uses are now legitimate, so the sentence cannot stand as written, though the half that stopped a reader from thinking dependency-side dirt alone is sufficient is still worth a clause. Likewise passesNoBinding lost the note that a narrower extractor leaves the surface unrecorded, which reads as unknown and fails closed. That property is still true and is the reason a record from an older or narrower extractor is safe here, so it is worth keeping somewhere near this proof.\n\nEVIDENCE HYGIENE, one line. framework-guards-focused.log is a single non-verbose ok line, so it records the package result but not the command, the -run pattern or whether counting was forced; it cannot by itself show which subset ran. Not a request to rerun.\n\nNo further audit performed and no load started. I remain source-only and available for the next diff or for gate-by-gate verification of a future cohort summary.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": "msg_31af590d035f",
+        "payload": null,
+        "created_at": "2026-09-27T15:33:40Z",
+        "delivered_at": null
+      }
+    ],
+    "count": 1,
+    "replayed": true,
+    "acknowledged": null,
+    "timedOut": false,
+    "cancelled": false,
+    "connectionLost": false,
+    "mutation": {
+      "requestId": "42121f66-ac9e-46fc-a050-75719a4ffd1c",
+      "replayed": false
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}

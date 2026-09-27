@@ -1,0 +1,12 @@
+{
+  "source_revision": "7812838",
+  "binary_path": "/tmp/enola-local-surface-guarded/enola-experimental",
+  "binary_sha256": "f69bae0951bffec1fc9976e7c2fea7548d03f2ae56c62aa934c4a8d4275d08b1",
+  "source_files": {
+    "internal/graphsession/invalidate.go": "0e96bf78566746052f16024f1317f3651df43c758c57b107dd9fc74882c1dba2",
+    "internal/extractors/tsextractor/session.go": "af8240d844ff136756643968b45520e7684e7909263c6ad86d966caaafba2015"
+  },
+  "purpose": "guarded prototype; correctness running, performance not accepted",
+  "full_suite_session": 94706,
+  "product_correctness_session": 78388
+}

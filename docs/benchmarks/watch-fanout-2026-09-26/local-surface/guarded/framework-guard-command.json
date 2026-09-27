@@ -1,0 +1,5 @@
+{
+  "command": "go test ./internal/graphsession -run '^TestExternalImportProofRefusesFrameworkChanges$' -count=1 -v",
+  "exit": 0,
+  "scope": "five pairwise framework guards; runtime unchanged from 7812838"
+}

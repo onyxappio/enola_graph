@@ -1,0 +1,391 @@
+{
+  "background_owner_pid": 31975,
+  "background_mode": null,
+  "background_errors": [],
+  "background_vectors": [],
+  "background_evidence": null,
+  "validation_error": null,
+  "all_checks_validated": true,
+  "arm": "candidate",
+  "repeat": 1,
+  "quiet_ack_message_id": null,
+  "exit": 0,
+  "competing_samples": [
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "36145 go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIForkThenDeltaParsesOnlyChangedFile2011555215/001/enola ./cmd/enola",
+      "36169 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3018851233/b001/exe/a.out -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3018851233/b001/importcfg.link -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=pc6oWSWVe-f8PmP5YLxk/P61Hff5WTKwdAPYtOGBa/0SBauFX8Hrq8ffdP6wxk/pc6oWSWVe-f8PmP5YLxk -extld=cc /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3018851233/b001/_pkg_.a"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "36145 go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIForkThenDeltaParsesOnlyChangedFile2011555215/001/enola ./cmd/enola",
+      "36169 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3018851233/b001/exe/a.out -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3018851233/b001/importcfg.link -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=pc6oWSWVe-f8PmP5YLxk/P61Hff5WTKwdAPYtOGBa/0SBauFX8Hrq8ffdP6wxk/pc6oWSWVe-f8PmP5YLxk -extld=cc /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3018851233/b001/_pkg_.a"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "36145 go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIForkThenDeltaParsesOnlyChangedFile2011555215/001/enola ./cmd/enola",
+      "36169 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3018851233/b001/exe/a.out -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3018851233/b001/importcfg.link -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=pc6oWSWVe-f8PmP5YLxk/P61Hff5WTKwdAPYtOGBa/0SBauFX8Hrq8ffdP6wxk/pc6oWSWVe-f8PmP5YLxk -extld=cc /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3018851233/b001/_pkg_.a"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "36353 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIForkThenDeltaParsesOnlyChangedFile2011555215/001/enola graph analyze --context main --state-dir /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIForkThenDeltaParsesOnlyChangedFile2011555215/003 --events /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIForkThenDeltaParsesOnlyChangedFile2011555215/004/main.jsonl --json /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIForkThenDeltaParsesOnlyChangedFile2011555215/002"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "30297 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/bootstrap.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b638/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "36533 go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIFrozenMaxBeginBytesPublishesNothing2730820047/001/enola ./cmd/enola"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "36533 go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIFrozenMaxBeginBytesPublishesNothing2730820047/001/enola ./cmd/enola",
+      "36549 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2783994984/b001/exe/a.out -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2783994984/b001/importcfg.link -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=pc6oWSWVe-f8PmP5YLxk/P61Hff5WTKwdAPYtOGBa/0SBauFX8Hrq8ffdP6wxk/pc6oWSWVe-f8PmP5YLxk -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/0b/0b0958deef3478fe315c1c63e8ab1b0ee6d1b213f8b51427751b0c693a6d8584-d"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "36533 go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIFrozenMaxBeginBytesPublishesNothing2730820047/001/enola ./cmd/enola",
+      "36549 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2783994984/b001/exe/a.out -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2783994984/b001/importcfg.link -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=pc6oWSWVe-f8PmP5YLxk/P61Hff5WTKwdAPYtOGBa/0SBauFX8Hrq8ffdP6wxk/pc6oWSWVe-f8PmP5YLxk -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/0b/0b0958deef3478fe315c1c63e8ab1b0ee6d1b213f8b51427751b0c693a6d8584-d"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s",
+      "36593 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIFrozenMaxBeginBytesPublishesNothing2730820047/001/enola graph analyze --authoritative-scope --max-begin-bytes 1 --context cli-test --state-dir /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIFrozenMaxBeginBytesPublishesNothing2730820047/003 --events /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIFrozenMaxBeginBytesPublishesNothing2730820047/004/events.jsonl --json /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestCLIFrozenMaxBeginBytesPublishesNothing2730820047/002"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "29932 go test ./...",
+      "30296 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build4059044329/b550/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ]
+  ],
+  "host_load_log": "/private/tmp/enola-local-surface-guarded/cli-pairs/correctness-candidate-1/host-load.jsonl",
+  "host_load_samples": 41,
+  "host_sample_errors": [],
+  "correctness_only": true,
+  "run_succeeded": true,
+  "timing_eligible": false,
+  "binary_sha256": "f69bae0951bffec1fc9976e7c2fea7548d03f2ae56c62aa934c4a8d4275d08b1"
+}

@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/enola-labs/enola/internal/extractors/tsextractor"
 	"github.com/enola-labs/enola/internal/graphstream"
 )
 
@@ -172,6 +173,8 @@ func TestExternalImportProofReconcilesResolverChanges(t *testing.T) {
 				assertAppliedEqualsCold(t, cons, coldConsumer(t, eng, root))
 			}
 			apply()
+			// This checks record-local eligibility only; pairwise framework stability
+			// is checked separately by sideReadProven.
 			if rec := lookupState(r.state.Files, "src/leaf.ts"); rec == nil || !sideReadLocalSurface(rec.TS) {
 				t.Fatal("initial external-import fixture does not exercise local proof")
 			}
@@ -184,8 +187,43 @@ func TestExternalImportProofReconcilesResolverChanges(t *testing.T) {
 				t.Fatal(err)
 			}
 			apply()
+			// This checks record-local eligibility only; pairwise framework stability
+			// is checked separately by sideReadProven.
 			if rec := lookupState(r.state.Files, "src/leaf.ts"); rec == nil || !sideReadLocalSurface(rec.TS) {
 				t.Fatal("removing resolver input did not reconcile external proof")
+			}
+		})
+	}
+}
+
+// Equal export names cannot prove unchanged framework composition. Exercise both
+// directions so removal is protected as well as addition.
+func TestExternalImportProofRefusesFrameworkChanges(t *testing.T) {
+	base := tsextractor.FileRecord{ParseKind: "ts", ImportComplete: true,
+		ExportSurfaceRecorded: true, ExportSurfaceContextFree: true,
+		ExportSurface: []string{"pick"}, NuxtScope: "-"}
+	if !sideReadProven(&base, &base) {
+		t.Fatal("stable local surface must be provable")
+	}
+	cases := []struct {
+		name   string
+		change func(*tsextractor.FileRecord)
+	}{
+		{"router", func(r *tsextractor.FileRecord) { r.Router = &tsextractor.RouterDTO{} }},
+		{"scope", func(r *tsextractor.FileRecord) { r.NuxtScope = "app" }},
+		{"resolution", func(r *tsextractor.FileRecord) { r.ResolutionSpecs = []string{"#imports"} }},
+		{"directories", func(r *tsextractor.FileRecord) { r.AutoImportDirs = []string{"composables"} }},
+		{"aliases", func(r *tsextractor.FileRecord) { r.NuxtAliases = []string{"#local=src/local"} }},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			changed := base
+			tc.change(&changed)
+			if sideReadProven(&base, &changed) || sideReadProven(&changed, &base) {
+				t.Fatal("framework change must invalidate an otherwise equal export surface")
+			}
+			if tc.name != "router" && !sideReadProven(&changed, &changed) {
+				t.Fatal("unchanged framework context must remain eligible")
 			}
 		})
 	}
