@@ -1,0 +1,15 @@
+{
+  "base_commit": "a4c69c78e7efaada42387877471981f723250116",
+  "binary": "/tmp/enola-proven-inventory/enola-experimental",
+  "binary_sha256": "358f22f9fcb8fa32f64ce1794ea2fa8b6dc9d119f8f90fa6698a12055d8b9961",
+  "patch_sha256": "9e58014a6dbda8c85094b35156b883e99c4ba618eba31628e323604cff70779a",
+  "source_files": {
+    "internal/engine/engine.go": "d8dba5eb3d675a9561401a25dcfdeac75617afd550359ee4ad745af66fb8bed7",
+    "internal/graphinput/policy.go": "ee58c0ccb256d1385af977e7dbdbe31543a299d890d7a27535919021f2222bb8",
+    "internal/graphsession/resident.go": "a001512ab92637c9f2cab3ee7ea23f982e567265a1fd1e827d934644690cf961",
+    "internal/graphsession/session.go": "dff87decc54295287af70223da5acecd56b00e503059223a736be2113ccef874",
+    "internal/engine/proven_inventory_test.go": "0db100b787b1a05ef57a248aa2c4ca8f22792787671acec0569863ffe5bda0bb",
+    "internal/graphsession/graph_input_proof_regression_test.go": "08651af6b08c5c7d95426938dc83e1d8e7e52b81163c64dbafb59d785c0ea32f"
+  },
+  "purpose": "experimental correctness only; not accepted"
+}

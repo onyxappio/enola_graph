@@ -1,0 +1,378 @@
+{
+  "background_owner_pid": 68598,
+  "background_mode": null,
+  "background_errors": [],
+  "background_vectors": [],
+  "background_evidence": null,
+  "validation_error": null,
+  "all_checks_validated": true,
+  "arm": "candidate",
+  "repeat": 1,
+  "quiet_ack_message_id": null,
+  "exit": 0,
+  "competing_samples": [
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ],
+    [
+      "60318 go test ./internal/engine ./internal/graphinput ./internal/graphsession ./pkg/command",
+      "60424 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/graphsession.test -test.testlogfile=/var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build197586683/b410/testlog.txt -test.paniconexit0 -test.timeout=10m0s"
+    ]
+  ],
+  "host_load_log": "/private/tmp/enola-proven-inventory/cli-pairs/correctness-candidate-1/host-load.jsonl",
+  "host_load_samples": 44,
+  "host_sample_errors": [],
+  "correctness_only": true,
+  "run_succeeded": true,
+  "timing_eligible": false,
+  "binary_sha256": "358f22f9fcb8fa32f64ce1794ea2fa8b6dc9d119f8f90fa6698a12055d8b9961"
+}

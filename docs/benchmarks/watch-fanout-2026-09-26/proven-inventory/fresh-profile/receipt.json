@@ -1,0 +1,148 @@
+{
+  "purpose": "diagnostic phases only, shared host, no acceptance timing",
+  "binary_sha256": "358f22f9fcb8fa32f64ce1794ea2fa8b6dc9d119f8f90fa6698a12055d8b9961",
+  "product_revision": "01baa6eb0cc2ea74018eafc07e230a29d4efa8f4",
+  "rows": [
+    {
+      "name": "initial",
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "initial": 6752
+          }
+        },
+        "RunID": "stage15-cli-product-fresh-noop-profile-1-1790518011850435000",
+        "BaseGeneration": 0,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 6804,
+          "files_parsed": 6752,
+          "cached_files": 0,
+          "graphql_parsed": 2,
+          "sfc_parsed": 17,
+          "summary_scans": 2291,
+          "derived_indexes": 4438,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "all prior/current file owners",
+            "reason": "frozen scope: global name-resolution domain"
+          },
+          {
+            "extractor": "manifests",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "hcl",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "python",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "swift",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 7709,
+        "ParsedFiles": 6752,
+        "EarlyLocal": 0,
+        "Facts": null
+      },
+      "events": 3091,
+      "state_before": null,
+      "state_after": "805e917e1ec503244bc02e44ec027710b6d7fc9c5961f55cf20fc1b53e298667"
+    },
+    {
+      "name": "noop-1",
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {}
+        },
+        "RunID": "",
+        "BaseGeneration": 1,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 6804,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0,
+          "derived_indexes": 0,
+          "discovery_passes": 0
+        },
+        "Fallbacks": null,
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 0,
+        "EarlyLocal": 0,
+        "Facts": null
+      },
+      "events": 0,
+      "state_before": "805e917e1ec503244bc02e44ec027710b6d7fc9c5961f55cf20fc1b53e298667",
+      "state_after": "805e917e1ec503244bc02e44ec027710b6d7fc9c5961f55cf20fc1b53e298667"
+    },
+    {
+      "name": "noop-2",
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {}
+        },
+        "RunID": "",
+        "BaseGeneration": 1,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 0,
+          "files_parsed": 0,
+          "cached_files": 6804,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 0,
+          "derived_indexes": 0,
+          "discovery_passes": 0
+        },
+        "Fallbacks": null,
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 0,
+        "EarlyLocal": 0,
+        "Facts": null
+      },
+      "events": 0,
+      "state_before": "805e917e1ec503244bc02e44ec027710b6d7fc9c5961f55cf20fc1b53e298667",
+      "state_after": "805e917e1ec503244bc02e44ec027710b6d7fc9c5961f55cf20fc1b53e298667"
+    }
+  ]
+}

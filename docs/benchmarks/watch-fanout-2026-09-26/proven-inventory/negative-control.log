@@ -1,0 +1,7 @@
+--- FAIL: TestProvenInventoryPreservesWalkOrderAndPruning (0.09s)
+    proven_inventory_test.go:46: proof=true ()
+        want=engine.RepoInventory{Files:[]string{"a/child.ts", "a-/sibling.ts", "a.ts", "alias", "media.png", "pruned-more/visible.ts"}, TestFiles:[]string{"file.test.ts"}, AllNames:[]string{"a/child.ts", "a-/sibling.ts", "a.ts", "alias", "file.test.ts", "media.png", "pruned-more/visible.ts"}}
+        got=engine.RepoInventory{Files:[]string(nil), TestFiles:[]string(nil), AllNames:[]string(nil)}
+FAIL
+FAIL	github.com/enola-labs/enola/internal/engine	0.860s
+FAIL

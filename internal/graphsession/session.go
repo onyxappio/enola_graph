@@ -502,7 +502,8 @@ func identityOK(st *State, opts Options, abs string) error {
 }
 
 type session struct {
-	deferBegin bool
+	provenInventory *engine.RepoInventory
+	deferBegin      bool
 	// retained is the snapshot the resident's last committed run proved, and
 	// retainedFor the policy identity it was proven under. Both are an offer,
 	// never an answer: nothing is used until this run proves it again.
@@ -628,7 +629,8 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	var err error
 	input := s.inputs
 	if !s.fast {
-		input, err = readRuntimeInputs(s.eng, s.abs, s.state, &s.work, s.retained, s.retainedFor)
+		input, err = readRuntimeInputs(s.eng, s.abs, s.state, &s.work, s.retained, s.retainedFor, s.provenInventory)
+		s.provenInventory = nil
 		if err != nil {
 			return nil, err
 		}

@@ -1,0 +1,51 @@
+{
+  "purpose": "correctness only; concurrent full tests; no timing claim",
+  "baseline_metrics": "/tmp/enola-summary-noop/acceptance-v2/cli-pairs/candidate-1/metrics.json",
+  "baseline_metrics_sha256": "618e81d19e7f94f809efa76ab02fd3638810b021eff401ab2e045db37659c8bd",
+  "candidate_metrics_sha256": "37503ba3bad2ce8447994a08cab1cb1f74572624033eb670ac66c0727d0dac60",
+  "all_seven_calls_equal": true,
+  "rows": [
+    {
+      "label": "r1-new-initial",
+      "graph_hash": "7fe9440b1d16a8d3da57959504eeb977b338db5cfe535d6f922ff598de5deaad",
+      "parsed_files": 6752,
+      "cross_binary_equal": true
+    },
+    {
+      "label": "r1-new-noop",
+      "graph_hash": "7fe9440b1d16a8d3da57959504eeb977b338db5cfe535d6f922ff598de5deaad",
+      "parsed_files": 0,
+      "cross_binary_equal": true
+    },
+    {
+      "label": "r1-new-body",
+      "graph_hash": "7fe9440b1d16a8d3da57959504eeb977b338db5cfe535d6f922ff598de5deaad",
+      "parsed_files": 21,
+      "cross_binary_equal": true
+    },
+    {
+      "label": "r1-new-structural",
+      "graph_hash": "5dec281283083790349329a61909f097a2dec578c18c5c2d7a9fa274038b3393",
+      "parsed_files": 22,
+      "cross_binary_equal": true
+    },
+    {
+      "label": "cold-structural",
+      "graph_hash": "5dec281283083790349329a61909f097a2dec578c18c5c2d7a9fa274038b3393",
+      "parsed_files": 6752,
+      "cross_binary_equal": true
+    },
+    {
+      "label": "cold-body",
+      "graph_hash": "7fe9440b1d16a8d3da57959504eeb977b338db5cfe535d6f922ff598de5deaad",
+      "parsed_files": 6752,
+      "cross_binary_equal": true
+    },
+    {
+      "label": "cold-original",
+      "graph_hash": "7fe9440b1d16a8d3da57959504eeb977b338db5cfe535d6f922ff598de5deaad",
+      "parsed_files": 6752,
+      "cross_binary_equal": true
+    }
+  ]
+}

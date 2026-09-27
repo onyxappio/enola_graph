@@ -1,0 +1,42 @@
+{
+  "diagnostic_only": true,
+  "different_shared_host_runs": true,
+  "rows": [
+    {
+      "graph_inputs_proven": 0.106,
+      "inventory": 0.106,
+      "load_state": 0.448,
+      "cli_complete": 1.984,
+      "proof_plus_inventory": 0.212,
+      "build": "enola-summary-noop",
+      "name": "noop-1"
+    },
+    {
+      "graph_inputs_proven": 0.098,
+      "inventory": 0.106,
+      "load_state": 0.455,
+      "cli_complete": 1.978,
+      "proof_plus_inventory": 0.20400000000000001,
+      "build": "enola-summary-noop",
+      "name": "noop-2"
+    },
+    {
+      "graph_inputs_proven": 0.178,
+      "inventory": 0.0,
+      "load_state": 0.448,
+      "cli_complete": 2.008,
+      "proof_plus_inventory": 0.178,
+      "build": "enola-proven-inventory",
+      "name": "noop-1"
+    },
+    {
+      "graph_inputs_proven": 0.189,
+      "inventory": 0.0,
+      "load_state": 0.444,
+      "cli_complete": 1.966,
+      "proof_plus_inventory": 0.189,
+      "build": "enola-proven-inventory",
+      "name": "noop-2"
+    }
+  ]
+}

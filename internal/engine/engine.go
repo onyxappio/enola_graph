@@ -1116,8 +1116,6 @@ const skippedSampleCap = 20
 // the only marker a language has, and the bundled config ignores **/*.yaml, which
 // is how a Dart repository is spelled.
 func (e *Engine) walkRepo(repoPath string) (files, testFiles, allNames []string, skips walkSkips, err error) {
-	ignoreSet := facts.CompileGlobs(e.cfg.Ignore)
-	testSet := facts.CompileGlobs(e.cfg.TestGlobs)
 	tWalk := time.Now()
 	defer func() {
 		graphprofile.Since("engine_walk_repo", tWalk, fmt.Sprintf("files=%d tests=%d all_names=%d", len(files), len(testFiles), len(allNames)))
@@ -1130,7 +1128,15 @@ func (e *Engine) walkRepo(repoPath string) (files, testFiles, allNames []string,
 	if resolved, rerr := filepath.EvalSymlinks(repoPath); rerr == nil && resolved != repoPath && e.graphScope == nil {
 		repoPath = resolved
 	}
-	err = filepath.WalkDir(repoPath, func(path string, d fs.DirEntry, err error) error {
+	visit := e.inventoryVisitor(repoPath, &files, &testFiles, &allNames, &skips)
+	err = filepath.WalkDir(repoPath, visit)
+	return files, testFiles, allNames, skips, err
+}
+
+func (e *Engine) inventoryVisitor(repoPath string, files, testFiles, allNames *[]string, skips *walkSkips) fs.WalkDirFunc {
+	ignoreSet := facts.CompileGlobs(e.cfg.Ignore)
+	testSet := facts.CompileGlobs(e.cfg.TestGlobs)
+	return func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -1159,7 +1165,7 @@ func (e *Engine) walkRepo(repoPath string) (files, testFiles, allNames []string,
 		// the set plugin.FileListDetector answers from; see walkRepo's own comment for
 		// why it is taken here and not two lines lower.
 		if !d.IsDir() {
-			allNames = append(allNames, relPath)
+			*allNames = append(*allNames, relPath)
 		}
 
 		// Skip ignored paths
@@ -1178,7 +1184,7 @@ func (e *Engine) walkRepo(repoPath string) (files, testFiles, allNames []string,
 			// source, but is collected for reference-only extraction so a
 			// production symbol exercised only by a test does not look dead.
 			if testSet.MatchAny(relPath) {
-				testFiles = append(testFiles, relPath)
+				*testFiles = append(*testFiles, relPath)
 			}
 			skips.count++
 			skips.record(relPath, pattern)
@@ -1186,11 +1192,52 @@ func (e *Engine) walkRepo(repoPath string) (files, testFiles, allNames []string,
 		}
 
 		if !d.IsDir() {
-			files = append(files, relPath)
+			*files = append(*files, relPath)
 		}
 		return nil
+	}
+}
+
+// ProvenInventory shares the policy proof's walk, without allowing inventory
+// pruning to hide entries from the proof. Its result belongs to this transaction.
+func (e *Engine) ProvenInventory(repoPath string) (RepoInventory, string, bool) {
+	if e.graphScope == nil || e.graphScope.Policy == nil {
+		return RepoInventory{}, "no graph scope", false
+	}
+	abs, err := filepath.Abs(repoPath)
+	if err != nil {
+		return RepoInventory{}, err.Error(), false
+	}
+	var inv RepoInventory
+	var skips walkSkips
+	visit := e.inventoryVisitor(abs, &inv.Files, &inv.TestFiles, &inv.AllNames, &skips)
+	var pruned string
+	var visitErr error
+	first := true
+	reason, ok := e.graphScope.Policy.ReusableOverObserving(func(path string, d fs.DirEntry) {
+		if first {
+			first = false
+			if path != abs {
+				visitErr = fmt.Errorf("policy root differs from inventory root")
+			}
+		}
+		if visitErr != nil || (pruned != "" && strings.HasPrefix(path, pruned)) {
+			return
+		}
+		pruned = ""
+		if err := visit(path, d, nil); err == filepath.SkipDir {
+			pruned = path + string(filepath.Separator)
+		} else if err != nil {
+			visitErr = err
+		}
 	})
-	return files, testFiles, allNames, skips, err
+	if !ok {
+		return RepoInventory{}, reason, false
+	}
+	if visitErr != nil {
+		return RepoInventory{}, visitErr.Error(), false
+	}
+	return inv, "", true
 }
 
 // detect answers whether an extractor applies to this repository, preferring the
