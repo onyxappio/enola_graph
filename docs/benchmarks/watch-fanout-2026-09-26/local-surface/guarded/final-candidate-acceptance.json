@@ -1,0 +1,12 @@
+{
+  "correctness_accepted": true,
+  "source_revision": "7812838",
+  "test_revision": "3a94865",
+  "binary_sha256": "f69bae0951bffec1fc9976e7c2fea7548d03f2ae56c62aa934c4a8d4275d08b1",
+  "scope": "Product seven CLI calls and two real current-main histories; performance not accepted",
+  "evidence": {
+    "/tmp/enola-local-surface-guarded/cli-pairs/correctness-candidate-1/pair-receipt.json": "7b4297d116f179b08c26c19ea41e4893d106396d809274f9bfdd79ae2f84b136",
+    "/tmp/enola-local-surface-guarded/history-recent/receipt-recent.json": "bb5d2fabbe39ea0cf613f6a0c2f22210c87079f3040811d2e94fde73ddbf3734",
+    "/tmp/enola-local-surface-guarded/history-broad-v2/receipt-broad.json": "fe31ab0b96d79dc911719fcabeb39f8a4537e447624eecc6e16533b32a11ce2b"
+  }
+}
