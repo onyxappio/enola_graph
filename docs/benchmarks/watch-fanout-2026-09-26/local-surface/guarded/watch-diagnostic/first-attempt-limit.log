@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/tmp/enola-stage36-watch/watch.py", line 1848, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/tmp/enola-stage36-watch/watch.py", line 1844, in main
+    return run_watch(args)
+  File "/tmp/enola-stage36-watch/watch.py", line 1094, in run_watch
+    frames = wait_frames(jsonl, 1, 120 if fixture == "product" else 40, obs_proc, watch_proc, stderr_paths)
+  File "/tmp/enola-stage36-watch/watch.py", line 391, in wait_frames
+    raise RuntimeError("graph watch exited:\n" + stderr_paths["watch"].read_text()[-4000:])
+RuntimeError: graph watch exited:
+enola graph: config /tmp/enola-stage36-watch/product-current/config.yaml
+enola graph: frozen Begin manifest is 1075423 bytes, exceeds limit 1048576; no scope chunks allowed
+
