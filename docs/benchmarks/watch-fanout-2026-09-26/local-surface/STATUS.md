@@ -38,3 +38,5 @@ Guarded broad history completed exit 0; all gates passed, delta parsed 1453. Bot
 Four participant holds verified for 15:50–16:55 UTC, including Codata terminal acknowledgment after dispatch_run_mismatch. Timing scheduled with caffeinate in session 10341, waiting for window start. No acceptance samples yet.
 
 Timing session10341 exited0, all12 arms completed; quiet window explicitly released. Computed Stage36 acceptance passed: body4.141125 ->3.777263 s (-8.78655%), six paired wins, no time/RSS gate violation. Independent source-only gate review requested; main still unchanged. Evidence in guarded/timing-20260927.
+
+Pre-publication check: origin/main remains 2b11e7d2; no divergent commits. Pre-push hook completed exit0 (cache coverage, docslint, golden/determinism). Independent timing review pending. Cumulative HTML now records the measured body benefit without claiming publication.
