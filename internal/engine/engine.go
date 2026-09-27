@@ -1727,8 +1727,10 @@ func (e *Engine) GetArtifact(name string) ([]byte, error) {
 }
 
 // computeFileHashes reads all content using a bounded scratch-buffer pool.
-// Earlier unbuffered parallel reads regressed on Airflow. This candidate must
-// pass full CLI measurements before its Product diagnostic is generalized.
+// Earlier parallel hashing regressed on Airflow; the recorded rationale was
+// concurrent random reads contending against sequential OS prefetch. Buffer
+// reuse alone does not disprove that contention. Product measurements cover
+// the bounded candidate only, not every repository or storage device.
 func (e *Engine) computeFileHashes(repoPath string, files []string) map[string]string {
 	tHash := time.Now()
 	hashes, nbytes := boundedFileHashes(repoPath, files)

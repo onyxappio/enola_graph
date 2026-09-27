@@ -12,6 +12,7 @@ import (
 
 // readHash reads every byte. The scratch buffer bounds per-worker allocation;
 // it is not an input cache and no metadata can establish content equality.
+// scratch must be nonempty; each caller owns its scratch and digest.
 func readHash(r io.Reader, scratch []byte, digest hash.Hash) (string, int64, error) {
 	digest.Reset()
 	// Hide WriterTo: os.File otherwise bypasses CopyBuffer's supplied buffer.
@@ -19,15 +20,18 @@ func readHash(r io.Reader, scratch []byte, digest hash.Hash) (string, int64, err
 	if err != nil {
 		return "", 0, err
 	}
+	// CopyBuffer is finished; EncodeToString copies the appended digest before
+	// the next read reuses scratch, so no returned value aliases that buffer.
 	return hex.EncodeToString(digest.Sum(scratch[:0])), n, nil
 }
 
 func boundedFileHashes(repo string, files []string) (map[string]string, int64) {
 	type result struct {
-		digest string
+		digest string // A successful SHA256 hex digest is never empty, even for an empty file.
 		bytes  int64
 	}
 	results := make([]result, len(files))
+	// The bound is per invocation, not a process-wide concurrency limit.
 	workers := min(4, len(files))
 	work := func(jobs <-chan int) {
 		scratch := make([]byte, 64<<10)
