@@ -1,0 +1,800 @@
+[
+  {
+    "state_peak_sampled_bytes": 98086187,
+    "spool_peak_sampled_bytes": 38839583,
+    "state_final_bytes": 90888627,
+    "label": "r1-new-initial",
+    "start_ns": 1790534932672409000,
+    "seconds": 11.99126070807688,
+    "exit": 0,
+    "process_real_s": 11.98,
+    "rss_bytes": 1301151744.0,
+    "user_s": 48.37,
+    "sys_s": 3.01,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 6749
+        }
+      },
+      "RunID": "stage15-cli-product-correctness-candidate-1-main1-1-1790534934855755000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 6801,
+        "files_parsed": 6749,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 2292,
+        "derived_indexes": 4434,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "all prior/current file owners",
+          "reason": "frozen scope: global name-resolution domain"
+        },
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 7714,
+      "ParsedFiles": 6749,
+      "EarlyLocal": 0
+    },
+    "fallbacks": [
+      "graph: all prior/current file owners (frozen scope: global name-resolution domain)",
+      "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "applied_generation": 1,
+      "base_generation": 0,
+      "batch_count_end": 3081,
+      "batch_count_matches_end": true,
+      "batches_observed": 3081,
+      "broker_end_ns": 1790534944565526000,
+      "completeness_cached_files": 0,
+      "completeness_early_local": false,
+      "completeness_fallbacks": 6,
+      "completeness_files_analyzed": 13777,
+      "completeness_files_unreadable": 0,
+      "completeness_parsed_files": 6749,
+      "completeness_status": "success",
+      "completeness_summary_scans": 2292,
+      "consumer_applied_ns": 1790534944686063000,
+      "consumer_end_ns": 1790534944686063000,
+      "context": "correctness-candidate-1-main1",
+      "edge_records_sent": 196970,
+      "edge_records_sent_resolved": 196970,
+      "end_broker_ns": 1790534944565526000,
+      "first_batch_broker_ns": 1790534941224354000,
+      "first_batch_ns": 1790534941224354000,
+      "first_broker_ns": 1790534934923055000,
+      "first_ns": 1790534934923055000,
+      "generation_kind": "initial",
+      "graph_edges_delta": 196970,
+      "graph_edges_total": 196970,
+      "graph_nodes_delta": 100577,
+      "graph_nodes_total": 100577,
+      "messages_observed": 3083,
+      "node_records_sent": 100577,
+      "node_records_sent_resolved": 100577,
+      "normalized_hash": "194f7fbfbfa36deb3d45e1a335fd5e5eed43d916067d8a684e206487c8568f35",
+      "owner_scope_count": 11284,
+      "payload_bytes_basis": "json_payload_bytes_including_begin_and_end_excluding_broker_framing",
+      "payload_bytes_batches": 103814887,
+      "payload_bytes_begin": 1075438,
+      "payload_bytes_end": 1268,
+      "payload_bytes_total": 104891593,
+      "repo_id": "stage15-cli-product",
+      "run_id": "stage15-cli-product-correctness-candidate-1-main1-1-1790534934855755000",
+      "schema_version": "enola.graph.v2",
+      "scope_mode": "complete",
+      "target_generation": 1,
+      "time_base": "broker_metadata_timestamp"
+    },
+    "first_s": 2.250646,
+    "first_batch_s": 8.551945,
+    "broker_end_s": 11.893117,
+    "consumer_end_s": 12.013654,
+    "graph_hash": "194f7fbfbfa36deb3d45e1a335fd5e5eed43d916067d8a684e206487c8568f35"
+  },
+  {
+    "state_peak_sampled_bytes": 90888627,
+    "spool_peak_sampled_bytes": 316,
+    "state_final_bytes": 90888627,
+    "label": "r1-new-noop",
+    "start_ns": 1790534945133890000,
+    "seconds": 1.8865026249550283,
+    "exit": 0,
+    "process_real_s": 1.88,
+    "rss_bytes": 374947840.0,
+    "user_s": 1.73,
+    "sys_s": 1.2,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {}
+      },
+      "RunID": "",
+      "BaseGeneration": 1,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 0,
+        "files_parsed": 0,
+        "cached_files": 6801,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 0,
+        "derived_indexes": 0,
+        "discovery_passes": 0
+      },
+      "Fallbacks": null,
+      "Unreadable": null,
+      "OwnersPublished": 0,
+      "ParsedFiles": 0,
+      "EarlyLocal": 0
+    },
+    "fallbacks": [],
+    "graph_hash": "194f7fbfbfa36deb3d45e1a335fd5e5eed43d916067d8a684e206487c8568f35",
+    "noop_state_before": "4b351888a7d1a17150101a3d1bc647391951a4d814de6fc7ef50c06a4601373a",
+    "noop_state_after": "4b351888a7d1a17150101a3d1bc647391951a4d814de6fc7ef50c06a4601373a",
+    "noop_wire_messages": 0
+  },
+  {
+    "state_peak_sampled_bytes": 181777619,
+    "spool_peak_sampled_bytes": 1263,
+    "state_final_bytes": 90888714,
+    "label": "r1-new-body",
+    "start_ns": 1790534947082605000,
+    "seconds": 3.641499749966897,
+    "exit": 0,
+    "process_real_s": 3.63,
+    "rss_bytes": 709722112.0,
+    "user_s": 3.71,
+    "sys_s": 1.62,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "source content": 1
+        }
+      },
+      "RunID": "stage15-cli-product-correctness-candidate-1-main1-2-1790534948826248000",
+      "BaseGeneration": 1,
+      "TargetGeneration": 2,
+      "Stats": {
+        "files_read": 1,
+        "files_parsed": 1,
+        "cached_files": 6800,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 0,
+        "derived_indexes": 1,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "changed files and reverse file dependents",
+          "reason": "frozen scope: prior file-to-file dependency closure"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 0,
+      "ParsedFiles": 1,
+      "EarlyLocal": 0
+    },
+    "fallbacks": [
+      "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+    ],
+    "wire": {
+      "applied_generation": 2,
+      "base_generation": 1,
+      "batch_count_end": 0,
+      "batch_count_matches_end": true,
+      "batches_observed": 0,
+      "broker_end_ns": 1790534950645484000,
+      "completeness_cached_files": 6800,
+      "completeness_early_local": false,
+      "completeness_fallbacks": 1,
+      "completeness_files_analyzed": 13777,
+      "completeness_files_unreadable": 0,
+      "completeness_parsed_files": 1,
+      "completeness_status": "success",
+      "completeness_summary_scans": 0,
+      "consumer_applied_ns": 1790534950645772000,
+      "consumer_end_ns": 1790534950645772000,
+      "context": "correctness-candidate-1-main1",
+      "edge_records_sent": 0,
+      "edge_records_sent_resolved": 0,
+      "end_broker_ns": 1790534950645484000,
+      "first_batch_broker_ns": 0,
+      "first_batch_ns": 0,
+      "first_broker_ns": 1790534949896045000,
+      "first_ns": 1790534949896045000,
+      "generation_kind": "delta",
+      "graph_edges_delta": 0,
+      "graph_edges_total": 196970,
+      "graph_nodes_delta": 0,
+      "graph_nodes_total": 100577,
+      "messages_observed": 2,
+      "node_records_sent": 0,
+      "node_records_sent_resolved": 0,
+      "normalized_hash": "194f7fbfbfa36deb3d45e1a335fd5e5eed43d916067d8a684e206487c8568f35",
+      "owner_scope_count": 0,
+      "payload_bytes_basis": "json_payload_bytes_including_begin_and_end_excluding_broker_framing",
+      "payload_bytes_batches": 0,
+      "payload_bytes_begin": 413,
+      "payload_bytes_end": 636,
+      "payload_bytes_total": 1049,
+      "repo_id": "stage15-cli-product",
+      "run_id": "stage15-cli-product-correctness-candidate-1-main1-2-1790534948826248000",
+      "schema_version": "enola.graph.v2",
+      "scope_mode": "complete",
+      "target_generation": 2,
+      "time_base": "broker_metadata_timestamp"
+    },
+    "first_s": 2.81344,
+    "first_batch_s": null,
+    "broker_end_s": 3.562879,
+    "consumer_end_s": 3.563167,
+    "graph_hash": "194f7fbfbfa36deb3d45e1a335fd5e5eed43d916067d8a684e206487c8568f35"
+  },
+  {
+    "state_peak_sampled_bytes": 181805356,
+    "spool_peak_sampled_bytes": 28281,
+    "state_final_bytes": 90889518,
+    "label": "r1-new-structural",
+    "start_ns": 1790534951008399000,
+    "seconds": 4.1899565000785515,
+    "exit": 0,
+    "process_real_s": 4.18,
+    "rss_bytes": 926679040.0,
+    "user_s": 4.98,
+    "sys_s": 1.7,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "resolution": 21,
+          "source content": 1
+        }
+      },
+      "RunID": "stage15-cli-product-correctness-candidate-1-main1-3-1790534952731505000",
+      "BaseGeneration": 2,
+      "TargetGeneration": 3,
+      "Stats": {
+        "files_read": 22,
+        "files_parsed": 22,
+        "cached_files": 6779,
+        "graphql_parsed": 0,
+        "sfc_parsed": 0,
+        "summary_scans": 129,
+        "derived_indexes": 16,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "changed files and reverse file dependents",
+          "reason": "frozen scope: prior file-to-file dependency closure"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 1,
+      "ParsedFiles": 22,
+      "EarlyLocal": 0
+    },
+    "fallbacks": [
+      "graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)"
+    ],
+    "wire": {
+      "applied_generation": 3,
+      "base_generation": 2,
+      "batch_count_end": 1,
+      "batch_count_matches_end": true,
+      "batches_observed": 1,
+      "broker_end_ns": 1790534955102590000,
+      "completeness_cached_files": 6779,
+      "completeness_early_local": false,
+      "completeness_fallbacks": 1,
+      "completeness_files_analyzed": 13777,
+      "completeness_files_unreadable": 0,
+      "completeness_parsed_files": 22,
+      "completeness_status": "success",
+      "completeness_summary_scans": 129,
+      "consumer_applied_ns": 1790534955102860000,
+      "consumer_end_ns": 1790534955102860000,
+      "context": "correctness-candidate-1-main1",
+      "edge_records_sent": 46,
+      "edge_records_sent_resolved": 46,
+      "end_broker_ns": 1790534955102590000,
+      "first_batch_broker_ns": 1790534954319664000,
+      "first_batch_ns": 1790534954319664000,
+      "first_broker_ns": 1790534954285681000,
+      "first_ns": 1790534954285681000,
+      "generation_kind": "delta",
+      "graph_edges_delta": 3,
+      "graph_edges_total": 196973,
+      "graph_nodes_delta": 1,
+      "graph_nodes_total": 100578,
+      "messages_observed": 3,
+      "node_records_sent": 25,
+      "node_records_sent_resolved": 25,
+      "normalized_hash": "777ca16850b64c1bd665d2e4f48147209509de6ae64df6ccf28b49e01c5a190b",
+      "owner_scope_count": 1,
+      "payload_bytes_basis": "json_payload_bytes_including_begin_and_end_excluding_broker_framing",
+      "payload_bytes_batches": 19870,
+      "payload_bytes_begin": 484,
+      "payload_bytes_end": 655,
+      "payload_bytes_total": 21009,
+      "repo_id": "stage15-cli-product",
+      "run_id": "stage15-cli-product-correctness-candidate-1-main1-3-1790534952731505000",
+      "schema_version": "enola.graph.v2",
+      "scope_mode": "complete",
+      "target_generation": 3,
+      "time_base": "broker_metadata_timestamp"
+    },
+    "first_s": 3.277282,
+    "first_batch_s": 3.311265,
+    "broker_end_s": 4.094191,
+    "consumer_end_s": 4.094461,
+    "graph_hash": "777ca16850b64c1bd665d2e4f48147209509de6ae64df6ccf28b49e01c5a190b"
+  },
+  {
+    "state_peak_sampled_bytes": 98382356,
+    "spool_peak_sampled_bytes": 39230028,
+    "state_final_bytes": 90889388,
+    "label": "cold-structural",
+    "start_ns": 1790534955433595000,
+    "seconds": 11.339185291086324,
+    "exit": 0,
+    "process_real_s": 11.33,
+    "rss_bytes": 1398145024.0,
+    "user_s": 48.09,
+    "sys_s": 3.1,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 6749
+        }
+      },
+      "RunID": "stage15-cli-product-correctness-candidate-1-cold-structural-1-1790534956698652000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 6801,
+        "files_parsed": 6749,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 2265,
+        "derived_indexes": 4461,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "all prior/current file owners",
+          "reason": "frozen scope: global name-resolution domain"
+        },
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 7714,
+      "ParsedFiles": 6749,
+      "EarlyLocal": 0
+    },
+    "fallbacks": [
+      "graph: all prior/current file owners (frozen scope: global name-resolution domain)",
+      "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "applied_generation": 1,
+      "base_generation": 0,
+      "batch_count_end": 3081,
+      "batch_count_matches_end": true,
+      "batches_observed": 3081,
+      "broker_end_ns": 1790534966673329000,
+      "completeness_cached_files": 0,
+      "completeness_early_local": false,
+      "completeness_fallbacks": 6,
+      "completeness_files_analyzed": 13777,
+      "completeness_files_unreadable": 0,
+      "completeness_parsed_files": 6749,
+      "completeness_status": "success",
+      "completeness_summary_scans": 2265,
+      "consumer_applied_ns": 1790534966777854000,
+      "consumer_end_ns": 1790534966777854000,
+      "context": "correctness-candidate-1-cold-structural",
+      "edge_records_sent": 196973,
+      "edge_records_sent_resolved": 196973,
+      "end_broker_ns": 1790534966673329000,
+      "first_batch_broker_ns": 1790534963049675000,
+      "first_batch_ns": 1790534963049675000,
+      "first_broker_ns": 1790534956766395000,
+      "first_ns": 1790534956766395000,
+      "generation_kind": "initial",
+      "graph_edges_delta": 196973,
+      "graph_edges_total": 196973,
+      "graph_nodes_delta": 100578,
+      "graph_nodes_total": 100578,
+      "messages_observed": 3083,
+      "node_records_sent": 100578,
+      "node_records_sent_resolved": 100578,
+      "normalized_hash": "777ca16850b64c1bd665d2e4f48147209509de6ae64df6ccf28b49e01c5a190b",
+      "owner_scope_count": 11284,
+      "payload_bytes_basis": "json_payload_bytes_including_begin_and_end_excluding_broker_framing",
+      "payload_bytes_batches": 103846761,
+      "payload_bytes_begin": 1075458,
+      "payload_bytes_end": 1278,
+      "payload_bytes_total": 104923497,
+      "repo_id": "stage15-cli-product",
+      "run_id": "stage15-cli-product-correctness-candidate-1-cold-structural-1-1790534956698652000",
+      "schema_version": "enola.graph.v2",
+      "scope_mode": "complete",
+      "target_generation": 1,
+      "time_base": "broker_metadata_timestamp"
+    },
+    "first_s": 1.3328,
+    "first_batch_s": 7.61608,
+    "broker_end_s": 11.239734,
+    "consumer_end_s": 11.344259,
+    "graph_hash": "777ca16850b64c1bd665d2e4f48147209509de6ae64df6ccf28b49e01c5a190b"
+  },
+  {
+    "state_peak_sampled_bytes": 98199965,
+    "spool_peak_sampled_bytes": 35363551,
+    "state_final_bytes": 90888863,
+    "label": "cold-body",
+    "start_ns": 1790534967128155000,
+    "seconds": 11.531441833009012,
+    "exit": 0,
+    "process_real_s": 11.52,
+    "rss_bytes": 1315012608.0,
+    "user_s": 48.68,
+    "sys_s": 2.97,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 6749
+        }
+      },
+      "RunID": "stage15-cli-product-correctness-candidate-1-cold-body-1-1790534968400371000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 6801,
+        "files_parsed": 6749,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 2274,
+        "derived_indexes": 4452,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "all prior/current file owners",
+          "reason": "frozen scope: global name-resolution domain"
+        },
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 7714,
+      "ParsedFiles": 6749,
+      "EarlyLocal": 0
+    },
+    "fallbacks": [
+      "graph: all prior/current file owners (frozen scope: global name-resolution domain)",
+      "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "applied_generation": 1,
+      "base_generation": 0,
+      "batch_count_end": 3081,
+      "batch_count_matches_end": true,
+      "batches_observed": 3081,
+      "broker_end_ns": 1790534978544179000,
+      "completeness_cached_files": 0,
+      "completeness_early_local": false,
+      "completeness_fallbacks": 6,
+      "completeness_files_analyzed": 13777,
+      "completeness_files_unreadable": 0,
+      "completeness_parsed_files": 6749,
+      "completeness_status": "success",
+      "completeness_summary_scans": 2274,
+      "consumer_applied_ns": 1790534978675005000,
+      "consumer_end_ns": 1790534978675005000,
+      "context": "correctness-candidate-1-cold-body",
+      "edge_records_sent": 196970,
+      "edge_records_sent_resolved": 196970,
+      "end_broker_ns": 1790534978544179000,
+      "first_batch_broker_ns": 1790534975158880000,
+      "first_batch_ns": 1790534975158880000,
+      "first_broker_ns": 1790534968469983000,
+      "first_ns": 1790534968469983000,
+      "generation_kind": "initial",
+      "graph_edges_delta": 196970,
+      "graph_edges_total": 196970,
+      "graph_nodes_delta": 100577,
+      "graph_nodes_total": 100577,
+      "messages_observed": 3083,
+      "node_records_sent": 100577,
+      "node_records_sent_resolved": 100577,
+      "normalized_hash": "194f7fbfbfa36deb3d45e1a335fd5e5eed43d916067d8a684e206487c8568f35",
+      "owner_scope_count": 11284,
+      "payload_bytes_basis": "json_payload_bytes_including_begin_and_end_excluding_broker_framing",
+      "payload_bytes_batches": 103827211,
+      "payload_bytes_begin": 1075446,
+      "payload_bytes_end": 1272,
+      "payload_bytes_total": 104903929,
+      "repo_id": "stage15-cli-product",
+      "run_id": "stage15-cli-product-correctness-candidate-1-cold-body-1-1790534968400371000",
+      "schema_version": "enola.graph.v2",
+      "scope_mode": "complete",
+      "target_generation": 1,
+      "time_base": "broker_metadata_timestamp"
+    },
+    "first_s": 1.341828,
+    "first_batch_s": 8.030725,
+    "broker_end_s": 11.416024,
+    "consumer_end_s": 11.54685,
+    "graph_hash": "194f7fbfbfa36deb3d45e1a335fd5e5eed43d916067d8a684e206487c8568f35"
+  },
+  {
+    "state_peak_sampled_bytes": 98283072,
+    "spool_peak_sampled_bytes": 38613655,
+    "state_final_bytes": 90888670,
+    "label": "cold-original",
+    "start_ns": 1790534979058984000,
+    "seconds": 11.50105508393608,
+    "exit": 0,
+    "process_real_s": 11.49,
+    "rss_bytes": 1290715136.0,
+    "user_s": 49.79,
+    "sys_s": 2.97,
+    "result": {
+      "Invalidation": {
+        "RawConfigChanged": false,
+        "PolicyReconciled": false,
+        "AddedSources": 0,
+        "RemovedSources": 0,
+        "ContextAffectedSources": 0,
+        "ContextReasons": null,
+        "ParsedByReason": {
+          "initial": 6749
+        }
+      },
+      "RunID": "stage15-cli-product-correctness-candidate-1-cold-original-1-1790534980324831000",
+      "BaseGeneration": 0,
+      "TargetGeneration": 1,
+      "Stats": {
+        "files_read": 6801,
+        "files_parsed": 6749,
+        "cached_files": 0,
+        "graphql_parsed": 2,
+        "sfc_parsed": 17,
+        "summary_scans": 2318,
+        "derived_indexes": 4408,
+        "discovery_passes": 0
+      },
+      "Fallbacks": [
+        {
+          "extractor": "graph",
+          "scope": "all prior/current file owners",
+          "reason": "frozen scope: global name-resolution domain"
+        },
+        {
+          "extractor": "manifests",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "mdintent",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "hcl",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "python",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        },
+        {
+          "extractor": "swift",
+          "scope": "all files owned by extractor",
+          "reason": "no per-file incremental session; whole-extractor re-run"
+        }
+      ],
+      "Unreadable": null,
+      "OwnersPublished": 7714,
+      "ParsedFiles": 6749,
+      "EarlyLocal": 0
+    },
+    "fallbacks": [
+      "graph: all prior/current file owners (frozen scope: global name-resolution domain)",
+      "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+      "swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+    ],
+    "wire": {
+      "applied_generation": 1,
+      "base_generation": 0,
+      "batch_count_end": 3081,
+      "batch_count_matches_end": true,
+      "batches_observed": 3081,
+      "broker_end_ns": 1790534990450033000,
+      "completeness_cached_files": 0,
+      "completeness_early_local": false,
+      "completeness_fallbacks": 6,
+      "completeness_files_analyzed": 13777,
+      "completeness_files_unreadable": 0,
+      "completeness_parsed_files": 6749,
+      "completeness_status": "success",
+      "completeness_summary_scans": 2318,
+      "consumer_applied_ns": 1790534990550205000,
+      "consumer_end_ns": 1790534990550205000,
+      "context": "correctness-candidate-1-cold-original",
+      "edge_records_sent": 196970,
+      "edge_records_sent_resolved": 196970,
+      "end_broker_ns": 1790534990450033000,
+      "first_batch_broker_ns": 1790534987012424000,
+      "first_batch_ns": 1790534987012424000,
+      "first_broker_ns": 1790534980388240000,
+      "first_ns": 1790534980388240000,
+      "generation_kind": "initial",
+      "graph_edges_delta": 196970,
+      "graph_edges_total": 196970,
+      "graph_nodes_delta": 100577,
+      "graph_nodes_total": 100577,
+      "messages_observed": 3083,
+      "node_records_sent": 100577,
+      "node_records_sent_resolved": 100577,
+      "normalized_hash": "194f7fbfbfa36deb3d45e1a335fd5e5eed43d916067d8a684e206487c8568f35",
+      "owner_scope_count": 11284,
+      "payload_bytes_basis": "json_payload_bytes_including_begin_and_end_excluding_broker_framing",
+      "payload_bytes_batches": 103839535,
+      "payload_bytes_begin": 1075454,
+      "payload_bytes_end": 1276,
+      "payload_bytes_total": 104916265,
+      "repo_id": "stage15-cli-product",
+      "run_id": "stage15-cli-product-correctness-candidate-1-cold-original-1-1790534980324831000",
+      "schema_version": "enola.graph.v2",
+      "scope_mode": "complete",
+      "target_generation": 1,
+      "time_base": "broker_metadata_timestamp"
+    },
+    "first_s": 1.329256,
+    "first_batch_s": 7.95344,
+    "broker_end_s": 11.391049,
+    "consumer_end_s": 11.491221,
+    "graph_hash": "194f7fbfbfa36deb3d45e1a335fd5e5eed43d916067d8a684e206487c8568f35"
+  }
+]

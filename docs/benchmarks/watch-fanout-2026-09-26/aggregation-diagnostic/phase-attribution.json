@@ -1,0 +1,31 @@
+{
+  "correctness_passed": true,
+  "all_seven_labels_equal_to_uninstrumented": true,
+  "phases": {
+    "initial": [
+      "[graph-profile] mapfiles_only                      5.558s  total= 5.558s  trace=ts_mapfiles_breakdown  files=6801",
+      "[graph-profile] aggregate_only                     0.036s  total= 5.594s  trace=ts_mapfiles_breakdown  facts=89381",
+      "[graph-profile] ts_mapfiles_aggregate              5.595s  total= 5.756s  trace=ts  parsed=6749 facts=89381 routers=0 scans=2292 derived=4434",
+      "[graph-profile] revalidate_ts_records              0.208s  total= 9.931s  trace=session  n=6801",
+      "[graph-profile] write_pending_state                0.529s  total=10.460s  trace=session"
+    ],
+    "body": [
+      "[graph-profile] mapfiles_only                      0.012s  total= 0.012s  trace=ts_mapfiles_breakdown  files=6801",
+      "[graph-profile] aggregate_only                     0.042s  total= 0.055s  trace=ts_mapfiles_breakdown  facts=89381",
+      "[graph-profile] ts_mapfiles_aggregate              0.055s  total= 0.059s  trace=ts  parsed=1 facts=89381 routers=0 scans=0 derived=1",
+      "[graph-profile] revalidate_ts_records              0.250s  total= 2.181s  trace=session  n=6801",
+      "[graph-profile] write_pending_state                0.466s  total= 2.647s  trace=session"
+    ],
+    "structural": [
+      "[graph-profile] mapfiles_only                      0.012s  total= 0.012s  trace=ts_mapfiles_breakdown  files=6801",
+      "[graph-profile] aggregate_only                     0.045s  total= 0.057s  trace=ts_mapfiles_breakdown  facts=89382",
+      "[graph-profile] ts_mapfiles_aggregate              0.057s  total= 0.062s  trace=ts  parsed=1 facts=89382 routers=0 scans=0 derived=1",
+      "[graph-profile] mapfiles_only                      0.304s  total= 0.304s  trace=ts_mapfiles_breakdown  files=6801",
+      "[graph-profile] aggregate_only                     0.033s  total= 0.338s  trace=ts_mapfiles_breakdown  facts=89382",
+      "[graph-profile] ts_mapfiles_aggregate              0.338s  total= 0.345s  trace=ts  parsed=21 facts=89382 routers=0 scans=129 derived=15",
+      "[graph-profile] revalidate_ts_records              0.242s  total= 2.669s  trace=session  n=6801",
+      "[graph-profile] write_pending_state                0.512s  total= 3.181s  trace=session"
+    ]
+  },
+  "note": "single shared-host instrumented diagnostic; nested spans must not be summed with parent"
+}
