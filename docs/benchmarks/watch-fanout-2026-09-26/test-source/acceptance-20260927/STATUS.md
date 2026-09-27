@@ -1,0 +1,1 @@
+Prepared prospective same-scope six-pair cohort. No timing started yet. All numerical acceptance gates retained. Current participant holds required before execution. Summary gate regression checks passed after restoring missing synthetic fixture from current correctness-only metrics; synthetic cases are not benchmark evidence.
