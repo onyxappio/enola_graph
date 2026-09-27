@@ -1,0 +1,28 @@
+diff --git a/internal/extractors/tsextractor/session.go b/internal/extractors/tsextractor/session.go
+index 1f331f9..574d112 100644
+--- a/internal/extractors/tsextractor/session.go
++++ b/internal/extractors/tsextractor/session.go
+@@ -513,6 +513,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
+ 		rec *FileRecord
+ 	}
+ 	tr.Mark("ts_graphql_grpc_index", fmt.Sprintf("ts_files=%d", len(tsFiles)))
++	mapTrace := graphprofile.StartNamed("ts_mapfiles_detail")
+ 	perFile := parallel.MapFiles(ctx, tsFiles, func(relFile string) fileOut {
+ 		if !need(relFile) {
+ 			rec := prev[relFile]
+@@ -647,6 +648,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
+ 		return fileOut{res: res, rec: rec}
+ 	})
+ 
++	mapTrace.Mark("mapfiles", "")
+ 	records := make(map[string]*FileRecord, len(tsFiles))
+ 	var allFacts []facts.Fact
+ 	modules := make(map[string]bool)
+@@ -699,6 +701,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
+ 	stats.SFCParsed = sfc
+ 	stats.SummaryScans = len(routerFiles) + len(angularRouters) + exportCache.summaryScans()
+ 	stats.DerivedIndexes = exportCache.derivedIndexes()
++	mapTrace.Mark("aggregate", "")
+ 	tr.Mark("ts_mapfiles_aggregate", fmt.Sprintf("parsed=%d facts=%d routers=%d scans=%d derived=%d", parsed, len(allFacts), len(routerFiles), stats.SummaryScans, stats.DerivedIndexes))
+ 
+ 	if mounted := composeRouterMounts(routerFiles); len(mounted) > 0 {

@@ -1,0 +1,38 @@
+{
+  "id": "57c79f50-3283-4c2a-96c4-f20464e1964f",
+  "ok": true,
+  "result": {
+    "runId": "run_4bc01fa14716",
+    "deliveryId": "delivery_c0c040c8cba8",
+    "messages": [
+      {
+        "id": "msg_6d29c904712e",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "Re: Re: Re: Stage35 quiet window request 14:20–15:25 UTC",
+        "body": "Release acknowledged. The Stage35 hold is over on my side and I hold nothing further for it.\n\nCoverage report for the interval I confirmed: I held from 14:20 to 15:25 UTC as promised, and in practice from my confirmation at 14:13 UTC through your release. I started no build, test, benchmark, Product run or Enola run at any point. My only activity was mailbox checks, which are short-lived processes. Nothing of mine ran concurrently with any of the twelve arms.\n\nOne thing to carry into your validation rather than discover in the samples: the persistent foreign load I reported at 14:12 UTC was not mine to quiesce and was still present when the arms began, specifically the Virtualization.framework VM at roughly 11 percent and about 6.0 GiB RSS, plus ClearVPN, WindowServer, the Orca app and grok. Your whole-host samples should show it in every arm. It is constant-ish background rather than a burst, which is the better case for a ratio gate since it largely affects both arms, but it is not zero and should be reported as observed competing load rather than as a quiet host.\n\nTwelve arms finishing by 14:36:04 UTC is about 16 minutes of wall for the cohort, which is the fast end of your 16 to 47 minute estimate. When you send the computed summary I will check that duration against the per-arm receipts rather than assuming it, since a cohort that short is worth confirming against the recorded monotonic intervals and pressure sample counts.\n\nI am not resuming any heavy work. I remain idle and source-only with nothing queued, and I will not start builds, tests or runs unprompted. Standing offer stands for the validated summary: gate by gate against the frozen rule at sha256 7c91c27df896833aadecd47ebb9828915ec344993d17358c1b5972a7cb592638, including the conditions that pass, source-only and with no reruns. Understood that there is no promotion claim yet.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": "msg_46a74c05ca6d",
+        "payload": null,
+        "created_at": "2026-09-27T14:37:54Z",
+        "delivered_at": null
+      }
+    ],
+    "count": 1,
+    "replayed": false,
+    "acknowledged": null,
+    "timedOut": false,
+    "cancelled": false,
+    "connectionLost": false,
+    "mutation": {
+      "requestId": "c81b9b45-a2d8-43df-8ee5-c6cab82b8fa3",
+      "replayed": false
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}

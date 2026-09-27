@@ -1,0 +1,166 @@
+{
+  "purpose": "diagnostic phases only, shared host, no acceptance timing",
+  "binary_sha256": "42a3e6eaf3927d5664001d0494ecd27c7644d495f63bf52fc616efd0d26b8aa3",
+  "product_revision": "01baa6eb0cc2ea74018eafc07e230a29d4efa8f4",
+  "rows": [
+    {
+      "name": "initial",
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "initial": 6752
+          }
+        },
+        "RunID": "stage15-cli-product-fresh-noop-profile-1-1790520139151689000",
+        "BaseGeneration": 0,
+        "TargetGeneration": 1,
+        "Stats": {
+          "files_read": 6804,
+          "files_parsed": 6752,
+          "cached_files": 0,
+          "graphql_parsed": 2,
+          "sfc_parsed": 17,
+          "summary_scans": 2287,
+          "derived_indexes": 4442,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "all prior/current file owners",
+            "reason": "frozen scope: global name-resolution domain"
+          },
+          {
+            "extractor": "manifests",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "mdintent",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "hcl",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "python",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          },
+          {
+            "extractor": "swift",
+            "scope": "all files owned by extractor",
+            "reason": "no per-file incremental session; whole-extractor re-run"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 7709,
+        "ParsedFiles": 6752,
+        "EarlyLocal": 0,
+        "Facts": null
+      },
+      "events": 3091,
+      "state_before": null,
+      "state_after": "1bd114135159c2e4e67033520bf06d011e3ca9b64c1cca9d377690477afdac4b"
+    },
+    {
+      "name": "body",
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 20,
+            "source content": 1
+          }
+        },
+        "RunID": "stage15-cli-product-fresh-noop-profile-2-1790520151109249000",
+        "BaseGeneration": 1,
+        "TargetGeneration": 2,
+        "Stats": {
+          "files_read": 21,
+          "files_parsed": 21,
+          "cached_files": 6783,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 127,
+          "derived_indexes": 16,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 0,
+        "ParsedFiles": 21,
+        "EarlyLocal": 0,
+        "Facts": null
+      },
+      "events": 2,
+      "state_before": "1bd114135159c2e4e67033520bf06d011e3ca9b64c1cca9d377690477afdac4b",
+      "state_after": "3692a0b18fcb5c35237941b95df47360eb96c06c663bc921c3dccf39ac6c45dd"
+    },
+    {
+      "name": "structural",
+      "result": {
+        "Invalidation": {
+          "RawConfigChanged": false,
+          "PolicyReconciled": false,
+          "AddedSources": 0,
+          "RemovedSources": 0,
+          "ContextAffectedSources": 0,
+          "ContextReasons": null,
+          "ParsedByReason": {
+            "resolution": 21,
+            "source content": 1
+          }
+        },
+        "RunID": "stage15-cli-product-fresh-noop-profile-3-1790520155462305000",
+        "BaseGeneration": 2,
+        "TargetGeneration": 3,
+        "Stats": {
+          "files_read": 22,
+          "files_parsed": 22,
+          "cached_files": 6782,
+          "graphql_parsed": 0,
+          "sfc_parsed": 0,
+          "summary_scans": 127,
+          "derived_indexes": 16,
+          "discovery_passes": 0
+        },
+        "Fallbacks": [
+          {
+            "extractor": "graph",
+            "scope": "changed files and reverse file dependents",
+            "reason": "frozen scope: prior file-to-file dependency closure"
+          }
+        ],
+        "Unreadable": null,
+        "OwnersPublished": 1,
+        "ParsedFiles": 22,
+        "EarlyLocal": 0,
+        "Facts": null
+      },
+      "events": 3,
+      "state_before": "3692a0b18fcb5c35237941b95df47360eb96c06c663bc921c3dccf39ac6c45dd",
+      "state_after": "3b5f31f8716fb74b79f4e5512db7a605670aec98c7499c9f18e0e93fd4d636ed"
+    }
+  ]
+}
