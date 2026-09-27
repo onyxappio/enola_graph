@@ -1,0 +1,24 @@
+{
+  "candidate-1-pressure.jsonl": {
+    "sha256": "4abe0d135f2ea35ee6e42a2f4930656bc9351ffb7e8a4fd7665d22b1064605d6",
+    "bytes": 58284,
+    "archive": "candidate-1-pressure.jsonl.gz"
+  },
+  "baseline-1-pressure.jsonl": {
+    "sha256": "a2641c61beb2b9d8018588d8e96466f934803440cbb3dd382dc07eb869b9f807",
+    "bytes": 68787,
+    "archive": "baseline-1-pressure.jsonl.gz"
+  },
+  "baseline-1/host-load.jsonl": {
+    "sha256": "fe0efdbcdbaecc4d105554f185e666b950688b626c05bbca4f423ab558741656",
+    "bytes": 14939104,
+    "local_source": "/tmp/enola-summary-noop/acceptance/cli-pairs/baseline-1/host-load.jsonl",
+    "note": "Full process command lines retained locally, not copied into repository report."
+  },
+  "candidate-1/host-load.jsonl": {
+    "sha256": "d00feebd4324cdaa37bc464bee43bce8d3e71fe8eb36917d0f3a9c0b6e93b845",
+    "bytes": 11913895,
+    "local_source": "/tmp/enola-summary-noop/acceptance/cli-pairs/candidate-1/host-load.jsonl",
+    "note": "Full process command lines retained locally, not copied into repository report."
+  }
+}

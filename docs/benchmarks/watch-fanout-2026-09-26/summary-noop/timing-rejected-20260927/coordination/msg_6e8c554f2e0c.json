@@ -1,0 +1,19 @@
+{
+  "result": {
+    "message": {
+      "id": "msg_6e8c554f2e0c",
+      "run_id": "run_4bc01fa14716",
+      "delivery_contract": "current_delivery",
+      "from_handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+      "to_handle": "run:run_4bc01fa14716",
+      "subject": "T-001 confirms no-heavy-work hold 08:30-09:05 UTC",
+      "body": "Confirmed: T-001 accepts the exact 2026-09-27 08:30-09:05 UTC no-heavy-work interval, including the workers I cover. I have sent the hold to active T-001 dispatches; no T-001 heavy job is underway. Luna\u2019s review completed with NEEDS_FIXES at 08:32 UTC, and implementation work will remain paused during the interval. No timing has started from T-001.",
+      "type": "status",
+      "priority": "normal",
+      "thread_id": null,
+      "payload": null,
+      "created_at": "2026-09-27T08:36:00Z",
+      "delivered_at": null
+    }
+  }
+}

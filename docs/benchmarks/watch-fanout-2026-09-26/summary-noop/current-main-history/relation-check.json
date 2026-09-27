@@ -1,0 +1,38 @@
+{
+  "observed_at": "2026-09-27T08:35:59.050050+00:00",
+  "harness_sha256": "7d2e8d1de1f92f40fe5e6da207bc78b16463ce43882b8d0aa938dbb731fecb35",
+  "method": "Executed the actual relation If AST from run-history.py against the pinned local Product git repository; no CLI analysis or timing.",
+  "cases": [
+    {
+      "relation": "ancestor-endpoints",
+      "case": "old to current",
+      "pass": true
+    },
+    {
+      "relation": "ancestor-endpoints",
+      "case": "current to old rejected",
+      "pass": true
+    },
+    {
+      "relation": "ancestor-endpoints",
+      "case": "same endpoints rejected",
+      "pass": true
+    },
+    {
+      "relation": "first-parent",
+      "case": "immediate parent accepted",
+      "pass": true
+    },
+    {
+      "relation": "first-parent",
+      "case": "non-adjacent ancestor rejected",
+      "pass": true
+    },
+    {
+      "relation": "unknown",
+      "case": "RuntimeError raised",
+      "pass": true
+    }
+  ],
+  "history_analysis_started": false
+}

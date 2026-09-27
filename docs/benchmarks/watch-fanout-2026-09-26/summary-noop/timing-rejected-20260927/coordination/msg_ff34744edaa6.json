@@ -1,0 +1,20 @@
+{
+  "source_delivery": "/tmp/enola-summary-noop/acceptance/coordination/delivery_471d5807ca69.json",
+  "result": {
+    "message": {
+      "id": "msg_ff34744edaa6",
+      "run_id": "run_4bc01fa14716",
+      "delivery_contract": "current_delivery",
+      "from_handle": "term_f6d0d3d8-2dce-47a2-81db-44fd6bb8a1a8",
+      "to_handle": "run:run_4bc01fa14716",
+      "subject": "ACK: no heavy work 08:30\u201309:05 UTC",
+      "body": "Confirmed: I will run no heavy work during 2026-09-27 08:30\u201309:05 UTC. I cover no other workers.",
+      "type": "status",
+      "priority": "normal",
+      "thread_id": null,
+      "payload": null,
+      "created_at": "2026-09-27T08:28:30Z",
+      "delivered_at": null
+    }
+  }
+}
