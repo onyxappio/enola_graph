@@ -51,3 +51,10 @@ func TestOwnerDigestPreservesWireDifferences(t *testing.T) {
 		t.Fatal("ordering alone changed digest")
 	}
 }
+
+func TestOwnerDigestRejectsUnencodableProperties(t *testing.T) {
+	_, err := resolvedOwnerDigest([]graphstream.Node{{Props: map[string]any{"invalid": make(chan int)}}}, nil)
+	if err == nil {
+		t.Fatal("unencodable contribution accepted")
+	}
+}

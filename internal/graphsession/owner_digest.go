@@ -1,6 +1,7 @@
 package graphsession
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -9,33 +10,43 @@ import (
 	"github.com/enola-labs/enola/internal/graphstream"
 )
 
-const ownerDigestVersion = "resolved-owner-json-v1"
+const ownerDigestVersion = "resolved-owner-record-sha256-v2"
 
 // Hash complete encoded contributions, including resolved targets and occurrence
 // identifiers. Record order is immaterial; duplicate records remain significant.
 func resolvedOwnerDigest(nodes []graphstream.Node, edges []graphstream.Edge) (string, error) {
-	records := make([]string, 0, len(nodes)+len(edges))
-	for _, node := range nodes {
-		b, err := json.Marshal(node)
+	// Fixed-width, type-tagged record hashes avoid re-encoding a potentially
+	// large array of escaped JSON strings. Sorting preserves multiset semantics.
+	records := make([][sha256.Size + 1]byte, 0, len(nodes)+len(edges))
+	add := func(kind byte, value any) error {
+		b, err := json.Marshal(value)
 		if err != nil {
+			return err
+		}
+		digest := sha256.Sum256(b)
+		var record [sha256.Size + 1]byte
+		record[0] = kind
+		copy(record[1:], digest[:])
+		records = append(records, record)
+		return nil
+	}
+	for _, node := range nodes {
+		if err := add('n', node); err != nil {
 			return "", err
 		}
-		records = append(records, "n:"+string(b))
 	}
 	for _, edge := range edges {
-		b, err := json.Marshal(edge)
-		if err != nil {
+		if err := add('e', edge); err != nil {
 			return "", err
 		}
-		records = append(records, "e:"+string(b))
 	}
-	sort.Strings(records)
-	b, err := json.Marshal(records)
-	if err != nil {
-		return "", err
+	sort.Slice(records, func(i, j int) bool { return bytes.Compare(records[i][:], records[j][:]) < 0 })
+	h := sha256.New()
+	h.Write([]byte(ownerDigestVersion))
+	for i := range records {
+		h.Write(records[i][:])
 	}
-	sum := sha256.Sum256(b)
-	return hex.EncodeToString(sum[:]), nil
+	return hex.EncodeToString(h.Sum(nil)), nil
 }
 
 func (s *session) narrowPublishedOwners(grouped []ownerOutput, idx *idIndex, digests map[string]string) error {
