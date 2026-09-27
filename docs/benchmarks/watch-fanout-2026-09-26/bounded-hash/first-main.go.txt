@@ -1,0 +1,11 @@
+package main
+import("crypto/sha256";"encoding/json";"fmt";"hash";"io";"os";"path/filepath";"reflect";"runtime";"sync";"time")
+type result struct { Sum [32]byte; Bytes int64; OK bool }
+type mode struct {Name string; Workers int; Buffered bool}
+func one(path string, buffered bool, buf []byte, h hash.Hash) result {
+ if !buffered { b,e:=os.ReadFile(path);if e!=nil{return result{}};return result{sha256.Sum256(b),int64(len(b)),true} }
+ f,e:=os.Open(path);if e!=nil{return result{}};defer f.Close();h.Reset();var nbytes int64
+ for {n,e:=f.Read(buf);if n>0{h.Write(buf[:n]);nbytes+=int64(n)};if e==io.EOF{var sum [32]byte;copy(sum[:],h.Sum(nil));return result{sum,nbytes,true}};if e!=nil{return result{}}}
+}
+func run(paths []string,m mode) []result {out:=make([]result,len(paths));if m.Workers==1{buf:=make([]byte,64<<10);h:=sha256.New();for i,p:=range paths{out[i]=one(p,m.Buffered,buf,h)};return out};jobs:=make(chan int);var w sync.WaitGroup;for n:=0;n<m.Workers;n++{w.Add(1);go func(){defer w.Done();buf:=make([]byte,64<<10);h:=sha256.New();for i:=range jobs{out[i]=one(paths[i],m.Buffered,buf,h)}}()};for i:=range paths{jobs<-i};close(jobs);w.Wait();return out}
+func main(){root:=os.Args[1];raw,e:=os.ReadFile(os.Args[2]);if e!=nil{panic(e)};var names []string;if e=json.Unmarshal(raw,&names);e!=nil{panic(e)};paths:=make([]string,len(names));for i,p:=range names{paths[i]=filepath.Join(root,p)};modes:=[]mode{{"readfile-sequential",1,false},{"buffer-sequential",1,true},{"readfile-four",4,false}};oracle:=run(paths,modes[0]);count:=0;var bytes int64;for _,r:=range oracle{if r.OK{count++;bytes+=r.Bytes}};enc:=json.NewEncoder(os.Stdout);for rep:=0;rep<6;rep++{order:=[]int{0,1,2};if rep%2!=0{order=[]int{2,1,0}};for _,i:=range order{runtime.GC();var a,z runtime.MemStats;runtime.ReadMemStats(&a);t:=time.Now();got:=run(paths,modes[i]);elapsed:=time.Since(t).Seconds();runtime.ReadMemStats(&z);if !reflect.DeepEqual(oracle,got){panic("hash/read-result mismatch")};enc.Encode(map[string]any{"repeat":rep+1,"mode":modes[i].Name,"seconds":elapsed,"alloc_bytes":z.TotalAlloc-a.TotalAlloc,"allocations":z.Mallocs-a.Mallocs,"files":count,"bytes":bytes,"input_paths":len(paths),"exact_hashes_equal":true})}};fmt.Fprintln(os.Stderr,"diagnostic complete; no CLI performance acceptance")}

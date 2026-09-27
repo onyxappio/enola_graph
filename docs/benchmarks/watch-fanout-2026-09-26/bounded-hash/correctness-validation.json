@@ -1,0 +1,18 @@
+{
+  "correctness_accepted": true,
+  "cli_calls": 7,
+  "checks": 4,
+  "all_seven_graph_hashes_equal_stage37": true,
+  "parsed_files": {
+    "r1-new-initial": 6749,
+    "r1-new-noop": 0,
+    "r1-new-body": 1,
+    "r1-new-structural": 22,
+    "cold-structural": 6749,
+    "cold-body": 6749,
+    "cold-original": 6749
+  },
+  "performance_accepted": false,
+  "source": "experimental Go overlay only",
+  "binary_sha256": "9d6b9da20d13aff45d1730e0cc6f05a4b9b4c6f791049e956bd3efaf1cfbae2d"
+}

@@ -1,0 +1,23 @@
+{
+  "readfile-sequential": {
+    "median": 0.210065771,
+    "min": 0.208846458,
+    "max": 0.210913083,
+    "alloc_bytes": 88085576.0,
+    "allocations": 38903.0
+  },
+  "buffer-sequential": {
+    "median": 0.1954785415,
+    "min": 0.190587417,
+    "max": 0.196925417,
+    "alloc_bytes": 2611528.0,
+    "allocations": 31119.0
+  },
+  "readfile-four": {
+    "median": 0.11868325,
+    "min": 0.117129791,
+    "max": 0.119077542,
+    "alloc_bytes": 88291200.0,
+    "allocations": 38982.0
+  }
+}

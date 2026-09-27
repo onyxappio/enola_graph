@@ -1,0 +1,22 @@
+{
+  "full_suite_session": 84555,
+  "started_utc": "2026-09-27T17:50:28.634489+00:00",
+  "status": "live at launch; poll exact session",
+  "command": "go test -overlay=/tmp/enola-hash-read-diagnostic/overlay/overlay.json ./...",
+  "log": "overlay/full-suite.log",
+  "correctness_session": 3794,
+  "correctness_exit": 0,
+  "stage37_publication": "awaiting independent review; do not mix overlay into Stage37",
+  "history_session": 59129,
+  "history_started_utc": "2026-09-27T17:53:36.764117+00:00",
+  "history_log": "history-launch.log",
+  "history_scenarios": [
+    "source-only",
+    "recent-to-current",
+    "history-to-current"
+  ],
+  "full_suite_status": "exited0",
+  "full_suite_exit": 0,
+  "history_status": "exited0",
+  "history_exit": 0
+}

@@ -1,0 +1,30 @@
+{
+  "exit": 0,
+  "source": "4788fda plus Go overlay; runtime unchanged by later docs commits",
+  "overlay_files": {
+    "overlay/engine.go": "16e96043f16643b99c92a84a742991078cc4aa38ae6e7013bc90e10423a2f31c",
+    "overlay/buffered_hash.go": "dab645c547aebd78ede7b91562b59f0bb2d7beec878b460e9dbe3d0f12c4cf0e",
+    "overlay/buffered_hash_test.go": "27c39eb401547a29e4df3e3320887523876e3892d8d9f667c3609a2749c02b42"
+  },
+  "packages_passed": 110,
+  "cached": 96,
+  "uncached": [
+    "ok  \tgithub.com/enola-labs/enola/cmd/enola\t11.336s",
+    "ok  \tgithub.com/enola-labs/enola/internal/cachecov\t1.082s",
+    "ok  \tgithub.com/enola-labs/enola/internal/docslint\t1.644s",
+    "ok  \tgithub.com/enola-labs/enola/internal/explainers/messagingcoverage\t0.682s",
+    "ok  \tgithub.com/enola-labs/enola/internal/facts\t6.762s",
+    "ok  \tgithub.com/enola-labs/enola/internal/graphsession\t474.588s",
+    "ok  \tgithub.com/enola-labs/enola/internal/intent\t5.089s",
+    "ok  \tgithub.com/enola-labs/enola/internal/server\t9.956s",
+    "ok  \tgithub.com/enola-labs/enola/pkg/bootstrap\t124.259s",
+    "ok  \tgithub.com/enola-labs/enola/pkg/check\t6.345s",
+    "ok  \tgithub.com/enola-labs/enola/pkg/command\t8.457s",
+    "ok  \tgithub.com/enola-labs/enola/pkg/coverage\t3.948s",
+    "ok  \tgithub.com/enola-labs/enola/pkg/dashboard\t4.439s",
+    "ok  \tgithub.com/enola-labs/enola/pkg/plan\t2.609s"
+  ],
+  "log_sha256": "4c4e554647c220de91ec0545b0dc662350ad162429fbb2e9fbf6d09d651cd188",
+  "observed_completed_utc": "2026-09-27T18:00:07.910604+00:00",
+  "session": 84555
+}
