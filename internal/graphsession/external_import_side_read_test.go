@@ -144,6 +144,7 @@ func TestExternalImportProofReconcilesResolverChanges(t *testing.T) {
 	for _, tc := range []struct{ name, path, content string }{
 		{"tsconfig alias", "tsconfig.json", `{"compilerOptions":{"baseUrl":".","paths":{"vendor":["src/provider.ts"]}}}`},
 		{"new package alias", "src/package.json", `{"name":"vendor","exports":{".":"./provider.ts"}}`},
+		{"bare specifier gains file", "vendor.ts", "export function value() { return 9; }\n"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			root := setupTSRepo(t, map[string]string{
@@ -177,14 +178,14 @@ func TestExternalImportProofReconcilesResolverChanges(t *testing.T) {
 			writeFile(t, root, tc.path, tc.content)
 			apply()
 			if rec := lookupState(r.state.Files, "src/leaf.ts"); rec == nil || sideReadLocalSurface(rec.TS) {
-				t.Fatal("repository alias retained external-import proof")
+				t.Fatal("repository binding retained external-import proof")
 			}
 			if err := os.Remove(filepath.Join(root, tc.path)); err != nil {
 				t.Fatal(err)
 			}
 			apply()
 			if rec := lookupState(r.state.Files, "src/leaf.ts"); rec == nil || !sideReadLocalSurface(rec.TS) {
-				t.Fatal("removing alias did not reconcile external proof")
+				t.Fatal("removing resolver input did not reconcile external proof")
 			}
 		})
 	}
