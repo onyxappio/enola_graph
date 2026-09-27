@@ -1,0 +1,21 @@
+enola graph: config /private/tmp/enola-summary-noop/correctness/cli-pairs/correctness-candidate-1/config.yaml
+[graph] /private/tmp/enola-summary-noop/correctness/cli-pairs/correctness-candidate-1/product: generation 2→3 parsed=22 cached=6782 early_local=0 fallbacks=1
+[graph] fallback graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)
+        4.70 real         5.08 user         1.53 sys
+           938278912  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               88131  page reclaims
+                 267  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                  12  messages sent
+                  11  messages received
+                 603  signals received
+                 363  voluntary context switches
+               16726  involuntary context switches
+         63792945578  instructions retired
+         19540175180  cycles elapsed
+           883625856  peak memory footprint

@@ -20,3 +20,10 @@ in the in-progress full graphsession/command suite (session71382, log
 Next: complete full suite, real Product cold/delta/noop and replay checks,
 then repeated same-scope same-host timing against published main. No performance
 claim, watch speed claim, acceptance or publication yet.
+
+Product correctness completed exit0: seven calls and four gates passed, including
+zero-parse/zero-event/byte-stable-state noop and exact cold equality for initial,
+body and structural cases. All seven graph hashes also equal the previously
+published Stage32 cohort on the same pinned tree and explicit scope. The new
+harness uses changed-owner-scope for both builds; its receipt explicitly sets
+timing_eligible=false. Full package suite is still running; no promotion.
