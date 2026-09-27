@@ -1,0 +1,36 @@
+{
+  "source_repository": "/tmp/enola-stage16-root-review/product-source",
+  "source_head": "a609c19f3861971930fae7b33dcb2950598953c5",
+  "status": "pinned before execution; no results yet",
+  "scenarios": [
+    {
+      "kind": "recent-to-current",
+      "base": "42f589cacb0297694eddbd4de4852b74bf154c45",
+      "target": "fba38bab93c76a4da8df58cf45fd6847a468c315",
+      "base_tree": "92c54b13b6340b1ff3194dfc48a163f918935a36",
+      "target_tree": "aeb009e96c29b0758ee7dfe835e3dae80e2fb776",
+      "relation": "ancestor-endpoints",
+      "changed_path_count": 8,
+      "changed_paths": [
+        ".github/workflows/tasks-gate.yml",
+        "packages/checkout-vue/CHANGELOG.md",
+        "packages/checkout-vue/package.json",
+        "packages/checkout-vue/src/api.test.ts",
+        "packages/checkout-vue/src/api.ts",
+        "packages/tracking-client/package.json",
+        "packages/tracking-client/src/core/tracker.test.ts",
+        "packages/tracking-client/src/core/tracker.ts"
+      ],
+      "note": "Recent source/test changes plus two manifest changes and workflow/changelog; not source-only."
+    },
+    {
+      "kind": "history-to-current",
+      "base": "a609c19f3861971930fae7b33dcb2950598953c5",
+      "target": "fba38bab93c76a4da8df58cf45fd6847a468c315",
+      "base_tree": "b0308e5af59ec2ca97850f2a6da3ea1d38b6e190",
+      "target_tree": "aeb009e96c29b0758ee7dfe835e3dae80e2fb776",
+      "relation": "ancestor-endpoints",
+      "changed_path_count": 8462
+    }
+  ]
+}
