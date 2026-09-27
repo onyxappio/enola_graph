@@ -17,7 +17,7 @@ Candidate parsed initial/noop/body/structural:6749/0/1/22. The body edit changes
 
 ## Status and limitations
 
-Frozen engineering gates pass; independent complete-cohort review msg_a2041212da30 reproduced the raw figures, pins and every criterion with no blockers and recommends bounded acceptance. Runtime publication follows normal hooks. The broader near-zero no-op / substantially faster delta objective remains open. Initial and body ranges overlap and show no meaningful gain claimed here; no significance claim.
+Frozen engineering gates pass; independent complete-cohort review msg_a2041212da30 reproduced the raw figures, pins and every criterion with no blockers and recommends bounded acceptance. Published to origin/main at `893a44627298cc74fa2929aa42e7d17a4d66f6f3` with normal pre-push checks passed. The broader near-zero no-op / substantially faster delta objective remains open. Initial and body ranges overlap and show no meaningful gain claimed here; no significance claim.
 
 Foreign CPU is variable, including siriactionsd, WindowServer and virtual machine work. `host-audit.json` reports argument-free per-arm summaries; raw ps logs remain local and their SHA256 identities are archived, avoiding publication of full process arguments. There were no host sampling errors; host cadence is distinct from the stricter pressure gate. Do not describe the host as universally clean. AC/charge/low-power checks are at arm boundaries only; caffeinate-i was used, not continuous-power proof. All3606 pressure samples were normal, max gap0.279919s; zero new Swapouts, Swapins+1288 are contextual only. Details are in the series and comparison receipts.
 
