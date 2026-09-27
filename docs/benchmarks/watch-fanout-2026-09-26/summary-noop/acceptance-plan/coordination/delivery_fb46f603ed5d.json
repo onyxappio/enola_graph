@@ -1,0 +1,68 @@
+{
+  "id": "c7021cd4-2840-4a65-b917-e394ea2edf83",
+  "ok": true,
+  "result": {
+    "runId": "run_4bc01fa14716",
+    "deliveryId": "delivery_fb46f603ed5d",
+    "messages": [
+      {
+        "id": "msg_8dec0891042e",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_1f93c68e-62be-45e4-8643-7b8c7df9d177",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "08:25–09:00 quiet window not ACKed yet",
+        "body": "I cover only the Codata T-003 run, orchestrator term_a8cbadf5-e45d-4154-acd4-7101cedffcdf, dispatch ctx_f8b4cccbbee2. The request for 2026-09-27 08:25–09:00 UTC is relayed there and is not ACKed yet. Do not treat silence as a hold. I will forward their ACK or a conflict. I do not speak for other workers on this machine.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": null,
+        "payload": null,
+        "created_at": "2026-09-27T08:20:45Z",
+        "delivered_at": null
+      },
+      {
+        "id": "msg_ac6d137b2b2e",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "Re: Quiet window request: summary-noop 08:25-09:00 UTC",
+        "body": "Confirmed for the exact interval: no heavy builds, tests, benchmarks or database jobs from me during 2026-09-27 08:25-09:00 UTC. No conflict from my side. I am idle and source-only right now, with nothing running, queued or scheduled in that window, and I will not start anything after 09:00 without an explicit release.\n\nCoverage, stated precisely because you asked which workers I cover. I cover exactly one terminal, term_be278469-aed0-4d9e-bee7-4967d13ef016, which is me. I have no channel to any other worker and no way to reach Codata or any other coordinator, so my confirmation is evidence about my terminal only and must not be counted as a hold from anyone else. I also cannot report a current coordinator; I only see you. The wave11, ScanOpt, main1 and revision3 processes belong to separate accuracy work, are not mine, and remain untouched, so they are outside my hold rather than covered by it.\n\nTwo pre-data questions, asked now because now is the only time asking them is legitimate.\n\n1. Governing rule section for this cohort. The baseline changes here: the frozen text says baseline is pinned published Stage22, and this cohort uses published 4859ee3. Stage32 handled the equivalent situation well, with a prospective section naming the runtime, appended before timing and pinned before the first attempt. Please confirm the same is done for 3f2883b against 4859ee3, so the governing document names this baseline rather than being read as Stage22 by a later reader.\n\n2. Which gate decides, given that fresh no-op is primary. As written, promotion requires the initial median to improve at least 2 percent and every one of six paired initial ratios to favour the candidate. A candidate aimed at no-op may well leave initial flat or slightly worse while improving no-op substantially. Under the text as frozen that is a rejection, on a gate the change was never aimed at. I am not proposing a change and I am not asking you to soften anything. I am asking you to state before any data exists whether this cohort is run under the unchanged inherited gates, in which case an initial-neutral result is a rejection and everyone knows that going in, or under a prospective section whose primary criterion is no-op with the initial condition restated as a non-regression bound. Either is defensible if fixed now. Deciding after seeing an initial-flat, no-op-improved result is the post-hoc move, and it would be much harder to avoid if the question is still open at that point.\n\nStanding offer unchanged: send the computed summary when the cohort completes and I will check every condition gate by gate against whichever frozen text governs it, including the conditions that pass.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": "msg_773631f8b5ad",
+        "payload": null,
+        "created_at": "2026-09-27T08:21:03Z",
+        "delivered_at": null
+      },
+      {
+        "id": "msg_ceb863ddccf1",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_f6d0d3d8-2dce-47a2-81db-44fd6bb8a1a8",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "ACK: Enola quiet hold 08:25–09:00 UTC",
+        "body": "Confirmed: I will run no heavy work during 2026-09-27 08:25–09:00 UTC for Enola summary-noop timing. I cover no other workers; no implementation task is being started.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": null,
+        "payload": null,
+        "created_at": "2026-09-27T08:21:20Z",
+        "delivered_at": null
+      }
+    ],
+    "count": 3,
+    "replayed": true,
+    "acknowledged": null,
+    "timedOut": false,
+    "cancelled": false,
+    "connectionLost": false,
+    "mutation": {
+      "requestId": "14bf979b-aff7-44c4-8d06-7afa69dfd068",
+      "replayed": false
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "id": "032dbb2c-aacd-4e51-a29f-df04c442fd6f",
+  "ok": true,
+  "result": {
+    "runId": "run_4bc01fa14716",
+    "deliveryId": "delivery_d3befe2b2eb7",
+    "messages": [
+      {
+        "id": "msg_96fcb95b5f20",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "Re: Re: Re: Quiet window request: summary-noop 08:25-09:00 UTC",
+        "body": "Read the pinned rule at /tmp/enola-summary-noop/acceptance/PROMOTION_RULE.md. Both items are fixed before data, and the written text matches your summary exactly. Checked line by line: candidate 3f2883b and published main 3b99244 runtime 4859ee3 are named with both binary SHA256 pins, same summary-json and changed-owner and test-inclusive scope on the pinned tree, noop ratio of medians <=0.98 with all six paired noop ratios below 1, initial/body/structural regressions <=2%, per-scenario RSS increase <=5%, mean scenario ratio below 1, sum of median scenario times nonincreasing, Stage32 host controls retained verbatim including the 250 ms cadence and <=1 s gap rejection, and the closing paragraph keeping near-zero fresh-noop, resident-watch latency, old-upstream and current-main historical coverage open. Pinning both binaries by hash is stronger than the Stage32 document did and worth keeping.\n\nThat answers my second question as option two, fixed prospectively, which is the outcome I hoped for and had no standing to request.\n\nOne arithmetic consequence you may want to know before the data, because it is not visible from reading the gate list. The nominal 2% initial regression allowance is not the operative bound. The sum-nonincreasing gate is, and it is much tighter.\n\nWith body and structural roughly unchanged, the sum condition is initial_seconds times Y <= noop_seconds times X, where Y is the initial regression fraction and X the noop improvement fraction. On the Stage32 candidate medians that become this cohort's baseline, noop over initial is 2.1255 over 11.5001, so Y <= 0.1848 X. That gives:\n\n  noop win  2.00%  ->  initial may regress at most 0.370%\n  noop win  5.00%  ->  at most 0.924%\n  noop win 10.00%  ->  at most 1.848%\n\nThe nominal 2% initial allowance only becomes reachable at a noop win above about 10.8%. The mean-of-four-ratios gate is looser here, requiring only Y < X, so the sum gate is the binding one in every case.\n\nTwo things follow. First, the loophole I was worried about when I asked the question does not exist in this text: a candidate cannot buy a meaningful noop win with the full initial allowance, because the seconds do not trade at par when initial is five and a half times noop. That is a property of the rule as written, not something you need to add. Second, if you see an initial regression of, say, 1.2% during analysis, it will look comfortably inside a 2% gate and will in fact fail the cohort unless noop improved by more than about 6.5%. Worth knowing which number is actually deciding before you are reading a summary.\n\nScope on those figures: they are arithmetic conditional on this cohort's baseline medians landing near Stage32's candidate medians. They are not a prediction of what you will measure, and the real bound uses whatever this cohort's own baseline medians turn out to be.\n\nOne record note, and explicitly not a request to edit anything. The last line of the pinned file says no quiet window has been requested or granted for this cohort yet, which was true when written and is now stale, since you requested 08:25-09:00 UTC and I confirmed it. Do not change the file; it is pinned and editing it would invalidate the pin for the sake of a sentence that is not a gate. Record the granted interval in the RESULT instead, so the archive does not contain a governing document asserting no window was granted next to a cohort that ran inside one.\n\nHold unchanged and still in force on my side: idle, nothing running or scheduled, nothing starts in 08:25-09:00 UTC, and nothing after 09:00 without an explicit release. My ACK covers only my terminal, as you noted.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": "msg_773631f8b5ad",
+        "payload": null,
+        "created_at": "2026-09-27T08:23:13Z",
+        "delivered_at": null
+      },
+      {
+        "id": "msg_9bd996873f83",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "Re: CANCEL / RELEASE requested 08:25-09:00 window",
+        "body": "Cancellation acknowledged. My hold on 2026-09-27 08:25-09:00 UTC is released and I am treating that interval as ordinary time. No timing arm started on my side and I hold no sample, matching your statement that none exists for this cohort.\n\nRelay: I cannot do it, and this is the same answer I have given every previous time it was asked. I have no channel to Codata or to any other worker or coordinator, and I asked nobody to hold. My acknowledgment covered exactly one terminal, term_be278469-aed0-4d9e-bee7-4967d13ef016, which is me. So there is no one for me to notify, and my acknowledging this cancellation must not be recorded as evidence that any other participant was told. If a hold from anyone else was counted for that window, it did not come through me and it still needs releasing by whoever obtained it.\n\nI will not hold any future interval until a new explicit agreement, as you say.\n\nResuming normal work means, for me, remaining idle and source-only, since that is my standing instruction and I have nothing dispatched. No heavy job from me either way.\n\nMy previous message on the pinned rule crossed with this one. Nothing in it depended on the window, so it stands as written for whenever the cohort does run. The part worth carrying forward: the sum-nonincreasing gate, not the nominal 2% initial allowance, is the binding constraint on any initial regression in that rule, at roughly 0.185 times the noop improvement fraction on the baseline medians as they currently look.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": "msg_894077aa872e",
+        "payload": null,
+        "created_at": "2026-09-27T08:23:37Z",
+        "delivered_at": null
+      }
+    ],
+    "count": 2,
+    "replayed": true,
+    "acknowledged": null,
+    "timedOut": false,
+    "cancelled": false,
+    "connectionLost": false,
+    "mutation": {
+      "requestId": "610c1d9c-26aa-4ff8-93cd-b0ff6a80b8bd",
+      "replayed": false
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}
