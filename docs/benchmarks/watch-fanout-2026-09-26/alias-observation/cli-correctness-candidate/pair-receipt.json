@@ -1,0 +1,136 @@
+{
+  "background_owner_pid": 70124,
+  "background_mode": null,
+  "background_errors": [],
+  "background_vectors": [],
+  "background_evidence": null,
+  "validation_error": null,
+  "all_checks_validated": true,
+  "arm": "candidate",
+  "repeat": 1,
+  "quiet_ack_message_id": null,
+  "exit": 0,
+  "competing_samples": [
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70303 /tmp/enola-alias-observation/enola-experimental graph delta --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70303 /tmp/enola-alias-observation/enola-experimental graph delta --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/chain-state --context test-inclusive-history-chain /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70332 /tmp/enola-alias-observation/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-candidate-01 --context test-inclusive-history-cold-candidate-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70332 /tmp/enola-alias-observation/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-candidate-01 --context test-inclusive-history-cold-candidate-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70332 /tmp/enola-alias-observation/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-candidate-01 --context test-inclusive-history-cold-candidate-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70332 /tmp/enola-alias-observation/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-candidate-01 --context test-inclusive-history-cold-candidate-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70332 /tmp/enola-alias-observation/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-candidate-01 --context test-inclusive-history-cold-candidate-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70332 /tmp/enola-alias-observation/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-candidate-01 --context test-inclusive-history-cold-candidate-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70332 /tmp/enola-alias-observation/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-candidate-01 --context test-inclusive-history-cold-candidate-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70332 /tmp/enola-alias-observation/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-candidate-01 --context test-inclusive-history-cold-candidate-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70332 /tmp/enola-alias-observation/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-candidate-01 --context test-inclusive-history-cold-candidate-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70332 /tmp/enola-alias-observation/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-candidate-01 --context test-inclusive-history-cold-candidate-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70332 /tmp/enola-alias-observation/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-candidate-01 --context test-inclusive-history-cold-candidate-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70332 /tmp/enola-alias-observation/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-candidate-01 --context test-inclusive-history-cold-candidate-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70332 /tmp/enola-alias-observation/enola-experimental graph analyze --changed-owner-scope --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-candidate-01 --context test-inclusive-history-cold-candidate-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70651 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-baseline-01 --context test-inclusive-history-cold-baseline-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70651 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-baseline-01 --context test-inclusive-history-cold-baseline-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70651 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-baseline-01 --context test-inclusive-history-cold-baseline-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70651 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-baseline-01 --context test-inclusive-history-cold-baseline-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70651 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-baseline-01 --context test-inclusive-history-cold-baseline-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70651 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-baseline-01 --context test-inclusive-history-cold-baseline-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70651 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-baseline-01 --context test-inclusive-history-cold-baseline-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70651 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-baseline-01 --context test-inclusive-history-cold-baseline-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70651 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-baseline-01 --context test-inclusive-history-cold-baseline-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70651 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-baseline-01 --context test-inclusive-history-cold-baseline-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70651 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-baseline-01 --context test-inclusive-history-cold-baseline-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl",
+      "70651 /tmp/enola-local-surface-guarded/enola-experimental graph analyze --authoritative-scope --max-begin-bytes 8388608 --repo-id test-inclusive-history-product --summary-json --nats nats://127.0.0.1:55455 --state-dir /private/tmp/enola-alias-observation/history-broad/work-broad/cold-baseline-01 --context test-inclusive-history-cold-baseline-01 /private/tmp/enola-alias-observation/history-broad/work-broad/graph-config.yaml"
+    ],
+    [
+      "68821 /tmp/enola-stage9-product-watch-control/bin/benchobserver nats://127.0.0.1:55455 /private/tmp/enola-alias-observation/history-broad/work-broad/consumer.jsonl"
+    ]
+  ],
+  "host_load_log": "/private/tmp/enola-alias-observation/cli-pairs/correctness-candidate-1/host-load.jsonl",
+  "host_load_samples": 32,
+  "host_sample_errors": [],
+  "correctness_only": true,
+  "run_succeeded": true,
+  "timing_eligible": false,
+  "binary_sha256": "042a0c6e1580e62389913c7cb646377a05c1942b0c1acf44962c05581f4550eb"
+}
