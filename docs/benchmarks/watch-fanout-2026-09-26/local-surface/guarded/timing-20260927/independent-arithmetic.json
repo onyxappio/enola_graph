@@ -1,0 +1,66 @@
+{
+  "arithmetic_pass": true,
+  "source": "independent direct metrics calculation; does not substitute host evidence review",
+  "order_verified": true,
+  "scenario_checks": {
+    "initial": {
+      "median_baseline_s": 11.299933604022954,
+      "median_candidate_s": 11.249997562495992,
+      "ratio_of_medians": 0.9955808553150096,
+      "paired_ratios": [
+        0.9940575724400567,
+        1.0017207580071712,
+        0.9758577341288404,
+        0.9769057669685519,
+        1.008771191400725,
+        1.0057377297525607
+      ],
+      "rss_median_ratio": 0.980505384080832
+    },
+    "noop": {
+      "median_baseline_s": 2.0453958334983326,
+      "median_candidate_s": 2.0432063540210947,
+      "ratio_of_medians": 0.9989295570855382,
+      "paired_ratios": [
+        1.0184119338779485,
+        0.9969595804286601,
+        1.0378306135713542,
+        1.0011544626142337,
+        0.9958303921906932,
+        0.9790211959249508
+      ],
+      "rss_median_ratio": 0.9976235119696507
+    },
+    "body": {
+      "median_baseline_s": 4.141124916553963,
+      "median_candidate_s": 3.777263000025414,
+      "ratio_of_medians": 0.9121345228988319,
+      "paired_ratios": [
+        0.9145513871935588,
+        0.907831110080996,
+        0.9084056585266088,
+        0.9050055816724004,
+        0.9268377543566214,
+        0.8689126951985702
+      ],
+      "rss_median_ratio": 1.0077893997634535
+    },
+    "structural": {
+      "median_baseline_s": 4.232406958471984,
+      "median_candidate_s": 4.23131112504052,
+      "ratio_of_medians": 0.9997410850510795,
+      "paired_ratios": [
+        0.996618265948581,
+        1.0043848635858004,
+        1.0008039601348258,
+        0.9936384134731351,
+        1.0028347862950073,
+        0.9931852772974612
+      ],
+      "rss_median_ratio": 0.9569657050338534
+    }
+  },
+  "mean_median_ratio": 0.9765965050876149,
+  "sum_medians_baseline": 21.718861312547233,
+  "sum_medians_candidate": 21.30177804158302
+}
