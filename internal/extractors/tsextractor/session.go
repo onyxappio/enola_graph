@@ -445,22 +445,35 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 	grpcIdx := newGRPCStubIndex()
 	freshGQL := make(map[string]graphqlFileContribution, len(toRead))
 	freshGRPC := make(map[string]*GRPCRecord, len(toRead))
+	// Summaries depend only on each file's bytes. Compute fresh summaries with
+	// bounded workers, then merge in tsFiles order so duplicate stub resolution
+	// retains exactly the same precedence as the serial collector.
+	var summaryFiles []string
 	for _, rel := range tsFiles {
-		if src, ok := sources[rel]; ok {
-			g := collectGraphQLContribution(rel, src)
-			if possibleGraphQLServerSignal(src) && !isGraphQLDocFile(rel) && !facts.IsTestPath(rel) {
-				stats.GraphQLParsed++
-			}
-			freshGQL[rel] = g
+		if _, ok := sources[rel]; ok {
+			summaryFiles = append(summaryFiles, rel)
+		}
+	}
+	summaries := parallel.MapFiles(ctx, summaryFiles, func(rel string) frameworkSummary {
+		return collectFrameworkSummary(rel, sources[rel])
+	})
+	for i, rel := range summaryFiles {
+		summary := summaries[i]
+		freshGQL[rel] = summary.graphql
+		freshGRPC[rel] = summary.grpc
+		if summary.graphqlParsed {
+			stats.GraphQLParsed++
+		}
+	}
+	for _, rel := range tsFiles {
+		if g, ok := freshGQL[rel]; ok {
 			if g.Server {
 				graphqlServer.enabled = true
 			}
 			for _, s := range g.SDL {
 				graphqlServer.sdlDocuments[s] = true
 			}
-			rec := grpcFileContribution(src)
-			freshGRPC[rel] = rec
-			grpcIdx.mergeFile(rec)
+			grpcIdx.mergeFile(freshGRPC[rel])
 			continue
 		}
 		if rec := prev[rel]; rec != nil {
@@ -1626,4 +1639,19 @@ func compositionSignatureOn(ctx context.Context, repoPath string, files []string
 	h.Write([]byte{0})
 	h.Write([]byte(strings.Join(vis, ";")))
 	return hex.EncodeToString(h.Sum(nil)), nil
+}
+
+// frameworkSummary is transient prepass output, not a persisted dependency index.
+type frameworkSummary struct {
+	graphql       graphqlFileContribution
+	grpc          *GRPCRecord
+	graphqlParsed bool
+}
+
+func collectFrameworkSummary(rel string, src []byte) frameworkSummary {
+	return frameworkSummary{
+		graphql:       collectGraphQLContribution(rel, src),
+		grpc:          grpcFileContribution(src),
+		graphqlParsed: possibleGraphQLServerSignal(src) && !isGraphQLDocFile(rel) && !facts.IsTestPath(rel),
+	}
 }

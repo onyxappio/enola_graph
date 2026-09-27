@@ -1,0 +1,12 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/enola-labs/enola/internal/extractors/tsextractor
+cpu: Apple M1 Pro
+BenchmarkFrameworkSummaryProduct/serial-10         	       3	 475549042 ns/op	 1353562 B/op	   11462 allocs/op
+BenchmarkFrameworkSummaryProduct/serial-10         	       3	 475231097 ns/op	 1349648 B/op	   11333 allocs/op
+BenchmarkFrameworkSummaryProduct/serial-10         	       3	 475082194 ns/op	 1349648 B/op	   11333 allocs/op
+BenchmarkFrameworkSummaryProduct/bounded_parallel-10         	       3	  73932708 ns/op	 1358034 B/op	   11365 allocs/op
+BenchmarkFrameworkSummaryProduct/bounded_parallel-10         	       3	  74437694 ns/op	 1354293 B/op	   11358 allocs/op
+BenchmarkFrameworkSummaryProduct/bounded_parallel-10         	       3	  75195972 ns/op	 1352933 B/op	   11350 allocs/op
+PASS
+ok  	github.com/enola-labs/enola/internal/extractors/tsextractor	5.757s
