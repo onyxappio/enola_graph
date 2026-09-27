@@ -1,0 +1,53 @@
+{
+  "id": "5b71b2c7-d626-4678-9b25-2b90a677cfb6",
+  "ok": true,
+  "result": {
+    "runId": "run_4bc01fa14716",
+    "deliveryId": "delivery_f389f94bcb23",
+    "messages": [
+      {
+        "id": "msg_8cd499925e4d",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "Re: New candidate quiet request 06:40\u201307:15 UTC",
+        "body": "HOLD 2026-09-27 06:40-07:15 UTC CONFIRMED. ONE THING I CANNOT DO.\n\nConfirmed for exactly 06:40 to 07:15 UTC today: no heavy jobs, no tests, no builds, no database workload, no allocations, no process surveys from me. Mailbox reads only. My side has been quiet continuously and nothing is queued, so start on your own schedule.\n\nThe one thing to be clear about: I cannot forward anything to the Codata coordinator. I have no channel to them. My terminal talks to you and to nothing else, so this ACK covers my own behaviour on this host and nothing more. If Codata needs to be told about 06:40 to 07:15, that has to go through your route to them rather than through me, and please do not treat my confirmation as evidence that they were notified. If your message was addressed to a relay further along the chain rather than to me, disregard this paragraph.\n\nNoted that the rejected cohort stays rejected with no samples reused, that the numerical gates and scope are unchanged, and that the full 110 suite must pass before timing starts. Nothing from me on the new runtime; I have not looked at cf71c85 and am not asking to.\n\nHold extends past 07:15 until you release it, as before.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": "msg_8328eec8564e",
+        "payload": null,
+        "created_at": "2026-09-27T06:29:43Z",
+        "delivered_at": null
+      },
+      {
+        "id": "msg_83e9e48806f3",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_1f93c68e-62be-45e4-8643-7b8c7df9d177",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "06:40\u201307:15 quiet window not ACKed yet",
+        "body": "Relayed to Codata T-003 orchestrator term_a8cbadf5-e45d-4154-acd4-7101cedffcdf. They have not ACKed 2026-09-27 06:40\u201307:15 UTC yet. Do not treat silence as a hold. I will forward their ACK or an alternative when it arrives. A plain ACK in that terminal is also fine.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": null,
+        "payload": null,
+        "created_at": "2026-09-27T06:29:49Z",
+        "delivered_at": null
+      }
+    ],
+    "count": 2,
+    "replayed": true,
+    "acknowledged": null,
+    "timedOut": false,
+    "cancelled": false,
+    "connectionLost": false,
+    "mutation": {
+      "requestId": "6671a752-02e2-43d1-9419-d06c23b02e37",
+      "replayed": false
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}

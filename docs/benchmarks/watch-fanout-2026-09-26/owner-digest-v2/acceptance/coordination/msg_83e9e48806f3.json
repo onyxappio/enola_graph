@@ -1,0 +1,19 @@
+{
+  "result": {
+    "message": {
+      "id": "msg_83e9e48806f3",
+      "run_id": "run_4bc01fa14716",
+      "delivery_contract": "current_delivery",
+      "from_handle": "term_1f93c68e-62be-45e4-8643-7b8c7df9d177",
+      "to_handle": "run:run_4bc01fa14716",
+      "subject": "06:40\u201307:15 quiet window not ACKed yet",
+      "body": "Relayed to Codata T-003 orchestrator term_a8cbadf5-e45d-4154-acd4-7101cedffcdf. They have not ACKed 2026-09-27 06:40\u201307:15 UTC yet. Do not treat silence as a hold. I will forward their ACK or an alternative when it arrives. A plain ACK in that terminal is also fine.",
+      "type": "status",
+      "priority": "normal",
+      "thread_id": null,
+      "payload": null,
+      "created_at": "2026-09-27T06:29:49Z",
+      "delivered_at": null
+    }
+  }
+}

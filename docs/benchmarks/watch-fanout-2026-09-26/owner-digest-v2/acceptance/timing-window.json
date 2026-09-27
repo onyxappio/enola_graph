@@ -1,0 +1,43 @@
+{
+  "mode": "current-roster",
+  "combined_authorized": true,
+  "worker_message": "msg_8cd499925e4d",
+  "start_utc": "2026-09-27T06:40:00+00:00",
+  "end_utc": "2026-09-27T07:15:00+00:00",
+  "participants": [
+    {
+      "handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+      "status": "held",
+      "message_id": "msg_8cd499925e4d",
+      "evidence_path": "/tmp/enola-owner-digest-v2/acceptance/coordination/msg_8cd499925e4d.json",
+      "sha256": "ef0f32a50cd73c1e13c6b6e75728e999592487449d7cbaea6f425c3530b089bd"
+    },
+    {
+      "handle": "term_f6d0d3d8-2dce-47a2-81db-44fd6bb8a1a8",
+      "status": "terminal-held",
+      "quote": "ACK: no heavy work during 2026-09-27 06:40\u201307:15 UTC.",
+      "evidence_path": "/tmp/enola-owner-digest-v2/acceptance/coordination/fsm-hold.json",
+      "sha256": "a84690727354b1d76ec04587aeff5e7cadc96ae2dee35ee940f2f6d83887628e"
+    },
+    {
+      "handle": "term_a8cbadf5-e45d-4154-acd4-7101cedffcdf",
+      "status": "terminal-held",
+      "quote": "ACK \u2014 2026-09-27 06:40\u201307:15 UTC is clear of heavy tests, builds, database work, and Docker jobs.",
+      "evidence_path": "/tmp/enola-owner-digest-v2/acceptance/coordination/codata-hold.json",
+      "sha256": "fbb252dc21ae3f9d80ad93319d53580beb5c38a46d891852e16d513b781ee931"
+    },
+    {
+      "handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+      "status": "terminal-held",
+      "quote": "T-001 \u043f\u0456\u0434\u0442\u0432\u0435\u0440\u0434\u0436\u0435\u043d\u043e: \u0442\u0438\u0445\u0435 \u0432\u0456\u043a\u043d\u043e 06:40\u201307:15 UTC.",
+      "evidence_path": "/tmp/enola-owner-digest-v2/acceptance/coordination/plugin-hold.json",
+      "sha256": "e7902435f8157b9ecba86e30898b1b3b4185c52a8fafdac146fec82538a6bcb4"
+    },
+    {
+      "handle": "term_b4d33c66-3033-42d6-8870-0852aa948bfd",
+      "status": "exited",
+      "evidence_path": "/tmp/enola-owner-digest-v2/acceptance/coordination/closed-coordinator.json",
+      "sha256": "2df379ab3251abb344a97bbcf622a1ce37783a742d55ddfc08ac9adb3c161d37"
+    }
+  ]
+}
