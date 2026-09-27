@@ -1,0 +1,32 @@
+{
+  "correctness_accepted": true,
+  "source_revision": "1af548c",
+  "build_checkout": "cb6a69f",
+  "binary_sha256": "e9e48eb0eaeb4e642ff6078ee4a5db0b65eda9d545b61e935ee9f330bb6e1805",
+  "source_review_message": "msg_f04619eb67a2",
+  "source_review": "source-review.json",
+  "suite": "full-suite-receipt.json",
+  "histories": [
+    {
+      "path": "/tmp/enola-hash-read-diagnostic/final/history-source/receipt-source.json",
+      "sha256": "9c95a50a853011b47238ccc2cd80c516b79764ccfa9b686483e5aac373a2c0aa",
+      "delta_parses": 3
+    },
+    {
+      "path": "/tmp/enola-hash-read-diagnostic/final/history-recent/receipt-recent.json",
+      "sha256": "9db1d78245a3d3ee219e4ad3874455ef7a090064bd240ca1d3fa5cbf6ca27b19",
+      "delta_parses": 14
+    },
+    {
+      "path": "/tmp/enola-hash-read-diagnostic/final/history-broad/receipt-broad.json",
+      "sha256": "ec613b583971aa5eb39c171835615b262e3d6771c530335f13f576743692c42c",
+      "delta_parses": 1453
+    }
+  ],
+  "cli": "cli-cross-arm-validation.json",
+  "scope": "correctness prerequisites only; performance acceptance pending",
+  "followups_before_publication": [
+    "deterministic buffer-use/WriterTo regression test",
+    "clarify historical parallel-read contention rationale; no unproven buffering-causality claim"
+  ]
+}
