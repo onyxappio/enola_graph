@@ -1,0 +1,5049 @@
+{
+  "r1-new-noop": [
+    {
+      "phase": "flags_parsed",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 0.0,
+      "detail": "mode=delta"
+    },
+    {
+      "phase": "config_load",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.0,
+      "detail": "config.yaml"
+    },
+    {
+      "phase": "declare_config_deps",
+      "seconds": 0.0,
+      "trace": "graphinput_build",
+      "total_seconds": 0.0,
+      "detail": "deps=2"
+    },
+    {
+      "phase": "discover_git",
+      "seconds": 0.045,
+      "trace": "graphinput_build",
+      "total_seconds": 0.045,
+      "detail": "repo=true dirs=2"
+    },
+    {
+      "phase": "declare_git_control",
+      "seconds": 0.005,
+      "trace": "graphinput_build",
+      "total_seconds": 0.05,
+      "detail": "deps=6"
+    },
+    {
+      "phase": "git_ls_files",
+      "seconds": 0.06,
+      "trace": "graphinput_build",
+      "total_seconds": 0.11,
+      "detail": "tracked=45453 dirs=5852"
+    },
+    {
+      "phase": "walk_tree",
+      "seconds": 0.121,
+      "trace": "graphinput_build",
+      "total_seconds": 0.231,
+      "detail": "names=14446 ignorefiles=4"
+    },
+    {
+      "phase": "check_ignore_setup",
+      "seconds": 0.018,
+      "trace": "graphinput_build",
+      "total_seconds": 0.249,
+      "detail": ""
+    },
+    {
+      "phase": "check_ignore_run",
+      "seconds": 0.073,
+      "trace": "graphinput_build",
+      "total_seconds": 0.322,
+      "detail": "names=14446 ignored=0"
+    },
+    {
+      "phase": "declare_ignore_files",
+      "seconds": 0.0,
+      "trace": "graphinput_build",
+      "total_seconds": 0.323,
+      "detail": "deps=9"
+    },
+    {
+      "phase": "compute_identities",
+      "seconds": 0.033,
+      "trace": "graphinput_build",
+      "total_seconds": 0.355,
+      "detail": "deps=9 entries=14446"
+    },
+    {
+      "phase": "graphinput_build",
+      "seconds": 0.356,
+      "trace": "graph_engine",
+      "total_seconds": 0.356,
+      "detail": "configpaths=2"
+    },
+    {
+      "phase": "engine_new",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.356,
+      "detail": ""
+    },
+    {
+      "phase": "register_plugins",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.356,
+      "detail": ""
+    },
+    {
+      "phase": "config_recheck",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.356,
+      "detail": ""
+    },
+    {
+      "phase": "resolve_graph_target",
+      "seconds": 0.357,
+      "trace": "cli",
+      "total_seconds": 0.357,
+      "detail": "repos=1"
+    },
+    {
+      "phase": "connect_sink",
+      "seconds": 0.001,
+      "trace": "cli",
+      "total_seconds": 0.358,
+      "detail": "nats=true"
+    },
+    {
+      "phase": "session_options",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 0.358,
+      "detail": "repo=/private/tmp/enola-test-inclusive-profile-20260927/cli-pairs/correctness-candidate-1/product"
+    },
+    {
+      "phase": "lock",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "bind_identity",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "open_journal",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "replay_unacked",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "state_read_bytes",
+      "seconds": 0.014,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "state.json bytes=90686087"
+    },
+    {
+      "phase": "state_fingerprint",
+      "seconds": 0.04,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "bytes=90686087"
+    },
+    {
+      "phase": "state_json_unmarshal",
+      "seconds": 0.405,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "files=7772"
+    },
+    {
+      "phase": "load_state",
+      "seconds": 0.459,
+      "trace": "open",
+      "total_seconds": 0.459,
+      "detail": "files=7772"
+    },
+    {
+      "phase": "transaction_enter",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.0,
+      "detail": "fast=false failed=false"
+    },
+    {
+      "phase": "effective_config_before",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.0,
+      "detail": "files=2"
+    },
+    {
+      "phase": "graph_inputs_proven",
+      "seconds": 0.104,
+      "trace": "reconcile",
+      "total_seconds": 0.104,
+      "detail": ""
+    },
+    {
+      "phase": "effective_config",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.104,
+      "detail": "files=2 fast=false"
+    },
+    {
+      "phase": "reconcile_complete",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.104,
+      "detail": "reloaded=false"
+    },
+    {
+      "phase": "engine_walk_repo",
+      "seconds": 0.124,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "files=13764 tests=0 all_names=13764"
+    },
+    {
+      "phase": "inventory",
+      "seconds": 0.124,
+      "trace": "inputs",
+      "total_seconds": 0.124,
+      "detail": "files=13764 all_names=13764"
+    },
+    {
+      "phase": "detect_go",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_manifests",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_mdintent",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_dotnet",
+      "seconds": 0.006,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_cpp",
+      "seconds": 0.007,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_hcl",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_ansible",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_java",
+      "seconds": 0.004,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_kotlin",
+      "seconds": 0.005,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_php",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_python",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_typescript",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_swift",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_ruby",
+      "seconds": 0.003,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_rust",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_scala",
+      "seconds": 0.006,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_dart",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_grpc",
+      "seconds": 0.077,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_openapi",
+      "seconds": 0.078,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_asyncapi",
+      "seconds": 0.148,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_extractors",
+      "seconds": 0.148,
+      "trace": "inputs",
+      "total_seconds": 0.272,
+      "detail": "detected=6"
+    },
+    {
+      "phase": "select_hash_targets",
+      "seconds": 0.024,
+      "trace": "inputs",
+      "total_seconds": 0.296,
+      "detail": "targets=7791"
+    },
+    {
+      "phase": "engine_hash_files",
+      "seconds": 0.297,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=7791 hashed=7791 bytes=82572444"
+    },
+    {
+      "phase": "hash_content_inputs",
+      "seconds": 0.297,
+      "trace": "inputs",
+      "total_seconds": 0.593,
+      "detail": "targets=7791"
+    },
+    {
+      "phase": "capture_contexts",
+      "seconds": 0.08,
+      "trace": "inputs",
+      "total_seconds": 0.673,
+      "detail": "contexts=2"
+    },
+    {
+      "phase": "ts_config_inputs",
+      "seconds": 0.065,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=83"
+    },
+    {
+      "phase": "analysis_fingerprint",
+      "seconds": 0.073,
+      "trace": "inputs",
+      "total_seconds": 0.746,
+      "detail": "cfg_files=59"
+    },
+    {
+      "phase": "angular_probe",
+      "seconds": 0.004,
+      "trace": "inputs",
+      "total_seconds": 0.75,
+      "detail": "angular=false"
+    },
+    {
+      "phase": "policy_identity",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.75,
+      "detail": ""
+    },
+    {
+      "phase": "engine_context_fingerprint",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.75,
+      "detail": ""
+    },
+    {
+      "phase": "ts_disc_nuxt_packages",
+      "seconds": 0.104,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "pkgs=0"
+    },
+    {
+      "phase": "ts_disc_package_gates",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "ts_disc_package_names",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "names=30"
+    },
+    {
+      "phase": "ts_disc_alias_roots",
+      "seconds": 0.074,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "roots=1"
+    },
+    {
+      "phase": "ts_disc_package_exports",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "packages=30"
+    },
+    {
+      "phase": "ts_discovery_build",
+      "seconds": 0.19,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "side_reads=2001 stat_reads=2013 walked_dirs=667 captured=59"
+    },
+    {
+      "phase": "ts_discovery",
+      "seconds": 0.19,
+      "trace": "inputs",
+      "total_seconds": 0.94,
+      "detail": "names=0 bytes=0 dirs=0"
+    },
+    {
+      "phase": "ts_session_context",
+      "seconds": 0.088,
+      "trace": "inputs",
+      "total_seconds": 1.029,
+      "detail": "files=6804"
+    },
+    {
+      "phase": "runtime_inputs_complete",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 1.029,
+      "detail": ""
+    },
+    {
+      "phase": "clone_file_state_copy",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=7772"
+    },
+    {
+      "phase": "extractor_need",
+      "seconds": 1.097,
+      "trace": "session",
+      "total_seconds": 1.097,
+      "detail": "non_ts_need=false detected=6 neutral=0"
+    },
+    {
+      "phase": "changed_terms",
+      "seconds": 0.009,
+      "trace": "session",
+      "total_seconds": 1.106,
+      "detail": "initial=false force=false non_ts=false scan=false raw_cfg=false policy=false neutral_scan=false neutral_cfg=false"
+    },
+    {
+      "phase": "ts_reuse_cache",
+      "seconds": 0.083,
+      "trace": "session",
+      "total_seconds": 1.189,
+      "detail": "owned=6804 facts=101962"
+    },
+    {
+      "phase": "assemble_new_files",
+      "seconds": 0.012,
+      "trace": "session",
+      "total_seconds": 1.201,
+      "detail": "new=7772 ts_noop=true non_ts_need=false skip=true facts=101981"
+    },
+    {
+      "phase": "ts_config_inputs",
+      "seconds": 0.063,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=83"
+    },
+    {
+      "phase": "skip_publish_return",
+      "seconds": 0.066,
+      "trace": "session",
+      "total_seconds": 1.268,
+      "detail": ""
+    },
+    {
+      "phase": "graph_session_run",
+      "seconds": 1.839,
+      "trace": "cli",
+      "total_seconds": 2.197,
+      "detail": "repo=/private/tmp/enola-test-inclusive-profile-20260927/cli-pairs/correctness-candidate-1/product parsed=0"
+    },
+    {
+      "phase": "cli_complete",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 2.197,
+      "detail": "results=1"
+    }
+  ],
+  "r1-new-structural": [
+    {
+      "phase": "flags_parsed",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 0.0,
+      "detail": "mode=delta"
+    },
+    {
+      "phase": "config_load",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.0,
+      "detail": "config.yaml"
+    },
+    {
+      "phase": "declare_config_deps",
+      "seconds": 0.0,
+      "trace": "graphinput_build",
+      "total_seconds": 0.0,
+      "detail": "deps=2"
+    },
+    {
+      "phase": "discover_git",
+      "seconds": 0.043,
+      "trace": "graphinput_build",
+      "total_seconds": 0.043,
+      "detail": "repo=true dirs=2"
+    },
+    {
+      "phase": "declare_git_control",
+      "seconds": 0.005,
+      "trace": "graphinput_build",
+      "total_seconds": 0.048,
+      "detail": "deps=6"
+    },
+    {
+      "phase": "git_ls_files",
+      "seconds": 0.06,
+      "trace": "graphinput_build",
+      "total_seconds": 0.108,
+      "detail": "tracked=45453 dirs=5852"
+    },
+    {
+      "phase": "walk_tree",
+      "seconds": 0.125,
+      "trace": "graphinput_build",
+      "total_seconds": 0.233,
+      "detail": "names=14446 ignorefiles=4"
+    },
+    {
+      "phase": "check_ignore_setup",
+      "seconds": 0.019,
+      "trace": "graphinput_build",
+      "total_seconds": 0.251,
+      "detail": ""
+    },
+    {
+      "phase": "check_ignore_run",
+      "seconds": 0.07,
+      "trace": "graphinput_build",
+      "total_seconds": 0.321,
+      "detail": "names=14446 ignored=0"
+    },
+    {
+      "phase": "declare_ignore_files",
+      "seconds": 0.0,
+      "trace": "graphinput_build",
+      "total_seconds": 0.321,
+      "detail": "deps=9"
+    },
+    {
+      "phase": "compute_identities",
+      "seconds": 0.034,
+      "trace": "graphinput_build",
+      "total_seconds": 0.356,
+      "detail": "deps=9 entries=14446"
+    },
+    {
+      "phase": "graphinput_build",
+      "seconds": 0.357,
+      "trace": "graph_engine",
+      "total_seconds": 0.357,
+      "detail": "configpaths=2"
+    },
+    {
+      "phase": "engine_new",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.357,
+      "detail": ""
+    },
+    {
+      "phase": "register_plugins",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.357,
+      "detail": ""
+    },
+    {
+      "phase": "config_recheck",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.357,
+      "detail": ""
+    },
+    {
+      "phase": "resolve_graph_target",
+      "seconds": 0.357,
+      "trace": "cli",
+      "total_seconds": 0.357,
+      "detail": "repos=1"
+    },
+    {
+      "phase": "connect_sink",
+      "seconds": 0.001,
+      "trace": "cli",
+      "total_seconds": 0.358,
+      "detail": "nats=true"
+    },
+    {
+      "phase": "session_options",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 0.358,
+      "detail": "repo=/private/tmp/enola-test-inclusive-profile-20260927/cli-pairs/correctness-candidate-1/product"
+    },
+    {
+      "phase": "lock",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "bind_identity",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "open_journal",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "replay_unacked",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "state_read_bytes",
+      "seconds": 0.015,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "state.json bytes=90686087"
+    },
+    {
+      "phase": "state_fingerprint",
+      "seconds": 0.042,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "bytes=90686087"
+    },
+    {
+      "phase": "state_json_unmarshal",
+      "seconds": 0.402,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "files=7772"
+    },
+    {
+      "phase": "load_state",
+      "seconds": 0.46,
+      "trace": "open",
+      "total_seconds": 0.46,
+      "detail": "files=7772"
+    },
+    {
+      "phase": "transaction_enter",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.0,
+      "detail": "fast=false failed=false"
+    },
+    {
+      "phase": "effective_config_before",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.0,
+      "detail": "files=2"
+    },
+    {
+      "phase": "graph_inputs_proven",
+      "seconds": 0.101,
+      "trace": "reconcile",
+      "total_seconds": 0.101,
+      "detail": ""
+    },
+    {
+      "phase": "effective_config",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.101,
+      "detail": "files=2 fast=false"
+    },
+    {
+      "phase": "reconcile_complete",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.101,
+      "detail": "reloaded=false"
+    },
+    {
+      "phase": "engine_walk_repo",
+      "seconds": 0.129,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "files=13764 tests=0 all_names=13764"
+    },
+    {
+      "phase": "inventory",
+      "seconds": 0.129,
+      "trace": "inputs",
+      "total_seconds": 0.129,
+      "detail": "files=13764 all_names=13764"
+    },
+    {
+      "phase": "detect_go",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_manifests",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_mdintent",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_dotnet",
+      "seconds": 0.006,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_cpp",
+      "seconds": 0.006,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_hcl",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_ansible",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_java",
+      "seconds": 0.005,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_kotlin",
+      "seconds": 0.005,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_php",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_python",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_typescript",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_swift",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_ruby",
+      "seconds": 0.004,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_rust",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_scala",
+      "seconds": 0.006,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_dart",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_grpc",
+      "seconds": 0.096,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_openapi",
+      "seconds": 0.101,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_asyncapi",
+      "seconds": 0.161,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_extractors",
+      "seconds": 0.161,
+      "trace": "inputs",
+      "total_seconds": 0.29,
+      "detail": "detected=6"
+    },
+    {
+      "phase": "select_hash_targets",
+      "seconds": 0.024,
+      "trace": "inputs",
+      "total_seconds": 0.314,
+      "detail": "targets=7791"
+    },
+    {
+      "phase": "engine_hash_files",
+      "seconds": 0.298,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=7791 hashed=7791 bytes=82572551"
+    },
+    {
+      "phase": "hash_content_inputs",
+      "seconds": 0.298,
+      "trace": "inputs",
+      "total_seconds": 0.613,
+      "detail": "targets=7791"
+    },
+    {
+      "phase": "capture_contexts",
+      "seconds": 0.082,
+      "trace": "inputs",
+      "total_seconds": 0.695,
+      "detail": "contexts=2"
+    },
+    {
+      "phase": "ts_config_inputs",
+      "seconds": 0.062,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=83"
+    },
+    {
+      "phase": "analysis_fingerprint",
+      "seconds": 0.069,
+      "trace": "inputs",
+      "total_seconds": 0.764,
+      "detail": "cfg_files=59"
+    },
+    {
+      "phase": "angular_probe",
+      "seconds": 0.004,
+      "trace": "inputs",
+      "total_seconds": 0.768,
+      "detail": "angular=false"
+    },
+    {
+      "phase": "policy_identity",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.768,
+      "detail": ""
+    },
+    {
+      "phase": "engine_context_fingerprint",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.768,
+      "detail": ""
+    },
+    {
+      "phase": "ts_disc_nuxt_packages",
+      "seconds": 0.105,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "pkgs=0"
+    },
+    {
+      "phase": "ts_disc_package_gates",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "ts_disc_package_names",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "names=30"
+    },
+    {
+      "phase": "ts_disc_alias_roots",
+      "seconds": 0.073,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "roots=1"
+    },
+    {
+      "phase": "ts_disc_package_exports",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "packages=30"
+    },
+    {
+      "phase": "ts_discovery_build",
+      "seconds": 0.188,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "side_reads=2001 stat_reads=2013 walked_dirs=667 captured=59"
+    },
+    {
+      "phase": "ts_discovery",
+      "seconds": 0.188,
+      "trace": "inputs",
+      "total_seconds": 0.956,
+      "detail": "names=0 bytes=0 dirs=0"
+    },
+    {
+      "phase": "ts_session_context",
+      "seconds": 0.081,
+      "trace": "inputs",
+      "total_seconds": 1.037,
+      "detail": "files=6804"
+    },
+    {
+      "phase": "runtime_inputs_complete",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 1.037,
+      "detail": ""
+    },
+    {
+      "phase": "clone_file_state_copy",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=7772"
+    },
+    {
+      "phase": "extractor_need",
+      "seconds": 1.101,
+      "trace": "session",
+      "total_seconds": 1.101,
+      "detail": "non_ts_need=false detected=6 neutral=0"
+    },
+    {
+      "phase": "changed_terms",
+      "seconds": 0.023,
+      "trace": "session",
+      "total_seconds": 1.124,
+      "detail": "initial=false force=false non_ts=false scan=true raw_cfg=false policy=false neutral_scan=false neutral_cfg=false"
+    },
+    {
+      "phase": "ts_detect_frameworks",
+      "seconds": 0.0,
+      "trace": "ts",
+      "total_seconds": 0.0,
+      "detail": "files=6804 shared_discovery=true"
+    },
+    {
+      "phase": "ts_disc_package_aliases",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "aliases=21"
+    },
+    {
+      "phase": "ts_read_dirty",
+      "seconds": 0.004,
+      "trace": "ts",
+      "total_seconds": 0.004,
+      "detail": "to_read=1 cached=6803"
+    },
+    {
+      "phase": "ts_graphql_grpc_index",
+      "seconds": 0.001,
+      "trace": "ts",
+      "total_seconds": 0.005,
+      "detail": "ts_files=6804"
+    },
+    {
+      "phase": "ts_mapfiles_aggregate",
+      "seconds": 0.066,
+      "trace": "ts",
+      "total_seconds": 0.071,
+      "detail": "parsed=1 facts=89517 routers=0 scans=0 derived=1"
+    },
+    {
+      "phase": "ts_compose_modules",
+      "seconds": 0.004,
+      "trace": "ts",
+      "total_seconds": 0.075,
+      "detail": "facts=89959 records=6804 unread=0"
+    },
+    {
+      "phase": "ts_detect_frameworks",
+      "seconds": 0.0,
+      "trace": "ts",
+      "total_seconds": 0.0,
+      "detail": "files=6804 shared_discovery=true"
+    },
+    {
+      "phase": "ts_disc_package_aliases",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "aliases=21"
+    },
+    {
+      "phase": "ts_read_dirty",
+      "seconds": 0.005,
+      "trace": "ts",
+      "total_seconds": 0.005,
+      "detail": "to_read=21 cached=6783"
+    },
+    {
+      "phase": "ts_graphql_grpc_index",
+      "seconds": 0.007,
+      "trace": "ts",
+      "total_seconds": 0.011,
+      "detail": "ts_files=6804"
+    },
+    {
+      "phase": "ts_mapfiles_aggregate",
+      "seconds": 0.352,
+      "trace": "ts",
+      "total_seconds": 0.363,
+      "detail": "parsed=21 facts=89517 routers=0 scans=127 derived=15"
+    },
+    {
+      "phase": "ts_compose_modules",
+      "seconds": 0.004,
+      "trace": "ts",
+      "total_seconds": 0.367,
+      "detail": "facts=89959 records=6804 unread=0"
+    },
+    {
+      "phase": "ts_frozen_preview",
+      "seconds": 0.663,
+      "trace": "session",
+      "total_seconds": 1.787,
+      "detail": "dirty=22 err=false"
+    },
+    {
+      "phase": "invalidation_plan",
+      "seconds": 0.279,
+      "trace": "session",
+      "total_seconds": 2.066,
+      "detail": "reason=frozen scope: prior file-to-file dependency closure whole=false extra=0"
+    },
+    {
+      "phase": "begin_publish",
+      "seconds": 0.0,
+      "trace": "session",
+      "total_seconds": 2.067,
+      "detail": "scope=22"
+    },
+    {
+      "phase": "ts_dirty_scope",
+      "seconds": 0.162,
+      "trace": "session",
+      "total_seconds": 2.228,
+      "detail": "dirty=22 scope=22 force=false"
+    },
+    {
+      "phase": "ts_extract_session",
+      "seconds": 0.0,
+      "trace": "session",
+      "total_seconds": 2.229,
+      "detail": "parsed=22 cached=6782 facts=89959 records=6804"
+    },
+    {
+      "phase": "assemble_new_files",
+      "seconds": 0.257,
+      "trace": "session",
+      "total_seconds": 2.486,
+      "detail": "new=7772 ts_noop=false non_ts_need=false skip=false facts=101982"
+    },
+    {
+      "phase": "index_group_owners",
+      "seconds": 0.187,
+      "trace": "session",
+      "total_seconds": 2.672,
+      "detail": "facts=100618 owners=7709"
+    },
+    {
+      "phase": "compare_owner_contributions",
+      "seconds": 0.009,
+      "trace": "session",
+      "total_seconds": 2.681,
+      "detail": "scope=1"
+    },
+    {
+      "phase": "revalidate_before_begin",
+      "seconds": 0.003,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=81 superseded=false"
+    },
+    {
+      "phase": "begin_publish_late",
+      "seconds": 0.04,
+      "trace": "session",
+      "total_seconds": 2.721,
+      "detail": "scope=1"
+    },
+    {
+      "phase": "encode_append_owners",
+      "seconds": 0.001,
+      "trace": "session",
+      "total_seconds": 2.722,
+      "detail": "published=1"
+    },
+    {
+      "phase": "publish_resolved",
+      "seconds": 0.026,
+      "trace": "session",
+      "total_seconds": 2.748,
+      "detail": "owners=1"
+    },
+    {
+      "phase": "revalidate_ts_records",
+      "seconds": 0.258,
+      "trace": "session",
+      "total_seconds": 3.006,
+      "detail": "n=6804"
+    },
+    {
+      "phase": "ts_config_inputs",
+      "seconds": 0.065,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=83"
+    },
+    {
+      "phase": "state_json_encode_write",
+      "seconds": 0.321,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "bytes=90686806 files=7772"
+    },
+    {
+      "phase": "write_pending_state",
+      "seconds": 0.495,
+      "trace": "session",
+      "total_seconds": 3.501,
+      "detail": ""
+    },
+    {
+      "phase": "end_flush_ack",
+      "seconds": 0.026,
+      "trace": "session",
+      "total_seconds": 3.527,
+      "detail": ""
+    },
+    {
+      "phase": "promote_compact_state",
+      "seconds": 0.057,
+      "trace": "session",
+      "total_seconds": 3.584,
+      "detail": "parsed=22 published=1"
+    },
+    {
+      "phase": "graph_session_run",
+      "seconds": 4.145,
+      "trace": "cli",
+      "total_seconds": 4.503,
+      "detail": "repo=/private/tmp/enola-test-inclusive-profile-20260927/cli-pairs/correctness-candidate-1/product parsed=22"
+    },
+    {
+      "phase": "cli_complete",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 4.504,
+      "detail": "results=1"
+    }
+  ],
+  "cold-structural": [
+    {
+      "phase": "flags_parsed",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 0.0,
+      "detail": "mode=analyze"
+    },
+    {
+      "phase": "config_load",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.0,
+      "detail": "config.yaml"
+    },
+    {
+      "phase": "declare_config_deps",
+      "seconds": 0.0,
+      "trace": "graphinput_build",
+      "total_seconds": 0.0,
+      "detail": "deps=2"
+    },
+    {
+      "phase": "discover_git",
+      "seconds": 0.045,
+      "trace": "graphinput_build",
+      "total_seconds": 0.045,
+      "detail": "repo=true dirs=2"
+    },
+    {
+      "phase": "declare_git_control",
+      "seconds": 0.005,
+      "trace": "graphinput_build",
+      "total_seconds": 0.05,
+      "detail": "deps=6"
+    },
+    {
+      "phase": "git_ls_files",
+      "seconds": 0.058,
+      "trace": "graphinput_build",
+      "total_seconds": 0.108,
+      "detail": "tracked=45453 dirs=5852"
+    },
+    {
+      "phase": "walk_tree",
+      "seconds": 0.117,
+      "trace": "graphinput_build",
+      "total_seconds": 0.226,
+      "detail": "names=14446 ignorefiles=4"
+    },
+    {
+      "phase": "check_ignore_setup",
+      "seconds": 0.019,
+      "trace": "graphinput_build",
+      "total_seconds": 0.245,
+      "detail": ""
+    },
+    {
+      "phase": "check_ignore_run",
+      "seconds": 0.07,
+      "trace": "graphinput_build",
+      "total_seconds": 0.315,
+      "detail": "names=14446 ignored=0"
+    },
+    {
+      "phase": "declare_ignore_files",
+      "seconds": 0.0,
+      "trace": "graphinput_build",
+      "total_seconds": 0.315,
+      "detail": "deps=9"
+    },
+    {
+      "phase": "compute_identities",
+      "seconds": 0.032,
+      "trace": "graphinput_build",
+      "total_seconds": 0.347,
+      "detail": "deps=9 entries=14446"
+    },
+    {
+      "phase": "graphinput_build",
+      "seconds": 0.348,
+      "trace": "graph_engine",
+      "total_seconds": 0.348,
+      "detail": "configpaths=2"
+    },
+    {
+      "phase": "engine_new",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.348,
+      "detail": ""
+    },
+    {
+      "phase": "register_plugins",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.348,
+      "detail": ""
+    },
+    {
+      "phase": "config_recheck",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.348,
+      "detail": ""
+    },
+    {
+      "phase": "resolve_graph_target",
+      "seconds": 0.349,
+      "trace": "cli",
+      "total_seconds": 0.349,
+      "detail": "repos=1"
+    },
+    {
+      "phase": "connect_sink",
+      "seconds": 0.001,
+      "trace": "cli",
+      "total_seconds": 0.35,
+      "detail": "nats=true"
+    },
+    {
+      "phase": "session_options",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 0.35,
+      "detail": "repo=/private/tmp/enola-test-inclusive-profile-20260927/cli-pairs/correctness-candidate-1/product"
+    },
+    {
+      "phase": "lock",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "bind_identity",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "open_journal",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "replay_unacked",
+      "seconds": 0.004,
+      "trace": "open",
+      "total_seconds": 0.005,
+      "detail": ""
+    },
+    {
+      "phase": "load_state",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.005,
+      "detail": "files=0"
+    },
+    {
+      "phase": "transaction_enter",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.0,
+      "detail": "fast=false failed=false"
+    },
+    {
+      "phase": "effective_config_before",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.0,
+      "detail": "files=2"
+    },
+    {
+      "phase": "graph_inputs_proven",
+      "seconds": 0.103,
+      "trace": "reconcile",
+      "total_seconds": 0.103,
+      "detail": ""
+    },
+    {
+      "phase": "effective_config",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.103,
+      "detail": "files=2 fast=false"
+    },
+    {
+      "phase": "reconcile_complete",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.103,
+      "detail": "reloaded=false"
+    },
+    {
+      "phase": "engine_walk_repo",
+      "seconds": 0.126,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "files=13764 tests=0 all_names=13764"
+    },
+    {
+      "phase": "inventory",
+      "seconds": 0.126,
+      "trace": "inputs",
+      "total_seconds": 0.126,
+      "detail": "files=13764 all_names=13764"
+    },
+    {
+      "phase": "detect_go",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_manifests",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_mdintent",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_dotnet",
+      "seconds": 0.006,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_cpp",
+      "seconds": 0.006,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_hcl",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_ansible",
+      "seconds": 0.003,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_java",
+      "seconds": 0.005,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_kotlin",
+      "seconds": 0.005,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_php",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_python",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_typescript",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_swift",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_ruby",
+      "seconds": 0.003,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_rust",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_scala",
+      "seconds": 0.007,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_dart",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_grpc",
+      "seconds": 0.081,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_openapi",
+      "seconds": 0.082,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_asyncapi",
+      "seconds": 0.14,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_extractors",
+      "seconds": 0.14,
+      "trace": "inputs",
+      "total_seconds": 0.266,
+      "detail": "detected=6"
+    },
+    {
+      "phase": "select_hash_targets",
+      "seconds": 0.019,
+      "trace": "inputs",
+      "total_seconds": 0.285,
+      "detail": "targets=7791"
+    },
+    {
+      "phase": "engine_hash_files",
+      "seconds": 0.272,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=7791 hashed=7791 bytes=82572551"
+    },
+    {
+      "phase": "hash_content_inputs",
+      "seconds": 0.272,
+      "trace": "inputs",
+      "total_seconds": 0.557,
+      "detail": "targets=7791"
+    },
+    {
+      "phase": "capture_contexts",
+      "seconds": 0.076,
+      "trace": "inputs",
+      "total_seconds": 0.633,
+      "detail": "contexts=2"
+    },
+    {
+      "phase": "ts_config_inputs",
+      "seconds": 0.065,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=83"
+    },
+    {
+      "phase": "analysis_fingerprint",
+      "seconds": 0.072,
+      "trace": "inputs",
+      "total_seconds": 0.705,
+      "detail": "cfg_files=59"
+    },
+    {
+      "phase": "angular_probe",
+      "seconds": 0.004,
+      "trace": "inputs",
+      "total_seconds": 0.709,
+      "detail": "angular=false"
+    },
+    {
+      "phase": "policy_identity",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.709,
+      "detail": ""
+    },
+    {
+      "phase": "engine_context_fingerprint",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.709,
+      "detail": ""
+    },
+    {
+      "phase": "ts_disc_nuxt_packages",
+      "seconds": 0.101,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "pkgs=0"
+    },
+    {
+      "phase": "ts_disc_package_gates",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "ts_disc_package_names",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "names=30"
+    },
+    {
+      "phase": "ts_disc_alias_roots",
+      "seconds": 0.074,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "roots=1"
+    },
+    {
+      "phase": "ts_disc_package_exports",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "packages=30"
+    },
+    {
+      "phase": "ts_discovery_build",
+      "seconds": 0.185,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "side_reads=2001 stat_reads=2013 walked_dirs=667 captured=59"
+    },
+    {
+      "phase": "ts_discovery",
+      "seconds": 0.185,
+      "trace": "inputs",
+      "total_seconds": 0.894,
+      "detail": "names=0 bytes=0 dirs=0"
+    },
+    {
+      "phase": "ts_session_context",
+      "seconds": 0.088,
+      "trace": "inputs",
+      "total_seconds": 0.983,
+      "detail": "files=6804"
+    },
+    {
+      "phase": "runtime_inputs_complete",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.983,
+      "detail": ""
+    },
+    {
+      "phase": "clone_file_state_copy",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=0"
+    },
+    {
+      "phase": "extractor_need",
+      "seconds": 1.02,
+      "trace": "session",
+      "total_seconds": 1.02,
+      "detail": "non_ts_need=true detected=6 neutral=0"
+    },
+    {
+      "phase": "changed_terms",
+      "seconds": 0.009,
+      "trace": "session",
+      "total_seconds": 1.029,
+      "detail": "initial=true force=true non_ts=true scan=false raw_cfg=false policy=true neutral_scan=false neutral_cfg=false"
+    },
+    {
+      "phase": "invalidation_plan",
+      "seconds": 0.019,
+      "trace": "session",
+      "total_seconds": 1.048,
+      "detail": "reason=frozen scope: global name-resolution domain whole=true extra=0"
+    },
+    {
+      "phase": "revalidate_before_begin",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=59 superseded=false"
+    },
+    {
+      "phase": "begin_publish",
+      "seconds": 0.072,
+      "trace": "session",
+      "total_seconds": 1.12,
+      "detail": "scope=11271"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.073,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "manifests facts=133"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "manifests"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.126,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "mdintent facts=11762"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.024,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "mdintent"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "hcl facts=10"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "hcl"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.008,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "python facts=99"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "python"
+    },
+    {
+      "phase": "ts_dirty_scope",
+      "seconds": 0.248,
+      "trace": "session",
+      "total_seconds": 1.368,
+      "detail": "dirty=0 scope=6804 force=true"
+    },
+    {
+      "phase": "ts_detect_frameworks",
+      "seconds": 0.0,
+      "trace": "ts",
+      "total_seconds": 0.0,
+      "detail": "files=6804 shared_discovery=true"
+    },
+    {
+      "phase": "ts_disc_package_aliases",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "aliases=21"
+    },
+    {
+      "phase": "ts_read_dirty",
+      "seconds": 0.081,
+      "trace": "ts",
+      "total_seconds": 0.081,
+      "detail": "to_read=6804 cached=0"
+    },
+    {
+      "phase": "ts_graphql_grpc_index",
+      "seconds": 0.526,
+      "trace": "ts",
+      "total_seconds": 0.607,
+      "detail": "ts_files=6804"
+    },
+    {
+      "phase": "ts_mapfiles_aggregate",
+      "seconds": 5.834,
+      "trace": "ts",
+      "total_seconds": 6.442,
+      "detail": "parsed=6752 facts=89517 routers=0 scans=2295 derived=4434"
+    },
+    {
+      "phase": "ts_compose_modules",
+      "seconds": 0.004,
+      "trace": "ts",
+      "total_seconds": 6.445,
+      "detail": "facts=89959 records=6804 unread=0"
+    },
+    {
+      "phase": "ts_extract_session",
+      "seconds": 6.452,
+      "trace": "session",
+      "total_seconds": 7.82,
+      "detail": "parsed=6752 cached=0 facts=89959 records=6804"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.008,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "swift facts=19"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "swift"
+    },
+    {
+      "phase": "assemble_new_files",
+      "seconds": 0.195,
+      "trace": "session",
+      "total_seconds": 8.015,
+      "detail": "new=7772 ts_noop=false non_ts_need=true skip=false facts=101982"
+    },
+    {
+      "phase": "index_group_owners",
+      "seconds": 0.026,
+      "trace": "session",
+      "total_seconds": 8.041,
+      "detail": "facts=100618 owners=7709"
+    },
+    {
+      "phase": "publish_scope",
+      "seconds": 0.002,
+      "trace": "session",
+      "total_seconds": 8.042,
+      "detail": "scope=11271"
+    },
+    {
+      "phase": "encode_append_owners",
+      "seconds": 2.66,
+      "trace": "session",
+      "total_seconds": 10.703,
+      "detail": "published=7709"
+    },
+    {
+      "phase": "publish_resolved",
+      "seconds": 0.045,
+      "trace": "session",
+      "total_seconds": 10.747,
+      "detail": "owners=7709"
+    },
+    {
+      "phase": "revalidate_ts_records",
+      "seconds": 0.253,
+      "trace": "session",
+      "total_seconds": 11.0,
+      "detail": "n=6804"
+    },
+    {
+      "phase": "ts_config_inputs",
+      "seconds": 0.066,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=83"
+    },
+    {
+      "phase": "state_json_encode_write",
+      "seconds": 0.339,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "bytes=90686826 files=7772"
+    },
+    {
+      "phase": "write_pending_state",
+      "seconds": 0.517,
+      "trace": "session",
+      "total_seconds": 11.517,
+      "detail": ""
+    },
+    {
+      "phase": "end_flush_ack",
+      "seconds": 0.083,
+      "trace": "session",
+      "total_seconds": 11.6,
+      "detail": ""
+    },
+    {
+      "phase": "promote_compact_state",
+      "seconds": 0.063,
+      "trace": "session",
+      "total_seconds": 11.663,
+      "detail": "parsed=6752 published=7709"
+    },
+    {
+      "phase": "graph_session_run",
+      "seconds": 11.771,
+      "trace": "cli",
+      "total_seconds": 12.121,
+      "detail": "repo=/private/tmp/enola-test-inclusive-profile-20260927/cli-pairs/correctness-candidate-1/product parsed=6752"
+    },
+    {
+      "phase": "cli_complete",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 12.121,
+      "detail": "results=1"
+    }
+  ],
+  "r1-new-initial": [
+    {
+      "phase": "flags_parsed",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 0.0,
+      "detail": "mode=analyze"
+    },
+    {
+      "phase": "config_load",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.0,
+      "detail": "config.yaml"
+    },
+    {
+      "phase": "declare_config_deps",
+      "seconds": 0.0,
+      "trace": "graphinput_build",
+      "total_seconds": 0.0,
+      "detail": "deps=2"
+    },
+    {
+      "phase": "discover_git",
+      "seconds": 0.044,
+      "trace": "graphinput_build",
+      "total_seconds": 0.044,
+      "detail": "repo=true dirs=2"
+    },
+    {
+      "phase": "declare_git_control",
+      "seconds": 0.005,
+      "trace": "graphinput_build",
+      "total_seconds": 0.049,
+      "detail": "deps=6"
+    },
+    {
+      "phase": "git_ls_files",
+      "seconds": 0.057,
+      "trace": "graphinput_build",
+      "total_seconds": 0.107,
+      "detail": "tracked=45453 dirs=5852"
+    },
+    {
+      "phase": "walk_tree",
+      "seconds": 0.126,
+      "trace": "graphinput_build",
+      "total_seconds": 0.232,
+      "detail": "names=14446 ignorefiles=4"
+    },
+    {
+      "phase": "check_ignore_setup",
+      "seconds": 0.017,
+      "trace": "graphinput_build",
+      "total_seconds": 0.25,
+      "detail": ""
+    },
+    {
+      "phase": "check_ignore_run",
+      "seconds": 0.071,
+      "trace": "graphinput_build",
+      "total_seconds": 0.32,
+      "detail": "names=14446 ignored=0"
+    },
+    {
+      "phase": "declare_ignore_files",
+      "seconds": 0.0,
+      "trace": "graphinput_build",
+      "total_seconds": 0.321,
+      "detail": "deps=9"
+    },
+    {
+      "phase": "compute_identities",
+      "seconds": 0.032,
+      "trace": "graphinput_build",
+      "total_seconds": 0.353,
+      "detail": "deps=9 entries=14446"
+    },
+    {
+      "phase": "graphinput_build",
+      "seconds": 0.354,
+      "trace": "graph_engine",
+      "total_seconds": 0.354,
+      "detail": "configpaths=2"
+    },
+    {
+      "phase": "engine_new",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.354,
+      "detail": ""
+    },
+    {
+      "phase": "register_plugins",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.354,
+      "detail": ""
+    },
+    {
+      "phase": "config_recheck",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.354,
+      "detail": ""
+    },
+    {
+      "phase": "resolve_graph_target",
+      "seconds": 0.354,
+      "trace": "cli",
+      "total_seconds": 0.354,
+      "detail": "repos=1"
+    },
+    {
+      "phase": "connect_sink",
+      "seconds": 0.002,
+      "trace": "cli",
+      "total_seconds": 0.356,
+      "detail": "nats=true"
+    },
+    {
+      "phase": "session_options",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 0.356,
+      "detail": "repo=/private/tmp/enola-test-inclusive-profile-20260927/cli-pairs/correctness-candidate-1/product"
+    },
+    {
+      "phase": "lock",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "bind_identity",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "open_journal",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "replay_unacked",
+      "seconds": 0.006,
+      "trace": "open",
+      "total_seconds": 0.006,
+      "detail": ""
+    },
+    {
+      "phase": "load_state",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.006,
+      "detail": "files=0"
+    },
+    {
+      "phase": "transaction_enter",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.0,
+      "detail": "fast=false failed=false"
+    },
+    {
+      "phase": "effective_config_before",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.0,
+      "detail": "files=2"
+    },
+    {
+      "phase": "graph_inputs_proven",
+      "seconds": 0.1,
+      "trace": "reconcile",
+      "total_seconds": 0.1,
+      "detail": ""
+    },
+    {
+      "phase": "effective_config",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.1,
+      "detail": "files=2 fast=false"
+    },
+    {
+      "phase": "reconcile_complete",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.1,
+      "detail": "reloaded=false"
+    },
+    {
+      "phase": "engine_walk_repo",
+      "seconds": 0.128,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "files=13764 tests=0 all_names=13764"
+    },
+    {
+      "phase": "inventory",
+      "seconds": 0.128,
+      "trace": "inputs",
+      "total_seconds": 0.128,
+      "detail": "files=13764 all_names=13764"
+    },
+    {
+      "phase": "detect_go",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_manifests",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_mdintent",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_dotnet",
+      "seconds": 0.006,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_cpp",
+      "seconds": 0.007,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_hcl",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_ansible",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_java",
+      "seconds": 0.004,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_kotlin",
+      "seconds": 0.004,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_php",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_python",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_typescript",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_swift",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_ruby",
+      "seconds": 0.003,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_rust",
+      "seconds": 0.003,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_scala",
+      "seconds": 0.006,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_dart",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_openapi",
+      "seconds": 0.083,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_grpc",
+      "seconds": 0.094,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_asyncapi",
+      "seconds": 0.14,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_extractors",
+      "seconds": 0.14,
+      "trace": "inputs",
+      "total_seconds": 0.268,
+      "detail": "detected=6"
+    },
+    {
+      "phase": "select_hash_targets",
+      "seconds": 0.017,
+      "trace": "inputs",
+      "total_seconds": 0.285,
+      "detail": "targets=7791"
+    },
+    {
+      "phase": "engine_hash_files",
+      "seconds": 0.287,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=7791 hashed=7791 bytes=82572444"
+    },
+    {
+      "phase": "hash_content_inputs",
+      "seconds": 0.287,
+      "trace": "inputs",
+      "total_seconds": 0.572,
+      "detail": "targets=7791"
+    },
+    {
+      "phase": "capture_contexts",
+      "seconds": 0.086,
+      "trace": "inputs",
+      "total_seconds": 0.658,
+      "detail": "contexts=2"
+    },
+    {
+      "phase": "ts_config_inputs",
+      "seconds": 0.071,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=83"
+    },
+    {
+      "phase": "analysis_fingerprint",
+      "seconds": 0.079,
+      "trace": "inputs",
+      "total_seconds": 0.737,
+      "detail": "cfg_files=59"
+    },
+    {
+      "phase": "angular_probe",
+      "seconds": 0.004,
+      "trace": "inputs",
+      "total_seconds": 0.741,
+      "detail": "angular=false"
+    },
+    {
+      "phase": "policy_identity",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.741,
+      "detail": ""
+    },
+    {
+      "phase": "engine_context_fingerprint",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.741,
+      "detail": ""
+    },
+    {
+      "phase": "ts_disc_nuxt_packages",
+      "seconds": 0.108,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "pkgs=0"
+    },
+    {
+      "phase": "ts_disc_package_gates",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "ts_disc_package_names",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "names=30"
+    },
+    {
+      "phase": "ts_disc_alias_roots",
+      "seconds": 0.082,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "roots=1"
+    },
+    {
+      "phase": "ts_disc_package_exports",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "packages=30"
+    },
+    {
+      "phase": "ts_discovery_build",
+      "seconds": 0.203,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "side_reads=2001 stat_reads=2013 walked_dirs=667 captured=59"
+    },
+    {
+      "phase": "ts_discovery",
+      "seconds": 0.203,
+      "trace": "inputs",
+      "total_seconds": 0.943,
+      "detail": "names=0 bytes=0 dirs=0"
+    },
+    {
+      "phase": "ts_session_context",
+      "seconds": 0.085,
+      "trace": "inputs",
+      "total_seconds": 1.028,
+      "detail": "files=6804"
+    },
+    {
+      "phase": "runtime_inputs_complete",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 1.028,
+      "detail": ""
+    },
+    {
+      "phase": "clone_file_state_copy",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=0"
+    },
+    {
+      "phase": "extractor_need",
+      "seconds": 1.065,
+      "trace": "session",
+      "total_seconds": 1.065,
+      "detail": "non_ts_need=true detected=6 neutral=0"
+    },
+    {
+      "phase": "changed_terms",
+      "seconds": 0.009,
+      "trace": "session",
+      "total_seconds": 1.074,
+      "detail": "initial=true force=true non_ts=true scan=false raw_cfg=false policy=true neutral_scan=false neutral_cfg=false"
+    },
+    {
+      "phase": "invalidation_plan",
+      "seconds": 0.018,
+      "trace": "session",
+      "total_seconds": 1.092,
+      "detail": "reason=frozen scope: global name-resolution domain whole=true extra=0"
+    },
+    {
+      "phase": "revalidate_before_begin",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=59 superseded=false"
+    },
+    {
+      "phase": "begin_publish",
+      "seconds": 0.047,
+      "trace": "session",
+      "total_seconds": 1.139,
+      "detail": "scope=11271"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.078,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "manifests facts=133"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "manifests"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.131,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "mdintent facts=11762"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.025,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "mdintent"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "hcl facts=10"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "hcl"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.009,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "python facts=99"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "python"
+    },
+    {
+      "phase": "ts_dirty_scope",
+      "seconds": 0.26,
+      "trace": "session",
+      "total_seconds": 1.4,
+      "detail": "dirty=0 scope=6804 force=true"
+    },
+    {
+      "phase": "ts_detect_frameworks",
+      "seconds": 0.0,
+      "trace": "ts",
+      "total_seconds": 0.0,
+      "detail": "files=6804 shared_discovery=true"
+    },
+    {
+      "phase": "ts_disc_package_aliases",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "aliases=21"
+    },
+    {
+      "phase": "ts_read_dirty",
+      "seconds": 0.222,
+      "trace": "ts",
+      "total_seconds": 0.222,
+      "detail": "to_read=6804 cached=0"
+    },
+    {
+      "phase": "ts_graphql_grpc_index",
+      "seconds": 0.544,
+      "trace": "ts",
+      "total_seconds": 0.767,
+      "detail": "ts_files=6804"
+    },
+    {
+      "phase": "ts_mapfiles_aggregate",
+      "seconds": 5.783,
+      "trace": "ts",
+      "total_seconds": 6.55,
+      "detail": "parsed=6752 facts=89516 routers=0 scans=2292 derived=4437"
+    },
+    {
+      "phase": "ts_compose_modules",
+      "seconds": 0.004,
+      "trace": "ts",
+      "total_seconds": 6.554,
+      "detail": "facts=89958 records=6804 unread=0"
+    },
+    {
+      "phase": "ts_extract_session",
+      "seconds": 6.56,
+      "trace": "session",
+      "total_seconds": 7.96,
+      "detail": "parsed=6752 cached=0 facts=89958 records=6804"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.01,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "swift facts=19"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "swift"
+    },
+    {
+      "phase": "assemble_new_files",
+      "seconds": 0.207,
+      "trace": "session",
+      "total_seconds": 8.167,
+      "detail": "new=7772 ts_noop=false non_ts_need=true skip=false facts=101981"
+    },
+    {
+      "phase": "index_group_owners",
+      "seconds": 0.034,
+      "trace": "session",
+      "total_seconds": 8.201,
+      "detail": "facts=100617 owners=7709"
+    },
+    {
+      "phase": "publish_scope",
+      "seconds": 0.002,
+      "trace": "session",
+      "total_seconds": 8.202,
+      "detail": "scope=11271"
+    },
+    {
+      "phase": "encode_append_owners",
+      "seconds": 2.78,
+      "trace": "session",
+      "total_seconds": 10.982,
+      "detail": "published=7709"
+    },
+    {
+      "phase": "publish_resolved",
+      "seconds": 0.051,
+      "trace": "session",
+      "total_seconds": 11.033,
+      "detail": "owners=7709"
+    },
+    {
+      "phase": "revalidate_ts_records",
+      "seconds": 0.255,
+      "trace": "session",
+      "total_seconds": 11.288,
+      "detail": "n=6804"
+    },
+    {
+      "phase": "ts_config_inputs",
+      "seconds": 0.066,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=83"
+    },
+    {
+      "phase": "state_json_encode_write",
+      "seconds": 0.357,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "bytes=90686087 files=7772"
+    },
+    {
+      "phase": "write_pending_state",
+      "seconds": 0.524,
+      "trace": "session",
+      "total_seconds": 11.812,
+      "detail": ""
+    },
+    {
+      "phase": "end_flush_ack",
+      "seconds": 0.077,
+      "trace": "session",
+      "total_seconds": 11.889,
+      "detail": ""
+    },
+    {
+      "phase": "promote_compact_state",
+      "seconds": 0.064,
+      "trace": "session",
+      "total_seconds": 11.953,
+      "detail": "parsed=6752 published=7709"
+    },
+    {
+      "phase": "graph_session_run",
+      "seconds": 12.06,
+      "trace": "cli",
+      "total_seconds": 12.416,
+      "detail": "repo=/private/tmp/enola-test-inclusive-profile-20260927/cli-pairs/correctness-candidate-1/product parsed=6752"
+    },
+    {
+      "phase": "cli_complete",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 12.416,
+      "detail": "results=1"
+    }
+  ],
+  "r1-new-body": [
+    {
+      "phase": "flags_parsed",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 0.0,
+      "detail": "mode=delta"
+    },
+    {
+      "phase": "config_load",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.0,
+      "detail": "config.yaml"
+    },
+    {
+      "phase": "declare_config_deps",
+      "seconds": 0.0,
+      "trace": "graphinput_build",
+      "total_seconds": 0.0,
+      "detail": "deps=2"
+    },
+    {
+      "phase": "discover_git",
+      "seconds": 0.042,
+      "trace": "graphinput_build",
+      "total_seconds": 0.042,
+      "detail": "repo=true dirs=2"
+    },
+    {
+      "phase": "declare_git_control",
+      "seconds": 0.005,
+      "trace": "graphinput_build",
+      "total_seconds": 0.047,
+      "detail": "deps=6"
+    },
+    {
+      "phase": "git_ls_files",
+      "seconds": 0.058,
+      "trace": "graphinput_build",
+      "total_seconds": 0.106,
+      "detail": "tracked=45453 dirs=5852"
+    },
+    {
+      "phase": "walk_tree",
+      "seconds": 0.119,
+      "trace": "graphinput_build",
+      "total_seconds": 0.224,
+      "detail": "names=14446 ignorefiles=4"
+    },
+    {
+      "phase": "check_ignore_setup",
+      "seconds": 0.017,
+      "trace": "graphinput_build",
+      "total_seconds": 0.242,
+      "detail": ""
+    },
+    {
+      "phase": "check_ignore_run",
+      "seconds": 0.072,
+      "trace": "graphinput_build",
+      "total_seconds": 0.314,
+      "detail": "names=14446 ignored=0"
+    },
+    {
+      "phase": "declare_ignore_files",
+      "seconds": 0.0,
+      "trace": "graphinput_build",
+      "total_seconds": 0.314,
+      "detail": "deps=9"
+    },
+    {
+      "phase": "compute_identities",
+      "seconds": 0.031,
+      "trace": "graphinput_build",
+      "total_seconds": 0.345,
+      "detail": "deps=9 entries=14446"
+    },
+    {
+      "phase": "graphinput_build",
+      "seconds": 0.346,
+      "trace": "graph_engine",
+      "total_seconds": 0.346,
+      "detail": "configpaths=2"
+    },
+    {
+      "phase": "engine_new",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.346,
+      "detail": ""
+    },
+    {
+      "phase": "register_plugins",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.346,
+      "detail": ""
+    },
+    {
+      "phase": "config_recheck",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.346,
+      "detail": ""
+    },
+    {
+      "phase": "resolve_graph_target",
+      "seconds": 0.346,
+      "trace": "cli",
+      "total_seconds": 0.346,
+      "detail": "repos=1"
+    },
+    {
+      "phase": "connect_sink",
+      "seconds": 0.001,
+      "trace": "cli",
+      "total_seconds": 0.347,
+      "detail": "nats=true"
+    },
+    {
+      "phase": "session_options",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 0.347,
+      "detail": "repo=/private/tmp/enola-test-inclusive-profile-20260927/cli-pairs/correctness-candidate-1/product"
+    },
+    {
+      "phase": "lock",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "bind_identity",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "open_journal",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "replay_unacked",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "state_read_bytes",
+      "seconds": 0.013,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "state.json bytes=90686087"
+    },
+    {
+      "phase": "state_fingerprint",
+      "seconds": 0.041,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "bytes=90686087"
+    },
+    {
+      "phase": "state_json_unmarshal",
+      "seconds": 0.403,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "files=7772"
+    },
+    {
+      "phase": "load_state",
+      "seconds": 0.457,
+      "trace": "open",
+      "total_seconds": 0.457,
+      "detail": "files=7772"
+    },
+    {
+      "phase": "transaction_enter",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.0,
+      "detail": "fast=false failed=false"
+    },
+    {
+      "phase": "effective_config_before",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.0,
+      "detail": "files=2"
+    },
+    {
+      "phase": "graph_inputs_proven",
+      "seconds": 0.097,
+      "trace": "reconcile",
+      "total_seconds": 0.097,
+      "detail": ""
+    },
+    {
+      "phase": "effective_config",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.097,
+      "detail": "files=2 fast=false"
+    },
+    {
+      "phase": "reconcile_complete",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.097,
+      "detail": "reloaded=false"
+    },
+    {
+      "phase": "engine_walk_repo",
+      "seconds": 0.119,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "files=13764 tests=0 all_names=13764"
+    },
+    {
+      "phase": "inventory",
+      "seconds": 0.119,
+      "trace": "inputs",
+      "total_seconds": 0.119,
+      "detail": "files=13764 all_names=13764"
+    },
+    {
+      "phase": "detect_go",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_manifests",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_mdintent",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_dotnet",
+      "seconds": 0.006,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_cpp",
+      "seconds": 0.007,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_hcl",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_ansible",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_java",
+      "seconds": 0.004,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_kotlin",
+      "seconds": 0.005,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_php",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_python",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_typescript",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_swift",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_ruby",
+      "seconds": 0.003,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_rust",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_scala",
+      "seconds": 0.006,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_dart",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_grpc",
+      "seconds": 0.077,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_openapi",
+      "seconds": 0.083,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_asyncapi",
+      "seconds": 0.138,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_extractors",
+      "seconds": 0.138,
+      "trace": "inputs",
+      "total_seconds": 0.257,
+      "detail": "detected=6"
+    },
+    {
+      "phase": "select_hash_targets",
+      "seconds": 0.024,
+      "trace": "inputs",
+      "total_seconds": 0.28,
+      "detail": "targets=7791"
+    },
+    {
+      "phase": "engine_hash_files",
+      "seconds": 0.29,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=7791 hashed=7791 bytes=82572462"
+    },
+    {
+      "phase": "hash_content_inputs",
+      "seconds": 0.29,
+      "trace": "inputs",
+      "total_seconds": 0.57,
+      "detail": "targets=7791"
+    },
+    {
+      "phase": "capture_contexts",
+      "seconds": 0.077,
+      "trace": "inputs",
+      "total_seconds": 0.647,
+      "detail": "contexts=2"
+    },
+    {
+      "phase": "ts_config_inputs",
+      "seconds": 0.067,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=83"
+    },
+    {
+      "phase": "analysis_fingerprint",
+      "seconds": 0.075,
+      "trace": "inputs",
+      "total_seconds": 0.722,
+      "detail": "cfg_files=59"
+    },
+    {
+      "phase": "angular_probe",
+      "seconds": 0.004,
+      "trace": "inputs",
+      "total_seconds": 0.726,
+      "detail": "angular=false"
+    },
+    {
+      "phase": "policy_identity",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.726,
+      "detail": ""
+    },
+    {
+      "phase": "engine_context_fingerprint",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.726,
+      "detail": ""
+    },
+    {
+      "phase": "ts_disc_nuxt_packages",
+      "seconds": 0.103,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "pkgs=0"
+    },
+    {
+      "phase": "ts_disc_package_gates",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "ts_disc_package_names",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "names=30"
+    },
+    {
+      "phase": "ts_disc_alias_roots",
+      "seconds": 0.074,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "roots=1"
+    },
+    {
+      "phase": "ts_disc_package_exports",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "packages=30"
+    },
+    {
+      "phase": "ts_discovery_build",
+      "seconds": 0.188,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "side_reads=2001 stat_reads=2013 walked_dirs=667 captured=59"
+    },
+    {
+      "phase": "ts_discovery",
+      "seconds": 0.188,
+      "trace": "inputs",
+      "total_seconds": 0.914,
+      "detail": "names=0 bytes=0 dirs=0"
+    },
+    {
+      "phase": "ts_session_context",
+      "seconds": 0.085,
+      "trace": "inputs",
+      "total_seconds": 0.999,
+      "detail": "files=6804"
+    },
+    {
+      "phase": "runtime_inputs_complete",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.999,
+      "detail": ""
+    },
+    {
+      "phase": "clone_file_state_copy",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=7772"
+    },
+    {
+      "phase": "extractor_need",
+      "seconds": 1.065,
+      "trace": "session",
+      "total_seconds": 1.065,
+      "detail": "non_ts_need=false detected=6 neutral=0"
+    },
+    {
+      "phase": "changed_terms",
+      "seconds": 0.022,
+      "trace": "session",
+      "total_seconds": 1.086,
+      "detail": "initial=false force=false non_ts=false scan=true raw_cfg=false policy=false neutral_scan=false neutral_cfg=false"
+    },
+    {
+      "phase": "ts_detect_frameworks",
+      "seconds": 0.0,
+      "trace": "ts",
+      "total_seconds": 0.0,
+      "detail": "files=6804 shared_discovery=true"
+    },
+    {
+      "phase": "ts_disc_package_aliases",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "aliases=21"
+    },
+    {
+      "phase": "ts_read_dirty",
+      "seconds": 0.004,
+      "trace": "ts",
+      "total_seconds": 0.004,
+      "detail": "to_read=1 cached=6803"
+    },
+    {
+      "phase": "ts_graphql_grpc_index",
+      "seconds": 0.001,
+      "trace": "ts",
+      "total_seconds": 0.005,
+      "detail": "ts_files=6804"
+    },
+    {
+      "phase": "ts_mapfiles_aggregate",
+      "seconds": 0.056,
+      "trace": "ts",
+      "total_seconds": 0.061,
+      "detail": "parsed=1 facts=89516 routers=0 scans=0 derived=1"
+    },
+    {
+      "phase": "ts_compose_modules",
+      "seconds": 0.005,
+      "trace": "ts",
+      "total_seconds": 0.066,
+      "detail": "facts=89958 records=6804 unread=0"
+    },
+    {
+      "phase": "ts_detect_frameworks",
+      "seconds": 0.0,
+      "trace": "ts",
+      "total_seconds": 0.0,
+      "detail": "files=6804 shared_discovery=true"
+    },
+    {
+      "phase": "ts_disc_package_aliases",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "aliases=21"
+    },
+    {
+      "phase": "ts_read_dirty",
+      "seconds": 0.005,
+      "trace": "ts",
+      "total_seconds": 0.005,
+      "detail": "to_read=20 cached=6784"
+    },
+    {
+      "phase": "ts_graphql_grpc_index",
+      "seconds": 0.006,
+      "trace": "ts",
+      "total_seconds": 0.011,
+      "detail": "ts_files=6804"
+    },
+    {
+      "phase": "ts_mapfiles_aggregate",
+      "seconds": 0.348,
+      "trace": "ts",
+      "total_seconds": 0.359,
+      "detail": "parsed=20 facts=89516 routers=0 scans=127 derived=15"
+    },
+    {
+      "phase": "ts_compose_modules",
+      "seconds": 0.004,
+      "trace": "ts",
+      "total_seconds": 0.363,
+      "detail": "facts=89958 records=6804 unread=0"
+    },
+    {
+      "phase": "ts_frozen_preview",
+      "seconds": 0.648,
+      "trace": "session",
+      "total_seconds": 1.734,
+      "detail": "dirty=21 err=false"
+    },
+    {
+      "phase": "invalidation_plan",
+      "seconds": 0.23,
+      "trace": "session",
+      "total_seconds": 1.964,
+      "detail": "reason=frozen scope: prior file-to-file dependency closure whole=false extra=0"
+    },
+    {
+      "phase": "begin_publish",
+      "seconds": 0.0,
+      "trace": "session",
+      "total_seconds": 1.964,
+      "detail": "scope=21"
+    },
+    {
+      "phase": "ts_dirty_scope",
+      "seconds": 0.154,
+      "trace": "session",
+      "total_seconds": 2.119,
+      "detail": "dirty=21 scope=21 force=false"
+    },
+    {
+      "phase": "ts_extract_session",
+      "seconds": 0.0,
+      "trace": "session",
+      "total_seconds": 2.119,
+      "detail": "parsed=21 cached=6783 facts=89958 records=6804"
+    },
+    {
+      "phase": "assemble_new_files",
+      "seconds": 0.252,
+      "trace": "session",
+      "total_seconds": 2.371,
+      "detail": "new=7772 ts_noop=false non_ts_need=false skip=false facts=101981"
+    },
+    {
+      "phase": "index_group_owners",
+      "seconds": 0.155,
+      "trace": "session",
+      "total_seconds": 2.526,
+      "detail": "facts=100617 owners=7709"
+    },
+    {
+      "phase": "compare_owner_contributions",
+      "seconds": 0.016,
+      "trace": "session",
+      "total_seconds": 2.542,
+      "detail": "scope=0"
+    },
+    {
+      "phase": "revalidate_before_begin",
+      "seconds": 0.003,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=80 superseded=false"
+    },
+    {
+      "phase": "begin_publish_late",
+      "seconds": 0.052,
+      "trace": "session",
+      "total_seconds": 2.593,
+      "detail": "scope=0"
+    },
+    {
+      "phase": "encode_append_owners",
+      "seconds": 0.001,
+      "trace": "session",
+      "total_seconds": 2.594,
+      "detail": "published=0"
+    },
+    {
+      "phase": "publish_resolved",
+      "seconds": 0.0,
+      "trace": "session",
+      "total_seconds": 2.594,
+      "detail": "owners=0"
+    },
+    {
+      "phase": "revalidate_ts_records",
+      "seconds": 0.245,
+      "trace": "session",
+      "total_seconds": 2.839,
+      "detail": "n=6804"
+    },
+    {
+      "phase": "ts_config_inputs",
+      "seconds": 0.062,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=83"
+    },
+    {
+      "phase": "state_json_encode_write",
+      "seconds": 0.334,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "bytes=90686087 files=7772"
+    },
+    {
+      "phase": "write_pending_state",
+      "seconds": 0.494,
+      "trace": "session",
+      "total_seconds": 3.332,
+      "detail": ""
+    },
+    {
+      "phase": "end_flush_ack",
+      "seconds": 0.031,
+      "trace": "session",
+      "total_seconds": 3.364,
+      "detail": ""
+    },
+    {
+      "phase": "promote_compact_state",
+      "seconds": 0.057,
+      "trace": "session",
+      "total_seconds": 3.421,
+      "detail": "parsed=21 published=0"
+    },
+    {
+      "phase": "graph_session_run",
+      "seconds": 3.975,
+      "trace": "cli",
+      "total_seconds": 4.323,
+      "detail": "repo=/private/tmp/enola-test-inclusive-profile-20260927/cli-pairs/correctness-candidate-1/product parsed=21"
+    },
+    {
+      "phase": "cli_complete",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 4.323,
+      "detail": "results=1"
+    }
+  ],
+  "cold-original": [
+    {
+      "phase": "flags_parsed",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 0.0,
+      "detail": "mode=analyze"
+    },
+    {
+      "phase": "config_load",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.0,
+      "detail": "config.yaml"
+    },
+    {
+      "phase": "declare_config_deps",
+      "seconds": 0.0,
+      "trace": "graphinput_build",
+      "total_seconds": 0.0,
+      "detail": "deps=2"
+    },
+    {
+      "phase": "discover_git",
+      "seconds": 0.045,
+      "trace": "graphinput_build",
+      "total_seconds": 0.045,
+      "detail": "repo=true dirs=2"
+    },
+    {
+      "phase": "declare_git_control",
+      "seconds": 0.005,
+      "trace": "graphinput_build",
+      "total_seconds": 0.051,
+      "detail": "deps=6"
+    },
+    {
+      "phase": "git_ls_files",
+      "seconds": 0.061,
+      "trace": "graphinput_build",
+      "total_seconds": 0.112,
+      "detail": "tracked=45453 dirs=5852"
+    },
+    {
+      "phase": "walk_tree",
+      "seconds": 0.128,
+      "trace": "graphinput_build",
+      "total_seconds": 0.24,
+      "detail": "names=14446 ignorefiles=4"
+    },
+    {
+      "phase": "check_ignore_setup",
+      "seconds": 0.02,
+      "trace": "graphinput_build",
+      "total_seconds": 0.259,
+      "detail": ""
+    },
+    {
+      "phase": "check_ignore_run",
+      "seconds": 0.073,
+      "trace": "graphinput_build",
+      "total_seconds": 0.333,
+      "detail": "names=14446 ignored=0"
+    },
+    {
+      "phase": "declare_ignore_files",
+      "seconds": 0.0,
+      "trace": "graphinput_build",
+      "total_seconds": 0.333,
+      "detail": "deps=9"
+    },
+    {
+      "phase": "compute_identities",
+      "seconds": 0.033,
+      "trace": "graphinput_build",
+      "total_seconds": 0.366,
+      "detail": "deps=9 entries=14446"
+    },
+    {
+      "phase": "graphinput_build",
+      "seconds": 0.367,
+      "trace": "graph_engine",
+      "total_seconds": 0.367,
+      "detail": "configpaths=2"
+    },
+    {
+      "phase": "engine_new",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.367,
+      "detail": ""
+    },
+    {
+      "phase": "register_plugins",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.367,
+      "detail": ""
+    },
+    {
+      "phase": "config_recheck",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.367,
+      "detail": ""
+    },
+    {
+      "phase": "resolve_graph_target",
+      "seconds": 0.367,
+      "trace": "cli",
+      "total_seconds": 0.367,
+      "detail": "repos=1"
+    },
+    {
+      "phase": "connect_sink",
+      "seconds": 0.001,
+      "trace": "cli",
+      "total_seconds": 0.368,
+      "detail": "nats=true"
+    },
+    {
+      "phase": "session_options",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 0.368,
+      "detail": "repo=/private/tmp/enola-test-inclusive-profile-20260927/cli-pairs/correctness-candidate-1/product"
+    },
+    {
+      "phase": "lock",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "bind_identity",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "open_journal",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "replay_unacked",
+      "seconds": 0.006,
+      "trace": "open",
+      "total_seconds": 0.007,
+      "detail": ""
+    },
+    {
+      "phase": "load_state",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.007,
+      "detail": "files=0"
+    },
+    {
+      "phase": "transaction_enter",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.0,
+      "detail": "fast=false failed=false"
+    },
+    {
+      "phase": "effective_config_before",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.0,
+      "detail": "files=2"
+    },
+    {
+      "phase": "graph_inputs_proven",
+      "seconds": 0.105,
+      "trace": "reconcile",
+      "total_seconds": 0.105,
+      "detail": ""
+    },
+    {
+      "phase": "effective_config",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.105,
+      "detail": "files=2 fast=false"
+    },
+    {
+      "phase": "reconcile_complete",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.105,
+      "detail": "reloaded=false"
+    },
+    {
+      "phase": "engine_walk_repo",
+      "seconds": 0.125,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "files=13764 tests=0 all_names=13764"
+    },
+    {
+      "phase": "inventory",
+      "seconds": 0.125,
+      "trace": "inputs",
+      "total_seconds": 0.125,
+      "detail": "files=13764 all_names=13764"
+    },
+    {
+      "phase": "detect_go",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_manifests",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_mdintent",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_dotnet",
+      "seconds": 0.006,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_cpp",
+      "seconds": 0.006,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_hcl",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_ansible",
+      "seconds": 0.003,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_java",
+      "seconds": 0.005,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_kotlin",
+      "seconds": 0.005,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_php",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_python",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_typescript",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_swift",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_ruby",
+      "seconds": 0.003,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_rust",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_scala",
+      "seconds": 0.008,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_dart",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_grpc",
+      "seconds": 0.078,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_openapi",
+      "seconds": 0.08,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_asyncapi",
+      "seconds": 0.135,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_extractors",
+      "seconds": 0.135,
+      "trace": "inputs",
+      "total_seconds": 0.26,
+      "detail": "detected=6"
+    },
+    {
+      "phase": "select_hash_targets",
+      "seconds": 0.018,
+      "trace": "inputs",
+      "total_seconds": 0.278,
+      "detail": "targets=7791"
+    },
+    {
+      "phase": "engine_hash_files",
+      "seconds": 0.289,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=7791 hashed=7791 bytes=82572444"
+    },
+    {
+      "phase": "hash_content_inputs",
+      "seconds": 0.289,
+      "trace": "inputs",
+      "total_seconds": 0.566,
+      "detail": "targets=7791"
+    },
+    {
+      "phase": "capture_contexts",
+      "seconds": 0.08,
+      "trace": "inputs",
+      "total_seconds": 0.646,
+      "detail": "contexts=2"
+    },
+    {
+      "phase": "ts_config_inputs",
+      "seconds": 0.064,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=83"
+    },
+    {
+      "phase": "analysis_fingerprint",
+      "seconds": 0.071,
+      "trace": "inputs",
+      "total_seconds": 0.718,
+      "detail": "cfg_files=59"
+    },
+    {
+      "phase": "angular_probe",
+      "seconds": 0.003,
+      "trace": "inputs",
+      "total_seconds": 0.721,
+      "detail": "angular=false"
+    },
+    {
+      "phase": "policy_identity",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.721,
+      "detail": ""
+    },
+    {
+      "phase": "engine_context_fingerprint",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.721,
+      "detail": ""
+    },
+    {
+      "phase": "ts_disc_nuxt_packages",
+      "seconds": 0.103,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "pkgs=0"
+    },
+    {
+      "phase": "ts_disc_package_gates",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "ts_disc_package_names",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "names=30"
+    },
+    {
+      "phase": "ts_disc_alias_roots",
+      "seconds": 0.076,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "roots=1"
+    },
+    {
+      "phase": "ts_disc_package_exports",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "packages=30"
+    },
+    {
+      "phase": "ts_discovery_build",
+      "seconds": 0.19,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "side_reads=2001 stat_reads=2013 walked_dirs=667 captured=59"
+    },
+    {
+      "phase": "ts_discovery",
+      "seconds": 0.19,
+      "trace": "inputs",
+      "total_seconds": 0.911,
+      "detail": "names=0 bytes=0 dirs=0"
+    },
+    {
+      "phase": "ts_session_context",
+      "seconds": 0.09,
+      "trace": "inputs",
+      "total_seconds": 1.001,
+      "detail": "files=6804"
+    },
+    {
+      "phase": "runtime_inputs_complete",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 1.001,
+      "detail": ""
+    },
+    {
+      "phase": "clone_file_state_copy",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=0"
+    },
+    {
+      "phase": "extractor_need",
+      "seconds": 1.039,
+      "trace": "session",
+      "total_seconds": 1.039,
+      "detail": "non_ts_need=true detected=6 neutral=0"
+    },
+    {
+      "phase": "changed_terms",
+      "seconds": 0.009,
+      "trace": "session",
+      "total_seconds": 1.048,
+      "detail": "initial=true force=true non_ts=true scan=false raw_cfg=false policy=true neutral_scan=false neutral_cfg=false"
+    },
+    {
+      "phase": "invalidation_plan",
+      "seconds": 0.019,
+      "trace": "session",
+      "total_seconds": 1.067,
+      "detail": "reason=frozen scope: global name-resolution domain whole=true extra=0"
+    },
+    {
+      "phase": "revalidate_before_begin",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=59 superseded=false"
+    },
+    {
+      "phase": "begin_publish",
+      "seconds": 0.051,
+      "trace": "session",
+      "total_seconds": 1.119,
+      "detail": "scope=11271"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.075,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "manifests facts=133"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "manifests"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.126,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "mdintent facts=11762"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.024,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "mdintent"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "hcl facts=10"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "hcl"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.008,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "python facts=99"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "python"
+    },
+    {
+      "phase": "ts_dirty_scope",
+      "seconds": 0.25,
+      "trace": "session",
+      "total_seconds": 1.369,
+      "detail": "dirty=0 scope=6804 force=true"
+    },
+    {
+      "phase": "ts_detect_frameworks",
+      "seconds": 0.0,
+      "trace": "ts",
+      "total_seconds": 0.0,
+      "detail": "files=6804 shared_discovery=true"
+    },
+    {
+      "phase": "ts_disc_package_aliases",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "aliases=21"
+    },
+    {
+      "phase": "ts_read_dirty",
+      "seconds": 0.084,
+      "trace": "ts",
+      "total_seconds": 0.084,
+      "detail": "to_read=6804 cached=0"
+    },
+    {
+      "phase": "ts_graphql_grpc_index",
+      "seconds": 0.536,
+      "trace": "ts",
+      "total_seconds": 0.62,
+      "detail": "ts_files=6804"
+    },
+    {
+      "phase": "ts_mapfiles_aggregate",
+      "seconds": 5.772,
+      "trace": "ts",
+      "total_seconds": 6.392,
+      "detail": "parsed=6752 facts=89516 routers=0 scans=2299 derived=4430"
+    },
+    {
+      "phase": "ts_compose_modules",
+      "seconds": 0.004,
+      "trace": "ts",
+      "total_seconds": 6.396,
+      "detail": "facts=89958 records=6804 unread=0"
+    },
+    {
+      "phase": "ts_extract_session",
+      "seconds": 6.403,
+      "trace": "session",
+      "total_seconds": 7.772,
+      "detail": "parsed=6752 cached=0 facts=89958 records=6804"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.008,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "swift facts=19"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "swift"
+    },
+    {
+      "phase": "assemble_new_files",
+      "seconds": 0.192,
+      "trace": "session",
+      "total_seconds": 7.964,
+      "detail": "new=7772 ts_noop=false non_ts_need=true skip=false facts=101981"
+    },
+    {
+      "phase": "index_group_owners",
+      "seconds": 0.029,
+      "trace": "session",
+      "total_seconds": 7.993,
+      "detail": "facts=100617 owners=7709"
+    },
+    {
+      "phase": "publish_scope",
+      "seconds": 0.002,
+      "trace": "session",
+      "total_seconds": 7.995,
+      "detail": "scope=11271"
+    },
+    {
+      "phase": "encode_append_owners",
+      "seconds": 2.651,
+      "trace": "session",
+      "total_seconds": 10.646,
+      "detail": "published=7709"
+    },
+    {
+      "phase": "publish_resolved",
+      "seconds": 0.033,
+      "trace": "session",
+      "total_seconds": 10.678,
+      "detail": "owners=7709"
+    },
+    {
+      "phase": "revalidate_ts_records",
+      "seconds": 0.207,
+      "trace": "session",
+      "total_seconds": 10.886,
+      "detail": "n=6804"
+    },
+    {
+      "phase": "ts_config_inputs",
+      "seconds": 0.067,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=83"
+    },
+    {
+      "phase": "state_json_encode_write",
+      "seconds": 0.363,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "bytes=90686318 files=7772"
+    },
+    {
+      "phase": "write_pending_state",
+      "seconds": 0.533,
+      "trace": "session",
+      "total_seconds": 11.419,
+      "detail": ""
+    },
+    {
+      "phase": "end_flush_ack",
+      "seconds": 0.08,
+      "trace": "session",
+      "total_seconds": 11.499,
+      "detail": ""
+    },
+    {
+      "phase": "promote_compact_state",
+      "seconds": 0.065,
+      "trace": "session",
+      "total_seconds": 11.564,
+      "detail": "parsed=6752 published=7709"
+    },
+    {
+      "phase": "graph_session_run",
+      "seconds": 11.676,
+      "trace": "cli",
+      "total_seconds": 12.044,
+      "detail": "repo=/private/tmp/enola-test-inclusive-profile-20260927/cli-pairs/correctness-candidate-1/product parsed=6752"
+    },
+    {
+      "phase": "cli_complete",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 12.044,
+      "detail": "results=1"
+    }
+  ],
+  "cold-body": [
+    {
+      "phase": "flags_parsed",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 0.0,
+      "detail": "mode=analyze"
+    },
+    {
+      "phase": "config_load",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.0,
+      "detail": "config.yaml"
+    },
+    {
+      "phase": "declare_config_deps",
+      "seconds": 0.0,
+      "trace": "graphinput_build",
+      "total_seconds": 0.0,
+      "detail": "deps=2"
+    },
+    {
+      "phase": "discover_git",
+      "seconds": 0.044,
+      "trace": "graphinput_build",
+      "total_seconds": 0.045,
+      "detail": "repo=true dirs=2"
+    },
+    {
+      "phase": "declare_git_control",
+      "seconds": 0.005,
+      "trace": "graphinput_build",
+      "total_seconds": 0.05,
+      "detail": "deps=6"
+    },
+    {
+      "phase": "git_ls_files",
+      "seconds": 0.06,
+      "trace": "graphinput_build",
+      "total_seconds": 0.109,
+      "detail": "tracked=45453 dirs=5852"
+    },
+    {
+      "phase": "walk_tree",
+      "seconds": 0.121,
+      "trace": "graphinput_build",
+      "total_seconds": 0.231,
+      "detail": "names=14446 ignorefiles=4"
+    },
+    {
+      "phase": "check_ignore_setup",
+      "seconds": 0.018,
+      "trace": "graphinput_build",
+      "total_seconds": 0.248,
+      "detail": ""
+    },
+    {
+      "phase": "check_ignore_run",
+      "seconds": 0.072,
+      "trace": "graphinput_build",
+      "total_seconds": 0.32,
+      "detail": "names=14446 ignored=0"
+    },
+    {
+      "phase": "declare_ignore_files",
+      "seconds": 0.0,
+      "trace": "graphinput_build",
+      "total_seconds": 0.32,
+      "detail": "deps=9"
+    },
+    {
+      "phase": "compute_identities",
+      "seconds": 0.032,
+      "trace": "graphinput_build",
+      "total_seconds": 0.352,
+      "detail": "deps=9 entries=14446"
+    },
+    {
+      "phase": "graphinput_build",
+      "seconds": 0.353,
+      "trace": "graph_engine",
+      "total_seconds": 0.353,
+      "detail": "configpaths=2"
+    },
+    {
+      "phase": "engine_new",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.353,
+      "detail": ""
+    },
+    {
+      "phase": "register_plugins",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.353,
+      "detail": ""
+    },
+    {
+      "phase": "config_recheck",
+      "seconds": 0.0,
+      "trace": "graph_engine",
+      "total_seconds": 0.353,
+      "detail": ""
+    },
+    {
+      "phase": "resolve_graph_target",
+      "seconds": 0.354,
+      "trace": "cli",
+      "total_seconds": 0.354,
+      "detail": "repos=1"
+    },
+    {
+      "phase": "connect_sink",
+      "seconds": 0.001,
+      "trace": "cli",
+      "total_seconds": 0.355,
+      "detail": "nats=true"
+    },
+    {
+      "phase": "session_options",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 0.355,
+      "detail": "repo=/private/tmp/enola-test-inclusive-profile-20260927/cli-pairs/correctness-candidate-1/product"
+    },
+    {
+      "phase": "lock",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "bind_identity",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "open_journal",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.0,
+      "detail": ""
+    },
+    {
+      "phase": "replay_unacked",
+      "seconds": 0.004,
+      "trace": "open",
+      "total_seconds": 0.005,
+      "detail": ""
+    },
+    {
+      "phase": "load_state",
+      "seconds": 0.0,
+      "trace": "open",
+      "total_seconds": 0.005,
+      "detail": "files=0"
+    },
+    {
+      "phase": "transaction_enter",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.0,
+      "detail": "fast=false failed=false"
+    },
+    {
+      "phase": "effective_config_before",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.0,
+      "detail": "files=2"
+    },
+    {
+      "phase": "graph_inputs_proven",
+      "seconds": 0.103,
+      "trace": "reconcile",
+      "total_seconds": 0.104,
+      "detail": ""
+    },
+    {
+      "phase": "effective_config",
+      "seconds": 0.001,
+      "trace": "reconcile",
+      "total_seconds": 0.105,
+      "detail": "files=2 fast=false"
+    },
+    {
+      "phase": "reconcile_complete",
+      "seconds": 0.0,
+      "trace": "reconcile",
+      "total_seconds": 0.105,
+      "detail": "reloaded=false"
+    },
+    {
+      "phase": "engine_walk_repo",
+      "seconds": 0.122,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "files=13764 tests=0 all_names=13764"
+    },
+    {
+      "phase": "inventory",
+      "seconds": 0.122,
+      "trace": "inputs",
+      "total_seconds": 0.122,
+      "detail": "files=13764 all_names=13764"
+    },
+    {
+      "phase": "detect_go",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_manifests",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_mdintent",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_dotnet",
+      "seconds": 0.006,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_cpp",
+      "seconds": 0.007,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_hcl",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_ansible",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_java",
+      "seconds": 0.004,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_kotlin",
+      "seconds": 0.004,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_php",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_python",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_typescript",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_swift",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_ruby",
+      "seconds": 0.004,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_rust",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_scala",
+      "seconds": 0.006,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_dart",
+      "seconds": 0.002,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_grpc",
+      "seconds": 0.076,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_openapi",
+      "seconds": 0.076,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_asyncapi",
+      "seconds": 0.127,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "detect_extractors",
+      "seconds": 0.127,
+      "trace": "inputs",
+      "total_seconds": 0.248,
+      "detail": "detected=6"
+    },
+    {
+      "phase": "select_hash_targets",
+      "seconds": 0.018,
+      "trace": "inputs",
+      "total_seconds": 0.266,
+      "detail": "targets=7791"
+    },
+    {
+      "phase": "engine_hash_files",
+      "seconds": 0.269,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=7791 hashed=7791 bytes=82572462"
+    },
+    {
+      "phase": "hash_content_inputs",
+      "seconds": 0.269,
+      "trace": "inputs",
+      "total_seconds": 0.535,
+      "detail": "targets=7791"
+    },
+    {
+      "phase": "capture_contexts",
+      "seconds": 0.076,
+      "trace": "inputs",
+      "total_seconds": 0.611,
+      "detail": "contexts=2"
+    },
+    {
+      "phase": "ts_config_inputs",
+      "seconds": 0.063,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=83"
+    },
+    {
+      "phase": "analysis_fingerprint",
+      "seconds": 0.071,
+      "trace": "inputs",
+      "total_seconds": 0.682,
+      "detail": "cfg_files=59"
+    },
+    {
+      "phase": "angular_probe",
+      "seconds": 0.004,
+      "trace": "inputs",
+      "total_seconds": 0.686,
+      "detail": "angular=false"
+    },
+    {
+      "phase": "policy_identity",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.686,
+      "detail": ""
+    },
+    {
+      "phase": "engine_context_fingerprint",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.686,
+      "detail": ""
+    },
+    {
+      "phase": "ts_disc_nuxt_packages",
+      "seconds": 0.1,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "pkgs=0"
+    },
+    {
+      "phase": "ts_disc_package_gates",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": ""
+    },
+    {
+      "phase": "ts_disc_package_names",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "names=30"
+    },
+    {
+      "phase": "ts_disc_alias_roots",
+      "seconds": 0.072,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "roots=1"
+    },
+    {
+      "phase": "ts_disc_package_exports",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "packages=30"
+    },
+    {
+      "phase": "ts_discovery_build",
+      "seconds": 0.183,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "side_reads=2001 stat_reads=2013 walked_dirs=667 captured=59"
+    },
+    {
+      "phase": "ts_discovery",
+      "seconds": 0.183,
+      "trace": "inputs",
+      "total_seconds": 0.869,
+      "detail": "names=0 bytes=0 dirs=0"
+    },
+    {
+      "phase": "ts_session_context",
+      "seconds": 0.088,
+      "trace": "inputs",
+      "total_seconds": 0.957,
+      "detail": "files=6804"
+    },
+    {
+      "phase": "runtime_inputs_complete",
+      "seconds": 0.0,
+      "trace": "inputs",
+      "total_seconds": 0.957,
+      "detail": ""
+    },
+    {
+      "phase": "clone_file_state_copy",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=0"
+    },
+    {
+      "phase": "extractor_need",
+      "seconds": 0.993,
+      "trace": "session",
+      "total_seconds": 0.993,
+      "detail": "non_ts_need=true detected=6 neutral=0"
+    },
+    {
+      "phase": "changed_terms",
+      "seconds": 0.009,
+      "trace": "session",
+      "total_seconds": 1.001,
+      "detail": "initial=true force=true non_ts=true scan=false raw_cfg=false policy=true neutral_scan=false neutral_cfg=false"
+    },
+    {
+      "phase": "invalidation_plan",
+      "seconds": 0.02,
+      "trace": "session",
+      "total_seconds": 1.021,
+      "detail": "reason=frozen scope: global name-resolution domain whole=true extra=0"
+    },
+    {
+      "phase": "revalidate_before_begin",
+      "seconds": 0.001,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=59 superseded=false"
+    },
+    {
+      "phase": "begin_publish",
+      "seconds": 0.049,
+      "trace": "session",
+      "total_seconds": 1.07,
+      "detail": "scope=11271"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.072,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "manifests facts=133"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "manifests"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.122,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "mdintent facts=11762"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.024,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "mdintent"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "hcl facts=10"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "hcl"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.008,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "python facts=99"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "python"
+    },
+    {
+      "phase": "ts_dirty_scope",
+      "seconds": 0.244,
+      "trace": "session",
+      "total_seconds": 1.314,
+      "detail": "dirty=0 scope=6804 force=true"
+    },
+    {
+      "phase": "ts_detect_frameworks",
+      "seconds": 0.0,
+      "trace": "ts",
+      "total_seconds": 0.0,
+      "detail": "files=6804 shared_discovery=true"
+    },
+    {
+      "phase": "ts_disc_package_aliases",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "aliases=21"
+    },
+    {
+      "phase": "ts_read_dirty",
+      "seconds": 0.083,
+      "trace": "ts",
+      "total_seconds": 0.083,
+      "detail": "to_read=6804 cached=0"
+    },
+    {
+      "phase": "ts_graphql_grpc_index",
+      "seconds": 0.542,
+      "trace": "ts",
+      "total_seconds": 0.625,
+      "detail": "ts_files=6804"
+    },
+    {
+      "phase": "ts_mapfiles_aggregate",
+      "seconds": 5.891,
+      "trace": "ts",
+      "total_seconds": 6.515,
+      "detail": "parsed=6752 facts=89516 routers=0 scans=2298 derived=4431"
+    },
+    {
+      "phase": "ts_compose_modules",
+      "seconds": 0.004,
+      "trace": "ts",
+      "total_seconds": 6.519,
+      "detail": "facts=89958 records=6804 unread=0"
+    },
+    {
+      "phase": "ts_extract_session",
+      "seconds": 6.525,
+      "trace": "session",
+      "total_seconds": 7.839,
+      "detail": "parsed=6752 cached=0 facts=89958 records=6804"
+    },
+    {
+      "phase": "non_ts_extract",
+      "seconds": 0.009,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "swift facts=19"
+    },
+    {
+      "phase": "non_ts_fingerprint",
+      "seconds": 0.0,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "swift"
+    },
+    {
+      "phase": "assemble_new_files",
+      "seconds": 0.184,
+      "trace": "session",
+      "total_seconds": 8.023,
+      "detail": "new=7772 ts_noop=false non_ts_need=true skip=false facts=101981"
+    },
+    {
+      "phase": "index_group_owners",
+      "seconds": 0.036,
+      "trace": "session",
+      "total_seconds": 8.059,
+      "detail": "facts=100617 owners=7709"
+    },
+    {
+      "phase": "publish_scope",
+      "seconds": 0.002,
+      "trace": "session",
+      "total_seconds": 8.061,
+      "detail": "scope=11271"
+    },
+    {
+      "phase": "encode_append_owners",
+      "seconds": 2.611,
+      "trace": "session",
+      "total_seconds": 10.672,
+      "detail": "published=7709"
+    },
+    {
+      "phase": "publish_resolved",
+      "seconds": 0.046,
+      "trace": "session",
+      "total_seconds": 10.717,
+      "detail": "owners=7709"
+    },
+    {
+      "phase": "revalidate_ts_records",
+      "seconds": 0.252,
+      "trace": "session",
+      "total_seconds": 10.969,
+      "detail": "n=6804"
+    },
+    {
+      "phase": "ts_config_inputs",
+      "seconds": 0.07,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "n=83"
+    },
+    {
+      "phase": "state_json_encode_write",
+      "seconds": 0.364,
+      "trace": null,
+      "total_seconds": null,
+      "detail": "bytes=90686095 files=7772"
+    },
+    {
+      "phase": "write_pending_state",
+      "seconds": 0.55,
+      "trace": "session",
+      "total_seconds": 11.52,
+      "detail": ""
+    },
+    {
+      "phase": "end_flush_ack",
+      "seconds": 0.076,
+      "trace": "session",
+      "total_seconds": 11.596,
+      "detail": ""
+    },
+    {
+      "phase": "promote_compact_state",
+      "seconds": 0.059,
+      "trace": "session",
+      "total_seconds": 11.654,
+      "detail": "parsed=6752 published=7709"
+    },
+    {
+      "phase": "graph_session_run",
+      "seconds": 11.764,
+      "trace": "cli",
+      "total_seconds": 12.119,
+      "detail": "repo=/private/tmp/enola-test-inclusive-profile-20260927/cli-pairs/correctness-candidate-1/product parsed=6752"
+    },
+    {
+      "phase": "cli_complete",
+      "seconds": 0.0,
+      "trace": "cli",
+      "total_seconds": 12.119,
+      "detail": "results=1"
+    }
+  ]
+}
