@@ -40,3 +40,5 @@ Four participant holds verified for 15:50–16:55 UTC, including Codata terminal
 Timing session10341 exited0, all12 arms completed; quiet window explicitly released. Computed Stage36 acceptance passed: body4.141125 ->3.777263 s (-8.78655%), six paired wins, no time/RSS gate violation. Independent source-only gate review requested; main still unchanged. Evidence in guarded/timing-20260927.
 
 Pre-publication check: origin/main remains 2b11e7d2; no divergent commits. Pre-push hook completed exit0 (cache coverage, docslint, golden/determinism). Independent timing review pending. Cumulative HTML now records the measured body benefit without claiming publication.
+
+Independent review msg_6bad427439cc confirms every gate and no blocker. Pair6 contention and sensitivity (-8.41% without pair6), cache-enabled suite scope and frozen stale-purpose text documented in timing RESULTS. Stage36 accepted for normal main publication; overall startup/watch goal remains open.

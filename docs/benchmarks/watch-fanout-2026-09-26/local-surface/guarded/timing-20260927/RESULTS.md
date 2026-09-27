@@ -1,4 +1,4 @@
-# Stage36 guarded timing — computed acceptance, review pending
+# Stage36 guarded timing — accepted limited engineering stage
 
 Six counterbalanced pairs; same Product revision, full test-inclusive policy and Stage33 baseline. Fresh CLI through process exit including producer ACKs; no daemon/watch claim.
 
@@ -11,4 +11,12 @@ Six counterbalanced pairs; same Product revision, full test-inclusive policy and
 
 Body parse count 21 -> 1; candidate body/initial ratio median 0.335. All six body pairs won (7.32–13.11% improvement). All graph equality/no-op checks passed. Computed host/pressure/power gates passed; no median time or RSS gate exceeded. Detailed first batch, broker End, owner scope, RSS and spread are retained in timing-comparison.json.
 
-This meets the preregistered limited Stage36 engineering gate, not the overall near-zero fresh no-op or watch objective. No main publication yet. Independent gate review requested before publication. Raw host/pressure logs remain at /tmp/enola-local-surface-guarded; file digests below preserve evidence identity.
+This meets the preregistered limited Stage36 engineering gate, not the overall near-zero fresh no-op or watch objective. No main publication yet. Independent gate review completed: msg_6bad427439cc and msg_b1d715350252 reproduce every frozen condition and support acceptance. Raw host/pressure logs remain at /tmp/enola-local-surface-guarded; file digests below preserve evidence identity.
+
+## Independent review context
+
+Pair6 had substantially more foreign CPU than the other pairs, with imbalance favoring the candidate (baseline231.01%, candidate195.31% summed foreign CPU means). This is shared-host contention, not a clean-host claim. Excluding pair6 still yields -8.41% body median change; this sensitivity analysis does not change the frozen six-pair decision. Initial/noop/structural show overlapping ranges, so do not claim meaningful gains there.
+
+All3567 pressure samples normal, maximum gap0.2752s, zero new Swapouts; Swapins+1808 are context. Per-pressure-sample wall-minus-monotonic spread3.91ms shows no suspension. Series-level ~2.2s differences are instrumentation before/after the measured subprocess, not sleep. AC and low-power checks are boundary observations only. The launcher used caffeinate -i (recorded command); host samples confirm caffeinate presence but omit flags.
+
+Frozen pins retain their original pre-timing purpose string intentionally; this result is the post-timing status. Full-suite receipt is cache-enabled (110 passing,104 cached), not a fresh execution of every package or a total suite-duration measurement; graphsession was uncached462.536s, supplemental guard test passed separately. No requirement is satisfied by cache timing. Absolute seconds must not be compared across earlier cohorts with different host speed.
