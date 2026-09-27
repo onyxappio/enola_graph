@@ -1,0 +1,436 @@
+{
+  "purpose": "correctness-only history validation; no timing claim of any kind",
+  "started_utc": "2026-09-27T13:03:42Z",
+  "source": "/tmp/enola-stage16-root-review/product-source",
+  "expected_commits": [
+    "42f589cacb0297694eddbd4de4852b74bf154c45",
+    "fba38bab93c76a4da8df58cf45fd6847a468c315"
+  ],
+  "baseline_arm": true,
+  "series_gates": [
+    {
+      "key": "candidate-binary-pin",
+      "pass": true,
+      "detail": {
+        "measured": "ec5143e824760312920a1760d7674ec4a010f329dce44b7abbc11b648cf19fef",
+        "pinned": "ec5143e824760312920a1760d7674ec4a010f329dce44b7abbc11b648cf19fef"
+      }
+    },
+    {
+      "key": "baseline-binary-pin",
+      "pass": true,
+      "detail": {
+        "measured": "980e849a72e41570af21446d7f69f1624af0ed5967d9db14aaf8f9ae40bd0716",
+        "pinned": "980e849a72e41570af21446d7f69f1624af0ed5967d9db14aaf8f9ae40bd0716"
+      }
+    },
+    {
+      "key": "policy-pin",
+      "pass": true,
+      "detail": {
+        "measured": "d7fcc27d5290935b7a660c92e75234009e320ae765fe6f6205832daabd0c5f9d",
+        "pinned": "d7fcc27d5290935b7a660c92e75234009e320ae765fe6f6205832daabd0c5f9d",
+        "path": "/private/tmp/enola-summary-noop/acceptance/cli-pairs/test-inclusive-scope.yaml"
+      }
+    },
+    {
+      "key": "observer-pin",
+      "pass": true,
+      "detail": {
+        "measured": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+        "pinned": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f"
+      }
+    },
+    {
+      "key": "nats-pin",
+      "pass": true,
+      "detail": {
+        "measured": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af",
+        "pinned": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af"
+      }
+    },
+    {
+      "key": "source-head-pin",
+      "pass": true,
+      "detail": {
+        "head": "a609c19f3861971930fae7b33dcb2950598953c5",
+        "pinned": "a609c19f3861971930fae7b33dcb2950598953c5",
+        "porcelain": ""
+      }
+    },
+    {
+      "key": "commit-chain-pin",
+      "pass": true,
+      "detail": {
+        "relation": "ancestor-endpoints",
+        "endpoints": [
+          "42f589cacb0297694eddbd4de4852b74bf154c45",
+          "fba38bab93c76a4da8df58cf45fd6847a468c315"
+        ]
+      }
+    },
+    {
+      "key": "chain-initial-fresh",
+      "pass": true,
+      "detail": {
+        "base": 0,
+        "target": 1
+      }
+    }
+  ],
+  "steps": [
+    {
+      "label": "00-initial-42f589ca",
+      "kind": "initial",
+      "index": 0,
+      "expected_commit": "42f589cacb0297694eddbd4de4852b74bf154c45",
+      "completed": true,
+      "gates": [
+        {
+          "key": "source-pin",
+          "pass": true,
+          "detail": {
+            "head": "42f589cacb0297694eddbd4de4852b74bf154c45",
+            "expected": "42f589cacb0297694eddbd4de4852b74bf154c45"
+          }
+        },
+        {
+          "key": "worktree-clean",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "worktree-clean-after",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "candidate-published",
+          "pass": true,
+          "detail": {
+            "published": true
+          }
+        },
+        {
+          "key": "delta-equals-cold",
+          "pass": true,
+          "detail": {
+            "effective_chain_hash": "a35f82f66c769c7c51146a41dd210960d0ef3c62a054e754c2e7854595f7100d",
+            "candidate_cold_hash": "a35f82f66c769c7c51146a41dd210960d0ef3c62a054e754c2e7854595f7100d",
+            "published": true
+          }
+        },
+        {
+          "key": "noop-zero-parses",
+          "pass": true,
+          "detail": {
+            "parsed_files": 0
+          }
+        },
+        {
+          "key": "noop-stable-generation",
+          "pass": true,
+          "detail": {
+            "base": 1,
+            "target": 1
+          }
+        },
+        {
+          "key": "noop-zero-events",
+          "pass": true,
+          "detail": {
+            "wire_messages": 0
+          }
+        },
+        {
+          "key": "noop-state-unchanged",
+          "pass": true,
+          "detail": {
+            "before": "a225be7d95880717ba8a67ad5eed080a6a5395707e51ec72ad90920c746fb20d",
+            "after": "a225be7d95880717ba8a67ad5eed080a6a5395707e51ec72ad90920c746fb20d"
+          }
+        },
+        {
+          "key": "baseline-cold-equals-candidate-cold",
+          "pass": true,
+          "detail": {
+            "baseline_cold_hash": "a35f82f66c769c7c51146a41dd210960d0ef3c62a054e754c2e7854595f7100d",
+            "candidate_cold_hash": "a35f82f66c769c7c51146a41dd210960d0ef3c62a054e754c2e7854595f7100d",
+            "inputs": "same physical checkout, same policy overlay, same commit"
+          }
+        }
+      ],
+      "head": "42f589cacb0297694eddbd4de4852b74bf154c45",
+      "status_before": "",
+      "subject": "Merge pull request #1005 from onyxappio/AlexanderMykulych/t605-publish-bump",
+      "chain": {
+        "label": "001-00-initial-42f589ca-chain",
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": false,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "initial": 6749
+            }
+          },
+          "RunID": "test-inclusive-history-product-test-inclusive-history-chain-1-1790514244820680000",
+          "BaseGeneration": 0,
+          "TargetGeneration": 1,
+          "Stats": {
+            "files_read": 6801,
+            "files_parsed": 6749,
+            "cached_files": 0,
+            "graphql_parsed": 2,
+            "sfc_parsed": 17,
+            "summary_scans": 2262,
+            "derived_indexes": 4464,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "all prior/current file owners",
+              "reason": "frozen scope: global name-resolution domain"
+            },
+            {
+              "extractor": "manifests",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            },
+            {
+              "extractor": "mdintent",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            },
+            {
+              "extractor": "hcl",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            },
+            {
+              "extractor": "python",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            },
+            {
+              "extractor": "swift",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 7714,
+          "ParsedFiles": 6749,
+          "EarlyLocal": 0
+        },
+        "published": true,
+        "fallbacks": [
+          "graph: all prior/current file owners (frozen scope: global name-resolution domain)",
+          "manifests: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+          "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+          "hcl: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+          "python: all files owned by extractor (no per-file incremental session; whole-extractor re-run)",
+          "swift: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+        ],
+        "graph_hash": "a35f82f66c769c7c51146a41dd210960d0ef3c62a054e754c2e7854595f7100d"
+      },
+      "published": true,
+      "effective_hash": "a35f82f66c769c7c51146a41dd210960d0ef3c62a054e754c2e7854595f7100d",
+      "noop": {
+        "parsed_files": 0,
+        "base_generation": 1,
+        "target_generation": 1,
+        "wire_messages": 0,
+        "state_before": "a225be7d95880717ba8a67ad5eed080a6a5395707e51ec72ad90920c746fb20d",
+        "state_after": "a225be7d95880717ba8a67ad5eed080a6a5395707e51ec72ad90920c746fb20d"
+      },
+      "candidate_cold_hash": "a35f82f66c769c7c51146a41dd210960d0ef3c62a054e754c2e7854595f7100d",
+      "baseline_cold_hash": "a35f82f66c769c7c51146a41dd210960d0ef3c62a054e754c2e7854595f7100d",
+      "status_after": "",
+      "gates_missing": [],
+      "gates_present": true,
+      "all_gates_pass": true,
+      "accepted": true
+    },
+    {
+      "label": "01-transition-fba38bab",
+      "kind": "transition",
+      "index": 1,
+      "expected_commit": "fba38bab93c76a4da8df58cf45fd6847a468c315",
+      "completed": true,
+      "gates": [
+        {
+          "key": "source-pin",
+          "pass": true,
+          "detail": {
+            "head": "fba38bab93c76a4da8df58cf45fd6847a468c315",
+            "expected": "fba38bab93c76a4da8df58cf45fd6847a468c315"
+          }
+        },
+        {
+          "key": "worktree-clean",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "worktree-clean-after",
+          "pass": true,
+          "detail": {
+            "porcelain": ""
+          }
+        },
+        {
+          "key": "candidate-published",
+          "pass": true,
+          "detail": {
+            "published": true
+          }
+        },
+        {
+          "key": "delta-equals-cold",
+          "pass": true,
+          "detail": {
+            "effective_chain_hash": "5adfe2c1898c04d4cf8f7b54c32b92b6f042dc65eae393e1312a55ec69be5c90",
+            "candidate_cold_hash": "5adfe2c1898c04d4cf8f7b54c32b92b6f042dc65eae393e1312a55ec69be5c90",
+            "published": true
+          }
+        },
+        {
+          "key": "noop-zero-parses",
+          "pass": true,
+          "detail": {
+            "parsed_files": 0
+          }
+        },
+        {
+          "key": "noop-stable-generation",
+          "pass": true,
+          "detail": {
+            "base": 2,
+            "target": 2
+          }
+        },
+        {
+          "key": "noop-zero-events",
+          "pass": true,
+          "detail": {
+            "wire_messages": 0
+          }
+        },
+        {
+          "key": "noop-state-unchanged",
+          "pass": true,
+          "detail": {
+            "before": "06f62a6ad71901d2cb038d8f65dc209f9e205d7a0ceecff487a64d50c19c1296",
+            "after": "06f62a6ad71901d2cb038d8f65dc209f9e205d7a0ceecff487a64d50c19c1296"
+          }
+        },
+        {
+          "key": "baseline-cold-equals-candidate-cold",
+          "pass": true,
+          "detail": {
+            "baseline_cold_hash": "5adfe2c1898c04d4cf8f7b54c32b92b6f042dc65eae393e1312a55ec69be5c90",
+            "candidate_cold_hash": "5adfe2c1898c04d4cf8f7b54c32b92b6f042dc65eae393e1312a55ec69be5c90",
+            "inputs": "same physical checkout, same policy overlay, same commit"
+          }
+        }
+      ],
+      "head": "fba38bab93c76a4da8df58cf45fd6847a468c315",
+      "status_before": "",
+      "subject": "[codex] ci: move tasks-gate to Blacksmith (#1009)",
+      "chain": {
+        "label": "005-01-transition-fba38bab-chain",
+        "result": {
+          "Invalidation": {
+            "RawConfigChanged": true,
+            "PolicyReconciled": false,
+            "AddedSources": 0,
+            "RemovedSources": 0,
+            "ContextAffectedSources": 0,
+            "ContextReasons": null,
+            "ParsedByReason": {
+              "resolution": 10,
+              "source content": 4
+            }
+          },
+          "RunID": "test-inclusive-history-product-test-inclusive-history-chain-2-1790514283657252000",
+          "BaseGeneration": 1,
+          "TargetGeneration": 2,
+          "Stats": {
+            "files_read": 14,
+            "files_parsed": 14,
+            "cached_files": 6787,
+            "graphql_parsed": 0,
+            "sfc_parsed": 0,
+            "summary_scans": 45,
+            "derived_indexes": 6,
+            "discovery_passes": 0
+          },
+          "Fallbacks": [
+            {
+              "extractor": "graph",
+              "scope": "changed files and reverse file dependents",
+              "reason": "frozen scope: reverse-close plus owners that reference added or removed fact names"
+            },
+            {
+              "extractor": "mdintent",
+              "scope": "all files owned by extractor",
+              "reason": "no per-file incremental session; whole-extractor re-run"
+            }
+          ],
+          "Unreadable": null,
+          "OwnersPublished": 4,
+          "ParsedFiles": 14,
+          "EarlyLocal": 0
+        },
+        "published": true,
+        "fallbacks": [
+          "graph: changed files and reverse file dependents (frozen scope: reverse-close plus owners that reference added or removed fact names)",
+          "mdintent: all files owned by extractor (no per-file incremental session; whole-extractor re-run)"
+        ],
+        "graph_hash": "5adfe2c1898c04d4cf8f7b54c32b92b6f042dc65eae393e1312a55ec69be5c90"
+      },
+      "published": true,
+      "effective_hash": "5adfe2c1898c04d4cf8f7b54c32b92b6f042dc65eae393e1312a55ec69be5c90",
+      "noop": {
+        "parsed_files": 0,
+        "base_generation": 2,
+        "target_generation": 2,
+        "wire_messages": 0,
+        "state_before": "06f62a6ad71901d2cb038d8f65dc209f9e205d7a0ceecff487a64d50c19c1296",
+        "state_after": "06f62a6ad71901d2cb038d8f65dc209f9e205d7a0ceecff487a64d50c19c1296"
+      },
+      "candidate_cold_hash": "5adfe2c1898c04d4cf8f7b54c32b92b6f042dc65eae393e1312a55ec69be5c90",
+      "baseline_cold_hash": "5adfe2c1898c04d4cf8f7b54c32b92b6f042dc65eae393e1312a55ec69be5c90",
+      "status_after": "",
+      "gates_missing": [],
+      "gates_present": true,
+      "all_gates_pass": true,
+      "accepted": true
+    }
+  ],
+  "completed_sequence": true,
+  "tag": "recent",
+  "binary_sha256": {
+    "baseline": "980e849a72e41570af21446d7f69f1624af0ed5967d9db14aaf8f9ae40bd0716",
+    "control": "980e849a72e41570af21446d7f69f1624af0ed5967d9db14aaf8f9ae40bd0716",
+    "candidate": "ec5143e824760312920a1760d7674ec4a010f329dce44b7abbc11b648cf19fef"
+  },
+  "policy_sha256": "d7fcc27d5290935b7a660c92e75234009e320ae765fe6f6205832daabd0c5f9d",
+  "config": "repo: /private/tmp/enola-summary-noop/history-recent-current/work-recent/product\n\ngraph_inputs:\n    exclude:\n        - apps/mobile/e2e/artifacts/**\n        - worker-reports/**\nignore:\n    - '**/vendor/**'\n    - '**/node_modules/**'\n    - '**/.git/**'\n    - '**/dist/**'\n    - '**/build/**'\n    - '**/tmp/**'\n    - '**/public/assets/**'\n    - '**/testdata/**'\n    - '**/*.g.dart'\n    - '**/*.freezed.dart'\n    - '**/*.mocks.dart'\n    - '**/*.gr.dart'\n    - '**/*.config.dart'\n    - '**/*.pb.dart'\n    - '**/*.pbenum.dart'\n    - '**/*.pbjson.dart'\n    - '**/*.pbserver.dart'\n    - '**/*.pbgrpc.dart'\n    - '**/.dart_tool/**'\n    - '**/.pub-cache/**'\n    - '**/.flutter-plugins'\n    - '**/.flutter-plugins-dependencies'\n    - '**/pkg/front_end/testcases/**'\n    - '**/pkg/_fe_analyzer_shared/test/**'\n    - .enola/**\n    - '**/.enola/**'\n    - .next/**\n    - dist/**\n    - '**/build/**'\n    - out/**\n    - .vercel/**\n    - .turbo/**\n    - coverage/**\n    - .nuxt/**\n    - .svelte-kit/**\n    - '**/__pycache__/**'\n    - '**/.venv/**'\n    - '**/venv/**'\n    - '**/site-packages/**'\n    - '**/.tox/**'\n    - '**/.nox/**'\n    - '**/.eggs/**'\n    - '**/.mypy_cache/**'\n    - '**/.pytest_cache/**'\n    - '**/.ruff_cache/**'\n    - '**/Pods/**'\n    - '**/.gradle/**'\n    - '**/target/**'\n    - '**/obj/**'\n    - '**/bin/Debug/**'\n    - '**/bin/Release/**'\n    - '**/*.min.js'\n    - '**/*.bundle.js'\n",
+  "checkout": "/private/tmp/enola-summary-noop/history-recent-current/work-recent/product",
+  "problems": [],
+  "accepted": true,
+  "baseline_claim": "baseline and candidate cold graph hashes are equal at every commit, from the same physical checkout, policy overlay and commit",
+  "finished_utc": "2026-09-27T13:05:12Z"
+}
