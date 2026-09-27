@@ -1,0 +1,43 @@
+{
+  "mode": "current-roster",
+  "combined_authorized": true,
+  "worker_message": "msg_90aa4eb07244",
+  "start_utc": "2026-09-27T06:00:00+00:00",
+  "end_utc": "2026-09-27T06:35:00+00:00",
+  "participants": [
+    {
+      "handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+      "status": "held",
+      "message_id": "msg_90aa4eb07244",
+      "evidence_path": "/tmp/enola-test-inclusive-acceptance-20260927/coordination/msg_90aa4eb07244.json",
+      "sha256": "507904ce3c77e05dc00e31e8ed27974df42c9d95362147996a6bb39c09761b8a"
+    },
+    {
+      "handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+      "status": "held",
+      "message_id": "msg_c57f5be9d296",
+      "evidence_path": "/tmp/enola-test-inclusive-acceptance-20260927/coordination/msg_c57f5be9d296.json",
+      "sha256": "faed4be2f98c2fdc7d829feb1b4e710911a775cd0e92d2b76eadbc6710011d2f"
+    },
+    {
+      "handle": "term_f6d0d3d8-2dce-47a2-81db-44fd6bb8a1a8",
+      "status": "terminal-held",
+      "quote": "ACK: no heavy jobs during 2026-09-27 06:00\u201306:35 UTC.",
+      "evidence_path": "/tmp/enola-test-inclusive-acceptance-20260927/coordination/fsm-hold.json",
+      "sha256": "c20c3d23e98e8799c9861cf5f7dee9d4aec497de9ad89d976c830a03450d2b8a"
+    },
+    {
+      "handle": "term_a8cbadf5-e45d-4154-acd4-7101cedffcdf",
+      "status": "terminal-held",
+      "quote": "ACK \u2014 2026-09-27 06:00\u201306:35 UTC is clear of heavy jobs, tests, builds, and database/Docker workload.",
+      "evidence_path": "/tmp/enola-test-inclusive-acceptance-20260927/coordination/codata-hold.json",
+      "sha256": "4a28804b6fe0f33889101cfa8e10ab77ae48ddce027d5aa6c122075d331a7658"
+    },
+    {
+      "handle": "term_b4d33c66-3033-42d6-8870-0852aa948bfd",
+      "status": "exited",
+      "evidence_path": "/tmp/enola-test-inclusive-acceptance-20260927/coordination/closed-coordinator.json",
+      "sha256": "2df379ab3251abb344a97bbcf622a1ce37783a742d55ddfc08ac9adb3c161d37"
+    }
+  ]
+}

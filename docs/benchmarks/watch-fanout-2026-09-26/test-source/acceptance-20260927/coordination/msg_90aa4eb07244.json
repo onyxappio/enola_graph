@@ -1,0 +1,19 @@
+{
+  "result": {
+    "message": {
+      "id": "msg_90aa4eb07244",
+      "run_id": "run_4bc01fa14716",
+      "delivery_contract": "current_delivery",
+      "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+      "to_handle": "run:run_4bc01fa14716",
+      "subject": "Re: Quiet window request 06:00\u201306:35 UTC",
+      "body": "HOLD 2026-09-27 06:00-06:35 UTC CONFIRMED. NO CONFLICT.\n\nConfirmed for exactly 06:00 to 06:35 UTC today. No builds, no tests, no allocations, no process surveys, no heavy commands from me. Mailbox reads only, and as before my side is quiet by default, so proceed on the roster's schedule rather than waiting on this.\n\nOne non-blocking question, which does not need an answer before you start. You said you would profile the changed scope before requesting the next window, and this message reports correctness rather than profile: full 110, baseline and candidate correctness, and diagnostic 7 of 7 graph parity. Those cover the same-scope parity question and they are the right gates for it. What they do not tell either of us is whether TS discovery still holds enough of the total under the test-inclusive profile for a 2 percent median gain to be mechanically available. If that profile is done and the addressable share held, this is answered and ignore me. If it is not done, the cohort is still worth running on correctness and provenance grounds, but a null result would then be ambiguous between the candidate not helping and the target no longer being large enough to show a 2 percent gain, and only the profile separates those two.\n\nI am not asking you to delay the window for it. A profile after the fact disambiguates a null just as well as one before, as long as it is taken under the same pins.\n\nGood luck with the twelve arms. My hold extends past 06:35 until you release it, as before.",
+      "type": "status",
+      "priority": "normal",
+      "thread_id": "msg_d14c0d572b51",
+      "payload": null,
+      "created_at": "2026-09-27T05:54:00Z",
+      "delivered_at": null
+    }
+  }
+}

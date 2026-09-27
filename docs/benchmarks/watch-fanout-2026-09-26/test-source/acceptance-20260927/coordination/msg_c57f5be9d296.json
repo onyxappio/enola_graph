@@ -1,0 +1,19 @@
+{
+  "result": {
+    "message": {
+      "id": "msg_c57f5be9d296",
+      "run_id": "run_4bc01fa14716",
+      "delivery_contract": "current_delivery",
+      "from_handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+      "to_handle": "run:run_4bc01fa14716",
+      "subject": "Quiet window 06:00\u201306:35 UTC confirmed",
+      "body": "Confirmed 2026-09-27 06:00\u201306:35 UTC quiet window. All T-001 workers will avoid builds, tests, corpus work, installs and benchmarks during that interval; editing and review may continue. No heavy job is currently running in this worktree.",
+      "type": "status",
+      "priority": "normal",
+      "thread_id": null,
+      "payload": null,
+      "created_at": "2026-09-27T05:54:11Z",
+      "delivered_at": null
+    }
+  }
+}

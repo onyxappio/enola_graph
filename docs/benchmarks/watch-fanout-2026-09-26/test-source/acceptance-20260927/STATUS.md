@@ -1,1 +1,1 @@
-Prepared prospective same-scope six-pair cohort. No timing started yet. All numerical acceptance gates retained. Current participant holds required before execution. Summary gate regression checks passed after restoring missing synthetic fixture from current correctness-only metrics; synthetic cases are not benchmark evidence.
+Complete cohort; engineering_accepted=false. Failed initial consistency (4/6 winning pairs, requires6/6). All12 arms exit0; graph/no-op/memory gates passed. No promotion to main. See RESULT.md and timing-comparison.json.
