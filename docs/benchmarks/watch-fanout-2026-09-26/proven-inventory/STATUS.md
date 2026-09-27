@@ -1,6 +1,6 @@
 # Experimental transaction-local inventory collection
 
-Not accepted or published. This is separate from the accepted Stage33 timing
+Prototype commit 177c0c5 is not accepted or published. This is separate from the accepted Stage33 timing
 candidate 3f2883b; it must not inherit that candidate's performance evidence.
 
 The fresh profile recorded approximately 106 ms in inventory immediately after
@@ -34,6 +34,10 @@ The no-op preserved checkpoint bytes, generation and stream sequence. This run
 overlapped the full tests deliberately and establishes no timing claim.
 Diagnostic profile completed: the separate inventory span disappeared, but
 classification moved into the proof. CLI totals remained about two seconds;
-no overall speedup is established. See fresh-profile/RESULT.md. Full repository
-validation and repeated coordinated timing remain outstanding. No speed
+no overall speedup is established. See fresh-profile/RESULT.md. Full repository validation passed: 123 package rows, 77 cached passing
+packages, exit0. Prospective acceptance rule retains Stage33 performance
+thresholds; the summary, current-roster and power gate checks passed. Four
+participants have been asked for 14:20–15:25 UTC on 2026-09-27; no hold or
+timing run is claimed until their explicit acknowledgments arrive. Repeated
+coordinated timing remains outstanding. No speed
 claim is established by focused tests or the diagnostic 106 ms attribution.

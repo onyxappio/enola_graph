@@ -1,0 +1,51 @@
+# Prospective proven-inventory promotion rule
+
+Written before any acceptance timing for this candidate. Earlier Stage32 and
+other cohort verdicts remain unchanged; none of their samples enter this cohort.
+
+Target runtime: 177c0c5 (transaction-local inventory collection during policy proof),
+binary 358f22f9fcb8fa32f64ce1794ea2fa8b6dc9d119f8f90fa6698a12055d8b9961.
+Baseline: published main 2b11e7d, runtime 3f2883b, frozen binary
+ec5143e824760312920a1760d7674ec4a010f329dce44b7abbc11b648cf19fef.
+Both use --summary-json, --changed-owner-scope and identical explicit test-inclusive
+scope on Product 01baa6eb0cc2ea74018eafc07e230a29d4efa8f4. State is fully decoded
+and input contents are freshly hashed in both arms. Earlier diagnostic observations
+are not acceptance samples; criteria retain the prior Stage33 thresholds.
+
+This stage targets fresh-process unchanged CLI latency. Unlike the earlier
+initial-focused stage, the primary scenario is noop. Promotion requires:
+
+- Six counterbalanced pairs (AB, BA repeated three times), all twelve arms in
+  one explicitly acknowledged quiet interval; no refill or cross-window pooling.
+- Noop ratio of medians <=0.98, with all six paired noop ratios <1.
+- Initial, body and structural median time regressions <=2%; every scenario's
+  median RSS increase <=5%; mean scenario median ratio <1 and the sum of median
+  scenario times does not increase.
+- Full candidate repository suite and same-scope baseline/candidate correctness
+  checks pass on the pinned source/binaries. Every arm independently verifies
+  full/cold equality, broker completion and silent zero-parse/event no-op with
+  unchanged generation and checkpoint bytes. Cross-arm graph hashes must match.
+- Same host controls as Stage32: complete competitor/host samples, normal pressure
+  at 250ms cadence with <=1s gaps, zero new Swapouts, no counter resets, valid
+  boundaries and pins. Swapins are context, not evidence of zero paging impact.
+- Report all observations, spreads, first batch and broker End, parsed counts,
+  memory, absolute latency and delta/initial ratios, including rejected results.
+
+These are limited engineering promotion gates, not statistical significance,
+near-zero fresh-noop completion, resident-watch latency, old-upstream comparison
+or complete current-main historical coverage. Those obligations remain open.
+No quiet window has been requested or granted for this cohort yet.
+
+## Power and window preconditions inherited from Stage33
+
+No prior arm is reused. Performance thresholds and six-pair ordering above are
+unchanged. Before requesting a new window, add power preconditions at each arm's
+boundaries: AC power, reported battery charge at least 20%, AC Low Power Mode off.
+Record raw pmset output before and after each arm outside its measurement interval,
+and independently validate it in the final summarizer. Missing/failed observations
+reject the cohort. Boundary checks do not establish uninterrupted AC during an arm.
+Do not change system power settings. Run under caffeinate -i to prevent idle sleep;
+this does not promise protection against low-battery or forced system sleep.
+Existing wall/monotonic, pressure, host sampling and fixed quiet-window gates remain.
+Choose at least 60 minutes for twelve arms, based on the prior 234-second arm;
+that duration is planning evidence, not a valid speed comparison.
