@@ -17,4 +17,4 @@ Primary host audit excludes the harness owner PID and its descendants. Mean fore
 
 Final rule status/build updates were made before timing; numerical thresholds unchanged. Earliest reviewer ACK timestamp18:25:25 UTC precedes actual cohort start; no earlier work is claimed as quiet. Source review msg_f04619eb67a2 found no runtime blocker. Follow-up c3c481e changes comments/tests only; focused hash tests pass and a wrapper-removal mutation is rejected by the new deterministic scratch-buffer guard.
 
-Stage38 accepted by independent review; normal pre-push checks and publication follow. Near-zero fresh startup, much faster deltas, broad history performance and long-running watch remain open.
+Stage38 independently accepted and normally pushed to main as8c63211; all pre-push guards passed. Near-zero fresh startup, much faster deltas, broad history performance and long-running watch remain open.

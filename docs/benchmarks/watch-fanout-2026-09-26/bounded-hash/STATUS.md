@@ -1,4 +1,4 @@
-# Bounded file hashing: Stage38 accepted, publication pending
+# Bounded file hashing: Stage38 published in main8c63211
 
 Runtime source1af548c uses at most four readers, each with64KiB reusable scratch and reset SHA256 state; all bytes are read, errors remain omitted as before, and output folding preserves input-order duplicate-key behavior. No persistent index, metadata shortcut, schema or analysis-scope change.
 
@@ -13,3 +13,5 @@ Go diagnostic/overlay sources are archived as .go.txt to avoid turning documenta
 Completed cohort: all12 arms exited0, all frozen gates and independent primary arithmetic pass; no-op2.006362→1.869400s (-6.8264%, six wins), body3.781358→3.636822s, structural4.188238→4.046660s. Independent cohort review is pending; not yet published. All participants released. Post-cohort c3c481e adds a deterministic buffer-use guard (focused tests pass; wrapper-removal mutation fails as expected) and comments only. See final/RESULTS.md for spreads, RSS increases and shared-host caveats.
 
 Final review msg_76f385a8252f independently accepts Stage38 with no blockers, explicitly correcting the prior rule/host/test references. Normal main publication is authorized; pre-push guards remain required.
+
+Publication complete:8c63211, normal push, cacheVersion/docslint/golden+determinism hooks passed. Earlier pending statuses above are historical checkpoints. Next fence prototype remains external and unaccepted.
