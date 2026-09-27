@@ -1,0 +1,948 @@
+{
+  "background_owner_pid": 95990,
+  "background_mode": null,
+  "background_errors": [],
+  "background_vectors": [],
+  "background_evidence": null,
+  "validation_error": null,
+  "all_checks_validated": true,
+  "arm": "baseline",
+  "repeat": 1,
+  "quiet_ack_message_id": null,
+  "exit": 0,
+  "competing_samples": [
+    [
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96388 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/enola.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=HpQ6cnl6o27iAYfjlggE/nNftHndJmWlKFB7p-6o7/5QJDRq6aeQW-02I-bwKn/HpQ6cnl6o27iAYfjlggE -X testing.testBinary=1 -extld=cc /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/_pkg_.a"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96388 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/enola.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=HpQ6cnl6o27iAYfjlggE/nNftHndJmWlKFB7p-6o7/5QJDRq6aeQW-02I-bwKn/HpQ6cnl6o27iAYfjlggE -X testing.testBinary=1 -extld=cc /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/_pkg_.a"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96656 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/enola.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96656 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/enola.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96666 /opt/homebrew/Cellar/go/1.27.1/libexec/bin/go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-repoarg-bin-3503772273/enola ."
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96656 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/enola.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96666 /opt/homebrew/Cellar/go/1.27.1/libexec/bin/go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-repoarg-bin-3503772273/enola .",
+      "96688 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2347101250/b001/exe/a.out -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2347101250/b001/importcfg.link -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=vjheqY9brzyjmEf8Brw2/2_RvRuAZAV0bgUQqae92/JsJQQIb02YDFWaVfqDET/vjheqY9brzyjmEf8Brw2 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/2e/2ef1a2a06e5e7d4da8aa9b7ccd08bf0a9b470e154dc7438e07e21b7d346c0b55-d"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96656 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/enola.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96666 /opt/homebrew/Cellar/go/1.27.1/libexec/bin/go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-repoarg-bin-3503772273/enola .",
+      "96688 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2347101250/b001/exe/a.out -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2347101250/b001/importcfg.link -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=vjheqY9brzyjmEf8Brw2/2_RvRuAZAV0bgUQqae92/JsJQQIb02YDFWaVfqDET/vjheqY9brzyjmEf8Brw2 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/2e/2ef1a2a06e5e7d4da8aa9b7ccd08bf0a9b470e154dc7438e07e21b7d346c0b55-d"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96656 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/enola.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96666 /opt/homebrew/Cellar/go/1.27.1/libexec/bin/go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-repoarg-bin-3503772273/enola .",
+      "96688 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2347101250/b001/exe/a.out -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2347101250/b001/importcfg.link -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=vjheqY9brzyjmEf8Brw2/2_RvRuAZAV0bgUQqae92/JsJQQIb02YDFWaVfqDET/vjheqY9brzyjmEf8Brw2 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/2e/2ef1a2a06e5e7d4da8aa9b7ccd08bf0a9b470e154dc7438e07e21b7d346c0b55-d"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96656 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/enola.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96666 /opt/homebrew/Cellar/go/1.27.1/libexec/bin/go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-repoarg-bin-3503772273/enola .",
+      "96688 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2347101250/b001/exe/a.out -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2347101250/b001/importcfg.link -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=vjheqY9brzyjmEf8Brw2/2_RvRuAZAV0bgUQqae92/JsJQQIb02YDFWaVfqDET/vjheqY9brzyjmEf8Brw2 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/2e/2ef1a2a06e5e7d4da8aa9b7ccd08bf0a9b470e154dc7438e07e21b7d346c0b55-d"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96656 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/enola.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96666 /opt/homebrew/Cellar/go/1.27.1/libexec/bin/go build -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-repoarg-bin-3503772273/enola .",
+      "96688 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2347101250/b001/exe/a.out -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build2347101250/b001/importcfg.link -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=vjheqY9brzyjmEf8Brw2/2_RvRuAZAV0bgUQqae92/JsJQQIb02YDFWaVfqDET/vjheqY9brzyjmEf8Brw2 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/2e/2ef1a2a06e5e7d4da8aa9b7ccd08bf0a9b470e154dc7438e07e21b7d346c0b55-d"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96656 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/enola.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96767 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-repoarg-bin-3503772273/enola --generate /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestGenerate_FolderOfRepos_IsIndexedAsACluster4014216967/002"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96656 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/enola.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96767 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-repoarg-bin-3503772273/enola --generate /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestGenerate_FolderOfRepos_IsIndexedAsACluster4014216967/002"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96656 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/enola.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96817 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/enola-repoarg-bin-3503772273/enola --generate /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/TestGenerate_FolderOfRepos_IsIndexedAsACluster4014216967/002"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96656 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b001/enola.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96880 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b420/cachecov.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96913 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b425/config.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b425/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=PDGVG04EC7DvJq15YSTv/SiOFpt-022577WP1qwId/4FeU62eN9O5ppsS3_vYc/PDGVG04EC7DvJq15YSTv -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/34/34cad32dafdd3bf2d77514fae0558c76bbd744a72239b8e3b7bd427259096f78-d"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96931 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b425/config.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96950 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b427/conformance.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96969 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b429/diff.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "96969 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b429/diff.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97005 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b430/docslint.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97005 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b430/docslint.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97005 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b430/docslint.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97005 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b430/docslint.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97210 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=40qjd18Zot8qhu_ROxdc/MWf-9hDKGlU53Qof-jY7/ITiqLwE6GMg4J9lWkDk-/40qjd18Zot8qhu_ROxdc -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/f6/f6483b97c9953e0a60f5a2c6eec17dbf5a6ace64cc912cd2865c6e3cf00647fc-d"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97210 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=40qjd18Zot8qhu_ROxdc/MWf-9hDKGlU53Qof-jY7/ITiqLwE6GMg4J9lWkDk-/40qjd18Zot8qhu_ROxdc -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/f6/f6483b97c9953e0a60f5a2c6eec17dbf5a6ace64cc912cd2865c6e3cf00647fc-d"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "97291 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b434/engine.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "99497 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b440/eslintscaffold.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b440/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=-vlwOeRANKfGsxGftTxb/l_LhL_rlQ4M3jgXbJy2m/t-LJO1dGbX0LMrKAEZ1c/-vlwOeRANKfGsxGftTxb -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/96/967c5934e466d17595eef9db48253fa9b1a62dced468d2e0a56f45d50d83b191-d"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "99507 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b440/eslintscaffold.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "99534 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b444/explainers.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "99547 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b446/common.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "99707 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b450/constraints.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b450/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=ynTPPWrhHFO9_k6IkYoD/ZCBJDjZhbNVTJM4S4vZT/jo0ig42ge2S77vuRrj15/ynTPPWrhHFO9_k6IkYoD -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/a9/a904a677afaab05c2e0536550ccd9596d24e6f40e314199546ebd39b542a8d96-d"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "99781 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b450/constraints.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1",
+      "99917 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b452/coverage.test -test.paniconexit0 -test.timeout=10m0s -test.count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "155 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b458/deadmethods.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b458/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=L59up_caE5ZJVlRn-rJw/OZuCCuWHyJ3OuBMGTRzC/0044bPagjO9kI8RG_G0K/L59up_caE5ZJVlRn-rJw -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/fb/fb9a3a22193c1120d03d2d6fcc6519a96a5fa2a0494c821f235bbadaf77fc82e-d",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "191 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b460/depth.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "282 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b468/hotspots.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "301 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b470/importclosure.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "338 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b474/layers.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b474/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=wlS4NCm20jvA_EhgabpN/ZAJ9BC7TGZ0a9WEMI0Kf/4JyCeHCgc6fT5QOZA4vD/wlS4NCm20jvA_EhgabpN -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/98/9891e5e923fbda6c6ea992d99988c9150e3bfc39af66b9277c2ff028c179010d-d",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "364 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b476/messagingcoverage.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b476/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=09Mbqyd5nDWqpEyLapg2/4ZaPVmI741F42--gepzs/8gE_AYsT-VjBJPoDlEsY/09Mbqyd5nDWqpEyLapg2 -X testing.testBinary=1 -extld=cc /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b476/_pkg_.a",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "364 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b476/messagingcoverage.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b476/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=09Mbqyd5nDWqpEyLapg2/4ZaPVmI741F42--gepzs/8gE_AYsT-VjBJPoDlEsY/09Mbqyd5nDWqpEyLapg2 -X testing.testBinary=1 -extld=cc /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b476/_pkg_.a",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "403 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b476/messagingcoverage.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "403 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b476/messagingcoverage.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "458 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b484/unusedroutes.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b484/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=u0hZDPftVl3_wETA2tYS/045mKiNT2_ace1GXJC7y/jvs_OvfYCv564etBlOjf/u0hZDPftVl3_wETA2tYS -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/f6/f600085d69e8ebd3f4162a5b97400486bf24a43b849ba738daa9b460784035da-d",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "492 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b488/extractors.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "522 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b492/asyncapiextractor.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b492/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=uizvdhOUoFS6h4kR4tcx/1q6Fj3FSH-h3r-QS49iZ/BTzaOWQZZSzFmnAiY9RK/uizvdhOUoFS6h4kR4tcx -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/f3/f35871a061ad79c715227ced17088dd94da0f7fa6c970560b5361c02bba625e4-d",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "537 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b494/cppextractor.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b494/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=ke8sM4UT1GUY8VYQTy1h/Vv5bEOudq9LL-9CT7Av7/GdEyducL82d0nBGfi9BA/ke8sM4UT1GUY8VYQTy1h -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/49/49d3ff9755aa8e7c6586690b2b4456667e565449b35b46324d425cffcbcab630-d",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "554 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b494/cppextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "598 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b499/detectnames.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "645 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b501/dotnetextractor.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b501/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=VzU9fHu79qX0o02ZLPl1/bKqsHR9_1aIyioYnkxYa/MP-gHCfCvpkpt9TQ5btw/VzU9fHu79qX0o02ZLPl1 -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/3e/3ef77dfdcd915a9396ee7650b37b7085c812c5ade5523d2149474b42c88f163c-d",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "696 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b504/goextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "731 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b511/javaextractor.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b511/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=E_IEOdvsGNJ8Yy-TGfs7/o01khuKlYzdlfEu84JOW/gj2yr7uOWUD84VzVfPiJ/E_IEOdvsGNJ8Yy-TGfs7 -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/9b/9b75627047739223bac3b46e3f8d4f47a2f0b5dcc8f12d37f4401f2d55a8500c-d",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "754 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b511/javaextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "770 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b515/kotlinextractor.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b515/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=CHDqBU7HqFM9c2OkNHUo/8xuzHtjwWO1Fg7aTqXmI/0t-f2BGEcCBS7LMtsDdU/CHDqBU7HqFM9c2OkNHUo -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/5e/5e63e36d9b5ad893fd8896a32016e1c79f4390abb435bd25b646a61fcaa21137-d",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "807 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b517/manifestextractor.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b517/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=FsP8lI-2zuOLur0I5Pn8/_LOil6-zQ00ij1SxFHPY/Lnw1cdmIUd5bXrjK4oOo/FsP8lI-2zuOLur0I5Pn8 -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/d3/d3b304e72b2ed18a53d6b0a31e9cfb56125955fa71732b724b30b58947ad1cf9-d",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "810 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b517/manifestextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "840 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b519/mdintent.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "840 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b519/mdintent.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "930 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b521/openapiextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1059 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b525/pythonextractor.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b525/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=SNFMwKO9SMRtL6AX-euB/dBifYRo8q5CNj3VwYoX1/KP8IekGQiBfG3EC0989l/SNFMwKO9SMRtL6AX-euB -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/03/032c7d504a90290efc9c6e34ef910829e2adbc646c4b393a33cda3a5c36e54c7-d",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1086 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b525/pythonextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1097 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b527/rubyextractor.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b527/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=HjElTstjQlMc_ZDMiF_q/aunCVz22dGztZ50Y4hSj/IeJGY-Bmztp5BjeMsj9S/HjElTstjQlMc_ZDMiF_q -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/30/3052e5dffd68769a40676a10b46a4577ce8910a0a6618f5f2b049f6c742a113f-d",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1117 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b527/rubyextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1182 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b529/rustextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1194 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b531/scalaextractor.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b531/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=OTDgXnMZZhQDEPK6GH0B/Am4Fw1HaKBH-1HU-7eQh/1d-evaUWftoJzdTrR2G-/OTDgXnMZZhQDEPK6GH0B -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/d5/d5777044a14721a1aa10eddcb022c0737f2a1ec865cd5850e4689d245c73048e-d",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1235 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b533/swiftextractor.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b533/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=AlAke39lljQN22xjeeE6/eNJ-qJGJCDgMsJ8Mp2IS/MchmFToHHoS-fUIGzGiL/AlAke39lljQN22xjeeE6 -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/2b/2bc74ae38c1889358e9aad11e9dad88b5c7f5a030150c3eed54f77378c7f8562-d",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1256 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b533/swiftextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1267 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=X0e171lntac_udlv9_YA/Pbi5uIy5S0wTIHYYwI6n/CB0OGe0b8SDN-9sG4ti6/X0e171lntac_udlv9_YA -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/73/73bf0ede19e0cb60dc9e16283251603751a9a301f0f48ea221f0766eb7e6b04b-d",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "1322 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b536/tsextractor.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "3633 /opt/homebrew/Cellar/go/1.27.1/libexec/pkg/tool/darwin_arm64/link -o /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b539/factpath.test -importcfg /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b539/importcfg.link -s -w -X=runtime.godebugDefault=tracebacklabels=0,x509sslcertoverrideplatform=0 -buildmode=pie -buildid=D66zrC2VPLCyP6eZ1nat/89XAHF7ccsOMyagWKe-9/UAnNs2W4Pc73vBPAm6rN/D66zrC2VPLCyP6eZ1nat -X testing.testBinary=1 -extld=cc /Users/oleksandr.mykulych/Library/Caches/go-build/80/809a270e21187c2265e63f00b5a92023150d169d033b73b4bfcaf45333b4bf5e-d",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "3647 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b541/facts.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "3647 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b541/facts.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "3647 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b541/facts.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ],
+    [
+      "3647 /var/folders/69/n9gknnz11gq1gwnvwt1rlt200000gn/T/go-build3165351446/b541/facts.test -test.paniconexit0 -test.timeout=10m0s -test.count=1",
+      "96136 go test -p 1 ./... -count=1"
+    ]
+  ],
+  "host_load_log": "/private/tmp/enola-test-inclusive-correctness/cli-pairs/correctness-baseline-1/host-load.jsonl",
+  "host_load_samples": 116,
+  "host_sample_errors": [],
+  "correctness_only": true,
+  "run_succeeded": true,
+  "timing_eligible": false,
+  "binary_sha256": "a3c19dc902f80248cc14d0e7669bf8c0067d779bd6709741ab756ac7146986d1"
+}
