@@ -1,0 +1,123 @@
+ok  	github.com/enola-labs/enola/cmd/enola	(cached)
+ok  	github.com/enola-labs/enola/internal/cachecov	0.530s
+ok  	github.com/enola-labs/enola/internal/clientspec	(cached)
+ok  	github.com/enola-labs/enola/internal/config	(cached)
+ok  	github.com/enola-labs/enola/internal/conformance	(cached)
+ok  	github.com/enola-labs/enola/internal/diff	(cached)
+ok  	github.com/enola-labs/enola/internal/docslint	1.670s
+?   	github.com/enola-labs/enola/internal/drift	[no test files]
+ok  	github.com/enola-labs/enola/internal/engine	29.340s
+ok  	github.com/enola-labs/enola/internal/eslintscaffold	(cached)
+ok  	github.com/enola-labs/enola/internal/estateref	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/common	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/complexity	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/constraints	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/coverage	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/crossrepo	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/cycles	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/deadmethods	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/depth	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/domain	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/entrypoints	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/godclass	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/hotspots	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/importclosure	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/intentcheck	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/layers	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/messagingcoverage	1.323s
+ok  	github.com/enola-labs/enola/internal/explainers/queryloops	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/surface	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/unusedroutes	(cached)
+ok  	github.com/enola-labs/enola/internal/explainers/vendoredcandidates	(cached)
+ok  	github.com/enola-labs/enola/internal/extractors	(cached)
+ok  	github.com/enola-labs/enola/internal/extractors/ansibleextractor	1.568s
+ok  	github.com/enola-labs/enola/internal/extractors/asyncapiextractor	1.883s
+ok  	github.com/enola-labs/enola/internal/extractors/cppextractor	2.204s
+ok  	github.com/enola-labs/enola/internal/extractors/dartextractor	(cached)
+?   	github.com/enola-labs/enola/internal/extractors/dartextractor/grammar	[no test files]
+ok  	github.com/enola-labs/enola/internal/extractors/detectnames	2.343s
+ok  	github.com/enola-labs/enola/internal/extractors/dotnetextractor	(cached)
+?   	github.com/enola-labs/enola/internal/extractors/extcoverage	[no test files]
+ok  	github.com/enola-labs/enola/internal/extractors/goextractor	2.530s
+ok  	github.com/enola-labs/enola/internal/extractors/grpcextractor	2.150s
+ok  	github.com/enola-labs/enola/internal/extractors/hclextractor	2.094s
+?   	github.com/enola-labs/enola/internal/extractors/inputscope	[no test files]
+ok  	github.com/enola-labs/enola/internal/extractors/javaextractor	2.325s
+ok  	github.com/enola-labs/enola/internal/extractors/jvmsrc	(cached)
+ok  	github.com/enola-labs/enola/internal/extractors/kotlinextractor	2.351s
+ok  	github.com/enola-labs/enola/internal/extractors/manifestextractor	2.393s
+ok  	github.com/enola-labs/enola/internal/extractors/mdintent	2.673s
+ok  	github.com/enola-labs/enola/internal/extractors/openapiextractor	2.283s
+ok  	github.com/enola-labs/enola/internal/extractors/phpextractor	2.227s
+ok  	github.com/enola-labs/enola/internal/extractors/pythonextractor	2.552s
+ok  	github.com/enola-labs/enola/internal/extractors/rubyextractor	2.545s
+ok  	github.com/enola-labs/enola/internal/extractors/rustextractor	2.401s
+ok  	github.com/enola-labs/enola/internal/extractors/scalaextractor	2.480s
+ok  	github.com/enola-labs/enola/internal/extractors/swiftextractor	2.422s
+?   	github.com/enola-labs/enola/internal/extractors/swiftextractor/grammar	[no test files]
+ok  	github.com/enola-labs/enola/internal/extractors/tsextractor	28.421s
+?   	github.com/enola-labs/enola/internal/extractors/tsutil	[no test files]
+ok  	github.com/enola-labs/enola/internal/factpath	(cached)
+ok  	github.com/enola-labs/enola/internal/facts	5.096s
+ok  	github.com/enola-labs/enola/internal/filelock	(cached)
+ok  	github.com/enola-labs/enola/internal/gqlscan	(cached)
+ok  	github.com/enola-labs/enola/internal/graphinput	11.939s
+?   	github.com/enola-labs/enola/internal/graphprofile	[no test files]
+ok  	github.com/enola-labs/enola/internal/graphsession	(cached)
+ok  	github.com/enola-labs/enola/internal/graphstream	(cached)
+ok  	github.com/enola-labs/enola/internal/history	(cached)
+ok  	github.com/enola-labs/enola/internal/hookstate	(cached)
+ok  	github.com/enola-labs/enola/internal/intent	3.737s
+ok  	github.com/enola-labs/enola/internal/linkers/binders	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/binders/clientseam	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/binders/emberresolver	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/binders/frameworkroots	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/binders/grpcclientfqn	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/binders/grpcimpl	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/binders/httphandler	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/binders/messagingcontract	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/binders/mixinowner	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/binders/moduleedges	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/binders/stimulusresolver	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/binders/unmatchedroutes	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/binders/vendoredspecs	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/routeindex	(cached)
+?   	github.com/enola-labs/enola/internal/linkers/crossrepo/signals	[no test files]
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/graphqlsig	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/http	(cached)
+?   	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/imports	[no test files]
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/kafka	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/crossrepo/signals/sharedcode	(cached)
+ok  	github.com/enola-labs/enola/internal/linkers/vocab	(cached)
+ok  	github.com/enola-labs/enola/internal/litfold	(cached)
+ok  	github.com/enola-labs/enola/internal/metrics	(cached)
+ok  	github.com/enola-labs/enola/internal/mining	(cached)
+ok  	github.com/enola-labs/enola/internal/orphans	(cached)
+ok  	github.com/enola-labs/enola/internal/parallel	(cached)
+ok  	github.com/enola-labs/enola/internal/perf	(cached)
+ok  	github.com/enola-labs/enola/internal/providers	(cached)
+ok  	github.com/enola-labs/enola/internal/providers/rubydex	(cached)
+ok  	github.com/enola-labs/enola/internal/renderers	(cached)
+ok  	github.com/enola-labs/enola/internal/renderers/llmcontext	(cached)
+ok  	github.com/enola-labs/enola/internal/server	6.083s
+ok  	github.com/enola-labs/enola/internal/updatecheck	(cached)
+ok  	github.com/enola-labs/enola/internal/upgrade	(cached)
+?   	github.com/enola-labs/enola/internal/version	[no test files]
+ok  	github.com/enola-labs/enola/internal/workspace	(cached)
+ok  	github.com/enola-labs/enola/pkg/bootstrap	128.249s
+ok  	github.com/enola-labs/enola/pkg/check	5.129s
+ok  	github.com/enola-labs/enola/pkg/cli	(cached)
+ok  	github.com/enola-labs/enola/pkg/command	(cached)
+ok  	github.com/enola-labs/enola/pkg/coverage	2.518s
+ok  	github.com/enola-labs/enola/pkg/dashboard	1.993s
+?   	github.com/enola-labs/enola/pkg/diff	[no test files]
+ok  	github.com/enola-labs/enola/pkg/explain	(cached)
+?   	github.com/enola-labs/enola/pkg/facts	[no test files]
+ok  	github.com/enola-labs/enola/pkg/history	(cached)
+ok  	github.com/enola-labs/enola/pkg/install	(cached)
+ok  	github.com/enola-labs/enola/pkg/mcputil	(cached)
+ok  	github.com/enola-labs/enola/pkg/plan	3.510s
+?   	github.com/enola-labs/enola/pkg/plugin	[no test files]
+ok  	github.com/enola-labs/enola/pkg/status	(cached)

@@ -27,3 +27,5 @@ body and structural cases. All seven graph hashes also equal the previously
 published Stage32 cohort on the same pinned tree and explicit scope. The new
 harness uses changed-owner-scope for both builds; its receipt explicitly sets
 timing_eligible=false. Full package suite is still running; no promotion.
+
+Full two-package suite exited0 (graphsession419.448s; command5.811s). Full repository suite then exited0 in150.745s; package/cache counts are in full-suite-receipt.json. These are validation times, not benchmark claims.
