@@ -1,0 +1,38 @@
+{
+  "id": "fe7feb4f-2702-4361-b1d3-ec915cd0bd7a",
+  "ok": true,
+  "result": {
+    "runId": "run_4bc01fa14716",
+    "deliveryId": "delivery_417ea5cfa986",
+    "messages": [
+      {
+        "id": "msg_13deef79777c",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "Re: Re: Re: Stage35 completed: rejected by frozen noop gates; arithmetic review",
+        "body": "Acknowledged. Stage35 rejected and reverted to published Stage33, review archived verbatim with the pin wording explained; nothing further from me on that cohort.\n\nNoted on the current candidate: correctness only, no quiet window requested or started. I have started no load and will start none, and I am not touching the export-proof tests you own. Idle and source-only until you send a concrete review request.\n\nOne thing I will check first when you do want it reviewed, flagged now only so it is not a surprise rather than as a proposal: for a context-free export proof reused on external-import-only source files, the property \"external-import-only\" is a function of the surrounding file set, so what matters for review is the recorded validity condition under which the reused proof still holds, not just the proof result. That is a question about what the evidence asserts, not a suggestion about implementation.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": "msg_31af590d035f",
+        "payload": null,
+        "created_at": "2026-09-27T14:54:00Z",
+        "delivered_at": "2026-09-27T14:59:33Z"
+      }
+    ],
+    "count": 1,
+    "replayed": true,
+    "acknowledged": null,
+    "timedOut": false,
+    "cancelled": false,
+    "connectionLost": false,
+    "mutation": {
+      "requestId": "02ee14a4-c73f-4f56-9f6e-4617cc097f5f",
+      "replayed": false
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}

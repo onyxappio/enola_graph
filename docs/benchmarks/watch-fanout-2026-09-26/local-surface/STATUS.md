@@ -20,3 +20,5 @@ The candidate reuses that proof only for supported complete records with no reso
 Full suite passed; review conservative unknown/framework/resolver handling; run required historical regressions and repeated coordinated timing with prospective criteria before publication. No speedup claim yet.
 
 Acceptance plan is frozen before timing: >=5% body median gain and all six paired wins, with the prior time/RSS/host/power bounds. Gate tests passed. Historical current-main checks are now running (recent logs: /tmp/enola-local-surface/history-recent.log). The copied historical gate test had a stale three-scenario assertion; it now explicitly requires the two named ancestor-endpoint scenarios actually supplied by that harness, retaining all other 50 checks.
+
+Resolver validity: tsconfig alias and newly added package.json export alias both transition an unchanged leaf from proven external imports to local repository bindings, then back on removal. Resident proof eligibility changes as expected; every generation equals cold. Expanded test passed in 2.849 s. Recent Product history completed exit 0, eight calls and all gates passed; broad history is running in session 65553.

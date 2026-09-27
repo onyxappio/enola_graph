@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"maps"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/enola-labs/enola/internal/graphstream"
@@ -133,4 +135,57 @@ func TestExternalImportResidentProofRollsBackWithFailedEnd(t *testing.T) {
 		t.Fatal(err)
 	}
 	assertAppliedEqualsCold(t, cons, oracle)
+}
+
+// An alias makes a formerly external import resolve inside the repository.
+// Existing local-export proof must be discarded even when the leaf bytes and
+// export names are identical across that transition.
+func TestExternalImportProofReconcilesResolverChanges(t *testing.T) {
+	for _, tc := range []struct{ name, path, content string }{
+		{"tsconfig alias", "tsconfig.json", `{"compilerOptions":{"baseUrl":".","paths":{"vendor":["src/provider.ts"]}}}`},
+		{"new package alias", "src/package.json", `{"name":"vendor","exports":{".":"./provider.ts"}}`},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			root := setupTSRepo(t, map[string]string{
+				"src/leaf.ts":     "import { value } from 'vendor';\nexport function pick() { return value(); }\n",
+				"src/barrel.ts":   "export { pick } from './leaf';\n",
+				"src/use.ts":      "import { pick } from './barrel';\nexport const use = pick();\n",
+				"src/provider.ts": "export function value() { return 7; }\n",
+			})
+			eng := testEngine(t, root)
+			sink := &graphstream.MemorySink{}
+			r, err := OpenSession(context.Background(), eng, root, sink, Options{StateDir: t.TempDir(), AuthoritativeFiles: true})
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer r.Close()
+			apply := func() {
+				t.Helper()
+				if _, err := r.ApplyChanges(context.Background(), ChangeBatch{Reconcile: "resolver mutation"}); err != nil {
+					t.Fatal(err)
+				}
+				cons := NewConsumer()
+				if err := cons.ApplyRecords(sink.CloneRecords()); err != nil {
+					t.Fatal(err)
+				}
+				assertAppliedEqualsCold(t, cons, coldConsumer(t, eng, root))
+			}
+			apply()
+			if rec := lookupState(r.state.Files, "src/leaf.ts"); rec == nil || !sideReadLocalSurface(rec.TS) {
+				t.Fatal("initial external-import fixture does not exercise local proof")
+			}
+			writeFile(t, root, tc.path, tc.content)
+			apply()
+			if rec := lookupState(r.state.Files, "src/leaf.ts"); rec == nil || sideReadLocalSurface(rec.TS) {
+				t.Fatal("repository alias retained external-import proof")
+			}
+			if err := os.Remove(filepath.Join(root, tc.path)); err != nil {
+				t.Fatal(err)
+			}
+			apply()
+			if rec := lookupState(r.state.Files, "src/leaf.ts"); rec == nil || !sideReadLocalSurface(rec.TS) {
+				t.Fatal("removing alias did not reconcile external proof")
+			}
+		})
+	}
 }
