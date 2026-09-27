@@ -1,0 +1,977 @@
+{
+  "note": "Descriptive ps CPU samples, not instantaneous utilization or a new acceptance threshold. Owned runner descendants excluded; command arguments omitted.",
+  "arms": [
+    {
+      "arm": "baseline",
+      "repeat": 1,
+      "samples": 32,
+      "errors": [],
+      "max_sample_gap_s": 2.177741050720215,
+      "top_foreign_executables": [
+        {
+          "executable": "siriactionsd",
+          "mean_sampled_cpu_percent": 45.64375,
+          "p95_sampled_cpu_percent": 134.4,
+          "max_sampled_cpu_percent": 141.3
+        },
+        {
+          "executable": "WindowServer",
+          "mean_sampled_cpu_percent": 29.4125,
+          "p95_sampled_cpu_percent": 43.4,
+          "max_sampled_cpu_percent": 45.1
+        },
+        {
+          "executable": "codex",
+          "mean_sampled_cpu_percent": 16.928125,
+          "p95_sampled_cpu_percent": 61.00000000000001,
+          "max_sampled_cpu_percent": 361.1
+        },
+        {
+          "executable": "Orca",
+          "mean_sampled_cpu_percent": 8.75625,
+          "p95_sampled_cpu_percent": 13.899999999999999,
+          "max_sampled_cpu_percent": 20.1
+        },
+        {
+          "executable": "WallpaperAerialsExtension",
+          "mean_sampled_cpu_percent": 8.06875,
+          "p95_sampled_cpu_percent": 10.7,
+          "max_sampled_cpu_percent": 10.8
+        },
+        {
+          "executable": "com.apple.Virtualization.VirtualMachine",
+          "mean_sampled_cpu_percent": 7.43125,
+          "p95_sampled_cpu_percent": 24.1,
+          "max_sampled_cpu_percent": 28.5
+        },
+        {
+          "executable": "BackgroundShortcutRunner",
+          "mean_sampled_cpu_percent": 6.953125,
+          "p95_sampled_cpu_percent": 49.9,
+          "max_sampled_cpu_percent": 63.0
+        },
+        {
+          "executable": "ClearVPN",
+          "mean_sampled_cpu_percent": 6.4375,
+          "p95_sampled_cpu_percent": 11.0,
+          "max_sampled_cpu_percent": 11.1
+        },
+        {
+          "executable": "assetsubscriptiond",
+          "mean_sampled_cpu_percent": 4.165625,
+          "p95_sampled_cpu_percent": 29.4,
+          "max_sampled_cpu_percent": 34.5
+        },
+        {
+          "executable": "corespotlightd",
+          "mean_sampled_cpu_percent": 3.759375,
+          "p95_sampled_cpu_percent": 10.5,
+          "max_sampled_cpu_percent": 10.7
+        },
+        {
+          "executable": "Google",
+          "mean_sampled_cpu_percent": 3.7375,
+          "p95_sampled_cpu_percent": 10.9,
+          "max_sampled_cpu_percent": 12.4
+        },
+        {
+          "executable": "WhatsApp",
+          "mean_sampled_cpu_percent": 2.9125,
+          "p95_sampled_cpu_percent": 4.1,
+          "max_sampled_cpu_percent": 6.2
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "repeat": 1,
+      "samples": 32,
+      "errors": [],
+      "max_sample_gap_s": 2.1365268230438232,
+      "top_foreign_executables": [
+        {
+          "executable": "siriactionsd",
+          "mean_sampled_cpu_percent": 42.384375,
+          "p95_sampled_cpu_percent": 280.5,
+          "max_sampled_cpu_percent": 464.9
+        },
+        {
+          "executable": "WindowServer",
+          "mean_sampled_cpu_percent": 26.70625,
+          "p95_sampled_cpu_percent": 32.3,
+          "max_sampled_cpu_percent": 32.8
+        },
+        {
+          "executable": "mobileassetd",
+          "mean_sampled_cpu_percent": 25.140625,
+          "p95_sampled_cpu_percent": 69.2,
+          "max_sampled_cpu_percent": 70.1
+        },
+        {
+          "executable": "BackgroundShortcutRunner",
+          "mean_sampled_cpu_percent": 19.503125,
+          "p95_sampled_cpu_percent": 57.9,
+          "max_sampled_cpu_percent": 59.4
+        },
+        {
+          "executable": "Orca",
+          "mean_sampled_cpu_percent": 10.928125,
+          "p95_sampled_cpu_percent": 49.2,
+          "max_sampled_cpu_percent": 53.1
+        },
+        {
+          "executable": "com.apple.Virtualization.VirtualMachine",
+          "mean_sampled_cpu_percent": 6.659375,
+          "p95_sampled_cpu_percent": 10.3,
+          "max_sampled_cpu_percent": 14.1
+        },
+        {
+          "executable": "ClearVPN",
+          "mean_sampled_cpu_percent": 6.5687500000000005,
+          "p95_sampled_cpu_percent": 12.6,
+          "max_sampled_cpu_percent": 12.8
+        },
+        {
+          "executable": "WallpaperAerialsExtension",
+          "mean_sampled_cpu_percent": 4.859375,
+          "p95_sampled_cpu_percent": 6.2,
+          "max_sampled_cpu_percent": 6.4
+        },
+        {
+          "executable": "codex",
+          "mean_sampled_cpu_percent": 4.353125,
+          "p95_sampled_cpu_percent": 7.4,
+          "max_sampled_cpu_percent": 12.1
+        },
+        {
+          "executable": "assetsubscriptiond",
+          "mean_sampled_cpu_percent": 3.61875,
+          "p95_sampled_cpu_percent": 9.4,
+          "max_sampled_cpu_percent": 72.6
+        },
+        {
+          "executable": "Google",
+          "mean_sampled_cpu_percent": 3.546875,
+          "p95_sampled_cpu_percent": 5.5,
+          "max_sampled_cpu_percent": 11.5
+        },
+        {
+          "executable": "grok",
+          "mean_sampled_cpu_percent": 2.90625,
+          "p95_sampled_cpu_percent": 3.5999999999999996,
+          "max_sampled_cpu_percent": 3.9000000000000004
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "repeat": 2,
+      "samples": 31,
+      "errors": [],
+      "max_sample_gap_s": 2.1787238121032715,
+      "top_foreign_executables": [
+        {
+          "executable": "siriactionsd",
+          "mean_sampled_cpu_percent": 65.94193548387096,
+          "p95_sampled_cpu_percent": 230.1,
+          "max_sampled_cpu_percent": 595.9
+        },
+        {
+          "executable": "WindowServer",
+          "mean_sampled_cpu_percent": 30.1,
+          "p95_sampled_cpu_percent": 46.7,
+          "max_sampled_cpu_percent": 47.4
+        },
+        {
+          "executable": "BackgroundShortcutRunner",
+          "mean_sampled_cpu_percent": 16.596774193548388,
+          "p95_sampled_cpu_percent": 60.4,
+          "max_sampled_cpu_percent": 61.0
+        },
+        {
+          "executable": "Orca",
+          "mean_sampled_cpu_percent": 8.24516129032258,
+          "p95_sampled_cpu_percent": 11.2,
+          "max_sampled_cpu_percent": 11.9
+        },
+        {
+          "executable": "com.apple.Virtualization.VirtualMachine",
+          "mean_sampled_cpu_percent": 7.264516129032258,
+          "p95_sampled_cpu_percent": 14.7,
+          "max_sampled_cpu_percent": 42.6
+        },
+        {
+          "executable": "WallpaperAerialsExtension",
+          "mean_sampled_cpu_percent": 6.458064516129032,
+          "p95_sampled_cpu_percent": 8.2,
+          "max_sampled_cpu_percent": 8.4
+        },
+        {
+          "executable": "ClearVPN",
+          "mean_sampled_cpu_percent": 5.574193548387097,
+          "p95_sampled_cpu_percent": 10.9,
+          "max_sampled_cpu_percent": 11.3
+        },
+        {
+          "executable": "codex",
+          "mean_sampled_cpu_percent": 3.829032258064516,
+          "p95_sampled_cpu_percent": 5.3,
+          "max_sampled_cpu_percent": 7.4
+        },
+        {
+          "executable": "Google",
+          "mean_sampled_cpu_percent": 3.796774193548387,
+          "p95_sampled_cpu_percent": 7.899999999999999,
+          "max_sampled_cpu_percent": 17.799999999999997
+        },
+        {
+          "executable": "grok",
+          "mean_sampled_cpu_percent": 2.9387096774193546,
+          "p95_sampled_cpu_percent": 3.2,
+          "max_sampled_cpu_percent": 4.1
+        },
+        {
+          "executable": "WhatsApp",
+          "mean_sampled_cpu_percent": 2.729032258064516,
+          "p95_sampled_cpu_percent": 3.2,
+          "max_sampled_cpu_percent": 3.4
+        },
+        {
+          "executable": "VTDecoderXPCService",
+          "mean_sampled_cpu_percent": 2.238709677419355,
+          "p95_sampled_cpu_percent": 2.7,
+          "max_sampled_cpu_percent": 2.7
+        }
+      ]
+    },
+    {
+      "arm": "baseline",
+      "repeat": 2,
+      "samples": 33,
+      "errors": [],
+      "max_sample_gap_s": 2.1477701663970947,
+      "top_foreign_executables": [
+        {
+          "executable": "siriactionsd",
+          "mean_sampled_cpu_percent": 109.48484848484848,
+          "p95_sampled_cpu_percent": 338.8,
+          "max_sampled_cpu_percent": 766.2
+        },
+        {
+          "executable": "WindowServer",
+          "mean_sampled_cpu_percent": 26.03939393939394,
+          "p95_sampled_cpu_percent": 40.6,
+          "max_sampled_cpu_percent": 41.3
+        },
+        {
+          "executable": "mobileassetd",
+          "mean_sampled_cpu_percent": 22.524242424242424,
+          "p95_sampled_cpu_percent": 74.2,
+          "max_sampled_cpu_percent": 91.8
+        },
+        {
+          "executable": "Orca",
+          "mean_sampled_cpu_percent": 8.284848484848485,
+          "p95_sampled_cpu_percent": 13.6,
+          "max_sampled_cpu_percent": 22.299999999999997
+        },
+        {
+          "executable": "WallpaperAerialsExtension",
+          "mean_sampled_cpu_percent": 7.239393939393939,
+          "p95_sampled_cpu_percent": 8.3,
+          "max_sampled_cpu_percent": 8.3
+        },
+        {
+          "executable": "com.apple.Virtualization.VirtualMachine",
+          "mean_sampled_cpu_percent": 6.4,
+          "p95_sampled_cpu_percent": 11.9,
+          "max_sampled_cpu_percent": 15.2
+        },
+        {
+          "executable": "assetsubscriptiond",
+          "mean_sampled_cpu_percent": 5.16969696969697,
+          "p95_sampled_cpu_percent": 31.5,
+          "max_sampled_cpu_percent": 34.1
+        },
+        {
+          "executable": "ClearVPN",
+          "mean_sampled_cpu_percent": 4.951515151515152,
+          "p95_sampled_cpu_percent": 9.9,
+          "max_sampled_cpu_percent": 9.9
+        },
+        {
+          "executable": "codex",
+          "mean_sampled_cpu_percent": 3.903030303030303,
+          "p95_sampled_cpu_percent": 6.699999999999999,
+          "max_sampled_cpu_percent": 9.2
+        },
+        {
+          "executable": "grok",
+          "mean_sampled_cpu_percent": 3.6424242424242426,
+          "p95_sampled_cpu_percent": 11.4,
+          "max_sampled_cpu_percent": 21.6
+        },
+        {
+          "executable": "Google",
+          "mean_sampled_cpu_percent": 3.418181818181818,
+          "p95_sampled_cpu_percent": 7.1,
+          "max_sampled_cpu_percent": 12.299999999999999
+        },
+        {
+          "executable": "BackgroundShortcutRunner",
+          "mean_sampled_cpu_percent": 3.412121212121212,
+          "p95_sampled_cpu_percent": 51.2,
+          "max_sampled_cpu_percent": 61.4
+        }
+      ]
+    },
+    {
+      "arm": "baseline",
+      "repeat": 3,
+      "samples": 32,
+      "errors": [],
+      "max_sample_gap_s": 2.1533689498901367,
+      "top_foreign_executables": [
+        {
+          "executable": "siriactionsd",
+          "mean_sampled_cpu_percent": 79.671875,
+          "p95_sampled_cpu_percent": 148.6,
+          "max_sampled_cpu_percent": 156.9
+        },
+        {
+          "executable": "WindowServer",
+          "mean_sampled_cpu_percent": 26.1875,
+          "p95_sampled_cpu_percent": 32.5,
+          "max_sampled_cpu_percent": 43.9
+        },
+        {
+          "executable": "mobileassetd",
+          "mean_sampled_cpu_percent": 15.331249999999999,
+          "p95_sampled_cpu_percent": 53.2,
+          "max_sampled_cpu_percent": 71.8
+        },
+        {
+          "executable": "BackgroundShortcutRunner",
+          "mean_sampled_cpu_percent": 11.303125,
+          "p95_sampled_cpu_percent": 59.8,
+          "max_sampled_cpu_percent": 62.5
+        },
+        {
+          "executable": "Orca",
+          "mean_sampled_cpu_percent": 8.11875,
+          "p95_sampled_cpu_percent": 17.8,
+          "max_sampled_cpu_percent": 18.4
+        },
+        {
+          "executable": "cfprefsd",
+          "mean_sampled_cpu_percent": 6.596875,
+          "p95_sampled_cpu_percent": 13.3,
+          "max_sampled_cpu_percent": 14.2
+        },
+        {
+          "executable": "WallpaperAerialsExtension",
+          "mean_sampled_cpu_percent": 6.303125,
+          "p95_sampled_cpu_percent": 9.3,
+          "max_sampled_cpu_percent": 9.7
+        },
+        {
+          "executable": "com.apple.Virtualization.VirtualMachine",
+          "mean_sampled_cpu_percent": 5.946875,
+          "p95_sampled_cpu_percent": 12.0,
+          "max_sampled_cpu_percent": 13.8
+        },
+        {
+          "executable": "ClearVPN",
+          "mean_sampled_cpu_percent": 5.24375,
+          "p95_sampled_cpu_percent": 10.4,
+          "max_sampled_cpu_percent": 10.4
+        },
+        {
+          "executable": "ModelCatalogAgent",
+          "mean_sampled_cpu_percent": 4.971875,
+          "p95_sampled_cpu_percent": 46.8,
+          "max_sampled_cpu_percent": 49.0
+        },
+        {
+          "executable": "corespotlightd",
+          "mean_sampled_cpu_percent": 3.853125,
+          "p95_sampled_cpu_percent": 10.6,
+          "max_sampled_cpu_percent": 11.0
+        },
+        {
+          "executable": "codex",
+          "mean_sampled_cpu_percent": 3.36875,
+          "p95_sampled_cpu_percent": 5.699999999999999,
+          "max_sampled_cpu_percent": 5.9
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "repeat": 3,
+      "samples": 31,
+      "errors": [],
+      "max_sample_gap_s": 2.164513111114502,
+      "top_foreign_executables": [
+        {
+          "executable": "WindowServer",
+          "mean_sampled_cpu_percent": 33.5258064516129,
+          "p95_sampled_cpu_percent": 46.9,
+          "max_sampled_cpu_percent": 48.2
+        },
+        {
+          "executable": "siriactionsd",
+          "mean_sampled_cpu_percent": 30.164516129032258,
+          "p95_sampled_cpu_percent": 124.3,
+          "max_sampled_cpu_percent": 170.8
+        },
+        {
+          "executable": "Orca",
+          "mean_sampled_cpu_percent": 9.403225806451612,
+          "p95_sampled_cpu_percent": 12.2,
+          "max_sampled_cpu_percent": 46.7
+        },
+        {
+          "executable": "com.apple.Virtualization.VirtualMachine",
+          "mean_sampled_cpu_percent": 7.422580645161291,
+          "p95_sampled_cpu_percent": 14.3,
+          "max_sampled_cpu_percent": 18.5
+        },
+        {
+          "executable": "ClearVPN",
+          "mean_sampled_cpu_percent": 6.564516129032258,
+          "p95_sampled_cpu_percent": 11.1,
+          "max_sampled_cpu_percent": 12.3
+        },
+        {
+          "executable": "Google",
+          "mean_sampled_cpu_percent": 5.864516129032259,
+          "p95_sampled_cpu_percent": 36.70000000000001,
+          "max_sampled_cpu_percent": 51.4
+        },
+        {
+          "executable": "WallpaperAerialsExtension",
+          "mean_sampled_cpu_percent": 5.448387096774193,
+          "p95_sampled_cpu_percent": 6.5,
+          "max_sampled_cpu_percent": 7.0
+        },
+        {
+          "executable": "codex",
+          "mean_sampled_cpu_percent": 3.5903225806451613,
+          "p95_sampled_cpu_percent": 5.7,
+          "max_sampled_cpu_percent": 5.8
+        },
+        {
+          "executable": "cfprefsd",
+          "mean_sampled_cpu_percent": 3.303225806451613,
+          "p95_sampled_cpu_percent": 12.1,
+          "max_sampled_cpu_percent": 13.7
+        },
+        {
+          "executable": "corebrightnessd",
+          "mean_sampled_cpu_percent": 3.0193548387096776,
+          "p95_sampled_cpu_percent": 8.9,
+          "max_sampled_cpu_percent": 9.3
+        },
+        {
+          "executable": "grok",
+          "mean_sampled_cpu_percent": 2.932258064516129,
+          "p95_sampled_cpu_percent": 3.4000000000000004,
+          "max_sampled_cpu_percent": 3.5
+        },
+        {
+          "executable": "WhatsApp",
+          "mean_sampled_cpu_percent": 2.835483870967742,
+          "p95_sampled_cpu_percent": 3.4,
+          "max_sampled_cpu_percent": 3.7
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "repeat": 4,
+      "samples": 31,
+      "errors": [],
+      "max_sample_gap_s": 2.1681618690490723,
+      "top_foreign_executables": [
+        {
+          "executable": "WindowServer",
+          "mean_sampled_cpu_percent": 29.529032258064515,
+          "p95_sampled_cpu_percent": 44.3,
+          "max_sampled_cpu_percent": 44.3
+        },
+        {
+          "executable": "codex",
+          "mean_sampled_cpu_percent": 16.377419354838707,
+          "p95_sampled_cpu_percent": 38.9,
+          "max_sampled_cpu_percent": 332.09999999999997
+        },
+        {
+          "executable": "Orca",
+          "mean_sampled_cpu_percent": 12.206451612903226,
+          "p95_sampled_cpu_percent": 39.1,
+          "max_sampled_cpu_percent": 47.5
+        },
+        {
+          "executable": "ClearVPN",
+          "mean_sampled_cpu_percent": 7.338709677419355,
+          "p95_sampled_cpu_percent": 11.4,
+          "max_sampled_cpu_percent": 11.6
+        },
+        {
+          "executable": "com.apple.Virtualization.VirtualMachine",
+          "mean_sampled_cpu_percent": 6.993548387096774,
+          "p95_sampled_cpu_percent": 14.7,
+          "max_sampled_cpu_percent": 19.0
+        },
+        {
+          "executable": "WallpaperAerialsExtension",
+          "mean_sampled_cpu_percent": 6.993548387096774,
+          "p95_sampled_cpu_percent": 8.2,
+          "max_sampled_cpu_percent": 8.9
+        },
+        {
+          "executable": "Google",
+          "mean_sampled_cpu_percent": 3.7838709677419353,
+          "p95_sampled_cpu_percent": 11.6,
+          "max_sampled_cpu_percent": 13.0
+        },
+        {
+          "executable": "cliproxyapi",
+          "mean_sampled_cpu_percent": 3.738709677419355,
+          "p95_sampled_cpu_percent": 20.9,
+          "max_sampled_cpu_percent": 28.9
+        },
+        {
+          "executable": "grok",
+          "mean_sampled_cpu_percent": 3.393548387096774,
+          "p95_sampled_cpu_percent": 4.3,
+          "max_sampled_cpu_percent": 6.1
+        },
+        {
+          "executable": "WhatsApp",
+          "mean_sampled_cpu_percent": 2.838709677419355,
+          "p95_sampled_cpu_percent": 3.2,
+          "max_sampled_cpu_percent": 3.3
+        },
+        {
+          "executable": "cpa-manager-plus",
+          "mean_sampled_cpu_percent": 2.7870967741935484,
+          "p95_sampled_cpu_percent": 14.9,
+          "max_sampled_cpu_percent": 22.2
+        },
+        {
+          "executable": "VTDecoderXPCService",
+          "mean_sampled_cpu_percent": 2.3193548387096774,
+          "p95_sampled_cpu_percent": 2.7,
+          "max_sampled_cpu_percent": 2.7
+        }
+      ]
+    },
+    {
+      "arm": "baseline",
+      "repeat": 4,
+      "samples": 31,
+      "errors": [],
+      "max_sample_gap_s": 2.152466058731079,
+      "top_foreign_executables": [
+        {
+          "executable": "WindowServer",
+          "mean_sampled_cpu_percent": 28.596774193548388,
+          "p95_sampled_cpu_percent": 33.6,
+          "max_sampled_cpu_percent": 45.7
+        },
+        {
+          "executable": "WallpaperAerialsExtension",
+          "mean_sampled_cpu_percent": 8.219354838709677,
+          "p95_sampled_cpu_percent": 9.4,
+          "max_sampled_cpu_percent": 10.0
+        },
+        {
+          "executable": "Orca",
+          "mean_sampled_cpu_percent": 8.05483870967742,
+          "p95_sampled_cpu_percent": 11.0,
+          "max_sampled_cpu_percent": 12.0
+        },
+        {
+          "executable": "ClearVPN",
+          "mean_sampled_cpu_percent": 7.674193548387096,
+          "p95_sampled_cpu_percent": 11.5,
+          "max_sampled_cpu_percent": 11.5
+        },
+        {
+          "executable": "com.apple.Virtualization.VirtualMachine",
+          "mean_sampled_cpu_percent": 6.625806451612903,
+          "p95_sampled_cpu_percent": 14.9,
+          "max_sampled_cpu_percent": 21.2
+        },
+        {
+          "executable": "Google",
+          "mean_sampled_cpu_percent": 5.62258064516129,
+          "p95_sampled_cpu_percent": 7.7,
+          "max_sampled_cpu_percent": 73.89999999999999
+        },
+        {
+          "executable": "codex",
+          "mean_sampled_cpu_percent": 3.8903225806451616,
+          "p95_sampled_cpu_percent": 7.299999999999999,
+          "max_sampled_cpu_percent": 8.3
+        },
+        {
+          "executable": "grok",
+          "mean_sampled_cpu_percent": 2.854838709677419,
+          "p95_sampled_cpu_percent": 3.5,
+          "max_sampled_cpu_percent": 3.8
+        },
+        {
+          "executable": "WhatsApp",
+          "mean_sampled_cpu_percent": 2.8516129032258064,
+          "p95_sampled_cpu_percent": 3.2,
+          "max_sampled_cpu_percent": 3.3
+        },
+        {
+          "executable": "VTDecoderXPCService",
+          "mean_sampled_cpu_percent": 2.3,
+          "p95_sampled_cpu_percent": 2.7,
+          "max_sampled_cpu_percent": 2.7
+        },
+        {
+          "executable": "Telegram",
+          "mean_sampled_cpu_percent": 1.4580645161290322,
+          "p95_sampled_cpu_percent": 2.1,
+          "max_sampled_cpu_percent": 2.1
+        },
+        {
+          "executable": "claude",
+          "mean_sampled_cpu_percent": 1.4483870967741936,
+          "p95_sampled_cpu_percent": 4.5,
+          "max_sampled_cpu_percent": 5.8
+        }
+      ]
+    },
+    {
+      "arm": "baseline",
+      "repeat": 5,
+      "samples": 33,
+      "errors": [],
+      "max_sample_gap_s": 2.1582798957824707,
+      "top_foreign_executables": [
+        {
+          "executable": "siriactionsd",
+          "mean_sampled_cpu_percent": 70.86363636363636,
+          "p95_sampled_cpu_percent": 157.2,
+          "max_sampled_cpu_percent": 441.3
+        },
+        {
+          "executable": "WindowServer",
+          "mean_sampled_cpu_percent": 27.85151515151515,
+          "p95_sampled_cpu_percent": 43.5,
+          "max_sampled_cpu_percent": 44.8
+        },
+        {
+          "executable": "mobileassetd",
+          "mean_sampled_cpu_percent": 9.542424242424243,
+          "p95_sampled_cpu_percent": 54.2,
+          "max_sampled_cpu_percent": 56.7
+        },
+        {
+          "executable": "Orca",
+          "mean_sampled_cpu_percent": 8.421212121212122,
+          "p95_sampled_cpu_percent": 10.4,
+          "max_sampled_cpu_percent": 23.200000000000003
+        },
+        {
+          "executable": "ClearVPN",
+          "mean_sampled_cpu_percent": 7.833333333333333,
+          "p95_sampled_cpu_percent": 11.7,
+          "max_sampled_cpu_percent": 78.4
+        },
+        {
+          "executable": "BackgroundShortcutRunner",
+          "mean_sampled_cpu_percent": 7.245454545454545,
+          "p95_sampled_cpu_percent": 59.1,
+          "max_sampled_cpu_percent": 64.3
+        },
+        {
+          "executable": "com.apple.Virtualization.VirtualMachine",
+          "mean_sampled_cpu_percent": 6.845454545454546,
+          "p95_sampled_cpu_percent": 16.0,
+          "max_sampled_cpu_percent": 25.4
+        },
+        {
+          "executable": "assetsubscriptiond",
+          "mean_sampled_cpu_percent": 5.942424242424242,
+          "p95_sampled_cpu_percent": 45.5,
+          "max_sampled_cpu_percent": 50.4
+        },
+        {
+          "executable": "WallpaperAerialsExtension",
+          "mean_sampled_cpu_percent": 5.890909090909091,
+          "p95_sampled_cpu_percent": 10.4,
+          "max_sampled_cpu_percent": 11.4
+        },
+        {
+          "executable": "Google",
+          "mean_sampled_cpu_percent": 5.293939393939394,
+          "p95_sampled_cpu_percent": 35.199999999999996,
+          "max_sampled_cpu_percent": 46.5
+        },
+        {
+          "executable": "corespotlightd",
+          "mean_sampled_cpu_percent": 5.281818181818182,
+          "p95_sampled_cpu_percent": 11.7,
+          "max_sampled_cpu_percent": 17.5
+        },
+        {
+          "executable": "codex",
+          "mean_sampled_cpu_percent": 3.4060606060606062,
+          "p95_sampled_cpu_percent": 5.1,
+          "max_sampled_cpu_percent": 7.2
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "repeat": 5,
+      "samples": 31,
+      "errors": [],
+      "max_sample_gap_s": 2.1644139289855957,
+      "top_foreign_executables": [
+        {
+          "executable": "siriactionsd",
+          "mean_sampled_cpu_percent": 93.95161290322581,
+          "p95_sampled_cpu_percent": 152.2,
+          "max_sampled_cpu_percent": 155.0
+        },
+        {
+          "executable": "WindowServer",
+          "mean_sampled_cpu_percent": 24.912903225806453,
+          "p95_sampled_cpu_percent": 31.3,
+          "max_sampled_cpu_percent": 31.9
+        },
+        {
+          "executable": "BackgroundShortcutRunner",
+          "mean_sampled_cpu_percent": 23.93548387096774,
+          "p95_sampled_cpu_percent": 60.9,
+          "max_sampled_cpu_percent": 64.1
+        },
+        {
+          "executable": "mobileassetd",
+          "mean_sampled_cpu_percent": 10.719354838709677,
+          "p95_sampled_cpu_percent": 46.8,
+          "max_sampled_cpu_percent": 53.4
+        },
+        {
+          "executable": "com.apple.Virtualization.VirtualMachine",
+          "mean_sampled_cpu_percent": 8.364516129032259,
+          "p95_sampled_cpu_percent": 22.1,
+          "max_sampled_cpu_percent": 56.7
+        },
+        {
+          "executable": "Orca",
+          "mean_sampled_cpu_percent": 8.112903225806452,
+          "p95_sampled_cpu_percent": 12.8,
+          "max_sampled_cpu_percent": 31.500000000000004
+        },
+        {
+          "executable": "modelcatalogd",
+          "mean_sampled_cpu_percent": 6.358064516129033,
+          "p95_sampled_cpu_percent": 57.9,
+          "max_sampled_cpu_percent": 104.7
+        },
+        {
+          "executable": "Google",
+          "mean_sampled_cpu_percent": 6.138709677419355,
+          "p95_sampled_cpu_percent": 22.000000000000004,
+          "max_sampled_cpu_percent": 31.9
+        },
+        {
+          "executable": "WallpaperAerialsExtension",
+          "mean_sampled_cpu_percent": 5.47741935483871,
+          "p95_sampled_cpu_percent": 6.3,
+          "max_sampled_cpu_percent": 7.2
+        },
+        {
+          "executable": "ModelCatalogAgent",
+          "mean_sampled_cpu_percent": 4.848387096774194,
+          "p95_sampled_cpu_percent": 37.0,
+          "max_sampled_cpu_percent": 51.9
+        },
+        {
+          "executable": "assetsubscriptiond",
+          "mean_sampled_cpu_percent": 4.258064516129032,
+          "p95_sampled_cpu_percent": 18.1,
+          "max_sampled_cpu_percent": 68.4
+        },
+        {
+          "executable": "com.apple.geod",
+          "mean_sampled_cpu_percent": 4.161290322580645,
+          "p95_sampled_cpu_percent": 31.2,
+          "max_sampled_cpu_percent": 62.1
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "repeat": 6,
+      "samples": 31,
+      "errors": [],
+      "max_sample_gap_s": 2.1919450759887695,
+      "top_foreign_executables": [
+        {
+          "executable": "siriactionsd",
+          "mean_sampled_cpu_percent": 88.81612903225806,
+          "p95_sampled_cpu_percent": 123.2,
+          "max_sampled_cpu_percent": 136.6
+        },
+        {
+          "executable": "WindowServer",
+          "mean_sampled_cpu_percent": 25.383870967741935,
+          "p95_sampled_cpu_percent": 29.5,
+          "max_sampled_cpu_percent": 43.0
+        },
+        {
+          "executable": "mobileassetd",
+          "mean_sampled_cpu_percent": 19.670967741935485,
+          "p95_sampled_cpu_percent": 63.4,
+          "max_sampled_cpu_percent": 83.8
+        },
+        {
+          "executable": "BackgroundShortcutRunner",
+          "mean_sampled_cpu_percent": 19.635483870967743,
+          "p95_sampled_cpu_percent": 60.3,
+          "max_sampled_cpu_percent": 62.4
+        },
+        {
+          "executable": "Orca",
+          "mean_sampled_cpu_percent": 7.712903225806452,
+          "p95_sampled_cpu_percent": 9.7,
+          "max_sampled_cpu_percent": 10.0
+        },
+        {
+          "executable": "assetsubscriptiond",
+          "mean_sampled_cpu_percent": 7.035483870967742,
+          "p95_sampled_cpu_percent": 25.5,
+          "max_sampled_cpu_percent": 27.5
+        },
+        {
+          "executable": "com.apple.Virtualization.VirtualMachine",
+          "mean_sampled_cpu_percent": 6.741935483870968,
+          "p95_sampled_cpu_percent": 13.2,
+          "max_sampled_cpu_percent": 20.1
+        },
+        {
+          "executable": "WallpaperAerialsExtension",
+          "mean_sampled_cpu_percent": 6.5,
+          "p95_sampled_cpu_percent": 8.0,
+          "max_sampled_cpu_percent": 8.1
+        },
+        {
+          "executable": "ClearVPN",
+          "mean_sampled_cpu_percent": 4.72258064516129,
+          "p95_sampled_cpu_percent": 9.6,
+          "max_sampled_cpu_percent": 10.4
+        },
+        {
+          "executable": "Google",
+          "mean_sampled_cpu_percent": 3.8161290322580648,
+          "p95_sampled_cpu_percent": 9.5,
+          "max_sampled_cpu_percent": 26.599999999999998
+        },
+        {
+          "executable": "modelcatalogd",
+          "mean_sampled_cpu_percent": 3.632258064516129,
+          "p95_sampled_cpu_percent": 32.2,
+          "max_sampled_cpu_percent": 53.4
+        },
+        {
+          "executable": "codex",
+          "mean_sampled_cpu_percent": 3.480645161290323,
+          "p95_sampled_cpu_percent": 5.9,
+          "max_sampled_cpu_percent": 7.0
+        }
+      ]
+    },
+    {
+      "arm": "baseline",
+      "repeat": 6,
+      "samples": 32,
+      "errors": [],
+      "max_sample_gap_s": 2.154996871948242,
+      "top_foreign_executables": [
+        {
+          "executable": "siriactionsd",
+          "mean_sampled_cpu_percent": 96.615625,
+          "p95_sampled_cpu_percent": 149.1,
+          "max_sampled_cpu_percent": 158.6
+        },
+        {
+          "executable": "WindowServer",
+          "mean_sampled_cpu_percent": 25.43125,
+          "p95_sampled_cpu_percent": 35.6,
+          "max_sampled_cpu_percent": 43.4
+        },
+        {
+          "executable": "assetsubscriptiond",
+          "mean_sampled_cpu_percent": 13.659375,
+          "p95_sampled_cpu_percent": 45.9,
+          "max_sampled_cpu_percent": 52.7
+        },
+        {
+          "executable": "BackgroundShortcutRunner",
+          "mean_sampled_cpu_percent": 8.725,
+          "p95_sampled_cpu_percent": 61.5,
+          "max_sampled_cpu_percent": 63.0
+        },
+        {
+          "executable": "Orca",
+          "mean_sampled_cpu_percent": 8.634375,
+          "p95_sampled_cpu_percent": 17.799999999999997,
+          "max_sampled_cpu_percent": 26.5
+        },
+        {
+          "executable": "WallpaperAerialsExtension",
+          "mean_sampled_cpu_percent": 7.621875,
+          "p95_sampled_cpu_percent": 8.6,
+          "max_sampled_cpu_percent": 8.8
+        },
+        {
+          "executable": "com.apple.Virtualization.VirtualMachine",
+          "mean_sampled_cpu_percent": 6.484375,
+          "p95_sampled_cpu_percent": 11.5,
+          "max_sampled_cpu_percent": 16.0
+        },
+        {
+          "executable": "Google",
+          "mean_sampled_cpu_percent": 5.403125,
+          "p95_sampled_cpu_percent": 25.0,
+          "max_sampled_cpu_percent": 28.8
+        },
+        {
+          "executable": "ClearVPN",
+          "mean_sampled_cpu_percent": 5.153125,
+          "p95_sampled_cpu_percent": 15.8,
+          "max_sampled_cpu_percent": 17.1
+        },
+        {
+          "executable": "ModelCatalogAgent",
+          "mean_sampled_cpu_percent": 5.125,
+          "p95_sampled_cpu_percent": 18.0,
+          "max_sampled_cpu_percent": 18.2
+        },
+        {
+          "executable": "mobileassetd",
+          "mean_sampled_cpu_percent": 4.3,
+          "p95_sampled_cpu_percent": 17.5,
+          "max_sampled_cpu_percent": 24.0
+        },
+        {
+          "executable": "codex",
+          "mean_sampled_cpu_percent": 3.553125,
+          "p95_sampled_cpu_percent": 6.0,
+          "max_sampled_cpu_percent": 6.4
+        }
+      ]
+    }
+  ]
+}

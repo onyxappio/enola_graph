@@ -26,9 +26,6 @@ func TestFreshEngineProvesGraphInputsInsteadOfRebuilding(t *testing.T) {
 	if initial.Work.PolicyBuilds != 0 {
 		t.Fatalf("a run that built no policy still reported PolicyBuilds=%d: %+v", initial.Work.PolicyBuilds, initial.Work)
 	}
-	if initial.Work.InventoryFromPolicyProof != 1 || initial.Work.InventoryScans != 0 {
-		t.Fatalf("fresh policy proof did not supply inventory: %+v", initial.Work)
-	}
 	residentCold(t, dir, r, sink)
 
 	// The claim covers one run. The engine has now been used, so the window a
@@ -37,9 +34,6 @@ func TestFreshEngineProvesGraphInputsInsteadOfRebuilding(t *testing.T) {
 	writeFile(t, dir, "tsconfig.json", `{"compilerOptions":{"baseUrl":".","paths":{"@app/*":["lib/*"]}}}`+"\n")
 	q.Add("tsconfig.json")
 	second := residentApply(t, r, q)
-	if second.Work.InventoryFromPolicyProof != 0 || second.Work.InventoryScans != 1 {
-		t.Fatalf("inventory escaped its first transaction: %+v", second.Work)
-	}
 	if !second.Reconciled {
 		t.Fatalf("a tsconfig retarget did not reconcile: %+v", second.Work)
 	}

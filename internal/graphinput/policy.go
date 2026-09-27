@@ -269,13 +269,6 @@ func (p *Policy) Dependencies() []Dependency { return append([]Dependency(nil), 
 // The window it proves across is the caller's to bound: this says the tree
 // answers the same now, not that it never differed in between.
 func (p *Policy) ReusableOver() (string, bool) {
-	return p.ReusableOverObserving(nil)
-}
-
-// ReusableOverObserving exposes this proof's ordered walk to a transaction-local
-// observer. Observation never prunes the proof. Discard every observation when
-// the proof fails; callers must not retain it for a later transaction.
-func (p *Policy) ReusableOverObserving(observe func(string, fs.DirEntry)) (string, bool) {
 	for _, d := range p.deps {
 		digest := "missing"
 		b, err := os.ReadFile(d.Path)
@@ -326,9 +319,6 @@ func (p *Policy) ReusableOverObserving(observe func(string, fs.DirEntry)) (strin
 	err = filepath.WalkDir(p.root, func(abs string, entry fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
-		}
-		if observe != nil {
-			observe(abs, entry)
 		}
 		rel, _ := p.relative(abs)
 		if rel == "." {

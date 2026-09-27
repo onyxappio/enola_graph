@@ -52,10 +52,7 @@ type WorkCounters struct {
 	RetryParsesReused                                         int
 	CheckpointBytes                                           int64
 	InventoryScans, DetectionScans, ContextScans, ConfigScans int
-	// InventoryFromPolicyProof counts inventories collected during the policy
-	// proof walk, without an additional inventory filesystem scan.
-	InventoryFromPolicyProof                                int
-	HashedFiles, DirtyHashBytes, VerifiedFiles, Checkpoints int
+	HashedFiles, DirtyHashBytes, VerifiedFiles, Checkpoints   int
 	// NonTSCaptures counts the fenced snapshot-and-extract passes a run makes
 	// over non-TypeScript extractors. A run asks two questions about such an
 	// extractor - whether its output moved, and which owners its candidate
@@ -217,17 +214,10 @@ type retainedDiscoveryIdentity struct {
 	admission string
 }
 
-func readRuntimeInputs(eng *engine.Engine, abs string, st *State, work *WorkCounters, retained *tsextractor.Discovery, retainedFor retainedDiscoveryIdentity, proven *engine.RepoInventory) (*runtimeInputs, error) {
+func readRuntimeInputs(eng *engine.Engine, abs string, st *State, work *WorkCounters, retained *tsextractor.Discovery, retainedFor retainedDiscoveryIdentity) (*runtimeInputs, error) {
 	tr := graphprofile.StartNamed("inputs")
-	var inv engine.RepoInventory
-	var err error
-	if proven != nil {
-		work.InventoryFromPolicyProof++
-		inv = *proven
-	} else {
-		work.InventoryScans++
-		inv, err = eng.Inventory(abs)
-	}
+	work.InventoryScans++
+	inv, err := eng.Inventory(abs)
 	if err != nil {
 		return nil, fmt.Errorf("inventory: %w", err)
 	}
@@ -459,7 +449,6 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 	// provenInputs records that this run answered the policy question by
 	// re-reading what the policy declared rather than by building a second one.
 	provenInputs := false
-	var provenInventory *engine.RepoInventory
 	var beforeRebuild map[string][]byte
 	if !fast {
 		var captureErr error
@@ -492,10 +481,8 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 		case r.eng.GraphScope() == nil:
 			reason = "no graph scope"
 		default:
-			if inv, why, ok := r.eng.ProvenInventory(r.abs); !ok {
+			if why, ok := r.eng.GraphScope().Policy.ReusableOver(); !ok {
 				reason = why
-			} else {
-				provenInventory = &inv
 			}
 		}
 		if reason == "" {
@@ -552,7 +539,6 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 	}
 	rtr.Mark("reconcile_complete", fmt.Sprintf("reloaded=%v", reloaded))
 	s := &session{eng: r.eng, abs: r.abs, opts: r.opts, sink: r.sink, state: r.state, stateFP: r.ck.fp, journal: r.journal, prof: graphprofile.StartNamed("session"), inputs: input, fast: fast}
-	s.provenInventory = provenInventory
 	s.retained, s.retainedFor = r.tsDiscovery, r.tsDiscoveryFor
 	s.retryRecords, s.retryFor = r.retryRecords, r.retryFor
 	s.retryFileContext, s.retryFileBase = r.retryFileContext, r.retryFileBase
