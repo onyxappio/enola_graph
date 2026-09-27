@@ -1,0 +1,12 @@
+{
+  "correctness_accepted": true,
+  "source_revision": "4a62b78",
+  "test_revision": "75c3fd6",
+  "binary_sha256": "bb51ff0d39801358e5578163f52bba4ad678880f61ba7da011a247e2faa31170",
+  "scope": "Product seven-call correctness and two real history scenarios; performance not accepted",
+  "evidence": {
+    "/tmp/enola-local-surface/cli-pairs/correctness-candidate-1/pair-receipt.json": "2e73d77452a499e302596ead70f4684ce3508ed0fe55a4844a3baed6eed52faa",
+    "/tmp/enola-local-surface/history-recent/receipt-recent.json": "6171692ee8f77c4f32ad42837f2e9c41b1b1446c38d0953af9bede2ca8f9337f",
+    "/tmp/enola-local-surface/history-broad/receipt-broad.json": "ec27a41ede303ccd00d5d06a0b465994fb6ff4662507726af1f5e8b83aa9ae8f"
+  }
+}
