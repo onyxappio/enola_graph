@@ -1,0 +1,9 @@
+{
+  "path": "/tmp/enola-local-surface-guarded/cli-pairs/candidate-1/state1/state.json",
+  "sha256": "dbefa119bd2d669cdc5405d51e59d44c82a8c52743e204175e59e6896bcf5f96",
+  "bytes": 90686334,
+  "runtime": "7812838",
+  "execution": "Go test overlay only; checkout runtime unchanged",
+  "command": "ENOLA_STATE_BENCH_PATH=<input> go test -overlay <overlay.json> ./internal/graphsession -run ^TestDiagnosticProjectionDefersInvalidPayloadType$ -bench ^BenchmarkDiagnosticDeferredFacts$ -benchtime=3x -count=3",
+  "acceptance_timing": false
+}
