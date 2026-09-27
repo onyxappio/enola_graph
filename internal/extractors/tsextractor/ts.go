@@ -3261,7 +3261,7 @@ func walkTSAliasRoots(ctx context.Context, repoPath, dir string, out *[]tsAliasR
 // visit shares directory listings with configuration inventory. Both consumers
 // prune hidden directories and tsSkipDirs, but retain testdata.
 func walkTSAliasRootsVisit(ctx context.Context, repoPath, dir string, out *[]tsAliasRoot, visit func(string, []fs.DirEntry), inputScope *inputscope.Scope) {
-	entries, listingErr := overlayReadDir(ctx, dir, inputScope)
+	entries, listingErr := aliasDirectoryEntries(ctx, dir, inputScope, visit == nil)
 	if aliases, ok := aliasesAtDirFromListing(ctx, dir, entries, listingErr, inputScope); ok {
 		rel, err := filepath.Rel(repoPath, dir)
 		if err != nil || rel == "." {

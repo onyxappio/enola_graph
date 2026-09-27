@@ -1,0 +1,10 @@
+=== RUN   TestDiagnosticAliasObservedProduct
+    alias_observation_test.go:124: pair=0 live_ms=67.508 observed_ms=14.868 roots=1 dirs=668
+    alias_observation_test.go:124: pair=1 live_ms=66.902 observed_ms=13.804 roots=1 dirs=668
+    alias_observation_test.go:124: pair=2 live_ms=66.634 observed_ms=14.249 roots=1 dirs=668
+    alias_observation_test.go:124: pair=3 live_ms=66.479 observed_ms=14.083 roots=1 dirs=668
+    alias_observation_test.go:124: pair=4 live_ms=68.322 observed_ms=14.238 roots=1 dirs=668
+    alias_observation_test.go:124: pair=5 live_ms=65.710 observed_ms=13.998 roots=1 dirs=668
+--- PASS: TestDiagnosticAliasObservedProduct (1.65s)
+PASS
+ok  	github.com/enola-labs/enola/internal/extractors/tsextractor	2.117s

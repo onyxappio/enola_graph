@@ -1,0 +1,15 @@
+{
+  "status": "experimental/unaccepted",
+  "base": "9bf667d71f823a33fd1e13f554348105f84960c9",
+  "scope": "reuse completed probe directory observations for alias-only discovery traversal; no new index",
+  "files": {
+    "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-watch-fanout/internal/extractors/tsextractor/ts.go": "c827f614ae1f9a32ee1273ded6d90e0b24b6c2d893b71a16af6c61db15860a79",
+    "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-watch-fanout/internal/extractors/tsextractor/alias_observation.go": "67bdd00812752742afea135c31f25110f86a131ea81f5ae52c704b8ff69bb8e5",
+    "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-watch-fanout/internal/extractors/tsextractor/alias_observation_test.go": "c39aa8340ca41860123bdf1d541879d031bea0adef79a4f939ec0c3d73bd9a4f",
+    "/private/tmp/enola-alias-observation/enola-experimental": "042a0c6e1580e62389913c7cb646377a05c1942b0c1acf44962c05581f4550eb",
+    "/private/tmp/enola-stage36-watch/watch.py": "f1dc497dbb13c96497a84f91601fa0560ac7f4fc2007854217447b7a494756d9",
+    "/private/tmp/enola-stage36-watch/product-graph-scope.yaml": "d7fcc27d5290935b7a660c92e75234009e320ae765fe6f6205832daabd0c5f9d"
+  },
+  "full_ts_tests": "passed 22.571s",
+  "diagnostic": "six alternating pairs; alias and ledger equality; shared host microdiagnostic, not CLI acceptance"
+}
