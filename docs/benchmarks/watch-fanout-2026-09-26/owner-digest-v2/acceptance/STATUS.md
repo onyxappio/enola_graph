@@ -1,1 +1,1 @@
-Prospective cf71c85 six-pair cohort prepared. Full110 suite passed. All participant holds for2026-09-27 06:40–07:15 UTC validated; no timing started when this checkpoint was written. Same gates as prior rejected cohort; no reused samples.
+Complete, not accepted: initial median gain1.313% is below required2%. All6 initial pairs faster; other time, memory and correctness gates passed. No main publication.

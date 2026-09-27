@@ -1,0 +1,626 @@
+[
+  {
+    "arm": "baseline",
+    "repeat": 1,
+    "samples": 32,
+    "load1_min": 6.8212890625,
+    "load1_max": 14.83544921875,
+    "top_background": [
+      {
+        "name": "mediaanalysisd",
+        "mean_cpu_per_sample": 53.49687500000001,
+        "max_process_cpu": 110.4
+      },
+      {
+        "name": "WindowServer",
+        "mean_cpu_per_sample": 26.015625000000004,
+        "max_process_cpu": 35.4
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "mean_cpu_per_sample": 13.181250000000002,
+        "max_process_cpu": 77.0
+      },
+      {
+        "name": "ClearVPN",
+        "mean_cpu_per_sample": 8.021875,
+        "max_process_cpu": 12.2
+      },
+      {
+        "name": "Orca",
+        "mean_cpu_per_sample": 8.009374999999997,
+        "max_process_cpu": 18.7
+      },
+      {
+        "name": "WallpaperAerialsExtension",
+        "mean_cpu_per_sample": 7.137499999999998,
+        "max_process_cpu": 8.9
+      },
+      {
+        "name": "codex",
+        "mean_cpu_per_sample": 6.537499999999988,
+        "max_process_cpu": 19.5
+      },
+      {
+        "name": "Google",
+        "mean_cpu_per_sample": 4.5249999999999995,
+        "max_process_cpu": 17.3
+      }
+    ],
+    "recognized_competitors": [],
+    "raw_path": "/tmp/enola-owner-digest-v2/acceptance/cli-pairs/baseline-1/host-load.jsonl",
+    "raw_sha256": "6d7052c38759cfaef657041250be025d454f3fafda8e338fd8bc4fb3e02460e0"
+  },
+  {
+    "arm": "baseline",
+    "repeat": 2,
+    "samples": 32,
+    "load1_min": 8.10693359375,
+    "load1_max": 11.69482421875,
+    "top_background": [
+      {
+        "name": "WindowServer",
+        "mean_cpu_per_sample": 28.759375,
+        "max_process_cpu": 41.7
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "mean_cpu_per_sample": 12.528125000000001,
+        "max_process_cpu": 79.2
+      },
+      {
+        "name": "ClearVPN",
+        "mean_cpu_per_sample": 10.049999999999999,
+        "max_process_cpu": 67.1
+      },
+      {
+        "name": "WallpaperAerialsExtension",
+        "mean_cpu_per_sample": 6.843749999999999,
+        "max_process_cpu": 8.6
+      },
+      {
+        "name": "Orca",
+        "mean_cpu_per_sample": 6.30625,
+        "max_process_cpu": 6.5
+      },
+      {
+        "name": "Google",
+        "mean_cpu_per_sample": 3.478124999999999,
+        "max_process_cpu": 3.3
+      },
+      {
+        "name": "WhatsApp",
+        "mean_cpu_per_sample": 2.9812499999999997,
+        "max_process_cpu": 6.2
+      },
+      {
+        "name": "VTDecoderXPCService",
+        "mean_cpu_per_sample": 2.3156250000000003,
+        "max_process_cpu": 2.8
+      }
+    ],
+    "recognized_competitors": [],
+    "raw_path": "/tmp/enola-owner-digest-v2/acceptance/cli-pairs/baseline-2/host-load.jsonl",
+    "raw_sha256": "5a6ee0dfb32101bfa5fd8255ce8f2b6f173263cec09424c916581216d49efbbb"
+  },
+  {
+    "arm": "baseline",
+    "repeat": 3,
+    "samples": 34,
+    "load1_min": 7.1083984375,
+    "load1_max": 9.20654296875,
+    "top_background": [
+      {
+        "name": "WindowServer",
+        "mean_cpu_per_sample": 28.60588235294117,
+        "max_process_cpu": 44.1
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "mean_cpu_per_sample": 15.470588235294118,
+        "max_process_cpu": 80.5
+      },
+      {
+        "name": "ClearVPN",
+        "mean_cpu_per_sample": 8.017647058823528,
+        "max_process_cpu": 12.1
+      },
+      {
+        "name": "WallpaperAerialsExtension",
+        "mean_cpu_per_sample": 7.997058823529413,
+        "max_process_cpu": 10.1
+      },
+      {
+        "name": "Google",
+        "mean_cpu_per_sample": 7.788235294117646,
+        "max_process_cpu": 50.9
+      },
+      {
+        "name": "Orca",
+        "mean_cpu_per_sample": 5.729411764705884,
+        "max_process_cpu": 6.5
+      },
+      {
+        "name": "WhatsApp",
+        "mean_cpu_per_sample": 2.8235294117647056,
+        "max_process_cpu": 3.3
+      },
+      {
+        "name": "VTDecoderXPCService",
+        "mean_cpu_per_sample": 2.25,
+        "max_process_cpu": 2.6
+      }
+    ],
+    "recognized_competitors": [],
+    "raw_path": "/tmp/enola-owner-digest-v2/acceptance/cli-pairs/baseline-3/host-load.jsonl",
+    "raw_sha256": "057b0c6320790e6ae27620d58fa85e07fc28953fe756a207260edec90edbea86"
+  },
+  {
+    "arm": "baseline",
+    "repeat": 4,
+    "samples": 33,
+    "load1_min": 7.97265625,
+    "load1_max": 9.4599609375,
+    "top_background": [
+      {
+        "name": "WindowServer",
+        "mean_cpu_per_sample": 28.64848484848485,
+        "max_process_cpu": 44.1
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "mean_cpu_per_sample": 12.645454545454545,
+        "max_process_cpu": 83.5
+      },
+      {
+        "name": "ClearVPN",
+        "mean_cpu_per_sample": 8.366666666666665,
+        "max_process_cpu": 11.7
+      },
+      {
+        "name": "WallpaperAerialsExtension",
+        "mean_cpu_per_sample": 7.330303030303029,
+        "max_process_cpu": 9.2
+      },
+      {
+        "name": "Orca",
+        "mean_cpu_per_sample": 6.196969696969696,
+        "max_process_cpu": 6.5
+      },
+      {
+        "name": "WhatsApp",
+        "mean_cpu_per_sample": 3.8030303030303036,
+        "max_process_cpu": 35.0
+      },
+      {
+        "name": "Google",
+        "mean_cpu_per_sample": 3.6939393939393925,
+        "max_process_cpu": 15.0
+      },
+      {
+        "name": "sysmond",
+        "mean_cpu_per_sample": 3.6212121212121207,
+        "max_process_cpu": 28.4
+      }
+    ],
+    "recognized_competitors": [],
+    "raw_path": "/tmp/enola-owner-digest-v2/acceptance/cli-pairs/baseline-4/host-load.jsonl",
+    "raw_sha256": "e4b1de16dd3a4a1e7314be36e18bd3b7f4895a5c69479426aee51c6e5785cee7"
+  },
+  {
+    "arm": "baseline",
+    "repeat": 5,
+    "samples": 33,
+    "load1_min": 7.57177734375,
+    "load1_max": 10.890625,
+    "top_background": [
+      {
+        "name": "WindowServer",
+        "mean_cpu_per_sample": 28.148484848484852,
+        "max_process_cpu": 41.8
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "mean_cpu_per_sample": 11.818181818181815,
+        "max_process_cpu": 74.6
+      },
+      {
+        "name": "WallpaperAerialsExtension",
+        "mean_cpu_per_sample": 8.454545454545457,
+        "max_process_cpu": 10.7
+      },
+      {
+        "name": "ClearVPN",
+        "mean_cpu_per_sample": 7.421212121212121,
+        "max_process_cpu": 11.3
+      },
+      {
+        "name": "Orca",
+        "mean_cpu_per_sample": 5.7060606060606025,
+        "max_process_cpu": 5.3
+      },
+      {
+        "name": "Google",
+        "mean_cpu_per_sample": 3.233333333333333,
+        "max_process_cpu": 5.2
+      },
+      {
+        "name": "WhatsApp",
+        "mean_cpu_per_sample": 2.8090909090909086,
+        "max_process_cpu": 3.2
+      },
+      {
+        "name": "VTDecoderXPCService",
+        "mean_cpu_per_sample": 2.321212121212121,
+        "max_process_cpu": 2.7
+      }
+    ],
+    "recognized_competitors": [],
+    "raw_path": "/tmp/enola-owner-digest-v2/acceptance/cli-pairs/baseline-5/host-load.jsonl",
+    "raw_sha256": "e774055e437d39c88ac5c7cb732ab7615bff0cf5224fe0057c089046691e3dd2"
+  },
+  {
+    "arm": "baseline",
+    "repeat": 6,
+    "samples": 33,
+    "load1_min": 8.9814453125,
+    "load1_max": 14.46142578125,
+    "top_background": [
+      {
+        "name": "WindowServer",
+        "mean_cpu_per_sample": 28.454545454545446,
+        "max_process_cpu": 43.6
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "mean_cpu_per_sample": 10.881818181818183,
+        "max_process_cpu": 72.6
+      },
+      {
+        "name": "ClearVPN",
+        "mean_cpu_per_sample": 7.9909090909090885,
+        "max_process_cpu": 12.0
+      },
+      {
+        "name": "WallpaperAerialsExtension",
+        "mean_cpu_per_sample": 7.396969696969697,
+        "max_process_cpu": 9.2
+      },
+      {
+        "name": "Orca",
+        "mean_cpu_per_sample": 6.109090909090909,
+        "max_process_cpu": 8.8
+      },
+      {
+        "name": "Google",
+        "mean_cpu_per_sample": 2.9666666666666663,
+        "max_process_cpu": 3.0
+      },
+      {
+        "name": "WhatsApp",
+        "mean_cpu_per_sample": 2.8424242424242427,
+        "max_process_cpu": 3.3
+      },
+      {
+        "name": "VTDecoderXPCService",
+        "mean_cpu_per_sample": 2.287878787878788,
+        "max_process_cpu": 2.7
+      }
+    ],
+    "recognized_competitors": [],
+    "raw_path": "/tmp/enola-owner-digest-v2/acceptance/cli-pairs/baseline-6/host-load.jsonl",
+    "raw_sha256": "b00ecb059df46d80ebd168e7a15ef69d6523e13fd5ccceeaab78e3ce99867bd8"
+  },
+  {
+    "arm": "candidate",
+    "repeat": 1,
+    "samples": 32,
+    "load1_min": 9.45751953125,
+    "load1_max": 13.015625,
+    "top_background": [
+      {
+        "name": "WindowServer",
+        "mean_cpu_per_sample": 29.449999999999996,
+        "max_process_cpu": 46.6
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "mean_cpu_per_sample": 11.971875,
+        "max_process_cpu": 68.7
+      },
+      {
+        "name": "WallpaperAerialsExtension",
+        "mean_cpu_per_sample": 8.806249999999999,
+        "max_process_cpu": 10.7
+      },
+      {
+        "name": "ClearVPN",
+        "mean_cpu_per_sample": 8.356250000000001,
+        "max_process_cpu": 11.9
+      },
+      {
+        "name": "Orca",
+        "mean_cpu_per_sample": 7.596875000000001,
+        "max_process_cpu": 53.9
+      },
+      {
+        "name": "Google",
+        "mean_cpu_per_sample": 3.309375,
+        "max_process_cpu": 6.5
+      },
+      {
+        "name": "WhatsApp",
+        "mean_cpu_per_sample": 2.88125,
+        "max_process_cpu": 3.5
+      },
+      {
+        "name": "VTDecoderXPCService",
+        "mean_cpu_per_sample": 2.5156250000000004,
+        "max_process_cpu": 7.5
+      }
+    ],
+    "recognized_competitors": [],
+    "raw_path": "/tmp/enola-owner-digest-v2/acceptance/cli-pairs/candidate-1/host-load.jsonl",
+    "raw_sha256": "87190ebd72e7d4371dfe5c9fa8c5ec4cb09809ff1897479d30a871e0efb97b79"
+  },
+  {
+    "arm": "candidate",
+    "repeat": 2,
+    "samples": 32,
+    "load1_min": 8.69775390625,
+    "load1_max": 13.884765625,
+    "top_background": [
+      {
+        "name": "WindowServer",
+        "mean_cpu_per_sample": 28.756250000000005,
+        "max_process_cpu": 44.1
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "mean_cpu_per_sample": 10.787499999999998,
+        "max_process_cpu": 62.7
+      },
+      {
+        "name": "ClearVPN",
+        "mean_cpu_per_sample": 8.431249999999999,
+        "max_process_cpu": 11.5
+      },
+      {
+        "name": "Orca",
+        "mean_cpu_per_sample": 6.840624999999999,
+        "max_process_cpu": 32.6
+      },
+      {
+        "name": "Google",
+        "mean_cpu_per_sample": 6.137499999999997,
+        "max_process_cpu": 43.8
+      },
+      {
+        "name": "WallpaperAerialsExtension",
+        "mean_cpu_per_sample": 5.7250000000000005,
+        "max_process_cpu": 6.8
+      },
+      {
+        "name": "WhatsApp",
+        "mean_cpu_per_sample": 2.8687499999999995,
+        "max_process_cpu": 3.3
+      },
+      {
+        "name": "VTDecoderXPCService",
+        "mean_cpu_per_sample": 2.3625000000000003,
+        "max_process_cpu": 3.0
+      }
+    ],
+    "recognized_competitors": [],
+    "raw_path": "/tmp/enola-owner-digest-v2/acceptance/cli-pairs/candidate-2/host-load.jsonl",
+    "raw_sha256": "53dd61a295b73f8beefd45326d90706eec4c5bb800b7fb24048da4f2c5718357"
+  },
+  {
+    "arm": "candidate",
+    "repeat": 3,
+    "samples": 32,
+    "load1_min": 6.4755859375,
+    "load1_max": 11.49169921875,
+    "top_background": [
+      {
+        "name": "WindowServer",
+        "mean_cpu_per_sample": 29.012500000000003,
+        "max_process_cpu": 33.7
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "mean_cpu_per_sample": 12.59375,
+        "max_process_cpu": 80.3
+      },
+      {
+        "name": "ClearVPN",
+        "mean_cpu_per_sample": 8.400000000000002,
+        "max_process_cpu": 11.7
+      },
+      {
+        "name": "WallpaperAerialsExtension",
+        "mean_cpu_per_sample": 7.171875000000001,
+        "max_process_cpu": 10.2
+      },
+      {
+        "name": "Orca",
+        "mean_cpu_per_sample": 6.096875000000001,
+        "max_process_cpu": 9.2
+      },
+      {
+        "name": "WhatsApp",
+        "mean_cpu_per_sample": 4.221875,
+        "max_process_cpu": 25.3
+      },
+      {
+        "name": "Google",
+        "mean_cpu_per_sample": 3.9531250000000018,
+        "max_process_cpu": 16.2
+      },
+      {
+        "name": "sysmond",
+        "mean_cpu_per_sample": 2.5624999999999996,
+        "max_process_cpu": 21.9
+      }
+    ],
+    "recognized_competitors": [],
+    "raw_path": "/tmp/enola-owner-digest-v2/acceptance/cli-pairs/candidate-3/host-load.jsonl",
+    "raw_sha256": "780b74cf084760d37d06e9026ad91dca37f7e9029ddbcf8403a2e2e3e6e53c74"
+  },
+  {
+    "arm": "candidate",
+    "repeat": 4,
+    "samples": 32,
+    "load1_min": 8.34228515625,
+    "load1_max": 12.93994140625,
+    "top_background": [
+      {
+        "name": "WindowServer",
+        "mean_cpu_per_sample": 29.406249999999996,
+        "max_process_cpu": 44.3
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "mean_cpu_per_sample": 14.556249999999999,
+        "max_process_cpu": 72.5
+      },
+      {
+        "name": "ClearVPN",
+        "mean_cpu_per_sample": 9.762500000000003,
+        "max_process_cpu": 47.8
+      },
+      {
+        "name": "WallpaperAerialsExtension",
+        "mean_cpu_per_sample": 6.096874999999998,
+        "max_process_cpu": 7.8
+      },
+      {
+        "name": "Orca",
+        "mean_cpu_per_sample": 5.846874999999998,
+        "max_process_cpu": 6.4
+      },
+      {
+        "name": "Google",
+        "mean_cpu_per_sample": 3.096874999999999,
+        "max_process_cpu": 3.1
+      },
+      {
+        "name": "WhatsApp",
+        "mean_cpu_per_sample": 2.859375,
+        "max_process_cpu": 3.3
+      },
+      {
+        "name": "VTDecoderXPCService",
+        "mean_cpu_per_sample": 2.3218750000000004,
+        "max_process_cpu": 2.9
+      }
+    ],
+    "recognized_competitors": [],
+    "raw_path": "/tmp/enola-owner-digest-v2/acceptance/cli-pairs/candidate-4/host-load.jsonl",
+    "raw_sha256": "6379a8b2586854dfd025636f687cf0ef5175f2b7237401fff65946523ae82af8"
+  },
+  {
+    "arm": "candidate",
+    "repeat": 5,
+    "samples": 32,
+    "load1_min": 8.05126953125,
+    "load1_max": 11.0634765625,
+    "top_background": [
+      {
+        "name": "WindowServer",
+        "mean_cpu_per_sample": 28.90000000000001,
+        "max_process_cpu": 41.7
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "mean_cpu_per_sample": 12.453125,
+        "max_process_cpu": 117.0
+      },
+      {
+        "name": "ClearVPN",
+        "mean_cpu_per_sample": 8.440624999999999,
+        "max_process_cpu": 12.5
+      },
+      {
+        "name": "Orca",
+        "mean_cpu_per_sample": 6.112499999999998,
+        "max_process_cpu": 7.7
+      },
+      {
+        "name": "WallpaperAerialsExtension",
+        "mean_cpu_per_sample": 5.765624999999999,
+        "max_process_cpu": 10.2
+      },
+      {
+        "name": "Google",
+        "mean_cpu_per_sample": 3.6906249999999994,
+        "max_process_cpu": 16.4
+      },
+      {
+        "name": "WhatsApp",
+        "mean_cpu_per_sample": 2.9531250000000004,
+        "max_process_cpu": 5.4
+      },
+      {
+        "name": "VTDecoderXPCService",
+        "mean_cpu_per_sample": 2.3531249999999995,
+        "max_process_cpu": 2.9
+      }
+    ],
+    "recognized_competitors": [],
+    "raw_path": "/tmp/enola-owner-digest-v2/acceptance/cli-pairs/candidate-5/host-load.jsonl",
+    "raw_sha256": "7ff5116f6b805e4c111e83113715fa79ce7716760a03888c5efb7446735d490a"
+  },
+  {
+    "arm": "candidate",
+    "repeat": 6,
+    "samples": 32,
+    "load1_min": 8.30029296875,
+    "load1_max": 10.357421875,
+    "top_background": [
+      {
+        "name": "WindowServer",
+        "mean_cpu_per_sample": 29.21875,
+        "max_process_cpu": 45.0
+      },
+      {
+        "name": "com.apple.Virtualization.VirtualMachine",
+        "mean_cpu_per_sample": 12.781250000000002,
+        "max_process_cpu": 76.9
+      },
+      {
+        "name": "ClearVPN",
+        "mean_cpu_per_sample": 8.450000000000001,
+        "max_process_cpu": 11.6
+      },
+      {
+        "name": "WallpaperAerialsExtension",
+        "mean_cpu_per_sample": 6.503125000000001,
+        "max_process_cpu": 8.9
+      },
+      {
+        "name": "Orca",
+        "mean_cpu_per_sample": 6.034375,
+        "max_process_cpu": 6.3
+      },
+      {
+        "name": "sysmond",
+        "mean_cpu_per_sample": 4.1125,
+        "max_process_cpu": 27.4
+      },
+      {
+        "name": "Google",
+        "mean_cpu_per_sample": 3.774999999999999,
+        "max_process_cpu": 15.5
+      },
+      {
+        "name": "WhatsApp",
+        "mean_cpu_per_sample": 2.9625,
+        "max_process_cpu": 3.8
+      }
+    ],
+    "recognized_competitors": [],
+    "raw_path": "/tmp/enola-owner-digest-v2/acceptance/cli-pairs/candidate-6/host-load.jsonl",
+    "raw_sha256": "6f68d12df8e3f5e5b6c5b8c8e45474fe61ca8134f9a14d8fb8372ff4ec04f5ec"
+  }
+]

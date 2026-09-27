@@ -1,0 +1,431 @@
+{
+  "hold": {
+    "mode": "current-roster",
+    "combined_authorized": true,
+    "worker_message": "msg_8cd499925e4d",
+    "start_utc": "2026-09-27T06:40:00+00:00",
+    "end_utc": "2026-09-27T07:15:00+00:00",
+    "participants": [
+      {
+        "handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "status": "held",
+        "message_id": "msg_8cd499925e4d",
+        "evidence_path": "/tmp/enola-owner-digest-v2/acceptance/coordination/msg_8cd499925e4d.json",
+        "sha256": "ef0f32a50cd73c1e13c6b6e75728e999592487449d7cbaea6f425c3530b089bd"
+      },
+      {
+        "handle": "term_f6d0d3d8-2dce-47a2-81db-44fd6bb8a1a8",
+        "status": "terminal-held",
+        "quote": "ACK: no heavy work during 2026-09-27 06:40\u201307:15 UTC.",
+        "evidence_path": "/tmp/enola-owner-digest-v2/acceptance/coordination/fsm-hold.json",
+        "sha256": "a84690727354b1d76ec04587aeff5e7cadc96ae2dee35ee940f2f6d83887628e"
+      },
+      {
+        "handle": "term_a8cbadf5-e45d-4154-acd4-7101cedffcdf",
+        "status": "terminal-held",
+        "quote": "ACK \u2014 2026-09-27 06:40\u201307:15 UTC is clear of heavy tests, builds, database work, and Docker jobs.",
+        "evidence_path": "/tmp/enola-owner-digest-v2/acceptance/coordination/codata-hold.json",
+        "sha256": "fbb252dc21ae3f9d80ad93319d53580beb5c38a46d891852e16d513b781ee931"
+      },
+      {
+        "handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+        "status": "terminal-held",
+        "quote": "T-001 \u043f\u0456\u0434\u0442\u0432\u0435\u0440\u0434\u0436\u0435\u043d\u043e: \u0442\u0438\u0445\u0435 \u0432\u0456\u043a\u043d\u043e 06:40\u201307:15 UTC.",
+        "evidence_path": "/tmp/enola-owner-digest-v2/acceptance/coordination/plugin-hold.json",
+        "sha256": "e7902435f8157b9ecba86e30898b1b3b4185c52a8fafdac146fec82538a6bcb4"
+      },
+      {
+        "handle": "term_b4d33c66-3033-42d6-8870-0852aa948bfd",
+        "status": "exited",
+        "evidence_path": "/tmp/enola-owner-digest-v2/acceptance/coordination/closed-coordinator.json",
+        "sha256": "2df379ab3251abb344a97bbcf622a1ce37783a742d55ddfc08ac9adb3c161d37"
+      }
+    ]
+  },
+  "runs": [
+    {
+      "arm": "baseline",
+      "repeat": 1,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-owner-digest-v2/acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "msg_8cd499925e4d"
+      ],
+      "start_utc": "2026-09-27T06:40:22.789063+00:00",
+      "monotonic_start": 944226.344700916,
+      "monotonic_end": 944306.048758791,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 676,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 312,
+          "max_gap_seconds": 0.2645150419557467
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T06:41:44.714129+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 1,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-owner-digest-v2/acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "msg_8cd499925e4d"
+      ],
+      "start_utc": "2026-09-27T06:41:44.714360+00:00",
+      "monotonic_start": 944308.162512333,
+      "monotonic_end": 944386.524320291,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 296,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 307,
+          "max_gap_seconds": 0.2627539170207456
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T06:43:05.189127+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 2,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-owner-digest-v2/acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "2",
+        "--quiet-message-id",
+        "msg_8cd499925e4d"
+      ],
+      "start_utc": "2026-09-27T06:43:05.189391+00:00",
+      "monotonic_start": 944388.699392875,
+      "monotonic_end": 944466.9129255,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 3096,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 306,
+          "max_gap_seconds": 0.26522099995054305
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T06:44:25.584403+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 2,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-owner-digest-v2/acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "2",
+        "--quiet-message-id",
+        "msg_8cd499925e4d"
+      ],
+      "start_utc": "2026-09-27T06:44:25.584758+00:00",
+      "monotonic_start": 944469.037696083,
+      "monotonic_end": 944548.535940041,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 4424,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 311,
+          "max_gap_seconds": 0.26495858293492347
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T06:45:47.207251+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 3,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-owner-digest-v2/acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "3",
+        "--quiet-message-id",
+        "msg_8cd499925e4d"
+      ],
+      "start_utc": "2026-09-27T06:45:47.207631+00:00",
+      "monotonic_start": 944550.714752291,
+      "monotonic_end": 944633.696300041,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 17592,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 325,
+          "max_gap_seconds": 0.26815575000364333
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T06:47:12.367164+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 3,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-owner-digest-v2/acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "3",
+        "--quiet-message-id",
+        "msg_8cd499925e4d"
+      ],
+      "start_utc": "2026-09-27T06:47:12.367525+00:00",
+      "monotonic_start": 944635.831316583,
+      "monotonic_end": 944714.595881625,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 1904,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 308,
+          "max_gap_seconds": 0.26470691699068993
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T06:48:33.266889+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 4,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-owner-digest-v2/acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "4",
+        "--quiet-message-id",
+        "msg_8cd499925e4d"
+      ],
+      "start_utc": "2026-09-27T06:48:33.267268+00:00",
+      "monotonic_start": 944716.759002166,
+      "monotonic_end": 944795.063278583,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 6422,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 307,
+          "max_gap_seconds": 0.26574066700413823
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T06:49:53.734628+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 4,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-owner-digest-v2/acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "4",
+        "--quiet-message-id",
+        "msg_8cd499925e4d"
+      ],
+      "start_utc": "2026-09-27T06:49:53.735067+00:00",
+      "monotonic_start": 944797.146093208,
+      "monotonic_end": 944877.08798075,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 2352,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 313,
+          "max_gap_seconds": 0.28130716702435166
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T06:51:15.759014+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 5,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-owner-digest-v2/acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "5",
+        "--quiet-message-id",
+        "msg_8cd499925e4d"
+      ],
+      "start_utc": "2026-09-27T06:51:15.759462+00:00",
+      "monotonic_start": 944879.218558958,
+      "monotonic_end": 944959.696850166,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 2399,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 315,
+          "max_gap_seconds": 0.26518625009339303
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T06:52:38.368473+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 5,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-owner-digest-v2/acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "5",
+        "--quiet-message-id",
+        "msg_8cd499925e4d"
+      ],
+      "start_utc": "2026-09-27T06:52:38.369027+00:00",
+      "monotonic_start": 944961.811852708,
+      "monotonic_end": 945040.425156416,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 1243,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 308,
+          "max_gap_seconds": 0.26659499993547797
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T06:53:59.096745+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 6,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-owner-digest-v2/acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "6",
+        "--quiet-message-id",
+        "msg_8cd499925e4d"
+      ],
+      "start_utc": "2026-09-27T06:53:59.097193+00:00",
+      "monotonic_start": 945042.544941625,
+      "monotonic_end": 945120.641799666,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 1126,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 306,
+          "max_gap_seconds": 0.2669901659246534
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T06:55:19.313488+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 6,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-owner-digest-v2/acceptance/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "6",
+        "--quiet-message-id",
+        "msg_8cd499925e4d"
+      ],
+      "start_utc": "2026-09-27T06:55:19.313981+00:00",
+      "monotonic_start": 945122.765123583,
+      "monotonic_end": 945202.7267315,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 804,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 313,
+          "max_gap_seconds": 0.26823562500067055
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T06:56:41.398418+00:00"
+    }
+  ]
+}
