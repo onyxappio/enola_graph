@@ -13,11 +13,17 @@ import (
 // need real DirEntries, so that path always keeps the filesystem reader.
 // Reuse is limited to the policy-bound discovery build; its existing retained-discovery
 // reobservation fence still validates these names before cross-run reuse.
+// The probe and cache are created together under one immutable policy in
+// newDiscovery; they must not be shared across policies. Within that build,
+// aliases use the first completed enumeration, including when the live directory
+// later changes or becomes unreadable. This reduces independent observations;
+// it does not itself prove that filesystem inputs stayed stable during a run.
 // No additional retained listing or relationship index is created.
 func aliasDirectoryEntries(ctx context.Context, dir string, scope *inputscope.Scope, namesOnly bool) ([]fs.DirEntry, error) {
-	if ctx != nil && namesOnly && scope != nil && scope.Policy != nil && discoveryWalkCacheFrom(ctx) != nil {
+	if ctx != nil && namesOnly && scope != nil && scope.Policy != nil && scope.Allowed(dir, true) && discoveryWalkCacheFrom(ctx) != nil {
 		if probe := probeFrom(ctx); probe != nil {
 			probe.mu.Lock()
+			// Map membership means complete: recordDir never stores partial listings.
 			names, complete := probe.dirs[absOverlayKey(dir)]
 			var entries []fs.DirEntry
 			if complete {

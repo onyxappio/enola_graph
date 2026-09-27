@@ -2,6 +2,7 @@ package tsextractor
 
 import (
 	"context"
+	"errors"
 	"gopkg.in/yaml.v3"
 	"io/fs"
 	"os"
@@ -81,6 +82,78 @@ func TestAliasObservedListingKeepsCapturedAbsentConfig(t *testing.T) {
 	roots := collectTSAliasRoots(ctx, root, scope)
 	if len(roots) != 1 || roots[0].aliases["@captured/"].replacement != "src/" {
 		t.Fatalf("captured config lost: %#v", roots)
+	}
+}
+
+func TestAliasObservedListingUsesFirstEnumerationUntilRecheck(t *testing.T) {
+	root := retentionRepo(t, map[string]string{"package.json": "{}"})
+	policy, err := graphinput.Build(root, graphinput.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	scope := &inputscope.Scope{Root: root, Policy: policy}
+	ctx, probe := aliasObservedContext(root, scope)
+	writeRetentionFile(t, root, "newpkg/tsconfig.json", `{"compilerOptions":{"paths":{"@new/*":["src/*"]}}}`)
+	// Alias discovery shares the first enumeration within this build. It does
+	// not silently mix a newer directory tree into that observation.
+	if roots := collectTSAliasRoots(ctx, root, scope); len(roots) != 0 {
+		t.Fatalf("mixed a later directory into snapshot: %v", roots)
+	}
+	if roots := collectTSAliasRoots(context.Background(), root, scope); len(roots) != 1 {
+		t.Fatalf("live control did not see new config: %v", roots)
+	}
+	d := &Discovery{root: root, scope: scope, walkedDirs: probe.dirSnapshot()}
+	if _, ok := d.reobserve(newFileOverlay(root, nil)); ok {
+		t.Fatal("changed names passed cross-run reobservation")
+	}
+}
+
+func TestAliasObservedEmptyDirectoryAndLaterReadFailure(t *testing.T) {
+	root := t.TempDir()
+	empty := filepath.Join(root, "empty")
+	if err := os.Mkdir(empty, 0700); err != nil {
+		t.Fatal(err)
+	}
+	policy, err := graphinput.Build(root, graphinput.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	scope := &inputscope.Scope{Root: root, Policy: policy}
+	ctx, probe := aliasObservedContext(root, scope)
+	if names, present := probe.dirSnapshot()[absOverlayKey(empty)]; !present || len(names) != 0 {
+		t.Fatal("completed empty enumeration not recorded")
+	}
+	if err := os.Remove(empty); err != nil {
+		t.Fatal(err)
+	}
+	if entries, err := aliasDirectoryEntries(ctx, empty, scope, true); err != nil || len(entries) != 0 {
+		t.Fatalf("first empty listing not reused: %v, %v", entries, err)
+	}
+	// A callback still receives the actual reader result, even after discovery.
+	if _, err := aliasDirectoryEntries(ctx, empty, scope, false); !errors.Is(err, fs.ErrNotExist) {
+		t.Fatalf("callback path hid directory removal: %v", err)
+	}
+	d := &Discovery{root: root, scope: scope, walkedDirs: probe.dirSnapshot()}
+	if _, ok := d.reobserve(newFileOverlay(root, nil)); ok {
+		t.Fatal("removed directory passed cross-run reobservation")
+	}
+}
+
+func TestAliasObservedListingHonorsDirectoryRefusal(t *testing.T) {
+	root := retentionRepo(t, map[string]string{"blocked/tsconfig.json": "{}"})
+	policy, err := graphinput.Build(root, graphinput.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, _ := aliasObservedContext(root, &inputscope.Scope{Root: root, Policy: policy})
+	// A probe must normally have one policy. Even if a future caller violates
+	// that invariant, an explicitly refused directory cannot expose its ledger.
+	refused, err := graphinput.Build(root, graphinput.Options{Exclude: []string{"blocked"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := aliasDirectoryEntries(ctx, filepath.Join(root, "blocked"), &inputscope.Scope{Root: root, Policy: refused}, true); !errors.Is(err, fs.ErrNotExist) {
+		t.Fatalf("cached listing bypassed directory exclusion: %v", err)
 	}
 }
 
