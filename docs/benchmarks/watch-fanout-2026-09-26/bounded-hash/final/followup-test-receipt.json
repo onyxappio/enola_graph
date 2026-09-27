@@ -1,0 +1,10 @@
+{
+  "source_followup": "c3c481e",
+  "focused_command": "go test ./internal/engine -run 'TestBufferedHash' -count=1",
+  "focused_exit": 0,
+  "focused_log_sha256": "c6aa0655adffbcde288dc77da7ad6642518563f1dea2920dbff39be4c06a9a6a",
+  "mutation_command": "go test -overlay /tmp/enola-hash-read-diagnostic/final/buffer-test-mutation-overlay.json ./internal/engine -run '^TestBufferedHashUsesSuppliedScratch$' -count=1",
+  "mutation_exit": 1,
+  "mutation_log_sha256": "91f729827b2de5d648d3bd122e8c0a17dab7d1f5b208a986af7d668bc6678c5c",
+  "note": "Commands and exits recorded from executed tool receipts; no rerun or reconstructed timing."
+}

@@ -1,4 +1,4 @@
-# Bounded file hashing: Stage38 candidate, not accepted or in main
+# Bounded file hashing: Stage38 accepted, publication pending
 
 Runtime source1af548c uses at most four readers, each with64KiB reusable scratch and reset SHA256 state; all bytes are read, errors remain omitted as before, and output folding preserves input-order duplicate-key behavior. No persistent index, metadata shortcut, schema or analysis-scope change.
 
@@ -11,3 +11,5 @@ Integration into source1af548c is byte-identical to the tested overlay source/te
 Go diagnostic/overlay sources are archived as .go.txt to avoid turning documentation into extra build packages; original bytes and paths are in archive-manifest.json. Full process argument logs, binaries, Product clones and NATS/state stores stay outside Git. Source-only and mixed/broad scenarios retain explicit pinned revisions; source-only is a historical target, not current main.
 
 Completed cohort: all12 arms exited0, all frozen gates and independent primary arithmetic pass; no-op2.006362→1.869400s (-6.8264%, six wins), body3.781358→3.636822s, structural4.188238→4.046660s. Independent cohort review is pending; not yet published. All participants released. Post-cohort c3c481e adds a deterministic buffer-use guard (focused tests pass; wrapper-removal mutation fails as expected) and comments only. See final/RESULTS.md for spreads, RSS increases and shared-host caveats.
+
+Final review msg_76f385a8252f independently accepts Stage38 with no blockers, explicitly correcting the prior rule/host/test references. Normal main publication is authorized; pre-push guards remain required.
