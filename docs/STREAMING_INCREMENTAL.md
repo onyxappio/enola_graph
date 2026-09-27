@@ -258,7 +258,11 @@ still bounds extraction and resolution; it is not weakened by this option.
 Fingerprints include every encoded node and edge field, including occurrence,
 properties and resolved targets, and ignore only record ordering. They are saved
 in the same pending generation as analysis state and promoted only after End is
-acknowledged. Unknown or versionless fingerprints do not prove equality and
+acknowledged. The experimental `resolved-owner-record-sha256-v2` format hashes
+each JSON record, sorts fixed-width type-tagged hashes (retaining duplicates),
+and hashes that sequence. This removes the second escaped JSON-array encoding;
+it adds no persistent relationship index. Unknown, obsolete or versionless
+fingerprints do not prove equality and
 therefore conservatively publish that owner. A removed contribution is an empty
 replacement. An input edit with an unchanged graph can currently publish an empty
 Begin/End generation; identical inputs remain fully silent.

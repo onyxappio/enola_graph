@@ -1,0 +1,18 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/enola-labs/enola/internal/graphsession
+cpu: Apple M1 Pro
+BenchmarkOwnerContributionDigest/16/legacy-10         	   14521	     80982 ns/op	  115945 B/op	     337 allocs/op
+BenchmarkOwnerContributionDigest/16/legacy-10         	   15259	     78903 ns/op	  115939 B/op	     337 allocs/op
+BenchmarkOwnerContributionDigest/16/legacy-10         	   15105	     79522 ns/op	  115943 B/op	     337 allocs/op
+BenchmarkOwnerContributionDigest/16/candidate-10      	   24727	     48382 ns/op	   29006 B/op	     279 allocs/op
+BenchmarkOwnerContributionDigest/16/candidate-10      	   24536	     48843 ns/op	   29006 B/op	     279 allocs/op
+BenchmarkOwnerContributionDigest/16/candidate-10      	   24768	     48782 ns/op	   29007 B/op	     279 allocs/op
+BenchmarkOwnerContributionDigest/256/legacy-10        	     964	   1260328 ns/op	 1755821 B/op	    5153 allocs/op
+BenchmarkOwnerContributionDigest/256/legacy-10        	     963	   1248687 ns/op	 1755868 B/op	    5153 allocs/op
+BenchmarkOwnerContributionDigest/256/legacy-10        	     955	   1254630 ns/op	 1755862 B/op	    5153 allocs/op
+BenchmarkOwnerContributionDigest/256/candidate-10     	    1494	    798275 ns/op	  458518 B/op	    4360 allocs/op
+BenchmarkOwnerContributionDigest/256/candidate-10     	    1450	    808948 ns/op	  458501 B/op	    4360 allocs/op
+BenchmarkOwnerContributionDigest/256/candidate-10     	    1496	    823799 ns/op	  458496 B/op	    4360 allocs/op
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	14.910s
