@@ -1726,26 +1726,12 @@ func (e *Engine) GetArtifact(name string) ([]byte, error) {
 	}
 }
 
-// computeFileHashes computes SHA-256 hashes for all files (used in snapshot
-// metadata). This stays sequential on purpose: hashing is I/O-bound and already
-// fast (~0.25s on Airflow), and parallelizing it measurably regressed — many
-// concurrent random reads contend worse than the sequential reads the OS
-// prefetches. The extraction parsing, not hashing, is the bottleneck worth
-// parallelizing.
+// computeFileHashes reads all content using a bounded scratch-buffer pool.
+// Earlier unbuffered parallel reads regressed on Airflow. This candidate must
+// pass full CLI measurements before its Product diagnostic is generalized.
 func (e *Engine) computeFileHashes(repoPath string, files []string) map[string]string {
 	tHash := time.Now()
-	var nbytes int64
-	hashes := make(map[string]string, len(files))
-	for _, relFile := range files {
-		absFile := filepath.Join(repoPath, relFile)
-		data, err := os.ReadFile(absFile)
-		if err != nil {
-			continue
-		}
-		nbytes += int64(len(data))
-		h := sha256.Sum256(data)
-		hashes[relFile] = hex.EncodeToString(h[:])
-	}
+	hashes, nbytes := boundedFileHashes(repoPath, files)
 	graphprofile.Since("engine_hash_files", tHash, fmt.Sprintf("n=%d hashed=%d bytes=%d", len(files), len(hashes), nbytes))
 	return hashes
 }
