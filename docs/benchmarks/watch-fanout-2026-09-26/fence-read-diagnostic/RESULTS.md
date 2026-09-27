@@ -1,0 +1,7 @@
+# Source-fence reader component experiment
+
+6801 current TypeScript-record paths,69,331,619 bytes; six alternating forward/reverse sweeps across six read modes, all36 complete digest/result vectors exactly equal. On this warm/shared host, ReadFile sequential median186.25ms /76.45MB allocated; buffered sequential173.35ms /2.38MB; four buffered readers94.37ms /2.57MB. These are aggregate allocated bytes, not live memory or RSS. No cold-storage or whole-CLI performance claim.
+
+This copies the earlier Stage38 component harness, selecting the exact current record-path set instead of the7779-owner subset. It does NOT implement or validate the before-End fence: the diagnostic omits failed reads like the engine hashing experiment, whereas the real fence must reject read errors and changed hashes, preserve source-change classification and never emit successful End on an invalid input. A production candidate must preserve those distinctions, bounded descriptors, joining all workers and accurate verified-file counters; no metadata shortcut or persistent index.
+
+Evidence supports investigating a modest four-reader bounded fence, not selecting eight workers from the fastest component row. Before promotion require focused failure/race/mutation controls, exact Product/history cold equality, current source review and prospective delta/RSS acceptance against Stage38. Stage38 publication remains pending its reviewer clarification; no new runtime change is in this experiment.

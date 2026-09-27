@@ -1,0 +1,38 @@
+{
+  "buffer-eight": {
+    "median_ms": 79.304625,
+    "median_alloc_bytes": 2841552.0,
+    "files": 6801,
+    "bytes": 69331619
+  },
+  "buffer-four": {
+    "median_ms": 94.3740625,
+    "median_alloc_bytes": 2574800.0,
+    "files": 6801,
+    "bytes": 69331619
+  },
+  "buffer-sequential": {
+    "median_ms": 173.35475,
+    "median_alloc_bytes": 2376344.0,
+    "files": 6801,
+    "bytes": 69331619
+  },
+  "buffer-two": {
+    "median_ms": 122.18227100000001,
+    "median_alloc_bytes": 2442896.0,
+    "files": 6801,
+    "bytes": 69331619
+  },
+  "readfile-four": {
+    "median_ms": 105.2894165,
+    "median_alloc_bytes": 76651752.0,
+    "files": 6801,
+    "bytes": 69331619
+  },
+  "readfile-sequential": {
+    "median_ms": 186.25185399999998,
+    "median_alloc_bytes": 76446824.0,
+    "files": 6801,
+    "bytes": 69331619
+  }
+}
