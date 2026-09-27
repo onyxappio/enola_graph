@@ -1,0 +1,26 @@
+{
+  "purpose": "ten mutation/restoration cycles, min300s watch correctness soak; shared host, no performance acceptance",
+  "source": "/tmp/enola-local-surface-guarded/history-recent/work-recent/product",
+  "source_revision": "fba38bab93c76a4da8df58cf45fd6847a468c315",
+  "source_status": "",
+  "runtime_revision": "7812838",
+  "watch_every": "500ms",
+  "changed_owner_scope": true,
+  "scope": "default full extractor profile with test-inclusive repository policy overlay",
+  "files": {
+    "/tmp/enola-stage36-watch/watch.py": "f1dc497dbb13c96497a84f91601fa0560ac7f4fc2007854217447b7a494756d9",
+    "/tmp/enola-stage36-watch/run.py": "94caf3654e6283630dca8fbaa558c447d2cb1aade55f7b1bfc406cfba9d14c79",
+    "/tmp/enola-stage36-watch/observer.go.txt": "a9f4aa789135ad98d8618f4d91d13eb62857098256f36f1885c53c4e4fb30dd0",
+    "/tmp/enola-stage36-watch/nats.conf.template": "b322751328170507aed75dca3164d21b54750381ad04d5b8fb1eaae7b3316d41",
+    "/tmp/enola-stage36-watch/product-graph-scope.yaml": "d7fcc27d5290935b7a660c92e75234009e320ae765fe6f6205832daabd0c5f9d",
+    "/tmp/enola-local-surface-guarded/enola-experimental": "f69bae0951bffec1fc9976e7c2fea7548d03f2ae56c62aa934c4a8d4275d08b1",
+    "/tmp/enola-stage9-product-watch-control/bin/benchobserver": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
+    "/tmp/enola-toolchain/bin/nats-server": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af",
+    "/tmp/enola-stage36-watch/soak.py": "c8fe372dd7dfae4be5211a1c64ab41987713f06d3df036f9a1995d4c294b3aeb"
+  },
+  "max_begin_bytes": 8000000,
+  "nats_max_payload": 8388608,
+  "soak_cycles": 10,
+  "soak_min_seconds": 300,
+  "session_id": 2298
+}
