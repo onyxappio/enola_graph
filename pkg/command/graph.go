@@ -276,7 +276,11 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 				r.cmdFatal("graph", "%v", err)
 			}
 		}
-		res, err := graphsession.Run(ctx, tgt.engine.Analysis(), repo, sink, opts)
+		run := graphsession.Run
+		if *summaryJSON && !*asJSON {
+			run = graphsession.RunSummary
+		}
+		res, err := run(ctx, tgt.engine.Analysis(), repo, sink, opts)
 		if err != nil {
 			r.cmdFatal("graph", "%s: %v", repo, err)
 		}

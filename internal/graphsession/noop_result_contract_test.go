@@ -67,3 +67,55 @@ func TestReconciledNoopRetainsResidentSnapshot(t *testing.T) {
 		t.Fatalf("no-op summary erased resident snapshot: before=%d after=%d", len(before), len(after))
 	}
 }
+
+func TestSummaryNoopAndManifestDeltaPreserveGraph(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{"src/io.ts": "export function get(){ return fetch('/x') }\n"})
+	opts := Options{StateDir: filepath.Join(root, ".enola", "summary"), AuthoritativeFiles: true}
+	cons := NewConsumer()
+	lastEvents := 0
+	run := func() *Result {
+		t.Helper()
+		sink := &graphstream.MemorySink{}
+		res, err := RunSummary(context.Background(), configScopeEngine(t, root), root, sink, opts)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if res.Facts != nil {
+			t.Fatal("summary returned facts")
+		}
+		lastEvents = len(sink.CloneRecords())
+		if err := cons.ApplyRecords(sink.CloneRecords()); err != nil {
+			t.Fatal(err)
+		}
+		return res
+	}
+	initial := run()
+	before, err := os.ReadFile(statePath(opts.StateDir))
+	if err != nil {
+		t.Fatal(err)
+	}
+	noop := run()
+	after, err := os.ReadFile(statePath(opts.StateDir))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if lastEvents != 0 || noop.ParsedFiles != 0 || noop.TargetGeneration != initial.TargetGeneration || !bytes.Equal(before, after) {
+		t.Fatal("summary noop changed checkpoint")
+	}
+	writeRepoFile(t, root, "package.json", `{"name":"app","type":"module","dependencies":{"some-lib":"^1.0.0"}}`)
+	delta := run()
+	if delta.Stats.FilesParsed != 0 {
+		t.Fatalf("fixture must exercise cached TS facts; parsed=%d", delta.Stats.FilesParsed)
+	}
+	if delta.TargetGeneration == noop.TargetGeneration {
+		t.Fatal("manifest change did not publish")
+	}
+	assertAppliedEqualsCold(t, cons, coldConsumer(t, configScopeEngine(t, root), root))
+	full, err := Run(context.Background(), configScopeEngine(t, root), root, &graphstream.MemorySink{}, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(full.Facts) == 0 {
+		t.Fatal("subsequent full API lost cached facts")
+	}
+}

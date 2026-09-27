@@ -30,6 +30,9 @@ var ErrInputsChanged = errors.New("inputs changed during transaction")
 
 // Options configure a graph session and its generation transactions.
 type Options struct {
+	// summaryOnly is set only by the one-shot RunSummary API. Resident snapshots
+	// and the default Run result must retain complete facts.
+	summaryOnly bool
 	// AuthoritativeFiles selects the v2 frozen file-owner contract.
 	AuthoritativeFiles bool
 	// ChangedOwnersOnly computes delta contributions before freezing publication scope.
@@ -388,6 +391,19 @@ func Run(ctx context.Context, eng *engine.Engine, repoPath string, sink graphstr
 	return r.reconcile(ctx, true)
 }
 
+// RunSummary executes the same analysis and delivery contract as Run, but omits
+// Facts from the returned result. It may avoid cloning cached contributions on
+// a proven no-publication run. It still fully decodes and validates durable state.
+func RunSummary(ctx context.Context, eng *engine.Engine, repoPath string, sink graphstream.Sink, opts Options) (*Result, error) {
+	opts.summaryOnly = true
+	r, err := OpenSession(ctx, eng, repoPath, sink, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Close()
+	return r.reconcile(ctx, false)
+}
+
 // OpenSession owns the single-writer lock and recovers durable delivery before use.
 func OpenSession(ctx context.Context, eng *engine.Engine, repoPath string, sink graphstream.Sink, opts Options) (*Resident, error) {
 	tr := graphprofile.StartNamed("open")
@@ -713,6 +729,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	fallbacks := append([]graphstream.Fallback(nil), s.extraFallbacks...)
 	s.work.FactAssemblies++
 	var allFacts []facts.Fact
+	var deferredTSFacts func()
 	var unreadable []string
 	stats := tsextractor.ExtractStats{}
 	earlyLocal := 0
@@ -1333,16 +1350,32 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			reuseTSCache := func() {
 				tsNoop = true
 				stats.CachedFiles = len(owned)
-				for _, rec := range prevRecs {
-					if rec != nil {
-						ff := cloneTagged(rec.Facts, repoID)
-						applyLocalIO(ff)
-						allFacts = append(allFacts, ff...)
+				assemble := func() {
+					for _, rec := range prevRecs {
+						if rec != nil {
+							ff := cloneTagged(rec.Facts, repoID)
+							applyLocalIO(ff)
+							allFacts = append(allFacts, ff...)
+						}
 					}
+					syn := cloneTagged(syntheticFactsFor(s.state, "typescript"), repoID)
+					allFacts = append(allFacts, syn...)
+					appendExtractorSynthetic(synByExt, "typescript", syn)
 				}
-				syn := cloneTagged(syntheticFactsFor(s.state, "typescript"), repoID)
-				allFacts = append(allFacts, syn...)
-				appendExtractorSynthetic(synByExt, "typescript", syn)
+				if s.opts.summaryOnly {
+					// Keep the original append position if a later extractor
+					// requires publication; ordering and full graph stay intact.
+					at := len(allFacts)
+					deferredTSFacts = func() {
+						tail := allFacts[at:]
+						allFacts = allFacts[:at:at]
+						assemble()
+						allFacts = append(allFacts, tail...)
+					}
+				} else {
+					assemble()
+				}
+
 				tsRecords = prevRecs
 			}
 			if !forceAll && !anyDirty(dirty) && len(scopeFiles) == 0 {
@@ -1867,6 +1900,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 
 	if !initial && (tsNoop || !hadTS) && !nonTSNeed && !s.began && !(s.deferBegin && len(s.replaceScope) > 0) {
 		s.skipPublish = true
+	}
+	if deferredTSFacts != nil && !s.skipPublish {
+		deferredTSFacts()
 	}
 	tr.Mark("assemble_new_files", fmt.Sprintf("new=%d ts_noop=%v non_ts_need=%v skip=%v facts=%d", len(newFiles), tsNoop, nonTSNeed, s.skipPublish, len(allFacts)))
 	if s.skipPublish {
