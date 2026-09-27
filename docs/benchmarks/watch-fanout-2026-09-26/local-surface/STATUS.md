@@ -36,3 +36,5 @@ Guarded full suite completed exit 0: 110 passing packages (104 cached), graphses
 Guarded broad history completed exit 0; all gates passed, delta parsed 1453. Both histories now supply 16 successful CLI calls with exact cold/delta/baseline equality and silent no-ops. Fresh correctness acceptance receipt binds the guarded binary to these results. New quiet interval requested for 15:50–16:55 UTC; waiting for explicit participant acknowledgments.
 
 Four participant holds verified for 15:50–16:55 UTC, including Codata terminal acknowledgment after dispatch_run_mismatch. Timing scheduled with caffeinate in session 10341, waiting for window start. No acceptance samples yet.
+
+Timing session10341 exited0, all12 arms completed; quiet window explicitly released. Computed Stage36 acceptance passed: body4.141125 ->3.777263 s (-8.78655%), six paired wins, no time/RSS gate violation. Independent source-only gate review requested; main still unchanged. Evidence in guarded/timing-20260927.

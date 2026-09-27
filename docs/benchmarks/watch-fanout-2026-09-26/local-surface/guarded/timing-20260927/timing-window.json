@@ -1,0 +1,37 @@
+{
+  "start_utc": "2026-09-27T15:50:00+00:00",
+  "end_utc": "2026-09-27T16:55:00+00:00",
+  "mode": "current-roster",
+  "combined_authorized": true,
+  "worker_message": "msg_91c959ad9f93",
+  "participants": [
+    {
+      "handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+      "status": "held",
+      "message_id": "msg_91c959ad9f93",
+      "evidence_path": "/tmp/enola-local-surface-guarded/coordination/reviewer-hold.json",
+      "sha256": "4b822b20183d96421d38817c79d260b93b7cd408c89422feefda29880810c592"
+    },
+    {
+      "handle": "term_f6d0d3d8-2dce-47a2-81db-44fd6bb8a1a8",
+      "status": "held",
+      "message_id": "msg_a377e90f389a",
+      "evidence_path": "/tmp/enola-local-surface-guarded/coordination/fsm-hold.json",
+      "sha256": "a7d62e24026fd32e32942df12a3b9630a47928bc86733e3f011694d0e906b0cd"
+    },
+    {
+      "handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+      "status": "held",
+      "message_id": "msg_4be56160f217",
+      "evidence_path": "/tmp/enola-local-surface-guarded/coordination/plugin-hold.json",
+      "sha256": "deff5a7d9e2c6d9945ffec5304f391e0116369cde411f5db91a2fdb6b01b51b5"
+    },
+    {
+      "handle": "term_a8cbadf5-e45d-4154-acd4-7101cedffcdf",
+      "status": "terminal-held",
+      "quote": "\u2022 Confirmed: I will keep 2026-09-27 15:50\u201316:55 UTC clear of heavy jobs and worker activity. I cover T-003\u2019s coder and reviewer; both have completed and have no work scheduled",
+      "evidence_path": "/tmp/enola-local-surface-guarded/coordination/codata-final-observation-11.json",
+      "sha256": "a480638d00b92d7ac5917764d9deedd7b040a3cb334cbd25bbaa7638514cf42e"
+    }
+  ]
+}

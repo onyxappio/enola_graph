@@ -1,0 +1,1747 @@
+{
+  "complete": true,
+  "paging_context": [
+    {
+      "arm": "baseline",
+      "repeat": 1,
+      "swap_pages": {
+        "Swapins": 100,
+        "Swapouts": 0
+      },
+      "pressure": {
+        "samples": 297,
+        "max_gap_seconds": 0.27327679202426225
+      },
+      "swapins_policy": "context only; no disqualification or bounded-latency claim"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 1,
+      "swap_pages": {
+        "Swapins": 96,
+        "Swapouts": 0
+      },
+      "pressure": {
+        "samples": 295,
+        "max_gap_seconds": 0.26529091596603394
+      },
+      "swapins_policy": "context only; no disqualification or bounded-latency claim"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 2,
+      "swap_pages": {
+        "Swapins": 108,
+        "Swapouts": 0
+      },
+      "pressure": {
+        "samples": 294,
+        "max_gap_seconds": 0.2653344999998808
+      },
+      "swapins_policy": "context only; no disqualification or bounded-latency claim"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 2,
+      "swap_pages": {
+        "Swapins": 104,
+        "Swapouts": 0
+      },
+      "pressure": {
+        "samples": 295,
+        "max_gap_seconds": 0.2671787500148639
+      },
+      "swapins_policy": "context only; no disqualification or bounded-latency claim"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 3,
+      "swap_pages": {
+        "Swapins": 44,
+        "Swapouts": 0
+      },
+      "pressure": {
+        "samples": 294,
+        "max_gap_seconds": 0.269766042008996
+      },
+      "swapins_policy": "context only; no disqualification or bounded-latency claim"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 3,
+      "swap_pages": {
+        "Swapins": 112,
+        "Swapouts": 0
+      },
+      "pressure": {
+        "samples": 294,
+        "max_gap_seconds": 0.26355658401735127
+      },
+      "swapins_policy": "context only; no disqualification or bounded-latency claim"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 4,
+      "swap_pages": {
+        "Swapins": 76,
+        "Swapouts": 0
+      },
+      "pressure": {
+        "samples": 293,
+        "max_gap_seconds": 0.2643446669680998
+      },
+      "swapins_policy": "context only; no disqualification or bounded-latency claim"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 4,
+      "swap_pages": {
+        "Swapins": 116,
+        "Swapouts": 0
+      },
+      "pressure": {
+        "samples": 296,
+        "max_gap_seconds": 0.2751883330056444
+      },
+      "swapins_policy": "context only; no disqualification or bounded-latency claim"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 5,
+      "swap_pages": {
+        "Swapins": 568,
+        "Swapouts": 0
+      },
+      "pressure": {
+        "samples": 296,
+        "max_gap_seconds": 0.26651304098777473
+      },
+      "swapins_policy": "context only; no disqualification or bounded-latency claim"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 5,
+      "swap_pages": {
+        "Swapins": 156,
+        "Swapouts": 0
+      },
+      "pressure": {
+        "samples": 298,
+        "max_gap_seconds": 0.2624238330172375
+      },
+      "swapins_policy": "context only; no disqualification or bounded-latency claim"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 6,
+      "swap_pages": {
+        "Swapins": 100,
+        "Swapouts": 0
+      },
+      "pressure": {
+        "samples": 305,
+        "max_gap_seconds": 0.26469508407171816
+      },
+      "swapins_policy": "context only; no disqualification or bounded-latency claim"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 6,
+      "swap_pages": {
+        "Swapins": 152,
+        "Swapouts": 0
+      },
+      "pressure": {
+        "samples": 310,
+        "max_gap_seconds": 0.2694197919918224
+      },
+      "swapins_policy": "context only; no disqualification or bounded-latency claim"
+    }
+  ],
+  "arms": {
+    "baseline": {
+      "initial": {
+        "seconds": {
+          "n": 6,
+          "median": 11.299933604022954,
+          "min": 11.23311379191,
+          "max": 11.707860750029795,
+          "values": [
+            11.251988250063732,
+            11.29543429100886,
+            11.304432917037047,
+            11.39931050001178,
+            11.23311379191,
+            11.707860750029795
+          ]
+        },
+        "rss_bytes": {
+          "n": 6,
+          "median": 1332092928.0,
+          "min": 1300824064.0,
+          "max": 1379401728.0,
+          "values": [
+            1318486016.0,
+            1345699840.0,
+            1300824064.0,
+            1302020096.0,
+            1379401728.0,
+            1373274112.0
+          ]
+        },
+        "first_batch_s": {
+          "n": 6,
+          "median": 7.7864305,
+          "min": 7.753293,
+          "max": 8.091544,
+          "values": [
+            7.753293,
+            7.771916,
+            7.785076,
+            7.819139,
+            7.787785,
+            8.091544
+          ]
+        },
+        "broker_end_s": {
+          "n": 6,
+          "median": 11.2005235,
+          "min": 11.13052,
+          "max": 11.617391,
+          "values": [
+            11.152836,
+            11.19424,
+            11.206807,
+            11.28899,
+            11.13052,
+            11.617391
+          ]
+        },
+        "consumer_end_s": {
+          "n": 6,
+          "median": 11.321347,
+          "min": 11.258603,
+          "max": 11.731976,
+          "values": [
+            11.27168,
+            11.316041,
+            11.326653,
+            11.411969,
+            11.258603,
+            11.731976
+          ]
+        },
+        "parsed_files": {
+          "n": 6,
+          "median": 6752.0,
+          "min": 6752,
+          "max": 6752,
+          "values": [
+            6752,
+            6752,
+            6752,
+            6752,
+            6752,
+            6752
+          ]
+        },
+        "files_read": {
+          "n": 6,
+          "median": 6804.0,
+          "min": 6804,
+          "max": 6804,
+          "values": [
+            6804,
+            6804,
+            6804,
+            6804,
+            6804,
+            6804
+          ]
+        },
+        "cached_files": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "graphql_parsed": {
+          "n": 6,
+          "median": 2.0,
+          "min": 2,
+          "max": 2,
+          "values": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        },
+        "summary_scans": {
+          "n": 6,
+          "median": 2269.5,
+          "min": 2255,
+          "max": 2288,
+          "values": [
+            2275,
+            2263,
+            2288,
+            2278,
+            2264,
+            2255
+          ]
+        },
+        "derived_indexes": {
+          "n": 6,
+          "median": 4459.5,
+          "min": 4441,
+          "max": 4474,
+          "values": [
+            4454,
+            4466,
+            4441,
+            4451,
+            4465,
+            4474
+          ]
+        },
+        "owner_scope_count": {
+          "n": 6,
+          "median": 11271.0,
+          "min": 11271,
+          "max": 11271,
+          "values": [
+            11271,
+            11271,
+            11271,
+            11271,
+            11271,
+            11271
+          ]
+        },
+        "payload_bytes_total": {
+          "n": 6,
+          "median": 104924670.0,
+          "min": 104924670,
+          "max": 104924670,
+          "values": [
+            104924670,
+            104924670,
+            104924670,
+            104924670,
+            104924670,
+            104924670
+          ]
+        },
+        "messages_observed": {
+          "n": 6,
+          "median": 3091.0,
+          "min": 3091,
+          "max": 3091,
+          "values": [
+            3091,
+            3091,
+            3091,
+            3091,
+            3091,
+            3091
+          ]
+        },
+        "ratio_to_initial": {
+          "n": 6,
+          "median": 1.0,
+          "min": 1.0,
+          "max": 1.0,
+          "values": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        }
+      },
+      "noop": {
+        "seconds": {
+          "n": 6,
+          "median": 2.0453958334983326,
+          "min": 2.0085433330386877,
+          "max": 2.12369708402548,
+          "values": [
+            2.0085433330386877,
+            2.047031291993335,
+            2.0437603750033304,
+            2.0380331249907613,
+            2.0494335420662537,
+            2.12369708402548
+          ]
+        },
+        "rss_bytes": {
+          "n": 6,
+          "median": 375734272.0,
+          "min": 356335616.0,
+          "max": 379666432.0,
+          "values": [
+            356335616.0,
+            367017984.0,
+            373358592.0,
+            378109952.0,
+            379666432.0,
+            379633664.0
+          ]
+        },
+        "parsed_files": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "files_read": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "cached_files": {
+          "n": 6,
+          "median": 6804.0,
+          "min": 6804,
+          "max": 6804,
+          "values": [
+            6804,
+            6804,
+            6804,
+            6804,
+            6804,
+            6804
+          ]
+        },
+        "graphql_parsed": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "summary_scans": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "derived_indexes": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "ratio_to_initial": {
+          "n": 6,
+          "median": 0.1810096307328617,
+          "min": 0.17850563726169116,
+          "max": 0.18244572075306845,
+          "values": [
+            0.17850563726169116,
+            0.18122643532376326,
+            0.18079282614196016,
+            0.17878564892049,
+            0.18244572075306845,
+            0.18139070231255316
+          ]
+        }
+      },
+      "body": {
+        "seconds": {
+          "n": 6,
+          "median": 4.141124916553963,
+          "min": 4.075866834027693,
+          "max": 4.450645833974704,
+          "values": [
+            4.075866834027693,
+            4.173819750081748,
+            4.145067292032763,
+            4.137182541075163,
+            4.100259708007798,
+            4.450645833974704
+          ]
+        },
+        "rss_bytes": {
+          "n": 6,
+          "median": 886571008.0,
+          "min": 853737472.0,
+          "max": 919191552.0,
+          "values": [
+            905199616.0,
+            894681088.0,
+            853737472.0,
+            856784896.0,
+            919191552.0,
+            878460928.0
+          ]
+        },
+        "broker_end_s": {
+          "n": 6,
+          "median": 4.056547500000001,
+          "min": 3.984709,
+          "max": 4.357811,
+          "values": [
+            3.984709,
+            4.074452,
+            4.063168,
+            4.049927,
+            4.007475,
+            4.357811
+          ]
+        },
+        "consumer_end_s": {
+          "n": 6,
+          "median": 4.0567685,
+          "min": 3.985017,
+          "max": 4.358095,
+          "values": [
+            3.985017,
+            4.074676,
+            4.063381,
+            4.050156,
+            4.007719,
+            4.358095
+          ]
+        },
+        "parsed_files": {
+          "n": 6,
+          "median": 21.0,
+          "min": 21,
+          "max": 21,
+          "values": [
+            21,
+            21,
+            21,
+            21,
+            21,
+            21
+          ]
+        },
+        "files_read": {
+          "n": 6,
+          "median": 21.0,
+          "min": 21,
+          "max": 21,
+          "values": [
+            21,
+            21,
+            21,
+            21,
+            21,
+            21
+          ]
+        },
+        "cached_files": {
+          "n": 6,
+          "median": 6783.0,
+          "min": 6783,
+          "max": 6783,
+          "values": [
+            6783,
+            6783,
+            6783,
+            6783,
+            6783,
+            6783
+          ]
+        },
+        "graphql_parsed": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "summary_scans": {
+          "n": 6,
+          "median": 127.0,
+          "min": 127,
+          "max": 127,
+          "values": [
+            127,
+            127,
+            127,
+            127,
+            127,
+            127
+          ]
+        },
+        "derived_indexes": {
+          "n": 6,
+          "median": 16.0,
+          "min": 16,
+          "max": 16,
+          "values": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ]
+        },
+        "owner_scope_count": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "payload_bytes_total": {
+          "n": 6,
+          "median": 1029.0,
+          "min": 1029,
+          "max": 1029,
+          "values": [
+            1029,
+            1029,
+            1029,
+            1029,
+            1029,
+            1029
+          ]
+        },
+        "messages_observed": {
+          "n": 6,
+          "median": 2.0,
+          "min": 2,
+          "max": 2,
+          "values": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        },
+        "ratio_to_initial": {
+          "n": 6,
+          "median": 0.3658458429935421,
+          "min": 0.36223525508966,
+          "max": 0.38014167822788447,
+          "values": [
+            0.36223525508966,
+            0.36951387990491863,
+            0.3666762696062075,
+            0.36293270027787095,
+            0.3650154163808767,
+            0.38014167822788447
+          ]
+        }
+      },
+      "structural": {
+        "seconds": {
+          "n": 6,
+          "median": 4.232406958471984,
+          "min": 4.1668732919497415,
+          "max": 4.414743083994836,
+          "values": [
+            4.212582584004849,
+            4.2727953750872985,
+            4.1668732919497415,
+            4.190994792035781,
+            4.252231332939118,
+            4.414743083994836
+          ]
+        },
+        "rss_bytes": {
+          "n": 6,
+          "median": 890503168.0,
+          "min": 841187328.0,
+          "max": 927432704.0,
+          "values": [
+            892567552.0,
+            884555776.0,
+            927432704.0,
+            922714112.0,
+            888438784.0,
+            841187328.0
+          ]
+        },
+        "first_batch_s": {
+          "n": 6,
+          "median": 3.4373685,
+          "min": 3.394611,
+          "max": 3.569867,
+          "values": [
+            3.426741,
+            3.496583,
+            3.394611,
+            3.399328,
+            3.447996,
+            3.569867
+          ]
+        },
+        "broker_end_s": {
+          "n": 6,
+          "median": 4.144458,
+          "min": 4.076999,
+          "max": 4.321165,
+          "values": [
+            4.123277,
+            4.18495,
+            4.076999,
+            4.097273,
+            4.165639,
+            4.321165
+          ]
+        },
+        "consumer_end_s": {
+          "n": 6,
+          "median": 4.144717,
+          "min": 4.077365,
+          "max": 4.321482,
+          "values": [
+            4.123541,
+            4.185236,
+            4.077365,
+            4.097623,
+            4.165893,
+            4.321482
+          ]
+        },
+        "parsed_files": {
+          "n": 6,
+          "median": 22.0,
+          "min": 22,
+          "max": 22,
+          "values": [
+            22,
+            22,
+            22,
+            22,
+            22,
+            22
+          ]
+        },
+        "files_read": {
+          "n": 6,
+          "median": 22.0,
+          "min": 22,
+          "max": 22,
+          "values": [
+            22,
+            22,
+            22,
+            22,
+            22,
+            22
+          ]
+        },
+        "cached_files": {
+          "n": 6,
+          "median": 6782.0,
+          "min": 6782,
+          "max": 6782,
+          "values": [
+            6782,
+            6782,
+            6782,
+            6782,
+            6782,
+            6782
+          ]
+        },
+        "graphql_parsed": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "summary_scans": {
+          "n": 6,
+          "median": 127.0,
+          "min": 127,
+          "max": 127,
+          "values": [
+            127,
+            127,
+            127,
+            127,
+            127,
+            127
+          ]
+        },
+        "derived_indexes": {
+          "n": 6,
+          "median": 16.0,
+          "min": 16,
+          "max": 16,
+          "values": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ]
+        },
+        "owner_scope_count": {
+          "n": 6,
+          "median": 1.0,
+          "min": 1,
+          "max": 1,
+          "values": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        "payload_bytes_total": {
+          "n": 6,
+          "median": 20957.0,
+          "min": 20957,
+          "max": 20957,
+          "values": [
+            20957,
+            20957,
+            20957,
+            20957,
+            20957,
+            20957
+          ]
+        },
+        "messages_observed": {
+          "n": 6,
+          "median": 3.0,
+          "min": 3,
+          "max": 3,
+          "values": [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
+        },
+        "ratio_to_initial": {
+          "n": 6,
+          "median": 0.375730373116289,
+          "min": 0.36765335868616356,
+          "max": 0.3785443120857141,
+          "values": [
+            0.37438561882438764,
+            0.37827632519525467,
+            0.36860524738660677,
+            0.36765335868616356,
+            0.3785443120857141,
+            0.3770751274081903
+          ]
+        }
+      }
+    },
+    "candidate": {
+      "initial": {
+        "seconds": {
+          "n": 6,
+          "median": 11.249997562495992,
+          "min": 11.031518292031251,
+          "max": 11.775037290994078,
+          "values": [
+            11.185124124982394,
+            11.314871000009589,
+            11.031518292031251,
+            11.136052166926675,
+            11.331641583004966,
+            11.775037290994078
+          ]
+        },
+        "rss_bytes": {
+          "n": 6,
+          "median": 1306124288.0,
+          "min": 1244168192.0,
+          "max": 1318289408.0,
+          "values": [
+            1287684096.0,
+            1304444928.0,
+            1244168192.0,
+            1307803648.0,
+            1309949952.0,
+            1318289408.0
+          ]
+        },
+        "first_batch_s": {
+          "n": 6,
+          "median": 7.750915,
+          "min": 7.600262,
+          "max": 8.290788,
+          "values": [
+            7.690049,
+            7.811781,
+            7.600262,
+            7.685187,
+            7.862945,
+            8.290788
+          ]
+        },
+        "broker_end_s": {
+          "n": 6,
+          "median": 11.146685999999999,
+          "min": 10.927394,
+          "max": 11.67297,
+          "values": [
+            11.083622,
+            11.20975,
+            10.927394,
+            11.038053,
+            11.21708,
+            11.67297
+          ]
+        },
+        "consumer_end_s": {
+          "n": 6,
+          "median": 11.2670915,
+          "min": 11.047335,
+          "max": 11.797414,
+          "values": [
+            11.203171,
+            11.331012,
+            11.047335,
+            11.158056,
+            11.338491,
+            11.797414
+          ]
+        },
+        "parsed_files": {
+          "n": 6,
+          "median": 6752.0,
+          "min": 6752,
+          "max": 6752,
+          "values": [
+            6752,
+            6752,
+            6752,
+            6752,
+            6752,
+            6752
+          ]
+        },
+        "files_read": {
+          "n": 6,
+          "median": 6804.0,
+          "min": 6804,
+          "max": 6804,
+          "values": [
+            6804,
+            6804,
+            6804,
+            6804,
+            6804,
+            6804
+          ]
+        },
+        "cached_files": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "graphql_parsed": {
+          "n": 6,
+          "median": 2.0,
+          "min": 2,
+          "max": 2,
+          "values": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        },
+        "summary_scans": {
+          "n": 6,
+          "median": 2280.0,
+          "min": 2263,
+          "max": 2294,
+          "values": [
+            2272,
+            2263,
+            2293,
+            2278,
+            2282,
+            2294
+          ]
+        },
+        "derived_indexes": {
+          "n": 6,
+          "median": 4449.0,
+          "min": 4435,
+          "max": 4466,
+          "values": [
+            4457,
+            4466,
+            4436,
+            4451,
+            4447,
+            4435
+          ]
+        },
+        "owner_scope_count": {
+          "n": 6,
+          "median": 11271.0,
+          "min": 11271,
+          "max": 11271,
+          "values": [
+            11271,
+            11271,
+            11271,
+            11271,
+            11271,
+            11271
+          ]
+        },
+        "payload_bytes_total": {
+          "n": 6,
+          "median": 104927762.0,
+          "min": 104927762,
+          "max": 104927762,
+          "values": [
+            104927762,
+            104927762,
+            104927762,
+            104927762,
+            104927762,
+            104927762
+          ]
+        },
+        "messages_observed": {
+          "n": 6,
+          "median": 3091.0,
+          "min": 3091,
+          "max": 3091,
+          "values": [
+            3091,
+            3091,
+            3091,
+            3091,
+            3091,
+            3091
+          ]
+        },
+        "ratio_to_initial": {
+          "n": 6,
+          "median": 1.0,
+          "min": 1.0,
+          "max": 1.0,
+          "values": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ]
+        }
+      },
+      "noop": {
+        "seconds": {
+          "n": 6,
+          "median": 2.0432063540210947,
+          "min": 2.040385958040133,
+          "max": 2.1210770839825273,
+          "values": [
+            2.0455245000775903,
+            2.040807457990013,
+            2.1210770839825273,
+            2.040385958040133,
+            2.040888207964599,
+            2.079144458984956
+          ]
+        },
+        "rss_bytes": {
+          "n": 6,
+          "median": 374841344.0,
+          "min": 365133824.0,
+          "max": 380157952.0,
+          "values": [
+            373440512.0,
+            365133824.0,
+            376242176.0,
+            380157952.0,
+            367116288.0,
+            379781120.0
+          ]
+        },
+        "parsed_files": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "files_read": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "cached_files": {
+          "n": 6,
+          "median": 6804.0,
+          "min": 6804,
+          "max": 6804,
+          "values": [
+            6804,
+            6804,
+            6804,
+            6804,
+            6804,
+            6804
+          ]
+        },
+        "graphql_parsed": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "summary_scans": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "derived_indexes": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "ratio_to_initial": {
+          "n": 6,
+          "median": 0.18162204142543112,
+          "min": 0.17657221863536277,
+          "max": 0.19227426613748289,
+          "values": [
+            0.18287901655993558,
+            0.18036506629092666,
+            0.19227426613748289,
+            0.1832234554450043,
+            0.18010525597857718,
+            0.17657221863536277
+          ]
+        }
+      },
+      "body": {
+        "seconds": {
+          "n": 6,
+          "median": 3.777263000025414,
+          "min": 3.727589667076245,
+          "max": 3.867222666973248,
+          "values": [
+            3.727589667076245,
+            3.7891234169946983,
+            3.7654025830561295,
+            3.744173292070627,
+            3.8002755000488833,
+            3.867222666973248
+          ]
+        },
+        "rss_bytes": {
+          "n": 6,
+          "median": 893476864.0,
+          "min": 857669632.0,
+          "max": 936329216.0,
+          "values": [
+            857669632.0,
+            912982016.0,
+            936329216.0,
+            863682560.0,
+            873971712.0,
+            930250752.0
+          ]
+        },
+        "broker_end_s": {
+          "n": 6,
+          "median": 3.6869625,
+          "min": 3.640655,
+          "max": 3.78007,
+          "values": [
+            3.640655,
+            3.69909,
+            3.674835,
+            3.651318,
+            3.708668,
+            3.78007
+          ]
+        },
+        "consumer_end_s": {
+          "n": 6,
+          "median": 3.687207,
+          "min": 3.640875,
+          "max": 3.78033,
+          "values": [
+            3.640875,
+            3.69936,
+            3.675054,
+            3.651585,
+            3.708894,
+            3.78033
+          ]
+        },
+        "parsed_files": {
+          "n": 6,
+          "median": 1.0,
+          "min": 1,
+          "max": 1,
+          "values": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        "files_read": {
+          "n": 6,
+          "median": 1.0,
+          "min": 1,
+          "max": 1,
+          "values": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        "cached_files": {
+          "n": 6,
+          "median": 6803.0,
+          "min": 6803,
+          "max": 6803,
+          "values": [
+            6803,
+            6803,
+            6803,
+            6803,
+            6803,
+            6803
+          ]
+        },
+        "graphql_parsed": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "summary_scans": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "derived_indexes": {
+          "n": 6,
+          "median": 1.0,
+          "min": 1,
+          "max": 1,
+          "values": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        "owner_scope_count": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "payload_bytes_total": {
+          "n": 6,
+          "median": 1013.0,
+          "min": 1013,
+          "max": 1013,
+          "values": [
+            1013,
+            1013,
+            1013,
+            1013,
+            1013,
+            1013
+          ]
+        },
+        "messages_observed": {
+          "n": 6,
+          "median": 2.0,
+          "min": 2,
+          "max": 2,
+          "values": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ]
+        },
+        "ratio_to_initial": {
+          "n": 6,
+          "median": 0.3351242180304722,
+          "min": 0.32842551334686837,
+          "max": 0.34133130937888334,
+          "values": [
+            0.3332631471429569,
+            0.3348799484317132,
+            0.34133130937888334,
+            0.33622088294364944,
+            0.3353684876292312,
+            0.32842551334686837
+          ]
+        }
+      },
+      "structural": {
+        "seconds": {
+          "n": 6,
+          "median": 4.23131112504052,
+          "min": 4.164333416032605,
+          "max": 4.38465783407446,
+          "values": [
+            4.1983367500361055,
+            4.291530999937095,
+            4.170223291963339,
+            4.164333416032605,
+            4.2642855000449345,
+            4.38465783407446
+          ]
+        },
+        "rss_bytes": {
+          "n": 6,
+          "median": 852180992.0,
+          "min": 814022656.0,
+          "max": 960036864.0,
+          "values": [
+            960036864.0,
+            864993280.0,
+            814022656.0,
+            838041600.0,
+            876642304.0,
+            839368704.0
+          ]
+        },
+        "first_batch_s": {
+          "n": 6,
+          "median": 3.4182755,
+          "min": 3.383673,
+          "max": 3.555884,
+          "values": [
+            3.403011,
+            3.450412,
+            3.383673,
+            3.39698,
+            3.43354,
+            3.555884
+          ]
+        },
+        "broker_end_s": {
+          "n": 6,
+          "median": 4.1355059999999995,
+          "min": 4.078841,
+          "max": 4.304165,
+          "values": [
+            4.104502,
+            4.190412,
+            4.078841,
+            4.081427,
+            4.16651,
+            4.304165
+          ]
+        },
+        "consumer_end_s": {
+          "n": 6,
+          "median": 4.135771,
+          "min": 4.079116,
+          "max": 4.304486,
+          "values": [
+            4.10478,
+            4.190666,
+            4.079116,
+            4.081754,
+            4.166762,
+            4.304486
+          ]
+        },
+        "parsed_files": {
+          "n": 6,
+          "median": 22.0,
+          "min": 22,
+          "max": 22,
+          "values": [
+            22,
+            22,
+            22,
+            22,
+            22,
+            22
+          ]
+        },
+        "files_read": {
+          "n": 6,
+          "median": 22.0,
+          "min": 22,
+          "max": 22,
+          "values": [
+            22,
+            22,
+            22,
+            22,
+            22,
+            22
+          ]
+        },
+        "cached_files": {
+          "n": 6,
+          "median": 6782.0,
+          "min": 6782,
+          "max": 6782,
+          "values": [
+            6782,
+            6782,
+            6782,
+            6782,
+            6782,
+            6782
+          ]
+        },
+        "graphql_parsed": {
+          "n": 6,
+          "median": 0.0,
+          "min": 0,
+          "max": 0,
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "summary_scans": {
+          "n": 6,
+          "median": 127.0,
+          "min": 127,
+          "max": 127,
+          "values": [
+            127,
+            127,
+            127,
+            127,
+            127,
+            127
+          ]
+        },
+        "derived_indexes": {
+          "n": 6,
+          "median": 16.0,
+          "min": 16,
+          "max": 16,
+          "values": [
+            16,
+            16,
+            16,
+            16,
+            16,
+            16
+          ]
+        },
+        "owner_scope_count": {
+          "n": 6,
+          "median": 1.0,
+          "min": 1,
+          "max": 1,
+          "values": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ]
+        },
+        "payload_bytes_total": {
+          "n": 6,
+          "median": 20961.0,
+          "min": 20961,
+          "max": 20961,
+          "values": [
+            20961,
+            20961,
+            20961,
+            20961,
+            20961,
+            20961
+          ]
+        },
+        "messages_observed": {
+          "n": 6,
+          "median": 3.0,
+          "min": 3,
+          "max": 3,
+          "values": [
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ]
+        },
+        "ratio_to_initial": {
+          "n": 6,
+          "median": 0.3758333477512877,
+          "min": 0.3723689127870521,
+          "max": 0.3792823621173814,
+          "values": [
+            0.37535003663115035,
+            0.3792823621173814,
+            0.3780280448771725,
+            0.3739506023867592,
+            0.376316658871425,
+            0.3723689127870521
+          ]
+        }
+      }
+    }
+  },
+  "comparisons": {
+    "candidate_vs_baseline": {
+      "initial": {
+        "median_percent_change": -0.44191446849903837,
+        "paired_percent_changes": [
+          -0.5942427559943342,
+          0.1720758007171197,
+          -2.414226587115964,
+          -2.3094233031448086,
+          0.8771191400724909,
+          0.5737729752560705
+        ],
+        "ranges_overlap": true
+      },
+      "noop": {
+        "median_percent_change": -0.10704429144617889,
+        "paired_percent_changes": [
+          1.8411933877948483,
+          -0.3040419571339936,
+          3.78306135713542,
+          0.11544626142336867,
+          -0.41696078093067523,
+          -2.097880407504915
+        ],
+        "ranges_overlap": true
+      },
+      "body": {
+        "median_percent_change": -8.78654771011681,
+        "paired_percent_changes": [
+          -8.544861280644122,
+          -9.216888991900396,
+          -9.159434147339118,
+          -9.499441832759958,
+          -7.316224564337858,
+          -13.108730480142983
+        ],
+        "ranges_overlap": false
+      },
+      "structural": {
+        "median_percent_change": -0.02589149489204967,
+        "paired_percent_changes": [
+          -0.338173405141895,
+          0.43848635858003693,
+          0.08039601348257541,
+          -0.6361586526864915,
+          0.283478629500733,
+          -0.68147227025388
+        ],
+        "ranges_overlap": true
+      }
+    }
+  },
+  "stage_decisions": {
+    "candidate_vs_baseline": {
+      "engineering_accepted": true,
+      "primary_scenario": "body",
+      "mean_scenario_median_ratio": 0.9765965050876149,
+      "aggregate_median_seconds_percent_change": -1.9203735636143082,
+      "qualifying_scenarios": [
+        "body"
+      ],
+      "time_regressions": [],
+      "rss_regressions": [],
+      "scope": "limited stage only; broader startup/delta/watch goal remains open"
+    }
+  },
+  "promotion_decision": {
+    "engineering_accepted": true,
+    "primary_scenario": "body",
+    "mean_scenario_median_ratio": 0.9765965050876149,
+    "aggregate_median_seconds_percent_change": -1.9203735636143082,
+    "qualifying_scenarios": [
+      "body"
+    ],
+    "time_regressions": [],
+    "rss_regressions": [],
+    "scope": "limited stage only; broader startup/delta/watch goal remains open"
+  },
+  "promotion_rule": "PROMOTION_RULE.md; combined versus published baseline; prior controls not part of this cohort",
+  "note": "Fresh CLI through process exit including producer ACKs; broker/consumer boundaries separate. Six counterbalanced pairs are descriptive, not a significance test. No watch or near-zero startup claim."
+}
