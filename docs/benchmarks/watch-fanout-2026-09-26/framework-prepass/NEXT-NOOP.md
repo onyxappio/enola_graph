@@ -29,3 +29,20 @@ file additions/deletions/renames, policy/config edits and cold graph equality.
 These are investigation targets, not measured savings or accepted designs.
 Resident-session reuse does not prove fresh-CLI performance. Do not change the
 frozen Stage32 binary while its cohort is running.
+
+## Source audit after publication (2026-09-27)
+
+A shortcut based only on State.ConfigHash, file hashes and inventory membership
+is not yet justified. `TSExtractor.Discovery.reobserve` independently proves
+three input classes: stat presence/type, uncaptured live side-read bytes (including
+external extends), and walked directory membership/type. The retained Discovery
+contains those observations in memory; State's TSContext/TSFileContext/TSFileBase
+store derived projections, not the full observation proof. A fresh process cannot
+recover the former from the latter. Skipping DiscoveryFor/SessionContext on these
+existing durable hashes alone would drop an existing correctness boundary.
+
+Do not implement that shortcut or call its estimated 0.278s a saving. Next inspect
+whether discovery and configuration capture can share already-performed reads
+within the same fresh run, retaining side-input observation and the existing
+post-run fence. This avoids requiring a new durable dependency structure. State
+decode and graph-input-policy construction remain independent larger targets.
