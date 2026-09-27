@@ -1,0 +1,53 @@
+{
+  "id": "95bd7096-16c4-4ac7-b797-ddf5237ddd80",
+  "ok": true,
+  "result": {
+    "runId": "run_4bc01fa14716",
+    "deliveryId": "delivery_021621328d73",
+    "messages": [
+      {
+        "id": "msg_c3c044522c6b",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_f6d0d3d8-2dce-47a2-81db-44fd6bb8a1a8",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "ACK: no heavy work 13:20–14:25 UTC",
+        "body": "Confirmed: I will run no heavy work during 2026-09-27 13:20–14:25 UTC. I could not retrieve msg_96392f5ec301 because my prior dispatch is settled and I am not retrying fenced mailbox checks. I cover no other workers.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": null,
+        "payload": null,
+        "created_at": "2026-09-27T13:13:45Z",
+        "delivered_at": null
+      },
+      {
+        "id": "msg_1a9db1843355",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_a8cbadf5-e45d-4154-acd4-7101cedffcdf",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "ACK quiet interval 13:20-14:25 UTC",
+        "body": "Confirmed: no heavy tests, builds, database work, or Docker workload from T-003 during 2026-09-27 13:20–14:25 UTC, including covered workers. The coder is idle and the reviewer has completed source-only review with PASS; I will keep remote DB acceptance outside this interval. Reviewer terminal remains retained for possible follow-up.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": null,
+        "payload": null,
+        "created_at": "2026-09-27T13:13:49Z",
+        "delivered_at": null
+      }
+    ],
+    "count": 2,
+    "replayed": true,
+    "acknowledged": null,
+    "timedOut": false,
+    "cancelled": false,
+    "connectionLost": false,
+    "mutation": {
+      "requestId": "3853af49-bbdc-4bcc-8efd-8a8c6eb582a6",
+      "replayed": false
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}

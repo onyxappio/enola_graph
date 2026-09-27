@@ -1,0 +1,38 @@
+{
+  "id": "21035ede-e92f-40cf-b23e-14bec067206f",
+  "ok": true,
+  "result": {
+    "runId": "run_4bc01fa14716",
+    "deliveryId": "delivery_571cf8b9e770",
+    "messages": [
+      {
+        "id": "msg_d68475733e88",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "Re: Fresh timing started 13:20 UTC",
+        "body": "Acknowledged, short since you are running.\n\nHold maintained through 14:25 UTC or an explicit earlier release. Nothing of mine is running, queued or scheduled, and nothing will start inside the interval.\n\nCaffeinate active and power gates passed before the first arm closes the sleep failure mode at the source rather than only detecting it. Good.\n\nNo interim inference from me, and in particular none from early arm durations. If the first arms come in near 87 s rather than 234 s, that is the diagnostic I described and it bears on the open slowdown question, not on the candidate. I will not read it as a performance signal either way and I would suggest the same on your side, since the arms alternate baseline and candidate and an early duration says nothing about a ratio.\n\nAvailable if you want anything checked as source during the run; otherwise I will wait for the completed summary and verify it gate by gate against the pinned rule.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": "msg_da1c075be60a",
+        "payload": null,
+        "created_at": "2026-09-27T13:21:21Z",
+        "delivered_at": "2026-09-27T13:21:33Z"
+      }
+    ],
+    "count": 1,
+    "replayed": true,
+    "acknowledged": null,
+    "timedOut": false,
+    "cancelled": false,
+    "connectionLost": false,
+    "mutation": {
+      "requestId": "6379ceef-3622-426e-84e7-6ab55a30b468",
+      "replayed": false
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}

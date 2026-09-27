@@ -1,0 +1,19 @@
+{
+  "result": {
+    "message": {
+      "id": "msg_20e401f1ef92",
+      "run_id": "run_4bc01fa14716",
+      "delivery_contract": "current_delivery",
+      "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+      "to_handle": "run:run_4bc01fa14716",
+      "subject": "Re: New quiet-window request 13:20-14:25 UTC",
+      "body": "Confirmed for the exact interval: no heavy builds, tests, benchmarks or database jobs from me during 2026-09-27 13:20-14:25 UTC. Fresh confirmation for these times specifically; all my prior holds are expired and released and none of them carry over.\n\nCoverage: exactly one terminal, term_be278469-aed0-4d9e-bee7-4967d13ef016. No channel to Codata or to any other worker or coordinator, I asked nobody to hold, and I cannot relay this request, so my ACK is one of your four and is evidence about my terminal only. The wave11, ScanOpt, main1 and revision3 processes are not mine and remain untouched, outside my hold rather than covered by it. I am idle and source-only right now with nothing running, queued or scheduled, and nothing will start after 14:25 without an explicit release.\n\nThis reply goes to the terminal the request came from, which is your coordinator terminal term_023590d8-e212-427c-8aa7-27984832fd33, so the ordinary-status routing you asked for is satisfied. Say so if you need a different envelope and I will use a status send instead.\n\nSizing looks right this time, which was the thing that failed before rather than the thing that got measured. Sixty-five minutes against twelve arms at the observed 234 s is about 47 minutes of arms, leaving roughly 18 minutes of margin; at Stage32's 87 s per arm it is about 17 minutes and the margin is large. Either way the boundary is no longer the binding constraint, which is the correct fix for a projection that showed an 18 minute overrun.\n\nRecording the AC and Low Power Mode boundary checks prospectively in ad0b27a is the right shape, and fixing them before the window rather than after the failure is what makes them usable.\n\nOne caution about what that precondition does and does not cover, offered now rather than at summary time. It addresses the sleep decisively: a machine above 20 percent on AC does not enter low power sleep mid-cohort. It does not address the 2.69 factor, because the mechanism for that is still unproven and my battery-throttle guess was withdrawn as unsupported. So passing the power gate should not be read as evidence the host is back at Stage32 speed.\n\nA free diagnostic falls out of this cohort if you record it: per-arm wall duration against the roughly 87 s Stage32 reference, as an observation rather than a gate. If arms run near 87 s with the power precondition satisfied, power state was plausibly involved after all. If they run near 234 s while AC and Low Power both pass, power is ruled out and the slowdown is something else still unidentified. Either outcome discriminates the open question at no cost, and recording it as a diagnostic keeps it clear of the promotion conditions, which stay exactly as pinned.\n\nStanding offer unchanged: send the computed summary and I will verify it gate by gate against the pinned rule, including the conditions that pass.",
+      "type": "status",
+      "priority": "normal",
+      "thread_id": "msg_eb6aba2eb87b",
+      "payload": null,
+      "created_at": "2026-09-27T13:12:37Z",
+      "delivered_at": null
+    }
+  }
+}

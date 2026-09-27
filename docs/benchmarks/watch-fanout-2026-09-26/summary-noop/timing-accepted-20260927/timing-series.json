@@ -1,0 +1,581 @@
+{
+  "hold": {
+    "mode": "current-roster",
+    "combined_authorized": true,
+    "worker_message": "msg_20e401f1ef92",
+    "start_utc": "2026-09-27T13:20:00+00:00",
+    "end_utc": "2026-09-27T14:25:00+00:00",
+    "participants": [
+      {
+        "handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "status": "held",
+        "message_id": "msg_20e401f1ef92",
+        "evidence_path": "/tmp/enola-summary-noop/acceptance-v2/coordination/msg_20e401f1ef92.json",
+        "sha256": "e5dc9fdeeace0b34ec51288c8c823506422449517cf3e24c09ef48d7cc858fdb"
+      },
+      {
+        "handle": "term_f6d0d3d8-2dce-47a2-81db-44fd6bb8a1a8",
+        "status": "held",
+        "message_id": "msg_c3c044522c6b",
+        "evidence_path": "/tmp/enola-summary-noop/acceptance-v2/coordination/msg_c3c044522c6b.json",
+        "sha256": "045a9a81a951446f3d91b756da337b589406509b2e7c75314feebfb0c4f8ff47"
+      },
+      {
+        "handle": "term_a8cbadf5-e45d-4154-acd4-7101cedffcdf",
+        "status": "held",
+        "message_id": "msg_1a9db1843355",
+        "evidence_path": "/tmp/enola-summary-noop/acceptance-v2/coordination/msg_1a9db1843355.json",
+        "sha256": "a14d6cd70e55ddde541b3ba195d40c757dfbd901ce138c7867c62b10f2379cd6"
+      },
+      {
+        "handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+        "status": "held",
+        "message_id": "msg_d4f479e3a40c",
+        "evidence_path": "/tmp/enola-summary-noop/acceptance-v2/coordination/msg_d4f479e3a40c.json",
+        "sha256": "1ff0900b1de9cd6fed216dbcd3ec316d639d5671b4a09eaaa3db70edf8c7a9f6"
+      }
+    ]
+  },
+  "runs": [
+    {
+      "arm": "baseline",
+      "repeat": 1,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-summary-noop/acceptance-v2/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "msg_20e401f1ef92"
+      ],
+      "start_utc": "2026-09-27T13:20:00.072050+00:00",
+      "monotonic_start": 952751.659683416,
+      "monotonic_end": 952828.38281725,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 588,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 300,
+          "max_gap_seconds": 0.26670254208147526
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 63,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 65,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T13:21:19.126757+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 1,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-summary-noop/acceptance-v2/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "1",
+        "--quiet-message-id",
+        "msg_20e401f1ef92"
+      ],
+      "start_utc": "2026-09-27T13:21:19.126958+00:00",
+      "monotonic_start": 952830.560621916,
+      "monotonic_end": 952907.801823833,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 624,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 302,
+          "max_gap_seconds": 0.26678504201117903
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 65,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 67,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T13:22:38.548106+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 2,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-summary-noop/acceptance-v2/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "2",
+        "--quiet-message-id",
+        "msg_20e401f1ef92"
+      ],
+      "start_utc": "2026-09-27T13:22:38.548343+00:00",
+      "monotonic_start": 952909.948114291,
+      "monotonic_end": 952987.071420208,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 304,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 302,
+          "max_gap_seconds": 0.26471474999561906
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 67,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 68,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T13:23:57.816563+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 2,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-summary-noop/acceptance-v2/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "2",
+        "--quiet-message-id",
+        "msg_20e401f1ef92"
+      ],
+      "start_utc": "2026-09-27T13:23:57.816797+00:00",
+      "monotonic_start": 952989.224709958,
+      "monotonic_end": 953066.79724125,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 492,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 304,
+          "max_gap_seconds": 0.2666266669984907
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 68,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 70,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T13:25:17.545536+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 3,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-summary-noop/acceptance-v2/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "3",
+        "--quiet-message-id",
+        "msg_20e401f1ef92"
+      ],
+      "start_utc": "2026-09-27T13:25:17.545815+00:00",
+      "monotonic_start": 953068.968137875,
+      "monotonic_end": 953145.220593416,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 668,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 299,
+          "max_gap_seconds": 0.2670152079081163
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 70,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 71,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T13:26:35.966336+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 3,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-summary-noop/acceptance-v2/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "3",
+        "--quiet-message-id",
+        "msg_20e401f1ef92"
+      ],
+      "start_utc": "2026-09-27T13:26:35.966600+00:00",
+      "monotonic_start": 953147.376872291,
+      "monotonic_end": 953223.104768,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 380,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 296,
+          "max_gap_seconds": 0.26420654205139726
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 71,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 73,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T13:27:53.849784+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 4,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-summary-noop/acceptance-v2/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "4",
+        "--quiet-message-id",
+        "msg_20e401f1ef92"
+      ],
+      "start_utc": "2026-09-27T13:27:53.850083+00:00",
+      "monotonic_start": 953225.273701041,
+      "monotonic_end": 953302.481898,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 604,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 302,
+          "max_gap_seconds": 0.2656419579870999
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 73,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 74,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T13:29:13.227012+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 4,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-summary-noop/acceptance-v2/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "4",
+        "--quiet-message-id",
+        "msg_20e401f1ef92"
+      ],
+      "start_utc": "2026-09-27T13:29:13.227350+00:00",
+      "monotonic_start": 953304.654776166,
+      "monotonic_end": 953381.977675458,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 492,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 303,
+          "max_gap_seconds": 0.2643219999736175
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 74,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 75,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T13:30:32.724106+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 5,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-summary-noop/acceptance-v2/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "5",
+        "--quiet-message-id",
+        "msg_20e401f1ef92"
+      ],
+      "start_utc": "2026-09-27T13:30:32.724466+00:00",
+      "monotonic_start": 953384.127914333,
+      "monotonic_end": 953461.20908175,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 336,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 302,
+          "max_gap_seconds": 0.2652927919989452
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 75,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 77,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T13:31:51.955743+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 5,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-summary-noop/acceptance-v2/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "5",
+        "--quiet-message-id",
+        "msg_20e401f1ef92"
+      ],
+      "start_utc": "2026-09-27T13:31:51.956089+00:00",
+      "monotonic_start": 953463.396548916,
+      "monotonic_end": 953539.887056875,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 284,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 299,
+          "max_gap_seconds": 0.2684679579688236
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 77,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 78,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T13:33:10.633651+00:00"
+    },
+    {
+      "arm": "candidate",
+      "repeat": 6,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-summary-noop/acceptance-v2/cli-pairs/run-arm.py",
+        "--arm",
+        "candidate",
+        "--repeat",
+        "6",
+        "--quiet-message-id",
+        "msg_20e401f1ef92"
+      ],
+      "start_utc": "2026-09-27T13:33:10.633982+00:00",
+      "monotonic_start": 953542.080376333,
+      "monotonic_end": 953618.840253666,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 579,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 301,
+          "max_gap_seconds": 0.26529595896136016
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 78,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 80,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T13:34:29.589441+00:00"
+    },
+    {
+      "arm": "baseline",
+      "repeat": 6,
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/enola-summary-noop/acceptance-v2/cli-pairs/run-arm.py",
+        "--arm",
+        "baseline",
+        "--repeat",
+        "6",
+        "--quiet-message-id",
+        "msg_20e401f1ef92"
+      ],
+      "start_utc": "2026-09-27T13:34:29.589790+00:00",
+      "monotonic_start": 953621.036364125,
+      "monotonic_end": 953697.525432166,
+      "memory_evidence": {
+        "swap_pages": {
+          "Swapins": 579,
+          "Swapouts": 0
+        },
+        "pressure": {
+          "samples": 300,
+          "max_gap_seconds": 0.2691933329915628
+        },
+        "swapins_policy": "context only; no disqualification or bounded-latency claim"
+      },
+      "power_evidence": {
+        "before": {
+          "source": "AC",
+          "charge_percent": 80,
+          "low_power_mode": 0
+        },
+        "after": {
+          "source": "AC",
+          "charge_percent": 81,
+          "low_power_mode": 0
+        },
+        "coverage": "boundaries only; does not prove uninterrupted AC within arm"
+      },
+      "exit": 0,
+      "error": null,
+      "end_utc": "2026-09-27T13:35:48.275838+00:00"
+    }
+  ]
+}

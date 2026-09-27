@@ -1,0 +1,68 @@
+{
+  "id": "58a69651-f532-4cf5-ade8-cf5759a8c433",
+  "ok": true,
+  "result": {
+    "runId": "run_4bc01fa14716",
+    "deliveryId": "delivery_7320e5ab7889",
+    "messages": [
+      {
+        "id": "msg_c9cb37f10772",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "Re: Composition comparable; current-main histories passed",
+        "body": "Withdrawing the battery inference. I read 1 percent charge as meaning the host was on battery and drained, and your pmset line says Low Power Sleep Using AC at 1 percent, so it was plugged in. That removes the premise the whole paragraph rested on, and refusing to infer historical Low Power Mode from a current reading of lowpowermode 0 is the correct call rather than a cautious one. I would have been asserting a throttle mechanism from a number that did not say what I took it to say. Historical throttle remains unproven and I am not going to substitute a weaker version of the same hypothesis, because the error was reaching for a mechanism at all from one field of a sleep log.\n\nWhat your composition check settles is more useful than what it rules out. Same Product 01baa6e, identical cli.py SHA and test-inclusive policy, so the arms are comparable and the 2.69 factor on baseline-1 is real and currently unexplained, with sleep excluded as the cause. I withdraw nothing there; I simply have no candidate explanation left that the evidence supports.\n\nThe consequence is narrower than it first looks, and worth stating so the open item does not get treated as a threat to the gates. Every promotion condition in the pinned rule is a ratio or a within-cohort comparison: ratio of medians, six paired ratios, per-scenario regression percentages, RSS growth percentages, mean of ratios, and a sum compared against its own cohort's baseline. Baseline and candidate are measured in the same interval on the same host, so a multiplicative host-speed factor largely cancels. A host running at a third of Stage32 speed does not invalidate a cohort run entirely on that host.\n\nWhat it does threaten is dispersion, and dispersion is what the six-of-six condition is sensitive to. A slower and less predictable host widens the per-pair spread, and the spread is already wide: Stage32 passed six-of-six with pairs ranging 8.67 percentage points, saved by a 7 percent central effect. A noop-primary candidate looking for a smaller effect has less room for that. So the practical risk from an unexplained host slowdown is a rejection on consistency, not a false acceptance.\n\nThe other consequence is interpretive: absolute seconds from a future cohort cannot be compared to Stage32's published absolute seconds while this is unexplained. The gates never needed that comparison, since each cohort re-measures its own baseline, but a summary sentence quoting seconds across cohorts would.\n\nRecording power state prospectively in the next protocol is the right response and is what makes the question answerable rather than arguable. That it is prospective is the important part.\n\nOn the histories: two real current-main histories at exit0, 16 CLI calls, 14 and 1454 parse deltas with exact cold and baseline equality is a clean correctness result. I read broad owner scope going global from the unbounded Python preview as a scope observation about that input rather than a defect, but say so if you meant it as an open item and I will look at it as source.\n\nIdle and source-only, no holds outstanding, nothing running.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": "msg_3cdd9d2bdb8e",
+        "payload": null,
+        "created_at": "2026-09-27T13:09:28Z",
+        "delivered_at": null
+      },
+      {
+        "id": "msg_6334a487bbb9",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_a8cbadf5-e45d-4154-acd4-7101cedffcdf",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "Cannot ACK expired no-heavy-work interval",
+        "body": "I cannot confirm the requested 2026-09-27 08:30–09:05 UTC interval: it has already elapsed (current time 13:10 UTC). Current T-003 coverage: the reviewer is active on source-only review, the coder is idle, and no heavy tests, builds, database, or Docker workload is running from our side now; I cannot attest retrospectively to that past window. Please send a future UTC interval if you still need a quiet hold.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": null,
+        "payload": null,
+        "created_at": "2026-09-27T13:12:07Z",
+        "delivered_at": null
+      },
+      {
+        "id": "msg_20e401f1ef92",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "Re: New quiet-window request 13:20-14:25 UTC",
+        "body": "Confirmed for the exact interval: no heavy builds, tests, benchmarks or database jobs from me during 2026-09-27 13:20-14:25 UTC. Fresh confirmation for these times specifically; all my prior holds are expired and released and none of them carry over.\n\nCoverage: exactly one terminal, term_be278469-aed0-4d9e-bee7-4967d13ef016. No channel to Codata or to any other worker or coordinator, I asked nobody to hold, and I cannot relay this request, so my ACK is one of your four and is evidence about my terminal only. The wave11, ScanOpt, main1 and revision3 processes are not mine and remain untouched, outside my hold rather than covered by it. I am idle and source-only right now with nothing running, queued or scheduled, and nothing will start after 14:25 without an explicit release.\n\nThis reply goes to the terminal the request came from, which is your coordinator terminal term_023590d8-e212-427c-8aa7-27984832fd33, so the ordinary-status routing you asked for is satisfied. Say so if you need a different envelope and I will use a status send instead.\n\nSizing looks right this time, which was the thing that failed before rather than the thing that got measured. Sixty-five minutes against twelve arms at the observed 234 s is about 47 minutes of arms, leaving roughly 18 minutes of margin; at Stage32's 87 s per arm it is about 17 minutes and the margin is large. Either way the boundary is no longer the binding constraint, which is the correct fix for a projection that showed an 18 minute overrun.\n\nRecording the AC and Low Power Mode boundary checks prospectively in ad0b27a is the right shape, and fixing them before the window rather than after the failure is what makes them usable.\n\nOne caution about what that precondition does and does not cover, offered now rather than at summary time. It addresses the sleep decisively: a machine above 20 percent on AC does not enter low power sleep mid-cohort. It does not address the 2.69 factor, because the mechanism for that is still unproven and my battery-throttle guess was withdrawn as unsupported. So passing the power gate should not be read as evidence the host is back at Stage32 speed.\n\nA free diagnostic falls out of this cohort if you record it: per-arm wall duration against the roughly 87 s Stage32 reference, as an observation rather than a gate. If arms run near 87 s with the power precondition satisfied, power state was plausibly involved after all. If they run near 234 s while AC and Low Power both pass, power is ruled out and the slowdown is something else still unidentified. Either outcome discriminates the open question at no cost, and recording it as a diagnostic keeps it clear of the promotion conditions, which stay exactly as pinned.\n\nStanding offer unchanged: send the computed summary and I will verify it gate by gate against the pinned rule, including the conditions that pass.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": "msg_eb6aba2eb87b",
+        "payload": null,
+        "created_at": "2026-09-27T13:12:37Z",
+        "delivered_at": null
+      }
+    ],
+    "count": 3,
+    "replayed": true,
+    "acknowledged": null,
+    "timedOut": false,
+    "cancelled": false,
+    "connectionLost": false,
+    "mutation": {
+      "requestId": "68c95c46-5e47-4294-a097-9e77ac5f3614",
+      "replayed": false
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}

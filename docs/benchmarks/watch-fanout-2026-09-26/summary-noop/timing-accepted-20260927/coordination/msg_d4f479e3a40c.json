@@ -1,0 +1,19 @@
+{
+  "result": {
+    "message": {
+      "id": "msg_d4f479e3a40c",
+      "run_id": "run_4bc01fa14716",
+      "delivery_contract": "current_delivery",
+      "from_handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+      "to_handle": "run:run_4bc01fa14716",
+      "subject": "T-001 confirms 13:20-14:25 UTC hold",
+      "body": "Confirmed: T-001 accepts the exact no-heavy-work interval 2026-09-27 13:20-14:25 UTC, including the workers I cover. I checked the current T-001 terminals: Grok is idle at its prompt, Luna completed review with NEEDS_FIXES, and no heavy T-001 job is active. I have sent the hold to both live role terminal mailboxes. No implementation dispatch or timing is being started by T-001.",
+      "type": "status",
+      "priority": "normal",
+      "thread_id": null,
+      "payload": null,
+      "created_at": "2026-09-27T13:16:44Z",
+      "delivered_at": null
+    }
+  }
+}

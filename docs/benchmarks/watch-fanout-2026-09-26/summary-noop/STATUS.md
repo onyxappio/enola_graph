@@ -1,31 +1,11 @@
-# Experimental summary-only no-op result assembly
+# Summary-only no-op assembly: engineering gates passed
 
-`RunSummary` is an explicit one-shot API used only by CLI `--summary-json`
-when `--json` is absent. It retains full checkpoint decode, input reads,
-planning, fences, delivery and recovery. Default Run and resident Watch keep
-their full snapshot behavior. This is not lazy state decoding.
+Runtime 3f2883b adds the explicit one-shot RunSummary API, selected only by CLI --summary-json when --json is absent. Full checkpoint decoding, input reads, planning, fences, delivery and recovery remain intact. Default Run and resident Watch preserve complete facts. No state schema or persistent relationship index was added.
 
-Cached TS contribution cloning is delayed until the planner knows whether the
-run publishes. Publication flushes the delayed contribution at its original
-append position; a proven no-publication summary does not need those clones.
-State facts and cached records remain complete. No schema or index is added.
+Cached TS contribution cloning is delayed until publication is known; publishing flushes it at the original append position, while a proven no-publication summary skips cloning.
 
-Focused checks passed: default API full facts on fresh noop, resident snapshot
-preservation, summary initial/noop and manifest-only delta (zero TS parses),
-consumer graph equality to cold and a subsequent full API result. Focused
-command tests also passed. An added explicit zero-event assertion is included
-in the in-progress full graphsession/command suite (session71382, log
-/tmp/enola-summary-full-tests.log). Full-package outcome not yet established.
+Validation passed: full graphsession/command packages, full repository suite, default full-fact API and resident contracts, summary initial/no-op/zero-parse manifest delta, Product cold/delta/baseline equality, silent byte-stable no-op, and two real current-main Product histories (16 CLI calls;14/1454 delta parses).
 
-Next: complete full suite, real Product cold/delta/noop and replay checks,
-then repeated same-scope same-host timing against published main. No performance
-claim, watch speed claim, acceptance or publication yet.
+The original timing attempt was rejected after host Low Power Sleep interrupted observation. None of its samples entered the fresh cohort. The new twelve-arm cohort passed the preregistered engineering gates: fresh summary no-op median2.117442→2.065174s (-2.4685%, all six pairs improved), no-op RSS382.406→355.164 MiB. Initial median+0.4443%, body-1.3810%, structural-0.2872%, all under the preset regression bounds. See timing-accepted-20260927/RESULTS.md for spread, producer boundaries, caveats and evidence.
 
-Product correctness completed exit0: seven calls and four gates passed, including
-zero-parse/zero-event/byte-stable-state noop and exact cold equality for initial,
-body and structural cases. All seven graph hashes also equal the previously
-published Stage32 cohort on the same pinned tree and explicit scope. The new
-harness uses changed-owner-scope for both builds; its receipt explicitly sets
-timing_eligible=false. Full package suite is still running; no promotion.
-
-Full two-package suite exited0 (graphsession419.448s; command5.811s). Full repository suite then exited0 in150.745s; package/cache counts are in full-suite-receipt.json. These are validation times, not benchmark claims.
+Arithmetic review and main publication are pending. This limited stage does not complete the broader near-zero fresh-start, faster delta or long-running watch goal; current fresh no-op remains about2.065s and deltas about4.2s. State decoding and fresh input capture remain substantial costs.
