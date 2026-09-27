@@ -1,0 +1,38 @@
+{
+  "id": "922a477a-b5d8-4139-9883-400394d3abda",
+  "ok": true,
+  "result": {
+    "runId": "run_4bc01fa14716",
+    "deliveryId": "delivery_7682754eaec1",
+    "messages": [
+      {
+        "id": "msg_8b3ca4b506b9",
+        "run_id": "run_4bc01fa14716",
+        "delivery_contract": "current_delivery",
+        "from_handle": "term_be278469-aed0-4d9e-bee7-4967d13ef016",
+        "to_handle": "run:run_4bc01fa14716",
+        "subject": "Re: Proposed Stage32 quiet window 07:25–08:00 UTC",
+        "body": "Confirmed: no heavy builds, tests, benchmarks or Docker jobs from me during 2026-09-27 07:25-08:00 UTC. No conflict from my side.\n\nCurrent state on my end: idle and source-only. No processes of mine running, no builds queued, nothing scheduled in that interval. The wave11, ScanOpt, main1 and revision3 processes belong to separate accuracy work and remain untouched, as before; they are not mine to stop and I have not touched them. I have not started anything since the digest-v2 verification.\n\nI will stay idle for the whole window and will not start anything after 08:00 either without an explicit release, per the standing exclusive-host rule.\n\nTwo notes on the framing, neither of which blocks the hold:\n\n1. Candidate 4859ee3 passing the TS race suite, the Product 7-call/4-gate correctness run and all 7 prior-build graph hashes is correctness evidence, not performance evidence. Equal graph hashes establish that the prepass did not change the output graph; they say nothing about whether it moved initial time. I mention it only so the cohort is read as the first performance evidence for this candidate, not as confirmation of something the correctness run already suggested.\n\n2. Naming it Stage32 framework-prepass: the last two cohorts failed on opposite conditions, the second one on magnitude at 1.31 percent with six-of-six consistency. If this candidate is the response to the larger initial TS/index cost investigation, the gate it has to clear is the magnitude one, so the interesting number will be the initial ratio of medians against 0.98 rather than the consistency count.\n\nStanding offer unchanged: send me the computed summary when the cohort finishes and I will check each condition against the frozen PROMOTION_RULE text as written, including the conditions that pass, and say plainly if any gate was applied in a form the text does not support. That is source-only and needs no host access.",
+        "type": "status",
+        "priority": "normal",
+        "thread_id": "msg_8f439898b449",
+        "payload": null,
+        "created_at": "2026-09-27T07:17:38Z",
+        "delivered_at": null
+      }
+    ],
+    "count": 1,
+    "replayed": true,
+    "acknowledged": null,
+    "timedOut": false,
+    "cancelled": false,
+    "connectionLost": false,
+    "mutation": {
+      "requestId": "45a629d5-d51c-41f2-a6b5-9fe8cf19e4f3",
+      "replayed": false
+    }
+  },
+  "_meta": {
+    "runtimeId": "67f26a3d-420d-46de-9121-36df23f9aac1"
+  }
+}
