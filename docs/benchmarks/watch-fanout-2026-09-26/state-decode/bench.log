@@ -1,0 +1,10 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/enola-labs/enola/internal/graphsession
+cpu: Apple M1 Pro
+BenchmarkProductStateDecode-10    	      10	 383968396 ns/op	 235.22 MB/s	179408520 B/op	 2555572 allocs/op
+--- BENCH: BenchmarkProductStateDecode-10
+    persist_benchmark_test.go:81: checkpoint bytes=90315743
+    persist_benchmark_test.go:81: checkpoint bytes=90315743
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	5.094s

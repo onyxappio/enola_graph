@@ -1,0 +1,33 @@
+File: graphsession.test
+Type: cpu
+Time: 2026-09-27 11:02:47 EEST
+Duration: 4.47s, Total samples = 4.12s (92.21%)
+Showing nodes accounting for 3.16s, 76.70% of 4.12s total
+Dropped 88 nodes (cum <= 0.02s)
+Showing top 25 nodes out of 127
+      flat  flat%   sum%        cum   cum%
+     1.01s 24.51% 24.51%      1.01s 24.51%  encoding/json/internal/jsonwire.ConsumeSimpleString (inline)
+     0.77s 18.69% 43.20%      0.77s 18.69%  runtime.madvise
+     0.16s  3.88% 47.09%      0.16s  3.88%  encoding/json/internal/jsonwire.ConsumeWhitespace (inline)
+     0.16s  3.88% 50.97%      0.16s  3.88%  runtime.pthread_cond_signal
+     0.11s  2.67% 53.64%      1.30s 31.55%  encoding/json/jsontext.(*decoderState).consumeValue
+     0.10s  2.43% 56.07%      1.95s 47.33%  encoding/json/v2.makeStructArshaler.func3
+     0.09s  2.18% 58.25%      0.09s  2.18%  runtime.pthread_kill
+     0.07s  1.70% 59.95%      0.07s  1.70%  runtime.pthread_cond_wait
+     0.07s  1.70% 61.65%      0.07s  1.70%  runtime.usleep
+     0.06s  1.46% 63.11%      0.06s  1.46%  runtime.(*gcBits).bytep (inline)
+     0.06s  1.46% 64.56%      0.07s  1.70%  runtime.mallocgcSmallScanNoHeaderSC2
+     0.06s  1.46% 66.02%      0.06s  1.46%  runtime.tryDeferToSpanScan
+     0.05s  1.21% 67.23%      0.05s  1.21%  runtime.memclrNoHeapPointers
+     0.04s  0.97% 68.20%      0.04s  0.97%  encoding/json/v2.makeIntArshaler.func2
+     0.04s  0.97% 69.17%      0.04s  0.97%  runtime.memequal
+     0.04s  0.97% 70.15%      0.07s  1.70%  runtime.scanObjectsSmall
+     0.03s  0.73% 70.87%      0.05s  1.21%  encoding/json/internal/jsonwire.ConsumeStringResumable
+     0.03s  0.73% 71.60%      0.08s  1.94%  encoding/json/jsontext.(*decoderState).PeekKind
+     0.03s  0.73% 72.33%      0.60s 14.56%  encoding/json/jsontext.(*decoderState).ReadValue
+     0.03s  0.73% 73.06%      0.77s 18.69%  encoding/json/jsontext.(*decoderState).consumeObject
+     0.03s  0.73% 73.79%      0.32s  7.77%  encoding/json/v2.makeInterfaceArshaler.func2
+     0.03s  0.73% 74.51%      0.25s  6.07%  encoding/json/v2.makeString
+     0.03s  0.73% 75.24%      0.03s  0.73%  internal/runtime/atomic.(*UnsafePointer).Load (inline)
+     0.03s  0.73% 75.97%      0.04s  0.97%  internal/runtime/maps.(*Map).getWithoutKeySmallFastStr
+     0.03s  0.73% 76.70%      0.03s  0.73%  internal/sync.(*HashTrieMap[go.shape.interface {},go.shape.interface {}]).Load

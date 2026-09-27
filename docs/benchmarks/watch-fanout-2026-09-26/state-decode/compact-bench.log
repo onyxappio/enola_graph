@@ -1,0 +1,12 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/enola-labs/enola/internal/graphsession
+cpu: Apple M1 Pro
+BenchmarkProductStateWithoutDuplicateSummaries/current-10         	       3	 387202764 ns/op	179418288 B/op	 2555573 allocs/op
+BenchmarkProductStateWithoutDuplicateSummaries/current-10         	       3	 383378694 ns/op	179390880 B/op	 2555570 allocs/op
+BenchmarkProductStateWithoutDuplicateSummaries/current-10         	       3	 385805319 ns/op	179390800 B/op	 2555569 allocs/op
+BenchmarkProductStateWithoutDuplicateSummaries/prototype-10       	       3	 361464375 ns/op	168977741 B/op	 2432938 allocs/op
+BenchmarkProductStateWithoutDuplicateSummaries/prototype-10       	       3	 362396250 ns/op	169087064 B/op	 2432943 allocs/op
+BenchmarkProductStateWithoutDuplicateSummaries/prototype-10       	       3	 372437195 ns/op	169004920 B/op	 2432937 allocs/op
+PASS
+ok  	github.com/enola-labs/enola/internal/graphsession	10.939s

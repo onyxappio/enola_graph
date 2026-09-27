@@ -1,0 +1,27 @@
+File: graphsession.test
+Type: alloc_space
+Time: 2026-09-27 11:02:52 EEST
+Showing nodes accounting for 2058.43MB, 99.67% of 2065.18MB total
+Dropped 57 nodes (cum <= 10.33MB)
+Showing top 20 nodes out of 37
+      flat  flat%   sum%        cum   cum%
+  791.69MB 38.34% 38.34%   791.69MB 38.34%  reflect.growslice
+  450.92MB 21.83% 60.17%   450.92MB 21.83%  reflect.mapassign_faststr0
+  349.02MB 16.90% 77.07%   349.02MB 16.90%  encoding/json/v2.makeString
+  210.52MB 10.19% 87.26%   210.52MB 10.19%  reflect.unsafe_New
+  172.27MB  8.34% 95.61%   172.27MB  8.34%  os.readFileContents
+      57MB  2.76% 98.37%       57MB  2.76%  reflect.makemap
+   26.50MB  1.28% 99.65%    26.50MB  1.28%  slices.Grow[go.shape.[]uint8,go.shape.uint8] (inline)
+    0.50MB 0.024% 99.67%  2058.93MB 99.70%  github.com/enola-labs/enola/internal/graphsession.BenchmarkProductStateDecode
+         0     0% 99.67%  1885.66MB 91.31%  encoding/json.Unmarshal (inline)
+         0     0% 99.67%    26.50MB  1.28%  encoding/json/internal/jsonwire.AppendUnquote
+         0     0% 99.67%    26.50MB  1.28%  encoding/json/internal/jsonwire.UnquoteMayCopy
+         0     0% 99.67%  1885.66MB 91.31%  encoding/json/v2.Unmarshal
+         0     0% 99.67%   161.51MB  7.82%  encoding/json/v2.makeInterfaceArshaler.func2
+         0     0% 99.67%  1885.66MB 91.31%  encoding/json/v2.makeMapArshaler.func3
+         0     0% 99.67%  1820.05MB 88.13%  encoding/json/v2.makePointerArshaler.func3
+         0     0% 99.67%  1639.82MB 79.40%  encoding/json/v2.makeSliceArshaler.func3
+         0     0% 99.67%   375.52MB 18.18%  encoding/json/v2.makeStringArshaler.func2
+         0     0% 99.67%  1885.66MB 91.31%  encoding/json/v2.makeStructArshaler.func3
+         0     0% 99.67%       87MB  4.21%  encoding/json/v2.newAddressableValue
+         0     0% 99.67%  1885.66MB 91.31%  encoding/json/v2.unmarshalDecode
