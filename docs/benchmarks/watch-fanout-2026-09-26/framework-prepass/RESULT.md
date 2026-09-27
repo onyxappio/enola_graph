@@ -22,13 +22,16 @@ go test ./internal/extractors/tsextractor -run '^$' -bench '^BenchmarkFrameworkS
 ```
 
 Focused GraphQL/gRPC/minified/session tests passed (1.022s). The full TS suite also passed with the race detector (213.092s, exit0).
-Product cold/delta equivalence, full repository tests and fresh frozen acceptance
-remain required. Both earlier rejected cohorts remain unchanged. Not published.
+Product cold/delta correctness passed: seven CLI calls, four gates, and all seven
+graph hashes equal the cf71c85 candidate. Full repository tests and fresh frozen
+acceptance remain required. Both earlier rejected cohorts remain unchanged. Not published.
 
 Experimental binary: `/tmp/enola-framework-prepass/enola-experimental`, SHA256
 `980e849a72e41570af21446d7f69f1624af0ed5967d9db14aaf8f9ae40bd0716`.
 Runtime change is the session.go working diff from 9faa0fb; its hash is pinned in
 `/tmp/enola-framework-prepass/correctness/cli-pairs/pins.json`.
 Product correctness harness and full TS race check were started independently;
-their overlapping runtime is explicitly not performance evidence. The race check completed exit0; Product results remain pending until its exit
-receipt and graph checks have been inspected.
+their overlapping runtime is explicitly not performance evidence. Both completed exit0. Product checks and all seven cross-build graph hashes were
+independently verified; the receipt explicitly marks timing_eligible=false.
+Runtime source is now committed as 4859ee3. Full repository suite is running at
+`/tmp/enola-framework-prepass/full-suite` (session38781).
