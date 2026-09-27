@@ -1,0 +1,58 @@
+{
+  "session": 29443,
+  "exit": 0,
+  "all_seven_labels_equal": true,
+  "checks": [
+    {
+      "check": "r1-new-noop no-op",
+      "pass": true
+    },
+    {
+      "check": "r1-new-initial cold graph equality",
+      "pass": true
+    },
+    {
+      "check": "r1-new-body cold graph equality",
+      "pass": true
+    },
+    {
+      "check": "r1-new-structural cold graph equality",
+      "pass": true
+    }
+  ],
+  "phases": {
+    "initial": [
+      "[graph-profile] state_output_write                 0.026s",
+      "[graph-profile] state_output_hash                  0.038s",
+      "[graph-profile] state_encode_remaining             0.318s  includes diagnostic overhead",
+      "[graph-profile] state_json_encode_write            0.381s  bytes=90888042 files=7779",
+      "[graph-profile] state_file_sync                    0.009s  total= 0.009s  trace=state_durable_write",
+      "[graph-profile] state_file_close                   0.000s  total= 0.009s  trace=state_durable_write",
+      "[graph-profile] state_pending_rename               0.000s  total= 0.009s  trace=state_durable_write",
+      "[graph-profile] state_directory_sync               0.004s  total= 0.013s  trace=state_durable_write",
+      "[graph-profile] write_pending_state                0.547s  total=10.727s  trace=session"
+    ],
+    "body": [
+      "[graph-profile] state_output_write                 0.013s",
+      "[graph-profile] state_output_hash                  0.038s",
+      "[graph-profile] state_encode_remaining             0.276s  includes diagnostic overhead",
+      "[graph-profile] state_json_encode_write            0.327s  bytes=90888042 files=7779",
+      "[graph-profile] state_file_sync                    0.013s  total= 0.013s  trace=state_durable_write",
+      "[graph-profile] state_file_close                   0.000s  total= 0.013s  trace=state_durable_write",
+      "[graph-profile] state_pending_rename               0.000s  total= 0.014s  trace=state_durable_write",
+      "[graph-profile] state_directory_sync               0.006s  total= 0.019s  trace=state_durable_write",
+      "[graph-profile] write_pending_state                0.490s  total= 2.683s  trace=session"
+    ],
+    "structural": [
+      "[graph-profile] state_output_write                 0.013s",
+      "[graph-profile] state_output_hash                  0.038s",
+      "[graph-profile] state_encode_remaining             0.261s  includes diagnostic overhead",
+      "[graph-profile] state_json_encode_write            0.312s  bytes=90888761 files=7779",
+      "[graph-profile] state_file_sync                    0.013s  total= 0.013s  trace=state_durable_write",
+      "[graph-profile] state_file_close                   0.000s  total= 0.013s  trace=state_durable_write",
+      "[graph-profile] state_pending_rename               0.000s  total= 0.013s  trace=state_durable_write",
+      "[graph-profile] state_directory_sync               0.004s  total= 0.017s  trace=state_durable_write",
+      "[graph-profile] write_pending_state                0.469s  total= 3.051s  trace=session"
+    ]
+  }
+}

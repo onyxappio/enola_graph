@@ -1,0 +1,129 @@
+[graph-profile] flags_parsed                       0.000s  total= 0.000s  trace=cli  mode=delta
+[graph-profile] config_load                        0.000s  total= 0.000s  trace=graph_engine  config.yaml
+[graph-profile] declare_config_deps                0.000s  total= 0.000s  trace=graphinput_build  deps=2
+[graph-profile] discover_git                       0.045s  total= 0.045s  trace=graphinput_build  repo=true dirs=2
+[graph-profile] declare_git_control                0.005s  total= 0.050s  trace=graphinput_build  deps=6
+[graph-profile] git_ls_files                       0.043s  total= 0.093s  trace=graphinput_build  tracked=45466 dirs=5853
+[graph-profile] walk_tree                          0.117s  total= 0.210s  trace=graphinput_build  names=14460 ignorefiles=4
+[graph-profile] check_ignore_setup                 0.017s  total= 0.227s  trace=graphinput_build
+[graph-profile] check_ignore_run                   0.073s  total= 0.300s  trace=graphinput_build  names=14460 ignored=0
+[graph-profile] declare_ignore_files               0.000s  total= 0.300s  trace=graphinput_build  deps=9
+[graph-profile] compute_identities                 0.031s  total= 0.330s  trace=graphinput_build  deps=9 entries=14460
+[graph-profile] graphinput_build                   0.331s  total= 0.331s  trace=graph_engine  configpaths=2
+[graph-profile] engine_new                         0.000s  total= 0.331s  trace=graph_engine
+[graph-profile] register_plugins                   0.000s  total= 0.331s  trace=graph_engine
+[graph-profile] config_recheck                     0.000s  total= 0.332s  trace=graph_engine
+[graph-profile] resolve_graph_target               0.332s  total= 0.332s  trace=cli  repos=1
+enola graph: config /private/tmp/enola-state-write-diagnostic/cli-pairs/correctness-candidate-1/config.yaml
+[graph-profile] connect_sink                       0.001s  total= 0.333s  trace=cli  nats=true
+[graph-profile] session_options                    0.000s  total= 0.333s  trace=cli  repo=/private/tmp/enola-state-write-diagnostic/cli-pairs/correctness-candidate-1/product
+[graph-profile] lock                               0.000s  total= 0.000s  trace=open
+[graph-profile] bind_identity                      0.000s  total= 0.000s  trace=open
+[graph-profile] open_journal                       0.000s  total= 0.000s  trace=open
+[graph-profile] replay_unacked                     0.000s  total= 0.000s  trace=open
+[graph-profile] state_read_bytes                   0.013s  state.json bytes=90888042
+[graph-profile] state_fingerprint                  0.040s  bytes=90888042
+[graph-profile] state_json_unmarshal               0.391s  files=7779
+[graph-profile] load_state                         0.445s  total= 0.445s  trace=open  files=7779
+[graph-profile] transaction_enter                  0.000s  total= 0.000s  trace=reconcile  fast=false failed=false
+[graph-profile] effective_config_before            0.000s  total= 0.000s  trace=reconcile  files=2
+[graph-profile] graph_inputs_proven                0.098s  total= 0.098s  trace=reconcile
+[graph-profile] effective_config                   0.000s  total= 0.098s  trace=reconcile  files=2 fast=false
+[graph-profile] reconcile_complete                 0.000s  total= 0.098s  trace=reconcile  reloaded=false
+[graph-profile] engine_walk_repo                   0.116s  files=13777 tests=0 all_names=13777
+[graph-profile] inventory                          0.116s  total= 0.116s  trace=inputs  files=13777 all_names=13777
+[graph-profile] detect_go                          0.000s
+[graph-profile] detect_manifests                   0.000s
+[graph-profile] detect_mdintent                    0.000s
+[graph-profile] detect_dotnet                      0.006s
+[graph-profile] detect_cpp                         0.007s
+[graph-profile] detect_hcl                         0.001s
+[graph-profile] detect_ansible                     0.002s
+[graph-profile] detect_java                        0.004s
+[graph-profile] detect_kotlin                      0.005s
+[graph-profile] detect_php                         0.001s
+[graph-profile] detect_python                      0.000s
+[graph-profile] detect_typescript                  0.001s
+[graph-profile] detect_swift                       0.001s
+[graph-profile] detect_ruby                        0.003s
+[graph-profile] detect_rust                        0.002s
+[graph-profile] detect_scala                       0.006s
+[graph-profile] detect_dart                        0.002s
+[graph-profile] detect_grpc                        0.074s
+[graph-profile] detect_openapi                     0.075s
+[graph-profile] detect_asyncapi                    0.134s
+[graph-profile] detect_extractors                  0.134s  total= 0.250s  trace=inputs  detected=6
+[graph-profile] select_hash_targets                0.023s  total= 0.273s  trace=inputs  targets=7798
+[graph-profile] engine_hash_files                  0.153s  n=7798 hashed=7798 bytes=82212697
+[graph-profile] hash_content_inputs                0.153s  total= 0.426s  trace=inputs  targets=7798
+[graph-profile] capture_contexts                   0.079s  total= 0.505s  trace=inputs  contexts=2
+[graph-profile] ts_config_inputs                   0.064s  n=83
+[graph-profile] analysis_fingerprint               0.071s  total= 0.576s  trace=inputs  cfg_files=59
+[graph-profile] angular_probe                      0.004s  total= 0.580s  trace=inputs  angular=false
+[graph-profile] policy_identity                    0.000s  total= 0.580s  trace=inputs
+[graph-profile] engine_context_fingerprint         0.000s  total= 0.580s  trace=inputs
+[graph-profile] ts_disc_nuxt_packages              0.098s  pkgs=0
+[graph-profile] ts_disc_package_gates              0.001s
+[graph-profile] ts_disc_package_names              0.000s  names=30
+[graph-profile] ts_disc_alias_roots                0.016s  roots=1
+[graph-profile] ts_disc_package_exports            0.000s  packages=30
+[graph-profile] ts_discovery_build                 0.125s  side_reads=2004 stat_reads=2016 walked_dirs=668 captured=59
+[graph-profile] ts_discovery                       0.125s  total= 0.705s  trace=inputs  names=0 bytes=0 dirs=0
+[graph-profile] ts_session_context                 0.095s  total= 0.800s  trace=inputs  files=6801
+[graph-profile] runtime_inputs_complete            0.000s  total= 0.800s  trace=inputs
+[graph-profile] clone_file_state_copy              0.001s  n=7779
+[graph-profile] extractor_need                     0.869s  total= 0.869s  trace=session  non_ts_need=false detected=6 neutral=0
+[graph-profile] changed_terms                      0.020s  total= 0.889s  trace=session  initial=false force=false non_ts=false scan=true raw_cfg=false policy=false neutral_scan=false neutral_cfg=false
+[graph-profile] ts_detect_frameworks               0.000s  total= 0.000s  trace=ts  files=6801 shared_discovery=true
+[graph-profile] ts_disc_package_aliases            0.000s  aliases=21
+[graph-profile] ts_read_dirty                      0.004s  total= 0.004s  trace=ts  to_read=1 cached=6800
+[graph-profile] ts_graphql_grpc_index              0.001s  total= 0.004s  trace=ts  ts_files=6801
+[graph-profile] ts_mapfiles_aggregate              0.055s  total= 0.059s  trace=ts  parsed=1 facts=89381 routers=0 scans=0 derived=1
+[graph-profile] ts_compose_modules                 0.004s  total= 0.063s  trace=ts  facts=89823 records=6801 unread=0
+[graph-profile] ts_frozen_preview                  0.240s  total= 1.129s  trace=session  dirty=1 err=false
+[graph-profile] invalidation_plan                  0.233s  total= 1.362s  trace=session  reason=frozen scope: prior file-to-file dependency closure whole=false extra=0
+[graph-profile] begin_publish                      0.000s  total= 1.362s  trace=session  scope=1
+[graph-profile] ts_dirty_scope                     0.152s  total= 1.514s  trace=session  dirty=1 scope=1 force=false
+[graph-profile] ts_extract_session                 0.000s  total= 1.515s  trace=session  parsed=1 cached=6800 facts=89823 records=6801
+[graph-profile] assemble_new_files                 0.234s  total= 1.749s  trace=session  new=7779 ts_noop=false non_ts_need=false skip=false facts=101951
+[graph-profile] index_group_owners                 0.159s  total= 1.908s  trace=session  facts=100577 owners=7714
+[graph-profile] compare_owner_contributions        0.002s  total= 1.910s  trace=session  scope=0
+[graph-profile] revalidate_before_begin            0.001s  n=60 superseded=false
+[graph-profile] begin_publish_late                 0.041s  total= 1.951s  trace=session  scope=0
+[graph-profile] encode_append_owners               0.001s  total= 1.952s  trace=session  published=0
+[graph-profile] publish_resolved                   0.000s  total= 1.952s  trace=session  owners=0
+[graph-profile] revalidate_ts_records              0.241s  total= 2.193s  trace=session  n=6801
+[graph-profile] ts_config_inputs                   0.063s  n=83
+[graph-profile] state_output_write                 0.013s
+[graph-profile] state_output_hash                  0.038s
+[graph-profile] state_encode_remaining             0.276s  includes diagnostic overhead
+[graph-profile] state_json_encode_write            0.327s  bytes=90888042 files=7779
+[graph-profile] state_file_sync                    0.013s  total= 0.013s  trace=state_durable_write
+[graph-profile] state_file_close                   0.000s  total= 0.013s  trace=state_durable_write
+[graph-profile] state_pending_rename               0.000s  total= 0.014s  trace=state_durable_write
+[graph-profile] state_directory_sync               0.006s  total= 0.019s  trace=state_durable_write
+[graph-profile] write_pending_state                0.490s  total= 2.683s  trace=session
+[graph-profile] end_flush_ack                      0.030s  total= 2.713s  trace=session
+[graph-profile] promote_compact_state              0.058s  total= 2.771s  trace=session  parsed=1 published=0
+[graph-profile] graph_session_run                  3.314s  total= 3.647s  trace=cli  repo=/private/tmp/enola-state-write-diagnostic/cli-pairs/correctness-candidate-1/product parsed=1
+[graph] /private/tmp/enola-state-write-diagnostic/cli-pairs/correctness-candidate-1/product: generation 1→2 parsed=1 cached=6800 early_local=0 fallbacks=1
+[graph] fallback graph: changed files and reverse file dependents (frozen scope: prior file-to-file dependency closure)
+[graph-profile] cli_complete                       0.000s  total= 3.647s  trace=cli  results=1
+        3.67 real         3.74 user         1.64 sys
+           871366656  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               83418  page reclaims
+                 237  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                  11  messages sent
+                  10  messages received
+                 632  signals received
+                 346  voluntary context switches
+               20411  involuntary context switches
+         48648996906  instructions retired
+         16083554778  cycles elapsed
+           807980480  peak memory footprint
