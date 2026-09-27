@@ -35,3 +35,10 @@ their overlapping runtime is explicitly not performance evidence. Both completed
 independently verified; the receipt explicitly marks timing_eligible=false.
 Runtime source is now committed as 4859ee3. Full repository suite completed exit0 at
 `/tmp/enola-framework-prepass/full-suite` (session38781).
+
+The first 07:25 attempt aborted at the receipt hash preflight, before a Product
+clone, broker or Enola invocation. The old full-suite receipt hash had not been
+updated after the new suite passed. The failed attempt is preserved in
+preflight-abort/. A fresh acceptance-v2 root corrects that one inspected hash;
+both pin preflights pass and its complete twelve-arm series is running inside
+the same acknowledged 07:25–08:00 UTC interval. No samples were transferred.
