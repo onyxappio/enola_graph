@@ -1,0 +1,60 @@
+package graphsession
+
+import (
+ "encoding/json"
+ "os"
+ "reflect"
+ "testing"
+ "github.com/enola-labs/enola/internal/facts"
+ "github.com/enola-labs/enola/internal/extractors/tsextractor"
+)
+
+// Diagnostic projection only. RawMessage defers type checks and is deliberately
+// NOT a supported state reader. Production validation must not be weakened.
+type diagnosticStateAlias State
+type diagnosticFileAlias FileState
+type diagnosticTSAlias tsextractor.FileRecord
+type diagnosticProjectedTS struct {
+ diagnosticTSAlias
+ Facts json.RawMessage `json:"facts,omitempty"`
+}
+type diagnosticProjectedFile struct {
+ diagnosticFileAlias
+ Facts json.RawMessage `json:"facts,omitempty"`
+ Contrib json.RawMessage `json:"contrib,omitempty"`
+ TS *diagnosticProjectedTS `json:"ts,omitempty"`
+}
+type diagnosticProjectedState struct {
+ diagnosticStateAlias
+ Files map[string]*diagnosticProjectedFile `json:"files"`
+ Synthetic json.RawMessage `json:"synthetic,omitempty"`
+ ExtractorSynthetic json.RawMessage `json:"extractor_synthetic,omitempty"`
+}
+func BenchmarkDiagnosticDeferredFacts(b *testing.B) {
+ path:=os.Getenv("ENOLA_STATE_BENCH_PATH");if path=="" { b.Skip("requires exact Product checkpoint") }
+ raw,err:=os.ReadFile(path);if err!=nil {b.Fatal(err)}
+ var full State;if err=json.Unmarshal(raw,&full);err!=nil {b.Fatal(err)}
+ var projected diagnosticProjectedState;if err=json.Unmarshal(raw,&projected);err!=nil {b.Fatal(err)}
+ reconstructed,err:=json.Marshal(projected);if err!=nil {b.Fatal(err)}
+ var restored State;if err=json.Unmarshal(reconstructed,&restored);err!=nil {b.Fatal(err)}
+ if !reflect.DeepEqual(full,restored) {b.Fatal("projection lost checkpoint data")}
+ b.Logf("checkpoint=%d files=%d; reconstruction exact; raw payload type validation remains deferred",len(raw),len(full.Files))
+ for _,name:=range []string{"full","projection","projection_then_typed"} {b.Run(name,func(b *testing.B){b.ReportAllocs();for i:=0;i<b.N;i++ {
+  if name=="full" {var s State;if err:=json.Unmarshal(raw,&s);err!=nil {b.Fatal(err)}} else {var s diagnosticProjectedState;if err:=json.Unmarshal(raw,&s);err!=nil {b.Fatal(err)};if name=="projection_then_typed" {if err:=diagnosticValidatePayloads(&s);err!=nil {b.Fatal(err)}}}
+ }})}
+}
+func TestDiagnosticProjectionDefersInvalidPayloadType(t *testing.T) {
+ raw:=[]byte(`{"files":{"a.ts":{"ts":{"file":"a.ts","facts":42}}}}`)
+ var full State;if json.Unmarshal(raw,&full)==nil {t.Fatal("full decoder must reject malformed facts type")}
+ var projection diagnosticProjectedState;if err:=json.Unmarshal(raw,&projection);err!=nil {t.Fatal(err)}
+ // This explicitly records why this experiment is not a production solution.
+}
+
+func diagnosticValidatePayloads(s *diagnosticProjectedState) error {
+ list:=func(raw json.RawMessage) error {if len(raw)==0{return nil};var v []facts.Fact;return json.Unmarshal(raw,&v)}
+ mapping:=func(raw json.RawMessage) error {if len(raw)==0{return nil};var v map[string][]facts.Fact;return json.Unmarshal(raw,&v)}
+ for _,f:=range s.Files {if f==nil{continue};if err:=list(f.Facts);err!=nil{return err};if err:=mapping(f.Contrib);err!=nil{return err};if f.TS!=nil {if err:=list(f.TS.Facts);err!=nil{return err}}}
+ if err:=mapping(s.Synthetic);err!=nil{return err}
+ if len(s.ExtractorSynthetic)>0 {var v map[string]map[string][]facts.Fact;return json.Unmarshal(s.ExtractorSynthetic,&v)}
+ return nil
+}
