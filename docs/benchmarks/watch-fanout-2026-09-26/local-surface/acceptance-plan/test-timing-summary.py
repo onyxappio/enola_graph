@@ -11,6 +11,14 @@ bad=copy.deepcopy(comp);bad['candidate_vs_baseline']['body']['paired_percent_cha
 assert not m.stage_decision(arms,bad,'baseline','candidate')['engineering_accepted']
 bad=copy.deepcopy(arms);bad['candidate']['body']['rss_bytes']['median']=106
 assert not m.stage_decision(bad,comp,'baseline','candidate')['engineering_accepted']
+# Stage36 primary is body, and the preregistered effect floor is 5 percent.
+bad=copy.deepcopy(comp);bad['candidate_vs_baseline']['body']['median_percent_change']=-4.99
+assert not m.stage_decision(arms,bad,'baseline','candidate')['engineering_accepted']
+edge=copy.deepcopy(comp);edge['candidate_vs_baseline']['body']['median_percent_change']=-5
+assert m.stage_decision(arms,edge,'baseline','candidate')['engineering_accepted']
+bad=copy.deepcopy(comp);bad['candidate_vs_baseline']['body']['median_percent_change']=0
+bad['candidate_vs_baseline']['noop']={'median_percent_change':-20,'paired_percent_changes':[-20]*6}
+assert not m.stage_decision(arms,bad,'baseline','candidate')['engineering_accepted']
 with tempfile.TemporaryDirectory(prefix='stage23-24-summary-test-') as tmp:
  b=Path(tmp);c=b/'cli-pairs';c.mkdir()
  v=c/'validate_results.py';shutil.copy2(B/'cli-pairs/validate_results.py',v)
