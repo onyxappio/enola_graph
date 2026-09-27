@@ -1,0 +1,41 @@
+{
+  "mode": "current-roster",
+  "combined_authorized": false,
+  "worker_message": null,
+  "start_utc": "2026-09-27T15:10:00+00:00",
+  "end_utc": "2026-09-27T16:15:00+00:00",
+  "participants": [
+    {
+      "handle": "term_f6d0d3d8-2dce-47a2-81db-44fd6bb8a1a8",
+      "status": "held",
+      "message_id": "msg_f18473a951a8",
+      "evidence_path": "/tmp/enola-local-surface/coordination/msg_f18473a951a8-message.json",
+      "sha256": "21b2e7c9a32c4cbacf20dcc73346726a5dd09caf6c5ff999ca503aaf62b09e66"
+    },
+    {
+      "handle": "term_d0820f00-fd44-4836-9aab-7dffb4746896",
+      "status": "held",
+      "message_id": "msg_a971f431e045",
+      "evidence_path": "/tmp/enola-local-surface/coordination/msg_a971f431e045-message.json",
+      "sha256": "398d9bc32ef590262d07b3fb1833710fea47b67692f4aeff8d6ab47477473050"
+    },
+    {
+      "handle": "term_a8cbadf5-e45d-4154-acd4-7101cedffcdf",
+      "status": "terminal-held",
+      "quote": "\u2022 Confirmed: I will do no heavy work during 2026-09-27 15:10\u201316:15 UTC. I cover T-003\u2019s coder and reviewer; both have finished and have no heavy work running or scheduled.",
+      "evidence_path": "/tmp/enola-local-surface/coordination/codata-hold.json",
+      "sha256": "2bad8e81648abfb9a4666ebe5a7c9d6c622b3784dab0c3b7e188f5129bcdfd34"
+    }
+  ],
+  "pending": [
+    "term_be278469-aed0-4d9e-bee7-4967d13ef016"
+  ],
+  "status": "released without timing",
+  "released_at": "2026-09-27T15:28:15+00:00",
+  "release_message_ids": [
+    "msg_39812e51b761",
+    "msg_510a4ec87ec4",
+    "msg_e83da53bfef4",
+    "msg_9baf54f5a872"
+  ]
+}

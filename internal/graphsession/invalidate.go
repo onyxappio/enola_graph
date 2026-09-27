@@ -275,15 +275,11 @@ func eqStrings(a, b []string) bool {
 	return true
 }
 
-// replayableDependent reports whether a cached record proves that this file's
-// bindings into its dependencies can be rebuilt from the record alone. A
-// dependent that proves it only has to be reparsed when a dependency publishes a
-// changed import/export surface; one that does not keeps the old rule of being
-// reparsed on any dirt underneath it. GraphQL SDL composition and gRPC stubs
-// bind across files without going through the import graph, and a record written
-// before import resolution was stored proves nothing at all. The check is on the
-// DEPENDENT, not on the changed file: an ordinary TypeScript edit can feed a
-// consumer whose own analysis reads more than its imports.
+// replayableDependent reports whether a record models its cross-file bindings.
+// GraphQL composition, gRPC stubs and unknown record kinds cannot use ordinary
+// import-surface reuse. Consumers need this check even when their changed source
+// is ordinary TypeScript; source proofs use it to exclude the same unmodelled
+// extraction paths.
 func replayableDependent(rec *tsextractor.FileRecord) bool {
 	if rec == nil || !rec.ImportComplete {
 		return false
@@ -578,9 +574,9 @@ func refreshProvenSideReads(recs map[string]*tsextractor.FileRecord, parsed, pro
 // reads out of these bytes. An unrecorded surface - a record written before the
 // field existed - is unknown, never equal, and so never proven.
 //
-// Two conditions are kept on top of it, both conservative. The file must have no imports
-// or prove its exports are context-free without repository or framework reads,
-// so that it cannot hide a changed binding behind an unchanged surface; and Declared and Referenced must hold, because a
+// The file must have no imports or prove its exports are context-free without
+// repository or framework reads. Framework context, Declared and Referenced
+// must also remain unchanged, because a
 // side read is a consumer reading source bytes and the export index is only the
 // part of that reading which is modelled here. What remains provable is a file
 // that forwards nothing, exports the same names, and merely moved code inside
@@ -590,6 +586,14 @@ func sideReadProven(prev, neu *tsextractor.FileRecord) bool {
 		return false
 	}
 	if !sideReadLocalSurface(prev) || !sideReadLocalSurface(neu) {
+		return false
+	}
+	// Export names do not describe framework composition. Keep these checks
+	// here so this proof does not rely on separate composition/context fences.
+	if prev.Router != nil || neu.Router != nil || prev.NuxtScope != neu.NuxtScope ||
+		!eqStrings(prev.ResolutionSpecs, neu.ResolutionSpecs) ||
+		!eqStrings(prev.AutoImportDirs, neu.AutoImportDirs) ||
+		!eqStrings(prev.NuxtAliases, neu.NuxtAliases) {
 		return false
 	}
 	// A local surface is not on its own enough, and neither is any field that
@@ -622,10 +626,9 @@ func sideReadLocalSurface(rec *tsextractor.FileRecord) bool {
 
 // passesNoBinding reports whether a record describes a file that resolves no
 // import of its own, and so cannot be a link in anyone's re-export chain. The
-// extractor answers the same question when it decides whether to record an
-// export surface at all, so both ask FileRecord rather than each spelling the
-// condition out; a narrower extractor would leave the surface unrecorded, which
-// reads as unknown and fails closed.
+// extractor uses the same condition for eagerly recording an export surface.
+// Importing files can instead carry an opportunistically recorded surface; the
+// separate sideReadLocalSurface proof governs reuse of those records.
 func passesNoBinding(rec *tsextractor.FileRecord) bool {
 	return rec.BindsNoImports()
 }

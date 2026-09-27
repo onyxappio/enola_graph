@@ -93,7 +93,8 @@ type FileRecord struct {
 	// same place, however far this file's own imports moved. It is deliberately
 	// separate from ExportSurfaceRecorded and from BindsNoImports: a context-free
 	// file may still be someone's re-export chain link through its OWN imports,
-	// so sideReadProven must keep the strict gate and read only the latter.
+	// so side-read reuse additionally requires no repository imports, unresolved
+	// imports, reexports or side reads, and unchanged framework context.
 	// Absent on records written before this field existed, which reads as
 	// unproven and narrows nothing.
 	ExportSurfaceContextFree bool `json:"export_surface_context_free,omitempty"`
@@ -120,11 +121,10 @@ type FileRecord struct {
 }
 
 // BindsNoImports reports whether the file resolves no import or re-export of its
-// own, and so cannot be a link in anyone's re-export chain. It is both the
-// condition under which an export surface is worth recording and the condition
-// under which one may be trusted, kept in one place so those two cannot drift
-// apart: a file the extractor judged ineligible must never be one the planner
-// judged provable.
+// own, and so cannot be a link in anyone's re-export chain. This is the eager
+// export-surface recording condition. Importing files may also record a surface
+// when their export index was already derived; planners must separately prove
+// that such a recorded surface is local and its surrounding context is valid.
 func (r *FileRecord) BindsNoImports() bool {
 	return r != nil && len(r.ImportSpecs) == 0 && len(r.ResolvedFiles) == 0 &&
 		len(r.UnresolvedSpecs) == 0 && len(r.Reexports) == 0
