@@ -17,7 +17,7 @@ Candidate parsed initial/noop/body/structural:6749/0/1/22. The body edit changes
 
 ## Status and limitations
 
-Frozen engineering gates pass; independent complete-cohort review is pending. Runtime is not yet published to main. The broader near-zero no-op / substantially faster delta objective remains open. Initial and body ranges overlap and show no meaningful gain claimed here; no significance claim.
+Frozen engineering gates pass; independent complete-cohort review msg_a2041212da30 reproduced the raw figures, pins and every criterion with no blockers and recommends bounded acceptance. Runtime publication follows normal hooks. The broader near-zero no-op / substantially faster delta objective remains open. Initial and body ranges overlap and show no meaningful gain claimed here; no significance claim.
 
 Foreign CPU is variable, including siriactionsd, WindowServer and virtual machine work. `host-audit.json` reports argument-free per-arm summaries; raw ps logs remain local and their SHA256 identities are archived, avoiding publication of full process arguments. There were no host sampling errors; host cadence is distinct from the stricter pressure gate. Do not describe the host as universally clean. AC/charge/low-power checks are at arm boundaries only; caffeinate-i was used, not continuous-power proof. All3606 pressure samples were normal, max gap0.279919s; zero new Swapouts, Swapins+1288 are contextual only. Details are in the series and comparison receipts.
 
@@ -26,3 +26,13 @@ Final full suite:110 passing packages,99 cached; graphsession uncached512.044s. 
 Prototype outer-directory files are superseded by this final guarded candidate. The first final source-history preflight failed before workload due to /tmp versus /private/tmp pin relocation; corrected v2 logs, original CLI pins and independent byte-equivalence audit are retained. Pin repair preceded acceptance timing. `PROMOTION_RULE.md` intentionally retains its pre-timing status text; timing-window and these results supersede that status, without changing thresholds.
 
 No new persistent relationship index, cache schema, protocol or resolver semantics. Completed discovery directory observations are reused only inside the same build; missing observations fall back to live reads.
+
+## Raw-host arithmetic follow-up
+
+Independent primary recomputation from84 metrics reproduces every numerical gate; primary-audit.json also verifies host sample counts and reports summed foreign CPU. Mean foreign CPU baseline/candidate pairs:184.75/176.52,90.68/94.86,214.67/194.98,242.86/220.98,169.43/160.05,89.68/89.50 percent (sum across processes, may exceed100%). Several pairs favor the candidate in background load. This is a limitation of shared-host inference, not grounds for discarding selected pairs or claiming clean-host causality; the preregistered six-pair decision is unchanged.
+
+## Independent acceptance and publication caveat
+
+The complete review is retained in cohort-review.json. Foreign CPU favored the candidate in five of six pairs, so the full2.87% must not be attributed cleanly to this mechanism alone; attribution and repeatability remain limited to this shared-host cohort. Sensitivity calculations in the review are exploratory, not causal estimates or alternative gates, and no pairs were removed from acceptance. Initial/body changes are within noise; structural and no-op have consistent signs. The traced alias phase localizes saved work (73→16ms) but two single instrumented total CLI times do not establish a speedup.
+
+Wire payload byte differences are fully explained by candidate run identifiers being one character longer than baseline identifiers, not changed graph content. Raw acceptance pins and VALIDATION-STATE.json intentionally retain historical pre-timing text; STATUS.md and this report give the current verdict. The full-suite receipt explicitly reports99 cached packages and11 uncached package executions; no all-uncached claim or rerun is needed. The outer prototype042a0c6e is superseded by final guarded15f55895.
