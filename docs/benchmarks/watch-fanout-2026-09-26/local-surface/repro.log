@@ -1,0 +1,5 @@
+--- FAIL: TestExternalImportLocalSurfaceBodyEditKeepsSideReadersCached (0.65s)
+    external_import_side_read_test.go:18: body edit parsed 2 files, want only changed leaf
+FAIL
+FAIL	github.com/enola-labs/enola/internal/graphsession	1.224s
+FAIL

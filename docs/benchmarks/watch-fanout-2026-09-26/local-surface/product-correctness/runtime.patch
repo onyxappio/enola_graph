@@ -1,0 +1,49 @@
+diff --git a/internal/graphsession/invalidate.go b/internal/graphsession/invalidate.go
+index 751b80b..4e265e1 100644
+--- a/internal/graphsession/invalidate.go
++++ b/internal/graphsession/invalidate.go
+@@ -578,9 +578,9 @@ func refreshProvenSideReads(recs map[string]*tsextractor.FileRecord, parsed, pro
+ // reads out of these bytes. An unrecorded surface - a record written before the
+ // field existed - is unknown, never equal, and so never proven.
+ //
+-// Two conditions are kept on top of it, both conservative. The file must resolve
+-// no import of its own, so that it cannot be a link in a chain whose far end moved
+-// without this record moving; and Declared and Referenced must hold, because a
++// Two conditions are kept on top of it, both conservative. The file must have no imports
++// or prove its exports are context-free without repository or framework reads,
++// so that it cannot hide a changed binding behind an unchanged surface; and Declared and Referenced must hold, because a
+ // side read is a consumer reading source bytes and the export index is only the
+ // part of that reading which is modelled here. What remains provable is a file
+ // that forwards nothing, exports the same names, and merely moved code inside
+@@ -589,10 +589,10 @@ func sideReadProven(prev, neu *tsextractor.FileRecord) bool {
+ 	if prev == nil || neu == nil {
+ 		return false
+ 	}
+-	if !passesNoBinding(prev) || !passesNoBinding(neu) {
++	if !sideReadLocalSurface(prev) || !sideReadLocalSurface(neu) {
+ 		return false
+ 	}
+-	// Resolving no import is not on its own enough, and neither is any field that
++	// A local surface is not on its own enough, and neither is any field that
+ 	// summarizes declarations. `export default round` changed to `export default
+ 	// ceil`, `export function round` demoted to `function round`, and `export {
+ 	// round, ceil }` narrowed to `export { ceil }` all leave Declared and
+@@ -608,6 +608,18 @@ func sideReadProven(prev, neu *tsextractor.FileRecord) bool {
+ 	return eqStrings(prev.Declared, neu.Declared) && eqStrings(prev.Referenced, neu.Referenced)
+ }
+ 
++// A file importing only external modules can still expose a fully local export
++// surface. Reuse only an already recorded context-free proof, with no repository
++// or framework reads; unknown and cross-file bindings keep the conservative path.
++func sideReadLocalSurface(rec *tsextractor.FileRecord) bool {
++	if passesNoBinding(rec) {
++		return true
++	}
++	return replayableDependent(rec) && rec.ExportSurfaceRecorded && rec.ExportSurfaceContextFree &&
++		len(rec.ResolvedFiles) == 0 && len(rec.UnresolvedSpecs) == 0 &&
++		len(rec.Reexports) == 0 && len(rec.SideReads) == 0 && len(rec.SideReadHashes) == 0
++}
++
+ // passesNoBinding reports whether a record describes a file that resolves no
+ // import of its own, and so cannot be a link in anyone's re-export chain. The
+ // extractor answers the same question when it decides whether to record an
