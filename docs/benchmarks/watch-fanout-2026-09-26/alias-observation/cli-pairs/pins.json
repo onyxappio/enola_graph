@@ -16,7 +16,10 @@
     "/private/tmp/enola-stage14-watch-pairs/watch.py": "629fae95963c62b83df4acdc2ea5d6438dd114d67bbca2425b96416eda7538cb",
     "/private/tmp/enola-stage9-product-watch-control/bin/benchobserver": "9d4322e7fdeb7068b049ba0ded77aa043ada59396162c9d1286b4e29c3c4bd5f",
     "/private/tmp/enola-toolchain/bin/nats-server": "47a95067f10358c7cd7cdf56f5e840c5aa17ed0be91fcf88170cc876d2be02af",
-    "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/run.py": "94caf3654e6283630dca8fbaa558c447d2cb1aade55f7b1bfc406cfba9d14c79"
+    "/Users/oleksandr.mykulych/orca/enola_graph/docs/benchmarks/product-efficiency-2026-09-22/run.py": "94caf3654e6283630dca8fbaa558c447d2cb1aade55f7b1bfc406cfba9d14c79",
+    "/private/tmp/enola-alias-observation/summarize-timing.py": "30360fd59ef2c10e52a2c1b17008052806f45e0b14e59ab0a70f028f79472af0",
+    "/private/tmp/enola-alias-observation/test-timing-summary.py": "37e39fb3528b60d25eb34baffcc1df3f9910e36e7481ab12fac8a6c77bfc264a",
+    "/private/tmp/enola-alias-observation/run-timing-series.py": "2acb3e4852b740790dcc8bb727bcbc1aa054d70befdd9ea691189cde7ce3935b"
   },
   "binaries": {
     "baseline": {
@@ -41,5 +44,6 @@
     "GODEBUG": null,
     "ENOLA_GRAPH_PROFILE": null
   },
-  "nats_max_payload": 8388608
+  "nats_max_payload": 8388608,
+  "combined_source_revision": "fca10d8"
 }
