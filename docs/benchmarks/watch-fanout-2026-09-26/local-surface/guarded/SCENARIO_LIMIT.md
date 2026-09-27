@@ -1,0 +1,1 @@
+Scenario limitation recorded before timing: Product password.ts is outside a Nuxt auto-import composition domain. Body edits inside those domains change the full-source composition signature and can still force broad work; this candidate does not claim a benefit there. Named addImports registrations remain unmodelled on both cold and delta paths, a pre-existing modelling limit.
