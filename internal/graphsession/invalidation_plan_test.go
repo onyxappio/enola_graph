@@ -32,6 +32,25 @@ func TestFileInvalidationPlan(t *testing.T) {
 	}
 }
 
+func TestFSMBodySideReadChangeReparsesDependentDespiteStableExportSurface(t *testing.T) {
+	prev := map[string]*tsextractor.FileRecord{
+		"apps/mobile/src/App.tsx": {
+			File: "apps/mobile/src/App.tsx", ParseKind: "ts", ImportComplete: true,
+			SideReads:      []string{"apps/mobile/src/screens/forgot-password/forgotPasswordRuntimeView.ts"},
+			SideReadHashes: map[string]string{"apps/mobile/src/screens/forgot-password/forgotPasswordRuntimeView.ts": "old-body"},
+			FSMReads:       []string{"apps/mobile/src/screens/forgot-password/forgotPasswordRuntimeView.ts"},
+		},
+	}
+	side := "apps/mobile/src/screens/forgot-password/forgotPasswordRuntimeView.ts"
+	changed := sideReadDependents(map[string]bool{}, map[string]bool{side: true}, prev, map[string]string{side: "new-body"}, false)
+	if !changed["apps/mobile/src/App.tsx"] {
+		t.Fatalf("FSM consumer was skipped after imported type body change: %v", changed)
+	}
+	if replayableDependent(prev["apps/mobile/src/App.tsx"]) {
+		t.Fatal("FSM body-sensitive consumer remained eligible for export-surface-only replay")
+	}
+}
+
 func TestAuthoritativePlanSeedsNameDependentOutsideReverseClose(t *testing.T) {
 	prev := map[string]*FileState{
 		"packages/crypto/src/password.ts": {

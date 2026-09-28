@@ -711,6 +711,9 @@ func ownerOf(f facts.Fact) graphstream.OwnerRef {
 		return graphstream.OwnerRef{Kind: graphstream.OwnerSynthetic, ID: "module:" + f.Name}
 	}
 	if f.Kind == facts.KindExtraction {
+		if f.Props != nil && f.Props["extractor"] == "typescript:fsm" && f.File != "" {
+			return graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: filepath.ToSlash(f.File)}
+		}
 		return graphstream.OwnerRef{Kind: graphstream.OwnerSynthetic, ID: "aggregate:typescript"}
 	}
 	file := filepath.ToSlash(f.File)
@@ -845,6 +848,24 @@ func (idx *idIndex) resolveRelConstrained(fromRepo, fromKind, relKind, target st
 	cands := idx.byName[target]
 	if len(cands) == 0 {
 		return "", graphstream.ResUnresolved
+	}
+	if wantKind, isFSMRelation := facts.FSMRelationTargetKind(relKind); isFSMRelation {
+		selected := ""
+		for _, f := range cands {
+			if f.Kind != wantKind || (targetFile != "" && filepath.ToSlash(f.File) != filepath.ToSlash(targetFile)) ||
+				(fromRepo != "" && f.Repo != fromRepo) {
+				continue
+			}
+			id := f.Identity()
+			if selected != "" && selected != id {
+				return "", graphstream.ResAmbiguous
+			}
+			selected = id
+		}
+		if selected == "" {
+			return "", graphstream.ResUnresolved
+		}
+		return selected, graphstream.ResResolved
 	}
 	if relKind == facts.RelDeclares || relKind == facts.RelImports {
 		if mods := moduleCandidates(cands, fromRepo); len(mods) > 0 {

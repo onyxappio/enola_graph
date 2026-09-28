@@ -189,7 +189,7 @@ type FileChangeSource struct {
 	*ChangeQueue
 	root         string
 	ignored      []string
-	watcher      *fsnotify.Watcher
+	watcher      nativeWatcher
 	done         chan struct{}
 	once         sync.Once
 	registration sync.Mutex
@@ -219,6 +219,11 @@ func (s *FileChangeSource) ignore(path string) bool {
 func (s *FileChangeSource) register(root string) error {
 	s.registration.Lock()
 	defer s.registration.Unlock()
+	if s.watcher != nil && s.watcher.Recursive() {
+		// FSEvents covers the complete hierarchy from one stream. Filtering is
+		// still performed in handleEvent so policy exclusions remain authoritative.
+		return s.watcher.Add(root)
+	}
 	return filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
 		if s.ignore(path) || (s.policy.Load() != nil && d != nil && s.policy.Load().Classify(path, d.IsDir()).Kind == graphinput.Excluded) {
 			if d != nil && d.IsDir() {
@@ -242,12 +247,12 @@ func (s *FileChangeSource) Start(ctx context.Context) error {
 	if err := requireLocalWatch(s.root); err != nil {
 		return err
 	}
-	w, err := fsnotify.NewWatcher()
+	w, err := newNativeWatcher()
 	if err != nil {
 		return err
 	}
 	s.watcher = w
-	// Reader starts before traversal; each directory is watched before descent.
+	// Reader starts before registration so events cannot race watch bootstrap.
 	go s.read(ctx)
 	if err = s.register(s.root); err != nil {
 		s.Close()
@@ -262,14 +267,14 @@ func (s *FileChangeSource) read(ctx context.Context) {
 		case <-ctx.Done():
 			s.markUncertain("watch context ended")
 			return
-		case e, ok := <-s.watcher.Events:
+		case e, ok := <-s.watcher.Events():
 			if !ok {
 				s.markUncertain("watch event stream closed")
 				return
 			}
 			s.handleEvent(e)
 			s.recordObserved(e.Name)
-		case _, ok := <-s.watcher.Errors:
+		case _, ok := <-s.watcher.Errors():
 			s.markUncertain("filesystem watcher error or overflow")
 			if !ok {
 				return
@@ -541,7 +546,7 @@ func (s *FileChangeSource) CoverSessionInputs(r *Resident) error {
 		if !filepath.IsAbs(p) {
 			p = filepath.Join(r.abs, p)
 		}
-		if watched[filepath.Dir(p)] {
+		if watcherCovers(s.watcher, filepath.Dir(p)) {
 			continue
 		}
 		common := s.root
@@ -588,10 +593,12 @@ func (s *FileChangeSource) CoverSessionInputs(r *Resident) error {
 		for p := range targets {
 			needed[filepath.Dir(p)] = true
 		}
-		for _, dir := range s.watcher.WatchList() {
-			if (dir == s.root || strings.HasPrefix(dir, s.root+string(filepath.Separator))) && s.policy.Load().Classify(dir, true).Kind == graphinput.Excluded && !needed[strings.ToLower(dir)] {
-				if err := s.watcher.Remove(dir); err != nil && !errors.Is(err, fsnotify.ErrNonExistentWatch) {
-					return err
+		if s.watcher != nil && !s.watcher.Recursive() {
+			for _, dir := range s.watcher.WatchList() {
+				if (dir == s.root || strings.HasPrefix(dir, s.root+string(filepath.Separator))) && s.policy.Load().Classify(dir, true).Kind == graphinput.Excluded && !needed[strings.ToLower(dir)] {
+					if err := s.watcher.Remove(dir); err != nil && !errors.Is(err, fsnotify.ErrNonExistentWatch) {
+						return err
+					}
 				}
 			}
 		}
@@ -693,12 +700,14 @@ func (s *FileChangeSource) handleEvent(e fsnotify.Event) {
 		if st, err := os.Lstat(e.Name); err == nil && st.Mode()&os.ModeSymlink != 0 {
 			s.markUncertain("new symlink has uncertain target coverage")
 		}
-		if st, err := os.Stat(e.Name); err == nil && st.IsDir() {
-			if err = s.register(e.Name); err != nil {
-				s.registration.Lock()
-				s.uncertain = true
-				s.registration.Unlock()
-				s.Lost("watch registration failed")
+		if s.watcher != nil && !s.watcher.Recursive() {
+			if st, err := os.Stat(e.Name); err == nil && st.IsDir() {
+				if err = s.register(e.Name); err != nil {
+					s.registration.Lock()
+					s.uncertain = true
+					s.registration.Unlock()
+					s.Lost("watch registration failed")
+				}
 			}
 		}
 		s.Lost("filesystem name change requires reconciliation")

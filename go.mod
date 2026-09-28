@@ -3,8 +3,9 @@ module github.com/enola-labs/enola
 go 1.26.8
 
 require (
-	github.com/fsnotify/fsnotify v1.9.0
 	github.com/ebitengine/purego v0.10.2
+	github.com/fsnotify/fsevents v0.2.0
+	github.com/fsnotify/fsnotify v1.9.0
 	github.com/modelcontextprotocol/go-sdk v1.8.0
 	github.com/nats-io/nats.go v1.47.0
 	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58

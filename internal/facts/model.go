@@ -70,6 +70,14 @@ const (
 	// either ignored or miscounted; "I saw 45 of these and could not name their
 	// targets" belongs in a report, not in an untraversable edge.
 	KindAssociation = "association"
+
+	// The FSM kinds describe admitted finite-state-machine source declarations.
+	// They are produced only by configured extractors, not by external providers.
+	KindFSMMachine    = "fsm_machine"
+	KindFSMState      = "fsm_state"
+	KindFSMEvent      = "fsm_event"
+	KindFSMTransition = "fsm_transition"
+	KindFSMCommand    = "fsm_command"
 	// KindTestRef is a reference-only fact emitted from a test/spec file. It carries
 	// only reference relations — RelCalls, and RelInstantiates where the reference is
 	// a constructor call — naming the production symbols the test exercises
@@ -95,6 +103,29 @@ const (
 	// with because-prose and a ratchet and the check's one comment covers
 	// both engines. Props: lint_engine, lint_rule, lint_severity, line, message.
 	KindLint = "lint"
+)
+
+// FSM relation kinds. Evidence and per-site details live on the source fact;
+// Relation remains the positionless {kind,target,target_id} wire object.
+const (
+	RelFSMParent                 = "fsm_parent"
+	RelFSMInitial                = "fsm_initial"
+	RelFSMFrom                   = "fsm_from"
+	RelFSMTo                     = "fsm_to"
+	RelFSMOn                     = "fsm_on"
+	RelFSMEmits                  = "fsm_emits"
+	RelFSMEntryEmits             = "fsm_entry_emits"
+	RelFSMOutcome                = "fsm_outcome"
+	RelFSMGuardRef               = "fsm_guard_ref"
+	RelFSMReducerRef             = "fsm_reducer_ref"
+	RelFSMGuardCalls             = "fsm_guard_calls"
+	RelFSMActionCalls            = "fsm_action_calls"
+	RelFSMDeclaredIn             = "fsm_declared_in"
+	RelFSMTypedBy                = "fsm_typed_by"
+	RelFSMConstructsEvent        = "fsm_constructs_event"
+	RelFSMDispatches             = "fsm_dispatches"
+	RelFSMDispatchesUnknownEvent = "fsm_dispatches_unknown_event"
+	RelFSMHandlesCommand         = "fsm_handles_command"
 )
 
 // pathShapedName names the kinds whose Name IS a repo-relative path, and which the

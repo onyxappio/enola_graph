@@ -75,6 +75,10 @@ type FileRecord struct {
 	// this contribution even when this file is untouched.
 	SideReads      []string          `json:"side_reads,omitempty"`
 	SideReadHashes map[string]string `json:"side_read_hashes,omitempty"`
+	// FSMReads are direct source dependencies consulted by the configured FSM
+	// adapter. Their bodies can affect machine, converter and dispatch facts even
+	// when their exported symbol surface is unchanged.
+	FSMReads []string `json:"fsm_reads,omitempty"`
 	// ExportSurface is the file's observable export membership as the binder sees
 	// it - the encoded namedExportIndex, see (*namedExportIndex).surface. Nothing
 	// else on this record describes it: Declared holds every declaration whether
@@ -502,6 +506,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			return raw
 		}, prev, dirty, nuxtPkgs, pkgDirSet, invertPackageNames(pkgNamesEarly))
 	}
+	fsmAnalyzer := e.newFSMAnalyzer(ctx, repoPath, knownFiles, readSource, aliasesForFile)
 
 	nuxtAutoByPkg := map[string]map[string]string{}
 	for _, p := range nuxtPkgs {
@@ -564,6 +569,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		var res tsFileResult
 		sideReads := map[string]bool{}
 		resolutionSpecs := map[string]bool{}
+		var fsmReads []string
 		readSrc := func(rel string) []byte {
 			if b, ok := sources[rel]; ok {
 				return b
@@ -579,6 +585,11 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			rec.DefaultExportName = name
 			rec.DefaultExportRecorded = true
 		}, sideReads, resolutionSpecs)
+		if fsmAnalyzer != nil {
+			fsmFacts, reads := fsmAnalyzer.ExtractFile(relFile, src)
+			res.facts = mergeFSMFacts(res.facts, fsmFacts)
+			fsmReads = reads
+		}
 		if len(resolutionSpecs) > 0 {
 			rec.ResolutionSpecs = make([]string, 0, len(resolutionSpecs))
 			for spec := range resolutionSpecs {
@@ -599,6 +610,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			}
 			sort.Strings(rec.SideReads)
 		}
+		appendFSMReads(rec, fsmReads, repoPath, readSource)
 		if !facts.IsTestPath(relFile) {
 			res.routers = collectRouterFile(src, relFile, aliases, knownFiles)
 		}
@@ -646,6 +658,7 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 		}
 		return fileOut{res: res, rec: rec}
 	})
+	e.rememberFSMAnalyzer(fsmAnalyzer, knownFiles, readSource, aliasesForFile)
 
 	records := make(map[string]*FileRecord, len(tsFiles))
 	var allFacts []facts.Fact

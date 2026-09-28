@@ -1629,3 +1629,22 @@ func TestGovernedByPage(t *testing.T) {
 		t.Fatal("a graph without page nodes must not report compiled pages")
 	}
 }
+
+func TestNodeFor_FSMRelationsResolveTheirTypedTargets(t *testing.T) {
+	s := NewStore()
+	s.Add(
+		Fact{Kind: KindFSMTransition, Name: "jobs/transition:start", File: "machine.ts",
+			Relations: []Relation{{Kind: RelFSMTo, Target: "jobs/state:Done"}}},
+		Fact{Kind: KindFSMState, Name: "jobs/state:Done", File: "machine.ts"},
+		// A same-named symbol must not steal an FSM-state relationship target.
+		Fact{Kind: KindSymbol, Name: "jobs/state:Done", File: "collision.ts", Props: map[string]any{"symbol_kind": SymbolType}},
+	)
+	s.BuildGraph()
+	node := s.Graph().nodeFor("jobs/state:Done", 1, RelFSMTo)
+	if node.Kind != KindFSMState {
+		t.Fatalf("fsm_to resolved target kind %q, want %q", node.Kind, KindFSMState)
+	}
+	if !reflect.DeepEqual(node.Conflated, []string{KindFSMState, KindSymbol}) {
+		t.Fatalf("same-name FSM target conflation = %v, want both kinds", node.Conflated)
+	}
+}

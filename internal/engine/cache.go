@@ -2618,7 +2618,10 @@ import (
 // surface and the proof that it is context-free, so a consumer that binds a
 // name inside it is no longer rebound when only that file's own imports move;
 // an index merged from a block nobody could read carries no such proof.
-const cacheVersion = "v321"
+// v322: repository-configured TypeScript FSM machines, transitions, returned-value
+// and type dependencies, file-owned coverage, canonical source bindings and
+// relation-kind constrained endpoint provenance change cached facts.
+const cacheVersion = "v322"
 
 // ExtractorVersion is cacheVersion, named for callers outside this package.
 //

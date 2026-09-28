@@ -7,6 +7,7 @@ import (
 	"github.com/enola-labs/enola/internal/extractors/tsutil"
 	"io/fs"
 	"log"
+	"sync"
 
 	"path/filepath"
 	"sort"
@@ -16,6 +17,7 @@ import (
 	"github.com/enola-labs/enola/internal/clientspec"
 	"github.com/enola-labs/enola/internal/extractors/detectnames"
 	"github.com/enola-labs/enola/internal/facts"
+	"github.com/enola-labs/enola/internal/fsm"
 	"github.com/enola-labs/enola/internal/parallel"
 
 	"github.com/enola-labs/enola/internal/extractors/inputscope"
@@ -30,6 +32,11 @@ type TSExtractor struct {
 	// clients are the in-house HTTP clients the config declares for TypeScript, handed
 	// over by the engine at registration and read-only afterwards.
 	clients []clientspec.Spec
+	// stateMachines are explicit repository-local machine adapters. They remain
+	// immutable after registration, like client specs.
+	stateMachines []fsm.Spec
+	fsmCacheMu    sync.Mutex
+	fsmCache      *fsmAnalyzerCache
 }
 
 // New creates a new TSExtractor.
@@ -44,9 +51,20 @@ func (e *TSExtractor) Name() string {
 // SetClientSpecs implements clientspec.Consumer.
 func (e *TSExtractor) SetClientSpecs(specs []clientspec.Spec) { e.clients = specs }
 
+// SetStateMachineSpecs implements fsm.Consumer.
+func (e *TSExtractor) SetStateMachineSpecs(specs []fsm.Spec) {
+	e.stateMachines = append([]fsm.Spec(nil), specs...)
+}
+
 // ConfigKey implements plugin.ConfigKeyed: the declared clients decide which call sites
 // become routes, so they are part of what a cached result was extracted under.
-func (e *TSExtractor) ConfigKey() string { return clientspec.Fingerprint(e.clients) }
+func (e *TSExtractor) ConfigKey() string {
+	clientKey, machineKey := clientspec.Fingerprint(e.clients), fsm.Fingerprint(e.stateMachines)
+	if machineKey == "" {
+		return clientKey
+	}
+	return "clients=" + clientKey + "\x00fsm=" + machineKey
+}
 
 // Detect returns true if the repository (or one of its immediate subdirectories
 // in the case of a monorepo) contains TypeScript markers.
@@ -310,6 +328,13 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 	}
 
 	exportCache := newNamedExportCache()
+	fsmReadSource := func(rel string) []byte {
+		return sources[filepath.ToSlash(rel)]
+	}
+	fsmAliasesFor := func(rel string) map[string]tsAlias {
+		return mergePackageAliases(aliasesForDir(aliasRoots, factpath.Dir(rel)), pkgAliases)
+	}
+	fsmAnalyzer := e.newFSMAnalyzer(ctx, repoPath, knownFiles, fsmReadSource, fsmAliasesFor)
 	perFile := parallel.MapFiles(ctx, tsFiles, func(relFile string) tsFileResult {
 		src := sources[relFile]
 		if src == nil {
@@ -333,6 +358,10 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 		res.facts, res.angular, res.angularRouter, res.angularInline, res.angularHTTP, res.clients = e.extractFile(src, relFile, isNextJS, fileVue, inNuxt, isSvelteKit, isEmber, isReactNav, isAngular, graphqlServer, fileOrms, aliases, knownFiles, func(rel string) []byte {
 			return sources[rel]
 		}, auto, grpcStubs, exportCache, nil, nil, nil)
+		if fsmAnalyzer != nil {
+			fsmFacts, _ := fsmAnalyzer.ExtractFile(relFile, src)
+			res.facts = mergeFSMFacts(res.facts, fsmFacts)
+		}
 		// Routers, mounts and held-back routes for the repo-wide mount pass below.
 		// Collected here because resolving an import needs this file's path aliases,
 		// which are in scope only during the per-file walk. Same test-path gate as
@@ -343,6 +372,7 @@ func (e *TSExtractor) Extract(ctx context.Context, repoPath string, files []stri
 		}
 		return res
 	})
+	e.rememberFSMAnalyzer(fsmAnalyzer, knownFiles, fsmReadSource, fsmAliasesFor)
 	nuxtExtraDirs := collectAddImportsDirs(sources)
 	nuxtSources := sources
 	if !isNuxt {
