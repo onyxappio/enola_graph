@@ -1545,9 +1545,9 @@ var kindForRel = map[string]string{
 }
 
 // FSMRelationTargetKind returns the declared fact kind expected at the far end
-// of a typed FSM relation. Graph construction and streaming resolution share
-// this mapping so source-name collisions cannot bind an FSM edge to the wrong
-// kind of fact.
+// of a typed FSM relation. Graph construction, streaming resolution, and plugin
+// validation share this mapping so source-name collisions cannot bind an edge
+// to the wrong kind of fact.
 func FSMRelationTargetKind(rel string) (string, bool) {
 	if !strings.HasPrefix(rel, "fsm_") {
 		return "", false

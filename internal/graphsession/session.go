@@ -16,6 +16,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/enola-labs/enola/internal/analyzerplugin"
 	"github.com/enola-labs/enola/internal/engine"
 	"github.com/enola-labs/enola/internal/extractors/tsextractor"
 	"github.com/enola-labs/enola/internal/facts"
@@ -75,6 +76,21 @@ type Options struct {
 	// any declared input moved, if the configuration bracket around the check
 	// does not hold, or if anything has already run against the engine.
 	FreshEngine bool
+	// AllowRepoPlugins is the operator allow-list for repository-owned plugin
+	// names. A repository cannot grant itself this trust through config.
+	AllowRepoPlugins []string
+	// PluginVerify forces every plugin unit to re-run and compare canonical
+	// digests with cached records. Matches publish nothing and advance no
+	// generation; mismatches fail before publication. It is never counted as
+	// an ordinary no-change run.
+	PluginVerify bool
+	// analyzerPlugins is populated only after OpenSession validates manifests
+	// and the operator allow-list, before state or broker activity.
+	analyzerPlugins []analyzerplugin.Loaded
+	// analyzerPluginConfigs preserves registrations bound at open so a later
+	// engine rebuild that drops Config.AnalyzerPlugins cannot disable them;
+	// each transaction still reloads manifests, bundles and runtime identity.
+	analyzerPluginConfigs []analyzerplugin.Config
 }
 
 // Result is the observable outcome of Analyze or Delta.
@@ -367,18 +383,32 @@ func (s *session) policyBookkeepingFenced(input *runtimeInputs) (bool, error) {
 	return true, nil
 }
 
+// AnalyzerPluginStats reports work done or reused by repository analyzer
+// plugins for one graph generation.
+type AnalyzerPluginStats struct {
+	Plugins          int
+	ProcessesStarted int
+	PlansRun         int
+	UnitsPlanned     int
+	UnitsExecuted    int
+	UnitsReused      int
+	OwnerFiles       int
+}
+
 type Result struct {
-	Invalidation     InvalidationStats
-	RunID            string
-	BaseGeneration   int64
-	TargetGeneration int64
-	Stats            tsextractor.ExtractStats
-	Fallbacks        []graphstream.Fallback
-	Unreadable       []string
-	OwnersPublished  int
-	ParsedFiles      int
-	EarlyLocal       int
-	Facts            []facts.Fact
+	Invalidation      InvalidationStats
+	AnalyzerPlugins   AnalyzerPluginStats
+	RunID             string
+	BaseGeneration    int64
+	TargetGeneration  int64
+	Stats             tsextractor.ExtractStats
+	Fallbacks         []graphstream.Fallback
+	Unreadable        []string
+	OwnersPublished   int
+	ReplacementOwners int
+	ParsedFiles       int
+	EarlyLocal        int
+	Facts             []facts.Fact
 }
 
 // Run performs initial analysis when no complete state exists, otherwise a delta.
@@ -471,15 +501,31 @@ func OpenSession(ctx context.Context, eng *engine.Engine, repoPath string, sink 
 		return nil, err
 	}
 	nfiles := 0
+	runtimeCache := analyzerplugin.RuntimeCache{}
 	if st != nil {
 		nfiles = len(st.Files)
 		if err := identityOK(st, opts, abs); err != nil {
 			return nil, err
 		}
+		if st.RuntimeFingerprints != nil {
+			runtimeCache = st.RuntimeFingerprints
+		}
 	}
+	pluginConfigs := append([]analyzerplugin.Config(nil), eng.Config().AnalyzerPlugins...)
+	loadedPlugins, err := analyzerplugin.Load(abs, pluginConfigs, runtimeCache)
+	if err != nil {
+		return nil, err
+	}
+	for _, p := range loadedPlugins {
+		if !analyzerplugin.Trusted(opts.AllowRepoPlugins, p.Manifest.Name) {
+			return nil, fmt.Errorf("repository analyzer plugin %q is not trusted; rerun with --allow-repo-plugins %s", p.Manifest.Name, p.Manifest.Name)
+		}
+	}
+	opts.analyzerPluginConfigs = pluginConfigs
+	opts.analyzerPlugins = loadedPlugins
 	tr.Mark("load_state", fmt.Sprintf("files=%d", nfiles))
 	opened = true
-	return &Resident{eng: eng, abs: abs, opts: opts, sink: sink, state: st, journal: journal, lock: lock, engineUnused: opts.FreshEngine, ck: newStateCheckpoint(st, stFP)}, nil
+	return &Resident{eng: eng, abs: abs, opts: opts, sink: sink, state: st, journal: journal, lock: lock, engineUnused: opts.FreshEngine, ck: newStateCheckpoint(st, stFP), runtimeFingerprints: runtimeCache}, nil
 }
 
 func identityOK(st *State, opts Options, abs string) error {
@@ -514,45 +560,72 @@ type session struct {
 	// retryFor the identity it parsed them under. Like the snapshot above they
 	// are an offer: each record is used only after this run has found the exact
 	// bytes its hash names still on disk.
-	retryRecords      map[string]*tsextractor.FileRecord
-	retryFor          retryIdentity
-	retryFileContext  map[string]string
-	retryFileBase     map[string]string
-	plan              *fileInvalidationPlan
-	extraFallbacks    []graphstream.Fallback
-	priorResolution   *idIndex
-	validateEffective func() error
-	eng               *engine.Engine
-	abs               string
-	opts              Options
-	sink              graphstream.Sink
-	state             *State
-	stateFP           stateFingerprint
-	journal           *graphstream.Journal
-	pub               *graphstream.Publisher
-	seq               int
-	replaceScope      []graphstream.OwnerRef
-	scopeLimited      bool
-	skipPublish       bool
-	began             bool
-	batchPayloads     [][]byte
-	frameworkSig      string
-	capturedSources   map[string][]byte
-	cfgCaptured       map[string][]byte
-	mu                sync.Mutex
-	announced         map[string]bool
-	scopeMode         string
-	localErr          error
-	localNodes        []graphstream.Node
-	localEdges        []graphstream.Edge
-	resolvNodes       []graphstream.Node
-	resolvEdges       []graphstream.Edge
-	firstLocalSent    bool
-	resolvedOwners    int
-	inputs            *runtimeInputs
-	fast              bool
-	work              WorkCounters
-	prof              *graphprofile.Trace
+	retryRecords        map[string]*tsextractor.FileRecord
+	retryFor            retryIdentity
+	retryFileContext    map[string]string
+	retryFileBase       map[string]string
+	plan                *fileInvalidationPlan
+	extraFallbacks      []graphstream.Fallback
+	priorResolution     *idIndex
+	validateEffective   func() error
+	eng                 *engine.Engine
+	abs                 string
+	opts                Options
+	sink                graphstream.Sink
+	state               *State
+	stateFP             stateFingerprint
+	journal             *graphstream.Journal
+	pub                 *graphstream.Publisher
+	seq                 int
+	replaceScope        []graphstream.OwnerRef
+	scopeLimited        bool
+	skipPublish         bool
+	began               bool
+	batchPayloads       [][]byte
+	frameworkSig        string
+	pluginExecution     bool
+	pluginChanged       bool
+	pluginPlanRefresh   bool
+	pluginVerifyOnly    bool
+	analyzerPluginStats AnalyzerPluginStats
+	nextAnalyzerPlugins map[string]analyzerplugin.PluginRecord
+	pluginFacts         []facts.Fact
+	pluginAnchors       []pluginAnchor
+	pluginContribs      map[string][]facts.Fact
+	// pluginDeltaOwners is P_pl: old∪new owners of invalidated/added/removed units.
+	pluginDeltaOwners []string
+	// pluginResOwners is P_res: cached owners mentioning changed plugin candidate names.
+	pluginResOwners []string
+	// pluginScopeIncomplete forces whole-domain when name/dependency indexes
+	// cannot prove a smaller safe plugin replacement boundary.
+	pluginScopeIncomplete bool
+	pluginHoldOwners      map[string]bool
+	// pluginHoldSnapshot is the frozen plugin set used for owner_domain holds
+	// during concurrent cold prepare; reload must not mutate it mid-run.
+	pluginHoldSnapshot  []analyzerplugin.Loaded
+	pluginPrepareDone   <-chan error
+	runtimeFingerprints analyzerplugin.RuntimeCache
+	capturedSources     map[string][]byte
+	// pluginCapturedSources holds plugin-callback reads until they are merged
+	// into capturedSources after concurrent prepare finishes, so cold-run TS
+	// extraction never races the plugin goroutine on the shared map.
+	pluginCapturedSources map[string][]byte
+	pluginPreviewFences   []func() error
+	cfgCaptured           map[string][]byte
+	mu                    sync.Mutex
+	announced             map[string]bool
+	scopeMode             string
+	localErr              error
+	localNodes            []graphstream.Node
+	localEdges            []graphstream.Edge
+	resolvNodes           []graphstream.Node
+	resolvEdges           []graphstream.Edge
+	firstLocalSent        bool
+	resolvedOwners        int
+	inputs                *runtimeInputs
+	fast                  bool
+	work                  WorkCounters
+	prof                  *graphprofile.Trace
 	// preparedTS is a dirty-file ExtractSession performed before frozen Begin
 	// so name-delta planning uses composed facts. The later TS path reuses it.
 	preparedTS    *tsextractor.SessionResult
@@ -619,15 +692,23 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	s.neutralScan = false
 	s.neutralConfig = false
 	s.previewFences = nil
+	s.pluginExecution = false
+	s.pluginPlanRefresh = false
 	if s.inputs != nil {
 		// A discovery snapshot is one run's observation of the tree, and a run
 		// does not inherit one. Whichever path below supplies this run's
 		// snapshot supplies it by proof.
 		s.inputs.tsDiscovery = nil
 	}
+	pluginStatePresent := s.state != nil && len(s.state.AnalyzerPlugins) > 0
+	// Live engine registrations participate in the gate so a resident opened
+	// without plugins still prepares after an engine rebuild adds analyzer_plugins.
+	pluginExecution := pluginStatePresent || len(s.boundAnalyzerPluginConfigs()) > 0
+	s.pluginExecution = pluginExecution
 	var err error
 	input := s.inputs
-	if !s.fast {
+	if !s.fast || pluginExecution {
+		s.fast = false
 		input, err = readRuntimeInputs(s.eng, s.abs, s.state, &s.work, s.retained, s.retainedFor)
 		if err != nil {
 			return nil, err
@@ -683,6 +764,38 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	for k, v := range input.sources {
 		s.capturedSources[k] = v
 	}
+	if s.opts.PluginVerify {
+		// Verification publishes nothing and advances no generation, even when
+		// no analyzer plugins are configured for this run.
+		s.pluginVerifyOnly = true
+		s.skipPublish = true
+	}
+	if pluginExecution {
+		coldPluginConcurrent := initial || s.state == nil
+		if coldPluginConcurrent {
+			// One reload feeds both the owner_domain hold snapshot and the
+			// concurrent prepare so a mid-run manifest edit cannot split them.
+			if err := s.reloadAnalyzerPlugins(); err != nil {
+				return nil, err
+			}
+			s.freezePluginOwnerHoldSnapshot(s.analyzerPluginsLocked())
+			done := make(chan error, 1)
+			s.pluginPrepareDone = done
+			go func() {
+				done <- s.prepareAnalyzerPluginsWith(ctx, input, inv.Files, inv.AllNames, hashes, false)
+			}()
+		} else {
+			if err := s.prepareAnalyzerPlugins(ctx, input, inv.Files, inv.AllNames, hashes); err != nil {
+				return nil, err
+			}
+			if err := s.mergePluginCapturedSources(); err != nil {
+				return nil, err
+			}
+			if err := s.revalidateCapturedInputs("refusing analyzer plugin output built from superseded inputs"); err != nil {
+				return nil, err
+			}
+		}
+	}
 	invalidation := InvalidationStats{ParsedByReason: map[string]int{}}
 	var invalidationMu sync.Mutex
 	if s.state != nil {
@@ -726,7 +839,13 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	s.pub.EnableAsync(64, 16<<20)
 	defer s.pub.CloseAsync()
 
-	fallbacks := append([]graphstream.Fallback(nil), s.extraFallbacks...)
+	// Concurrent cold plugin prepare may still append extraFallbacks. Copy them
+	// only after that goroutine has settled; sync prepare has already finished.
+	fallbacks := []graphstream.Fallback(nil)
+	if s.pluginPrepareDone == nil {
+		fallbacks = append(fallbacks, s.extraFallbacks...)
+		s.extraFallbacks = nil
+	}
 	s.work.FactAssemblies++
 	var allFacts []facts.Fact
 	var deferredTSFacts func()
@@ -844,6 +963,12 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		}
 	}
 	for _, name := range priorExtractorNames(s.state, prevFiles) {
+		// Plugin-owned file contributions are reconciled from the separate
+		// AnalyzerPlugins cache below. Treating their contribution key as a
+		// missing extractor would force a publication on every unchanged run.
+		if s.hasConfiguredAnalyzerPluginContribution(name) {
+			continue
+		}
 		if detectedExt[name] {
 			continue
 		}
@@ -910,7 +1035,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				}
 			}
 		}
-		changed := initial || forceAll || nonTSNeed || s.state == nil || scanChanged || rawConfigChanged || policyChanged
+		changed := initial || forceAll || nonTSNeed || s.state == nil || scanChanged || rawConfigChanged || policyChanged || s.pluginChanged
 		tr.Mark("changed_terms", fmt.Sprintf("initial=%v force=%v non_ts=%v scan=%v raw_cfg=%v policy=%v neutral_scan=%v neutral_cfg=%v", initial, forceAll, nonTSNeed, scanChanged, rawConfigChanged, policyChanged, s.neutralScan, s.neutralConfig))
 		if changed {
 			previous := []string{}
@@ -930,7 +1055,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			// Initial/global-context changes still require the complete domain.
 			// For an ordinary content delta, derive the manifest from changed
 			// files plus reverse file-to-file dependents in the prior state.
-			wholeDomain := initial || forceAll || s.state == nil || configChanged || policyReconciles(s.state, input) || incompleteDependencyRecords(prevFiles)
+			// Plugin unit changes seed P_pl ∪ P_res into the frozen scope (§9.1);
+			// they do not by themselves force whole-repository replacement.
+			wholeDomain := initial || forceAll || s.state == nil || configChanged || policyReconciles(s.state, input) || incompleteDependencyRecords(prevFiles) || s.pluginScopeIncomplete
 			// A raw configuration byte change is not by itself a reason to
 			// replace every owner. It is a reason to do so when no active
 			// consumer can prove a smaller boundary for it; rawConfigScopeBounded
@@ -1134,6 +1261,21 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 							previewRecs = s.preparedTS.Records
 						}
 						extraOwners = append(extraOwners, composedRouteOwnerDelta(prevFiles, dirty, previewRecs, retired)...)
+						if pluginExecution {
+							if err := s.waitAnalyzerPlugins(); err != nil {
+								return nil, err
+							}
+							fallbacks = append(fallbacks, s.extraFallbacks...)
+							s.extraFallbacks = nil
+							if s.pluginScopeIncomplete {
+								wholeDomain = true
+								fallbacks = append(fallbacks, graphstream.Fallback{Extractor: "analyzer_plugins", Scope: "all prior/current file owners", Reason: "plugin resolution name indexes are incomplete; using whole domain"})
+							}
+							// Re-seed after settle so concurrent cold prepare and
+							// incomplete-index fallback both keep P_pl ∪ P_res.
+							extraOwners = append(extraOwners, s.pluginDeltaOwners...)
+							extraOwners = append(extraOwners, s.pluginResOwners...)
+						}
 						// The extractor's framework signature is evaluated again after
 						// invalidation has closed over the files this preview reparsed.
 						// That expanded dirty set can reveal a Nuxt/GraphQL/gRPC
@@ -1153,6 +1295,18 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 					}
 				}
 			}
+			// Whole-domain plans (including incomplete-index fallback) must keep
+			// proven P_pl ∪ P_res. Settle concurrent prepare first so NameOnly
+			// plugin owners are stable seeds rather than a data race on empty slices.
+			if wholeDomain && pluginExecution {
+				if err := s.waitAnalyzerPlugins(); err != nil {
+					return nil, err
+				}
+				fallbacks = append(fallbacks, s.extraFallbacks...)
+				s.extraFallbacks = nil
+				extraOwners = append(extraOwners, s.pluginDeltaOwners...)
+				extraOwners = append(extraOwners, s.pluginResOwners...)
+			}
 			var planReason string
 			s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, wholeDomain, extraOwners, membership, proof)
 			tr.Mark("invalidation_plan", fmt.Sprintf("reason=%s whole=%v extra=%d", planReason, wholeDomain, len(extraOwners)))
@@ -1167,7 +1321,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				// the frozen contract safe by replacing the complete prior/current
 				// domain rather than publishing an empty manifest.
 				wholeDomain = true
-				s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, true, nil, membership, nil)
+				s.plan, planReason, err = authoritativeFilePlan(previous, current, prevFiles, hashes, true, extraOwners, membership, nil)
 				tr.Mark("invalidation_plan_retry", fmt.Sprintf("reason=%s", planReason))
 				if err != nil {
 					return nil, err
@@ -1397,6 +1551,27 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			}
 			fileOwners := scopeOwnerRefs(scopeFiles, owned, s.state, forceAll)
 			fileOwners = append(fileOwners, nonTSFileOwners...)
+			if pluginExecution && !s.opts.AuthoritativeFiles {
+				if initial && s.state == nil {
+					// The cold unit-to-owner index is empty. Freeze every admitted
+					// owner in a plugin's declared domain into Begin; those owners'
+					// batches remain held until concurrent plugin prepare settles.
+					for _, path := range inv.Files {
+						if s.pluginOwnerHeld(path) {
+							fileOwners = append(fileOwners, graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: filepath.ToSlash(path)})
+						}
+					}
+				} else {
+					// Delta plugin units and resolution effects determine P_pl ∪
+					// P_res. Settle them before Begin so the owner scope is frozen.
+					if err := s.waitAnalyzerPlugins(); err != nil {
+						return nil, err
+					}
+					fallbacks = append(fallbacks, s.extraFallbacks...)
+					s.extraFallbacks = nil
+					fileOwners = append(fileOwners, s.analyzerPluginReplacementOwners(inv.Files)...)
+				}
+			}
 			graphstream.SortOwners(fileOwners)
 			fileOwners = dedupeOwners(fileOwners)
 			s.growScope(fileOwners)
@@ -1921,7 +2096,28 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		newFiles[path] = st
 	}
 
-	if !initial && (tsNoop || !hadTS) && !nonTSNeed && !s.began && !(s.deferBegin && len(s.replaceScope) > 0) {
+	if pluginExecution {
+		if err := s.waitAnalyzerPlugins(); err != nil {
+			return nil, err
+		}
+		fallbacks = append(fallbacks, s.extraFallbacks...)
+		s.extraFallbacks = nil
+		replacePluginContributions(newFiles, s.pluginContribs, hashes, admittedOwnerSet(inv.Files, hashes))
+		// Non-authoritative deltas seed only dirty TS owners before plugins
+		// settle. Grow with P_pl ∪ P_res only when Begin has not been published;
+		// plugin runs with a published Begin must already have frozen this scope.
+		if !s.opts.AuthoritativeFiles {
+			s.growScope(s.analyzerPluginReplacementOwners(inv.Files))
+			if err := s.fileLocalErr(); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	if s.pluginVerifyOnly {
+		s.skipPublish = true
+	}
+	if !initial && (tsNoop || !hadTS) && !nonTSNeed && !s.pluginChanged && !s.began && !(s.deferBegin && len(s.replaceScope) > 0) {
 		s.skipPublish = true
 	}
 	if deferredTSFacts != nil && !s.skipPublish {
@@ -1963,7 +2159,8 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		// observation is not written down here, the next run raises the same
 		// need for the same reason and proves the same thing again, forever.
 		neutralNonTS := s.neutralNonTSPreviews()
-		if len(neutralNonTS) > 0 || s.neutralScan || s.neutralConfig {
+		refreshPluginPlan := s.pluginPlanRefresh && s.nextAnalyzerPlugins != nil && !s.opts.PluginVerify && !s.pluginVerifyOnly
+		if refreshPluginPlan || len(neutralNonTS) > 0 || s.neutralScan || s.neutralConfig {
 			// An observation commits under the same fence a publication does.
 			if err := s.revalidateCapturedInputs("refusing to record the run's observations"); err != nil {
 				return nil, err
@@ -1976,42 +2173,54 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		if perr != nil {
 			return nil, perr
 		}
-		if refreshScan || refreshPolicy || s.neutralConfig || len(neutralNonTS) > 0 {
-			st, err := cloneState(s.state)
-			if err != nil {
-				return nil, err
-			}
-			if refreshScan {
-				st.ScanHash = scanHash
-				st.ScanHashVersion = scanHashVersion
-				st.ScanClaimedHash = claimedScan
-				st.ScanClaimedMeta = claimedScanMeta
-			}
-			if refreshPolicy {
-				st.PolicyIdentity = input.policyIdentity
-				st.PolicyAdmissionIdentity = input.admissionIdentity
-			}
-			if s.neutralConfig {
-				st.ConfigHash = cfgHash
-			}
-			for name, pv := range neutralNonTS {
-				refreshExtractorObservedInputs(st.Files, pv.owned, hashes, name)
-				if pv.input != "" {
-					if st.ExtractorInputHash == nil {
-						st.ExtractorInputHash = map[string]string{}
-					}
-					st.ExtractorInputHash[name] = pv.input
+		if refreshScan || refreshPolicy || s.neutralConfig || len(neutralNonTS) > 0 || refreshPluginPlan {
+			if s.opts.PluginVerify || s.pluginVerifyOnly {
+				// PluginVerify must not persist graph, plugin, or input state,
+				// including neutral bookkeeping refreshes.
+			} else {
+				st, err := cloneState(s.state)
+				if err != nil {
+					return nil, err
 				}
+				if refreshScan {
+					st.ScanHash = scanHash
+					st.ScanHashVersion = scanHashVersion
+					st.ScanClaimedHash = claimedScan
+					st.ScanClaimedMeta = claimedScanMeta
+				}
+				if refreshPolicy {
+					st.PolicyIdentity = input.policyIdentity
+					st.PolicyAdmissionIdentity = input.admissionIdentity
+				}
+				if s.neutralConfig {
+					st.ConfigHash = cfgHash
+				}
+				for name, pv := range neutralNonTS {
+					refreshExtractorObservedInputs(st.Files, pv.owned, hashes, name)
+					if pv.input != "" {
+						if st.ExtractorInputHash == nil {
+							st.ExtractorInputHash = map[string]string{}
+						}
+						st.ExtractorInputHash[name] = pv.input
+					}
+				}
+				if refreshPluginPlan {
+					st.AnalyzerPlugins = make(map[string]analyzerplugin.PluginRecord, len(s.nextAnalyzerPlugins))
+					for name, record := range s.nextAnalyzerPlugins {
+						st.AnalyzerPlugins[name] = analyzerplugin.ClonePluginRecord(record)
+					}
+				}
+				fp, err := saveStateFP(s.opts.StateDir, st)
+				if err != nil {
+					return nil, err
+				}
+				s.state = st
+				s.stateFP = fp
 			}
-			fp, err := saveStateFP(s.opts.StateDir, st)
-			if err != nil {
-				return nil, err
-			}
-			s.state = st
-			s.stateFP = fp
 		}
 		return &Result{
 			Invalidation:     invalidation,
+			AnalyzerPlugins:  s.analyzerPluginStats,
 			BaseGeneration:   base,
 			TargetGeneration: base,
 			Stats:            tsextractor.ExtractStats{CachedFiles: cached},
@@ -2030,6 +2239,13 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			kept = append(kept, f)
 		}
 		allFacts = kept
+	}
+	if pluginExecution {
+		allFacts = mergeAnalyzerPluginAnchors(append(allFacts, s.pluginFacts...), s.pluginAnchors)
+		// Plugin FSM nodes and plugin-created fallback facts must carry the
+		// current RepoID before resolution indexes are built so TS-anchored
+		// edges can resolve to them. Existing extracted facts keep their Repo.
+		tagRepo(allFacts, repoID)
 	}
 	idx := buildIndex(allFacts)
 	s.inputs.resolution = idx
@@ -2189,6 +2405,12 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	next.ExtractorDigest = extractorDigest
 	next.ExtractorInputHash = extractorInput
 	next.ExtractorSynthetic = synByExt
+	next.AnalyzerPlugins = s.nextAnalyzerPlugins
+	if s.runtimeFingerprints != nil {
+		next.RuntimeFingerprints = s.runtimeFingerprints
+	} else if s.state != nil {
+		next.RuntimeFingerprints = s.state.RuntimeFingerprints
+	}
 	next.LastRunID = runID
 	next.LastComplete = true
 	nRehash, rehashErr := s.revalidateRecordHashes(tsRecords, "refusing successful EndReplace", &s.work.VerifiedFiles)
@@ -2271,17 +2493,19 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	tr.Mark("promote_compact_state", fmt.Sprintf("parsed=%d published=%d", stats.FilesParsed, published))
 
 	return &Result{
-		Invalidation:     invalidation,
-		RunID:            runID,
-		BaseGeneration:   base,
-		TargetGeneration: target,
-		Stats:            stats,
-		Fallbacks:        fallbacks,
-		Unreadable:       unreadable,
-		OwnersPublished:  published,
-		ParsedFiles:      stats.FilesParsed,
-		EarlyLocal:       earlyLocal,
-		Facts:            allFacts,
+		Invalidation:      invalidation,
+		AnalyzerPlugins:   s.analyzerPluginStats,
+		RunID:             runID,
+		BaseGeneration:    base,
+		TargetGeneration:  target,
+		Stats:             stats,
+		Fallbacks:         fallbacks,
+		Unreadable:        unreadable,
+		OwnersPublished:   published,
+		ReplacementOwners: len(s.replaceScope),
+		ParsedFiles:       stats.FilesParsed,
+		EarlyLocal:        earlyLocal,
+		Facts:             allFacts,
 	}, nil
 }
 
@@ -2315,6 +2539,12 @@ func chunkOwner(nodes []graphstream.Node, edges []graphstream.Edge, limit int) [
 }
 
 func (s *session) begin(ctx context.Context, runID, repoID string, base, target int64, phase, scopeMode string, owners []graphstream.OwnerRef) error {
+	if s.opts.PluginVerify || s.pluginVerifyOnly || s.skipPublish {
+		// Verification publishes nothing. Mark began so authoritative analysis
+		// can proceed without broker BeginReplace/EndReplace activity.
+		s.began = true
+		return nil
+	}
 	if s.deferBegin {
 		return nil
 	}
@@ -2659,6 +2889,19 @@ func (s *session) growScope(owners []graphstream.OwnerRef) {
 	if len(owners) == 0 {
 		return
 	}
+	if s.pluginExecution && s.began && !s.opts.AuthoritativeFiles && !s.opts.PluginVerify && !s.pluginVerifyOnly && !s.skipPublish {
+		inScope := make(map[string]bool, len(s.replaceScope))
+		for _, owner := range s.replaceScope {
+			inScope[owner.String()] = true
+		}
+		for _, owner := range owners {
+			if !inScope[owner.String()] {
+				s.localErr = fmt.Errorf("analyzer plugin frozen replacement scope missed owner %s", owner.String())
+				return
+			}
+		}
+		return
+	}
 	s.replaceScope = append(s.replaceScope, owners...)
 	graphstream.SortOwners(s.replaceScope)
 	s.replaceScope = dedupeOwners(s.replaceScope)
@@ -2719,10 +2962,14 @@ func scopeOwnerRefs(scopeFiles map[string]bool, owned []string, st *State, force
 }
 
 func (s *session) publishLocal(ctx context.Context, runID, repoID string, rec *tsextractor.FileRecord, earlyLocal *int) {
-	if s.opts.AuthoritativeFiles {
+	if s.opts.AuthoritativeFiles || s.opts.PluginVerify || s.pluginVerifyOnly || s.skipPublish {
 		return
 	}
 	if rec == nil || rec.Unreadable || rec.Minified {
+		return
+	}
+	if s.pluginOwnerHeld(rec.File) {
+		// Design §11: hold owner_domain files until plugin units settle.
 		return
 	}
 	s.mu.Lock()
@@ -2753,6 +3000,9 @@ func (s *session) publishLocal(ctx context.Context, runID, repoID string, rec *t
 // Session-side aggregation: mixed-owner batches packed to BatchLimit.
 // Empty resolved batches are omitted; deletion is owner-scope membership at End.
 func (s *session) appendPhase(ctx context.Context, runID, phase string, nodes []graphstream.Node, edges []graphstream.Edge, earlyLocal bool) error {
+	if s.opts.PluginVerify || s.pluginVerifyOnly {
+		return nil
+	}
 	if len(nodes) == 0 && len(edges) == 0 {
 		return nil
 	}
@@ -2882,6 +3132,9 @@ func (s *session) emitBatch(ctx context.Context, runID, phase string, nodes []gr
 }
 
 func (s *session) publishScope(ctx context.Context, runID string, owners []graphstream.OwnerRef) error {
+	if s.opts.PluginVerify || s.pluginVerifyOnly || s.skipPublish {
+		return nil
+	}
 	if s.opts.AuthoritativeFiles {
 		return s.fileLocalErr()
 	}
@@ -2962,6 +3215,9 @@ func (s *session) batch(ctx context.Context, runID string, seq int, phase string
 }
 
 func (s *session) end(ctx context.Context, runID string, batchCount int, owners []graphstream.OwnerRef, c graphstream.Completeness) error {
+	if s.opts.PluginVerify || s.pluginVerifyOnly || s.skipPublish {
+		return nil
+	}
 	if s.opts.AuthoritativeFiles {
 		if err := s.fileLocalErr(); err != nil {
 			return err

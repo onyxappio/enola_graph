@@ -9,6 +9,7 @@ import (
 
 	"github.com/enola-labs/enola/internal/extractors/tsextractor"
 	"github.com/enola-labs/enola/internal/facts"
+	"github.com/enola-labs/enola/internal/graphinput"
 	"github.com/enola-labs/enola/internal/graphstream"
 )
 
@@ -35,6 +36,16 @@ func authoritativeFilePlan(previous, current []string, prevFiles map[string]*Fil
 	current = graphSemanticNames(nil, current)
 	domain := append(append([]string{}, previous...), current...)
 	if wholeDomain {
+		// Preserve proven plugin seeds (P_pl ∪ P_res) through whole-domain
+		// fallback. graphSemanticNames drops NameOnly/unhashed owners, but those
+		// can still be plugin unit owners that must appear in the frozen Begin.
+		for _, f := range extraOwners {
+			f = filepath.ToSlash(f)
+			if f == "" || graphinput.IsLockfile(f) {
+				continue
+			}
+			domain = append(domain, f)
+		}
 		p, err := planFileInvalidation(domain, previous, current, nil, true, domain)
 		return p, frozenScopeWholeDomain, err
 	}

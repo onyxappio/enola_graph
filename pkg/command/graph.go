@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/enola-labs/enola/internal/config"
 	"github.com/enola-labs/enola/internal/engine"
@@ -59,6 +60,8 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 		force         = fs.Bool("force-initial", false, "with analyze: ignore existing state and run a full initial replacement")
 		baseStateDir  = fs.String("base-state-dir", "", "completed source graphstate to seed a new --state-dir/--context (fork, or delta)")
 		repoID        = fs.String("repo-id", "", "stable repository identity (default: absolute checkout path)")
+		allowPlugins  = fs.String("allow-repo-plugins", "", "operator trust allow-list: comma-separated repository analyzer plugin names")
+		pluginVerify  = fs.Bool("plugin-verify", false, "re-run all repository analyzer plugin units and compare digests; publish nothing; fail on mismatch")
 	)
 	fs.Usage = func() {
 		fmt.Fprint(os.Stderr,
@@ -196,7 +199,9 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 			// ago, in this process, and nothing has run against it. That is the
 			// whole of the claim; the session still has to prove the policy's
 			// declared inputs unmoved before it acts on it.
-			FreshEngine: true,
+			FreshEngine:      true,
+			AllowRepoPlugins: splitNames(*allowPlugins),
+			PluginVerify:     *pluginVerify,
 		}
 		if opts.StateDir == "" {
 			opts.StateDir = filepath.Join(repo, tgt.engine.Config().Output.Dir, "graphstate")
@@ -312,6 +317,20 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 	// Terminal mark: result marshalling of a full --json run is not free, and
 	// without this it lands after the last mark and outside the trace.
 	ctr.Mark("cli_complete", fmt.Sprintf("results=%d", len(results)))
+}
+
+func splitNames(raw string) []string {
+	var out []string
+	seen := map[string]bool{}
+	for _, item := range strings.Split(raw, ",") {
+		name := strings.TrimSpace(item)
+		if name == "" || seen[name] {
+			continue
+		}
+		seen[name] = true
+		out = append(out, name)
+	}
+	return out
 }
 
 type eventFileSink struct {

@@ -532,6 +532,12 @@ func (s *FileChangeSource) CoverSessionInputs(r *Resident) error {
 	for p := range r.inputs.effective {
 		paths = append(paths, p)
 	}
+	// Plugin identity files (manifest, entry, declared identity_files) must stay
+	// covered even when graph-input policy excludes their directories; otherwise a
+	// content edit never reaches resident reload and stale plugin facts remain.
+	for _, plugin := range r.opts.analyzerPlugins {
+		paths = append(paths, plugin.IdentityFiles...)
+	}
 	targets := map[string]bool{}
 	for _, p := range paths {
 		if !filepath.IsAbs(p) {
