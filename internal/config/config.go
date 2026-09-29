@@ -8,6 +8,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
+	"github.com/enola-labs/enola/internal/analyzerplugin"
 	"github.com/enola-labs/enola/internal/clientspec"
 	"github.com/enola-labs/enola/internal/intent"
 	"github.com/enola-labs/enola/internal/linkers/vocab"
@@ -74,6 +75,11 @@ type Config struct {
 	// emitted facts, so it is folded into the snapshot's config hash and the
 	// ran-provider set is compared between snapshots like the extractor set.
 	Providers []providers.Provider `yaml:"providers"`
+
+	// AnalyzerPlugins explicitly registers repository-owned graph extractors.
+	// Their code remains untrusted until the operator passes
+	// --allow-repo-plugins for each configured plugin name.
+	AnalyzerPlugins []analyzerplugin.Config `yaml:"analyzer_plugins,omitempty"`
 
 	// Linking overlays the cross-repo linker's tuning vocabulary — the word lists that
 	// decide which names are too generic to link on, and the numeric thresholds. It is
@@ -653,6 +659,18 @@ func (c *Config) Normalize() error {
 
 	if err := providers.Validate(c.Providers); err != nil {
 		return err
+	}
+	seenAnalyzerPaths := map[string]bool{}
+	for i, p := range c.AnalyzerPlugins {
+		p.Path = strings.TrimSpace(filepath.ToSlash(p.Path))
+		if p.Path == "" || filepath.IsAbs(p.Path) || strings.HasPrefix(p.Path, "../") || p.Path == ".." {
+			return fmt.Errorf("analyzer_plugins[%d].path must be a repository-relative directory", i)
+		}
+		if seenAnalyzerPaths[p.Path] {
+			return fmt.Errorf("duplicate analyzer plugin path %q", p.Path)
+		}
+		seenAnalyzerPaths[p.Path] = true
+		c.AnalyzerPlugins[i] = p
 	}
 
 	clientspec.Normalize(c.Clients)

@@ -1514,16 +1514,45 @@ func (g *Graph) EdgeCount() int {
 // to arrive says which one was meant: only a service is the target of depends_on, only
 // a module of imports.
 var kindForRel = map[string]string{
-	RelDependsOn:     KindService,
-	RelImports:       KindModule,
-	RelCalls:         KindSymbol,
-	RelImplements:    KindSymbol,
-	RelHasMethod:     KindSymbol,
-	RelInstantiates:  KindSymbol,
-	RelInjects:       KindSymbol,
-	RelDeclares:      KindSymbol,
-	RelHandledBy:     KindRoute,
-	RelImplementedBy: KindSymbol,
+	RelDependsOn:                 KindService,
+	RelImports:                   KindModule,
+	RelCalls:                     KindSymbol,
+	RelImplements:                KindSymbol,
+	RelHasMethod:                 KindSymbol,
+	RelInstantiates:              KindSymbol,
+	RelInjects:                   KindSymbol,
+	RelDeclares:                  KindSymbol,
+	RelHandledBy:                 KindRoute,
+	RelImplementedBy:             KindSymbol,
+	RelFSMParent:                 KindFSMState,
+	RelFSMInitial:                KindFSMState,
+	RelFSMFrom:                   KindFSMState,
+	RelFSMTo:                     KindFSMState,
+	RelFSMOn:                     KindFSMEvent,
+	RelFSMEmits:                  KindFSMCommand,
+	RelFSMEntryEmits:             KindFSMCommand,
+	RelFSMOutcome:                KindFSMEvent,
+	RelFSMGuardRef:               KindSymbol,
+	RelFSMReducerRef:             KindSymbol,
+	RelFSMGuardCalls:             KindSymbol,
+	RelFSMActionCalls:            KindSymbol,
+	RelFSMDeclaredIn:             KindSymbol,
+	RelFSMTypedBy:                KindSymbol,
+	RelFSMConstructsEvent:        KindFSMEvent,
+	RelFSMDispatches:             KindFSMEvent,
+	RelFSMDispatchesUnknownEvent: KindFSMMachine,
+	RelFSMHandlesCommand:         KindFSMCommand,
+}
+
+// FSMRelationTargetKind returns the kind accepted at the destination of a
+// registered enola.fsm@1 relation. Keeping this table in facts lets both graph
+// resolution and plugin validation apply the same target typing.
+func FSMRelationTargetKind(rel string) (string, bool) {
+	if !strings.HasPrefix(rel, "fsm_") {
+		return "", false
+	}
+	kind, ok := kindForRel[rel]
+	return kind, ok
 }
 
 // kindRank orders fact kinds for picking among same-named facts when there is no edge
@@ -1532,12 +1561,17 @@ var kindForRel = map[string]string{
 // repo label and something else, the repo is the more meaningful node in the graph
 // queries (traverse/find_path/impact) that reach it.
 var kindRank = map[string]int{
-	KindService:    0,
-	KindModule:     1,
-	KindSymbol:     2,
-	KindRoute:      3,
-	KindStorage:    4,
-	KindDependency: 5,
+	KindService:       0,
+	KindModule:        1,
+	KindSymbol:        2,
+	KindRoute:         3,
+	KindStorage:       4,
+	KindDependency:    5,
+	KindFSMMachine:    6,
+	KindFSMState:      7,
+	KindFSMEvent:      8,
+	KindFSMTransition: 9,
+	KindFSMCommand:    10,
 }
 
 func rankOf(kind string) int {

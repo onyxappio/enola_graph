@@ -78,6 +78,9 @@ func (s *session) rawConfigScopeBounded(haveCache bool, input *runtimeInputs, de
 		}
 	}
 	for _, name := range priorExtractorNames(s.state, prevFiles) {
+		if s.hasConfiguredAnalyzerPluginContribution(name) {
+			continue
+		}
 		if detected[name] {
 			continue
 		}

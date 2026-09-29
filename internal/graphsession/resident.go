@@ -12,8 +12,10 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"sync"
 
+	"github.com/enola-labs/enola/internal/analyzerplugin"
 	"github.com/enola-labs/enola/internal/engine"
 	"github.com/enola-labs/enola/internal/extractors/swiftextractor"
 	"github.com/enola-labs/enola/internal/extractors/tsextractor"
@@ -118,14 +120,16 @@ type runtimeInputs struct {
 	generation        int64
 	resolution        *idIndex
 	configPaths       []string
-	sources           map[string][]byte
-	effective         map[string][]byte
-	inventory         engine.RepoInventory
-	detected          map[string]bool
-	hashes, contexts  map[string]string
-	configHash        string
-	config            map[string][]byte
-	angular           bool
+	// sources is an immutable byte snapshot for this runtime-input generation.
+	// Per-run discovered captures grow separately in session.capturedSources.
+	sources          map[string][]byte
+	effective        map[string][]byte
+	inventory        engine.RepoInventory
+	detected         map[string]bool
+	hashes, contexts map[string]string
+	configHash       string
+	config           map[string][]byte
+	angular          bool
 }
 
 // retryIdentity is what a refused attempt's parses were produced under. It is
@@ -358,6 +362,9 @@ type Resident struct {
 	// produced a result, and is folded into the next result that does.
 	probeWork      WorkCounters
 	failed, closed bool
+	// runtimeFingerprints is the durable Node executable digest cache shared
+	// across resident transactions so unchanged runs pay one stat.
+	runtimeFingerprints analyzerplugin.RuntimeCache
 	// engineUnused is the caller's FreshEngine claim, still true. It survives
 	// exactly until the first transaction, because after that the engine is one
 	// this session has been running against rather than one just constructed,
@@ -538,7 +545,7 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 		rtr.Mark("reload_engine", "")
 	}
 	rtr.Mark("reconcile_complete", fmt.Sprintf("reloaded=%v", reloaded))
-	s := &session{eng: r.eng, abs: r.abs, opts: r.opts, sink: r.sink, state: r.state, stateFP: r.ck.fp, journal: r.journal, prof: graphprofile.StartNamed("session"), inputs: input, fast: fast}
+	s := &session{eng: r.eng, abs: r.abs, opts: r.opts, sink: r.sink, state: r.state, stateFP: r.ck.fp, journal: r.journal, prof: graphprofile.StartNamed("session"), inputs: input, fast: fast, runtimeFingerprints: r.runtimeFingerprints}
 	s.retained, s.retainedFor = r.tsDiscovery, r.tsDiscoveryFor
 	s.retryRecords, s.retryFor = r.retryRecords, r.retryFor
 	s.retryFileContext, s.retryFileBase = r.retryFileContext, r.retryFileBase
@@ -604,7 +611,17 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 	r.failed = false
 	r.state = s.state
 	r.ck = newStateCheckpoint(s.state, s.stateFP)
-	if !fast {
+	if s.runtimeFingerprints != nil {
+		r.runtimeFingerprints = s.runtimeFingerprints
+	}
+	// Session opts are a value copy. reloadAnalyzerPlugins updates that copy;
+	// promote the committed registrations/identity set so later CoverSessionInputs,
+	// pluginIdentityPath, and changeReason see newly declared identity_files.
+	prevIdentityCover := pluginIdentityCoverKey(r.opts.analyzerPlugins)
+	r.opts.analyzerPluginConfigs = append([]analyzerplugin.Config(nil), s.opts.analyzerPluginConfigs...)
+	r.opts.analyzerPlugins = append([]analyzerplugin.Loaded(nil), s.opts.analyzerPlugins...)
+	identityCoverChanged := pluginIdentityCoverKey(r.opts.analyzerPlugins) != prevIdentityCover
+	if !fast || identityCoverChanged {
 		r.coverageVersion++
 		s.inputs.coverageVersion = r.coverageVersion
 	}
@@ -633,6 +650,7 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 // own allowlist, so the two cannot drift into disagreeing about which events
 // are content-only. Caller holds r.mu.
 func (r *Resident) changeReason(batch *ChangeBatch) string {
+	pluginIdentityTouched := false
 	if scope := r.eng.GraphScope(); scope != nil {
 		var paths []string
 		for _, p := range batch.Paths {
@@ -640,6 +658,9 @@ func (r *Resident) changeReason(batch *ChangeBatch) string {
 			case graphinput.Ignore:
 				if !r.explicitContentPath(p) {
 					continue
+				}
+				if r.pluginIdentityPath(p) {
+					pluginIdentityTouched = true
 				}
 			case graphinput.Reconcile:
 				if batch.Reconcile == "" {
@@ -649,8 +670,21 @@ func (r *Resident) changeReason(batch *ChangeBatch) string {
 			paths = append(paths, p)
 		}
 		batch.Paths = paths
+	} else {
+		for _, p := range batch.Paths {
+			if r.pluginIdentityPath(p) {
+				pluginIdentityTouched = true
+				break
+			}
+		}
 	}
 	reason := batch.Reconcile
+	if reason == "" && pluginIdentityTouched {
+		// Excluded plugin identity files are Ignore under graph-input policy and
+		// are not inventory content hashes; force a transaction so reload sees
+		// the new identity before publication.
+		reason = "repository analyzer plugin identity changed"
+	}
 	if reason == "" && (!batch.Covered || batch.Epoch == "") {
 		reason = "uncovered change source"
 	}
@@ -901,18 +935,69 @@ func (r *Resident) explicitContentPath(p string) bool {
 	if !filepath.IsAbs(p) {
 		p = filepath.Join(r.abs, p)
 	}
-	if !r.eng.GraphScope().Allowed(p, false) {
-		return false
-	}
+	p = filepath.Clean(p)
 	for _, candidate := range r.inputs.configPaths {
 		if !filepath.IsAbs(candidate) {
 			candidate = filepath.Join(r.abs, candidate)
 		}
-		if filepath.Clean(candidate) == filepath.Clean(p) {
+		if filepath.Clean(candidate) == p {
 			return true
 		}
 	}
+	// Plugin identity paths remain explicit content even when graph-input policy
+	// excludes them: ClassifyEvent returns Ignore, and changeReason must still
+	// keep the path so resident reload observes the identity bump.
+	if r.pluginIdentityPath(p) {
+		return true
+	}
 	return false
+}
+
+func (r *Resident) pluginIdentityPath(p string) bool {
+	if r == nil {
+		return false
+	}
+	if !filepath.IsAbs(p) {
+		p = filepath.Join(r.abs, p)
+	}
+	p = filepath.Clean(p)
+	for _, plugin := range r.opts.analyzerPlugins {
+		for _, candidate := range plugin.IdentityFiles {
+			if filepath.Clean(candidate) == p {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// pluginIdentityCoverKey is a stable fingerprint of declared plugin identity
+// paths used to decide whether watch coverage must refresh after a commit.
+func pluginIdentityCoverKey(plugins []analyzerplugin.Loaded) string {
+	if len(plugins) == 0 {
+		return ""
+	}
+	var b strings.Builder
+	names := make([]string, 0, len(plugins))
+	byName := map[string]analyzerplugin.Loaded{}
+	for _, p := range plugins {
+		names = append(names, p.Manifest.Name)
+		byName[p.Manifest.Name] = p
+	}
+	sort.Strings(names)
+	for _, name := range names {
+		p := byName[name]
+		b.WriteString(name)
+		b.WriteByte(0)
+		files := append([]string(nil), p.IdentityFiles...)
+		sort.Strings(files)
+		for _, f := range files {
+			b.WriteString(filepath.Clean(f))
+			b.WriteByte(0)
+		}
+		b.WriteByte(0)
+	}
+	return b.String()
 }
 
 // Reconciliation validates the policy controls captured by Build. Online content

@@ -91,6 +91,28 @@ fact's name exactly as that fact carries it.
 | `test_ref` | test file path | yes (`calls`, `instantiates`) | Reference-only: which production symbols a test exercises. Test files are otherwise excluded from indexing |
 | `file_ref` | source file path | yes (`calls`, `instantiates`) | Reference-only: call edges made in file-scope (top-level) code with no enclosing symbol |
 | `lint` | the linter finding's id | no | A finding an external linter reported through the provider seam |
+| `fsm_machine` | configured machine id | yes | Generic FSM declaration owned by the host graph vocabulary |
+| `fsm_state` | `<machine>/state:<path>` | yes | A declared state; nested regions use explicit parent links |
+| `fsm_event` | `<machine>/event:<tag>` | yes | A declared event or transition outcome |
+| `fsm_transition` | `<machine>/transition:<structural-key>` | yes | One decision branch with direct source, target, trigger and action facts |
+| `fsm_command` | `<machine>/command:<tag>` | yes | A declared command/effect; handlers are separate relations |
+
+### FSM facts
+
+The generic FSM vocabulary is registered by Enola and can be contributed by
+explicitly trusted repository-owned analyzer plugins. Plugins recognize local
+repository conventions; Enola owns fact identities, file owners, dependency
+observations, caching, replacement scope and publication. Facts describe local
+declarations and direct relationships; they do not propagate attributes through
+transitive callers.
+
+Canonical names are `<machine-id>`, `<machine-id>/state:<path>`,
+`<machine-id>/event:<tag>`, `<machine-id>/transition:<structural-key>`, and
+`<machine-id>/command:<tag>`. Names are stable under source movement and trivia
+edits. FSM facts retain source `file` and measured `line`/`end_line` where
+available. Machine, state, event, transition and command props describe the
+adapter, admission/coverage state, declaration status, state/event/command tags,
+guard status and direct outcomes as supported by the registered vocabulary.
 
 ### symbol
 
@@ -244,6 +266,24 @@ adding them to coupling metrics.
 | `handled_by` | A route/endpoint is served by target (e.g. a gRPC RPC route to its handler method). Added post-extraction |
 | `implemented_by` | A declared contract operation is implemented by a code symbol. Added post-extraction |
 | `names` | Source names target by symbol literal without calling it — a method name passed as data for something else to dispatch. A reference, not a call |
+| `fsm_parent` | State is nested under another state |
+| `fsm_initial` | Machine has the target initial state |
+| `fsm_from` | Transition starts in the target state |
+| `fsm_to` | Transition reaches the target state |
+| `fsm_on` | Transition is triggered by the target event |
+| `fsm_emits` | Transition directly emits the target command |
+| `fsm_entry_emits` | State entry directly emits the target command |
+| `fsm_outcome` | Command has the target event outcome |
+| `fsm_guard_ref` | Transition references a guard symbol |
+| `fsm_reducer_ref` | Transition references a reducer symbol |
+| `fsm_guard_calls` | Guard directly calls the target symbol |
+| `fsm_action_calls` | Action directly calls the target symbol |
+| `fsm_declared_in` | FSM declaration is defined in the target source symbol |
+| `fsm_typed_by` | Machine is typed by the target source symbol |
+| `fsm_constructs_event` | Source directly constructs the target event |
+| `fsm_dispatches` | Source directly dispatches the target event |
+| `fsm_dispatches_unknown_event` | Source dispatches an event not resolved to a declared event |
+| `fsm_handles_command` | Source directly handles the target command |
 
 ## Route sources
 

@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"sort"
 
+	"github.com/enola-labs/enola/internal/analyzerplugin"
 	"github.com/enola-labs/enola/internal/extractors/tsextractor"
 	"github.com/enola-labs/enola/internal/facts"
 	"github.com/enola-labs/enola/internal/graphstream"
@@ -76,8 +77,14 @@ type State struct {
 	// ExtractorSynthetic partitions synthetic facts by originating extractor so
 	// TypeScript cache reuse does not retain another extractor's coverage.
 	ExtractorSynthetic map[string]map[string][]facts.Fact `json:"extractor_synthetic,omitempty"`
-	LastRunID          string                             `json:"last_run_id,omitempty"`
-	LastComplete       bool                               `json:"last_complete"`
+	// AnalyzerPlugins stores host-owned observation records and complete unit
+	// outputs independently from the TypeScript extractor cache namespace.
+	AnalyzerPlugins map[string]analyzerplugin.PluginRecord `json:"analyzer_plugins,omitempty"`
+	// RuntimeFingerprints caches Node executable digests behind
+	// path/dev/inode/size/mtime/ctime so ordinary unchanged runs pay one stat.
+	RuntimeFingerprints analyzerplugin.RuntimeCache `json:"runtime_fingerprints,omitempty"`
+	LastRunID           string                      `json:"last_run_id,omitempty"`
+	LastComplete        bool                        `json:"last_complete"`
 	// ForkBase* record the completed source checkpoint this context was seeded
 	// from. They are never written back to the source directory.
 	ForkBaseRepoID     string `json:"fork_base_repo_id,omitempty"`
@@ -116,6 +123,7 @@ func newState(repoID, contextID, checkout, extractorVersion string) *State {
 		Synthetic:          map[string][]facts.Fact{},
 		ExtractorInputHash: map[string]string{},
 		ExtractorSynthetic: map[string]map[string][]facts.Fact{},
+		AnalyzerPlugins:    map[string]analyzerplugin.PluginRecord{},
 	}
 }
 

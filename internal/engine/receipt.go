@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/enola-labs/enola/internal/analyzerplugin"
 	"github.com/enola-labs/enola/internal/clientspec"
 	"github.com/enola-labs/enola/internal/config"
 	"github.com/enola-labs/enola/internal/facts"
@@ -102,6 +103,9 @@ func computeConfigHash(cfg *config.Config) string {
 	}
 	if fp := clientspec.AliasFingerprint(cfg.ServiceAliases); fp != "" {
 		sb.WriteString("service_aliases:\n" + fp)
+	}
+	if fp := analyzerplugin.ConfigFingerprint(cfg.AnalyzerPlugins); fp != "" {
+		sb.WriteString("analyzer_plugins:\n" + fp + "\n")
 	}
 	return sha256Prefixed([]byte(sb.String()))
 }

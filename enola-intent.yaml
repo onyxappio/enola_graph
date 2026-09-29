@@ -58,6 +58,7 @@ layers:
       - "internal/engine/**"
       - "internal/config/**"
       - "internal/graphsession/**"
+      - "internal/analyzerplugin/**"
   - name: analysis
     paths:
       - "internal/extractors/**"
