@@ -55,6 +55,7 @@ type Node struct {
 type Relation struct {
 	Kind       string `json:"kind"`
 	Target     string `json:"target"`
+	TargetKind string `json:"target_kind,omitempty"`
 	TargetFile string `json:"target_file,omitempty"`
 }
 
@@ -68,6 +69,17 @@ type Anchor struct {
 	Props          map[string]any `json:"props,omitempty"`
 }
 
+// Enrichment attaches plugin-owned properties and relations to one existing
+// fact identified by its owner, kind, and stable name. The host applies it only
+// after it has collected the current base facts for that owner.
+type Enrichment struct {
+	Owner     string         `json:"owner,omitempty"`
+	Kind      string         `json:"kind"`
+	Name      string         `json:"name"`
+	Props     map[string]any `json:"props,omitempty"`
+	Relations []Relation     `json:"relations,omitempty"`
+}
+
 type UnitResult struct {
 	Unit    string                 `json:"unit"`
 	Owners  map[string]OwnerResult `json:"owners"`
@@ -76,8 +88,9 @@ type UnitResult struct {
 }
 
 type OwnerResult struct {
-	Nodes   []Node   `json:"nodes,omitempty"`
-	Anchors []Anchor `json:"anchors,omitempty"`
+	Nodes       []Node       `json:"nodes,omitempty"`
+	Anchors     []Anchor     `json:"anchors,omitempty"`
+	Enrichments []Enrichment `json:"enrichments,omitempty"`
 }
 
 // ValidatePlan checks identity and dependency closure, then returns a stable
@@ -291,6 +304,13 @@ func cloneOwnerResult(in OwnerResult) OwnerResult {
 			out.Anchors[i].Relations = append([]Relation(nil), out.Anchors[i].Relations...)
 		}
 	}
+	if in.Enrichments != nil {
+		out.Enrichments = append([]Enrichment(nil), in.Enrichments...)
+		for i := range out.Enrichments {
+			out.Enrichments[i].Props = cloneJSONMap(out.Enrichments[i].Props)
+			out.Enrichments[i].Relations = append([]Relation(nil), out.Enrichments[i].Relations...)
+		}
+	}
 	return out
 }
 
@@ -351,6 +371,14 @@ func CanonicalizeResult(result UnitResult) UnitResult {
 				contribution.Anchors[i].Owner = owner
 			}
 		}
+		for i := range contribution.Enrichments {
+			if contribution.Enrichments[i].Owner == "" {
+				contribution.Enrichments[i].Owner = owner
+			}
+			sort.SliceStable(contribution.Enrichments[i].Relations, func(a, b int) bool {
+				return relationKey(contribution.Enrichments[i].Relations[a]) < relationKey(contribution.Enrichments[i].Relations[b])
+			})
+		}
 		for i := range contribution.Nodes {
 			sort.SliceStable(contribution.Nodes[i].Relations, func(a, b int) bool {
 				return relationKey(contribution.Nodes[i].Relations[a]) < relationKey(contribution.Nodes[i].Relations[b])
@@ -380,9 +408,29 @@ func CanonicalizeResult(result UnitResult) UnitResult {
 		sort.SliceStable(contribution.Anchors, func(a, b int) bool {
 			return anchorLess(contribution.Anchors[a], contribution.Anchors[b])
 		})
+		sort.SliceStable(contribution.Enrichments, func(a, b int) bool {
+			return enrichmentLess(contribution.Enrichments[a], contribution.Enrichments[b])
+		})
 		result.Owners[owner] = contribution
 	}
 	return result
+}
+
+func enrichmentLess(left, right Enrichment) bool {
+	if left.Owner != right.Owner {
+		return left.Owner < right.Owner
+	}
+	if left.Kind != right.Kind {
+		return left.Kind < right.Kind
+	}
+	if left.Name != right.Name {
+		return left.Name < right.Name
+	}
+	leftProps, rightProps := canonicalJSONKey(left.Props), canonicalJSONKey(right.Props)
+	if leftProps != rightProps {
+		return leftProps < rightProps
+	}
+	return relationsKey(left.Relations) < relationsKey(right.Relations)
 }
 
 func anchorLess(left, right Anchor) bool {
@@ -424,7 +472,7 @@ func AnchorSortKey(a Anchor) string {
 }
 
 func relationKey(relation Relation) string {
-	return relation.Kind + "\x00" + relation.Target + "\x00" + relation.TargetFile
+	return relation.Kind + "\x00" + relation.TargetKind + "\x00" + relation.Target + "\x00" + relation.TargetFile
 }
 
 func relationsKey(relations []Relation) string {

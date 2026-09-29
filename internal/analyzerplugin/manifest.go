@@ -22,7 +22,10 @@ import (
 
 const (
 	APIVersion         = "enola.plugin/v1"
+	GoAPIVersion       = "enola.plugin/v2"
 	FSMVocabularyV1    = "enola.fsm@1"
+	HookAnalysisPlanV1 = "analysis.plan@1"
+	HookAnalysisUnitV1 = "analysis.unit@1"
 	DefaultMaxFrame    = 64 << 20
 	DefaultTimeoutMS   = 60_000
 	DefaultHelloMS     = 2_000
@@ -71,6 +74,7 @@ type Manifest struct {
 	Vocabularies  []string      `yaml:"vocabularies" json:"vocabularies"`
 	Claims        Claims        `yaml:"claims,omitempty" json:"claims,omitempty"`
 	OwnerDomain   []string      `yaml:"owner_domain" json:"owner_domain"`
+	Hooks         []string      `yaml:"hooks,omitempty" json:"hooks,omitempty"`
 	Candidates    CandidateSpec `yaml:"candidates,omitempty" json:"candidates,omitempty"`
 	Limits        Limits        `yaml:"limits,omitempty" json:"limits,omitempty"`
 }
@@ -149,7 +153,7 @@ func Load(repo string, entries []Config, runtimeCache RuntimeCache) ([]Loaded, e
 		if err != nil {
 			return nil, fmt.Errorf("plugin %q entry %q: %w", m.Name, m.Runtime.Entry, err)
 		}
-		if embedsTypeScriptCompiler(entryBytes) {
+		if m.Runtime.Kind == "node" && embedsTypeScriptCompiler(entryBytes) {
 			return nil, fmt.Errorf("plugin %q bundle appears to embed the TypeScript compiler package", m.Name)
 		}
 		// Snapshot every identity-file byte once. identityDigest must hash these
@@ -177,17 +181,20 @@ func Load(repo string, entries []Config, runtimeCache RuntimeCache) ([]Loaded, e
 			identityFiles = append(identityFiles, p)
 			identityBytes[p] = b
 		}
-		runtimePath, err := exec.LookPath("node")
-		if err != nil {
-			return nil, fmt.Errorf("plugin %q requires Node %s: %w", m.Name, m.Runtime.Version, err)
-		}
-		runtimePath, err = filepath.Abs(runtimePath)
-		if err != nil {
-			return nil, err
-		}
-		runtimeDigest, _, err := CachedRuntimeDigest(runtimePath, runtimeCache)
-		if err != nil {
-			return nil, fmt.Errorf("plugin %q runtime fingerprint: %w", m.Name, err)
+		runtimePath, runtimeDigest := "", ""
+		if m.Runtime.Kind == "node" {
+			runtimePath, err = exec.LookPath("node")
+			if err != nil {
+				return nil, fmt.Errorf("plugin %q requires Node %s: %w", m.Name, m.Runtime.Version, err)
+			}
+			runtimePath, err = filepath.Abs(runtimePath)
+			if err != nil {
+				return nil, err
+			}
+			runtimeDigest, _, err = CachedRuntimeDigest(runtimePath, runtimeCache)
+			if err != nil {
+				return nil, fmt.Errorf("plugin %q runtime fingerprint: %w", m.Name, err)
+			}
 		}
 		identity, err := identityDigest(m, entry.Config, identityBytes, runtimeDigest)
 		if err != nil {
@@ -205,30 +212,54 @@ func Load(repo string, entries []Config, runtimeCache RuntimeCache) ([]Loaded, e
 }
 
 func validateManifest(m *Manifest) error {
-	if m.API != APIVersion {
-		return fmt.Errorf("api must be %q", APIVersion)
+	if m.API != APIVersion && m.API != GoAPIVersion {
+		return fmt.Errorf("api must be %q or %q", APIVersion, GoAPIVersion)
 	}
 	if !validID(m.Name) {
 		return fmt.Errorf("name must be a stable identifier")
 	}
-	if m.Runtime.Kind != "node" || strings.TrimSpace(m.Runtime.Version) == "" || strings.TrimSpace(m.Runtime.Entry) == "" {
-		return errors.New("runtime must declare kind: node, an exact version, and entry")
+	switch m.API {
+	case APIVersion:
+		if m.Runtime.Kind != "node" || strings.TrimSpace(m.Runtime.Version) == "" || strings.TrimSpace(m.Runtime.Entry) == "" {
+			return errors.New("enola.plugin/v1 runtime must declare kind: node, an exact version, and entry")
+		}
+	case GoAPIVersion:
+		if m.Runtime.Kind != "go-executable" || strings.TrimSpace(m.Runtime.Entry) == "" {
+			return errors.New("enola.plugin/v2 runtime must declare kind: go-executable and entry")
+		}
 	}
 	if len(m.IdentityFiles) == 0 {
 		return errors.New("identity_files must include the executed bundle")
 	}
-	if len(m.Vocabularies) == 0 {
+	if m.API == APIVersion && len(m.Vocabularies) == 0 {
 		return errors.New("vocabularies is required")
 	}
 	seen := map[string]bool{}
 	for _, v := range m.Vocabularies {
-		if v != FSMVocabularyV1 {
+		if v != FSMVocabularyV1 || (m.API == GoAPIVersion && v != FSMVocabularyV1) {
 			return fmt.Errorf("unsupported vocabulary %q", v)
 		}
 		if seen[v] {
 			return fmt.Errorf("duplicate vocabulary %q", v)
 		}
 		seen[v] = true
+	}
+	seenHooks := map[string]bool{}
+	for _, hook := range m.Hooks {
+		if !validHookID(hook) {
+			return fmt.Errorf("invalid hook ID %q", hook)
+		}
+		if seenHooks[hook] {
+			return fmt.Errorf("duplicate hook ID %q", hook)
+		}
+		seenHooks[hook] = true
+	}
+	if m.API == GoAPIVersion {
+		for _, hook := range []string{HookAnalysisPlanV1, HookAnalysisUnitV1} {
+			if !seenHooks[hook] {
+				return fmt.Errorf("enola.plugin/v2 must declare hook %q", hook)
+			}
+		}
 	}
 	if len(m.OwnerDomain) == 0 {
 		return errors.New("owner_domain must contain at least one admitted repository glob")
@@ -240,6 +271,7 @@ func validateManifest(m *Manifest) error {
 	}
 	sort.Strings(m.IdentityFiles)
 	sort.Strings(m.Vocabularies)
+	sort.Strings(m.Hooks)
 	sort.Strings(m.Claims.Machines)
 	sort.Strings(m.OwnerDomain)
 	sort.Strings(m.Candidates.Include)
@@ -263,6 +295,24 @@ func validateManifest(m *Manifest) error {
 		return errors.New("limits are outside supported bounds")
 	}
 	return nil
+}
+
+func validHookID(hook string) bool {
+	name, version, ok := strings.Cut(hook, "@")
+	if !ok || name == "" || version == "" {
+		return false
+	}
+	for _, r := range name {
+		if !(r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' || r >= '0' && r <= '9' || r == '.' || r == '_' || r == '-') {
+			return false
+		}
+	}
+	for _, r := range version {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return version != "0"
 }
 
 func validateRepoGlob(glob string) error {
@@ -333,15 +383,17 @@ func identityDigest(m Manifest, config map[string]any, fileBytes map[string][]by
 	if err != nil {
 		return "", err
 	}
-	grammar, err := HostGrammar()
-	if err != nil {
-		return "", fmt.Errorf("host grammar identity: %w", err)
-	}
 	write(mb)
 	write(cb)
 	write([]byte(runtimeDigest))
-	write([]byte(grammar.Label))
-	write([]byte(grammar.Digest))
+	if m.API == APIVersion {
+		grammar, err := HostGrammar()
+		if err != nil {
+			return "", fmt.Errorf("host grammar identity: %w", err)
+		}
+		write([]byte(grammar.Label))
+		write([]byte(grammar.Digest))
+	}
 	paths := make([]string, 0, len(fileBytes))
 	for p := range fileBytes {
 		paths = append(paths, p)

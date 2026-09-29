@@ -845,6 +845,10 @@ func (idx *idIndex) resolveRel(fromRepo, fromKind, relKind, target string) (id, 
 }
 
 func (idx *idIndex) resolveRelConstrained(fromRepo, fromKind, relKind, target string, requirePreferred bool, targetFile string) (id, status string) {
+	return idx.resolveRelTypedConstrained(fromRepo, fromKind, relKind, target, "", requirePreferred, targetFile)
+}
+
+func (idx *idIndex) resolveRelTypedConstrained(fromRepo, fromKind, relKind, target, targetKind string, requirePreferred bool, targetFile string) (id, status string) {
 	cands := idx.byName[target]
 	if len(cands) == 0 {
 		return "", graphstream.ResUnresolved
@@ -867,7 +871,19 @@ func (idx *idIndex) resolveRelConstrained(fromRepo, fromKind, relKind, target st
 		}
 		return selected, graphstream.ResResolved
 	}
-	if relKind == facts.RelDeclares || relKind == facts.RelImports {
+	if targetKind != "" {
+		typed := make([]facts.Fact, 0, len(cands))
+		for _, candidate := range cands {
+			if candidate.Kind == targetKind {
+				typed = append(typed, candidate)
+			}
+		}
+		cands = typed
+		if len(cands) == 0 {
+			return "", graphstream.ResUnresolved
+		}
+	}
+	if targetKind == "" && (relKind == facts.RelDeclares || relKind == facts.RelImports) {
 		if mods := moduleCandidates(cands, fromRepo); len(mods) > 0 {
 			return pickModuleIdentity(mods)
 		}
@@ -1012,12 +1028,13 @@ func encodeOwner(o ownerOutput, idx *idIndex, pending bool) (nodes []graphstream
 				FromID:     id,
 				Kind:       r.Kind,
 				TargetName: r.Target,
+				TargetKind: r.TargetKind,
 				Occurrence: i,
 			}
 			if pending {
 				e.Resolution = graphstream.ResPending
 			} else {
-				tid, st := idx.resolveRelConstrained(f.Repo, f.Kind, r.Kind, r.Target, fkStorageTargetRequired(f, r), r.TargetFile)
+				tid, st := idx.resolveRelTypedConstrained(f.Repo, f.Kind, r.Kind, r.Target, r.TargetKind, fkStorageTargetRequired(f, r), r.TargetFile)
 				e.Resolution = st
 				e.TargetID = tid
 			}

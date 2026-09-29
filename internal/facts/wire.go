@@ -58,9 +58,28 @@ type wireFact struct {
 //
 // The caller must hold s.mu.
 func (s *Store) targetFactFor(target, fromRepo string) int {
+	return s.targetFactForKind(target, "", fromRepo)
+}
+
+// targetFactForKind resolves a name and, when supplied, requires the target fact
+// to have the declared kind. Generic plugin relations use this to retain type
+// information without changing the resolution rules of existing extractors.
+func (s *Store) targetFactForKind(target, targetKind, fromRepo string) int {
 	idx := s.byName[target]
 	if len(idx) == 0 {
 		return -1
+	}
+	if targetKind != "" {
+		filtered := make([]int, 0, len(idx))
+		for _, i := range idx {
+			if s.facts[i].Kind == targetKind {
+				filtered = append(filtered, i)
+			}
+		}
+		idx = filtered
+		if len(idx) == 0 {
+			return -1
+		}
 	}
 
 	pick := -1

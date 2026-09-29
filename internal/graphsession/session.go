@@ -591,6 +591,7 @@ type session struct {
 	nextAnalyzerPlugins map[string]analyzerplugin.PluginRecord
 	pluginFacts         []facts.Fact
 	pluginAnchors       []pluginAnchor
+	pluginEnrichments   []pluginEnrichment
 	pluginContribs      map[string][]facts.Fact
 	// pluginDeltaOwners is P_pl: old∪new owners of invalidated/added/removed units.
 	pluginDeltaOwners []string
@@ -2242,6 +2243,10 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	}
 	if pluginExecution {
 		allFacts = mergeAnalyzerPluginAnchors(append(allFacts, s.pluginFacts...), s.pluginAnchors)
+		allFacts, err = mergeAnalyzerPluginEnrichments(allFacts, s.pluginEnrichments)
+		if err != nil {
+			return nil, err
+		}
 		// Plugin FSM nodes and plugin-created fallback facts must carry the
 		// current RepoID before resolution indexes are built so TS-anchored
 		// edges can resolve to them. Existing extracted facts keep their Repo.

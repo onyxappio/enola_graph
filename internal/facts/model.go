@@ -22,8 +22,9 @@ type Fact struct {
 
 // Relation represents a directed edge between two facts.
 type Relation struct {
-	Kind   string `json:"kind"`   // e.g. "declares", "imports", "calls", "implements", "depends_on"
-	Target string `json:"target"` // Target fact name
+	Kind       string `json:"kind"`                  // e.g. "declares", "imports", "calls", "implements", "depends_on"
+	Target     string `json:"target"`                // Target fact name
+	TargetKind string `json:"target_kind,omitempty"` // Explicit kind for extensible typed relations.
 	// TargetFile is extractor-proven file provenance for RelCalls and
 	// RelInstantiates. When set, graph resolution may only bind a same-name
 	// symbol in that file, subject to the source-repository filter when present.
@@ -72,7 +73,8 @@ const (
 	KindAssociation = "association"
 
 	// The FSM kinds describe admitted finite-state-machine source declarations.
-	// They are produced only by configured extractors, not by external providers.
+	// They are part of the host graph vocabulary and can be contributed by
+	// explicitly configured repository analyzers.
 	KindFSMMachine    = "fsm_machine"
 	KindFSMState      = "fsm_state"
 	KindFSMEvent      = "fsm_event"
@@ -103,18 +105,11 @@ const (
 	// with because-prose and a ratchet and the check's one comment covers
 	// both engines. Props: lint_engine, lint_rule, lint_severity, line, message.
 	KindLint = "lint"
-
-	// Generic FSM graph vocabulary. Repository plugins may contribute these
-	// kinds through enola.fsm@1; Enola still owns identity and graph handling.
-	KindFSMMachine    = "fsm_machine"
-	KindFSMState      = "fsm_state"
-	KindFSMEvent      = "fsm_event"
-	KindFSMTransition = "fsm_transition"
-	KindFSMCommand    = "fsm_command"
 )
 
 // FSM relation kinds. Evidence and per-site details live on the source fact;
-// Relation remains the positionless {kind,target,target_id} wire object.
+// Relation carries the kind, target name, optional target kind, and resolved
+// target ID at the graph publication boundary.
 const (
 	RelFSMParent                 = "fsm_parent"
 	RelFSMInitial                = "fsm_initial"
@@ -174,35 +169,17 @@ const (
 	// contains it (symbol -> module, route -> module): read it as "declared in".
 	// Nothing emits the module -> symbol direction, so a consumer building a
 	// containment tree walks this edge child-to-parent.
-	RelDeclares                  = "declares"
-	RelImports                   = "imports"
-	RelCalls                     = "calls"
-	RelImplements                = "implements"
-	RelDependsOn                 = "depends_on"
-	RelInstantiates              = "instantiates"   // Source constructs an instance of target via a constructor call.
-	RelInjects                   = "injects"        // Source declares target as a DI-injected constructor parameter.
-	RelHasMethod                 = "has_method"     // Owner type (struct/interface/class) declares target as a method. Synthesized in NewGraph.
-	RelHandledBy                 = "handled_by"     // A route/endpoint is served by target (e.g. a gRPC RPC route → its Go handler method). Added post-extraction.
-	RelImplementedBy             = "implemented_by" // A declared contract operation is implemented by a code symbol. Added post-extraction.
-	RelNames                     = "names"          // Source names target by symbol literal without calling it: a method name passed as data (`perform_async(id, :on_done)`) for something else to dispatch. A reference, not a call; read by dead-code questions, ignored by call metrics.
-	RelFSMParent                 = "fsm_parent"
-	RelFSMInitial                = "fsm_initial"
-	RelFSMFrom                   = "fsm_from"
-	RelFSMTo                     = "fsm_to"
-	RelFSMOn                     = "fsm_on"
-	RelFSMEmits                  = "fsm_emits"
-	RelFSMEntryEmits             = "fsm_entry_emits"
-	RelFSMOutcome                = "fsm_outcome"
-	RelFSMGuardRef               = "fsm_guard_ref"
-	RelFSMReducerRef             = "fsm_reducer_ref"
-	RelFSMGuardCalls             = "fsm_guard_calls"
-	RelFSMActionCalls            = "fsm_action_calls"
-	RelFSMDeclaredIn             = "fsm_declared_in"
-	RelFSMTypedBy                = "fsm_typed_by"
-	RelFSMConstructsEvent        = "fsm_constructs_event"
-	RelFSMDispatches             = "fsm_dispatches"
-	RelFSMDispatchesUnknownEvent = "fsm_dispatches_unknown_event"
-	RelFSMHandlesCommand         = "fsm_handles_command"
+	RelDeclares      = "declares"
+	RelImports       = "imports"
+	RelCalls         = "calls"
+	RelImplements    = "implements"
+	RelDependsOn     = "depends_on"
+	RelInstantiates  = "instantiates"   // Source constructs an instance of target via a constructor call.
+	RelInjects       = "injects"        // Source declares target as a DI-injected constructor parameter.
+	RelHasMethod     = "has_method"     // Owner type (struct/interface/class) declares target as a method. Synthesized in NewGraph.
+	RelHandledBy     = "handled_by"     // A route/endpoint is served by target (e.g. a gRPC RPC route → its Go handler method). Added post-extraction.
+	RelImplementedBy = "implemented_by" // A declared contract operation is implemented by a code symbol. Added post-extraction.
+	RelNames         = "names"          // Source names target by symbol literal without calling it: a method name passed as data (`perform_async(id, :on_done)`) for something else to dispatch. A reference, not a call; read by dead-code questions, ignored by call metrics.
 )
 
 // PropTargetFile is the repo-relative file a producer reports a relation's

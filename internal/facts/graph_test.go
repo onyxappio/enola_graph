@@ -710,6 +710,135 @@ func TestFindPath_EdgesHaveCorrectKinds(t *testing.T) {
 	}
 }
 
+func TestGraphSupportsPluginTypedRelations(t *testing.T) {
+	s := NewStore()
+	s.Add(
+		Fact{Kind: "task", Name: "series/T-1", File: "tasks/T-1.md", Relations: []Relation{{Kind: "depends_on", Target: "series/T-2", TargetKind: "task"}}},
+		Fact{Kind: "feedback", Name: "series/T-2", File: "feedback/F-1.md"},
+		Fact{Kind: "task", Name: "series/T-2", File: "tasks/T-2.md"},
+	)
+	s.BuildGraph()
+	g := s.Graph()
+
+	edges := g.ForwardEdges("series/T-1")
+	if len(edges) != 1 || edges[0].TargetKind != "task" {
+		t.Fatalf("typed forward edge = %#v, want one edge targeting kind task", edges)
+	}
+	traversal := g.Traverse("series/T-1", "forward", []string{"depends_on"}, []string{"task"}, 1, 10)
+	if len(traversal.Nodes) < 2 || traversal.Nodes[1].Kind != "task" {
+		t.Fatalf("typed traversal = %#v, want task target among same-named facts", traversal.Nodes)
+	}
+	path := g.FindPath("series/T-1", "series/T-2", []string{"depends_on"}, 1)
+	if !path.Found || len(path.Edges) != 1 {
+		t.Fatalf("typed FindPath = %#v, want one-edge task path", path)
+	}
+	if got := path.Edges[0]; got.SourceKind != "task" || got.TargetKind != "task" {
+		t.Fatalf("typed FindPath edge = %#v, want task source and target kinds", got)
+	}
+
+	written := s.All()
+	var source Fact
+	for _, fact := range written {
+		if fact.Name == "series/T-1" {
+			source = fact
+			break
+		}
+	}
+	if len(source.Relations) != 1 || source.Relations[0].TargetKind != "task" {
+		t.Fatalf("stored relation = %#v, want target kind preserved", source.Relations)
+	}
+}
+
+func TestFindPathReportsDifferentTypedEndpointKinds(t *testing.T) {
+	g := NewGraph([]Fact{
+		{Kind: "feedback", Name: "sample/F-1", Relations: []Relation{{Kind: "related", Target: "sample/T-2", TargetKind: "task"}}},
+		{Kind: "task", Name: "sample/T-2"},
+	})
+	path := g.FindPath("sample/F-1", "sample/T-2", []string{"related"}, 1)
+	if !path.Found || len(path.Edges) != 1 {
+		t.Fatalf("typed path = %#v, want one edge from feedback to task", path)
+	}
+	if got := path.Edges[0]; got.SourceKind != "feedback" || got.TargetKind != "task" {
+		t.Fatalf("typed path edge = %#v, want feedback source and task target", got)
+	}
+}
+
+func TestReverseFactsKeepsTypedSourcesWithSameName(t *testing.T) {
+	s := NewStore()
+	s.Add(
+		Fact{Kind: "task", Name: "shared", Relations: []Relation{{Kind: "related", Target: "target", TargetKind: "record"}}},
+		Fact{Kind: "feedback", Name: "shared", Relations: []Relation{{Kind: "related", Target: "target", TargetKind: "record"}}},
+		Fact{Kind: "record", Name: "target"},
+	)
+	s.BuildGraph()
+
+	got := s.Graph().ReverseFacts("target", "related")
+	if len(got) != 2 || got[0].Kind == got[1].Kind {
+		t.Fatalf("ReverseFacts = %#v, want both typed source facts with the same name", got)
+	}
+}
+
+func TestGraphDoesNotResolveExplicitRelationToWrongFactKind(t *testing.T) {
+	g := NewGraph([]Fact{
+		{Kind: "task", Name: "from", Relations: []Relation{{Kind: "depends_on", Target: "target", TargetKind: "task"}}},
+		{Kind: "feedback", Name: "target"},
+	})
+	traversal := g.Traverse("from", "forward", []string{"depends_on"}, nil, 1, 10)
+	if len(traversal.Nodes) < 2 || !traversal.Nodes[1].Unresolved || traversal.Nodes[1].Kind != "" {
+		t.Fatalf("explicit task relation resolved to a feedback fact: %#v", traversal.Nodes)
+	}
+}
+
+func TestTypedTraversalDoesNotMixOutgoingEdgesForSameNamedKinds(t *testing.T) {
+	g := NewGraph([]Fact{
+		{Kind: "root", Name: "start", Relations: []Relation{{Kind: "links", Target: "shared", TargetKind: "task"}}},
+		{Kind: "task", Name: "shared", Relations: []Relation{{Kind: "links", Target: "task-child", TargetKind: "task"}}},
+		{Kind: "feedback", Name: "shared", Relations: []Relation{{Kind: "links", Target: "feedback-child", TargetKind: "feedback"}}},
+		{Kind: "task", Name: "task-child"},
+		{Kind: "feedback", Name: "feedback-child"},
+	})
+
+	traversal := g.Traverse("start", "forward", []string{"links"}, nil, 3, 10)
+	got := map[string]string{}
+	for _, node := range traversal.Nodes {
+		got[node.Name] = node.Kind
+	}
+	if got["shared"] != "task" || got["task-child"] != "task" {
+		t.Fatalf("typed traversal omitted task branch: %#v", traversal.Nodes)
+	}
+	if _, leaked := got["feedback-child"]; leaked {
+		t.Fatalf("typed traversal followed another kind's same-name node: %#v", traversal.Nodes)
+	}
+	if path := g.FindPath("start", "feedback-child", []string{"links"}, 3); path.Found {
+		t.Fatalf("typed FindPath crossed into feedback branch: %#v", path.Path)
+	}
+	if count := g.reachableCount([]string{"start"}, "forward", 3); count != 2 {
+		t.Fatalf("typed reachable count = %d, want task branch's 2 nodes", count)
+	}
+}
+
+func TestTraverseNodeKindFilterDropsEdgesFromSameNamedExcludedKind(t *testing.T) {
+	g := NewGraph([]Fact{
+		{Kind: "root", Name: "start", Relations: []Relation{
+			{Kind: "links", Target: "shared", TargetKind: "task"},
+			{Kind: "links", Target: "shared", TargetKind: "feedback"},
+		}},
+		{Kind: "task", Name: "shared", Relations: []Relation{{Kind: "links", Target: "child", TargetKind: "task"}}},
+		{Kind: "feedback", Name: "shared", Relations: []Relation{{Kind: "links", Target: "child", TargetKind: "task"}}},
+		{Kind: "task", Name: "child"},
+	})
+
+	result := g.Traverse("start", "forward", []string{"links"}, []string{"task"}, 3, 10)
+	if len(result.Nodes) != 3 {
+		t.Fatalf("task-filtered nodes = %#v, want start, task/shared and task/child", result.Nodes)
+	}
+	for _, edge := range result.Edges {
+		if edge.Source == "shared" && edge.SourceKind != "task" {
+			t.Fatalf("node-kind filtering retained an edge from the excluded same-name kind: %#v", edge)
+		}
+	}
+}
+
 func TestNewGraph_DeduplicatesEdges(t *testing.T) {
 	s := NewStore()
 	// Two facts with identical relations (same source->kind->target).

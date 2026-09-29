@@ -114,6 +114,7 @@ type Edge struct {
 	FromID     string   `json:"from_id"`
 	Kind       string   `json:"kind"`
 	TargetName string   `json:"target_name"`
+	TargetKind string   `json:"target_kind,omitempty"`
 	TargetID   string   `json:"target_id,omitempty"`
 	Resolution string   `json:"resolution"`
 	Occurrence int      `json:"occurrence"`

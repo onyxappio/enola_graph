@@ -45,6 +45,13 @@ type pluginAnchor struct {
 	Value    analyzerplugin.Anchor
 }
 
+type pluginEnrichment struct {
+	Plugin   string
+	API      string
+	Identity string
+	Value    analyzerplugin.Enrichment
+}
+
 func (s *session) prepareAnalyzerPlugins(ctx context.Context, input *runtimeInputs, files, allNames []string, hashes map[string]string) error {
 	return s.prepareAnalyzerPluginsWith(ctx, input, files, allNames, hashes, true)
 }
@@ -63,6 +70,7 @@ func (s *session) prepareAnalyzerPluginsWith(ctx context.Context, input *runtime
 	s.pluginPreviewFences = nil
 	s.pluginDeltaOwners = nil
 	s.pluginResOwners = nil
+	s.pluginEnrichments = nil
 	s.pluginScopeIncomplete = false
 	loadedPlugins := s.analyzerPluginsLocked()
 	configured := map[string]analyzerplugin.Loaded{}
@@ -291,7 +299,7 @@ func (s *session) prepareAnalyzerPluginsWith(ctx context.Context, input *runtime
 				stagedUnits[unit.ID] = analyzerplugin.UnitRecord{Decl: unit, Observations: unitObs[unit.ID], Owners: owners, Summary: summaryBytes, OutputDigest: canonical}
 				addPluginOwnerKeys(deltaOwners, previousUnit.Owners)
 				addPluginOwnerKeys(deltaOwners, owners)
-				for n := range changedResolutionCandidateNames(pluginOwnerResultFacts(previousUnit.Owners), pluginOwnerResultFacts(owners)) {
+				for n := range changedResolutionCandidateNames(pluginOwnerResultFacts(name, p.Manifest.API, previousUnit.Owners), pluginOwnerResultFacts(name, p.Manifest.API, owners)) {
 					nameDelta[n] = true
 				}
 			}
@@ -481,6 +489,15 @@ func addPluginOwnerKeys(dst map[string]bool, owners map[string]analyzerplugin.Ow
 				dst[anchorOwner] = true
 			}
 		}
+		for _, enrichment := range result.Enrichments {
+			enrichmentOwner := filepath.ToSlash(enrichment.Owner)
+			if enrichmentOwner == "" {
+				enrichmentOwner = owner
+			}
+			if enrichmentOwner != "" {
+				dst[enrichmentOwner] = true
+			}
+		}
 	}
 }
 
@@ -513,16 +530,27 @@ func pluginOwnerResultNames(owners map[string]analyzerplugin.OwnerResult) map[st
 				}
 			}
 		}
+		for _, enrichment := range result.Enrichments {
+			if enrichment.Name != "" {
+				names[enrichment.Name] = true
+			}
+			for _, rel := range enrichment.Relations {
+				if rel.Target != "" {
+					names[rel.Target] = true
+				}
+			}
+		}
 	}
 	return names
 }
 
-func pluginOwnerResultFacts(owners map[string]analyzerplugin.OwnerResult) []facts.Fact {
+func pluginOwnerResultFacts(pluginName, api string, owners map[string]analyzerplugin.OwnerResult) []facts.Fact {
 	var out []facts.Fact
 	for owner, result := range owners {
 		owner = filepath.ToSlash(owner)
 		for _, node := range result.Nodes {
-			out = append(out, facts.Fact{Kind: node.Kind, Name: node.Name, File: owner, Line: node.Line, EndLine: node.EndLine})
+			rels := pluginFactsRelations(pluginName, api, node.Relations)
+			out = append(out, facts.Fact{Kind: pluginFactKind(pluginName, api, node.Kind), Name: node.Name, File: owner, Line: node.Line, EndLine: node.EndLine, Relations: rels})
 		}
 		for _, anchor := range result.Anchors {
 			anchorOwner := filepath.ToSlash(anchor.Owner)
@@ -532,9 +560,19 @@ func pluginOwnerResultFacts(owners map[string]analyzerplugin.OwnerResult) []fact
 			for _, rel := range anchor.Relations {
 				out = append(out, facts.Fact{
 					Kind: facts.KindSymbol, Name: anchor.Symbol, File: anchorOwner, Line: anchor.Line, EndLine: anchor.EndLine,
-					Relations: []facts.Relation{{Kind: rel.Kind, Target: rel.Target, TargetFile: rel.TargetFile}},
+					Relations: pluginAnchorRelations(pluginName, api, []analyzerplugin.Relation{rel}),
 				})
 			}
+		}
+		for _, enrichment := range result.Enrichments {
+			enrichmentOwner := filepath.ToSlash(enrichment.Owner)
+			if enrichmentOwner == "" {
+				enrichmentOwner = owner
+			}
+			out = append(out, facts.Fact{
+				Kind: pluginEnrichmentTargetKind(pluginName, api, enrichment.Kind), Name: enrichment.Name, File: enrichmentOwner,
+				Relations: pluginFactsRelations(pluginName, api, enrichment.Relations),
+			})
 		}
 	}
 	return out
@@ -1100,9 +1138,18 @@ func (s *session) pluginCallback(ctx context.Context, p analyzerplugin.Loaded, m
 func (s *session) collectPluginContributions(records map[string]analyzerplugin.PluginRecord, admitted map[string]bool) error {
 	s.pluginFacts = nil
 	s.pluginAnchors = nil
+	s.pluginEnrichments = nil
 	s.pluginContribs = map[string][]facts.Fact{}
-	seenIdentities := map[string]map[string]string{}
+	type seenPluginIdentity struct {
+		owner       string
+		occurrences map[string]string
+	}
+	seenIdentities := map[string]*seenPluginIdentity{}
 	ownerFiles := map[string]bool{}
+	apiVersions := map[string]string{}
+	for _, plugin := range s.analyzerPluginsLocked() {
+		apiVersions[plugin.Manifest.Name] = plugin.Manifest.API
+	}
 	repoID := ""
 	if s != nil {
 		repoID = s.opts.RepoID
@@ -1117,6 +1164,7 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 	sort.Strings(pluginNames)
 	for _, pluginName := range pluginNames {
 		record := records[pluginName]
+		api := apiVersions[pluginName]
 		unitIDs := make([]string, 0, len(record.Units))
 		for id := range record.Units {
 			unitIDs = append(unitIDs, id)
@@ -1140,31 +1188,35 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 				output := unit.Owners[owner]
 				key := "plugin:" + pluginName
 				for _, node := range output.Nodes {
-					identity := node.Kind + "\x00" + node.Name + "\x00" + filepath.ToSlash(owner)
+					factKind := pluginFactKind(pluginName, api, node.Kind)
+					identity := factKind + "\x00" + node.Name
+					if api != analyzerplugin.GoAPIVersion {
+						// Legacy Node plugins keep their owner-path-qualified fact identity.
+						identity += "\x00" + filepath.ToSlash(owner)
+					}
 					occurrence := ""
 					if node.Props != nil {
 						if value, ok := node.Props["occurrence"]; ok && value != nil {
 							occurrence = strings.TrimSpace(fmt.Sprint(value))
 						}
 					}
-					if seenIdentities[identity] == nil {
-						seenIdentities[identity] = map[string]string{}
+					seen := seenIdentities[identity]
+					if seen == nil {
+						seen = &seenPluginIdentity{owner: owner, occurrences: map[string]string{}}
+						seenIdentities[identity] = seen
+					} else if api == analyzerplugin.GoAPIVersion && seen.owner != owner {
+						return fmt.Errorf("Go analyzer plugin %q emitted stable fact identity %s/%s for multiple owners %q and %q", pluginName, node.Kind, node.Name, seen.owner, owner)
 					}
-					if len(seenIdentities[identity]) > 0 && (occurrence == "" || seenIdentities[identity][""] != "" || seenIdentities[identity][occurrence] != "") {
+					if len(seen.occurrences) > 0 && (occurrence == "" || seen.occurrences[""] != "" || seen.occurrences[occurrence] != "") {
 						return fmt.Errorf("analyzer plugins emitted duplicate fact identity %s/%s for owner %s without distinct occurrences", node.Kind, node.Name, owner)
 					}
-					seenIdentities[identity][occurrence] = id
-					props := cloneAnyMap(node.Props)
-					if props == nil {
-						props = map[string]any{}
-					}
+					seen.occurrences[occurrence] = id
+					props := pluginOwnedProperties(api, pluginName, node.Props)
 					props["plugin"] = pluginName
 					props["plugin_identity"] = record.Identity
 					rels := make([]facts.Relation, 0, len(node.Relations))
-					for _, r := range node.Relations {
-						rels = append(rels, facts.Relation{Kind: r.Kind, Target: r.Target, TargetFile: r.TargetFile})
-					}
-					fact := facts.Fact{Kind: node.Kind, Name: node.Name, File: owner, Line: node.Line, EndLine: node.EndLine, Repo: repoID, Props: props, Relations: rels}
+					rels = pluginFactsRelations(pluginName, api, node.Relations)
+					fact := facts.Fact{Kind: factKind, Name: node.Name, File: owner, Line: node.Line, EndLine: node.EndLine, Repo: repoID, Props: props, Relations: rels}
 					s.pluginFacts = append(s.pluginFacts, fact)
 					s.pluginContribs[key] = append(s.pluginContribs[key], fact)
 				}
@@ -1179,10 +1231,7 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 						anchor.Owner = anchorOwner
 					}
 					ownerFiles[anchorOwner] = true
-					props := cloneAnyMap(anchor.Props)
-					if props == nil {
-						props = map[string]any{}
-					}
+					props := pluginOwnedProperties(api, pluginName, anchor.Props)
 					props["plugin"] = pluginName
 					props["plugin_identity"] = record.Identity
 					props["plugin_anchor"] = true
@@ -1190,9 +1239,7 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 						props["fsm_source_identity"] = anchor.SourceIdentity
 					}
 					rels := make([]facts.Relation, 0, len(anchor.Relations))
-					for _, r := range anchor.Relations {
-						rels = append(rels, facts.Relation{Kind: r.Kind, Target: r.Target, TargetFile: r.TargetFile})
-					}
+					rels = pluginAnchorRelations(pluginName, api, anchor.Relations)
 					// Persist anchors into Contrib so frozen pre-Begin name
 					// planning and resolution indexes see old and new owners.
 					s.pluginContribs[key] = append(s.pluginContribs[key], facts.Fact{
@@ -1200,6 +1247,12 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 						Line: anchor.Line, EndLine: anchor.EndLine, Repo: repoID, Props: props, Relations: rels,
 					})
 					s.pluginAnchors = append(s.pluginAnchors, pluginAnchor{Plugin: pluginName, Identity: record.Identity, Value: anchor})
+				}
+				for _, enrichment := range output.Enrichments {
+					if enrichment.Owner == "" {
+						enrichment.Owner = owner
+					}
+					s.pluginEnrichments = append(s.pluginEnrichments, pluginEnrichment{Plugin: pluginName, API: api, Identity: record.Identity, Value: enrichment})
 				}
 			}
 		}
@@ -1248,6 +1301,16 @@ func pluginOwnerSeeds(records map[string]analyzerplugin.PluginRecord) []string {
 					if anchorOwner != "" && !seen[anchorOwner] {
 						seen[anchorOwner] = true
 						out = append(out, anchorOwner)
+					}
+				}
+				for _, enrichment := range record.Units[id].Owners[owner].Enrichments {
+					enrichmentOwner := filepath.ToSlash(enrichment.Owner)
+					if enrichmentOwner == "" {
+						enrichmentOwner = owner
+					}
+					if enrichmentOwner != "" && !seen[enrichmentOwner] {
+						seen[enrichmentOwner] = true
+						out = append(out, enrichmentOwner)
 					}
 				}
 			}
@@ -1369,7 +1432,7 @@ func mergeAnalyzerPluginAnchors(base []facts.Fact, anchors []pluginAnchor) []fac
 		overlay.Props["plugin"] = wrapped.Plugin
 		overlay.Props["plugin_identity"] = wrapped.Identity
 		for _, r := range a.Relations {
-			overlay.Relations = append(overlay.Relations, facts.Relation{Kind: r.Kind, Target: r.Target, TargetFile: r.TargetFile})
+			overlay.Relations = append(overlay.Relations, facts.Relation{Kind: r.Kind, Target: r.Target, TargetKind: r.TargetKind, TargetFile: r.TargetFile})
 		}
 		owner := pluginAnchorOwner(out, overlay, a.SourceIdentity)
 		if owner < 0 {
@@ -1385,7 +1448,7 @@ func mergeAnalyzerPluginAnchors(base []facts.Fact, anchors []pluginAnchor) []fac
 		for _, rel := range overlay.Relations {
 			found := false
 			for _, old := range out[owner].Relations {
-				if old.Kind == rel.Kind && old.Target == rel.Target && old.TargetFile == rel.TargetFile {
+				if old.Kind == rel.Kind && old.Target == rel.Target && old.TargetKind == rel.TargetKind && old.TargetFile == rel.TargetFile {
 					found = true
 					break
 				}
@@ -1405,6 +1468,175 @@ func mergeAnalyzerPluginAnchors(base []facts.Fact, anchors []pluginAnchor) []fac
 		out[owner].Props["fsm_evidence_sites"] = sites
 	}
 	return out
+}
+
+// mergeAnalyzerPluginEnrichments applies plugin-owned overlays only after all
+// base and plugin-created facts are available. The target is deliberately
+// resolved by the full stable identity (owner, kind, name); absent or ambiguous
+// targets fail the run instead of silently dropping or misapplying data.
+func mergeAnalyzerPluginEnrichments(base []facts.Fact, enrichments []pluginEnrichment) ([]facts.Fact, error) {
+	if len(enrichments) == 0 {
+		return base, nil
+	}
+	out := append([]facts.Fact(nil), base...)
+	ordered := append([]pluginEnrichment(nil), enrichments...)
+	sort.SliceStable(ordered, func(i, j int) bool {
+		left, right := ordered[i], ordered[j]
+		leftOwner, rightOwner := filepath.ToSlash(left.Value.Owner), filepath.ToSlash(right.Value.Owner)
+		leftKey := leftOwner + "\x00" + pluginEnrichmentTargetKind(left.Plugin, left.API, left.Value.Kind) + "\x00" + left.Value.Name
+		rightKey := rightOwner + "\x00" + pluginEnrichmentTargetKind(right.Plugin, right.API, right.Value.Kind) + "\x00" + right.Value.Name
+		if left.Plugin != right.Plugin {
+			return left.Plugin < right.Plugin
+		}
+		if leftKey != rightKey {
+			return leftKey < rightKey
+		}
+		return left.Identity < right.Identity
+	})
+
+	for _, wrapped := range ordered {
+		enrichment := wrapped.Value
+		owner := filepath.ToSlash(enrichment.Owner)
+		kind := pluginEnrichmentTargetKind(wrapped.Plugin, wrapped.API, enrichment.Kind)
+		match, matches := -1, 0
+		for i := range out {
+			if out[i].Kind == kind && out[i].Name == enrichment.Name && filepath.ToSlash(out[i].File) == owner {
+				match = i
+				matches++
+			}
+		}
+		if matches == 0 {
+			return nil, fmt.Errorf("analyzer plugin %q enrichment target %s/%s is missing in owner %s", wrapped.Plugin, kind, enrichment.Name, owner)
+		}
+		if matches != 1 {
+			return nil, fmt.Errorf("analyzer plugin %q enrichment target %s/%s is ambiguous in owner %s (%d facts)", wrapped.Plugin, kind, enrichment.Name, owner, matches)
+		}
+
+		target := out[match]
+		if len(enrichment.Props) > 0 {
+			properties := pluginOwnedProperties(wrapped.API, wrapped.Plugin, enrichment.Props)
+			incoming, _ := properties["plugin_properties"].(map[string]any)
+			existing, ok := target.Props["plugin_properties"].(map[string]any)
+			if value, present := target.Props["plugin_properties"]; present && !ok {
+				return nil, fmt.Errorf("analyzer plugin %q cannot enrich %s/%s in owner %s: existing plugin_properties has type %T", wrapped.Plugin, kind, enrichment.Name, owner, value)
+			}
+			merged := cloneAnyMap(existing)
+			if merged == nil {
+				merged = map[string]any{}
+			}
+			plugins := make([]string, 0, len(incoming))
+			for plugin := range incoming {
+				plugins = append(plugins, plugin)
+			}
+			sort.Strings(plugins)
+			for _, plugin := range plugins {
+				fields, _ := incoming[plugin].(map[string]any)
+				prior, ok := merged[plugin].(map[string]any)
+				if value, present := merged[plugin]; present && !ok {
+					return nil, fmt.Errorf("analyzer plugin %q cannot enrich %s/%s in owner %s: namespace %q has type %T", wrapped.Plugin, kind, enrichment.Name, owner, plugin, value)
+				}
+				prior = cloneAnyMap(prior)
+				if prior == nil {
+					prior = map[string]any{}
+				}
+				fieldNames := make([]string, 0, len(fields))
+				for field := range fields {
+					fieldNames = append(fieldNames, field)
+				}
+				sort.Strings(fieldNames)
+				for _, field := range fieldNames {
+					if _, exists := prior[field]; exists {
+						return nil, fmt.Errorf("analyzer plugin %q enrichment would overwrite its property %s on %s/%s in owner %s", wrapped.Plugin, field, kind, enrichment.Name, owner)
+					}
+					prior[field] = cloneAny(fields[field])
+				}
+				merged[plugin] = prior
+			}
+			if target.Props == nil {
+				target.Props = map[string]any{}
+			} else {
+				target.Props = cloneAnyMap(target.Props)
+			}
+			target.Props["plugin_properties"] = merged
+		}
+
+		relationsCopied := false
+		for _, relation := range pluginFactsRelations(wrapped.Plugin, wrapped.API, enrichment.Relations) {
+			found := false
+			for _, previous := range target.Relations {
+				if previous == relation {
+					found = true
+					break
+				}
+			}
+			if !found {
+				if !relationsCopied {
+					target.Relations = append([]facts.Relation(nil), target.Relations...)
+					relationsCopied = true
+				}
+				target.Relations = append(target.Relations, relation)
+			}
+		}
+		out[match] = target
+	}
+	return out, nil
+}
+
+func pluginFactKind(pluginName, api, kind string) string {
+	if api == analyzerplugin.GoAPIVersion {
+		return analyzerplugin.GenericFactKind(pluginName, kind)
+	}
+	return kind
+}
+
+func pluginEnrichmentTargetKind(pluginName, api, kind string) string {
+	if api == analyzerplugin.GoAPIVersion {
+		return analyzerplugin.GenericTargetKind(pluginName, kind)
+	}
+	return kind
+}
+
+func pluginFactsRelations(pluginName, api string, relations []analyzerplugin.Relation) []facts.Relation {
+	out := make([]facts.Relation, 0, len(relations))
+	for _, relation := range relations {
+		kind, targetKind := relation.Kind, relation.TargetKind
+		if api == analyzerplugin.GoAPIVersion {
+			kind = analyzerplugin.GenericRelationKind(pluginName, kind)
+			targetKind = analyzerplugin.GenericTargetKind(pluginName, targetKind)
+		}
+		out = append(out, facts.Relation{Kind: kind, Target: relation.Target, TargetKind: targetKind, TargetFile: relation.TargetFile})
+	}
+	return out
+}
+
+func pluginAnchorRelations(pluginName, api string, relations []analyzerplugin.Relation) []facts.Relation {
+	if api != analyzerplugin.GoAPIVersion {
+		return pluginFactsRelations(pluginName, api, relations)
+	}
+	out := make([]facts.Relation, 0, len(relations))
+	for _, relation := range relations {
+		targetKind := relation.TargetKind
+		if targetKind == "" {
+			targetKind, _ = facts.FSMRelationTargetKind(relation.Kind)
+		}
+		out = append(out, facts.Relation{Kind: relation.Kind, Target: relation.Target, TargetKind: targetKind, TargetFile: relation.TargetFile})
+	}
+	return out
+}
+
+func pluginOwnedProperties(api, pluginName string, properties map[string]any) map[string]any {
+	if api != analyzerplugin.GoAPIVersion {
+		out := cloneAnyMap(properties)
+		if out == nil {
+			out = map[string]any{}
+		}
+		return out
+	}
+	owned := cloneAnyMap(properties)
+	if owned == nil {
+		owned = map[string]any{}
+	}
+	return map[string]any{"plugin_properties": map[string]any{pluginName: owned}}
 }
 
 func evidenceSiteKey(site map[string]any) string {
@@ -1457,7 +1689,7 @@ func pluginAnchorOwner(base []facts.Fact, overlay facts.Fact, sourceIdentity str
 func relationEvidence(relations []facts.Relation) []map[string]string {
 	out := make([]map[string]string, 0, len(relations))
 	for _, r := range relations {
-		out = append(out, map[string]string{"kind": r.Kind, "target": r.Target, "target_file": r.TargetFile})
+		out = append(out, map[string]string{"kind": r.Kind, "target": r.Target, "target_kind": r.TargetKind, "target_file": r.TargetFile})
 	}
 	return out
 }

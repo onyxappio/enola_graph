@@ -3,6 +3,7 @@ package facts
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"strings"
 )
 
 // Fact identity for EXTERNAL consumers.
@@ -14,12 +15,12 @@ import (
 // preference, and DROPS the edge when the guess is ambiguous. The ids below
 // replace the guess.
 //
-// They exist only in facts.jsonl. Nothing inside enola reads them: the graph is
-// name-keyed (see NewGraph), diff keys on its own factKey, and the history store
-// keeps serialized lines. That is deliberate — an id that no internal reader
-// depends on cannot change an internal answer, so adding one cannot regress the
-// analysis. It is computed at serialization and never stored on a Fact, which
-// also keeps it off a struct that exists 39M times on the largest graphs.
+// For ordinary facts the identity is (repo, kind, name, file). Generic
+// repository-plugin kinds reserve the "plugin:" namespace and use
+// (repo, kind, name): their source file is the replaceable owner, while Name is
+// the stable domain identity. It is computed at serialization and never stored
+// on a Fact, which also keeps it off a struct that exists 39M times on the
+// largest graphs.
 
 // idBytes is the identity's width in bytes. 128 bits is far past what the
 // birthday bound needs: at 39M facts — the largest graph measured — the odds of
@@ -29,6 +30,8 @@ import (
 const idBytes = 16
 
 // FactID returns the stable identity of a fact as 32 lowercase hex characters.
+// For kinds in the reserved "plugin:" namespace, file is intentionally omitted
+// so moving an entity between owner files does not change its graph identity.
 //
 // The identity is (repo, kind, name, file). Name alone is not enough — two
 // functions sharing a name in different files are distinct facts, and merging
@@ -62,6 +65,9 @@ func FactID(repo, kind, name, file string) string {
 // each id costs three allocations; this costs one, the returned string, which is
 // the only part that has to outlive the call.
 func factIDInto(scratch []byte, repo, kind, name, file string) (string, []byte) {
+	if strings.HasPrefix(kind, "plugin:") {
+		file = ""
+	}
 	// NUL between the fields, so ("a", "b") cannot hash as ("ab", ""). No field
 	// may contain a NUL: they are a repo label, a registered kind, a symbol name
 	// and a path.
@@ -79,12 +85,15 @@ func factIDInto(scratch []byte, repo, kind, name, file string) (string, []byte) 
 	return hex.EncodeToString(sum[:idBytes]), scratch
 }
 
-// Identity returns this fact's FactID.
+// Identity returns this fact's FactID. Generic plugin facts are identified by
+// repository, namespaced kind and stable name; File remains their owner.
 func (f Fact) Identity() string { return FactID(f.Repo, f.Kind, f.Name, f.File) }
 
 // sameIdentity reports whether two facts carry the same id without computing
-// either: equal inputs to FactID mean an equal id, and comparing four strings is
-// cheaper than two hashes.
+// either. Plugin facts omit File from identity, matching factIDInto.
 func sameIdentity(a, b Fact) bool {
-	return a.Repo == b.Repo && a.Kind == b.Kind && a.Name == b.Name && a.File == b.File
+	if a.Repo != b.Repo || a.Kind != b.Kind || a.Name != b.Name {
+		return false
+	}
+	return strings.HasPrefix(a.Kind, "plugin:") || a.File == b.File
 }

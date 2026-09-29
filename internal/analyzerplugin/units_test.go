@@ -370,7 +370,7 @@ func TestParseDyldInfoUUIDDeterministic(t *testing.T) {
 	fixture := `/usr/lib/libSystem.B.dylib [arm64e]:
     -platform:
         platform     minOS      sdk
- zippered(macOS/Catalyst)     26.3      26.3   
+ zippered(macOS/Catalyst)     26.3      26.3
     -uuid:
         6ae3a2bd-839c-3dea-854c-1c4a10567c26
     -segments:

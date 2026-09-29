@@ -36,6 +36,7 @@ type WireMessage map[string]any
 
 type Client struct {
 	cmd         *exec.Cmd
+	apiVersion  string
 	workDir     string
 	stdin       io.WriteCloser
 	frames      chan frameResult
@@ -58,15 +59,18 @@ type frameResult struct {
 // `node -p` probe.
 func Start(ctx context.Context, p Loaded, handler Handler) (*Client, error) {
 	runtimePath := p.Runtime
-	if runtimePath == "" {
+	goExecutable := p.Manifest.API == GoAPIVersion && p.Manifest.Runtime.Kind == "go-executable"
+	if runtimePath == "" && !goExecutable {
 		return nil, fmt.Errorf("plugin %q has no resolved Node executable", p.Manifest.Name)
 	}
-	liveRuntimeDigest, _, err := CachedRuntimeDigest(runtimePath, nil)
-	if err != nil {
-		return nil, fmt.Errorf("plugin %q runtime fingerprint at start: %w", p.Manifest.Name, err)
-	}
-	if p.RuntimeDigest != "" && liveRuntimeDigest != p.RuntimeDigest {
-		return nil, fmt.Errorf("plugin %q runtime fingerprint changed since load", p.Manifest.Name)
+	if !goExecutable {
+		liveRuntimeDigest, _, err := CachedRuntimeDigest(runtimePath, nil)
+		if err != nil {
+			return nil, fmt.Errorf("plugin %q runtime fingerprint at start: %w", p.Manifest.Name, err)
+		}
+		if p.RuntimeDigest != "" && liveRuntimeDigest != p.RuntimeDigest {
+			return nil, fmt.Errorf("plugin %q runtime fingerprint changed since load", p.Manifest.Name)
+		}
 	}
 	cwd, err := os.MkdirTemp("", "enola-plugin-")
 	if err != nil {
@@ -100,16 +104,23 @@ func Start(ctx context.Context, p Loaded, handler Handler) (*Client, error) {
 		}
 	}
 	entryName := "plugin" + filepath.Ext(p.Entry)
-	if filepath.Ext(entryName) == "" {
+	if goExecutable {
+		entryName = "plugin"
+	} else if filepath.Ext(entryName) == "" {
 		entryName += ".mjs"
 	}
 	entryCopy := filepath.Join(cwd, entryName)
 	if err := os.WriteFile(entryCopy, entryBytes, 0o500); err != nil {
 		return nil, fmt.Errorf("stage plugin %q entry bundle: %w", p.Manifest.Name, err)
 	}
-	cmd := exec.CommandContext(ctx, runtimePath, "./"+entryName)
+	var cmd *exec.Cmd
+	if goExecutable {
+		cmd = exec.CommandContext(ctx, "./"+entryName)
+	} else {
+		cmd = exec.CommandContext(ctx, runtimePath, "./"+entryName)
+	}
 	cmd.Dir = cwd
-	cmd.Env = []string{"TZ=UTC", "LANG=C", "LC_ALL=C", "NODE_OPTIONS=", "PATH=" + filepath.Dir(runtimePath)}
+	cmd.Env = []string{"TZ=UTC", "LANG=C", "LC_ALL=C", "PATH=" + filepath.Dir(runtimePath)}
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		return nil, err
@@ -136,7 +147,7 @@ func Start(ctx context.Context, p Loaded, handler Handler) (*Client, error) {
 		runTimeoutMS = DefaultTimeoutMS
 	}
 	c := &Client{
-		cmd: cmd, workDir: cwd, stdin: stdin, frames: make(chan frameResult, 1), maxFrame: maxFrame,
+		cmd: cmd, apiVersion: p.Manifest.API, workDir: cwd, stdin: stdin, frames: make(chan frameResult, 1), maxFrame: maxFrame,
 		unitTimeout: time.Duration(unitTimeoutMS) * time.Millisecond,
 		runDeadline: time.Now().Add(time.Duration(runTimeoutMS) * time.Millisecond),
 	}
@@ -156,30 +167,69 @@ func Start(ctx context.Context, p Loaded, handler Handler) (*Client, error) {
 	}
 	helloCtx, cancelHello := context.WithTimeout(ctx, helloBudget)
 	defer cancelHello()
-	grammarHello, err := GrammarHelloValue()
-	if err != nil {
-		c.Abort()
-		return nil, fmt.Errorf("plugin %q host grammar: %w", p.Manifest.Name, err)
+	hello := WireMessage{"op": "hello", "host_api": APIVersion, "config": p.Config.Config, "runtime": json.RawMessage(versions), "concurrency": p.Manifest.Limits.Concurrency}
+	if p.Manifest.API == GoAPIVersion {
+		hello["host_api"] = GoAPIVersion
+		hello["host_hooks"] = []string{HookAnalysisPlanV1, HookAnalysisUnitV1}
+	} else {
+		grammarHello, err := GrammarHelloValue()
+		if err != nil {
+			c.Abort()
+			return nil, fmt.Errorf("plugin %q host grammar: %w", p.Manifest.Name, err)
+		}
+		hello["host_api"] = APIVersion
+		hello["grammar"] = grammarHello
+		hello["vocab"] = p.Manifest.Vocabularies
 	}
-	resp, err := c.Call(helloCtx, WireMessage{"op": "hello", "host_api": APIVersion, "grammar": grammarHello, "vocab": p.Manifest.Vocabularies, "config": p.Config.Config, "runtime": json.RawMessage(versions), "concurrency": p.Manifest.Limits.Concurrency}, handler, "hello_ack")
+	resp, err := c.Call(helloCtx, hello, handler, "hello_ack")
 	if err != nil {
 		c.Abort()
 		return nil, fmt.Errorf("plugin %q hello: %w", p.Manifest.Name, err)
 	}
-	if got, _ := resp["api"].(string); got != APIVersion {
+	wantAPI := APIVersion
+	if p.Manifest.API == GoAPIVersion {
+		wantAPI = GoAPIVersion
+	}
+	if got, _ := resp["api"].(string); got != wantAPI {
 		c.Abort()
 		return nil, fmt.Errorf("plugin %q negotiated unsupported host api %q", p.Manifest.Name, got)
 	}
-	reported, _ := resp["node"].(string)
-	if reported == "" {
+	if p.Manifest.API == APIVersion {
+		reported, _ := resp["node"].(string)
+		if reported == "" {
+			c.Abort()
+			return nil, fmt.Errorf("plugin %q hello omitted process.versions.node", p.Manifest.Name)
+		}
+		if reported != p.Manifest.Runtime.Version {
+			c.Abort()
+			return nil, fmt.Errorf("plugin %q requires Node %s; hello reported %s", p.Manifest.Name, p.Manifest.Runtime.Version, reported)
+		}
+	} else if err := validateHookHandshake(p.Manifest, resp["hooks"]); err != nil {
 		c.Abort()
-		return nil, fmt.Errorf("plugin %q hello omitted process.versions.node", p.Manifest.Name)
-	}
-	if reported != p.Manifest.Runtime.Version {
-		c.Abort()
-		return nil, fmt.Errorf("plugin %q requires Node %s; hello reported %s", p.Manifest.Name, p.Manifest.Runtime.Version, reported)
+		return nil, err
 	}
 	return c, nil
+}
+
+func validateHookHandshake(m Manifest, value any) error {
+	items, ok := value.([]any)
+	if !ok {
+		return fmt.Errorf("plugin %q hello omitted registered hook capabilities", m.Name)
+	}
+	registered := make(map[string]bool, len(items))
+	for _, item := range items {
+		id, ok := item.(string)
+		if !ok || !validHookID(id) {
+			return fmt.Errorf("plugin %q hello reported invalid hook capability %v", m.Name, item)
+		}
+		registered[id] = true
+	}
+	for _, id := range m.Hooks {
+		if !registered[id] {
+			return fmt.Errorf("plugin %q declared hook %q but did not register it", m.Name, id)
+		}
+	}
+	return nil
 }
 
 func (c *Client) readFrames(r io.Reader) {
@@ -364,6 +414,16 @@ func (c *Client) write(v WireMessage) error {
 
 // Plan asks the plugin for deterministic unit declarations.
 func (c *Client) Plan(ctx context.Context, filesDigest string, handler Handler) ([]UnitDecl, error) {
+	if c.apiVersion == GoAPIVersion {
+		var result PlanResult
+		if err := c.CallHook(ctx, HookAnalysisPlanV1, map[string]any{"files_digest": filesDigest}, "@plan", handler, &result); err != nil {
+			return nil, err
+		}
+		if err := ValidatePlan(result.Units); err != nil {
+			return nil, err
+		}
+		return result.Units, nil
+	}
 	resp, err := c.Call(ctx, WireMessage{"op": "plan", "files_digest": filesDigest}, handler, "plan_result")
 	if err != nil {
 		return nil, err
@@ -382,6 +442,36 @@ func (c *Client) Plan(ctx context.Context, filesDigest string, handler Handler) 
 	return units, nil
 }
 
+type PlanResult struct {
+	Units []UnitDecl `json:"units"`
+}
+
+// CallHook invokes a versioned hook using the shared v2 transport operation.
+// New hooks use this same request/response framing and do not add protocol ops.
+func (c *Client) CallHook(ctx context.Context, hook string, request any, unit string, handler Handler, result any) error {
+	if c.apiVersion != GoAPIVersion {
+		return errors.New("generic hooks require enola.plugin/v2")
+	}
+	if !validHookID(hook) {
+		return fmt.Errorf("invalid hook ID %q", hook)
+	}
+	resp, err := c.Call(ctx, WireMessage{"op": "hook_call", "hook": hook, "unit": unit, "request": request}, handler, "hook_result")
+	if err != nil {
+		return err
+	}
+	if result == nil {
+		return nil
+	}
+	encoded, err := json.Marshal(resp["result"])
+	if err != nil {
+		return err
+	}
+	if err := json.Unmarshal(encoded, result); err != nil {
+		return fmt.Errorf("invalid response from hook %q: %w", hook, err)
+	}
+	return nil
+}
+
 // Run executes the supplied units as one request. Per-unit results are returned
 // as raw JSON-compatible maps and are validated by the graph host before use.
 // Only summaries declared in each unit's consumes list are included in the
@@ -392,6 +482,18 @@ func (c *Client) Run(ctx context.Context, units []UnitDecl, summaries map[string
 		return nil, nil
 	}
 	declared := DeclaredSummaries(units, summaries)
+	if c.apiVersion == GoAPIVersion {
+		results := make([]WireMessage, 0, len(units))
+		for _, unit := range units {
+			request := WireMessage{"unit": unit, "summaries": DeclaredSummaries([]UnitDecl{unit}, declared)}
+			var response WireMessage
+			if err := c.CallHook(ctx, HookAnalysisUnitV1, request, unit.ID, handler, &response); err != nil {
+				return nil, err
+			}
+			results = append(results, response)
+		}
+		return results, nil
+	}
 	// The run stream may contain several unit_result frames before run_done. The
 	// shared Call machinery is specialized here to retain all such results.
 	request := WireMessage{"id": id, "op": "run", "units": units, "summaries": declared}
