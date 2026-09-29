@@ -1,8 +1,8 @@
 # Generalized repository analyzer hooks
 
-Status: implementation contract for the owner-directed T-001 generalization;
-implementation and review are in progress. This amendment supersedes the
-earlier V1 restriction that allowed only `enola.fsm@1`; it keeps
+Status: implemented and independently reviewed PASS on the T-001 feature
+branch; the task remains open for human review and reflection. This amendment
+supersedes the earlier V1 restriction that allowed only `enola.fsm@1`; it keeps
 repository-owned code, explicit operator trust, observation-backed caching,
 and frozen replacement scopes. The existing Node/FSM API remains a
 compatibility adapter; the generalized authoring API is Go-first.
