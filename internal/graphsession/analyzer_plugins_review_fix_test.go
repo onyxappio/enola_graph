@@ -275,7 +275,66 @@ func TestRepositoryAnalyzerPluginVerifyModeDoesNotAdvance(t *testing.T) {
 	}
 }
 
-func TestRepositoryAnalyzerPluginSlowPluginAllowsUnrelatedLocalStream(t *testing.T) {
+func TestPluginVerifyFailsWhenRefreshedPlanRemovesCachedUnit(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"src/a.ts": `export const a = 1;`,
+		"src/b.ts": `export const b = 1;`,
+	})
+	counter := filepath.Join(t.TempDir(), "plugin-starts.jsonl")
+	registration := genericAnalyzerPlugin(t, root, counter)
+	eng := admissionEngine(t, root, graphinput.Options{})
+	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+	stateDir := filepath.Join(root, ".enola", "verify-removed-unit-state")
+	opts := Options{StateDir: stateDir, AuthoritativeFiles: true, AllowRepoPlugins: []string{"fixture"}}
+	if _, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, opts); err != nil {
+		t.Fatal(err)
+	}
+	before := pluginState(t, stateDir).Generation
+	if err := os.Remove(filepath.Join(root, "src/a.ts")); err != nil {
+		t.Fatal(err)
+	}
+	verifyOpts := opts
+	verifyOpts.PluginVerify = true
+	sink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, sink, verifyOpts); err == nil || !strings.Contains(err.Error(), "removed from plan") {
+		t.Fatalf("plugin-verify should reject a cached unit removed by the refreshed plan, got %v", err)
+	}
+	if len(sink.CloneRecords()) != 0 {
+		t.Fatal("failed plugin-verify published graph records")
+	}
+	if got := pluginState(t, stateDir).Generation; got != before {
+		t.Fatalf("failed plugin-verify advanced generation from %d to %d", before, got)
+	}
+}
+
+func TestPluginVerifyFailsWhenPluginIsRemovedFromConfig(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{"src/a.ts": `export const a = 1;`})
+	counter := filepath.Join(t.TempDir(), "plugin-starts.jsonl")
+	registration := genericAnalyzerPlugin(t, root, counter)
+	eng := admissionEngine(t, root, graphinput.Options{})
+	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+	stateDir := filepath.Join(root, ".enola", "verify-removed-plugin-state")
+	opts := Options{StateDir: stateDir, AuthoritativeFiles: true, AllowRepoPlugins: []string{"fixture"}}
+	if _, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, opts); err != nil {
+		t.Fatal(err)
+	}
+	before := pluginState(t, stateDir).Generation
+	eng.Config().AnalyzerPlugins = nil
+	verifyOpts := opts
+	verifyOpts.PluginVerify = true
+	sink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, sink, verifyOpts); err == nil || !strings.Contains(err.Error(), "removed from config") {
+		t.Fatalf("plugin-verify should reject a removed configured plugin, got %v", err)
+	}
+	if len(sink.CloneRecords()) != 0 {
+		t.Fatal("failed plugin-verify published graph records")
+	}
+	if got := pluginState(t, stateDir).Generation; got != before {
+		t.Fatalf("failed plugin-verify advanced generation from %d to %d", before, got)
+	}
+}
+
+func TestRepositoryAnalyzerPluginDelaysColdBeginUntilPrepare(t *testing.T) {
 	root := setupTSRepo(t, map[string]string{
 		"src/held.ts":     `export const held = 1;`,
 		"outside/free.ts": `export const free = 1;`,
@@ -312,10 +371,13 @@ owner_domain:
 		t.Fatal(err)
 	}
 	gate := filepath.Join(t.TempDir(), "gate")
+	started := gate + ".started"
 	gateJSON, _ := json.Marshal(gate)
+	startedJSON, _ := json.Marshal(started)
 	script := fmt.Sprintf(`import { createInterface } from "node:readline";
-import { existsSync } from "node:fs";
+import { appendFileSync, existsSync } from "node:fs";
 const gate = %s;
+const started = %s;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const rl = createInterface({ input: process.stdin });
 let callbackId = 0;
@@ -330,6 +392,7 @@ async function handle(message) {
   if (message.op === "hello") {
     send({ id: message.id, op: "hello_ack", api: message.host_api, node: process.versions.node });
   } else if (message.op === "plan") {
+    appendFileSync(started, "started\n");
     while (!existsSync(gate)) { await sleep(20); }
     send({ id: message.id, op: "plan_result", units: [{ id: "file:src/held.ts", kind: "file", params: { file: "src/held.ts" } }] });
   } else if (message.op === "run") {
@@ -353,14 +416,13 @@ rl.on("line", (line) => {
   }
   void handle(message);
 });
-`, string(gateJSON))
+	`, string(gateJSON), string(startedJSON))
 	if err := os.WriteFile(filepath.Join(pluginDir, "plugin.mjs"), []byte(script), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	eng := admissionEngine(t, root, graphinput.Options{})
 	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{{Path: "tools/analyzers/slow"}}
 	sink := &graphstream.MemorySink{}
-	var sawFreeLocal atomic.Bool
 	done := make(chan error, 1)
 	go func() {
 		_, err := Run(context.Background(), eng, root, sink, Options{
@@ -370,49 +432,25 @@ rl.on("line", (line) => {
 	}()
 	deadline := time.Now().Add(3 * time.Second)
 	for time.Now().Before(deadline) {
-		for _, rec := range sink.CloneRecords() {
-			var probe struct {
-				Type  string             `json:"type"`
-				Phase string             `json:"phase"`
-				Nodes []graphstream.Node `json:"nodes"`
-			}
-			if json.Unmarshal(rec.Payload, &probe) != nil {
-				continue
-			}
-			if probe.Type != graphstream.TypeBatch || probe.Phase != graphstream.PhaseLocal {
-				continue
-			}
-			for _, n := range probe.Nodes {
-				owner := n.Owner.ID
-				if strings.Contains(owner, "outside/free.ts") || strings.Contains(n.File, "outside/free.ts") {
-					sawFreeLocal.Store(true)
-				}
-				if strings.Contains(owner, "src/held.ts") || strings.Contains(n.File, "src/held.ts") {
-					t.Fatalf("held owner streamed before plugin settle: %#v", n)
-				}
-			}
-		}
-		if sawFreeLocal.Load() {
+		if _, err := os.Stat(started); err == nil {
 			break
+		}
+		select {
+		case err := <-done:
+			t.Fatalf("run completed before the plugin gate opened: %v", err)
+		default:
 		}
 		time.Sleep(20 * time.Millisecond)
 	}
-	if !sawFreeLocal.Load() {
-		localBeforeGate := 0
-		for _, rec := range sink.CloneRecords() {
-			var probe struct {
-				Type  string `json:"type"`
-				Phase string `json:"phase"`
-			}
-			if json.Unmarshal(rec.Payload, &probe) != nil {
-				continue
-			}
-			if probe.Type == graphstream.TypeBatch && probe.Phase == graphstream.PhaseLocal {
-				localBeforeGate++
-			}
+	if _, err := os.Stat(started); err != nil {
+		t.Fatal("plugin plan did not reach the hold gate")
+	}
+	for _, rec := range sink.CloneRecords() {
+		var probe struct {
+			Type string `json:"type"`
 		}
-		if localBeforeGate == 0 {
-			t.Fatal("no local batches streamed while slow plugin was blocked")
+		if json.Unmarshal(rec.Payload, &probe) == nil && (probe.Type == graphstream.TypeBeginReplace || probe.Type == graphstream.TypeBatch || probe.Type == graphstream.TypeEndReplace) {
+			t.Fatalf("cold plugin transaction published %s before prepare settled", probe.Type)
 		}
 	}
 	if err := os.WriteFile(gate, []byte("go"), 0o644); err != nil {
@@ -1245,6 +1283,70 @@ func TestNonAuthoritativePluginOwnerChangeEntersReplacementScope(t *testing.T) {
 	_ = beforeFacts
 }
 
+func TestNonAuthoritativeForceAllIncludesReusedPluginOnlyOwnersInBegin(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"src/a.ts":      `export const a = 1;`,
+		"docs/task.md":  "# Task\n",
+		"src/plan.ts":   `export const plan = 1;`,
+		"package.json":  `{"name":"plugin-force-all","private":true}`,
+		"tsconfig.json": `{"compilerOptions":{"strict":true},"include":["src/**/*"]}`,
+	})
+	const plugin = "forceallscopefixture"
+	registration := fixedPlanAnalyzerPlugin(t, root, plugin, "src/a.ts", "docs/task.md", "src/plan.ts")
+	manifestPath := filepath.Join(root, registration.Path, "enola-plugin.yaml")
+	manifest, err := os.ReadFile(manifestPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	manifest = []byte(strings.Replace(string(manifest), "owner_domain:\n  - src/*", "owner_domain:\n  - src/*\n  - docs/**", 1))
+	if err := os.WriteFile(manifestPath, manifest, 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	eng := admissionEngine(t, root, graphinput.Options{})
+	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+	stateDir := t.TempDir()
+	opts := Options{StateDir: stateDir, AllowRepoPlugins: []string{plugin}}
+	if _, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, opts); err != nil {
+		t.Fatalf("cold plugin run: %v", err)
+	}
+	state := pluginState(t, stateDir)
+	if got := state.AnalyzerPlugins[plugin].Units["file:src/a.ts"].Owners["docs/task.md"].Nodes; len(got) != 1 {
+		t.Fatalf("expected cached plugin-only Markdown owner, got %#v", got)
+	}
+	if got := state.Files["docs/task.md"]; got == nil || got.TS != nil || got.Extractor != "" {
+		t.Fatalf("Markdown owner unexpectedly belongs to a graph extractor: %#v", got)
+	}
+
+	forceOpts := opts
+	forceOpts.ForceInitial = true
+	forceSink := &graphstream.MemorySink{}
+	result, err := Run(context.Background(), eng, root, forceSink, forceOpts)
+	if err != nil {
+		t.Fatalf("non-authoritative force-all with reused plugin units: %v", err)
+	}
+	if result.AnalyzerPlugins.UnitsExecuted != 0 || result.AnalyzerPlugins.UnitsReused == 0 {
+		t.Fatalf("force-all did not reuse an unchanged plugin unit: %+v", result.AnalyzerPlugins)
+	}
+	begins, _, ends, err := DecodeRun(forceSink.CloneRecords())
+	if err != nil || len(begins) != 1 || len(ends) != 1 {
+		t.Fatalf("replacement envelopes: begins=%d ends=%d err=%v", len(begins), len(ends), err)
+	}
+	foundPluginOwner := false
+	for _, owner := range begins[0].OwnerScope {
+		if owner.Kind == graphstream.OwnerFile && owner.ID == "docs/task.md" {
+			foundPluginOwner = true
+			break
+		}
+	}
+	if !foundPluginOwner {
+		t.Fatalf("force-all Begin omitted reused plugin-only owner docs/task.md: %v", begins[0].OwnerScope)
+	}
+	if ends[0].OwnerScopeDigest != graphstream.DigestOwners(begins[0].OwnerScope) {
+		t.Fatalf("force-all replacement changed frozen owner scope: begin=%+v end=%+v", begins[0], ends[0])
+	}
+}
+
 func TestPluginVerifyWithoutPluginsPublishesNothingOnChangedInput(t *testing.T) {
 	root := setupTSRepo(t, map[string]string{"src/a.ts": `export const a = 1;`})
 	eng := admissionEngine(t, root, graphinput.Options{})
@@ -1796,18 +1898,18 @@ func TestPluginResolutionIndexIncompleteForcesWholeDomain(t *testing.T) {
 func TestPluginFSMFactsCarryRepoSoTSAnchorsResolve(t *testing.T) {
 	repoID := "/repo/product"
 	pluginState := facts.Fact{
-		Kind: facts.KindFSMState, Name: "fixture-machine/state:idle", File: "src/a.ts", Line: 1, Repo: "",
+		Kind: facts.KindFSMEvent, Name: "fixture-machine/event:idle", File: "src/a.ts", Line: 1, Repo: "",
 		Props: map[string]any{"plugin": "fixture"},
 	}
 	tsSymbol := facts.Fact{
 		Kind: facts.KindSymbol, Name: "dispatch", File: "src/a.ts", Line: 2, Repo: repoID,
-		Relations: []facts.Relation{{Kind: "fsm_dispatches", Target: "fixture-machine/state:idle"}},
+		Relations: []facts.Relation{{Kind: facts.RelFSMDispatches, Target: "fixture-machine/event:idle"}},
 	}
 	assembled := mergeAnalyzerPluginAnchors([]facts.Fact{tsSymbol, pluginState}, nil)
 	tagRepo(assembled, repoID)
 	var gotFSM *facts.Fact
 	for i := range assembled {
-		if assembled[i].Kind == facts.KindFSMState && assembled[i].Name == "fixture-machine/state:idle" {
+		if assembled[i].Kind == facts.KindFSMEvent && assembled[i].Name == "fixture-machine/event:idle" {
 			gotFSM = &assembled[i]
 			break
 		}
@@ -1819,7 +1921,7 @@ func TestPluginFSMFactsCarryRepoSoTSAnchorsResolve(t *testing.T) {
 		t.Fatalf("plugin FSM Repo = %q, want %q", gotFSM.Repo, repoID)
 	}
 	idx := buildIndex(assembled)
-	tid, status := idx.resolveRelConstrained(repoID, facts.KindSymbol, "fsm_dispatches", "fixture-machine/state:idle", false, "")
+	tid, status := idx.resolveRelConstrained(repoID, facts.KindSymbol, facts.RelFSMDispatches, "fixture-machine/event:idle", false, "")
 	if status != graphstream.ResResolved {
 		t.Fatalf("TS-anchored edge resolution = %s/%s", status, tid)
 	}
@@ -1886,7 +1988,7 @@ func TestAnalyzerPluginReplacementOwnersPreservesSeedsWhenIncomplete(t *testing.
 		pluginResOwners:       []string{"src/b.ts"},
 		pluginScopeIncomplete: true,
 		state: &State{Files: map[string]*FileState{
-			"src/a.ts": {},
+			"src/a.ts":   {},
 			"src/old.ts": {},
 		}},
 	}

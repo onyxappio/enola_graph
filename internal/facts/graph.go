@@ -93,27 +93,33 @@ func (b *graphBuilder) idFor(name string) uint32 {
 }
 
 // relIDFor returns the ID for a relation kind, assigning the next one if it is new.
-func (b *graphBuilder) relIDFor(kind string) uint16 {
+func (b *graphBuilder) relIDFor(kind string) (uint16, error) {
 	if id, ok := b.g.relIDs[kind]; ok {
-		return id
+		return id, nil
+	}
+	if len(b.g.relKinds) > int(^uint16(0)) {
+		return 0, fmt.Errorf("relation-kind ID space exceeds %d distinct kinds", int(^uint16(0))+1)
 	}
 	id := uint16(len(b.g.relKinds))
 	b.g.relIDs[kind] = id
 	b.g.relKinds = append(b.g.relKinds, kind)
-	return id
+	return id, nil
 }
 
-func (b *graphBuilder) kindIDFor(kind string) uint16 {
+func (b *graphBuilder) kindIDFor(kind string) (uint16, error) {
 	if kind == "" {
-		return 0
+		return 0, nil
 	}
 	if id, ok := b.g.kindIDs[kind]; ok {
-		return id
+		return id, nil
+	}
+	if len(b.g.kindNames) >= int(^uint16(0)) {
+		return 0, fmt.Errorf("fact-kind ID space exceeds %d distinct kinds", int(^uint16(0)))
 	}
 	id := uint16(len(b.g.kindNames) + 1) // zero means no explicit kind
 	b.g.kindIDs[kind] = id
 	b.g.kindNames = append(b.g.kindNames, kind)
-	return id
+	return id, nil
 }
 
 // Edge represents a directed relationship between two facts.
@@ -227,7 +233,7 @@ type PathResult struct {
 // emitted by an external consumer), the graph normalises the target by stripping known
 // Go module path prefixes (stored in KindModule facts as props["modulePath"]). This
 // allows edges to land on the correct fact in the loaded external repo.
-func NewGraph(ff []Fact) *Graph {
+func NewGraph(ff []Fact) (*Graph, error) {
 	g := &Graph{
 		facts:   ff,
 		ids:     make(map[string]uint32, len(ff)),
@@ -296,7 +302,9 @@ func NewGraph(ff []Fact) *Graph {
 					}
 				}
 			}
-			b.addEdge(b.srcID(nameID[fi], f.Name), f.Kind, rel.Kind, target, rel.TargetKind)
+			if err := b.addEdge(b.srcID(nameID[fi], f.Name), f.Kind, rel.Kind, target, rel.TargetKind); err != nil {
+				return nil, fmt.Errorf("fact %q relation %q: %w", f.Name, rel.Kind, err)
+			}
 		}
 
 		// For dependency facts with imports, also create module→target edges
@@ -311,7 +319,9 @@ func NewGraph(ff []Fact) *Graph {
 					if rel.Kind == RelImports {
 						target := resolveToModule(rel.Target, moduleNames)
 						if target != "" && target != modName {
-							b.addEdge(b.idFor(modName), KindModule, RelImports, target, KindModule)
+							if err := b.addEdge(b.idFor(modName), KindModule, RelImports, target, KindModule); err != nil {
+								return nil, fmt.Errorf("module %q synthetic import: %w", modName, err)
+							}
 						}
 					}
 				}
@@ -336,12 +346,14 @@ func NewGraph(ff []Fact) *Graph {
 			continue
 		}
 		if owner := g.methodOwner(f.Name); owner != "" {
-			b.addEdge(b.idFor(owner), KindSymbol, RelHasMethod, f.Name, KindSymbol)
+			if err := b.addEdge(b.idFor(owner), KindSymbol, RelHasMethod, f.Name, KindSymbol); err != nil {
+				return nil, fmt.Errorf("method %q synthetic owner edge: %w", f.Name, err)
+			}
 		}
 	}
 
 	b.finish()
-	return g
+	return g, nil
 }
 
 // srcID resolves the source node of a fact's edges. A fact with no name still gets a
@@ -358,12 +370,25 @@ func (b *graphBuilder) srcID(id uint32, name string) uint32 {
 // finish, which is cheaper than the map of concatenated "source\x00kind\x00target"
 // keys this replaced: on the Linux kernel that map held 5.4M freshly built strings,
 // all of them garbage the moment construction ended.
-func (b *graphBuilder) addEdge(src uint32, sourceKind, relKind, target, targetKind string) {
+func (b *graphBuilder) addEdge(src uint32, sourceKind, relKind, target, targetKind string) error {
+	rel, err := b.relIDFor(relKind)
+	if err != nil {
+		return err
+	}
+	source, err := b.kindIDFor(sourceKind)
+	if err != nil {
+		return err
+	}
+	targetID, err := b.kindIDFor(targetKind)
+	if err != nil {
+		return err
+	}
 	b.src = append(b.src, src)
 	b.tgt = append(b.tgt, b.idFor(target))
-	b.rel = append(b.rel, b.relIDFor(relKind))
-	b.sourceKind = append(b.sourceKind, b.kindIDFor(sourceKind))
-	b.targetKind = append(b.targetKind, b.kindIDFor(targetKind))
+	b.rel = append(b.rel, rel)
+	b.sourceKind = append(b.sourceKind, source)
+	b.targetKind = append(b.targetKind, targetID)
+	return nil
 }
 
 // declares reports whether some fact declares this name — the CSR equivalent of the

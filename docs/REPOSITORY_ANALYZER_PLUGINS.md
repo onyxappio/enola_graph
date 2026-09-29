@@ -90,10 +90,11 @@ is explicit and replaces its previous contributions with empty output.
 ## Cache and migration boundaries
 
 Plugin observations and unit outputs live in graphsession state, separately
-from the TypeScript extractor cache version. This worktree starts from main at
-`v321` and leaves that version unchanged. Accuracy owns the separate `v322`
-candidate; do not import or change its semantics here. Recheck the accepted
-main revision and cache version before landing. Reserve `v323` only if plugin
+from the TypeScript extractor cache version. This worktree is rebased on
+`origin/main` at `6f06be9e`, whose extractor cache version is `v322`; this
+plugin work leaves that version unchanged. Accuracy owns the `v322` semantics;
+do not change them here. Recheck the accepted main revision and cache version
+before landing. Reserve `v323` only if plugin
 invalidation demonstrably requires a global extractor cache bump and the
 accuracy/performance owners coordinate that change. A plugin cache schema
 change does not by itself allocate a new extractor version.

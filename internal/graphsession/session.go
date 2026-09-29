@@ -1562,6 +1562,15 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 							fileOwners = append(fileOwners, graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: filepath.ToSlash(path)})
 						}
 					}
+					// The cold run has no committed graph to protect, but Begin
+					// still must not precede plugin validation: a failed prepare
+					// cannot leave an open replacement transaction behind.
+					if err := s.waitAnalyzerPlugins(); err != nil {
+						return nil, err
+					}
+					fallbacks = append(fallbacks, s.extraFallbacks...)
+					s.extraFallbacks = nil
+					fileOwners = append(fileOwners, s.analyzerPluginReplacementOwners(inv.Files)...)
 				} else {
 					// Delta plugin units and resolution effects determine P_pl ∪
 					// P_res. Settle them before Begin so the owner scope is frozen.
@@ -2957,6 +2966,20 @@ func scopeOwnerRefs(scopeFiles map[string]bool, owned []string, st *State, force
 			}
 			for id := range st.Synthetic {
 				fileOwners = append(fileOwners, graphstream.OwnerRef{Kind: graphstream.OwnerSynthetic, ID: id})
+			}
+			// A plugin may own graph contributions for files that no Enola
+			// extractor owns (for example, Markdown or repository metadata).
+			// Those owners are intentionally absent from the extractor-owned
+			// file sweep above, but a force-all replacement must still retire
+			// their prior contributions even when the plugin can reuse its cache.
+			for _, plugin := range st.AnalyzerPlugins {
+				for _, unit := range plugin.Units {
+					for owner := range unit.Owners {
+						if owner = filepath.ToSlash(owner); owner != "" {
+							fileOwners = append(fileOwners, graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: owner})
+						}
+					}
+				}
 			}
 		}
 	}

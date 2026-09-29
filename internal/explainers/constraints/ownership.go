@@ -1,6 +1,8 @@
 package constraints
 
 import (
+	"fmt"
+
 	"github.com/enola-labs/enola/internal/facts"
 	"github.com/enola-labs/enola/internal/intent"
 	"strings"
@@ -37,8 +39,8 @@ type methodIndex struct {
 	owned map[string][]facts.Fact
 }
 
-func newMethodIndex(store *facts.Store) *methodIndex {
-	return &methodIndex{store: store, owned: map[string][]facts.Fact{}}
+func newMethodIndex(store *facts.Store, graph *facts.Graph) *methodIndex {
+	return &methodIndex{store: store, graph: graph, owned: map[string][]facts.Fact{}}
 }
 
 // methodsOfOwner lists one owner's methods, sorted for the same reason every
@@ -50,7 +52,11 @@ func (mi *methodIndex) methodsOfOwner(owner string) []facts.Fact {
 		return owned
 	}
 	if mi.graph == nil {
-		mi.graph = facts.NewGraph(mi.store.FactsRef())
+		// newResolver builds this index when declarations can ask for owned
+		// methods. Reaching this branch means an internal caller skipped that
+		// check; return no result only for a resolver that cannot ask this
+		// question, never as a substitute for a failed graph construction.
+		return nil
 	}
 	var owned []facts.Fact
 	for _, edge := range mi.graph.ForwardEdges(owner) {
@@ -93,16 +99,40 @@ type resolver struct {
 	memberFiles map[string]map[string]map[string]bool
 }
 
-func newResolver(store *facts.Store, components map[string]component, members map[string]map[string]bool, memberFacts, carried map[string][]facts.Fact, ground *grounding) *resolver {
+func newResolver(store *facts.Store, components map[string]component, rules []rule, members map[string]map[string]bool, memberFacts, carried map[string][]facts.Fact, ground *grounding) (*resolver, error) {
+	var methodGraph *facts.Graph
+	if methodGraphRequired(components, rules) {
+		var err error
+		methodGraph, err = facts.NewGraph(store.FactsRef())
+		if err != nil {
+			return nil, fmt.Errorf("build graph index for constraint-owned methods: %w", err)
+		}
+	}
 	return &resolver{
 		components:  components,
 		members:     members,
 		memberFacts: memberFacts,
 		carried:     carried,
 		ground:      ground,
-		methods:     newMethodIndex(store),
+		methods:     newMethodIndex(store, methodGraph),
 		owned:       map[string]*ownedFacts{},
+	}, nil
+}
+
+func methodGraphRequired(components map[string]component, rules []rule) bool {
+	for _, c := range components {
+		if c.owns == intent.OwnsMethods {
+			return true
+		}
 	}
+	for _, r := range rules {
+		for _, owns := range r.owns {
+			if owns == intent.OwnsMethods {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // ownsMethods applies the precedence to one (rule, component) pair. It is the

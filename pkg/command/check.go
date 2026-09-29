@@ -293,10 +293,13 @@ func (r *Runner) Check(ctx context.Context, args []string) {
 	if *target != "" || *expected != "" {
 		baseStore := facts.NewStore()
 		baseStore.Add(base.Facts...)
-		rep := conformance.Compute(baseStore, eng.Store(), d, conformance.Options{
+		rep, err := conformance.Compute(baseStore, eng.Store(), d, conformance.Options{
 			Target:           *target,
 			ExpectedPackages: splitList(*expected),
 		})
+		if err != nil {
+			r.checkFatal("conformance: %v", err)
+		}
 		conf = &rep
 		// Reported as a MEASUREMENT, not graded here. Whether spillover fails a build is
 		// policy, and policy lives in one place — otherwise this gate and any other

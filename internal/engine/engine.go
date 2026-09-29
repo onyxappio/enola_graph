@@ -392,7 +392,9 @@ func (e *Engine) RestoreFromDir(dir string, repoPaths map[string]string, singleR
 		// Tags only facts whose Repo is empty, so a pre-tagged file is left intact.
 		work.SetRepoRange(0, singleRepoLabel)
 	}
-	work.BuildGraph()
+	if err := work.BuildGraph(); err != nil {
+		return fmt.Errorf("building graph index from %s: %w", factsPath, err)
+	}
 
 	// Default the primary repo path from the dir; snapshot.meta.json (loaded below)
 	// overrides it when present.
@@ -765,7 +767,9 @@ func (e *Engine) GenerateSnapshot(ctx context.Context, repoPath string, appendMo
 
 	// 3c. Build graph index for traversal queries
 	tStage = time.Now()
-	e.store.BuildGraph()
+	if err := e.store.BuildGraph(); err != nil {
+		return nil, fmt.Errorf("building graph index: %w", err)
+	}
 	tGraph = time.Since(tStage)
 	log.Printf("[engine] built graph index (%d nodes, %d edges)", e.store.Graph().NodeCount(), e.store.Graph().EdgeCount())
 

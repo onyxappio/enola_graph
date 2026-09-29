@@ -81,9 +81,9 @@ type Report struct {
 //
 // base is the pre-change store (the baseline's facts, with a graph built over them);
 // cur is the post-change store, needed only to attribute a new edge's source to a package.
-func Compute(base, cur *facts.Store, d *diff.SnapshotDiff, opts Options) Report {
+func Compute(base, cur *facts.Store, d *diff.SnapshotDiff, opts Options) (Report, error) {
 	if d == nil || base == nil {
-		return Report{}
+		return Report{}, nil
 	}
 	declared := strings.TrimSpace(opts.Target) != "" || len(opts.ExpectedPackages) > 0
 
@@ -115,7 +115,10 @@ func Compute(base, cur *facts.Store, d *diff.SnapshotDiff, opts Options) Report 
 	// because a store assembled from a loaded baseline has no graph index until asked.
 	predicted := map[string]bool{}
 	dependents := 0
-	g := facts.NewGraph(base.All())
+	g, err := facts.NewGraph(base.All())
+	if err != nil {
+		return Report{}, fmt.Errorf("building baseline graph for conformance: %w", err)
+	}
 	for _, t := range targets {
 		addPkg(predicted, pkgOfName(base, t)) // the target's own package is always expected
 		res := g.ImpactSet(t, opts.maxDepth(), opts.maxNodes(), false)
@@ -157,7 +160,7 @@ func Compute(base, cur *facts.Store, d *diff.SnapshotDiff, opts Options) Report 
 		Unrealized:          sortedKeys(minus(predicted, actual)),
 		MatchRatio:          round2(ratio),
 		PredictedDependents: dependents,
-	}
+	}, nil
 }
 
 func (o Options) maxDepth() int {

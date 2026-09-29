@@ -369,10 +369,10 @@ func unreachableMisreading(role string) string {
 // UnreachableRoles is the lint entry point to the same measurement the
 // explainer refuses on, so the authoring loop and the gate can never disagree
 // about which role resolves nothing.
-func UnreachableRoles(store *facts.Store) []UnreachableRole {
+func UnreachableRoles(store *facts.Store) ([]UnreachableRole, error) {
 	components, rules := declarations(store)
 	if len(components) == 0 {
-		return nil
+		return nil, nil
 	}
 	unasked := unaskedComponents(store, components)
 	unevaluable := map[string]bool{}
@@ -394,6 +394,9 @@ func UnreachableRoles(store *facts.Store) []UnreachableRole {
 		carried[name] = sources
 	}
 	ground := newGrounding(store, memberFacts)
-	resolve := newResolver(store, components, members, memberFacts, carried, ground)
-	return unreachableRoles(store, rules, resolve, ground, unasked, unevaluable)
+	resolve, err := newResolver(store, components, rules, members, memberFacts, carried, ground)
+	if err != nil {
+		return nil, err
+	}
+	return unreachableRoles(store, rules, resolve, ground, unasked, unevaluable), nil
 }

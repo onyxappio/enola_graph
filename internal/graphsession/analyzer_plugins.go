@@ -164,6 +164,9 @@ func (s *session) prepareAnalyzerPluginsWith(ctx context.Context, input *runtime
 					kept[id] = rec
 					continue
 				}
+				if verify && !ok {
+					verifyMismatches = append(verifyMismatches, name+":"+id+" (removed from plan)")
+				}
 				// Removed or invalidated units contribute their old owners to P_pl
 				// and their names to P_res.
 				addPluginOwnerKeys(deltaOwners, rec.Owners)
@@ -331,6 +334,9 @@ func (s *session) prepareAnalyzerPluginsWith(ctx context.Context, input *runtime
 	}
 	for name, rec := range previous {
 		if _, ok := configured[name]; !ok {
+			if verify {
+				verifyMismatches = append(verifyMismatches, name+" (removed from config)")
+			}
 			s.pluginChanged = true
 			for _, unit := range rec.Units {
 				addPluginOwnerKeys(deltaOwners, unit.Owners)

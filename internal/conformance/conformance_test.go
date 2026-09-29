@@ -42,7 +42,10 @@ func TestSpilloverIsReportedInDeclaredMode(t *testing.T) {
 		{Before: moduleFact("unrelated"), After: moduleFact("unrelated")},
 	}}
 
-	got := Compute(base, base, d, Options{Target: "core", ExpectedPackages: []string{"core"}})
+	got, err := Compute(base, base, d, Options{Target: "core", ExpectedPackages: []string{"core"}})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if !got.Declared {
 		t.Error("Declared = false, want true — a target was supplied")
@@ -62,7 +65,10 @@ func TestNoSpilloverWhenTheChangeStaysInScope(t *testing.T) {
 		{Before: moduleFact("core"), After: moduleFact("core")},
 	}}
 
-	got := Compute(base, base, d, Options{Target: "core"})
+	got, err := Compute(base, base, d, Options{Target: "core"})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if len(got.Spillover) != 0 {
 		t.Errorf("Spillover = %v, want none", got.Spillover)
@@ -82,7 +88,10 @@ func TestAutoModeTreatsEditSitesAsIntent(t *testing.T) {
 		{Before: moduleFact("unrelated"), After: moduleFact("unrelated")},
 	}}
 
-	got := Compute(base, base, d, Options{})
+	got, err := Compute(base, base, d, Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if got.Declared {
 		t.Error("Declared = true with no target or expected packages")
@@ -107,7 +116,10 @@ func TestNewCouplingCountsAsReached(t *testing.T) {
 	)
 	d := &diff.SnapshotDiff{EdgesAdded: []diff.Edge{{Source: "unrelated -> core", Target: "core"}}}
 
-	got := Compute(base, cur, d, Options{Target: "core", ExpectedPackages: []string{"core"}})
+	got, err := Compute(base, cur, d, Options{Target: "core", ExpectedPackages: []string{"core"}})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	found := false
 	for _, p := range got.ActualPackages {
@@ -124,7 +136,10 @@ func TestNewCouplingCountsAsReached(t *testing.T) {
 // symbol meant that symbol, and expanding would drag in every namesake.
 func TestExactTargetIsNotExpanded(t *testing.T) {
 	base := baseStore()
-	got := Compute(base, base, &diff.SnapshotDiff{}, Options{Target: "core"})
+	got, err := Compute(base, base, &diff.SnapshotDiff{}, Options{Target: "core"})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if len(got.Targets) != 1 || got.Targets[0] != "core" {
 		t.Errorf("Targets = %v, want exactly [core]", got.Targets)
@@ -134,7 +149,10 @@ func TestExactTargetIsNotExpanded(t *testing.T) {
 // A substring that matches nothing yields no targets rather than the whole graph.
 func TestUnmatchedTargetYieldsNothing(t *testing.T) {
 	base := baseStore()
-	got := Compute(base, base, &diff.SnapshotDiff{}, Options{Target: "nosuchthing"})
+	got, err := Compute(base, base, &diff.SnapshotDiff{}, Options{Target: "nosuchthing"})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if len(got.Targets) != 0 {
 		t.Errorf("Targets = %v, want none", got.Targets)

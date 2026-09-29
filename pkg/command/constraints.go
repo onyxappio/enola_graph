@@ -103,7 +103,12 @@ func (r *Runner) Constraints(args []string) {
 		problems += r.lintRepoDeclaration(tgt.engine.Config().Intent[filepath.Base(repoPath)], repoPath, declared)
 	}
 
-	problems += r.lintResolveComponents(tgt.engine, tgt.repoPaths[0], declared)
+	componentProblems, err := r.lintResolveComponents(tgt.engine, tgt.repoPaths[0], declared)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "constraints lint: resolve component ownership: %v\n", err)
+		os.Exit(2)
+	}
+	problems += componentProblems
 
 	if problems > 0 {
 		fmt.Printf("\nFAIL — %s.\n", plural(problems, "validation problem"))
@@ -328,15 +333,15 @@ func lintStore(measured []facts.Fact, declared []facts.Fact, label string) *fact
 	return store
 }
 
-func (r *Runner) lintResolveComponents(eng *bootstrap.Engine, anchor string, declared *facts.Store) int {
+func (r *Runner) lintResolveComponents(eng *bootstrap.Engine, anchor string, declared *facts.Store) (int, error) {
 	if len(declared.ByKind(facts.KindIntent)) == 0 {
-		return 0
+		return 0, nil
 	}
 	outDir := eng.OutputDir(anchor)
 	snap, err := bootstrap.LoadSnapshotDir(outDir)
 	if err != nil {
 		fmt.Printf("\nComponent resolution: no snapshot at %s - validation only.\n", outDir)
-		return 0
+		return 0, nil
 	}
 	store := lintStore(snap.Facts, declared.ByKind(facts.KindIntent), snapshotLabel(snap))
 
@@ -373,7 +378,10 @@ func (r *Runner) lintResolveComponents(eng *bootstrap.Engine, anchor string, dec
 			fmt.Printf("  %s: %s%s — declared in %s\n", u.Component, u.Problem(), suggestion, u.Source)
 		}
 	}
-	unreachable := constraints.UnreachableRoles(store)
+	unreachable, err := constraints.UnreachableRoles(store)
+	if err != nil {
+		return 0, err
+	}
 	if len(unreachable) > 0 {
 		fmt.Printf("\nRoles this snapshot resolves against nothing:\n")
 		for _, u := range unreachable {
@@ -391,7 +399,7 @@ func (r *Runner) lintResolveComponents(eng *bootstrap.Engine, anchor string, dec
 		}
 	}
 	reportLayerResolution(store)
-	return len(unevaluableList)
+	return len(unevaluableList), nil
 }
 
 // reportLayerResolution prints what each declared layer selects, beside the

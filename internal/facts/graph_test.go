@@ -1,10 +1,47 @@
 package facts
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
 )
+
+func mustNewGraph(t *testing.T, ff []Fact) *Graph {
+	t.Helper()
+	g, err := NewGraph(ff)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return g
+}
+
+func TestNewGraphRejectsRelationAndFactKindIDOverflow(t *testing.T) {
+	t.Run("relation kinds", func(t *testing.T) {
+		relations := make([]Relation, int(^uint16(0))+2)
+		for i := range relations {
+			relations[i] = Relation{Kind: fmt.Sprintf("relation:%d", i), Target: "target"}
+		}
+		store := NewStore()
+		store.Add(Fact{Kind: KindSymbol, Name: "source", Relations: relations})
+		if err := store.BuildGraph(); err == nil || !strings.Contains(err.Error(), "relation-kind ID space") {
+			t.Fatalf("BuildGraph error = %v, want relation-kind ID overflow", err)
+		}
+		if store.Graph() != nil {
+			t.Fatal("failed BuildGraph left a partial graph available")
+		}
+	})
+
+	t.Run("fact kinds", func(t *testing.T) {
+		relations := make([]Relation, int(^uint16(0))+1)
+		for i := range relations {
+			relations[i] = Relation{Kind: "related", Target: "target", TargetKind: fmt.Sprintf("kind:%d", i)}
+		}
+		if _, err := NewGraph([]Fact{{Kind: KindSymbol, Name: "source", Relations: relations}}); err == nil || !strings.Contains(err.Error(), "fact-kind ID space") {
+			t.Fatalf("NewGraph error = %v, want fact-kind ID overflow", err)
+		}
+	})
+}
 
 // buildTestGraph creates a graph from a set of facts for testing.
 // The topology is:
@@ -750,7 +787,7 @@ func TestGraphSupportsPluginTypedRelations(t *testing.T) {
 }
 
 func TestFindPathReportsDifferentTypedEndpointKinds(t *testing.T) {
-	g := NewGraph([]Fact{
+	g := mustNewGraph(t, []Fact{
 		{Kind: "feedback", Name: "sample/F-1", Relations: []Relation{{Kind: "related", Target: "sample/T-2", TargetKind: "task"}}},
 		{Kind: "task", Name: "sample/T-2"},
 	})
@@ -779,7 +816,7 @@ func TestReverseFactsKeepsTypedSourcesWithSameName(t *testing.T) {
 }
 
 func TestGraphDoesNotResolveExplicitRelationToWrongFactKind(t *testing.T) {
-	g := NewGraph([]Fact{
+	g := mustNewGraph(t, []Fact{
 		{Kind: "task", Name: "from", Relations: []Relation{{Kind: "depends_on", Target: "target", TargetKind: "task"}}},
 		{Kind: "feedback", Name: "target"},
 	})
@@ -790,7 +827,7 @@ func TestGraphDoesNotResolveExplicitRelationToWrongFactKind(t *testing.T) {
 }
 
 func TestTypedTraversalDoesNotMixOutgoingEdgesForSameNamedKinds(t *testing.T) {
-	g := NewGraph([]Fact{
+	g := mustNewGraph(t, []Fact{
 		{Kind: "root", Name: "start", Relations: []Relation{{Kind: "links", Target: "shared", TargetKind: "task"}}},
 		{Kind: "task", Name: "shared", Relations: []Relation{{Kind: "links", Target: "task-child", TargetKind: "task"}}},
 		{Kind: "feedback", Name: "shared", Relations: []Relation{{Kind: "links", Target: "feedback-child", TargetKind: "feedback"}}},
@@ -818,7 +855,7 @@ func TestTypedTraversalDoesNotMixOutgoingEdgesForSameNamedKinds(t *testing.T) {
 }
 
 func TestTraverseNodeKindFilterDropsEdgesFromSameNamedExcludedKind(t *testing.T) {
-	g := NewGraph([]Fact{
+	g := mustNewGraph(t, []Fact{
 		{Kind: "root", Name: "start", Relations: []Relation{
 			{Kind: "links", Target: "shared", TargetKind: "task"},
 			{Kind: "links", Target: "shared", TargetKind: "feedback"},
@@ -950,7 +987,7 @@ func TestNewGraph_CrossRepoCallNormalisation(t *testing.T) {
 		},
 	}
 
-	g := NewGraph(facts)
+	g := mustNewGraph(t, facts)
 
 	// The forward edge from golf's LoginWrapper.Login should point to the
 	// normalised fact name "adapters.AuthHandler.Login", not the full import path.
@@ -1638,7 +1675,7 @@ func TestImpactSet_GoverningIntent(t *testing.T) {
 		{Kind: KindIntent, Repo: "wiki", File: "wiki/prds/jobs.md", Name: "anchor: backend app/jobs",
 			Props: map[string]any{"intent_kind": "anchor", "intent_owner": "backend", "path": "app/jobs", "source": "wiki/prds/jobs.md"}},
 	}
-	g := NewGraph(ff)
+	g := mustNewGraph(t, ff)
 
 	got := g.ImpactSet("Formatter", 3, 100, false)
 	if len(got.GoverningIntent) != 1 || got.GoverningIntent[0].Page != "wiki/adrs/fmt.md" {
@@ -1683,7 +1720,7 @@ func TestGoverningIntent_RelationTrail(t *testing.T) {
 		{Kind: KindIntent, Repo: "wiki", File: "wiki/epics/text.md", Name: "page: wiki/epics/text.md",
 			Props: map[string]any{"intent_kind": "page", "page_type": "epic", "status": "living"}},
 	}
-	g := NewGraph(ff)
+	g := mustNewGraph(t, ff)
 
 	got := g.GoverningIntent("Formatter")
 	if len(got) != 1 || len(got[0].Relations) != 2 {
@@ -1706,7 +1743,7 @@ func TestGoverningIntentForFile(t *testing.T) {
 		{Kind: KindIntent, Repo: "wiki", File: "wiki/prds/jobs.md", Name: "anchor: backend app/jobs",
 			Props: map[string]any{"intent_kind": "anchor", "intent_owner": "backend", "path": "app/jobs", "source": "wiki/prds/jobs.md"}},
 	}
-	g := NewGraph(ff)
+	g := mustNewGraph(t, ff)
 
 	for _, file := range []string{"app/jobs/sync_job.rb", "backend/app/jobs/sync_job.rb"} {
 		got := g.GoverningIntentForFile("backend", file)
@@ -1734,7 +1771,7 @@ func TestGovernedByPage(t *testing.T) {
 		{Kind: KindIntent, Repo: "wiki", File: "wiki/prds/jobs.md", Name: "anchor: backend docs/jobs.md",
 			Props: map[string]any{"intent_kind": "anchor", "intent_owner": "backend", "path": "docs/jobs.md", "source": "wiki/prds/jobs.md"}},
 	}
-	g := NewGraph(ff)
+	g := mustNewGraph(t, ff)
 
 	for _, page := range []string{"wiki/prds/jobs.md", "prds/jobs.md"} {
 		cov, found := g.GovernedByPage(page)
@@ -1754,7 +1791,7 @@ func TestGovernedByPage(t *testing.T) {
 	if !g.HasCompiledPages() {
 		t.Fatal("a graph with a page node must report compiled pages")
 	}
-	if NewGraph([]Fact{{Kind: KindSymbol, Repo: "backend", File: "a.rb", Name: "A"}}).HasCompiledPages() {
+	if mustNewGraph(t, []Fact{{Kind: KindSymbol, Repo: "backend", File: "a.rb", Name: "A"}}).HasCompiledPages() {
 		t.Fatal("a graph without page nodes must not report compiled pages")
 	}
 }

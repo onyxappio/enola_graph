@@ -80,9 +80,17 @@ func blastRadius(store *facts.Store, files []string, snapshot map[string][]facts
 	}
 	e := New()
 	after := e.evaluate(store, evaluation{guard: true, exclude: exclude})
+	if after.err != nil {
+		out.NotComputed = []NotComputed{{Rule: "*", Cause: after.err.Error()}}
+		return out
+	}
 	before := evaluated{byRule: snapshot, rules: after.rules}
 	if snapshot == nil {
 		before = e.evaluate(store, evaluation{guard: true})
+		if before.err != nil {
+			out.NotComputed = []NotComputed{{Rule: "*", Cause: before.err.Error()}}
+			return out
+		}
 	}
 	out.RulesRun = len(after.rules)
 

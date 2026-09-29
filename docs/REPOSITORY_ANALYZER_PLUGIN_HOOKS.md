@@ -134,12 +134,13 @@ passed its full acceptance or delivery gates.
 Hook calls use stable names and versions with typed request/response payloads.
 The registry advertises supported hook capabilities during `hello`; required
 capabilities must match, while optional unknown capabilities do not prevent an
-older plugin from running. `plan` and `analyze_unit` are initial hook IDs.
+older plugin from running. `analysis.plan@1` and `analysis.unit@1` are initial
+hook IDs.
 Adding another hook adds its host invocation point, request/response types and
 SDK registration, without changing the framing protocol or requiring existing
-plugins to implement it. A single generic SDK `RegisterHook`/dispatcher path
-should serve all hook IDs rather than adding a new transport operation per
-hook.
+plugins to implement it. The generic SDK `Register[Request, Response]` API
+registers typed handlers into one shared dispatcher, rather than adding a new
+transport operation per hook.
 
 ## Generic graph contributions
 

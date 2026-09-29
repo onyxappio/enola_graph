@@ -830,6 +830,45 @@ func TestRepositoryAnalyzerPluginFailureKeepsLastCommittedGraph(t *testing.T) {
 	}
 }
 
+func TestColdNonAuthoritativePluginFailureDoesNotBeginReplacement(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{"src/a.ts": `export const a = 1;`})
+	counter := filepath.Join(t.TempDir(), "plugin-starts.jsonl")
+	registration := genericAnalyzerPlugin(t, root, counter)
+	entry := filepath.Join(root, "tools", "analyzers", "fixture", "plugin.mjs")
+	script, err := os.ReadFile(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	needle := `} else if (message.op === "run") {`
+	replacement := `} else if (message.op === "run") {
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    throw new Error("intentional cold plugin failure");`
+	if !strings.Contains(string(script), needle) {
+		t.Fatal("plugin fixture run branch changed")
+	}
+	if err := os.WriteFile(entry, []byte(strings.Replace(string(script), needle, replacement, 1)), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	eng := admissionEngine(t, root, graphinput.Options{})
+	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+	stateDir := filepath.Join(root, ".enola", "cold-nonauthoritative-plugin-failure")
+	sink := &graphstream.MemorySink{}
+	_, err = Run(context.Background(), eng, root, sink, Options{StateDir: stateDir, AllowRepoPlugins: []string{"fixture"}})
+	if err == nil {
+		t.Fatal("failed cold plugin run was accepted")
+	}
+	if records := sink.CloneRecords(); len(records) != 0 {
+		t.Fatalf("failed cold plugin run published %d graph records before failing", len(records))
+	}
+	state, err := loadCommittedState(stateDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if state != nil {
+		t.Fatalf("failed cold plugin run persisted generation %d", state.Generation)
+	}
+}
+
 func TestRepositoryAnalyzerPluginOutOfInventoryOwnerFailsBeforeBegin(t *testing.T) {
 	root := setupTSRepo(t, map[string]string{"src/a.ts": `export const a = 1;`})
 	counter := filepath.Join(t.TempDir(), "plugin-starts.jsonl")
