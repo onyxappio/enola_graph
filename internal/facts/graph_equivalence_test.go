@@ -87,7 +87,9 @@ func equivalenceCorpus(t *testing.T) *Store {
 		if err := s.ReadJSONLFile(path); err != nil {
 			t.Fatal(err)
 		}
-		s.BuildGraph()
+		if err := s.BuildGraph(); err != nil {
+			t.Fatal(err)
+		}
 		return s
 	}
 
@@ -121,7 +123,9 @@ func equivalenceCorpus(t *testing.T) *Store {
 		s.Add(Fact{Kind: KindModule, Name: "pkg" + itoa(i) + ".Sym" + itoa(i), File: "pkg" + itoa(i)})
 		s.Add(Fact{Kind: KindService, Name: "pkg" + itoa(i), File: "pkg" + itoa(i)})
 	}
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	return s
 }
 

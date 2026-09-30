@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 
@@ -611,7 +612,10 @@ func TestBodyScopeColdMultiHopReportsEachParseOnce(t *testing.T) {
 	})
 	eng := testEngine(t, root)
 	var seen []string
+	var seenMu sync.Mutex
 	opts := Options{StateDir: t.TempDir(), AuthoritativeFiles: true, OnBeforeParse: func(rel string) {
+		seenMu.Lock()
+		defer seenMu.Unlock()
 		seen = append(seen, filepath.ToSlash(rel))
 	}}
 	cons := bodyScopeStart(t, eng, root, opts)

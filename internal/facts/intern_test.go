@@ -66,7 +66,9 @@ func TestAdd_InternsRelationTargets(t *testing.T) {
 func TestAdd_InterningSurvivesGraphBuild(t *testing.T) {
 	s := NewStore()
 	s.Add(Fact{Kind: KindSymbol, Name: "A", File: distinctCopy("a.go")})
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	if s.intern != nil {
 		t.Error("BuildGraph left the interning table allocated")

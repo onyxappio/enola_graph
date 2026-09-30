@@ -379,7 +379,9 @@ func TestLinkCrossRepo_ConnectsServicesInGraph(t *testing.T) {
 	}
 
 	// The graph now connects the two service nodes.
-	eng.Store().BuildGraph()
+	if err := eng.Store().BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	g := eng.Store().Graph()
 	res := g.Traverse("svc-alpha", "forward", nil, nil, 5, 100)
 	reached := false

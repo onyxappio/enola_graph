@@ -771,7 +771,11 @@ func TestResidentReloadsPluginIdentityEachTransaction(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer res.Close()
+	defer func() {
+		if err := res.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
 	if _, err := res.reconcile(context.Background(), true); err != nil {
 		t.Fatal(err)
 	}
@@ -831,7 +835,11 @@ func TestResidentExplicitEmptyPluginConfigRetiresContributions(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer res.Close()
+	defer func() {
+		if err := res.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
 	if _, err := res.reconcile(context.Background(), true); err != nil {
 		t.Fatal(err)
 	}
@@ -899,7 +907,11 @@ func TestResidentLaterPluginRegistrationRunsWithoutReopen(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer res.Close()
+	defer func() {
+		if err := res.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
 	first, err := res.reconcile(context.Background(), true)
 	if err != nil {
 		t.Fatal(err)
@@ -975,7 +987,7 @@ owner_domain:
 	gate := filepath.Join(t.TempDir(), "gate")
 	gateJSON, _ := json.Marshal(gate)
 	script := fmt.Sprintf(`import { createInterface } from "node:readline";
-import { existsSync } from "node:fs";
+import { existsSync, writeFileSync } from "node:fs";
 const gate = %s;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const rl = createInterface({ input: process.stdin });
@@ -991,6 +1003,7 @@ async function handle(message) {
   if (message.op === "hello") {
     send({ id: message.id, op: "hello_ack", api: message.host_api, node: process.versions.node });
   } else if (message.op === "plan") {
+    writeFileSync(gate + ".started", "started");
     while (!existsSync(gate)) { await sleep(20); }
     send({ id: message.id, op: "plan_result", units: [{ id: "file:src/held.ts", kind: "file", params: { file: "src/held.ts" } }] });
   } else if (message.op === "run") {
@@ -1025,7 +1038,11 @@ rl.on("line", (line) => {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer res.Close()
+	defer func() {
+		if err := res.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
 	// After open, expand owner_domain so only a fresh reload snapshot holds src/*.
 	writeManifest("src/*")
 	sink := &graphstream.MemorySink{}
@@ -1035,49 +1052,48 @@ rl.on("line", (line) => {
 		_, err := res.reconcile(context.Background(), true)
 		done <- err
 	}()
-	deadline := time.Now().Add(3 * time.Second)
-	sawFreeBeforeRelease := false
-	var heldBeforeRelease graphstream.Node
-	heldStreamedBeforeRelease := false
+	deadline := time.Now().Add(10 * time.Second)
+	planStarted := false
 	for time.Now().Before(deadline) {
-		for _, rec := range sink.CloneRecords() {
-			var probe struct {
-				Type  string             `json:"type"`
-				Phase string             `json:"phase"`
-				Nodes []graphstream.Node `json:"nodes"`
-			}
-			if json.Unmarshal(rec.Payload, &probe) != nil {
-				continue
-			}
-			if probe.Type != graphstream.TypeBatch || probe.Phase != graphstream.PhaseLocal {
-				continue
-			}
-			for _, n := range probe.Nodes {
-				if strings.Contains(n.Owner.ID, "src/held.ts") || strings.Contains(n.File, "src/held.ts") {
-					heldStreamedBeforeRelease = true
-					heldBeforeRelease = n
-				}
-				if strings.Contains(n.Owner.ID, "outside/free.ts") || strings.Contains(n.File, "outside/free.ts") {
-					sawFreeBeforeRelease = true
-				}
-			}
-		}
-		if sawFreeBeforeRelease {
+		if _, err := os.Stat(gate + ".started"); err == nil {
+			planStarted = true
 			break
 		}
 		time.Sleep(20 * time.Millisecond)
 	}
+	beforeSettle := sink.CloneRecords()
+	// Always release and join the analysis before failing the assertion.
 	if err := os.WriteFile(gate, []byte("go"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	if err := <-done; err != nil {
 		t.Fatal(err)
 	}
-	if heldStreamedBeforeRelease {
-		t.Fatalf("newly covered owner streamed before plugin settle: %#v", heldBeforeRelease)
+	if !planStarted {
+		t.Fatal("plugin plan gate was never reached; ordering assertion would be vacuous")
 	}
-	if !sawFreeBeforeRelease {
-		t.Fatal("outside/free.ts did not stream as a local batch while the plugin plan gate was blocked; the hold assertion would be vacuous")
+	if len(beforeSettle) != 0 {
+		t.Fatalf("cold plugin run published before its plan settled: %d records", len(beforeSettle))
+	}
+	consumer := NewConsumer()
+	if err := consumer.ApplyRecords(sink.CloneRecords()); err != nil {
+		t.Fatal(err)
+	}
+	sawHeldPlugin, sawFree := false, false
+	for _, nodes := range consumer.Owners {
+		for _, n := range nodes {
+			if n.File == "src/held.ts" && n.Name == "domain/state:idle" {
+				sawHeldPlugin = true
+			}
+			if n.File == "outside/free.ts" {
+				sawFree = true
+			}
+		}
+	}
+	// An open-time outside/* domain would reject the src/held.ts contribution;
+	// requiring it here proves the transaction used the reloaded src/* manifest.
+	if !sawHeldPlugin || !sawFree {
+		t.Fatalf("reloaded-domain plugin/free contributions missing: plugin=%v free=%v", sawHeldPlugin, sawFree)
 	}
 }
 
@@ -2397,7 +2413,11 @@ func TestResidentExcludedPluginIdentityEditReloadsContributions(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer res.Close()
+	defer func() {
+		if err := res.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
 	if _, err := res.reconcile(context.Background(), true); err != nil {
 		t.Fatal(err)
 	}
@@ -2413,7 +2433,11 @@ func TestResidentExcludedPluginIdentityEditReloadsContributions(t *testing.T) {
 	if err := source.Start(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	defer source.Close()
+	defer func() {
+		if err := source.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
 	if err := source.CoverSessionInputs(res); err != nil {
 		t.Fatal(err)
 	}
@@ -2550,13 +2574,21 @@ owner_domain:
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer res.Close()
+	defer func() {
+		if err := res.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
 
 	source := NewGraphFileChangeSource(eng, root, nil, 64)
 	if err := source.Start(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	defer source.Close()
+	defer func() {
+		if err := source.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
 	bootstrap := source.Drain()
 	bootstrap.Reconcile = "test bootstrap"
 	if _, err := res.ApplyChanges(context.Background(), bootstrap); err != nil {

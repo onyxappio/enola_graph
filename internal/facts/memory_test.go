@@ -79,7 +79,9 @@ func TestGraphIndex_MemoryBudget(t *testing.T) {
 	s := buildMemCorpus(memCorpus)
 
 	beforeBytes, beforeObjects := heapNow()
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	afterBytes, afterObjects := heapNow()
 
 	if s.Graph() == nil {
@@ -121,7 +123,9 @@ func TestStore_InterningMemoryBudget(t *testing.T) {
 	s := buildMemCorpus(memCorpus)
 	// Drop the interning table so this measures what the store RETAINS, which is what
 	// a long-running server holds, not the transient cost of building it.
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	afterBytes, _ := heapNow()
 
 	storeBytes := int64(afterBytes) - int64(beforeBytes)
@@ -223,7 +227,9 @@ func TestGraphConsistency_LargeCorpus(t *testing.T) {
 	if err := s.ReadJSONLFile(path); err != nil {
 		t.Fatal(err)
 	}
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	g := s.Graph()
 	t.Logf("corpus: %d facts, %d nodes, %d edges", s.Count(), g.NodeCount(), g.EdgeCount())
 

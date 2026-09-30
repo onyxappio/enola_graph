@@ -67,7 +67,9 @@ func computeFixture(t *testing.T) *Report {
 	t.Helper()
 	eng := newTestEngine(t)
 	eng.Store().Add(fixtureFacts()...)
-	eng.Store().BuildGraph()
+	if err := eng.Store().BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	eng.SetSnapshot(&facts.Snapshot{
 		Meta: facts.SnapshotMeta{
 			RepoPath:    "/repo/demo",
@@ -96,7 +98,9 @@ func TestCompute_Languages(t *testing.T) {
 		facts.Fact{Kind: facts.KindModule, Name: "scripts/kconfig", File: "scripts/kconfig", Props: map[string]any{"language": "cpp"}},
 		facts.Fact{Kind: facts.KindModule, Name: "tools/perf", File: "tools/perf", Props: map[string]any{"language": "python"}},
 	)
-	eng.Store().BuildGraph()
+	if err := eng.Store().BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	// Extractor name "cpp" must NOT be what surfaces as the language.
 	eng.SetSnapshot(&facts.Snapshot{Meta: facts.SnapshotMeta{Extractors: []string{"cpp", "python"}}})
 
@@ -278,7 +282,9 @@ func TestComputeHotspots_BlastRadiusIsModuleGranular(t *testing.T) {
 
 	eng := newTestEngine(t)
 	eng.Store().Add(ff...)
-	eng.Store().BuildGraph()
+	if err := eng.Store().BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	var r Report
 	computeHotspots(eng.Store(), &r)
 
@@ -330,7 +336,9 @@ func unresolvedFixtureFacts() []facts.Fact {
 func TestCompute_CouplingUnresolved(t *testing.T) {
 	eng := newTestEngine(t)
 	eng.Store().Add(unresolvedFixtureFacts()...)
-	eng.Store().BuildGraph()
+	if err := eng.Store().BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	eng.SetSnapshot(&facts.Snapshot{Meta: facts.SnapshotMeta{RepoPath: "/repo/py"}})
 	r := Compute(eng)
 
@@ -356,7 +364,9 @@ func TestCompute_CouplingResolved_NoFlag(t *testing.T) {
 func TestRender_CouplingUnresolvedNote(t *testing.T) {
 	eng := newTestEngine(t)
 	eng.Store().Add(unresolvedFixtureFacts()...)
-	eng.Store().BuildGraph()
+	if err := eng.Store().BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	eng.SetSnapshot(&facts.Snapshot{Meta: facts.SnapshotMeta{RepoPath: "/repo/py"}})
 	out := Compute(eng).Render()
 	if !strings.Contains(out, "coupling could not be resolved") {
@@ -388,7 +398,9 @@ func subModuleFixtureFacts() []facts.Fact {
 func TestCompute_SubModuleTargetWalkUp(t *testing.T) {
 	eng := newTestEngine(t)
 	eng.Store().Add(subModuleFixtureFacts()...)
-	eng.Store().BuildGraph()
+	if err := eng.Store().BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	eng.SetSnapshot(&facts.Snapshot{Meta: facts.SnapshotMeta{RepoPath: "/repo/kt"}})
 	r := Compute(eng)
 
@@ -492,7 +504,9 @@ func codeHealthInsights() []facts.Insight {
 func TestCompute_CodeHealth_DigitsInNames(t *testing.T) {
 	eng := newTestEngine(t)
 	eng.Store().Add(fixtureFacts()...)
-	eng.Store().BuildGraph()
+	if err := eng.Store().BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	eng.SetSnapshot(&facts.Snapshot{
 		Meta: facts.SnapshotMeta{RepoPath: "/repo/digits"},
 		Insights: []facts.Insight{
@@ -530,7 +544,9 @@ func computeCodeHealth(t *testing.T) *Report {
 	t.Helper()
 	eng := newTestEngine(t)
 	eng.Store().Add(fixtureFacts()...)
-	eng.Store().BuildGraph()
+	if err := eng.Store().BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	eng.SetSnapshot(&facts.Snapshot{
 		Meta:     facts.SnapshotMeta{RepoPath: "/repo/health"},
 		Insights: codeHealthInsights(),

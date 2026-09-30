@@ -303,7 +303,7 @@ func validHookID(hook string) bool {
 		return false
 	}
 	for _, r := range name {
-		if !(r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' || r >= '0' && r <= '9' || r == '.' || r == '_' || r == '-') {
+		if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') && (r < '0' || r > '9') && r != '.' && r != '_' && r != '-' {
 			return false
 		}
 	}
@@ -335,7 +335,7 @@ func validID(s string) bool {
 		return false
 	}
 	for _, r := range s {
-		if !(r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' || r >= '0' && r <= '9' || r == '-' || r == '_' || r == '.') {
+		if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') && (r < '0' || r > '9') && r != '-' && r != '_' && r != '.' {
 			return false
 		}
 	}
@@ -373,6 +373,18 @@ func confinedPath(root, rel string) (string, error) {
 }
 
 func identityDigest(m Manifest, config map[string]any, fileBytes map[string][]byte, runtimeDigest string) (string, error) {
+	var grammar HostGrammarIdentity
+	if m.API == APIVersion {
+		var err error
+		grammar, err = HostGrammar()
+		if err != nil {
+			return "", fmt.Errorf("host grammar identity: %w", err)
+		}
+	}
+	return identityDigestWithGrammar(m, config, fileBytes, runtimeDigest, grammar)
+}
+
+func identityDigestWithGrammar(m Manifest, config map[string]any, fileBytes map[string][]byte, runtimeDigest string, grammar HostGrammarIdentity) (string, error) {
 	h := sha256.New()
 	write := func(b []byte) { _, _ = h.Write([]byte(fmt.Sprintf("%d:", len(b)))); _, _ = h.Write(b) }
 	mb, err := json.Marshal(m)
@@ -387,10 +399,6 @@ func identityDigest(m Manifest, config map[string]any, fileBytes map[string][]by
 	write(cb)
 	write([]byte(runtimeDigest))
 	if m.API == APIVersion {
-		grammar, err := HostGrammar()
-		if err != nil {
-			return "", fmt.Errorf("host grammar identity: %w", err)
-		}
 		write([]byte(grammar.Label))
 		write([]byte(grammar.Digest))
 	}

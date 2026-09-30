@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -589,17 +590,21 @@ export function dispatchIntent(intent: string) { sendUi(intentToEvent(intent)); 
 	if err := os.WriteFile(converter, changedSource, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	parsedApp := false
+	var parsedApp atomic.Bool
 	deltaSink := &graphstream.MemorySink{}
 	delta, err := Run(context.Background(), eng, dir, deltaSink, Options{
 		StateDir: state, AuthoritativeFiles: true,
-		OnBeforeParse: func(rel string) { parsedApp = parsedApp || rel == "App.tsx" },
+		OnBeforeParse: func(rel string) {
+			if rel == "App.tsx" {
+				parsedApp.Store(true)
+			}
+		},
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !parsedApp || delta.ParsedFiles == 0 || len(deltaSink.CloneRecords()) == 0 {
-		t.Fatalf("converter return edit skipped the dispatch owner: parsed_app=%v result=%+v records=%d", parsedApp, delta, len(deltaSink.CloneRecords()))
+	if !parsedApp.Load() || delta.ParsedFiles == 0 || len(deltaSink.CloneRecords()) == 0 {
+		t.Fatalf("converter return edit skipped the dispatch owner: parsed_app=%v result=%+v records=%d", parsedApp.Load(), delta, len(deltaSink.CloneRecords()))
 	}
 	applyRun(t, consumer, deltaSink)
 	if consumerHasResolvedRelation(consumer, "..dispatchIntent", "App.tsx", facts.RelFSMDispatches, "app/event:A", facts.KindFSMEvent, "machine.ts") ||
@@ -783,17 +788,21 @@ export function dispatchIntent(intent: Intent) { sendUi(intentToEvent(intent)); 
 			if err := os.WriteFile(intentPath, []byte(`export type Intent = { type: 'one' } | { type: 'two' } | { type: 'three' };`), 0o644); err != nil {
 				t.Fatal(err)
 			}
-			parsedApp := false
+			var parsedApp atomic.Bool
 			deltaSink := &graphstream.MemorySink{}
 			delta, err := Run(context.Background(), eng, dir, deltaSink, Options{
 				StateDir: state, AuthoritativeFiles: tc.authoritative,
-				OnBeforeParse: func(rel string) { parsedApp = parsedApp || rel == "App.tsx" },
+				OnBeforeParse: func(rel string) {
+					if rel == "App.tsx" {
+						parsedApp.Store(true)
+					}
+				},
 			})
 			if err != nil {
 				t.Fatal(err)
 			}
-			if !parsedApp || delta.ParsedFiles == 0 || len(deltaSink.CloneRecords()) == 0 {
-				t.Fatalf("imported type-body change skipped the dispatch owner: parsedApp=%v result=%+v", parsedApp, delta)
+			if !parsedApp.Load() || delta.ParsedFiles == 0 || len(deltaSink.CloneRecords()) == 0 {
+				t.Fatalf("imported type-body change skipped the dispatch owner: parsedApp=%v result=%+v", parsedApp.Load(), delta)
 			}
 			applyRun(t, consumer, deltaSink)
 			for _, event := range []string{"app/event:A", "app/event:B"} {

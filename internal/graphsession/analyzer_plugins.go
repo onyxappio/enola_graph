@@ -655,24 +655,6 @@ func pluginResolutionIndexIncomplete(files map[string]*FileState, previous map[s
 	return false
 }
 
-func filterUnitOwnersToAdmitted(units map[string]analyzerplugin.UnitRecord, admitted map[string]bool) {
-	for id, rec := range units {
-		if len(rec.Owners) == 0 {
-			continue
-		}
-		filtered := map[string]analyzerplugin.OwnerResult{}
-		for owner, result := range rec.Owners {
-			if admitted[filepath.ToSlash(owner)] {
-				filtered[owner] = result
-			}
-		}
-		rec.Owners = filtered
-		units[id] = rec
-	}
-}
-
-func pIdentity(p analyzerplugin.Loaded) string { return p.Identity }
-
 func (s *session) waitAnalyzerPlugins() error {
 	if s == nil {
 		return nil
@@ -1156,12 +1138,9 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 	for _, plugin := range s.analyzerPluginsLocked() {
 		apiVersions[plugin.Manifest.Name] = plugin.Manifest.API
 	}
-	repoID := ""
-	if s != nil {
-		repoID = s.opts.RepoID
-		if repoID == "" {
-			repoID = filepath.Clean(s.abs)
-		}
+	repoID := s.opts.RepoID
+	if repoID == "" {
+		repoID = filepath.Clean(s.abs)
 	}
 	pluginNames := make([]string, 0, len(records))
 	for pluginName := range records {
@@ -1211,7 +1190,7 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 						seen = &seenPluginIdentity{owner: owner, occurrences: map[string]string{}}
 						seenIdentities[identity] = seen
 					} else if api == analyzerplugin.GoAPIVersion && seen.owner != owner {
-						return fmt.Errorf("Go analyzer plugin %q emitted stable fact identity %s/%s for multiple owners %q and %q", pluginName, node.Kind, node.Name, seen.owner, owner)
+						return fmt.Errorf("go analyzer plugin %q emitted stable fact identity %s/%s for multiple owners %q and %q", pluginName, node.Kind, node.Name, seen.owner, owner)
 					}
 					if len(seen.occurrences) > 0 && (occurrence == "" || seen.occurrences[""] != "" || seen.occurrences[occurrence] != "") {
 						return fmt.Errorf("analyzer plugins emitted duplicate fact identity %s/%s for owner %s without distinct occurrences", node.Kind, node.Name, owner)
@@ -1220,8 +1199,7 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 					props := pluginOwnedProperties(api, pluginName, node.Props)
 					props["plugin"] = pluginName
 					props["plugin_identity"] = record.Identity
-					rels := make([]facts.Relation, 0, len(node.Relations))
-					rels = pluginFactsRelations(pluginName, api, node.Relations)
+					rels := pluginFactsRelations(pluginName, api, node.Relations)
 					fact := facts.Fact{Kind: factKind, Name: node.Name, File: owner, Line: node.Line, EndLine: node.EndLine, Repo: repoID, Props: props, Relations: rels}
 					s.pluginFacts = append(s.pluginFacts, fact)
 					s.pluginContribs[key] = append(s.pluginContribs[key], fact)
@@ -1244,8 +1222,7 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 					if anchor.SourceIdentity != "" {
 						props["fsm_source_identity"] = anchor.SourceIdentity
 					}
-					rels := make([]facts.Relation, 0, len(anchor.Relations))
-					rels = pluginAnchorRelations(pluginName, api, anchor.Relations)
+					rels := pluginAnchorRelations(pluginName, api, anchor.Relations)
 					// Persist anchors into Contrib so frozen pre-Begin name
 					// planning and resolution indexes see old and new owners.
 					s.pluginContribs[key] = append(s.pluginContribs[key], facts.Fact{

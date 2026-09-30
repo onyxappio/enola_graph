@@ -33,7 +33,9 @@ func TestNewGraph_DedupRetainsNothingPerEdge(t *testing.T) {
 		}},
 		Fact{Kind: KindModule, Name: "B", File: "b.go"},
 	)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	g := s.Graph()
 	if g == nil {
 		t.Fatal("graph should not be nil after BuildGraph")
@@ -77,7 +79,9 @@ func TestNewGraph_DedupAcrossFanOutSizes(t *testing.T) {
 			for i := 0; i < fanOut; i++ {
 				s.Add(Fact{Kind: KindSymbol, Name: fmt.Sprintf("T%03d", i), File: "t.go"})
 			}
-			s.BuildGraph()
+			if err := s.BuildGraph(); err != nil {
+				t.Fatal(err)
+			}
 			g := s.Graph()
 
 			edges := g.ForwardEdges("Src")
@@ -125,7 +129,9 @@ func buildWideGraph(n int) *Store {
 		}})
 		s.Add(Fact{Kind: KindSymbol, Name: leaf, File: leaf + ".go"})
 	}
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		panic(err)
+	}
 	return s
 }
 
@@ -155,7 +161,9 @@ func TestTraverse_BFSDepthOrderIsCorrect(t *testing.T) {
 		Fact{Kind: KindSymbol, Name: "C", Relations: []Relation{{Kind: RelCalls, Target: "D"}}},
 		Fact{Kind: KindSymbol, Name: "D"},
 	)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	result := s.Graph().Traverse("A", "forward", nil, nil, 10, 100)
 
@@ -428,7 +436,9 @@ func TestReverseLookup_FallbackWithoutGraph(t *testing.T) {
 // (graph is built) returns the same correct results.
 func TestReverseLookup_GraphFastPath(t *testing.T) {
 	s := buildReverseLookupStore()
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	if s.Graph() == nil {
 		t.Fatal("graph should be non-nil after BuildGraph")
@@ -464,7 +474,9 @@ func TestReverseLookup_BothPathsAgree(t *testing.T) {
 
 			// With graph (fast path)
 			s2 := buildReverseLookupStore()
-			s2.BuildGraph()
+			if err := s2.BuildGraph(); err != nil {
+				t.Fatal(err)
+			}
 			graphResult := s2.ReverseLookup(target, relKind)
 
 			if len(scanResult) != len(graphResult) {
@@ -489,7 +501,9 @@ func TestReverseLookup_BothPathsAgree(t *testing.T) {
 // fast path remains correct after the store is cleared and the graph rebuilt.
 func TestReverseLookup_GraphFastPath_AfterClearAndRebuild(t *testing.T) {
 	s := buildReverseLookupStore()
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	s.Clear()
 
@@ -506,7 +520,9 @@ func TestReverseLookup_GraphFastPath_AfterClearAndRebuild(t *testing.T) {
 		}},
 		Fact{Kind: KindSymbol, Name: "Y", File: "y.go"},
 	)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	callers = s.ReverseLookup("Y", RelCalls)
 	if len(callers) != 1 || callers[0].Name != "X" {

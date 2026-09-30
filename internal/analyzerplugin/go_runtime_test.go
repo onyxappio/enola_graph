@@ -31,7 +31,8 @@ func TestGoExecutableUsesVersionedHooksAndHostCallbacks(t *testing.T) {
 		"runtime:\n  kind: go-executable\n  entry: dist/task-graph\n" +
 		"identity_files: [dist/task-graph]\n" +
 		"hooks: [analysis.plan@1, analysis.unit@1]\n" +
-		"owner_domain: [docs/**]\n"
+		"owner_domain: [docs/**]\n" +
+		"limits:\n  hello_timeout_ms: 10000\n  unit_timeout_ms: 10000\n  run_timeout_ms: 30000\n"
 	if err := os.WriteFile(filepath.Join(pluginDir, "enola-plugin.yaml"), []byte(manifest), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -89,7 +90,7 @@ func TestGoExecutableUsesVersionedHooksAndHostCallbacks(t *testing.T) {
 	if err := ValidateResult(loaded[0], units[0], contribution); err != nil {
 		t.Fatalf("generic result validation: %v", err)
 	}
-	closeCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	closeCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := client.Close(closeCtx); err != nil {
 		t.Fatal(err)

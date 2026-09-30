@@ -32,7 +32,9 @@ func makeStore(hub string, fanIn, fanOut int) *facts.Store {
 		})
 	}
 
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		panic(err)
+	}
 	return s
 }
 
@@ -76,7 +78,9 @@ func TestExplain_DedupReopenedSymbol(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		store.Add(facts.Fact{Kind: facts.KindSymbol, Name: "core.Hub", File: fmt.Sprintf("reopen/%d.go", i)})
 	}
-	store.BuildGraph()
+	if err := store.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	insights, err := New().Explain(context.Background(), store)
 	if err != nil {
@@ -107,7 +111,9 @@ func TestExplain_RubyBaseClassExcluded(t *testing.T) {
 	}
 	addHub("MessengerBase", "app/messengers/messenger_base.rb")
 	addHub("User", "app/models/user.rb")
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	insights, err := New().Explain(context.Background(), s)
 	if err != nil {
@@ -230,7 +236,9 @@ func TestExplain_ExcludesTestRefFanIn(t *testing.T) {
 		Kind: facts.KindFileRef, Name: "config/init.rb", File: "config/init.rb",
 		Relations: []facts.Relation{{Kind: facts.RelCalls, Target: hub}},
 	})
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	insights, err := New().Explain(context.Background(), s)
 	if err != nil {
@@ -281,7 +289,9 @@ func TestExplain_OrderedByScore(t *testing.T) {
 	}
 	addHub("big.Hub", "big", 6, 6)
 	addHub("small.Hub", "small", 3, 3)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	insights, err := New().Explain(context.Background(), s)
 	if err != nil {
@@ -339,7 +349,9 @@ func TestExplain_TestSupportSymbolExcluded(t *testing.T) {
 			},
 		})
 	}
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	insights, err := New().Explain(context.Background(), s)
 	if err != nil {
@@ -383,7 +395,9 @@ func TestExplain_CapsInsightCount(t *testing.T) {
 				Relations: []facts.Relation{{Kind: facts.RelCalls, Target: name}}})
 		}
 	}
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	insights, err := New().Explain(context.Background(), s)
 	if err != nil {
@@ -418,7 +432,9 @@ func TestExplain_ExcludesInstantiateFanIn(t *testing.T) {
 	s.Add(facts.Fact{Kind: facts.KindSymbol, Name: "leaf.A", File: "leaf/a.go"})
 	s.Add(facts.Fact{Kind: facts.KindSymbol, Name: "leaf.B", File: "leaf/b.go"})
 	s.Add(facts.Fact{Kind: facts.KindSymbol, Name: "leaf.C", File: "leaf/c.go"})
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	insights, err := New().Explain(context.Background(), s)
 	if err != nil {
@@ -457,7 +473,9 @@ func TestExplain_ExcludesOwnedMethodsFromFanOut(t *testing.T) {
 			Props:     map[string]any{"symbol_kind": facts.SymbolClass},
 			Relations: []facts.Relation{{Kind: facts.RelCalls, Target: delegator}}})
 	}
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	if got, want := s.Graph().FanOut(delegator), 103; got != want {
 		t.Fatalf("precondition: raw FanOut(%s) = %d, want %d (one call plus 102 owned methods)", delegator, got, want)
@@ -493,7 +511,9 @@ func TestExplain_ReportedFanOutCountsOnlyOutgoingCoupling(t *testing.T) {
 		s.Add(facts.Fact{Kind: facts.KindSymbol, Name: fmt.Sprintf("caller/c%d.Fn", i), File: "caller/c.go",
 			Relations: []facts.Relation{{Kind: facts.RelCalls, Target: hub}}})
 	}
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	if got, want := s.Graph().FanOut(hub), 10; got != want {
 		t.Fatalf("precondition: raw FanOut(%s) = %d, want %d (five calls plus five owned methods)", hub, got, want)

@@ -25,7 +25,9 @@ func baseStore() *facts.Store {
 			Relations: []facts.Relation{{Kind: facts.RelImports, Target: "core"}},
 		},
 	)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		panic(err)
+	}
 	return s
 }
 

@@ -24,7 +24,7 @@ type PluginModuleResolution struct {
 func (d *Discovery) ResolvePluginModule(from, spec string, files []string) PluginModuleResolution {
 	known := knownTSFiles(files)
 	aliases := mergePackageAliases(aliasesForDir(d.aliasRootsFor(), factpath.Dir(from)), d.packageAliasesFor(known))
-	resolved, external := resolveImportPath(spec, factpath.Dir(from), aliases)
+	resolved, _ := resolveImportPath(spec, factpath.Dir(from), aliases)
 	file, moduleDir, replaySpec, external := bindImportTarget(spec, factpath.Dir(from), aliases, known)
 	result := PluginModuleResolution{Resolved: resolved, File: file, ModuleDir: moduleDir, ReplaySpec: replaySpec, External: external}
 	if external {

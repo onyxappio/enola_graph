@@ -373,7 +373,9 @@ func TestRemoveWhere_FiltersAndRebuildsIndices(t *testing.T) {
 func TestRemoveWhere_NoMatchIsNoOp(t *testing.T) {
 	s := NewStore()
 	s.Add(makeFact(KindSymbol, "Foo", "a.go"))
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	if removed := s.RemoveWhere(func(f Fact) bool { return false }); removed != 0 {
 		t.Errorf("removed = %d, want 0", removed)
 	}

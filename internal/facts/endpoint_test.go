@@ -23,7 +23,9 @@ func endpointStore() *Store {
 		Fact{Kind: KindAssociation, Name: "Candidate#job_applications", Props: map[string]any{
 			"model": "Candidate", "target": "JobApplication", "macro": "has_many"}},
 	)
-	st.BuildGraph()
+	if err := st.BuildGraph(); err != nil {
+		panic(err)
+	}
 	return st
 }
 
@@ -55,7 +57,9 @@ func TestAnalyzeEndpointNamesTheHopThatRanOut(t *testing.T) {
 	st := NewStore()
 	st.Add(Fact{Kind: KindRoute, Name: "/orphan", Props: map[string]any{
 		"method": "GET", "handler": "nowhere#show"}})
-	st.BuildGraph()
+	if err := st.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	got := st.AnalyzeEndpoint("/orphan", 25, nil)
 	if len(got.Routes) != 1 {
@@ -108,7 +112,9 @@ func TestAnalyzeEndpointFindsTheFrontendScreen(t *testing.T) {
 			File:  "ember_app/app/mirage/routes.js",
 			Props: map[string]any{"method": "GET", "role": "client", "test_double": true}},
 	)
-	st.BuildGraph()
+	if err := st.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	// The finder hands back every client call site, the mock included: which calls reach
 	// the endpoint is the linker's question, tested with it; what this package owns is

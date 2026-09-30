@@ -457,7 +457,11 @@ func TestFingerprintLinkedLibrariesFailsClosedOnUnreadableRegularFile(t *testing
 	if err := os.Chmod(lib, 0); err != nil {
 		t.Fatal(err)
 	}
-	defer os.Chmod(lib, 0o644)
+	t.Cleanup(func() {
+		if err := os.Chmod(lib, 0o644); err != nil {
+			t.Error(err)
+		}
+	})
 	if _, err := os.ReadFile(lib); err == nil {
 		t.Skip("this user can read a mode-0 file; fail-closed probe cannot be proven here")
 	}
@@ -645,7 +649,7 @@ func TestClientEnforcesUnitAndRunDeadlines(t *testing.T) {
 		t.Fatal(err)
 	}
 	version := strings.TrimSpace(string(versionBytes))
-	writeSlowPlugin := func(unitDelayMS, runBudgetMS int) Loaded {
+	writeSlowPlugin := func(t *testing.T, unitDelayMS, runBudgetMS int) Loaded {
 		t.Helper()
 		manifest := fmt.Sprintf(`api: enola.plugin/v1
 name: slow
@@ -699,7 +703,7 @@ rl.on("line", async (line) => {
 	}
 
 	t.Run("unit timeout", func(t *testing.T) {
-		p := writeSlowPlugin(100, 5000)
+		p := writeSlowPlugin(t, 100, 5000)
 		client, err := Start(context.Background(), p, nil)
 		if err != nil {
 			t.Fatal(err)
@@ -713,7 +717,7 @@ rl.on("line", async (line) => {
 
 	t.Run("run deadline", func(t *testing.T) {
 		// Allow hello to finish, then exhaust the remaining run budget before Run.
-		p := writeSlowPlugin(5000, 1000)
+		p := writeSlowPlugin(t, 5000, 1000)
 		client, err := Start(context.Background(), p, nil)
 		if err != nil {
 			t.Fatal(err)
@@ -721,7 +725,7 @@ rl.on("line", async (line) => {
 		defer client.Abort()
 		time.Sleep(850 * time.Millisecond)
 		_, err = client.Run(context.Background(), []UnitDecl{{ID: "file:src/a.ts", Kind: "file"}}, nil, nil)
-		if err == nil || !(strings.Contains(err.Error(), "deadline") || strings.Contains(err.Error(), "timed out")) {
+		if err == nil || !strings.Contains(err.Error(), "deadline") && !strings.Contains(err.Error(), "timed out") {
 			t.Fatalf("expected run deadline failure, got %v", err)
 		}
 	})
@@ -754,13 +758,6 @@ func TestHostGrammarIdentityIsPinnedAndDeterministic(t *testing.T) {
 	}
 	if strings.Contains(hello, "unbundled") {
 		t.Fatal("hello still advertises unbundled placeholder")
-	}
-	paths, err := GrammarPathsForTest()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(paths) != 4 {
-		t.Fatalf("expected 4 dialect grammar sources, got %v", paths)
 	}
 }
 
@@ -815,15 +812,8 @@ owner_domain: [src/**]
 		fileBytes[path] = b
 	}
 	original := loaded[0].Identity
-	prev := hostGrammar
-	prevErr := hostGrammarErr
-	t.Cleanup(func() {
-		hostGrammar = prev
-		hostGrammarErr = prevErr
-	})
-	hostGrammar = HostGrammarIdentity{Label: g.Label, Digest: strings.Repeat("ab", 32)}
-	hostGrammarErr = nil
-	recomputed, err := identityDigest(loaded[0].Manifest, loaded[0].Config.Config, fileBytes, loaded[0].RuntimeDigest)
+	g.Digest = strings.Repeat("ab", 32)
+	recomputed, err := identityDigestWithGrammar(loaded[0].Manifest, loaded[0].Config.Config, fileBytes, loaded[0].RuntimeDigest, g)
 	if err != nil {
 		t.Fatal(err)
 	}

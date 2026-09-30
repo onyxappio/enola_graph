@@ -68,6 +68,13 @@ The protocol has four host requests:
   order. It returns owner contributions and an optional summary.
 - `shutdown` ends the process.
 
+V1 hello and plugin cache identity include a digest of the host's pinned
+TypeScript/TSX parser and scanner sources. That digest is generated into the
+host binary; installed users need neither Go nor a Go module cache for this
+negotiation. When upgrading the grammar, run
+`go generate ./internal/analyzerplugin` and the grammar source/digest tests.
+The host refuses unverified grammar replacements or mismatched build metadata.
+
 Plugins request repository inputs through host callbacks: `read`, `probe`,
 `list`, `resolve_module`, `resolve_export`, and `summary`. Enola records each
 answer. Reads and resolver candidates are rechecked before successful

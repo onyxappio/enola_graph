@@ -205,7 +205,7 @@ func validLocalKind(kind string) bool {
 		return false
 	}
 	for _, r := range kind {
-		if !(r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' || r >= '0' && r <= '9' || r == '_' || r == '-' || r == '.') {
+		if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') && (r < '0' || r > '9') && r != '_' && r != '-' && r != '.' {
 			return false
 		}
 	}
@@ -414,9 +414,7 @@ func expandBraces(pattern string) []string {
 	end += start
 	var out []string
 	for _, choice := range strings.Split(pattern[start+1:end], ",") {
-		for _, suffix := range expandBraces(pattern[:start] + choice + pattern[end+1:]) {
-			out = append(out, suffix)
-		}
+		out = append(out, expandBraces(pattern[:start]+choice+pattern[end+1:])...)
 	}
 	return out
 }

@@ -468,7 +468,11 @@ func TestRepositoryAnalyzerPluginResidentRunMetrics(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resident.Close()
+	defer func() {
+		if err := resident.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
 	runtime.ReadMemStats(&openAfter)
 	t.Logf("T001_PLUGIN_RESIDENT %s", mustPluginMeasurementJSON(t, map[string]any{
 		"scenario":                        "session_open",
@@ -477,8 +481,7 @@ func TestRepositoryAnalyzerPluginResidentRunMetrics(t *testing.T) {
 	}))
 
 	var committed *Result
-	var applied *Consumer
-	applied = NewConsumer()
+	applied := NewConsumer()
 	consumedRecords := 0
 	measure := func(scenario string) *Result {
 		t.Helper()

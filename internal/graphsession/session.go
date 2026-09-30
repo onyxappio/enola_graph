@@ -64,6 +64,8 @@ type Options struct {
 	// never splits owner scope into PhaseScope chunks.
 	MaxBeginBytes int
 	// OnBeforeParse is a test hook invoked before each dirty TypeScript file is parsed.
+	// Extraction workers may call it concurrently; the callback must synchronize
+	// any mutable state it shares between calls.
 	OnBeforeParse func(rel string)
 	// FreshEngine is the caller stating that it constructed this engine for this
 	// session, in this process, and has run nothing against it since. Only a
@@ -2127,7 +2129,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	if s.pluginVerifyOnly {
 		s.skipPublish = true
 	}
-	if !initial && (tsNoop || !hadTS) && !nonTSNeed && !s.pluginChanged && !s.began && !(s.deferBegin && len(s.replaceScope) > 0) {
+	if !initial && (tsNoop || !hadTS) && !nonTSNeed && !s.pluginChanged && !s.began && (!s.deferBegin || len(s.replaceScope) == 0) {
 		s.skipPublish = true
 	}
 	if deferredTSFacts != nil && !s.skipPublish {
