@@ -21,6 +21,11 @@ analyzer_plugins:
       series: [enola-graph, product]
 ```
 
+Select this analysis configuration explicitly, for example
+`enola graph analyze --config enola.yaml --events .enola/events.jsonl --allow-repo-plugins task-graph .`.
+Flags precede the repository argument; registration and operator trust are
+separate requirements.
+
 Its `enola-plugin.yaml` points to a prebuilt Go executable and declares the
 hooks it registers:
 

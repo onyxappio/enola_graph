@@ -7,7 +7,8 @@ does not add Product-specific recognizers to Enola.
 
 ## Registration and trust
 
-Register a plugin in the repository's `enola.yaml`:
+Register a plugin in an Enola analysis configuration, for example the
+repository's `enola.yaml`, and select that file explicitly with `--config`:
 
 ```yaml
 analyzer_plugins:
@@ -42,9 +43,13 @@ owner_domain:
 The operator must allow configured code explicitly for each graph command:
 
 ```sh
-enola graph analyze . --events .enola/graph-events.jsonl --allow-repo-plugins example
-enola graph analyze . --events .enola/graph-events.jsonl --allow-repo-plugins example --plugin-verify
+enola graph analyze --config enola.yaml --events .enola/graph-events.jsonl --allow-repo-plugins example .
+enola graph analyze --config enola.yaml --events .enola/graph-events.jsonl --allow-repo-plugins example --plugin-verify .
 ```
+
+Place flags before the repository argument. Plugin registration is loaded from
+the selected analysis configuration; adding an unselected `enola.yaml` does
+not enable it. Operator trust is still required separately.
 
 Unknown manifest fields, unsupported vocabularies, duplicate claims, missing
 bundle or identity files, path escapes, and Node version mismatches fail before

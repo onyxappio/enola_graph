@@ -41,6 +41,16 @@ cannot be used to evaluate the pinned golangci-lint binary's type checking.
 
 Focused grammar, plugin runtime, callback race and graph API migration checks
 passed with the race detector. The final full-suite result is still pending.
+The complete `internal/analyzerplugin` race/coverage package passed in 15.485s.
+The expanded plugin/grammar/resolver/race selection passed across the host,
+graphsession and TypeScript packages; graphsession completed in 105.785s.
+Pre-push cache-version, documentation, golden and determinism gates passed.
+
+A separately built Go 1.26.8 CLI ran the V1 plugin fixture with `GOMODCACHE`
+pointing to a nonexistent directory. The initial run started one process and
+executed one unit; the unchanged fresh CLI reused that unit, started zero
+processes, parsed zero files, appended zero event bytes, and kept generation
+at one. This is a portability/correctness probe, not a performance benchmark.
 The local diagnostic full run uses `-timeout=20m`. GitHub now has an explicit
 45-minute package budget, retaining every test, race instrumentation and
 coverage. This changes the execution budget, not a correctness assertion or
