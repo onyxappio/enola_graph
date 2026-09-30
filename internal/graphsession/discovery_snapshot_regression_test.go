@@ -28,9 +28,15 @@ func discoveryFixture(t *testing.T, files map[string]string) (string, *Resident,
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { r.Close() })
+	t.Cleanup(func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("operation failed: %v", err)
+		}
+	})
 	q := NewChangeQueue("test", 8)
-	q.Start(context.Background())
+	if err := q.Start(context.Background()); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	return dir, r, q, sink
 }
 
@@ -125,13 +131,13 @@ func completedState(t *testing.T, stateDir string) string {
 	for _, name := range []string{"state.json", "fences.jsonl", "tombstones.jsonl"} {
 		b, err := os.ReadFile(filepath.Join(stateDir, name))
 		if errors.Is(err, os.ErrNotExist) {
-			fmt.Fprintf(sum, "%s:absent:", name)
+			_, _ = fmt.Fprintf(sum, "%s:absent:", name) // SHA-256 writers cannot fail.
 			continue
 		}
 		if err != nil {
 			t.Fatal(err)
 		}
-		fmt.Fprintf(sum, "%s:%d:", name, len(b))
+		_, _ = fmt.Fprintf(sum, "%s:%d:", name, len(b)) // SHA-256 writers cannot fail.
 		sum.Write(b)
 	}
 	return hex.EncodeToString(sum.Sum(nil))

@@ -403,7 +403,7 @@ func decodeRule(f facts.Fact) rule {
 // selector matched nothing.
 func (e *Explainer) Explain(ctx context.Context, store *facts.Store) ([]facts.Insight, error) {
 	ev := e.evaluate(store, evaluation{})
-	return ev.insights, nil
+	return ev.insights, ev.err
 }
 
 // evaluation is one pass of the constraints explainer over a store, with two
@@ -423,6 +423,7 @@ type evaluated struct {
 	byRule      map[string][]facts.Insight
 	rules       []rule
 	notComputed []NotComputed
+	err         error
 }
 
 func (e *Explainer) evaluate(store *facts.Store, opts evaluation) evaluated {
@@ -513,7 +514,11 @@ func (e *Explainer) evaluate(store *facts.Store, opts evaluation) evaluated {
 	// resolves onto a component, or how the fact the edge LANDED ON does, never
 	// both of a single role. It reads the declared ownership through the single
 	// statement of precedence, so a rule's reach is the rule's own.
-	resolve := newResolver(store, components, members, memberFacts, carried, ground)
+	resolve, err := newResolver(store, components, rules, members, memberFacts, carried, ground)
+	if err != nil {
+		out.err = err
+		return out
+	}
 
 	// Which files the snapshot measured exported content in — the private form's
 	// file-granular test, asked of the whole store rather than of one component's

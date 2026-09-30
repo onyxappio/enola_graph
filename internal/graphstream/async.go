@@ -165,12 +165,6 @@ func (a *asyncPub) getErr() error {
 	return a.err
 }
 
-func (a *asyncPub) snapshotClosed() bool {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-	return a.closed
-}
-
 func (a *asyncPub) queueLen() int {
 	return len(a.pending) + a.committing + len(a.ready)
 }

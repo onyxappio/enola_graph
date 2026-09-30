@@ -329,7 +329,9 @@ func (s *nonTSABASink) Publish(ctx context.Context, subject, id string, payload 
 		Type  string `json:"type"`
 		Phase string `json:"phase"`
 	}
-	json.Unmarshal(payload, &p)
+	if err := json.Unmarshal(payload, &p); err != nil {
+		return err
+	}
 	switch {
 	case p.Type == graphstream.TypeBeginReplace && s.onBegin != nil:
 		s.begun.Do(s.onBegin)

@@ -19,7 +19,11 @@ func TestIndependentConsecutiveRefusalsPreserveMultiHopParses(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	initial, err := r.reconcile(ctx, false)
 	if err != nil {
 		t.Fatal(err)

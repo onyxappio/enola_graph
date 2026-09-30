@@ -1938,7 +1938,9 @@ func TestBestPath_TriesCandidates(t *testing.T) {
 		facts.Fact{Kind: facts.KindSymbol, Name: "pkg/handler.Handler", Props: map[string]any{"symbol_kind": "struct"},
 			Relations: []facts.Relation{{Kind: facts.RelInstantiates, Target: "internal/domain/cart.CartService"}}},
 	)
-	store.BuildGraph()
+	if err := store.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	srv := newTestServer(store)
 
 	from := []string{"pkg/handler.Handler"}
@@ -1958,7 +1960,9 @@ func TestBestPath_NoPath(t *testing.T) {
 		facts.Fact{Kind: facts.KindSymbol, Name: "a.Foo", Props: map[string]any{"symbol_kind": "struct"}},
 		facts.Fact{Kind: facts.KindSymbol, Name: "b.Bar", Props: map[string]any{"symbol_kind": "struct"}},
 	)
-	store.BuildGraph()
+	if err := store.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	srv := newTestServer(store)
 	res := srv.bestPath(store.Graph(), []string{"a.Foo"}, []string{"b.Bar"}, nil, 0)
 	if res.Found {
@@ -1972,7 +1976,9 @@ func TestBestPath_NoPath(t *testing.T) {
 func TestBestPath_EmptyCandidates_NoPanic(t *testing.T) {
 	store := facts.NewStore()
 	store.Add(facts.Fact{Kind: facts.KindSymbol, Name: "a.Foo", Props: map[string]any{"symbol_kind": "struct"}})
-	store.BuildGraph()
+	if err := store.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	srv := newTestServer(store)
 
 	cases := []struct{ from, to []string }{

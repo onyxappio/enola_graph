@@ -26,7 +26,9 @@ func makeStore(hub string, callers []string, extraSymbols []string) *facts.Store
 	for _, x := range extraSymbols {
 		s.Add(facts.Fact{Kind: facts.KindSymbol, Name: x, File: "leaf/x.go"})
 	}
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		panic(err)
+	}
 	return s
 }
 
@@ -88,7 +90,9 @@ func TestExplain_DedupReopenedSymbol(t *testing.T) {
 	for i := 0; i < 4; i++ {
 		store.Add(facts.Fact{Kind: facts.KindSymbol, Name: "core.Hub", File: fmt.Sprintf("reopen/%d.go", i)})
 	}
-	store.BuildGraph()
+	if err := store.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	insights, err := New().Explain(context.Background(), store)
 	if err != nil {
@@ -114,7 +118,9 @@ func TestExplain_RubyBaseClassExcluded(t *testing.T) {
 			Relations: []facts.Relation{{Kind: facts.RelImplements, Target: "ApplicationRecord"}, {Kind: facts.RelCalls, Target: "User"}},
 		})
 	}
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	insights, err := New().Explain(context.Background(), s)
 	if err != nil {
@@ -158,7 +164,9 @@ func TestExplain_CapsInsightCount(t *testing.T) {
 			})
 		}
 	}
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	insights, err := New().Explain(context.Background(), s)
 	if err != nil {
@@ -241,7 +249,9 @@ func TestExplain_MultipleHubsOrderedByFanIn(t *testing.T) {
 		s.Add(facts.Fact{Kind: facts.KindSymbol, Name: fmt.Sprintf("b/c%d.Fn", i), File: "b/c.go",
 			Relations: []facts.Relation{{Kind: facts.RelCalls, Target: "core.Small"}}})
 	}
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	insights, err := New().Explain(context.Background(), s)
 	if err != nil {
@@ -291,7 +301,9 @@ func TestExplain_ExcludesTestRefFanIn(t *testing.T) {
 	s.Add(facts.Fact{Kind: facts.KindSymbol, Name: "leaf.A", File: "leaf/a.go"})
 	s.Add(facts.Fact{Kind: facts.KindSymbol, Name: "leaf.B", File: "leaf/b.go"})
 	s.Add(facts.Fact{Kind: facts.KindSymbol, Name: "leaf.C", File: "leaf/c.go"})
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	insights, err := New().Explain(context.Background(), s)
 	if err != nil {
@@ -382,7 +394,9 @@ func TestExplain_TestSupportSymbolExcluded(t *testing.T) {
 			},
 		})
 	}
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	insights, err := New().Explain(context.Background(), s)
 	if err != nil {
@@ -421,7 +435,9 @@ func TestExplain_ProductionABTestNotExcluded(t *testing.T) {
 		}
 		s2.Add(f)
 	}
-	s2.BuildGraph()
+	if err := s2.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	insights, err := New().Explain(context.Background(), s2)
 	if err != nil {
@@ -457,7 +473,9 @@ func TestExplain_ExcludesInstantiateFanIn(t *testing.T) {
 	s.Add(facts.Fact{Kind: facts.KindSymbol, Name: "leaf.A", File: "leaf/a.go"})
 	s.Add(facts.Fact{Kind: facts.KindSymbol, Name: "leaf.B", File: "leaf/b.go"})
 	s.Add(facts.Fact{Kind: facts.KindSymbol, Name: "leaf.C", File: "leaf/c.go"})
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	insights, err := New().Explain(context.Background(), s)
 	if err != nil {

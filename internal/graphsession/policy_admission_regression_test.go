@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/enola-labs/enola/internal/analyzerplugin"
 	"github.com/enola-labs/enola/internal/engine"
 	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/graphinput"
@@ -70,7 +71,13 @@ func admissionEngine(t *testing.T, dir string, popts graphinput.Options) *engine
 			t.Fatal(err)
 		}
 		eng.ConfigureGraphInputs(&inputscope.Scope{Root: dir, Policy: p}, func() (*engine.Engine, error) {
-			return attach(testEngine(t, dir)), nil
+			next := attach(testEngine(t, dir))
+			// Preserve live analyzer plugin registrations across graph-input
+			// rebuilds so an empty rebuilt Config is only explicit removal.
+			if cfg := eng.Config(); cfg != nil && next.Config() != nil {
+				next.Config().AnalyzerPlugins = append([]analyzerplugin.Config(nil), cfg.AnalyzerPlugins...)
+			}
+			return next, nil
 		})
 		return eng
 	}
@@ -95,7 +102,11 @@ func admissionEngineHook(t *testing.T, dir string, popts graphinput.Options, onB
 			onBuilt()
 		}
 		eng.ConfigureGraphInputs(&inputscope.Scope{Root: dir, Policy: p}, func() (*engine.Engine, error) {
-			return attach(testEngine(t, dir)), nil
+			next := attach(testEngine(t, dir))
+			if cfg := eng.Config(); cfg != nil && next.Config() != nil {
+				next.Config().AnalyzerPlugins = append([]analyzerplugin.Config(nil), cfg.AnalyzerPlugins...)
+			}
+			return next, nil
 		})
 		return eng
 	}
@@ -611,7 +622,10 @@ func TestAdmissionIndexEditAfterBeginFailsTheResidentRun(t *testing.T) {
 			// successfully and is supposed to have.
 			for _, rec := range sink.CloneRecords()[published:] {
 				var e graphstream.EndReplace
-				if json.Unmarshal(rec.Payload, &e); e.Type == graphstream.TypeEndReplace && e.Completeness.Status == "success" {
+				if err := json.Unmarshal(rec.Payload, &e); err != nil {
+					t.Fatal(err)
+				}
+				if e.Type == graphstream.TypeEndReplace && e.Completeness.Status == "success" {
 					t.Fatalf("the refused run published a successful EndReplace (%s)", rec.MsgID)
 				}
 			}

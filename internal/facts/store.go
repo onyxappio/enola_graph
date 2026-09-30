@@ -858,16 +858,22 @@ func (s *Store) Clear() {
 
 // BuildGraph constructs the adjacency-list graph index from the current facts.
 // Call this after all facts have been added and tagged (e.g. after snapshot generation).
-func (s *Store) BuildGraph() {
+func (s *Store) BuildGraph() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.graph = NewGraph(s.facts)
+	graph, err := NewGraph(s.facts)
+	if err != nil {
+		s.graph = nil
+		return err
+	}
+	s.graph = graph
 	// The interning table has done its job: the strings it canonicalized are held by
 	// the facts themselves now, and the map is pure overhead (1.3M entries on the
 	// kernel) for the rest of the store's life. Add recreates it if more facts
 	// arrive — interning is an optimization, so a fresh table is merely less
 	// effective, never incorrect.
 	s.intern = nil
+	return nil
 }
 
 // Graph returns the current graph index, or nil if BuildGraph has not been called.
@@ -962,7 +968,7 @@ func (s *Store) WriteJSONL(w io.Writer) error {
 		rels = rels[:0]
 		for _, r := range f.Relations {
 			wr := wireRelation{Relation: r}
-			if t := s.targetFactFor(r.Target, f.Repo); t >= 0 {
+			if t := s.targetFactForKind(r.Target, r.TargetKind, f.Repo); t >= 0 {
 				tf := s.facts[t]
 				wr.TargetID, idScratch = factIDInto(idScratch, tf.Repo, tf.Kind, tf.Name, tf.File)
 			}
@@ -972,6 +978,9 @@ func (s *Store) WriteJSONL(w io.Writer) error {
 			sort.Slice(rels, func(i, j int) bool {
 				if rels[i].Kind != rels[j].Kind {
 					return rels[i].Kind < rels[j].Kind
+				}
+				if rels[i].TargetKind != rels[j].TargetKind {
+					return rels[i].TargetKind < rels[j].TargetKind
 				}
 				return rels[i].Target < rels[j].Target
 			})

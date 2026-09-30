@@ -75,7 +75,7 @@ func (e *Extractor) captureContext(repoPath string, retain bool) (map[string][]b
 	h := sha256.New()
 	for _, p := range names {
 		b, err := e.inputScope.ReadFile(filepath.Join(repoPath, p))
-		fmt.Fprintf(h, "%q:%d:%v\n", p, len(b), err)
+		_, _ = fmt.Fprintf(h, "%q:%d:%v\n", p, len(b), err) // SHA-256 writers cannot fail.
 		h.Write(b)
 		if retain && err == nil {
 			src[p] = b

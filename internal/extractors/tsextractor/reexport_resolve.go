@@ -639,15 +639,6 @@ func exportSpecifierNames(kinds *tsutil.KindTable, spec *sitter.Node, src []byte
 	return orig, exported, true
 }
 
-func declExportsName(kinds *tsutil.KindTable, decl *sitter.Node, src []byte, exportName string) bool {
-	for _, n := range declExportedNames(kinds, decl, src) {
-		if n == exportName {
-			return true
-		}
-	}
-	return false
-}
-
 // surface encodes everything a consumer can observe about this file's exports
 // through followNamedExportFile, as a deterministic sorted list.
 //

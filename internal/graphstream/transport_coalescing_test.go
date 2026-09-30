@@ -30,7 +30,11 @@ func TestCommitCoalescingSparseProducerProgress(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer j.Close()
+	defer func() {
+		if err := j.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	synced := make(chan struct{}, 1)
 	j.SetSyncHook(func() {
 		select {
@@ -61,7 +65,15 @@ func TestCommitCoalescingFlushReturnsDurabilityError(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer j.Close()
+	defer func() {
+		// Flush left a dirty journal behind the deliberately blocked commit path.
+		// Close must report the same durability failure while releasing handles.
+		closeErr := j.Close()
+		var pathErr *os.PathError
+		if !errors.As(closeErr, &pathErr) || pathErr.Path != filepath.Join(dir, "commit.json.tmp") {
+			t.Errorf("Close must report the injected commit failure: %v", closeErr)
+		}
+	}()
 	// Prevent creation of the commit index, after payload file fsync succeeds.
 	if err := os.Mkdir(filepath.Join(dir, "commit.json.tmp"), 0755); err != nil {
 		t.Fatal(err)

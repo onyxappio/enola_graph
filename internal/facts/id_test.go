@@ -8,8 +8,8 @@ import (
 )
 
 // TestFactID_IsStableAndDistinct pins the two properties a consumer keys nodes
-// on: the same fact always hashes the same, and facts that differ in any of the
-// four identity fields hash differently.
+// on: the same ordinary fact always hashes the same, and facts that differ in
+// any of its four identity fields hash differently.
 func TestFactID_IsStableAndDistinct(t *testing.T) {
 	base := FactID("repo", KindSymbol, "app.Run", "app/main.go")
 	if len(base) != 2*idBytes {
@@ -33,6 +33,26 @@ func TestFactID_IsStableAndDistinct(t *testing.T) {
 		if got := FactID(tc.repo, tc.kind, tc.name, tc.file); got == base {
 			t.Errorf("a different %s produced the same id %q", tc.what, got)
 		}
+	}
+}
+
+func TestPluginFactIDIsStableAcrossOwnerPaths(t *testing.T) {
+	oldOwner := Fact{Repo: "repo", Kind: "plugin:tasks:task", Name: "series/T-123", File: "tasks/backlog/T-123.md"}
+	newOwner := Fact{Repo: "repo", Kind: "plugin:tasks:task", Name: "series/T-123", File: "tasks/in_progress/T-123.md"}
+	if oldOwner.Identity() != newOwner.Identity() {
+		t.Fatalf("plugin entity ID changed with owner path: old=%q new=%q", oldOwner.Identity(), newOwner.Identity())
+	}
+	if !sameIdentity(oldOwner, newOwner) {
+		t.Fatal("same plugin kind/name under a moved owner is not recognized as the same identity")
+	}
+	if FactID(oldOwner.Repo, oldOwner.Kind, oldOwner.Name, oldOwner.File) != oldOwner.Identity() {
+		t.Fatal("FactID and Fact.Identity disagree for a plugin-owned fact")
+	}
+
+	otherName := newOwner
+	otherName.Name = "series/T-124"
+	if otherName.Identity() == oldOwner.Identity() {
+		t.Fatal("different plugin entity names share an ID")
 	}
 }
 

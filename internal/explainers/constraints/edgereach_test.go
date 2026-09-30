@@ -1,12 +1,36 @@
 package constraints
 
 import (
+	"context"
+	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/enola-labs/enola/internal/facts"
 	"github.com/enola-labs/enola/internal/intent"
 )
+
+func TestOwnedMethodGraphBuildErrorIsPropagated(t *testing.T) {
+	store := facts.NewStore()
+	store.Add(
+		concept("exceptions", map[string]any{"owns": intent.OwnsMethods}),
+		componentIntent("models", "app/models/**"),
+		formRuleIntent("models-are-owned", map[string]any{
+			"protect": "models", "owners": "exceptions", "via": "calls"}),
+	)
+	relations := make([]facts.Relation, int(^uint16(0))+2)
+	for i := range relations {
+		relations[i] = facts.Relation{Kind: fmt.Sprintf("overflow-kind-%d", i), Target: "Target"}
+	}
+	store.Add(facts.Fact{Kind: facts.KindSymbol, Name: "Owner", Relations: relations})
+
+	if _, err := UnreachableRoles(store); err == nil || !strings.Contains(err.Error(), "relation-kind ID space") {
+		t.Fatalf("UnreachableRoles error = %v, want relation-kind overflow surfaced to constraints lint", err)
+	}
+	if _, err := New().Explain(context.Background(), store); err == nil || !strings.Contains(err.Error(), "relation-kind ID space") {
+		t.Fatalf("Explain error = %v, want relation-kind overflow propagated", err)
+	}
+}
 
 // The structural defect the previous machinery carried: it ORed three arms
 // belonging to different directions, so an edge pointing the wrong way declared
@@ -182,7 +206,10 @@ func TestReach_LintReportsWhatTheGateRefusesOn(t *testing.T) {
 			Props:     map[string]any{"symbol_kind": "method"},
 			Relations: []facts.Relation{{Kind: facts.RelCalls, Target: "Job"}}},
 	)
-	got := UnreachableRoles(store)
+	got, err := UnreachableRoles(store)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if len(got) != 1 || got[0].Component != "exceptions" || got[0].Role != "owners" || got[0].Side != intent.SideSource {
 		t.Fatalf("UnreachableRoles = %+v, want the owners role reported on the source side", got)
 	}

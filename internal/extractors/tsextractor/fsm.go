@@ -8,7 +8,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/enola-labs/enola/internal/extractors/inputscope"
 	"github.com/enola-labs/enola/internal/factpath"
 	"github.com/enola-labs/enola/internal/facts"
 	"github.com/enola-labs/enola/internal/fsm"
@@ -361,20 +360,3 @@ func appendFSMReads(rec *FileRecord, paths []string, repoPath string, read func(
 }
 
 func sortStrings(s []string) { sort.Strings(s) }
-
-func fsmReadFile(ctx context.Context, repoPath, rel string, input *inputscope.Scope, overlay map[string][]byte) []byte {
-	if b, ok := overlay[filepath.ToSlash(rel)]; ok {
-		return b
-	}
-	b, err := input.ReadFile(filepath.Join(repoPath, rel))
-	if err != nil {
-		return nil
-	}
-	return b
-}
-
-func (e *TSExtractor) fsmAliases(aliasesFor func(string) map[string]tsAlias) func(string) map[string]tsAlias {
-	return func(from string) map[string]tsAlias {
-		return aliasesFor(strings.TrimPrefix(filepath.ToSlash(from), "./"))
-	}
-}

@@ -32,7 +32,11 @@ func TestReviewPhysicalTombBound(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer j.Close()
+	defer func() {
+		if err := j.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	var boundErr error
 	nDone := 0
 	for i := 0; i < 4000; i++ {
@@ -74,7 +78,9 @@ func TestReviewCommittedTailLoss(t *testing.T) {
 	if err := j.Append(JournalEntry{MsgID: "committed", Subject: "s", Payload: []byte("durable")}); err != nil {
 		t.Fatal(err)
 	}
-	j.Close()
+	if err := j.Close(); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	p := filepath.Join(d, "payloads.jsonl")
 	b, _ := os.ReadFile(p)
 	if err := os.WriteFile(p, b[:len(b)-1], 0644); err != nil {
@@ -85,7 +91,11 @@ func TestReviewCommittedTailLoss(t *testing.T) {
 		t.Logf("correctly rejected committed damage: %v", err)
 		return
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if len(r.Unacked()) != 1 {
 		t.Fatalf("durably appended unacked message silently dropped after committed trailing newline corruption: got %d", len(r.Unacked()))
 	}
@@ -95,7 +105,11 @@ func TestReviewDetachedGroupFlushAndBound(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer j.Close()
+	defer func() {
+		if err := j.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if err := j.Append(JournalEntry{MsgID: "one", Payload: []byte("one")}); err != nil {
 		t.Fatal(err)
 	}

@@ -173,7 +173,7 @@ func nuxtJSCodeSpans(src []byte) [][2]int {
 		case src[i] == '/' && i+1 < len(src) && src[i+1] == '*':
 			flush(i)
 			i += 2
-			for i+1 < len(src) && !(src[i] == '*' && src[i+1] == '/') {
+			for i+1 < len(src) && (src[i] != '*' || src[i+1] != '/') {
 				i++
 			}
 			if i+1 < len(src) {
@@ -289,8 +289,7 @@ func nuxtKitResolverIdents(src []byte) map[string]bool {
 	decl := regexp.MustCompile(`(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*([A-Za-z_$][\w$]*)\s*\(\s*import\s*\.\s*meta\s*\.\s*url\s*\)`)
 	for _, m := range decl.FindAllSubmatch(code, -1) {
 		ident := string(m[1])
-		callee := string(m[2])
-		if !create[callee] {
+		if !create[string(m[2])] {
 			continue
 		}
 		if nuxtIdentAssignedOnceFrom(code, ident, create) {

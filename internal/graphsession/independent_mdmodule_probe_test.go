@@ -56,12 +56,20 @@ func TestIndependentResidentMDSiblingModuleSequence(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer resident.Close()
+			defer func() {
+				if err := resident.Close(); err != nil {
+					t.Errorf("cleanup: %v", err)
+				}
+			}()
 			q := NewChangeQueue("independent-md-siblings", 32)
 			if err := q.Start(context.Background()); err != nil {
 				t.Fatal(err)
 			}
-			defer q.Close()
+			defer func() {
+				if err := q.Close(); err != nil {
+					t.Errorf("cleanup: %v", err)
+				}
+			}()
 			run := func(paths ...string) {
 				t.Helper()
 				for _, p := range paths {

@@ -36,7 +36,11 @@ func TestInputRaceClassifiesOnlyDisappearance(t *testing.T) {
 	if err := os.Chmod(locked, 0); err != nil {
 		t.Fatal(err)
 	}
-	defer os.Chmod(locked, 0o644)
+	defer func() {
+		if err := os.Chmod(locked, 0o644); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, err := os.ReadFile(locked); err == nil {
 		t.Skip("this user can read a mode-0 file; the permission half cannot be proven here")
 	}
@@ -96,7 +100,11 @@ func TestInputRaceCompositionContextDeletionIsRetryable(t *testing.T) {
 	if err := os.Chmod(locked, 0); err != nil {
 		t.Fatal(err)
 	}
-	defer os.Chmod(locked, 0o644)
+	defer func() {
+		if err := os.Chmod(locked, 0o644); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, rerr := os.ReadFile(locked); rerr == nil {
 		t.Skip("this user can read a mode-0 file; the permission half cannot be proven here")
 	}
@@ -145,7 +153,11 @@ func TestInputRaceCapturedRevalidationSeparatesLossFromFault(t *testing.T) {
 	if err := os.Chmod(locked, 0); err != nil {
 		t.Fatal(err)
 	}
-	defer os.Chmod(locked, 0o644)
+	defer func() {
+		if err := os.Chmod(locked, 0o644); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, rerr := os.ReadFile(locked); rerr == nil {
 		t.Skip("this user can read a mode-0 file; the permission half cannot be proven here")
 	}

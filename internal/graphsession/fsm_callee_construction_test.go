@@ -74,9 +74,7 @@ export function intentToEvent(intent:Intent):AppEvent{switch(intent.type){case '
 				}
 				assertConstruction()
 
-				modified := `import type {AppEvent} from './machine';import type {Intent} from './converter';
-const send=(_event:AppEvent)=>{};function sendUi(event:AppEvent){send(event);}
-export function dispatchIntent(intent:Intent){sendUi(intentToEvent(intent));}`
+				var modified string
 				if mutation == "replace-sink" {
 					modified = `import type {AppEvent} from './machine';import {intentToEvent,type Intent} from './converter';
 const send=(_event:AppEvent)=>{};function sendUi(event:AppEvent){send(event);}

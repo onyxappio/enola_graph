@@ -415,7 +415,9 @@ func TestAsyncRetiredRunFailsAtFlush(t *testing.T) {
 	if err := j.CompactAcked(); err != nil {
 		t.Fatal(err)
 	}
-	j.Close()
+	if err := j.Close(); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	j, err = OpenJournal(dir)
 	if err != nil {
 		t.Fatal(err)

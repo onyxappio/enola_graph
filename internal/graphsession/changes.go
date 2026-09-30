@@ -255,7 +255,7 @@ func (s *FileChangeSource) Start(ctx context.Context) error {
 	// Reader starts before registration so events cannot race watch bootstrap.
 	go s.read(ctx)
 	if err = s.register(s.root); err != nil {
-		s.Close()
+		_ = s.Close() // Preserve the registration failure while releasing resources.
 		return err
 	}
 	return s.ChangeQueue.Start(ctx)
@@ -349,7 +349,9 @@ func (s *FileChangeSource) Close() error {
 			err = s.watcher.Close()
 			<-s.done
 		}
-		s.ChangeQueue.Close()
+		if closeErr := s.ChangeQueue.Close(); err == nil {
+			err = closeErr
+		}
 	})
 	return err
 }
@@ -367,7 +369,7 @@ type peekableSource interface {
 
 // Watch holds one resident writer and runs only in response to events. WatchEvery
 // is a debounce ceiling, not a polling interval or a disk-equality barrier.
-func Watch(ctx context.Context, eng *engine.Engine, repoPath string, sink graphstream.Sink, opts Options) error {
+func Watch(ctx context.Context, eng *engine.Engine, repoPath string, sink graphstream.Sink, opts Options) (retErr error) {
 	delay := opts.WatchEvery
 	if delay <= 0 {
 		delay = DefaultWatchEvery
@@ -387,13 +389,21 @@ func Watch(ctx context.Context, eng *engine.Engine, repoPath string, sink graphs
 	if err != nil {
 		return err
 	}
-	defer r.Close()
+	defer func() {
+		if closeErr := r.Close(); retErr == nil {
+			retErr = closeErr
+		}
+	}()
 	ignored := append([]string{r.opts.StateDir}, opts.WatchIgnore...)
 	source := NewGraphFileChangeSource(eng, r.abs, ignored, 4096)
 	if err = source.Start(ctx); err != nil {
 		return err
 	}
-	defer source.Close()
+	defer func() {
+		if closeErr := source.Close(); retErr == nil {
+			retErr = closeErr
+		}
+	}()
 	// Do not drain after baseline: events arriving during baseline remain pending.
 	batch := source.Drain()
 	if !batch.Covered {
@@ -479,9 +489,9 @@ func (s *FileChangeSource) CoverSessionInputs(r *Resident) error {
 	if s.root != r.abs {
 		return fmt.Errorf("watch root does not match resident checkout")
 	}
-	s.ChangeQueue.mu.Lock()
-	covered := s.ChangeQueue.covered
-	s.ChangeQueue.mu.Unlock()
+	s.mu.Lock()
+	covered := s.covered
+	s.mu.Unlock()
 	if !covered || s.watcher == nil {
 		return fmt.Errorf("start the change source before covering session inputs")
 	}
@@ -531,6 +541,12 @@ func (s *FileChangeSource) CoverSessionInputs(r *Resident) error {
 	}
 	for p := range r.inputs.effective {
 		paths = append(paths, p)
+	}
+	// Plugin identity files (manifest, entry, declared identity_files) must stay
+	// covered even when graph-input policy excludes their directories; otherwise a
+	// content edit never reaches resident reload and stale plugin facts remain.
+	for _, plugin := range r.opts.analyzerPlugins {
+		paths = append(paths, plugin.IdentityFiles...)
 	}
 	targets := map[string]bool{}
 	for _, p := range paths {

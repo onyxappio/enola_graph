@@ -2,7 +2,6 @@ package tsextractor
 
 import (
 	"encoding/json"
-	"path/filepath"
 	"sort"
 	"strings"
 
@@ -208,25 +207,5 @@ func applyParsedExports(out map[string]tsAlias, parsed packageJSONExports) {
 			continue
 		}
 		out[p.prefix] = tsAlias{replacement: p.replacement, suffix: p.suffix, exact: false}
-	}
-}
-
-func nearestPackageDir(pkgNames map[string]string, dir string) string {
-	for d := filepath.ToSlash(dir); ; {
-		if _, ok := pkgNames[d]; ok {
-			return d
-		}
-		i := strings.LastIndexByte(d, '/')
-		if i < 0 {
-			if d == "." {
-				if _, ok := pkgNames[""]; ok {
-					return ""
-				}
-				return ""
-			}
-			d = "."
-			continue
-		}
-		d = d[:i]
 	}
 }

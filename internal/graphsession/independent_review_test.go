@@ -12,8 +12,7 @@ import (
 )
 
 type reviewContentExt struct {
-	name  string
-	owner bool
+	name string
 }
 
 func (e reviewContentExt) Name() string                { return e.name }

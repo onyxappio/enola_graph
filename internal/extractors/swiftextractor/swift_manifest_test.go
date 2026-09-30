@@ -98,7 +98,10 @@ func TestManifest_GraphTraversal(t *testing.T) {
 	}
 
 	base := "Packages/Mods/Sources"
-	g := facts.NewGraph(allFacts)
+	g, err := facts.NewGraph(allFacts)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Forward from AppShell reaches its transitive dependencies.
 	fwd := g.Traverse(base+"/AppShell", "forward", []string{"imports"}, nil, 0, 0)

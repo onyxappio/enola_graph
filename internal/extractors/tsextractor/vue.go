@@ -248,7 +248,7 @@ func moreSpecificPlainPackage(pkgDirs map[string]bool, nuxt map[string]bool, rel
 		return false
 	}
 	if nuxtRoot != "" {
-		if owner == "" || !(owner == nuxtRoot || strings.HasPrefix(owner, nuxtRoot+"/")) {
+		if owner == "" || (owner != nuxtRoot && !strings.HasPrefix(owner, nuxtRoot+"/")) {
 			// Owner is an ancestor (or unrelated). Nested config may live
 			// inside a plain parent manifest.
 			return false
@@ -503,13 +503,11 @@ func detectNuxtConventionPage(relFile string, knownFiles map[string]bool) *facts
 		return detectNuxtRoute(relFile)
 	}
 	hasConfig := false
-	if knownFiles != nil {
-		for f := range knownFiles {
-			base := filepath.Base(f)
-			if base == "nuxt.config.ts" || base == "nuxt.config.js" || base == "nuxt.config.mjs" {
-				hasConfig = true
-				break
-			}
+	for f := range knownFiles {
+		base := filepath.Base(f)
+		if base == "nuxt.config.ts" || base == "nuxt.config.js" || base == "nuxt.config.mjs" {
+			hasConfig = true
+			break
 		}
 	}
 	if hasConfig {

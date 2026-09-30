@@ -30,7 +30,11 @@ func TestGraphTestSourcesInitialDeltaAndExclusion(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer s.Close()
+	defer func() {
+		if err := s.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	var watermark uint64
 	apply := func(paths ...string) *graphsession.OnlineResult {
 		t.Helper()

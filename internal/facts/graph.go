@@ -35,21 +35,27 @@ type Graph struct {
 	// Relation-kind table. The vocabulary is closed and tiny (the RelXxx constants,
 	// plus anything an extractor invents), so an ID indexes it instead of repeating
 	// the string on all 5.4M edges.
-	relKinds []string
-	relIDs   map[string]uint16
+	relKinds  []string
+	relIDs    map[string]uint16
+	kindNames []string
+	kindIDs   map[string]uint16
 
 	// CSR adjacency over node IDs. fwdOff has len(names)+1 entries; the edges of node
 	// n are the half-open range [fwdOff[n], fwdOff[n+1]) in fwdTgt/fwdRel. Within a
 	// node's range, edges keep the order they were added — traversal output, and so
 	// every golden file, depends on it.
-	fwdOff []uint32
-	fwdTgt []uint32
-	fwdRel []uint16
+	fwdOff        []uint32
+	fwdTgt        []uint32
+	fwdRel        []uint16
+	fwdSourceKind []uint16
+	fwdTargetKind []uint16
 
 	// Reverse adjacency, same layout. revTgt holds the SOURCE of each incoming edge.
-	revOff []uint32
-	revTgt []uint32
-	revRel []uint16
+	revOff        []uint32
+	revTgt        []uint32
+	revRel        []uint16
+	revSourceKind []uint16
+	revTargetKind []uint16
 
 	// Node ID → the indices in facts of every fact declaring that name, also CSR.
 	// Only covers IDs below declaredNodes.
@@ -60,17 +66,19 @@ type Graph struct {
 // noNode marks "this fact declares no name" in the per-fact ID scratch array.
 const noNode = ^uint32(0)
 
-// graphBuilder accumulates edges as three parallel arrays of IDs during construction
-// and lays them out as CSR at the end.
+// graphBuilder accumulates edges as parallel arrays of IDs during construction and
+// lays them out as CSR at the end.
 //
 // Edges are appended in INSERTION ORDER and that order is preserved through to the
 // final layout, because the old map-of-slices appended in the same order and
 // traversal walks it. Dedup keeps the FIRST occurrence for the same reason.
 type graphBuilder struct {
-	g   *Graph
-	src []uint32
-	tgt []uint32
-	rel []uint16
+	g          *Graph
+	src        []uint32
+	tgt        []uint32
+	rel        []uint16
+	sourceKind []uint16
+	targetKind []uint16
 }
 
 // idFor returns the node ID for name, assigning the next one if it is new.
@@ -85,20 +93,40 @@ func (b *graphBuilder) idFor(name string) uint32 {
 }
 
 // relIDFor returns the ID for a relation kind, assigning the next one if it is new.
-func (b *graphBuilder) relIDFor(kind string) uint16 {
+func (b *graphBuilder) relIDFor(kind string) (uint16, error) {
 	if id, ok := b.g.relIDs[kind]; ok {
-		return id
+		return id, nil
+	}
+	if len(b.g.relKinds) > int(^uint16(0)) {
+		return 0, fmt.Errorf("relation-kind ID space exceeds %d distinct kinds", int(^uint16(0))+1)
 	}
 	id := uint16(len(b.g.relKinds))
 	b.g.relIDs[kind] = id
 	b.g.relKinds = append(b.g.relKinds, kind)
-	return id
+	return id, nil
+}
+
+func (b *graphBuilder) kindIDFor(kind string) (uint16, error) {
+	if kind == "" {
+		return 0, nil
+	}
+	if id, ok := b.g.kindIDs[kind]; ok {
+		return id, nil
+	}
+	if len(b.g.kindNames) >= int(^uint16(0)) {
+		return 0, fmt.Errorf("fact-kind ID space exceeds %d distinct kinds", int(^uint16(0)))
+	}
+	id := uint16(len(b.g.kindNames) + 1) // zero means no explicit kind
+	b.g.kindIDs[kind] = id
+	b.g.kindNames = append(b.g.kindNames, kind)
+	return id, nil
 }
 
 // Edge represents a directed relationship between two facts.
 type Edge struct {
-	RelKind string // "imports", "calls", "declares", "implements", "depends_on", "has_method", "handled_by", and domain relations
-	Target  string // target fact name (forward) or source fact name (reverse)
+	RelKind    string // Built-in, FSM, or repository plugin relation kind.
+	Target     string // target fact name (forward) or source fact name (reverse)
+	TargetKind string // explicit target fact kind when the relation is typed
 }
 
 // TraversalResult holds the output of a graph traversal.
@@ -133,9 +161,11 @@ type TraversalNode struct {
 
 // TraversalEdge is an edge traversed during traversal.
 type TraversalEdge struct {
-	Source string `json:"source"`
-	Target string `json:"target"`
-	Kind   string `json:"kind"`
+	Source     string `json:"source"`
+	Target     string `json:"target"`
+	Kind       string `json:"kind"`
+	SourceKind string `json:"source_kind,omitempty"`
+	TargetKind string `json:"target_kind,omitempty"`
 }
 
 // TraversalStats summarizes a traversal.
@@ -203,11 +233,12 @@ type PathResult struct {
 // emitted by an external consumer), the graph normalises the target by stripping known
 // Go module path prefixes (stored in KindModule facts as props["modulePath"]). This
 // allows edges to land on the correct fact in the loaded external repo.
-func NewGraph(ff []Fact) *Graph {
+func NewGraph(ff []Fact) (*Graph, error) {
 	g := &Graph{
-		facts:  ff,
-		ids:    make(map[string]uint32, len(ff)),
-		relIDs: make(map[string]uint16, 16),
+		facts:   ff,
+		ids:     make(map[string]uint32, len(ff)),
+		relIDs:  make(map[string]uint16, 16),
+		kindIDs: make(map[string]uint16, 8),
 	}
 	b := &graphBuilder{g: g}
 
@@ -271,7 +302,9 @@ func NewGraph(ff []Fact) *Graph {
 					}
 				}
 			}
-			b.addEdge(b.srcID(nameID[fi], f.Name), rel.Kind, target)
+			if err := b.addEdge(b.srcID(nameID[fi], f.Name), f.Kind, rel.Kind, target, rel.TargetKind); err != nil {
+				return nil, fmt.Errorf("fact %q relation %q: %w", f.Name, rel.Kind, err)
+			}
 		}
 
 		// For dependency facts with imports, also create module→target edges
@@ -286,7 +319,9 @@ func NewGraph(ff []Fact) *Graph {
 					if rel.Kind == RelImports {
 						target := resolveToModule(rel.Target, moduleNames)
 						if target != "" && target != modName {
-							b.addEdge(b.idFor(modName), RelImports, target)
+							if err := b.addEdge(b.idFor(modName), KindModule, RelImports, target, KindModule); err != nil {
+								return nil, fmt.Errorf("module %q synthetic import: %w", modName, err)
+							}
 						}
 					}
 				}
@@ -311,12 +346,14 @@ func NewGraph(ff []Fact) *Graph {
 			continue
 		}
 		if owner := g.methodOwner(f.Name); owner != "" {
-			b.addEdge(b.idFor(owner), RelHasMethod, f.Name)
+			if err := b.addEdge(b.idFor(owner), KindSymbol, RelHasMethod, f.Name, KindSymbol); err != nil {
+				return nil, fmt.Errorf("method %q synthetic owner edge: %w", f.Name, err)
+			}
 		}
 	}
 
 	b.finish()
-	return g
+	return g, nil
 }
 
 // srcID resolves the source node of a fact's edges. A fact with no name still gets a
@@ -333,10 +370,25 @@ func (b *graphBuilder) srcID(id uint32, name string) uint32 {
 // finish, which is cheaper than the map of concatenated "source\x00kind\x00target"
 // keys this replaced: on the Linux kernel that map held 5.4M freshly built strings,
 // all of them garbage the moment construction ended.
-func (b *graphBuilder) addEdge(src uint32, relKind, target string) {
+func (b *graphBuilder) addEdge(src uint32, sourceKind, relKind, target, targetKind string) error {
+	rel, err := b.relIDFor(relKind)
+	if err != nil {
+		return err
+	}
+	source, err := b.kindIDFor(sourceKind)
+	if err != nil {
+		return err
+	}
+	targetID, err := b.kindIDFor(targetKind)
+	if err != nil {
+		return err
+	}
 	b.src = append(b.src, src)
 	b.tgt = append(b.tgt, b.idFor(target))
-	b.rel = append(b.rel, b.relIDFor(relKind))
+	b.rel = append(b.rel, rel)
+	b.sourceKind = append(b.sourceKind, source)
+	b.targetKind = append(b.targetKind, targetID)
+	return nil
 }
 
 // declares reports whether some fact declares this name — the CSR equivalent of the
@@ -361,13 +413,14 @@ func (b *graphBuilder) finish() {
 				continue // marked as a duplicate by dedup
 			}
 			b.src[w], b.tgt[w], b.rel[w] = b.src[i], b.tgt[i], b.rel[i]
+			b.sourceKind[w], b.targetKind[w] = b.sourceKind[i], b.targetKind[i]
 			w++
 		}
 		b.src, b.tgt, b.rel = b.src[:w], b.tgt[:w], b.rel[:w]
 	}
 
-	g.fwdOff, g.fwdTgt, g.fwdRel = buildCSR(b.src, b.tgt, b.rel, n)
-	g.revOff, g.revTgt, g.revRel = buildCSR(b.tgt, b.src, b.rel, n)
+	g.fwdOff, g.fwdTgt, g.fwdRel, g.fwdSourceKind, g.fwdTargetKind = buildCSR(b.src, b.tgt, b.rel, b.sourceKind, b.targetKind, n)
+	g.revOff, g.revTgt, g.revRel, g.revSourceKind, g.revTargetKind = buildCSR(b.tgt, b.src, b.rel, b.targetKind, b.sourceKind, n)
 }
 
 // dedup marks duplicate (source, relation, target) triples by setting their source to
@@ -385,7 +438,11 @@ func (b *graphBuilder) dedup(n uint32) int {
 
 	off, order := groupBy(b.src, n)
 	dropped := 0
-	var seen map[uint64]struct{}
+	type edgeKey struct {
+		target                           uint32
+		relation, sourceKind, targetKind uint16
+	}
+	var seen map[edgeKey]struct{}
 	for s := uint32(0); s < n; s++ {
 		run := order[off[s]:off[s+1]]
 		if len(run) < 2 {
@@ -399,7 +456,7 @@ func (b *graphBuilder) dedup(n uint32) int {
 					if b.src[run[j]] == noNode {
 						continue // already dropped; not a valid comparison partner
 					}
-					if b.tgt[run[i]] == b.tgt[run[j]] && b.rel[run[i]] == b.rel[run[j]] {
+					if b.tgt[run[i]] == b.tgt[run[j]] && b.rel[run[i]] == b.rel[run[j]] && b.sourceKind[run[i]] == b.sourceKind[run[j]] && b.targetKind[run[i]] == b.targetKind[run[j]] {
 						b.src[run[i]] = noNode
 						dropped++
 						break
@@ -409,12 +466,12 @@ func (b *graphBuilder) dedup(n uint32) int {
 			continue
 		}
 		if seen == nil {
-			seen = make(map[uint64]struct{}, len(run))
+			seen = make(map[edgeKey]struct{}, len(run))
 		} else {
 			clear(seen)
 		}
 		for _, ei := range run {
-			k := uint64(b.tgt[ei])<<16 | uint64(b.rel[ei])
+			k := edgeKey{target: b.tgt[ei], relation: b.rel[ei], sourceKind: b.sourceKind[ei], targetKind: b.targetKind[ei]}
 			if _, dup := seen[k]; dup {
 				b.src[ei] = noNode
 				dropped++
@@ -455,17 +512,22 @@ func groupBy(key []uint32, n uint32) (off, order []uint32) {
 	return off, order
 }
 
-// buildCSR lays out edges keyed by `from`, storing `to` and `rel` in the flat arrays.
-// Forward and reverse adjacency are the same call with the two ends swapped.
-func buildCSR(from, to []uint32, rel []uint16, n uint32) (off, tgt []uint32, kinds []uint16) {
+// buildCSR lays out edges keyed by `from`, storing endpoint, relation and endpoint
+// kind IDs in flat arrays. Forward and reverse adjacency are the same call with the
+// two ends and endpoint kinds swapped.
+func buildCSR(from, to []uint32, rel, sourceKind, targetKind []uint16, n uint32) (off, tgt []uint32, kinds, sourceKinds, targetKinds []uint16) {
 	off, order := groupBy(from, n)
 	tgt = make([]uint32, len(order))
 	kinds = make([]uint16, len(order))
+	sourceKinds = make([]uint16, len(order))
+	targetKinds = make([]uint16, len(order))
 	for i, ei := range order {
 		tgt[i] = to[ei]
 		kinds[i] = rel[ei]
+		sourceKinds[i] = sourceKind[ei]
+		targetKinds[i] = targetKind[ei]
 	}
-	return off, tgt, kinds
+	return off, tgt, kinds, sourceKinds, targetKinds
 }
 
 // lookup resolves a node name to its ID. A name with no node is not in the graph at
@@ -475,18 +537,26 @@ func (g *Graph) lookup(name string) (uint32, bool) {
 	return id, ok
 }
 
-// adjOf returns node id's edges as parallel target/relation-ID slices, sub-slices of
-// the flat CSR arrays. They alias the graph's storage and must not be modified.
-func (g *Graph) adjOf(id uint32, reverse bool) ([]uint32, []uint16) {
-	off, tgt, rel := g.fwdOff, g.fwdTgt, g.fwdRel
+// adjOf returns node id's edges as parallel target/relation/source-kind/target-kind
+// ID slices, sub-slices of the flat CSR arrays. They alias the graph's storage and
+// must not be modified.
+func (g *Graph) adjOf(id uint32, reverse bool) ([]uint32, []uint16, []uint16, []uint16) {
+	off, tgt, rel, sourceKind, targetKind := g.fwdOff, g.fwdTgt, g.fwdRel, g.fwdSourceKind, g.fwdTargetKind
 	if reverse {
-		off, tgt, rel = g.revOff, g.revTgt, g.revRel
+		off, tgt, rel, sourceKind, targetKind = g.revOff, g.revTgt, g.revRel, g.revSourceKind, g.revTargetKind
 	}
 	if id >= uint32(len(off)-1) {
-		return nil, nil
+		return nil, nil, nil, nil
 	}
 	lo, hi := off[id], off[id+1]
-	return tgt[lo:hi], rel[lo:hi]
+	return tgt[lo:hi], rel[lo:hi], sourceKind[lo:hi], targetKind[lo:hi]
+}
+
+func (g *Graph) kindName(id uint16) string {
+	if id == 0 || int(id) > len(g.kindNames) {
+		return ""
+	}
+	return g.kindNames[id-1]
 }
 
 // degreeOf returns how many edges node id has in the given direction, without
@@ -625,12 +695,17 @@ func (g *Graph) traverseFrom(starts []string, direction string, relKinds, nodeKi
 	kindSet := toSet(nodeKinds)
 
 	var result TraversalResult
-	// Keyed by node ID rather than name: same asymptotics, but hashing a uint32
-	// instead of a string, and no key strings retained for the walk's duration.
-	visited := make(map[uint32]struct{})
+	// Keyed by node ID and declared kind rather than name: hashing compact IDs keeps
+	// the walk allocation-light while preserving typed nodes with the same name.
+	type walkNode struct {
+		id   uint32
+		kind uint16
+	}
+	visited := make(map[walkNode]struct{})
 
 	type queueItem struct {
 		id    uint32
+		kind  uint16
 		depth int
 	}
 
@@ -644,10 +719,11 @@ func (g *Graph) traverseFrom(starts []string, direction string, relKinds, nodeKi
 			result.Nodes = append(result.Nodes, TraversalNode{Name: start, Depth: 0, Unresolved: true})
 			continue
 		}
-		if _, seen := visited[id]; seen {
+		key := walkNode{id: id}
+		if _, seen := visited[key]; seen {
 			continue
 		}
-		visited[id] = struct{}{}
+		visited[key] = struct{}{}
 		queue = append(queue, queueItem{id: id, depth: 0})
 		result.Nodes = append(result.Nodes, g.nodeForID(id, 0, ""))
 	}
@@ -664,8 +740,11 @@ func (g *Graph) traverseFrom(starts []string, direction string, relKinds, nodeKi
 			continue
 		}
 
-		tgts, rels := g.adjOf(item.id, reverse)
+		tgts, rels, sourceKinds, targetKinds := g.adjOf(item.id, reverse)
 		for i, tid := range tgts {
+			if item.kind != 0 && sourceKinds[i] != 0 && sourceKinds[i] != item.kind {
+				continue
+			}
 			relID := rels[i]
 			if relSet != nil {
 				if _, ok := relSet[relID]; !ok {
@@ -676,38 +755,50 @@ func (g *Graph) traverseFrom(starts []string, direction string, relKinds, nodeKi
 
 			result.Stats.EdgesTraversed++
 
-			// Record the edge
+			nextKind := targetKinds[i]
+			currentKind := sourceKinds[i]
+			if currentKind == 0 {
+				currentKind = item.kind
+			}
+
+			// Record the edge with endpoint kinds so filtering and serialization
+			// distinguish same-named facts from different domains.
 			if reverse {
 				result.Edges = append(result.Edges, TraversalEdge{
-					Source: g.names[tid],
-					Target: g.names[item.id],
-					Kind:   relKind,
+					Source:     g.names[tid],
+					Target:     g.names[item.id],
+					Kind:       relKind,
+					SourceKind: g.kindName(nextKind),
+					TargetKind: g.kindName(currentKind),
 				})
 			} else {
 				result.Edges = append(result.Edges, TraversalEdge{
-					Source: g.names[item.id],
-					Target: g.names[tid],
-					Kind:   relKind,
+					Source:     g.names[item.id],
+					Target:     g.names[tid],
+					Kind:       relKind,
+					SourceKind: g.kindName(currentKind),
+					TargetKind: g.kindName(nextKind),
 				})
 			}
 
-			if _, seen := visited[tid]; seen {
+			key := walkNode{id: tid, kind: nextKind}
+			if _, seen := visited[key]; seen {
 				continue
 			}
-			visited[tid] = struct{}{}
+			visited[key] = struct{}{}
 
 			newDepth := item.depth + 1
 			if newDepth > maxDepthReached {
 				maxDepthReached = newDepth
 			}
 
-			node := g.nodeForID(tid, newDepth, relKind)
+			node := g.nodeForTypedID(tid, newDepth, relKind, g.kindName(nextKind))
 
 			// Apply node kind filter
 			if kindSet != nil {
 				if _, ok := kindSet[node.Kind]; !ok {
 					// Still traverse through this node but don't include it in results
-					queue = append(queue, queueItem{id: tid, depth: newDepth})
+					queue = append(queue, queueItem{id: tid, kind: nextKind, depth: newDepth})
 					continue
 				}
 			}
@@ -722,12 +813,12 @@ func (g *Graph) traverseFrom(starts []string, direction string, relKinds, nodeKi
 				// are unaffected, so the returned set stays the BFS-order prefix
 				// of an uncapped traversal.
 				truncated = true
-				queue = append(queue, queueItem{id: tid, depth: newDepth})
+				queue = append(queue, queueItem{id: tid, kind: nextKind, depth: newDepth})
 				continue
 			}
 
 			result.Nodes = append(result.Nodes, node)
-			queue = append(queue, queueItem{id: tid, depth: newDepth})
+			queue = append(queue, queueItem{id: tid, kind: nextKind, depth: newDepth})
 		}
 	}
 
@@ -741,13 +832,25 @@ func (g *Graph) traverseFrom(starts []string, direction string, relKinds, nodeKi
 	// (every edge endpoint appears in Nodes). Only needed when something was
 	// excluded; otherwise every visited node is already in Nodes.
 	if truncated || kindSet != nil {
-		inSet := make(map[string]bool, len(result.Nodes))
+		type endpoint struct {
+			name string
+			kind string
+		}
+		inSet := make(map[endpoint]bool, len(result.Nodes))
+		byName := make(map[string]bool, len(result.Nodes))
 		for _, n := range result.Nodes {
-			inSet[n.Name] = true
+			byName[n.Name] = true
+			inSet[endpoint{name: n.Name, kind: n.Kind}] = true
+		}
+		endpointIncluded := func(name, kind string) bool {
+			if kind == "" {
+				return byName[name]
+			}
+			return inSet[endpoint{name: name, kind: kind}]
 		}
 		kept := result.Edges[:0]
 		for _, e := range result.Edges {
-			if inSet[e.Source] && inSet[e.Target] {
+			if endpointIncluded(e.Source, e.SourceKind) && endpointIncluded(e.Target, e.TargetKind) {
 				kept = append(kept, e)
 			}
 		}
@@ -790,19 +893,24 @@ func (g *Graph) FindPath(from, to string, relKinds []string, maxDepth int) PathR
 		return PathResult{From: from, To: to, Found: false}
 	}
 
+	type walkNode struct {
+		id   uint32
+		kind uint16
+	}
 	type queueItem struct {
-		id    uint32
+		node  walkNode
 		depth int
 	}
 
-	visited := make(map[uint32]struct{})
-	parent := make(map[uint32]uint32)    // child → parent
-	parentRel := make(map[uint32]uint16) // child → relation kind of the edge from parent
-
-	visited[fromID] = struct{}{}
-	queue := []queueItem{{id: fromID, depth: 0}}
+	start := walkNode{id: fromID}
+	visited := map[walkNode]struct{}{start: {}}
+	parent := make(map[walkNode]walkNode)
+	parentRel := make(map[walkNode]uint16)
+	parentSourceKind := make(map[walkNode]uint16)
+	queue := []queueItem{{node: start, depth: 0}}
 
 	found := false
+	var target walkNode
 	// Use an index pointer to avoid keeping the full backing array alive.
 	for qi := 0; qi < len(queue) && !found; qi++ {
 		item := queue[qi]
@@ -811,25 +919,31 @@ func (g *Graph) FindPath(from, to string, relKinds []string, maxDepth int) PathR
 			continue
 		}
 
-		tgts, rels := g.adjOf(item.id, false)
+		tgts, rels, sourceKinds, targetKinds := g.adjOf(item.node.id, false)
 		for i, tid := range tgts {
+			if item.node.kind != 0 && sourceKinds[i] != 0 && sourceKinds[i] != item.node.kind {
+				continue
+			}
 			if relSet != nil {
 				if _, ok := relSet[rels[i]]; !ok {
 					continue
 				}
 			}
-			if _, seen := visited[tid]; seen {
+			next := walkNode{id: tid, kind: targetKinds[i]}
+			if _, seen := visited[next]; seen {
 				continue
 			}
-			visited[tid] = struct{}{}
-			parent[tid] = item.id
-			parentRel[tid] = rels[i]
+			visited[next] = struct{}{}
+			parent[next] = item.node
+			parentRel[next] = rels[i]
+			parentSourceKind[next] = sourceKinds[i]
 
 			if tid == toID {
 				found = true
+				target = next
 				break
 			}
-			queue = append(queue, queueItem{id: tid, depth: item.depth + 1})
+			queue = append(queue, queueItem{node: next, depth: item.depth + 1})
 		}
 	}
 
@@ -839,11 +953,11 @@ func (g *Graph) FindPath(from, to string, relKinds []string, maxDepth int) PathR
 	}
 
 	// Reconstruct path
-	var path []uint32
-	for cur := toID; cur != fromID; cur = parent[cur] {
+	var path []walkNode
+	for cur := target; cur != start; cur = parent[cur] {
 		path = append(path, cur)
 	}
-	path = append(path, fromID)
+	path = append(path, start)
 
 	// Reverse to get from → to order
 	for i, j := 0, len(path)-1; i < j; i, j = i+1, j-1 {
@@ -857,15 +971,21 @@ func (g *Graph) FindPath(from, to string, relKinds []string, maxDepth int) PathR
 		if i > 0 {
 			via = g.relName(parentRel[id])
 		}
-		result.Path = append(result.Path, g.nodeForID(id, i, via))
+		result.Path = append(result.Path, g.nodeForTypedID(id.id, i, via, g.kindName(id.kind)))
 	}
 
 	// Reconstruct edges along the path
 	for i := 1; i < len(path); i++ {
+		sourceKind := parentSourceKind[path[i]]
+		if sourceKind == 0 {
+			sourceKind = path[i-1].kind
+		}
 		result.Edges = append(result.Edges, TraversalEdge{
-			Source: g.names[path[i-1]],
-			Target: g.names[path[i]],
-			Kind:   g.relName(parentRel[path[i]]),
+			Source:     g.names[path[i-1].id],
+			Target:     g.names[path[i].id],
+			Kind:       g.relName(parentRel[path[i]]),
+			SourceKind: g.kindName(sourceKind),
+			TargetKind: g.kindName(path[i].kind),
 		})
 	}
 
@@ -913,9 +1033,13 @@ func (g *Graph) ImpactSet(target string, maxDepth, maxNodes int, includeForward 
 	// Bucket nodes by depth (skip depth 0, which holds the target entity's own
 	// seed nodes) and roll up which other repos contain a dependent.
 	targetRepo := g.repoOf(target)
+	seedNames := make(map[string]bool, len(seeds))
+	for _, seed := range seeds {
+		seedNames[seed] = true
+	}
 	repoSet := map[string]bool{}
 	for _, n := range rev.Nodes {
-		if n.Depth > 0 {
+		if n.Depth > 0 && !seedNames[n.Name] {
 			result.ByDepth[n.Depth] = append(result.ByDepth[n.Depth], n)
 			if n.Repo != "" && n.Repo != targetRepo {
 				repoSet[n.Repo] = true
@@ -1191,7 +1315,7 @@ func (g *Graph) impactSeeds(target string) []string {
 
 	// Methods: has_method edges point from the type to each of its methods.
 	if id, ok := g.lookup(target); ok {
-		tgts, rels := g.adjOf(id, false)
+		tgts, rels, _, _ := g.adjOf(id, false)
 		for i, tid := range tgts {
 			if g.relName(rels[i]) == RelHasMethod {
 				seeds = append(seeds, g.names[tid])
@@ -1266,23 +1390,23 @@ func (g *Graph) ReverseFacts(targetName, relKind string) []Fact {
 	if !ok {
 		return nil
 	}
-	srcs, rels := g.adjOf(id, true)
+	srcs, rels, _, targetKinds := g.adjOf(id, true)
 	if len(srcs) == 0 {
 		return nil
 	}
 
 	result := make([]Fact, 0, len(srcs))
-	seen := make(map[uint32]struct{}, len(srcs))
+	seen := make(map[int]struct{}, len(srcs))
 	for i, sid := range srcs {
 		rk := g.relName(rels[i])
 		if relKind != "" && rk != relKind {
 			continue
 		}
-		if _, already := seen[sid]; already {
-			continue
-		}
-		seen[sid] = struct{}{}
-		if idx, ok := g.factIndexForID(sid, rk); ok {
+		if idx, ok := g.factIndexForTypedID(sid, rk, g.kindName(targetKinds[i])); ok {
+			if _, already := seen[idx]; already {
+				continue
+			}
+			seen[idx] = struct{}{}
 			result = append(result, g.facts[idx])
 		}
 	}
@@ -1330,13 +1454,13 @@ func (g *Graph) FanOut(name string) int {
 
 // edgesOf materializes node id's edges in the given direction. Callers hold the lock.
 func (g *Graph) edgesOf(id uint32, reverse bool) []Edge {
-	tgts, rels := g.adjOf(id, reverse)
+	tgts, rels, _, targetKinds := g.adjOf(id, reverse)
 	if len(tgts) == 0 {
 		return nil
 	}
 	out := make([]Edge, len(tgts))
 	for i, tid := range tgts {
-		out[i] = Edge{RelKind: g.relName(rels[i]), Target: g.names[tid]}
+		out[i] = Edge{RelKind: g.relName(rels[i]), Target: g.names[tid], TargetKind: g.kindName(targetKinds[i])}
 	}
 	return out
 }
@@ -1380,13 +1504,13 @@ func (g *Graph) ArchitecturalReverseEdges(name string) []Edge {
 	if !ok {
 		return nil
 	}
-	srcs, rels := g.adjOf(id, true)
+	srcs, rels, _, targetKinds := g.adjOf(id, true)
 	var out []Edge
 	for i, sid := range srcs {
-		if !g.isArchitecturalEdge(sid, rels[i]) {
+		if !g.isArchitecturalEdge(sid, rels[i], g.kindName(targetKinds[i])) {
 			continue
 		}
-		out = append(out, Edge{RelKind: g.relName(rels[i]), Target: g.names[sid]})
+		out = append(out, Edge{RelKind: g.relName(rels[i]), Target: g.names[sid], TargetKind: g.kindName(targetKinds[i])})
 	}
 	return out
 }
@@ -1400,10 +1524,10 @@ func (g *Graph) ArchitecturalFanIn(name string) int {
 	if !ok {
 		return 0
 	}
-	srcs, rels := g.adjOf(id, true)
+	srcs, rels, _, targetKinds := g.adjOf(id, true)
 	n := 0
 	for i, sid := range srcs {
-		if g.isArchitecturalEdge(sid, rels[i]) {
+		if g.isArchitecturalEdge(sid, rels[i], g.kindName(targetKinds[i])) {
 			n++
 		}
 	}
@@ -1435,13 +1559,13 @@ func (g *Graph) ArchitecturalForwardEdges(name string) []Edge {
 	if !ok {
 		return nil
 	}
-	tgts, rels := g.adjOf(id, false)
+	tgts, rels, _, targetKinds := g.adjOf(id, false)
 	var out []Edge
 	for i, tid := range tgts {
 		if !g.isArchitecturalForwardEdge(rels[i]) {
 			continue
 		}
-		out = append(out, Edge{RelKind: g.relName(rels[i]), Target: g.names[tid]})
+		out = append(out, Edge{RelKind: g.relName(rels[i]), Target: g.names[tid], TargetKind: g.kindName(targetKinds[i])})
 	}
 	return out
 }
@@ -1455,7 +1579,7 @@ func (g *Graph) ArchitecturalFanOut(name string) int {
 	if !ok {
 		return 0
 	}
-	_, rels := g.adjOf(id, false)
+	_, rels, _, _ := g.adjOf(id, false)
 	n := 0
 	for _, rel := range rels {
 		if g.isArchitecturalForwardEdge(rel) {
@@ -1473,7 +1597,7 @@ func (g *Graph) isArchitecturalForwardEdge(relID uint16) bool {
 
 // isArchitecturalEdge applies the coupling filter to one incoming edge, given its
 // SOURCE node and relation kind. Callers hold the lock.
-func (g *Graph) isArchitecturalEdge(srcID uint32, relID uint16) bool {
+func (g *Graph) isArchitecturalEdge(srcID uint32, relID uint16, sourceKind string) bool {
 	rk := g.relName(relID)
 	// RelInstantiates keeps ubiquitous DATA structs out of the dead-code report, but
 	// it is not change-risk coupling: a data struct built at many sites is not a god
@@ -1483,7 +1607,7 @@ func (g *Graph) isArchitecturalEdge(srcID uint32, relID uint16) bool {
 	if rk == RelInstantiates || rk == RelImplementedBy {
 		return false
 	}
-	if idx, ok := g.factIndexForID(srcID, rk); ok && isReferenceOnlyKind(g.facts[idx].Kind) {
+	if idx, ok := g.factIndexForTypedID(srcID, rk, sourceKind); ok && isReferenceOnlyKind(g.facts[idx].Kind) {
 		return false
 	}
 	return true
@@ -1545,9 +1669,9 @@ var kindForRel = map[string]string{
 }
 
 // FSMRelationTargetKind returns the declared fact kind expected at the far end
-// of a typed FSM relation. Graph construction and streaming resolution share
-// this mapping so source-name collisions cannot bind an FSM edge to the wrong
-// kind of fact.
+// of a typed FSM relation. Graph construction, streaming resolution, and plugin
+// validation share this mapping so source-name collisions cannot bind an edge
+// to the wrong kind of fact.
 func FSMRelationTargetKind(rel string) (string, bool) {
 	if !strings.HasPrefix(rel, "fsm_") {
 		return "", false
@@ -1596,8 +1720,21 @@ func (g *Graph) factIndexFor(name, viaRel string) (int, bool) {
 // factIndexForID is factIndexFor for a node whose ID is already known — every caller
 // on a traversal path, which reaches nodes by edge rather than by name.
 func (g *Graph) factIndexForID(id uint32, viaRel string) (int, bool) {
+	return g.factIndexForTypedID(id, viaRel, "")
+}
+
+func (g *Graph) factIndexForTypedID(id uint32, viaRel, targetKind string) (int, bool) {
 	idxs := g.factIdxsOf(id)
 	if len(idxs) == 0 {
+		return 0, false
+	}
+	if targetKind != "" {
+		for _, i32 := range idxs {
+			idx := int(i32)
+			if idx < len(g.facts) && g.facts[idx].Kind == targetKind {
+				return idx, true
+			}
+		}
 		return 0, false
 	}
 	if len(idxs) == 1 {
@@ -1661,8 +1798,12 @@ func (g *Graph) nodeFor(name string, depth int, viaRel string) TraversalNode {
 
 // nodeForID is nodeFor for a node reached by edge, where the ID is already in hand.
 func (g *Graph) nodeForID(id uint32, depth int, viaRel string) TraversalNode {
+	return g.nodeForTypedID(id, depth, viaRel, "")
+}
+
+func (g *Graph) nodeForTypedID(id uint32, depth int, viaRel, targetKind string) TraversalNode {
 	node := TraversalNode{Name: g.names[id], Depth: depth}
-	if idx, ok := g.factIndexForID(id, viaRel); ok {
+	if idx, ok := g.factIndexForTypedID(id, viaRel, targetKind); ok {
 		f := g.facts[idx]
 		node.Kind = f.Kind
 		node.File = f.File
@@ -1745,40 +1886,56 @@ func (g *Graph) reachableCount(seeds []string, direction string, maxDepth int) i
 	}
 	reverse := direction == "reverse"
 
-	visited := make(map[uint32]struct{})
+	type walkNode struct {
+		id   uint32
+		kind uint16
+	}
 	type queueItem struct {
 		id    uint32
+		kind  uint16
 		depth int
 	}
+	visited := make(map[walkNode]struct{})
+	seedIDs := make(map[uint32]bool)
+	reachedIDs := make(map[uint32]bool)
 	var queue []queueItem
 	for _, s := range seeds {
 		id, ok := g.lookup(s)
 		if !ok {
 			continue
 		}
-		if _, seen := visited[id]; !seen {
-			visited[id] = struct{}{}
+		key := walkNode{id: id}
+		if _, seen := visited[key]; !seen {
+			visited[key] = struct{}{}
+			seedIDs[id] = true
 			queue = append(queue, queueItem{id: id, depth: 0})
 		}
 	}
-	seedCount := len(visited)
 
 	for qi := 0; qi < len(queue); qi++ {
 		item := queue[qi]
 		if item.depth >= maxDepth {
 			continue
 		}
-		tgts, _ := g.adjOf(item.id, reverse)
-		for _, tid := range tgts {
-			if _, seen := visited[tid]; seen {
+		tgts, _, sourceKinds, targetKinds := g.adjOf(item.id, reverse)
+		for i, tid := range tgts {
+			if item.kind != 0 && sourceKinds[i] != 0 && sourceKinds[i] != item.kind {
 				continue
 			}
-			visited[tid] = struct{}{}
-			queue = append(queue, queueItem{id: tid, depth: item.depth + 1})
+			nextKind := targetKinds[i]
+			key := walkNode{id: tid, kind: nextKind}
+			if _, seen := visited[key]; seen {
+				continue
+			}
+			visited[key] = struct{}{}
+			if !seedIDs[tid] {
+				reachedIDs[tid] = true
+			}
+			queue = append(queue, queueItem{id: tid, kind: nextKind, depth: item.depth + 1})
 		}
 	}
 
-	return len(visited) - seedCount
+	return len(reachedIDs)
 }
 
 // relIDSet maps a relation-kind filter to the IDs the adjacency arrays actually hold,

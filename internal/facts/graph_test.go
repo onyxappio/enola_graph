@@ -1,10 +1,47 @@
 package facts
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
 )
+
+func mustNewGraph(t *testing.T, ff []Fact) *Graph {
+	t.Helper()
+	g, err := NewGraph(ff)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return g
+}
+
+func TestNewGraphRejectsRelationAndFactKindIDOverflow(t *testing.T) {
+	t.Run("relation kinds", func(t *testing.T) {
+		relations := make([]Relation, int(^uint16(0))+2)
+		for i := range relations {
+			relations[i] = Relation{Kind: fmt.Sprintf("relation:%d", i), Target: "target"}
+		}
+		store := NewStore()
+		store.Add(Fact{Kind: KindSymbol, Name: "source", Relations: relations})
+		if err := store.BuildGraph(); err == nil || !strings.Contains(err.Error(), "relation-kind ID space") {
+			t.Fatalf("BuildGraph error = %v, want relation-kind ID overflow", err)
+		}
+		if store.Graph() != nil {
+			t.Fatal("failed BuildGraph left a partial graph available")
+		}
+	})
+
+	t.Run("fact kinds", func(t *testing.T) {
+		relations := make([]Relation, int(^uint16(0))+1)
+		for i := range relations {
+			relations[i] = Relation{Kind: "related", Target: "target", TargetKind: fmt.Sprintf("kind:%d", i)}
+		}
+		if _, err := NewGraph([]Fact{{Kind: KindSymbol, Name: "source", Relations: relations}}); err == nil || !strings.Contains(err.Error(), "fact-kind ID space") {
+			t.Fatalf("NewGraph error = %v, want fact-kind ID overflow", err)
+		}
+	})
+}
 
 // buildTestGraph creates a graph from a set of facts for testing.
 // The topology is:
@@ -32,7 +69,9 @@ func buildTestGraph() (*Graph, *Store) {
 		}},
 		Fact{Kind: KindSymbol, Name: "F", File: "f.go", Line: 50}, // disconnected
 	)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		panic(err)
+	}
 	return s.Graph(), s
 }
 
@@ -50,7 +89,9 @@ func buildCyclicGraph() (*Graph, *Store) {
 			{Kind: RelImports, Target: "A"},
 		}},
 	)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		panic(err)
+	}
 	return s.Graph(), s
 }
 
@@ -177,7 +218,9 @@ func buildChainGraph(n int) *Graph {
 		}
 		s.Add(f)
 	}
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		panic(err)
+	}
 	return s.Graph()
 }
 
@@ -267,7 +310,9 @@ func TestTraverse_MaxNodesPrefixWithBranching(t *testing.T) {
 		Fact{Kind: KindSymbol, Name: "C1", File: "c1.go"},
 		Fact{Kind: KindSymbol, Name: "C2", File: "c2.go"},
 	)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	g := s.Graph()
 
 	full := g.Traverse("R", "forward", nil, nil, 5, 500)
@@ -623,7 +668,9 @@ func TestBuildGraph_ViaStore(t *testing.T) {
 		t.Error("Graph should be nil before BuildGraph")
 	}
 
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 
 	g := s.Graph()
 	if g == nil {
@@ -640,7 +687,9 @@ func TestBuildGraph_ViaStore(t *testing.T) {
 func TestBuildGraph_ClearedByStoreClear(t *testing.T) {
 	s := NewStore()
 	s.Add(Fact{Kind: KindSymbol, Name: "X", File: "x.go"})
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	if s.Graph() == nil {
 		t.Fatal("Graph should exist after BuildGraph")
 	}
@@ -710,6 +759,139 @@ func TestFindPath_EdgesHaveCorrectKinds(t *testing.T) {
 	}
 }
 
+func TestGraphSupportsPluginTypedRelations(t *testing.T) {
+	s := NewStore()
+	s.Add(
+		Fact{Kind: "task", Name: "series/T-1", File: "tasks/T-1.md", Relations: []Relation{{Kind: "depends_on", Target: "series/T-2", TargetKind: "task"}}},
+		Fact{Kind: "feedback", Name: "series/T-2", File: "feedback/F-1.md"},
+		Fact{Kind: "task", Name: "series/T-2", File: "tasks/T-2.md"},
+	)
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
+	g := s.Graph()
+
+	edges := g.ForwardEdges("series/T-1")
+	if len(edges) != 1 || edges[0].TargetKind != "task" {
+		t.Fatalf("typed forward edge = %#v, want one edge targeting kind task", edges)
+	}
+	traversal := g.Traverse("series/T-1", "forward", []string{"depends_on"}, []string{"task"}, 1, 10)
+	if len(traversal.Nodes) < 2 || traversal.Nodes[1].Kind != "task" {
+		t.Fatalf("typed traversal = %#v, want task target among same-named facts", traversal.Nodes)
+	}
+	path := g.FindPath("series/T-1", "series/T-2", []string{"depends_on"}, 1)
+	if !path.Found || len(path.Edges) != 1 {
+		t.Fatalf("typed FindPath = %#v, want one-edge task path", path)
+	}
+	if got := path.Edges[0]; got.SourceKind != "task" || got.TargetKind != "task" {
+		t.Fatalf("typed FindPath edge = %#v, want task source and target kinds", got)
+	}
+
+	written := s.All()
+	var source Fact
+	for _, fact := range written {
+		if fact.Name == "series/T-1" {
+			source = fact
+			break
+		}
+	}
+	if len(source.Relations) != 1 || source.Relations[0].TargetKind != "task" {
+		t.Fatalf("stored relation = %#v, want target kind preserved", source.Relations)
+	}
+}
+
+func TestFindPathReportsDifferentTypedEndpointKinds(t *testing.T) {
+	g := mustNewGraph(t, []Fact{
+		{Kind: "feedback", Name: "sample/F-1", Relations: []Relation{{Kind: "related", Target: "sample/T-2", TargetKind: "task"}}},
+		{Kind: "task", Name: "sample/T-2"},
+	})
+	path := g.FindPath("sample/F-1", "sample/T-2", []string{"related"}, 1)
+	if !path.Found || len(path.Edges) != 1 {
+		t.Fatalf("typed path = %#v, want one edge from feedback to task", path)
+	}
+	if got := path.Edges[0]; got.SourceKind != "feedback" || got.TargetKind != "task" {
+		t.Fatalf("typed path edge = %#v, want feedback source and task target", got)
+	}
+}
+
+func TestReverseFactsKeepsTypedSourcesWithSameName(t *testing.T) {
+	s := NewStore()
+	s.Add(
+		Fact{Kind: "task", Name: "shared", Relations: []Relation{{Kind: "related", Target: "target", TargetKind: "record"}}},
+		Fact{Kind: "feedback", Name: "shared", Relations: []Relation{{Kind: "related", Target: "target", TargetKind: "record"}}},
+		Fact{Kind: "record", Name: "target"},
+	)
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
+
+	got := s.Graph().ReverseFacts("target", "related")
+	if len(got) != 2 || got[0].Kind == got[1].Kind {
+		t.Fatalf("ReverseFacts = %#v, want both typed source facts with the same name", got)
+	}
+}
+
+func TestGraphDoesNotResolveExplicitRelationToWrongFactKind(t *testing.T) {
+	g := mustNewGraph(t, []Fact{
+		{Kind: "task", Name: "from", Relations: []Relation{{Kind: "depends_on", Target: "target", TargetKind: "task"}}},
+		{Kind: "feedback", Name: "target"},
+	})
+	traversal := g.Traverse("from", "forward", []string{"depends_on"}, nil, 1, 10)
+	if len(traversal.Nodes) < 2 || !traversal.Nodes[1].Unresolved || traversal.Nodes[1].Kind != "" {
+		t.Fatalf("explicit task relation resolved to a feedback fact: %#v", traversal.Nodes)
+	}
+}
+
+func TestTypedTraversalDoesNotMixOutgoingEdgesForSameNamedKinds(t *testing.T) {
+	g := mustNewGraph(t, []Fact{
+		{Kind: "root", Name: "start", Relations: []Relation{{Kind: "links", Target: "shared", TargetKind: "task"}}},
+		{Kind: "task", Name: "shared", Relations: []Relation{{Kind: "links", Target: "task-child", TargetKind: "task"}}},
+		{Kind: "feedback", Name: "shared", Relations: []Relation{{Kind: "links", Target: "feedback-child", TargetKind: "feedback"}}},
+		{Kind: "task", Name: "task-child"},
+		{Kind: "feedback", Name: "feedback-child"},
+	})
+
+	traversal := g.Traverse("start", "forward", []string{"links"}, nil, 3, 10)
+	got := map[string]string{}
+	for _, node := range traversal.Nodes {
+		got[node.Name] = node.Kind
+	}
+	if got["shared"] != "task" || got["task-child"] != "task" {
+		t.Fatalf("typed traversal omitted task branch: %#v", traversal.Nodes)
+	}
+	if _, leaked := got["feedback-child"]; leaked {
+		t.Fatalf("typed traversal followed another kind's same-name node: %#v", traversal.Nodes)
+	}
+	if path := g.FindPath("start", "feedback-child", []string{"links"}, 3); path.Found {
+		t.Fatalf("typed FindPath crossed into feedback branch: %#v", path.Path)
+	}
+	if count := g.reachableCount([]string{"start"}, "forward", 3); count != 2 {
+		t.Fatalf("typed reachable count = %d, want task branch's 2 nodes", count)
+	}
+}
+
+func TestTraverseNodeKindFilterDropsEdgesFromSameNamedExcludedKind(t *testing.T) {
+	g := mustNewGraph(t, []Fact{
+		{Kind: "root", Name: "start", Relations: []Relation{
+			{Kind: "links", Target: "shared", TargetKind: "task"},
+			{Kind: "links", Target: "shared", TargetKind: "feedback"},
+		}},
+		{Kind: "task", Name: "shared", Relations: []Relation{{Kind: "links", Target: "child", TargetKind: "task"}}},
+		{Kind: "feedback", Name: "shared", Relations: []Relation{{Kind: "links", Target: "child", TargetKind: "task"}}},
+		{Kind: "task", Name: "child"},
+	})
+
+	result := g.Traverse("start", "forward", []string{"links"}, []string{"task"}, 3, 10)
+	if len(result.Nodes) != 3 {
+		t.Fatalf("task-filtered nodes = %#v, want start, task/shared and task/child", result.Nodes)
+	}
+	for _, edge := range result.Edges {
+		if edge.Source == "shared" && edge.SourceKind != "task" {
+			t.Fatalf("node-kind filtering retained an edge from the excluded same-name kind: %#v", edge)
+		}
+	}
+}
+
 func TestNewGraph_DeduplicatesEdges(t *testing.T) {
 	s := NewStore()
 	// Two facts with identical relations (same source->kind->target).
@@ -731,7 +913,9 @@ func TestNewGraph_DeduplicatesEdges(t *testing.T) {
 		}},
 		Fact{Kind: KindModule, Name: "B", File: "b.rb"},
 	)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	g := s.Graph()
 
 	// dep1->User and dep2->User are distinct source nodes, so both edges exist.
@@ -821,7 +1005,7 @@ func TestNewGraph_CrossRepoCallNormalisation(t *testing.T) {
 		},
 	}
 
-	g := NewGraph(facts)
+	g := mustNewGraph(t, facts)
 
 	// The forward edge from golf's LoginWrapper.Login should point to the
 	// normalised fact name "adapters.AuthHandler.Login", not the full import path.
@@ -879,7 +1063,9 @@ func buildTypeMethodStore() (*Graph, *Store) {
 		Fact{Kind: KindSymbol, Name: "jwt.Sign", File: "jwt/jwt.go", Line: 5,
 			Props: map[string]any{"symbol_kind": SymbolFunc}},
 	)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		panic(err)
+	}
 	return s.Graph(), s
 }
 
@@ -949,7 +1135,9 @@ func buildRubyMethodStore() *Graph {
 		Fact{Kind: KindSymbol, Name: "lib/tasks.reindex", File: "lib/tasks/reindex.rb", Line: 1,
 			Props: ruby(SymbolMethod)},
 	)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		panic(err)
+	}
 	return s.Graph()
 }
 
@@ -1018,7 +1206,9 @@ func TestNewGraph_HashSeparatorWinsOverDot(t *testing.T) {
 		Fact{Kind: KindSymbol, Name: "Reports.Weekly#render", File: "reports.rb", Line: 9,
 			Props: map[string]any{"symbol_kind": SymbolMethod}},
 	)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	g := s.Graph()
 
 	if got := ownedBy(g, "Reports.Weekly#render"); len(got) != 1 || got[0] != "Reports.Weekly" {
@@ -1074,7 +1264,9 @@ func buildCrossRepoTypeStore() (*Graph, *Store) {
 				{Kind: RelCalls, Target: "adapters.AuthHandler.Login"},
 			}},
 	)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		panic(err)
+	}
 	return s.Graph(), s
 }
 
@@ -1189,7 +1381,9 @@ func TestArchitecturalReverse_ExcludesReferenceKinds(t *testing.T) {
 			{Kind: RelCalls, Target: "Prod"},
 		}},
 	)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	g := s.Graph()
 
 	// Unfiltered: all three sources (symbol + test_ref + file_ref) are dependents.
@@ -1235,7 +1429,9 @@ func TestArchitecturalReverse_ExcludesRouteSources(t *testing.T) {
 		Relations: []Relation{{Kind: RelCalls, Target: "http/plan.HandlerV2.UpdatePlan"}}})
 	s.Add(Fact{Kind: KindRoute, Name: "/plans/{id}", File: "bootstrap/routes.go",
 		Relations: []Relation{{Kind: RelHandledBy, Target: "http/plan.HandlerV2.UpdatePlan"}}})
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	g := s.Graph()
 
 	// The architectural view counts the one real symbol caller, not the route.
@@ -1266,7 +1462,9 @@ func TestArchitecturalReverse_ExcludesInstantiate(t *testing.T) {
 		Relations: []Relation{{Kind: RelInstantiates, Target: "pkg.Data"}}})
 	s.Add(Fact{Kind: KindSymbol, Name: "pkg.call", File: "pkg/call.go",
 		Relations: []Relation{{Kind: RelCalls, Target: "pkg.Data"}}})
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	g := s.Graph()
 
 	hasSrc := func(edges []Edge, src string) bool {
@@ -1321,7 +1519,9 @@ func TestArchitecturalForwardEdges_ExcludeOwnedMethods(t *testing.T) {
 		Fact{Kind: KindSymbol, Name: "Runner.run", File: "app/runner.rb",
 			Props: map[string]any{"symbol_kind": SymbolFunc}},
 	)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	g := s.Graph()
 
 	if got, want := g.FanOut("Batch"), 3; got != want {
@@ -1347,7 +1547,9 @@ func TestArchitecturalReverse_ExcludesImplementedBy(t *testing.T) {
 	s.Add(Fact{Kind: KindSymbol, Name: "pkg.Publish"})
 	s.Add(Fact{Kind: KindStorage, Name: "orders.a", Relations: []Relation{{Kind: RelImplementedBy, Target: "pkg.Publish"}}})
 	s.Add(Fact{Kind: KindStorage, Name: "orders.b", Relations: []Relation{{Kind: RelImplementedBy, Target: "pkg.Publish"}}})
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	if got := s.Graph().ArchitecturalFanIn("pkg.Publish"); got != 0 {
 		t.Fatalf("implemented_by edges fabricated fan-in: got %d, want 0", got)
 	}
@@ -1380,7 +1582,9 @@ func buildCollisionGraph() *Graph {
 		}},
 		Fact{Kind: KindService, Name: "db"},
 	)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		panic(err)
+	}
 	return s.Graph()
 }
 
@@ -1509,7 +1713,7 @@ func TestImpactSet_GoverningIntent(t *testing.T) {
 		{Kind: KindIntent, Repo: "wiki", File: "wiki/prds/jobs.md", Name: "anchor: backend app/jobs",
 			Props: map[string]any{"intent_kind": "anchor", "intent_owner": "backend", "path": "app/jobs", "source": "wiki/prds/jobs.md"}},
 	}
-	g := NewGraph(ff)
+	g := mustNewGraph(t, ff)
 
 	got := g.ImpactSet("Formatter", 3, 100, false)
 	if len(got.GoverningIntent) != 1 || got.GoverningIntent[0].Page != "wiki/adrs/fmt.md" {
@@ -1554,7 +1758,7 @@ func TestGoverningIntent_RelationTrail(t *testing.T) {
 		{Kind: KindIntent, Repo: "wiki", File: "wiki/epics/text.md", Name: "page: wiki/epics/text.md",
 			Props: map[string]any{"intent_kind": "page", "page_type": "epic", "status": "living"}},
 	}
-	g := NewGraph(ff)
+	g := mustNewGraph(t, ff)
 
 	got := g.GoverningIntent("Formatter")
 	if len(got) != 1 || len(got[0].Relations) != 2 {
@@ -1577,7 +1781,7 @@ func TestGoverningIntentForFile(t *testing.T) {
 		{Kind: KindIntent, Repo: "wiki", File: "wiki/prds/jobs.md", Name: "anchor: backend app/jobs",
 			Props: map[string]any{"intent_kind": "anchor", "intent_owner": "backend", "path": "app/jobs", "source": "wiki/prds/jobs.md"}},
 	}
-	g := NewGraph(ff)
+	g := mustNewGraph(t, ff)
 
 	for _, file := range []string{"app/jobs/sync_job.rb", "backend/app/jobs/sync_job.rb"} {
 		got := g.GoverningIntentForFile("backend", file)
@@ -1605,7 +1809,7 @@ func TestGovernedByPage(t *testing.T) {
 		{Kind: KindIntent, Repo: "wiki", File: "wiki/prds/jobs.md", Name: "anchor: backend docs/jobs.md",
 			Props: map[string]any{"intent_kind": "anchor", "intent_owner": "backend", "path": "docs/jobs.md", "source": "wiki/prds/jobs.md"}},
 	}
-	g := NewGraph(ff)
+	g := mustNewGraph(t, ff)
 
 	for _, page := range []string{"wiki/prds/jobs.md", "prds/jobs.md"} {
 		cov, found := g.GovernedByPage(page)
@@ -1625,7 +1829,7 @@ func TestGovernedByPage(t *testing.T) {
 	if !g.HasCompiledPages() {
 		t.Fatal("a graph with a page node must report compiled pages")
 	}
-	if NewGraph([]Fact{{Kind: KindSymbol, Repo: "backend", File: "a.rb", Name: "A"}}).HasCompiledPages() {
+	if mustNewGraph(t, []Fact{{Kind: KindSymbol, Repo: "backend", File: "a.rb", Name: "A"}}).HasCompiledPages() {
 		t.Fatal("a graph without page nodes must not report compiled pages")
 	}
 }
@@ -1639,7 +1843,9 @@ func TestNodeFor_FSMRelationsResolveTheirTypedTargets(t *testing.T) {
 		// A same-named symbol must not steal an FSM-state relationship target.
 		Fact{Kind: KindSymbol, Name: "jobs/state:Done", File: "collision.ts", Props: map[string]any{"symbol_kind": SymbolType}},
 	)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		t.Fatal(err)
+	}
 	node := s.Graph().nodeFor("jobs/state:Done", 1, RelFSMTo)
 	if node.Kind != KindFSMState {
 		t.Fatalf("fsm_to resolved target kind %q, want %q", node.Kind, KindFSMState)

@@ -209,7 +209,10 @@ final class HomeBuilder {
 		t.Fatalf("expected AppComposition symbol fact; facts=%v", factNames(allFacts))
 	}
 
-	g := facts.NewGraph(allFacts)
+	g, err := facts.NewGraph(allFacts)
+	if err != nil {
+		t.Fatal(err)
+	}
 	impact := g.ImpactSet("App.AppComposition", 0, 0, false)
 
 	deps := impact.ByDepth[1]

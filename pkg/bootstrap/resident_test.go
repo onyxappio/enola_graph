@@ -29,12 +29,18 @@ func TestDefaultBuiltinResidentTSContentScope(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, err = r.ApplyChanges(context.Background(), graphsession.ChangeBatch{Epoch: "default", Covered: true}); err != nil {
 		t.Fatal(err)
 	}
 	for i, body := range []string{"export function a(){return fetch('/a')}", "export function renamed(){return 1}", "export function a(){return 1}"} {
-		os.WriteFile(filepath.Join(root, "a.ts"), []byte(body), 0644)
+		if err := os.WriteFile(filepath.Join(root, "a.ts"), []byte(body), 0644); err != nil {
+			t.Errorf("operation failed: %v", err)
+		}
 		res, err := r.ApplyChanges(context.Background(), graphsession.ChangeBatch{Epoch: "default", From: uint64(i), Through: uint64(i + 1), Covered: true, Paths: []string{"a.ts"}})
 		if err != nil {
 			t.Fatal(err)

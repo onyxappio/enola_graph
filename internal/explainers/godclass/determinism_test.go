@@ -55,7 +55,9 @@ func ringGraph(n, mod, hubExtra int) []facts.Fact {
 func storeInOrder(symbols []facts.Fact) *facts.Store {
 	s := facts.NewStore()
 	s.Add(symbols...)
-	s.BuildGraph()
+	if err := s.BuildGraph(); err != nil {
+		panic(err)
+	}
 	return s
 }
 

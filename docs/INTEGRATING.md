@@ -111,8 +111,10 @@ time, duration, and the absolute repository path.
 
 ## 4. Load facts
 
-`facts.jsonl` contains one JSON object per line. Current writers add a 32-character
-fact `id` derived from `(repo, kind, name, file)`.
+`facts.jsonl` contains one JSON object per line. Ordinary facts use a 32-character
+fact `id` derived from `(repo, kind, name, file)`. Generic repository-plugin kinds
+in the reserved `plugin:` namespace use `(repo, kind, name)` and exclude the owner
+file, so moving the entity between files preserves its identity.
 
 Use `id` as the materialized node identity, but do not require each JSONL record
 to have a unique ID. Multiple records can share an ID. When materializing one
@@ -127,7 +129,8 @@ node per ID:
 If raw-record fidelity matters, store the JSONL records separately from the
 materialized nodes.
 
-Fact IDs are stable only while all four identity inputs remain stable. In
+Ordinary fact IDs remain stable while all four identity inputs remain stable;
+plugin fact IDs remain stable while `repo`, `kind`, and `name` remain stable. In
 particular, `repo` normally comes from the Git remote's repository name but
 falls back to the checkout directory name when no usable remote exists. Two
 remote-less checkouts under different directory names therefore produce
@@ -145,11 +148,13 @@ Each relation contains a readable target name and may contain a resolved ID:
 {
   "kind": "declares",
   "target": "api",
+  "target_kind": "module",
   "target_id": "b40cc8199deadc4199623e0a6a8c64b1"
 }
 ```
 
-Use `target_id` when present. Current writers resolve it as follows:
+Use `target_id` when present. When `target_kind` is present, it narrows the
+matching facts before current writers resolve the ID as follows:
 
 1. Prefer facts named `target` in the source fact's repository.
 2. Emit an ID when all matching local facts have the same identity.

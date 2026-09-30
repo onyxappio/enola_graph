@@ -399,7 +399,7 @@ func (j *Journal) readLog(name string) (lines [][]byte, validEnd int64, torn, ne
 		if got != m.CRC64 {
 			return nil, 0, false, false, 0, fmt.Errorf("graphstream journal %s: committed checksum mismatch", name)
 		}
-		lines, validEnd, torn, needNL, err = splitJournalLines(name, prefix, true)
+		lines, _, torn, needNL, err = splitJournalLines(name, prefix, true)
 		if err != nil {
 			return nil, 0, false, false, 0, err
 		}
@@ -562,7 +562,7 @@ func syncDir(dir string) error {
 	if err != nil {
 		return err
 	}
-	defer d.Close()
+	defer func() { _ = d.Close() }() // Read-only handle; Sync below reports durability failures.
 	return d.Sync()
 }
 
@@ -644,16 +644,16 @@ func (j *Journal) openOneLocked(name string, f **os.File, w **bufio.Writer, vali
 	}
 	fi, err := fh.Stat()
 	if err != nil {
-		fh.Close()
+		_ = fh.Close() // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if torn && fi.Size() > valid {
 		if err := fh.Truncate(valid); err != nil {
-			fh.Close()
+			_ = fh.Close() // Preserve the primary operation error; cleanup is best effort.
 			return err
 		}
 		if err := fh.Sync(); err != nil {
-			fh.Close()
+			_ = fh.Close() // Preserve the primary operation error; cleanup is best effort.
 			return err
 		}
 		*tornOut = false
@@ -662,12 +662,12 @@ func (j *Journal) openOneLocked(name string, f **os.File, w **bufio.Writer, vali
 		*validOut = fi.Size()
 	}
 	if _, err := fh.Seek(0, io.SeekEnd); err != nil {
-		fh.Close()
+		_ = fh.Close() // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if needNL {
 		if _, err := fh.Write([]byte{'\n'}); err != nil {
-			fh.Close()
+			_ = fh.Close() // Preserve the primary operation error; cleanup is best effort.
 			return err
 		}
 		*crc = crc64.Update(*crc, journalCRC, []byte{'\n'})
@@ -899,20 +899,20 @@ func (j *Journal) writeCommitNamedLocked(name string) error {
 	}
 	tf, err := os.Open(tmp)
 	if err != nil {
-		os.Remove(tmp)
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if err := tf.Sync(); err != nil {
-		tf.Close()
-		os.Remove(tmp)
+		_ = tf.Close()     // Preserve the primary operation error; cleanup is best effort.
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if err := tf.Close(); err != nil {
-		os.Remove(tmp)
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if err := os.Rename(tmp, path); err != nil {
-		os.Remove(tmp)
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if err := syncDir(j.dir); err != nil {
@@ -972,10 +972,6 @@ func (j *Journal) boundLocked() int64 {
 		return defaultJournalMaxBytes
 	}
 	return j.maxBytes
-}
-
-func (j *Journal) peakBoundLocked() int64 {
-	return 2 * j.boundLocked()
 }
 
 // SyncCount is the number of completed group fsyncs of journal files.
@@ -1067,15 +1063,6 @@ func (j *Journal) completedLocked(msgID, subject string, payload []byte) error {
 		}
 	}
 	return errNotFound
-}
-
-func (j *Journal) checkIdentity(msgID, subject string, payload []byte) error {
-	if j == nil {
-		return errNotFound
-	}
-	j.mu.Lock()
-	defer j.mu.Unlock()
-	return j.completedLocked(msgID, subject, payload)
 }
 
 // asyncAdmit is used by the commit worker. skip means the identity is already
@@ -1519,15 +1506,15 @@ func (j *Journal) rewrite(name string, keep []string, byID map[string]*JournalEn
 		e := byID[id]
 		b, err := json.Marshal(payloadLine{MsgID: e.MsgID, Subject: e.Subject, Payload: e.Payload})
 		if err != nil {
-			f.Close()
-			os.Remove(tmp)
+			_ = f.Close()      // Preserve the primary operation error; cleanup is best effort.
+			_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 			return err
 		}
 		j.lineScratch = append(j.lineScratch[:0], b...)
 		j.lineScratch = append(j.lineScratch, '\n')
 		if _, err := w.Write(j.lineScratch); err != nil {
-			f.Close()
-			os.Remove(tmp)
+			_ = f.Close()      // Preserve the primary operation error; cleanup is best effort.
+			_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 			return err
 		}
 		crc = crc64.Update(crc, journalCRC, j.lineScratch)
@@ -1536,17 +1523,17 @@ func (j *Journal) rewrite(name string, keep []string, byID map[string]*JournalEn
 		e.lineN = n
 	}
 	if err := w.Flush(); err != nil {
-		f.Close()
-		os.Remove(tmp)
+		_ = f.Close()      // Preserve the primary operation error; cleanup is best effort.
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if err := f.Sync(); err != nil {
-		f.Close()
-		os.Remove(tmp)
+		_ = f.Close()      // Preserve the primary operation error; cleanup is best effort.
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if err := f.Close(); err != nil {
-		os.Remove(tmp)
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	j.payloadValid = written
@@ -1556,7 +1543,7 @@ func (j *Journal) rewrite(name string, keep []string, byID map[string]*JournalEn
 		return nil
 	}
 	if err := os.Rename(tmp, path); err != nil {
-		os.Remove(tmp)
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if err := syncDir(j.dir); err != nil {
@@ -1583,32 +1570,32 @@ func (j *Journal) rewriteAcks(keep []string, byID map[string]*JournalEntry, inst
 		}
 		b, err := json.Marshal(ackLine{MsgID: e.MsgID})
 		if err != nil {
-			f.Close()
-			os.Remove(tmp)
+			_ = f.Close()      // Preserve the primary operation error; cleanup is best effort.
+			_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 			return err
 		}
 		j.lineScratch = append(j.lineScratch[:0], b...)
 		j.lineScratch = append(j.lineScratch, '\n')
 		if _, err := w.Write(j.lineScratch); err != nil {
-			f.Close()
-			os.Remove(tmp)
+			_ = f.Close()      // Preserve the primary operation error; cleanup is best effort.
+			_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 			return err
 		}
 		crc = crc64.Update(crc, journalCRC, j.lineScratch)
 		written += int64(len(b) + 1)
 	}
 	if err := w.Flush(); err != nil {
-		f.Close()
-		os.Remove(tmp)
+		_ = f.Close()      // Preserve the primary operation error; cleanup is best effort.
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if err := f.Sync(); err != nil {
-		f.Close()
-		os.Remove(tmp)
+		_ = f.Close()      // Preserve the primary operation error; cleanup is best effort.
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if err := f.Close(); err != nil {
-		os.Remove(tmp)
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	j.ackValid = written
@@ -1618,7 +1605,7 @@ func (j *Journal) rewriteAcks(keep []string, byID map[string]*JournalEntry, inst
 		return nil
 	}
 	if err := os.Rename(tmp, path); err != nil {
-		os.Remove(tmp)
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if err := syncDir(j.dir); err != nil {
@@ -1636,12 +1623,12 @@ func (j *Journal) writeEmptyAcksTmp() error {
 		return err
 	}
 	if err := f.Sync(); err != nil {
-		f.Close()
-		os.Remove(tmp)
+		_ = f.Close()      // Preserve the primary operation error; cleanup is best effort.
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if err := f.Close(); err != nil {
-		os.Remove(tmp)
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	j.ackValid = 0
@@ -1691,15 +1678,15 @@ func (j *Journal) rewriteTombsLocked(install bool) error {
 		}
 		b, err := json.Marshal(ts)
 		if err != nil {
-			f.Close()
-			os.Remove(tmp)
+			_ = f.Close()      // Preserve the primary operation error; cleanup is best effort.
+			_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 			return err
 		}
 		j.lineScratch = append(j.lineScratch[:0], b...)
 		j.lineScratch = append(j.lineScratch, '\n')
 		if _, err := w.Write(j.lineScratch); err != nil {
-			f.Close()
-			os.Remove(tmp)
+			_ = f.Close()      // Preserve the primary operation error; cleanup is best effort.
+			_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 			return err
 		}
 		crc = crc64.Update(crc, journalCRC, j.lineScratch)
@@ -1707,17 +1694,17 @@ func (j *Journal) rewriteTombsLocked(install bool) error {
 		next[id] = ts
 	}
 	if err := w.Flush(); err != nil {
-		f.Close()
-		os.Remove(tmp)
+		_ = f.Close()      // Preserve the primary operation error; cleanup is best effort.
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if err := f.Sync(); err != nil {
-		f.Close()
-		os.Remove(tmp)
+		_ = f.Close()      // Preserve the primary operation error; cleanup is best effort.
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if err := f.Close(); err != nil {
-		os.Remove(tmp)
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	_ = os.Remove(filepath.Join(j.dir, "idents.bin"))
@@ -1738,7 +1725,7 @@ func (j *Journal) rewriteTombsLocked(install bool) error {
 		return nil
 	}
 	if err := os.Rename(tmp, path); err != nil {
-		os.Remove(tmp)
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if err := syncDir(j.dir); err != nil {

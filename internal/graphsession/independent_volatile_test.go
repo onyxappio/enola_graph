@@ -55,7 +55,11 @@ func TestIndependentUnsyncedAdmissionCannotPromote(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer j.Close()
+	defer func() {
+		if err := j.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if j.HasAckedEnd("new") {
 		t.Fatal("lost volatile End invented durable ack")
 	}

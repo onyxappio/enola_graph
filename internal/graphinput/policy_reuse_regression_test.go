@@ -138,7 +138,11 @@ func TestReusableOverRefusesEveryMoveTheBuildWouldSee(t *testing.T) {
 				if err := os.Chmod(sub, 0o000); err != nil {
 					t.Fatal(err)
 				}
-				t.Cleanup(func() { os.Chmod(sub, 0o755) })
+				t.Cleanup(func() {
+					if err := os.Chmod(sub, 0o755); err != nil {
+						t.Errorf("operation failed: %v", err)
+					}
+				})
 			},
 			reuse: false,
 		},

@@ -20,12 +20,20 @@ func TestIndependentResidentDiscoveryRetargetSequence(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	q := NewChangeQueue("independent-discovery", 32)
 	if err = q.Start(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	defer q.Close()
+	defer func() {
+		if err := q.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	cons := NewConsumer()
 	apply := func(t *testing.T) {
 		t.Helper()

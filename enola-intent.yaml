@@ -58,6 +58,7 @@ layers:
       - "internal/engine/**"
       - "internal/config/**"
       - "internal/graphsession/**"
+      - "internal/analyzerplugin/**"
   - name: analysis
     paths:
       - "internal/extractors/**"
@@ -105,6 +106,7 @@ layers:
       # repositories under a folder for the CLI, the subcommands and the MCP server.
       - "internal/workspace/**"
       - "pkg/facts/**"
+      - "pkg/analyzerplugin/**"
       - "pkg/plugin/**"
       - "pkg/history/**"
       - "pkg/coverage/**"

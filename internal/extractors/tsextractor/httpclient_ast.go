@@ -83,11 +83,6 @@ func parseHTTPClientTree(src []byte, relFile string) (*sitter.Parser, *sitter.Tr
 	return parser, tree, tsKindsFor(isTSX)
 }
 
-func lexicalFetchCalls(src []byte, relFile string) []lexicalFetchCall {
-	calls, _ := lexicalFetchAnalysis(src, relFile)
-	return calls
-}
-
 func lexicalFetchAnalysis(src []byte, relFile string) ([]lexicalFetchCall, map[int]bool) {
 	parser, tree, kinds := parseHTTPClientTree(src, relFile)
 	if parser == nil || tree == nil {
@@ -511,11 +506,12 @@ func staticURLExpr(kinds *tsutil.KindTable, n *sitter.Node, src []byte) (string,
 				return "", false
 			}
 			narg++
-			if narg == 1 {
+			switch narg {
+			case 1:
 				a = lit
-			} else if narg == 2 {
+			case 2:
 				b = lit
-			} else {
+			default:
 				return "", false
 			}
 		}

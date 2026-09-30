@@ -39,7 +39,11 @@ func TestScopedSvelteConfigCapture(t *testing.T) {
 						if err != nil {
 							t.Fatal(err)
 						}
-						defer resident.Close()
+						defer func() {
+							if err := resident.Close(); err != nil {
+								t.Errorf("cleanup: %v", err)
+							}
+						}()
 						var watermark uint64
 						apply = func(paths ...string) {
 							t.Helper()

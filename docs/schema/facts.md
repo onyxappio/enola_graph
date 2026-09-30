@@ -25,6 +25,7 @@ serialization.
 |---|---|---|
 | `kind` | string | Relation kind — [Relation kinds](#relation-kinds) |
 | `target` | string | The target fact's **name** |
+| `target_kind` | string, when set | The target fact's kind; disambiguates same-named facts during resolution |
 | `target_id` | string, 32 lowercase hex chars, when set | Resolved target identity — [Relation target resolution](#relation-target-resolution) |
 
 Use `target_id` when present. When absent, preserve `target` as an unresolved
@@ -33,7 +34,8 @@ historical writer that did not emit IDs.
 
 ### Relation target resolution
 
-Current writers resolve `target_id` using the source fact's repository:
+Current writers resolve `target_id` using the source fact's repository and, when
+`target_kind` is present, only consider facts of that kind:
 
 1. Find facts named `target` in the source fact's repository.
 2. Emit an ID if all local matches have the same identity.
@@ -44,29 +46,35 @@ Do not choose an arbitrary fact when `target_id` is absent.
 
 ## Identity and IDs
 
-Current writers compute `id` as `sha256(repo \0 kind \0 name \0 file)`, truncated
-to 128 bits and written as 32 lowercase hex characters. The ID excludes source
-positions, so it remains stable when code moves within the same file.
+Ordinary facts use `sha256(repo \0 kind \0 name \0 file)`, truncated to 128 bits
+and written as 32 lowercase hex characters. Generic repository-plugin kinds in
+the reserved `plugin:` namespace use `(repo, kind, name)` as identity and omit
+the owner file from that identity. Both forms exclude source positions.
 
-The ID identifies `(repo, kind, name, file)`; it does not uniquely identify a
-JSONL record. Facts with the same four values share an ID. A consumer
-materializing one node per ID must combine relations and define how it retains
-locations and conflicting props. Preserve the original JSONL records when raw
-record fidelity is required.
+For ordinary facts the ID identifies `(repo, kind, name, file)`; for plugin facts
+it identifies `(repo, kind, name)`, so moving a plugin entity to a different
+owner file does not change its ID. The ID does not uniquely identify a JSONL
+record: facts with the same identity share an ID. A consumer materializing one
+node per ID must combine relations and define how it retains locations and
+conflicting props. Preserve the original JSONL records when raw record fidelity
+is required.
 
-ID stability requires all four inputs to remain stable. `repo` normally comes
-from the Git remote's repository name and falls back to the checkout directory
-name when no usable remote exists. Remote-less checkouts under different
-directory names therefore produce different IDs.
+Ordinary-fact ID stability requires all four identity inputs to remain stable;
+plugin-fact ID stability requires `repo`, `kind`, and `name` to remain stable.
+`repo` normally comes from the Git remote's repository name and falls back to
+the checkout directory name when no usable remote exists. Remote-less checkouts
+under different directory names therefore produce different IDs.
 
 ### The name rules underneath
 
 Enola's internal graph resolves relation targets by name. `facts.jsonl` is not a
-deduplicated node set, so `(repo, kind, name)` and `name` are not uniqueness
-guarantees.
+deduplicated node set, so names are not uniqueness guarantees. Ordinary facts
+may share `(repo, kind, name)` across different owner files; generic plugin
+facts deliberately use that tuple as their stable entity identity while keeping
+the owner file separate.
 
-Use `id` rather than `(repo, kind, name)` to keep same-named facts from different
-files separate. Retain `repo`; removing it merges identities across repositories.
+Use `id` to preserve each writer's identity contract. Retain `repo`; removing it
+merges identities across repositories.
 
 Name normalization: for path-shaped kinds (`module`, `test_ref`, `file_ref`)
 the store normalizes `name` to forward slashes. No other kind's name is

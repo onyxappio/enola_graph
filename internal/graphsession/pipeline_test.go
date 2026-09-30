@@ -161,9 +161,6 @@ func TestDeleteAndRenameAppliedEqualsCold(t *testing.T) {
 		t.Fatal(err)
 	}
 	applyRun(t, cons, s2)
-	if _, ok := factByName(consFacts(cons), "src.leaf"); ok {
-		// leaf still exists from d.ts; gone file owner must be empty in canonical compare.
-	}
 	coldSink := &graphstream.MemorySink{}
 	if _, err := Run(context.Background(), eng, dir, coldSink, Options{StateDir: filepath.Join(dir, ".enola", "cold"), ForceInitial: true}); err != nil {
 		t.Fatal(err)
@@ -268,7 +265,11 @@ func TestUnreadablePrismaSchemaFails(t *testing.T) {
 	if _, err := Run(context.Background(), eng, dir, &graphstream.MemorySink{}, Options{StateDir: state}); err != nil {
 		t.Fatal(err)
 	}
-	defer os.Chmod(p, 0o644)
+	defer func() {
+		if err := os.Chmod(p, 0o644); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if err := os.Chmod(p, 0); err != nil {
 		t.Fatal(err)
 	}

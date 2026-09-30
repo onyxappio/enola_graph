@@ -431,8 +431,8 @@ func typedFastifyParamScopes(src []byte) []fastifyParamScope {
 		if mask[m[0]] {
 			continue
 		}
-		ident, typ := string(src[m[2]:m[3]]), string(src[m[4]:m[5]])
-		if !local[typ] {
+		ident := string(src[m[2]:m[3]])
+		if !local[string(src[m[4]:m[5]])] {
 			continue
 		}
 		bodyStart, bodyEnd, ok := functionBodyAroundParam(src, mask, m[0])

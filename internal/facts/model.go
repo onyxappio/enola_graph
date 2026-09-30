@@ -22,8 +22,9 @@ type Fact struct {
 
 // Relation represents a directed edge between two facts.
 type Relation struct {
-	Kind   string `json:"kind"`   // e.g. "declares", "imports", "calls", "implements", "depends_on"
-	Target string `json:"target"` // Target fact name
+	Kind       string `json:"kind"`                  // e.g. "declares", "imports", "calls", "implements", "depends_on"
+	Target     string `json:"target"`                // Target fact name
+	TargetKind string `json:"target_kind,omitempty"` // Explicit kind for extensible typed relations.
 	// TargetFile is extractor-proven file provenance for RelCalls and
 	// RelInstantiates. When set, graph resolution may only bind a same-name
 	// symbol in that file, subject to the source-repository filter when present.
@@ -72,7 +73,8 @@ const (
 	KindAssociation = "association"
 
 	// The FSM kinds describe admitted finite-state-machine source declarations.
-	// They are produced only by configured extractors, not by external providers.
+	// They are part of the host graph vocabulary and can be contributed by
+	// explicitly configured repository analyzers.
 	KindFSMMachine    = "fsm_machine"
 	KindFSMState      = "fsm_state"
 	KindFSMEvent      = "fsm_event"
@@ -106,7 +108,8 @@ const (
 )
 
 // FSM relation kinds. Evidence and per-site details live on the source fact;
-// Relation remains the positionless {kind,target,target_id} wire object.
+// Relation carries the kind, target name, optional target kind, and resolved
+// target ID at the graph publication boundary.
 const (
 	RelFSMParent                 = "fsm_parent"
 	RelFSMInitial                = "fsm_initial"

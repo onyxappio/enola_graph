@@ -2030,12 +2030,15 @@ func (s *Server) registerTools() {
 		if args.Target != "" || len(args.ExpectedPackages) > 0 {
 			baseStore := facts.NewStore()
 			baseStore.Add(baseline.Facts...)
-			rep := conformance.Compute(baseStore, s.eng.Store(), d, conformance.Options{
+			rep, err := conformance.Compute(baseStore, s.eng.Store(), d, conformance.Options{
 				Target:           args.Target,
 				ExpectedPackages: args.ExpectedPackages,
 				MaxDepth:         args.MaxDepth,
 				MaxNodes:         args.MaxNodes,
 			})
+			if err != nil {
+				return errorResult(fmt.Sprintf("conformance analysis failed: %v", err)), nil, nil
+			}
 			conf = &rep
 		}
 		// Whether the CURRENT snapshot still matches the working tree is something only

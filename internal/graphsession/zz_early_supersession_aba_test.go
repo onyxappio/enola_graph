@@ -38,7 +38,11 @@ func TestEarlySupersessionRefusesTheRevertedWrite(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer resident.Close()
+	defer func() {
+		if err := resident.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	initial, err := resident.reconcile(ctx, false)
 	if err != nil {
 		t.Fatal(err)
