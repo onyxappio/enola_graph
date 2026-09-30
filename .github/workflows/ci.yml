@@ -17,12 +17,17 @@ jobs:
           go-version-file: go.mod
           cache: true
 
+      - name: Run tests with race detection
+        # Run the full suite for each instrumentation. Combining race detection
+        # with atomic coverage makes every hot-loop coverage counter a traced
+        # atomic operation: the inherited decoy regression exceeded 20 minutes
+        # combined, but passed with race detection alone in about 210 seconds.
+        run: go test -race -count=1 -timeout=45m ./...
+
       - name: Run tests with coverage
-        # The inherited large-decoy and pinned FSM regressions exceed Go's
-        # default ten-minute package budget under race/coverage instrumentation.
-        # Keep every assertion and both instrumentations; bound the full run
-        # explicitly instead of interrupting a package before its suite ends.
-        run: go test -race -count=1 -timeout=45m -coverprofile=coverage.out -covermode=atomic ./...
+        # Preserve coverage for all packages and assertions without paying the
+        # race detector cost on the coverage counters themselves.
+        run: go test -count=1 -timeout=45m -coverprofile=coverage.out -covermode=atomic ./...
 
       - name: Coverage summary
         run: |

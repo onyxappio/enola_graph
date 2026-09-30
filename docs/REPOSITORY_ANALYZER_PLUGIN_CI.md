@@ -40,7 +40,9 @@ Use `GOTOOLCHAIN=go1.26.8`, matching `go.mod` and GitHub CI. Local Go 1.27.1
 cannot be used to evaluate the pinned golangci-lint binary's type checking.
 
 Focused grammar, plugin runtime, callback race and graph API migration checks
-passed with the race detector. The final full-suite result is still pending.
+passed with the race detector. The final combined full-suite run was not green:
+the TypeScript decoy test reached its 20-minute package timeout, the native
+quiet test failed under broad load, and the Git metadata settle test failed.
 The complete `internal/analyzerplugin` race/coverage package passed in 15.485s.
 The expanded plugin/grammar/resolver/race selection passed across the host,
 graphsession and TypeScript packages; graphsession completed in 105.785s.
@@ -51,11 +53,12 @@ pointing to a nonexistent directory. The initial run started one process and
 executed one unit; the unchanged fresh CLI reused that unit, started zero
 processes, parsed zero files, appended zero event bytes, and kept generation
 at one. This is a portability/correctness probe, not a performance benchmark.
-The local diagnostic full run uses `-timeout=20m`. GitHub now has an explicit
-45-minute package budget, retaining every test, race instrumentation and
-coverage. This changes the execution budget, not a correctness assertion or
-an analysis performance acceptance threshold. The longer local diagnostic
-timeout alone does not establish that the GitHub command passes.
+GitHub now has an explicit 45-minute package budget and runs the complete suite
+twice: once with race detection, once with atomic coverage. Every test and
+assertion remains in both runs. Separating the instrumentations avoids tracing
+an atomic coverage-counter write on every hot-loop iteration. This changes
+the execution setup, not a correctness assertion or an analysis performance
+acceptance threshold. The new GitHub result is still pending.
 
 The original CI also timed out in the inherited
 `TestScanOpt_LargeDecoyMatchesBaseline` after it had run for 9m23s. A prior
@@ -66,6 +69,11 @@ identified the decoy workload scanning lexical bindings and repeated
 `enclosingBlockEnd` searches, while the graphsession sample was executing the
 pinned Product FSM delta. Neither sample showed a blocked test. The quadratic
 extractor work is inherited and has not been changed by this plugin task.
+The exact decoy test passed with race detection alone in 209.887s. The native
+quiet test passed all three focused repetitions. The Git metadata settle
+failure also reproduced on an unchanged export of default-branch `6f06be9e`
+on this macOS host; its source and implementation paths were not changed by
+T-001. The original failures remain evidence, not superseded green results.
 
 ## Inherited lint blocker
 
