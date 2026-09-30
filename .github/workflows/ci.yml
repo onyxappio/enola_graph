@@ -18,7 +18,11 @@ jobs:
           cache: true
 
       - name: Run tests with coverage
-        run: go test -race -count=1 -coverprofile=coverage.out -covermode=atomic ./...
+        # The inherited large-decoy and pinned FSM regressions exceed Go's
+        # default ten-minute package budget under race/coverage instrumentation.
+        # Keep every assertion and both instrumentations; bound the full run
+        # explicitly instead of interrupting a package before its suite ends.
+        run: go test -race -count=1 -timeout=45m -coverprofile=coverage.out -covermode=atomic ./...
 
       - name: Coverage summary
         run: |

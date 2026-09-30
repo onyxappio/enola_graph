@@ -41,15 +41,21 @@ cannot be used to evaluate the pinned golangci-lint binary's type checking.
 
 Focused grammar, plugin runtime, callback race and graph API migration checks
 passed with the race detector. The final full-suite result is still pending.
-The local diagnostic full run uses `-timeout=20m`; GitHub currently retains
-Go's default ten-minute package timeout. A longer local diagnostic timeout
-does not establish that the unchanged GitHub command passes.
+The local diagnostic full run uses `-timeout=20m`. GitHub now has an explicit
+45-minute package budget, retaining every test, race instrumentation and
+coverage. This changes the execution budget, not a correctness assertion or
+an analysis performance acceptance threshold. The longer local diagnostic
+timeout alone does not establish that the GitHub command passes.
 
 The original CI also timed out in the inherited
 `TestScanOpt_LargeDecoyMatchesBaseline` after it had run for 9m23s. A prior
 local graphsession run exhausted its overall ten-minute package budget while
 its current test had run for only one second. These observations require
-separate diagnosis; they are not proof of a deadlock.
+separate diagnosis; they are not proof of a deadlock. A live local sample
+identified the decoy workload scanning lexical bindings and repeated
+`enclosingBlockEnd` searches, while the graphsession sample was executing the
+pinned Product FSM delta. Neither sample showed a blocked test. The quadratic
+extractor work is inherited and has not been changed by this plugin task.
 
 ## Inherited lint blocker
 
