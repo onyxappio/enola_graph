@@ -52,13 +52,27 @@ A separately built Go 1.26.8 CLI ran the V1 plugin fixture with `GOMODCACHE`
 pointing to a nonexistent directory. The initial run started one process and
 executed one unit; the unchanged fresh CLI reused that unit, started zero
 processes, parsed zero files, appended zero event bytes, and kept generation
-at one. This is a portability/correctness probe, not a performance benchmark.
+at one. A second CLI probe used the Go V2 fixture with a runtime PATH that
+contains neither Go nor Node. It created namespaced task facts, reused its
+unit with zero processes/events on no-change, reran the unit after a Markdown
+edit, and exactly matched the fresh target-input cold Facts. These are
+portability/correctness probes, not performance benchmarks.
 GitHub now has an explicit 45-minute package budget and runs the complete suite
 twice: once with race detection, once with atomic coverage. Every test and
 assertion remains in both runs. Separating the instrumentations avoids tracing
 an atomic coverage-counter write on every hot-loop iteration. This changes
 the execution setup, not a correctness assertion or an analysis performance
-acceptance threshold. The new GitHub result is still pending.
+acceptance threshold.
+
+The complete local command
+`GOTOOLCHAIN=go1.26.8 go test -race -count=1 -timeout=45m ./...`
+finished with exit zero: 113 tested packages passed. GitHub run
+[`36667989812`](https://github.com/onyxappio/enola_graph/actions/runs/36667989812)
+on feature commit `23f8348b43033f8b087b049c1d76616ace5fd2f2` finished
+both complete race and atomic-coverage steps successfully. Windows,
+determinism, architecture, documentation, vulnerability and workflow checks
+also passed. The run's overall conclusion remains failure because lint is
+still red; this is not green-CI or delivery evidence.
 
 The original CI also timed out in the inherited
 `TestScanOpt_LargeDecoyMatchesBaseline` after it had run for 9m23s. A prior
@@ -73,7 +87,12 @@ The exact decoy test passed with race detection alone in 209.887s. The native
 quiet test passed all three focused repetitions. The Git metadata settle
 failure also reproduced on an unchanged export of default-branch `6f06be9e`
 on this macOS host; its source and implementation paths were not changed by
-T-001. The original failures remain evidence, not superseded green results.
+T-001. The original failures remain recorded evidence; the subsequent complete
+local race and GitHub race/coverage runs passed without extractor/watch
+semantic changes.
+The decoy test also passed with atomic coverage alone in 98.034s; the full
+TypeScript package passed in the separate race run in 257.488s. The separate
+complete local and GitHub results are recorded above.
 
 ## Inherited lint blocker
 
@@ -99,9 +118,12 @@ Local diagnostic logs are ephemeral and not required for plugin use:
 
 - `/tmp/t001-original-ci-failures.log`: original GitHub test/lint output.
 - `/tmp/t001-latest-focused.log`: latest cold-domain and Go-runtime checks.
-- `/tmp/t001-final-full-tests.log`: ongoing full race/coverage run.
-- `/tmp/t001-final-lint.json`: current whole-tree lint findings.
+- `/tmp/t001-final-full-tests.log`: prior failed combined race/coverage run.
+- `/tmp/t001-final-race-alone.log`: complete local race PASS (113 packages).
+- `/tmp/t001-pushed-lint.json`: current whole-tree lint findings.
 - `/tmp/t001-main-lint.json`: unchanged-main whole-tree baseline findings.
+- `/tmp/t001-portable-smoke-result.json`: built V1 CLI portability/no-change probe.
+- `/tmp/t001-go-cli-smoke-result.json`: built V2 CLI initial/no-change/delta/cold probe.
 
 This remediation preserves extractor cache version `v322`; plugin protocol
 and unit-record schema versions remain separate. Product and tasks-hub
