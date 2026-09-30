@@ -26,9 +26,15 @@ func residentFixture(t *testing.T, files map[string]string, opts Options) (strin
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { r.Close() })
+	t.Cleanup(func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("operation failed: %v", err)
+		}
+	})
 	q := NewChangeQueue("test", 8)
-	q.Start(context.Background())
+	if err := q.Start(context.Background()); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	if _, err = r.ApplyChanges(context.Background(), q.Drain()); err != nil {
 		t.Fatal(err)
 	}
@@ -113,7 +119,9 @@ func TestResidentContentEditsAndFallbacksEqualCold(t *testing.T) {
 		p := filepath.Join(root, "src/a.ts")
 		st, _ := os.Stat(p)
 		independentWrite(t, root, "src/a.ts", body)
-		os.Chtimes(p, st.ModTime(), st.ModTime())
+		if err := os.Chtimes(p, st.ModTime(), st.ModTime()); err != nil {
+			t.Errorf("operation failed: %v", err)
+		}
 		q.Add("src/a.ts")
 		res := residentApply(t, r, q)
 		if res.Reconciled || res.Work.InventoryScans != 0 || res.Work.DetectionScans != 0 || res.Work.ContextScans != 0 || res.Work.ConfigScans != 0 || res.Work.HashedFiles != 1 {
@@ -166,13 +174,19 @@ func TestResidentOverflowRestartAndContinuity(t *testing.T) {
 	if err != nil || !res.Reconciled {
 		t.Fatalf("epoch gap: %+v %v", res, err)
 	}
-	r.Close()
+	if err := r.Close(); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	independentWrite(t, root, "src/a.ts", "export const a=3")
 	fresh, err := OpenSession(context.Background(), r.eng, root, &graphstream.MemorySink{}, r.opts)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer fresh.Close()
+	defer func() {
+		if err := fresh.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	res, err = fresh.ApplyChanges(context.Background(), ChangeBatch{Epoch: "other", Covered: true})
 	if err != nil || !res.Reconciled || res.ParsedFiles != 1 {
 		t.Fatalf("restart gap: %+v %v", res, err)
@@ -187,7 +201,9 @@ type residentEndSink struct {
 
 func (s *residentEndSink) Publish(ctx context.Context, subject, id string, b []byte) error {
 	var p struct{ Type string }
-	json.Unmarshal(b, &p)
+	if err := json.Unmarshal(b, &p); err != nil {
+		return err
+	}
 	if p.Type == graphstream.TypeEndReplace {
 		s.mu.Lock()
 		f := s.onEnd
@@ -202,21 +218,36 @@ func (s *residentEndSink) Publish(ctx context.Context, subject, id string, b []b
 func TestResidentLateEventsDuringAcknowledgmentSurvive(t *testing.T) {
 	root := setupTSRepo(t, map[string]string{"a.ts": "export const a=1", "b.ts": "export const b=1"})
 	q := NewChangeQueue("late", 8)
-	q.Start(context.Background())
+	if err := q.Start(context.Background()); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	sink := &residentEndSink{}
 	r, err := OpenSession(context.Background(), testEngine(t, root), root, sink, Options{StateDir: t.TempDir()})
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	// Events during baseline and after captured-byte validation must remain queued.
-	sink.onEnd = func() { os.WriteFile(filepath.Join(root, "a.ts"), []byte("export const a=2"), 0644); q.Add("a.ts") }
+	sink.onEnd = func() {
+		if err := os.WriteFile(filepath.Join(root, "a.ts"), []byte("export const a=2"), 0644); err != nil {
+			t.Errorf("operation failed: %v", err)
+		}
+		q.Add("a.ts")
+	}
 	residentApply(t, r, q)
 	sink.mu.Lock()
 	sink.onEnd = func() {
-		os.WriteFile(filepath.Join(root, "a.ts"), []byte("export const a=3"), 0644)
+		if err := os.WriteFile(filepath.Join(root, "a.ts"), []byte("export const a=3"), 0644); err != nil {
+			t.Errorf("operation failed: %v", err)
+		}
 		q.Add("a.ts")
-		os.WriteFile(filepath.Join(root, "b.ts"), []byte("export const b=3"), 0644)
+		if err := os.WriteFile(filepath.Join(root, "b.ts"), []byte("export const b=3"), 0644); err != nil {
+			t.Errorf("operation failed: %v", err)
+		}
 		q.Add("b.ts")
 	}
 	sink.mu.Unlock()
@@ -239,7 +270,12 @@ func TestResidentFailurePreservesCommittedCachesAndRecovers(t *testing.T) {
 	beforeHash := r.inputs.hashes["a.ts"]
 	independentWrite(t, root, "a.ts", "export const a=2")
 	q.Add("a.ts")
-	mutate = func() { os.WriteFile(filepath.Join(root, "a.ts"), []byte("export const a=3"), 0644); q.Add("a.ts") }
+	mutate = func() {
+		if err := os.WriteFile(filepath.Join(root, "a.ts"), []byte("export const a=3"), 0644); err != nil {
+			t.Errorf("operation failed: %v", err)
+		}
+		q.Add("a.ts")
+	}
 	if _, err := r.ApplyChanges(context.Background(), q.Drain()); err == nil {
 		t.Fatal("mid-parse captured-byte mutation succeeded")
 	}
@@ -292,14 +328,20 @@ func TestResidentConfigReloadFailsClosed(t *testing.T) {
 func TestFileChangeSourceRealWritesAtomicSaveAndNewDirectory(t *testing.T) {
 	root := t.TempDir()
 	p := filepath.Join(root, "a.ts")
-	os.WriteFile(p, []byte("old"), 0644)
+	if err := os.WriteFile(p, []byte("old"), 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	s := NewFileChangeSource(root, nil, 32)
 	if err := s.Start(ctx); err != nil {
 		t.Fatal(err)
 	}
-	defer s.Close()
+	defer func() {
+		if err := s.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	s.Drain()
 	wait := func() {
 		t.Helper()
@@ -314,33 +356,54 @@ func TestFileChangeSourceRealWritesAtomicSaveAndNewDirectory(t *testing.T) {
 		}
 	}
 	st, _ := os.Stat(p)
-	os.WriteFile(p, []byte("new"), 0644)
-	os.Chtimes(p, st.ModTime(), st.ModTime())
+	if err := os.WriteFile(p, []byte("new"), 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
+	if err := os.Chtimes(p, st.ModTime(), st.ModTime()); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	wait()
 	tmp := filepath.Join(root, "tmp")
-	os.WriteFile(tmp, []byte("end"), 0644)
-	os.Rename(tmp, p)
+	if err := os.WriteFile(tmp, []byte("end"), 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
+	if err := os.Rename(tmp, p); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	wait()
 	dir := filepath.Join(root, "nested")
-	os.Mkdir(dir, 0755)
-	os.WriteFile(filepath.Join(dir, "b.ts"), []byte("a"), 0644)
+	if err := os.Mkdir(dir, 0755); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "b.ts"), []byte("a"), 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	wait()
 	// Synchronize with recursive registration before draining creation events.
 	s.registration.Lock()
+	uncertain := s.uncertain
 	s.registration.Unlock()
+	if uncertain {
+		t.Fatal("recursive registration lost coverage")
+	}
 	time.Sleep(30 * time.Millisecond)
 	s.Drain()
-	os.WriteFile(filepath.Join(dir, "b.ts"), []byte("b"), 0644)
+	if err := os.WriteFile(filepath.Join(dir, "b.ts"), []byte("b"), 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	wait()
 	s.markUncertain("simulated kernel loss")
-	if s.Drain().Covered || s.Drain().Covered {
+	firstDrain, secondDrain := s.Drain(), s.Drain()
+	if firstDrain.Covered || secondDrain.Covered {
 		t.Fatal("coverage loss was cleared by drain")
 	}
 }
 
 func TestChangeQueueBoundsAndLateCapture(t *testing.T) {
 	q := NewChangeQueue("fake", 2)
-	q.Start(context.Background())
+	if err := q.Start(context.Background()); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	q.Add("a")
 	first := q.Drain()
 	q.Add("a")
@@ -368,9 +431,15 @@ func TestResidentSwiftContextIncludesAreNeverSkipped(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	q := NewChangeQueue("swift", 10)
-	q.Start(context.Background())
+	if err := q.Start(context.Background()); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	residentApply(t, r, q)
 	independentWrite(t, root, "a.ts", "export const a=2")
 	q.Add("a.ts")
@@ -397,7 +466,9 @@ func (s *watchEndSink) Publish(ctx context.Context, subject, id string, b []byte
 		return err
 	}
 	var p struct{ Type string }
-	json.Unmarshal(b, &p)
+	if err := json.Unmarshal(b, &p); err != nil {
+		return err
+	}
 	if p.Type == graphstream.TypeEndReplace {
 		select {
 		case s.ends <- struct{}{}:
@@ -429,8 +500,12 @@ func TestWatchUsesResidentSessionForRealFileEdits(t *testing.T) {
 	independentWrite(t, root, "src/a.ts", "export const a=2")
 	wait()
 	tmp := filepath.Join(root, "src/atomic.tmp")
-	os.WriteFile(tmp, []byte("export const a=3"), 0644)
-	os.Rename(tmp, filepath.Join(root, "src/a.ts"))
+	if err := os.WriteFile(tmp, []byte("export const a=3"), 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
+	if err := os.Rename(tmp, filepath.Join(root, "src/a.ts")); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	wait()
 	cancel()
 	select {
@@ -452,9 +527,15 @@ func TestResidentUnauditedInactiveDetectorReconciles(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	q := NewChangeQueue("custom", 4)
-	q.Start(context.Background())
+	if err := q.Start(context.Background()); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	residentApply(t, r, q)
 	independentWrite(t, root, "a.ts", "export const a=2")
 	q.Add("a.ts")
@@ -467,16 +548,24 @@ func TestResidentUnauditedInactiveDetectorReconciles(t *testing.T) {
 func TestFileChangeSourceExternalExtendedConfig(t *testing.T) {
 	root, r, _, _ := residentFixture(t, map[string]string{"a.ts": "export const a=1"}, Options{})
 	external := filepath.Join(t.TempDir(), "base.json")
-	os.WriteFile(external, []byte("{}"), 0644)
+	if err := os.WriteFile(external, []byte("{}"), 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	b, _ := json.Marshal(map[string]string{"extends": external})
-	os.WriteFile(filepath.Join(root, "tsconfig.json"), b, 0644)
+	if err := os.WriteFile(filepath.Join(root, "tsconfig.json"), b, 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	source := NewFileChangeSource(root, []string{r.opts.StateDir}, 64)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	if err := source.Start(ctx); err != nil {
 		t.Fatal(err)
 	}
-	defer source.Close()
+	defer func() {
+		if err := source.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, err := r.ApplyChanges(ctx, source.Drain()); err != nil {
 		t.Fatal(err)
 	}
@@ -491,7 +580,9 @@ func TestFileChangeSourceExternalExtendedConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 	source.Drain()
-	os.WriteFile(external, []byte(`{"compilerOptions":{"strict":true}}`), 0644)
+	if err := os.WriteFile(external, []byte(`{"compilerOptions":{"strict":true}}`), 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	select {
 	case <-source.Ready():
 	case <-time.After(3 * time.Second):
@@ -511,16 +602,24 @@ func TestExternalCoverageIgnoresSiblingLogsAndDetectsAtomicConfig(t *testing.T) 
 	root, r, _, _ := residentFixture(t, map[string]string{"a.ts": "export const a=1"}, Options{})
 	externalDir := t.TempDir()
 	external := filepath.Join(externalDir, "base.json")
-	os.WriteFile(external, []byte("{}"), 0644)
+	if err := os.WriteFile(external, []byte("{}"), 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	b, _ := json.Marshal(map[string]string{"extends": external})
-	os.WriteFile(filepath.Join(root, "tsconfig.json"), b, 0644)
+	if err := os.WriteFile(filepath.Join(root, "tsconfig.json"), b, 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	source := NewFileChangeSource(root, []string{r.opts.StateDir}, 64)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	if err := source.Start(ctx); err != nil {
 		t.Fatal(err)
 	}
-	defer source.Close()
+	defer func() {
+		if err := source.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, err := r.ApplyChanges(ctx, source.Drain()); err != nil {
 		t.Fatal(err)
 	}
@@ -535,18 +634,28 @@ func TestExternalCoverageIgnoresSiblingLogsAndDetectsAtomicConfig(t *testing.T) 
 	}
 	source.Drain()
 	for i := 0; i < 5; i++ {
-		os.WriteFile(filepath.Join(externalDir, "run.log"), []byte(strings.Repeat("log", i+1)), 0644)
+		if err := os.WriteFile(filepath.Join(externalDir, "run.log"), []byte(strings.Repeat("log", i+1)), 0644); err != nil {
+			t.Errorf("operation failed: %v", err)
+		}
 	}
-	os.Mkdir(filepath.Join(externalDir, "state"), 0755)
-	os.WriteFile(filepath.Join(externalDir, "state", "checkpoint"), []byte("data"), 0644)
+	if err := os.Mkdir(filepath.Join(externalDir, "state"), 0755); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(externalDir, "state", "checkpoint"), []byte("data"), 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	select {
 	case <-source.Ready():
 		t.Fatalf("external sibling triggered analysis: %+v", source.Drain())
 	case <-time.After(150 * time.Millisecond):
 	}
 	tmp := filepath.Join(externalDir, "config.tmp")
-	os.WriteFile(tmp, []byte(`{"compilerOptions":{"strict":true}}`), 0644)
-	os.Rename(tmp, external)
+	if err := os.WriteFile(tmp, []byte(`{"compilerOptions":{"strict":true}}`), 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
+	if err := os.Rename(tmp, external); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	select {
 	case <-source.Ready():
 	case <-time.After(3 * time.Second):
@@ -571,7 +680,11 @@ func TestWatchRetriesCapturedInputChange(t *testing.T) {
 	eng := testEngine(t, root)
 	go func() {
 		done <- Watch(ctx, eng, root, sink, Options{StateDir: t.TempDir(), WatchEvery: time.Millisecond, OnBeforeParse: func(string) {
-			once.Do(func() { os.WriteFile(filepath.Join(root, "a.ts"), []byte("export const a=2"), 0644) })
+			once.Do(func() {
+				if err := os.WriteFile(filepath.Join(root, "a.ts"), []byte("export const a=2"), 0644); err != nil {
+					t.Errorf("operation failed: %v", err)
+				}
+			})
 		}})
 	}()
 	select {

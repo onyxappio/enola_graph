@@ -24,7 +24,11 @@ func TestJournalLegacyValidJSONWithoutNewlineRetained(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer j.Close()
+	defer func() {
+		if err := j.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if dirFingerprint(t, dir) != before {
 		t.Fatal("open must not mutate a valid JSON tail that lacks a newline")
 	}
@@ -85,7 +89,11 @@ func TestJournalExactTombsBoundAndConflict(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer j.Close()
+	defer func() {
+		if err := j.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	first := []byte("AAAA")
 	if err := j.Append(JournalEntry{MsgID: "same", Subject: "s", Payload: first}); err != nil {
 		t.Fatal(err)
@@ -125,7 +133,11 @@ func TestJournalExactTombsBoundAndConflict(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer j2.Close()
+	defer func() {
+		if err := j2.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if err := j2.Append(JournalEntry{MsgID: "same", Subject: "s", Payload: []byte("BBBB")}); err == nil {
 		t.Fatal("conflicting reuse after reopen must fail")
 	}
@@ -140,7 +152,11 @@ func TestJournalCompactAckedFencesProtocolRun(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer j.Close()
+	defer func() {
+		if err := j.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	run := "run-fence"
 	if err := j.Append(JournalEntry{MsgID: MessageID(run, TypeBatch, 1), Subject: "s", Payload: []byte(`{"type":"batch","run_id":"run-fence","seq":1}`)}); err != nil {
 		t.Fatal(err)
@@ -171,7 +187,11 @@ func TestJournalCompactAckedFencesProtocolRun(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer j2.Close()
+	defer func() {
+		if err := j2.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, ok := j2.fenced[run]; !ok {
 		t.Fatal("reopen lost run fence")
 	}
@@ -225,7 +245,11 @@ func TestJournalReclaimCrashUsesNextManifest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer j.Close()
+	defer func() {
+		if err := j.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if dirFingerprint(t, dir) != before {
 		t.Fatal("open must not mutate while recovering commit.next")
 	}
@@ -253,7 +277,9 @@ func TestJournalOpenDoesNotWriteCommit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	j.Close()
+	if err := j.Close(); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	if dirFingerprint(t, dir) != before {
 		t.Fatal("OpenJournal/Close of a read-only load must not create commit.json")
 	}

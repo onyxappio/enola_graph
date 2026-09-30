@@ -93,7 +93,11 @@ func TestJournalCloseReleasesHandles(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer j2.Close()
+	defer func() {
+		if err := j2.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if n := len(j2.Unacked()); n != 1 {
 		t.Fatalf("unacked %d", n)
 	}

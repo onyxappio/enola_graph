@@ -417,7 +417,6 @@ func vueLooksLikeMemberStart(shape string, start int) bool {
 				return true
 			}
 			if i < len(shape) && vueIdentifierStartAt(shape, i) {
-				wordStart = i
 				i = vueIdentifierEnd(shape, i)
 			}
 		}
@@ -641,10 +640,6 @@ func collectAddImportsDirs(sources map[string][]byte) []string {
 	return out
 }
 
-func extraDirsByNuxtPackage(sources map[string][]byte, nuxtPkgs []string, pkgDirs map[string]bool) map[string][]string {
-	return extraDirsByNuxtPackageRead(sources, nil, nil, nuxtPkgs, pkgDirs, nil, nil)
-}
-
 func extraDirsByNuxtPackageRead(sources map[string][]byte, knownFiles map[string]bool, readSrc func(string) []byte, nuxtPkgs []string, pkgDirs map[string]bool, records map[string]*FileRecord, dirty map[string]bool) map[string][]string {
 	if len(nuxtPkgs) == 0 {
 		return map[string][]string{}
@@ -729,10 +724,6 @@ func eachNuxtConfigSource(sources map[string][]byte, knownFiles map[string]bool,
 		}
 		visit(file, readSrc(file))
 	}
-}
-
-func nuxtModuleConsumers(sources map[string][]byte, nuxtPkgs []string, pkgDirByName map[string]string, pkgDirs map[string]bool) map[string][]string {
-	return nuxtModuleConsumersRead(sources, nil, nil, nuxtPkgs, pkgDirByName, pkgDirs)
 }
 
 func nuxtModuleConsumersRead(sources map[string][]byte, knownFiles map[string]bool, readSrc func(string) []byte, nuxtPkgs []string, pkgDirByName map[string]string, pkgDirs map[string]bool) map[string][]string {

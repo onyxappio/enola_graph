@@ -58,7 +58,8 @@ func TestFactsFingerprint_DuplicateMultiplicity(t *testing.T) {
 	if one == two {
 		t.Fatal("duplicate facts must contribute to the fingerprint")
 	}
-	if factsFingerprint([]facts.Fact{f, f}) != factsFingerprint([]facts.Fact{f, f}) {
+	repeated := factsFingerprint([]facts.Fact{f, f})
+	if repeated != factsFingerprint([]facts.Fact{f, f}) {
 		t.Fatal("identical duplicate lists must hash equal")
 	}
 }

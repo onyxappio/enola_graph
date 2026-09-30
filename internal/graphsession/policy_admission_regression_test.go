@@ -622,7 +622,10 @@ func TestAdmissionIndexEditAfterBeginFailsTheResidentRun(t *testing.T) {
 			// successfully and is supposed to have.
 			for _, rec := range sink.CloneRecords()[published:] {
 				var e graphstream.EndReplace
-				if json.Unmarshal(rec.Payload, &e); e.Type == graphstream.TypeEndReplace && e.Completeness.Status == "success" {
+				if err := json.Unmarshal(rec.Payload, &e); err != nil {
+					t.Fatal(err)
+				}
+				if e.Type == graphstream.TypeEndReplace && e.Completeness.Status == "success" {
 					t.Fatalf("the refused run published a successful EndReplace (%s)", rec.MsgID)
 				}
 			}

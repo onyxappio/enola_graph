@@ -241,9 +241,6 @@ export function bogus(extendPages: any) {
 		if r.File != "packages/landings-module/src/registerRoutes.ts" {
 			t.Fatalf("%s owned by %s", p, r.File)
 		}
-		if r.Props["mode"] == "client" && p == "/__images" {
-			// ok
-		}
 		if r.Props["handler"] == nil && r.Props["file"] == nil {
 			t.Fatalf("%s missing handler", p)
 		}

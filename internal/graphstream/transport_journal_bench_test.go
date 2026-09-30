@@ -59,7 +59,9 @@ func BenchmarkJournalTransport(b *testing.B) {
 		elapsed += time.Since(start)
 		b.StopTimer()
 		p.CloseAsync()
-		j.Close()
+		if err := j.Close(); err != nil {
+			b.Errorf("operation failed: %v", err)
+		}
 		b.StartTimer()
 	}
 	b.ReportMetric(float64(groups)/float64(b.N), "groups/run")

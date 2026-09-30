@@ -186,7 +186,7 @@ func nameSetDigest(names []string) string {
 	sort.Strings(sorted)
 	h := sha256.New()
 	for _, n := range sorted {
-		fmt.Fprintf(h, "%d:%s\n", len(n), n)
+		_, _ = fmt.Fprintf(h, "%d:%s\n", len(n), n) // SHA-256 writers cannot fail.
 	}
 	return hex.EncodeToString(h.Sum(nil))
 }
@@ -204,7 +204,7 @@ func stringMapDigest(m map[string]string) string {
 	sort.Strings(keys)
 	h := sha256.New()
 	for _, k := range keys {
-		fmt.Fprintf(h, "%d:%s=%d:%s\n", len(k), k, len(m[k]), m[k])
+		_, _ = fmt.Fprintf(h, "%d:%s=%d:%s\n", len(k), k, len(m[k]), m[k]) // SHA-256 writers cannot fail.
 	}
 	return hex.EncodeToString(h.Sum(nil))
 }

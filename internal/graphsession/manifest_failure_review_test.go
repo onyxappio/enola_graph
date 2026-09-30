@@ -50,7 +50,11 @@ func TestIndependentManifestHashRefreshFailedEndRollback(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer r.Close()
+			defer func() {
+				if err := r.Close(); err != nil {
+					t.Errorf("cleanup: %v", err)
+				}
+			}()
 			if _, err = r.reconcile(context.Background(), false); err != nil {
 				t.Fatal(err)
 			}
@@ -146,7 +150,11 @@ func TestIndependentNeutralManifestChangeNeverPublishes(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer r.Close()
+			defer func() {
+				if err := r.Close(); err != nil {
+					t.Errorf("cleanup: %v", err)
+				}
+			}()
 			if _, err = r.reconcile(context.Background(), false); err != nil {
 				t.Fatal(err)
 			}

@@ -137,13 +137,6 @@ func factExtractorName(f facts.Fact) string {
 	return s
 }
 
-func extractorContextHash(owned []string, fileSetHash, scanHash string) string {
-	if len(owned) == 0 {
-		return scanHash
-	}
-	return fileSetHash
-}
-
 func ownedExtractorContextNeed(owned []string, st *State, ext plugin.Extractor, invFiles, allNames []string, hashes map[string]string, fileSetHash, prevScan, scanHash string) bool {
 	if ext == nil {
 		return false

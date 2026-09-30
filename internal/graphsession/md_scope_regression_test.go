@@ -160,7 +160,10 @@ func forbidSuccessfulEnd(t *testing.T, sink *graphstream.MemorySink) {
 	t.Helper()
 	for _, r := range sink.CloneRecords() {
 		var e graphstream.EndReplace
-		if json.Unmarshal(r.Payload, &e); e.Type != graphstream.TypeEndReplace {
+		if err := json.Unmarshal(r.Payload, &e); err != nil {
+			t.Fatal(err)
+		}
+		if e.Type != graphstream.TypeEndReplace {
 			continue
 		}
 		if e.Completeness.Status == "success" {
@@ -400,9 +403,15 @@ func TestMDScopeDeltaAndWatchFreezeTheSameManifest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	q := NewChangeQueue("md-scope", 8)
-	q.Start(context.Background())
+	if err := q.Start(context.Background()); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	if _, err := r.ApplyChanges(context.Background(), q.Drain()); err != nil {
 		t.Fatal(err)
 	}
@@ -476,7 +485,10 @@ type mdScopeBeginSink struct {
 
 func (s *mdScopeBeginSink) Publish(ctx context.Context, subject, id string, payload []byte) error {
 	var p struct{ Type string }
-	if json.Unmarshal(payload, &p); p.Type == graphstream.TypeBeginReplace && s.onBegin != nil {
+	if err := json.Unmarshal(payload, &p); err != nil {
+		return err
+	}
+	if p.Type == graphstream.TypeBeginReplace && s.onBegin != nil {
 		s.once.Do(s.onBegin)
 	}
 	return s.MemorySink.Publish(ctx, subject, id, payload)

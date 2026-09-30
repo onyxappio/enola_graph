@@ -201,18 +201,18 @@ func writePendingStateFP(dir string, st *State) (stateFingerprint, error) {
 	tJSON := time.Now()
 	fp, err := encodeStateJSON(f, st)
 	if err != nil {
-		f.Close()
-		os.Remove(tmp)
+		_ = f.Close()      // Preserve the primary operation error; cleanup is best effort.
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return stateFingerprint{}, err
 	}
 	graphprofile.Since("state_json_encode_write", tJSON, fmt.Sprintf("bytes=%d files=%d", fp.size, len(st.Files)))
 	if err := f.Sync(); err != nil {
-		f.Close()
-		os.Remove(tmp)
+		_ = f.Close()      // Preserve the primary operation error; cleanup is best effort.
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return stateFingerprint{}, err
 	}
 	if err := f.Close(); err != nil {
-		os.Remove(tmp)
+		_ = os.Remove(tmp) // Preserve the primary operation error; cleanup is best effort.
 		return stateFingerprint{}, err
 	}
 	if err := os.Rename(tmp, path); err != nil {
@@ -243,7 +243,7 @@ func fsyncDir(dir string) error {
 	if err != nil {
 		return err
 	}
-	defer d.Close()
+	defer func() { _ = d.Close() }() // Read-only handle; Sync below reports durability failures.
 	return d.Sync()
 }
 

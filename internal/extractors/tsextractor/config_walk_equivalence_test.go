@@ -130,7 +130,11 @@ func TestConfigDiscoverySingleWalkMatchesStage22(t *testing.T) {
 				if err := os.Rename(root, path); err != nil {
 					t.Fatal(err)
 				}
-				defer os.Rename(path, root)
+				defer func() {
+					if err := os.Rename(path, root); err != nil {
+						t.Errorf("cleanup: %v", err)
+					}
+				}()
 			}
 			if name == "symlink-root" || name == "config-named-symlink-root" {
 				base := "repo"

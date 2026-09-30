@@ -83,7 +83,11 @@ func TestGraphPolicyResidentScopeAndLocks(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	watermark := uint64(0)
 	apply := func(paths ...string) *graphsession.OnlineResult {
 		t.Helper()
@@ -100,7 +104,9 @@ func TestGraphPolicyResidentScopeAndLocks(t *testing.T) {
 	for _, p := range []string{"package-lock.json", "nested/yarn.lock", "node_modules/x.ts", "pic.png", "hidden/a.ts", "hidden/package.json", "private/tsconfig.json"} {
 		for _, action := range []string{"add", "edit", "delete"} {
 			if action == "delete" {
-				os.Remove(filepath.Join(root, p))
+				if err := os.Remove(filepath.Join(root, p)); err != nil {
+					t.Errorf("operation failed: %v", err)
+				}
 			} else {
 				graphWrite(t, root, p, action)
 			}
@@ -137,7 +143,9 @@ func TestGraphFactoryConfigOverrideAndUnsupported(t *testing.T) {
 	graphWrite(t, root, "a.ts", "export const a=1")
 	graphWrite(t, root, "mcp-arch.yaml", "extractors: [typescript]\nignore: [a.ts]\n")
 	other := filepath.Join(t.TempDir(), "explicit.yaml")
-	os.WriteFile(other, []byte("extractors: [typescript]\nignore: []\n"), 0644)
+	if err := os.WriteFile(other, []byte("extractors: [typescript]\nignore: []\n"), 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	e, err := NewGraphEngine(GraphOptions{Repo: root, ConfigPath: other})
 	if err != nil {
 		t.Fatal(err)
@@ -176,12 +184,20 @@ func TestGraphRealWatcherFiltersObservedLock(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	s := graphsession.NewFileChangeSource(root, nil, 128)
 	if err = s.Start(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	defer s.Close()
+	defer func() {
+		if err := s.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	for i := 0; i < 3; i++ {
 		if _, err = r.ApplyChanges(context.Background(), s.Drain()); err != nil {
 			t.Fatal(err)
@@ -223,7 +239,9 @@ func TestGraphPolicyStrictLockDeltaAndSemanticMedia(t *testing.T) {
 	}
 	for _, body := range []string{`{"packages":{"node_modules/x":{"version":"1.1"}}}`, `{"packages":{"node_modules/x":{"version":"1.2"}}}`, ""} {
 		if body == "" {
-			os.Remove(filepath.Join(root, "package-lock.json"))
+			if err := os.Remove(filepath.Join(root, "package-lock.json")); err != nil {
+				t.Errorf("operation failed: %v", err)
+			}
 		} else {
 			graphWrite(t, root, "package-lock.json", body)
 		}
@@ -247,7 +265,11 @@ func TestGraphPolicyStrictLockDeltaAndSemanticMedia(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, err = r.ApplyChanges(context.Background(), graphsession.ChangeBatch{Epoch: "media", Covered: true}); err != nil {
 		t.Fatal(err)
 	}
@@ -274,12 +296,20 @@ func TestGraphRealWatcherPolicyScopeChange(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	source := graphsession.NewGraphFileChangeSource(eng.Analysis(), root, nil, 128)
 	if err = source.Start(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	defer source.Close()
+	defer func() {
+		if err := source.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	settle := func() {
 		t.Helper()
 		for i := 0; i < 3; i++ {
@@ -320,7 +350,11 @@ func TestGraphFactoryInitialConfigurationChange(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, err = r.ApplyChanges(context.Background(), graphsession.ChangeBatch{Epoch: "initial", Covered: true}); err != nil {
 		t.Fatal(err)
 	}
@@ -361,12 +395,20 @@ func TestGraphExplicitDependencyNativeEvents(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer r.Close()
+			defer func() {
+				if err := r.Close(); err != nil {
+					t.Errorf("cleanup: %v", err)
+				}
+			}()
 			source := graphsession.NewGraphFileChangeSource(eng.Analysis(), root, nil, 128)
 			if err = source.Start(context.Background()); err != nil {
 				t.Fatal(err)
 			}
-			defer source.Close()
+			defer func() {
+				if err := source.Close(); err != nil {
+					t.Errorf("cleanup: %v", err)
+				}
+			}()
 			for i := 0; i < 3; i++ {
 				if _, err = r.ApplyChanges(context.Background(), source.Drain()); err != nil {
 					t.Fatal(err)

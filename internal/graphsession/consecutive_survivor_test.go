@@ -54,7 +54,11 @@ func survivorFixture(t *testing.T) (context.Context, string, *Resident, *graphst
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { r.Close() })
+	t.Cleanup(func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("operation failed: %v", err)
+		}
+	})
 	if _, err := r.reconcile(ctx, false); err != nil {
 		t.Fatal(err)
 	}

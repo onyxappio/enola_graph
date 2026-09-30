@@ -29,19 +29,6 @@ import (
 // pins the parse count, because shrinking one manifest while still reparsing the
 // same files is not what this is for.
 
-// bodyScopeRun runs a delta and returns the result with its Begin scope.
-func bodyScopeRun(t *testing.T, eng *engine.Engine, root string, opts Options) (*Result, map[string]bool, []string) {
-	t.Helper()
-	sink := &graphstream.MemorySink{}
-	res, err := Run(context.Background(), eng, root, sink, opts)
-	if err != nil {
-		t.Fatal(err)
-	}
-	owners, ids := beginScope(t, sink)
-	requireNoWholeDomainFallback(t, res, ids)
-	return res, owners, ids
-}
-
 // bodyScopeStart runs the analysis that leaves state behind and returns the
 // consumer holding it, so later deltas can be applied onto it and compared cold.
 func bodyScopeStart(t *testing.T, eng *engine.Engine, root string, opts Options) *Consumer {
@@ -996,7 +983,11 @@ func TestBodyScopeResidentProvenSideReadRollsBackWithFailedEnd(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, err := r.ApplyChanges(context.Background(), ChangeBatch{Reconcile: "initial"}); err != nil {
 		t.Fatal(err)
 	}

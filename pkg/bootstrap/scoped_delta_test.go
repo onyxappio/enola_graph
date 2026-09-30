@@ -38,7 +38,11 @@ func scopedFixture(t *testing.T) (string, *graphsession.Resident, *graphstream.M
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { r.Close() })
+	t.Cleanup(func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("operation failed: %v", err)
+		}
+	})
 	watermark := uint64(0)
 	apply := func(paths ...string) *graphsession.OnlineResult {
 		t.Helper()
@@ -242,7 +246,11 @@ func TestScopedNativeGitMetadataSettles(t *testing.T) {
 	if err = source.Start(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	defer source.Close()
+	defer func() {
+		if err := source.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	for i := 0; i < 4; i++ {
 		if _, err = r.ApplyChanges(context.Background(), source.Drain()); err != nil {
 			t.Fatal(err)

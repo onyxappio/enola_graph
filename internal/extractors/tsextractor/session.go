@@ -615,9 +615,6 @@ func (e *TSExtractor) ExtractSession(ctx context.Context, repoPath string, files
 			res.routers = collectRouterFile(src, relFile, aliases, knownFiles)
 		}
 		statsKind := parseKind(relFile)
-		if statsKind == "vue" || statsKind == "svelte" {
-			// counted after merge; workers must not race on stats
-		}
 		fillRecord(rec, res, knownFiles, freshGQL[relFile], freshGRPC[relFile], statsKind)
 		// After fillRecord, because eligibility is read off the finished record.
 		// Two arms, and only the first may pay for a scan. A file that binds

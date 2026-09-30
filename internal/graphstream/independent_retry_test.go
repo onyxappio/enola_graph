@@ -10,7 +10,11 @@ func TestIndependentAsyncExistingUnackedFlush(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer j.Close()
+	defer func() {
+		if err := j.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if err := j.Append(JournalEntry{MsgID: "retry", Subject: "s", Payload: []byte("same")}); err != nil {
 		t.Fatal(err)
 	}

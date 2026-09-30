@@ -42,7 +42,11 @@ func TestRetryReusesUnmovedParsesAndStaysColdEqual(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer res.Close()
+	defer func() {
+		if err := res.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, err := res.reconcile(ctx, false); err != nil {
 		t.Fatal(err)
 	}
@@ -109,7 +113,11 @@ func TestRetryOfferIsProvenPerFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer res.Close()
+	defer func() {
+		if err := res.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, err := res.reconcile(ctx, false); err != nil {
 		t.Fatal(err)
 	}
@@ -240,7 +248,11 @@ func TestRetryDeclinesRecordWhoseSideReadMoved(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer res.Close()
+	defer func() {
+		if err := res.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, err := res.reconcile(ctx, false); err != nil {
 		t.Fatal(err)
 	}
@@ -305,7 +317,11 @@ func TestRetryDeclinesOfferWhenAliasTargetMoved(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer res.Close()
+	defer func() {
+		if err := res.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, err := res.reconcile(ctx, false); err != nil {
 		t.Fatal(err)
 	}

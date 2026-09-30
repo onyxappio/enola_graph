@@ -23,7 +23,9 @@ func TestGitControlMetadataRequiresIdenticalCapturedBytes(t *testing.T) {
 	}
 	// A control need not be an index in this unit probe; use HEAD because Build
 	// legitimately reads Git's index and should not parse invented index contents.
-	os.Remove(index)
+	if err := os.Remove(index); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	control := filepath.Join(root, ".git", "HEAD")
 	policy, err := graphinput.Build(root, graphinput.Options{})
 	if err != nil {
@@ -31,7 +33,9 @@ func TestGitControlMetadataRequiresIdenticalCapturedBytes(t *testing.T) {
 	}
 	s := NewFileChangeSource(root, nil, 16)
 	s.policy.Store(policy)
-	s.ChangeQueue.Start(context.Background())
+	if err := s.ChangeQueue.Start(context.Background()); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	for i := 0; i < 4; i++ {
 		s.handleEvent(fsnotify.Event{Name: control, Op: fsnotify.Chmod})
 		b := s.Drain()
@@ -40,19 +44,25 @@ func TestGitControlMetadataRequiresIdenticalCapturedBytes(t *testing.T) {
 		}
 	}
 	original, _ := os.ReadFile(control)
-	os.WriteFile(control, []byte("ref: refs/heads/changed\n"), 0644)
+	if err := os.WriteFile(control, []byte("ref: refs/heads/changed\n"), 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	s.handleEvent(fsnotify.Event{Name: control, Op: fsnotify.Chmod})
 	if b := s.Drain(); b.Reconcile == "" {
 		t.Fatal("changed bytes hidden by chmod")
 	}
-	os.WriteFile(control, original, 0644)
+	if err := os.WriteFile(control, original, 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	for _, op := range []fsnotify.Op{fsnotify.Write, fsnotify.Rename, fsnotify.Remove, fsnotify.Create, fsnotify.Write | fsnotify.Chmod} {
 		s.handleEvent(fsnotify.Event{Name: control, Op: op})
 		if b := s.Drain(); b.Reconcile == "" {
 			t.Fatalf("control operation %v ignored", op)
 		}
 	}
-	os.Remove(control)
+	if err := os.Remove(control); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	s.handleEvent(fsnotify.Event{Name: control, Op: fsnotify.Chmod})
 	if b := s.Drain(); b.Reconcile == "" {
 		t.Fatal("missing control accepted as metadata-only")

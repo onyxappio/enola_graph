@@ -274,8 +274,12 @@ func TestExtractSessionRecordsEmptyExportSurface(t *testing.T) {
 	}
 	// The neighbour is the control: "empty" has to be the empty file's own
 	// marker, not what every eligible file in this repo happens to record.
-	if leaf := res.Records["leaf.ts"]; leaf == nil || !leaf.ExportSurfaceRecorded ||
+	leaf := res.Records["leaf.ts"]
+	if leaf == nil {
+		t.Fatal("leaf.ts record missing")
+	}
+	if !leaf.ExportSurfaceRecorded ||
 		strings.Join(leaf.ExportSurface, ",") != "local:leaf" {
-		t.Fatalf("leaf.ts surface = %v recorded=%v, want [local:leaf]", leaf.ExportSurface, leaf != nil && leaf.ExportSurfaceRecorded)
+		t.Fatalf("leaf.ts surface = %v recorded=%v, want [local:leaf]", leaf.ExportSurface, leaf.ExportSurfaceRecorded)
 	}
 }

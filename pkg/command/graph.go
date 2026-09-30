@@ -170,14 +170,22 @@ func (r *Runner) Graph(ctx context.Context, args []string) {
 		if err != nil {
 			r.cmdFatal("graph", "%v", err)
 		}
-		defer js.Close()
+		defer func() {
+			if err := js.Close(); err != nil {
+				r.cmdFatal("graph", "close sink: %v", err)
+			}
+		}()
 		sink = js
 	} else {
 		fsink, err := openEventFile(*events)
 		if err != nil {
 			r.cmdFatal("graph", "%v", err)
 		}
-		defer fsink.Close()
+		defer func() {
+			if err := fsink.Close(); err != nil {
+				r.cmdFatal("graph", "close sink: %v", err)
+			}
+		}()
 		sink = fsink
 	}
 	ctr.Mark("connect_sink", fmt.Sprintf("nats=%v", *natsURL != ""))

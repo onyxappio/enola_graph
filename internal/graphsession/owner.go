@@ -1233,13 +1233,6 @@ func slicesEqual[T comparable](a, b []T) bool {
 	return true
 }
 
-func stateResolutionIndex(st *State, repo string) *idIndex {
-	if st == nil {
-		return fileResolutionIndex(nil, repo)
-	}
-	return fileResolutionIndex(st.Files, repo)
-}
-
 // fileResolutionIndex builds the name-resolution domain from cached file
 // contributions (FileRecord facts plus contrib). Session-level composition
 // extras (router mounts, coverage aggregates, directory modules) live on

@@ -94,7 +94,7 @@ The decoy test also passed with atomic coverage alone in 98.034s; the full
 TypeScript package passed in the separate race run in 257.488s. The separate
 complete local and GitHub results are recorded above.
 
-## Inherited lint blocker
+## Inherited lint remediation
 
 With identical Go 1.26.8, golangci-lint 2.12.2 and whole-tree configuration:
 
@@ -109,8 +109,28 @@ numbers alone are unsuitable because T-001 edits shift existing lines.
 
 The remaining 220 unchecked calls include 153 test calls and 67 production
 calls. The lint configuration and whole-tree CI gate remain unchanged.
-An ownership decision for separate inherited-debt remediation is pending;
-this report does not waive the green-CI requirement.
+The owner explicitly authorized completing this cleanup on 2026-09-30.
+The cleanup is isolated from the plugin implementation in a separate commit:
+private unused helpers and overwritten assignments are removed, equivalent
+simplifications are applied, test setup/mutation/decoder/cleanup failures are
+checked, and production cleanup preserves the primary operation error. Session
+and CLI sink close failures are reported when no earlier operation failed.
+The intentional watch registration barrier and both sticky-uncertainty drains
+remain; cache `v322`, extraction semantics, all existing test assertions and the
+whole-tree linter configuration remain unchanged.
+
+The same pinned whole-tree lint command now exits zero with **0 findings**.
+The post-cleanup complete race run passed 111 packages and failed two: the
+newly checked cleanup in the intentional durability-failure regression, and
+`TestScopedNativeGitMetadataSettles`, the previously reproduced macOS default-
+branch failure above. The durability regression now explicitly requires Close
+to return the injected commit-path error while retaining the original Flush
+failure and zero-publication assertions; the entire graphstream race package
+then passed. The separate complete bootstrap race repetition failed only the same native
+Git metadata assertion; the cleanup adds error checks but does not change that
+assertion or its event-handling semantics.
+The new GitHub full race/coverage matrix and independent cleanup review must
+pass before merge; the initial failed run is not green verification evidence.
 
 ## Evidence locations and limits
 
@@ -120,7 +140,11 @@ Local diagnostic logs are ephemeral and not required for plugin use:
 - `/tmp/t001-latest-focused.log`: latest cold-domain and Go-runtime checks.
 - `/tmp/t001-final-full-tests.log`: prior failed combined race/coverage run.
 - `/tmp/t001-final-race-alone.log`: complete local race PASS (113 packages).
-- `/tmp/t001-pushed-lint.json`: current whole-tree lint findings.
+- `/tmp/t001-pushed-lint.json`: pre-cleanup whole-tree lint findings.
+- `/tmp/t001-cleanup-final-lint.json`: final post-cleanup whole-tree lint.
+- `/tmp/t001-cleanup-full-race.log`: post-cleanup complete race run (111 PASS, 2 failures).
+- `/tmp/t001-cleanup-graphstream-race.log`: complete graphstream race PASS after fixing the expected cleanup error.
+- `/tmp/t001-cleanup-bootstrap-race.log`: separately repeated complete bootstrap race run.
 - `/tmp/t001-main-lint.json`: unchanged-main whole-tree baseline findings.
 - `/tmp/t001-portable-smoke-result.json`: built V1 CLI portability/no-change probe.
 - `/tmp/t001-go-cli-smoke-result.json`: built V2 CLI initial/no-change/delta/cold probe.

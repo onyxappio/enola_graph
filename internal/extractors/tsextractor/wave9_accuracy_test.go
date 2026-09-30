@@ -222,9 +222,6 @@ export function Real() { return <Card />; }
 		t.Fatalf("unshadowed JSX must call Card: %+v", real.Relations)
 	}
 	widgetFR := fileRefFact(ff, "src/Widget.tsx")
-	if hasCallToFile(widgetFR, "src.Card", "src/Card.tsx") {
-		// file_ref still records the Real() use
-	}
 	if !hasCallToFile(widgetFR, "src.Card", "src/Card.tsx") {
 		t.Fatalf("file_ref must keep genuine JSX Card use: %+v", widgetFR.Relations)
 	}

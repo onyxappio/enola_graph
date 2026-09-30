@@ -106,9 +106,6 @@ func TestRecoverPendingPromotesAfterAckedEnd(t *testing.T) {
 func TestRepoIDDefaultIsAbsolutePath(t *testing.T) {
 	a := setupTSRepo(t, map[string]string{"src/a.ts": "export const a=1;"})
 	b := setupTSRepo(t, map[string]string{"src/a.ts": "export const a=1;"})
-	if filepath.Base(a) == filepath.Base(b) {
-		// temp dirs can share a basename in theory; the stored id must still differ.
-	}
 	engA := testEngine(t, a)
 	shared := t.TempDir()
 	if _, err := Run(context.Background(), engA, a, &graphstream.MemorySink{}, Options{StateDir: shared, ContextID: "x"}); err != nil {
@@ -252,18 +249,6 @@ func TestExtendsAliasInvalidation(t *testing.T) {
 	if targets(warm.Facts) != targets(cold.Facts) {
 		t.Fatalf("alias targets warm=%s cold=%s parsed=%d", targets(warm.Facts), targets(cold.Facts), warm.ParsedFiles)
 	}
-}
-
-type reviewSink struct {
-	graphstream.MemorySink
-	before func(string)
-}
-
-func (s *reviewSink) Publish(c context.Context, sub, id string, p []byte) error {
-	if s.before != nil {
-		s.before(string(p))
-	}
-	return s.MemorySink.Publish(c, sub, id, p)
 }
 
 type mutationExtractor struct {
@@ -415,7 +400,11 @@ func TestUnreadableAngularTemplateRefuses(t *testing.T) {
 		t.Fatal(err)
 	}
 	p := filepath.Join(d, "src/page.html")
-	defer os.Chmod(p, 0o644)
+	defer func() {
+		if err := os.Chmod(p, 0o644); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if err := os.Chmod(p, 0); err != nil {
 		t.Fatal(err)
 	}

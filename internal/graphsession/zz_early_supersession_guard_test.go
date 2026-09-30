@@ -35,7 +35,11 @@ func TestEarlySupersessionCheckIsBoundedAndSilent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, err := r.ApplyChanges(ctx, ChangeBatch{Reconcile: "initial"}); err != nil {
 		t.Fatal(err)
 	}
@@ -44,7 +48,7 @@ func TestEarlySupersessionCheckIsBoundedAndSilent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if changed.Result.OwnersPublished == 0 {
+	if changed.OwnersPublished == 0 {
 		t.Fatal("a real edit published nothing")
 	}
 	t.Logf("pre-Begin reads: delta=%d (repo=%d files); End-fence reads: %d", changed.Work.EarlyConsumedReads, len(files), changed.Work.VerifiedFiles)

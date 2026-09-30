@@ -24,7 +24,9 @@ func TestIndependentFailedReloadRevert(t *testing.T) {
 	if _, err := r.ApplyChanges(context.Background(), q.Drain()); err == nil {
 		t.Fatal("wanted failure")
 	}
-	os.Remove(filepath.Join(root, "mcp-arch.yaml"))
+	if err := os.Remove(filepath.Join(root, "mcp-arch.yaml")); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	sink.FailAt(0, nil)
 	q.Add("mcp-arch.yaml")
 	if _, err := r.ApplyChanges(context.Background(), q.Drain()); err != nil {
@@ -40,8 +42,12 @@ func TestIndependentExternalAncestorSymlink(t *testing.T) {
 	root, r, _, _ := residentFixture(t, map[string]string{"a.ts": "export const a=1"}, Options{})
 	outer := t.TempDir()
 	real := filepath.Join(outer, "real")
-	os.Mkdir(real, 0755)
-	os.WriteFile(filepath.Join(real, "base.json"), []byte("{}"), 0644)
+	if err := os.Mkdir(real, 0755); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(real, "base.json"), []byte("{}"), 0644); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	alias := filepath.Join(outer, "alias")
 	if err := os.Symlink(real, alias); err != nil {
 		t.Fatal(err)
@@ -51,7 +57,11 @@ func TestIndependentExternalAncestorSymlink(t *testing.T) {
 	if err := s.Start(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	defer s.Close()
+	defer func() {
+		if err := s.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if err := s.CoverSessionInputs(r); err == nil {
 		t.Fatal("coverage accepted external config with symlinked ancestor")
 	}

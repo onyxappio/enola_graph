@@ -317,9 +317,10 @@ func (a *Analyzer) buildInterpreter(m *machineModel, root *sitter.Node, kinds *t
 	returnKinds := map[string]int{}
 	for _, callee := range selectedReturnSites {
 		kind := "other_transition"
-		if callee == spec.Enter {
+		switch callee {
+		case spec.Enter:
 			kind = "enter_state"
-		} else if callee == spec.Reject {
+		case spec.Reject:
 			kind = "rejection"
 		}
 		returnKinds[kind]++

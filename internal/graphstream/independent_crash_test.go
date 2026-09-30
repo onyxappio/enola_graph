@@ -58,7 +58,11 @@ func TestIndependentReclaimEveryRename(t *testing.T) {
 			if err != nil {
 				t.Fatalf("valid crash after %d compaction renames cannot recover durable b: %v", renamed, err)
 			}
-			defer r.Close()
+			defer func() {
+				if err := r.Close(); err != nil {
+					t.Errorf("cleanup: %v", err)
+				}
+			}()
 			u := r.Unacked()
 			if len(u) != 1 || u[0].MsgID != "b" || !bytes.Equal(u[0].Payload, []byte("durable-b")) {
 				t.Fatalf("lost/changed durable b: %+v", u)
@@ -141,7 +145,11 @@ func TestIndependentCompactEveryRename(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer r.Close()
+			defer func() {
+				if err := r.Close(); err != nil {
+					t.Errorf("cleanup: %v", err)
+				}
+			}()
 			if len(r.Unacked()) != 2 {
 				t.Fatalf("post-recovery durable entries %v", r.Unacked())
 			}

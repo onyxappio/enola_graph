@@ -31,7 +31,11 @@ func TestIndependentScopedResidentConfigMutationFence(t *testing.T) {
 					f()
 				}
 			}})
-			defer q.Close()
+			defer func() {
+				if err := q.Close(); err != nil {
+					t.Errorf("cleanup: %v", err)
+				}
+			}()
 			before, err := json.Marshal(r.state)
 			if err != nil {
 				t.Fatal(err)
@@ -127,7 +131,11 @@ func independentScopedFenceFixture(t *testing.T, files map[string]string, opts O
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { r.Close() })
+	t.Cleanup(func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("operation failed: %v", err)
+		}
+	})
 	q := NewChangeQueue("scoped-review", 32)
 	if err = q.Start(context.Background()); err != nil {
 		t.Fatal(err)

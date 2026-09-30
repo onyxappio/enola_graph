@@ -20,12 +20,20 @@ func TestIndependentResidentPackageExportsMembershipSequence(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	q := NewChangeQueue("independent-package-membership", 32)
 	if err := q.Start(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	defer q.Close()
+	defer func() {
+		if err := q.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	consumer := NewConsumer()
 	apply := func(want string) {
 		t.Helper()

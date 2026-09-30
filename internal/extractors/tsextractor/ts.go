@@ -1128,8 +1128,7 @@ func collectTSModuleBlockScopes(kinds *tsutil.KindTable, root *sitter.Node, src 
 		return scopes
 	}
 	var walkControl func(*sitter.Node, map[string]string, []int, *int)
-	var visitBlock func(*sitter.Node, map[string]string, []int)
-	visitBlock = func(block *sitter.Node, inherited map[string]string, path []int) {
+	visitBlock := func(block *sitter.Node, inherited map[string]string, path []int) {
 		if block == nil || tsIsFunctionLike(kindOf(kinds, block)) {
 			return
 		}
@@ -3578,7 +3577,7 @@ func validViteVersionQuery(query string) bool {
 		return false
 	}
 	for _, c := range query[3:] {
-		if !(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9' || c == '_' || c == '-' || c == '.') {
+		if (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') && c != '_' && c != '-' && c != '.' {
 			return false
 		}
 	}
@@ -4029,10 +4028,7 @@ func isTSScriptMode(kinds *tsutil.KindTable, root *sitter.Node, relFile string, 
 		}
 	}
 	scan(root)
-	if commonJS {
-		return false
-	}
-	return true
+	return !commonJS
 }
 
 // collectTSFileRefs performs a whole-file reference pass for the dead-code detector.
@@ -5547,37 +5543,6 @@ func (w *tsBodyWalker) lookupRequireValue(name string) (string, string, bool) {
 		}
 	}
 	return "", "", false
-}
-
-func (w *tsBodyWalker) bindScopedImport(local, exportName, importPath string) {
-	if local == "" || importPath == "" || w.ctx == nil || len(w.importScopes) == 0 {
-		return
-	}
-	resolved, isExternal := resolveImportPath(importPath, w.dir, w.ctx.aliases)
-	if isExternal {
-		return
-	}
-	idx, dir, found := resolveModuleFile(resolved, w.ctx.knownFiles)
-	if !found {
-		dir = factpath.Dir(resolved)
-	}
-	note := func(f string) {
-		if w.ctx.sideReads == nil {
-			return
-		}
-		f = filepath.ToSlash(f)
-		if f != "" && f != filepath.ToSlash(w.relFile) {
-			w.ctx.sideReads[f] = true
-		}
-	}
-	target, file := bindImportedSymbol(dir, idx, exportName, resolved, found, w.ctx.readSrc, w.ctx.aliases, w.ctx.knownFiles, w.ctx.exportCache, note)
-	if target == "" {
-		return
-	}
-	w.importScopes[len(w.importScopes)-1][local] = target
-	if file != "" {
-		w.importFileScopes[len(w.importFileScopes)-1][local] = file
-	}
 }
 
 func (w *tsBodyWalker) bindLiteralImportDecl(n *sitter.Node) {

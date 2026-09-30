@@ -170,7 +170,11 @@ func TestProbeDeclinesLostOverflowAndClose(t *testing.T) {
 				q.Add(string(rune('a'+i%26)) + string(rune('a'+i/26)) + ".ts")
 			}
 		}, "change queue overflow"},
-		{"close", func(q *ChangeQueue) { q.Close() }, "change source closed"},
+		{"close", func(q *ChangeQueue) {
+			if err := q.Close(); err != nil {
+				t.Errorf("operation failed: %v", err)
+			}
+		}, "change source closed"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			_, r, q, _ := probeFixture(t)
@@ -264,7 +268,7 @@ func TestProbeHonoursSourceUncertaintyWhileQueueStillCovered(t *testing.T) {
 	if s.Discard(tok) {
 		t.Fatal("discarded a batch whose source coverage was uncertain")
 	}
-	if s.ChangeQueue.drained != 0 || len(s.ChangeQueue.paths) != 1 {
+	if s.drained != 0 || len(s.paths) != 1 {
 		t.Fatal("refused discard consumed the queue")
 	}
 	if drained := s.Drain(); drained.Covered {
@@ -292,13 +296,13 @@ func TestProbeCommitDeclinesUncertaintyRaisedAfterPeek(t *testing.T) {
 	s.uncertain = true
 	s.registration.Unlock()
 
-	if s.ChangeQueue.seq != tok.seq || s.ChangeQueue.covered != tok.covered {
+	if s.seq != tok.seq || s.covered != tok.covered {
 		t.Fatal("fixture invalid: the queue should not have moved yet")
 	}
 	if s.Discard(tok) {
 		t.Fatal("discarded a batch after coverage became uncertain")
 	}
-	if s.ChangeQueue.drained != 0 {
+	if s.drained != 0 {
 		t.Fatal("refused discard consumed the queue")
 	}
 }

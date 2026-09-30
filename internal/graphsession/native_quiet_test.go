@@ -50,7 +50,11 @@ func TestNativeQuietExternalConfigOutputLayouts(t *testing.T) {
 			if err := source.Start(ctx); err != nil {
 				t.Fatal(err)
 			}
-			defer source.Close()
+			defer func() {
+				if err := source.Close(); err != nil {
+					t.Errorf("cleanup: %v", err)
+				}
+			}()
 			for i := 0; i < 4; i++ {
 				if _, err := r.ApplyChanges(ctx, source.Drain()); err != nil {
 					t.Fatal(err)

@@ -181,8 +181,8 @@ func (p *Policy) Classify(name string, directory bool) Decision {
 	// descendants are hard-excluded exempts nothing, because every file under it
 	// is excluded either by that hard rule or by gitignore with no tracking to
 	// override it. Keeping the two sets equal is what lets the admission digest
-	// stand for the decision function: see trackedAdmission.
-	if p.gitIgnored(rel) && !p.tracked[rel] && !(directory && p.admitDirs[rel]) {
+	// stand for the decision function: see trackedAdmissionWith.
+	if p.gitIgnored(rel) && !p.tracked[rel] && (!directory || !p.admitDirs[rel]) {
 		return Decision{Excluded, known, "gitignore"}
 	}
 	if !directory && !p.conservative && !p.semantic.MatchAny(rel) && media(rel) {
@@ -591,7 +591,7 @@ func Build(root string, options Options) (*Policy, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer os.RemoveAll(temp)
+	defer func() { _ = os.RemoveAll(temp) }() // Best-effort cleanup of the temporary Git repository.
 	if _, err := runGit(root, "", nil, "init", "--bare", "--quiet", "--template=", temp); err != nil {
 		return nil, err
 	}
@@ -709,7 +709,7 @@ func (p *Policy) gitIgnoredMemo(m *policyMemo, name string) bool {
 	return ign
 }
 
-// trackedAdmission returns the tracked entries whose index membership can move a
+// trackedAdmissionWith returns the tracked entries whose index membership can move a
 // decision: the ones Git ignores and no hard rule already excludes. A hard
 // exclusion is evaluated before the override and wins over it, so a tracked
 // lockfile, state directory or Enola-excluded path entering or leaving the index
@@ -728,12 +728,8 @@ func (p *Policy) gitIgnoredMemo(m *policyMemo, name string) bool {
 // consults, so the two cannot drift. That is what makes the digest stand for the
 // decision function rather than merely for the leaf decisions: staging a build
 // artifact under an ignored directory moves neither.
-func (p *Policy) trackedAdmission() (files, dirs []string) {
-	return p.trackedAdmissionWith(newPolicyMemo())
-}
-
-// trackedAdmissionWith is trackedAdmission sharing one memo with the caller, so
-// the hard evaluations computeIdentities already paid for are not repeated here.
+// It shares one memo with the caller, so the hard evaluations
+// computeIdentities already paid for are not repeated here.
 func (p *Policy) trackedAdmissionWith(m *policyMemo) (files, dirs []string) {
 	files = []string{}
 	dirSet := map[string]bool{}

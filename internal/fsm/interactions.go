@@ -398,11 +398,6 @@ func returnedObjectHasMethod(value *sitter.Node, method string, src []byte, kind
 	return false
 }
 
-func (a *Analyzer) eventArgumentTags(m *machineModel, from string, args []*sitter.Node, src []byte, kinds *tsutil.KindTable) ([]string, bool, string) {
-	tags, resolved, calleeFile, _ := a.eventArgumentTagsWithReads(m, from, args, src, kinds)
-	return tags, resolved, calleeFile
-}
-
 func (a *Analyzer) eventArgumentTagsWithReads(m *machineModel, from string, args []*sitter.Node, src []byte, kinds *tsutil.KindTable) ([]string, bool, string, []string) {
 	if len(args) == 0 {
 		return nil, false, "", nil
@@ -1830,18 +1825,6 @@ func conditionHasLiteralFieldComparison(n *sitter.Node, field string, src []byte
 	return found
 }
 
-func configuredTypeImported(m *machineModel, file string, src []byte, kinds *tsutil.KindTable, a *Analyzer) bool {
-	typeName := m.spec.CommandType
-	if typeName == "" {
-		typeName = m.spec.EffectType
-	}
-	if typeName == "" {
-		return false
-	}
-	resolvedFile, resolvedExport := a.resolveType(file, typeName)
-	return resolvedFile == m.commandFile && resolvedExport == m.commandExport
-}
-
 func (a *Analyzer) typeNodeMatchesCommand(m *machineModel, file string, typ *sitter.Node, src []byte, kinds *tsutil.KindTable) bool {
 	matched := false
 	walk(typ, func(n *sitter.Node) {
@@ -1854,13 +1837,6 @@ func (a *Analyzer) typeNodeMatchesCommand(m *machineModel, file string, typ *sit
 		}
 	})
 	return matched
-}
-
-func memberFieldIs(n *sitter.Node, field string, src []byte, kinds *tsutil.KindTable) bool {
-	if n == nil || kinds.Of(n) != "member_expression" {
-		return false
-	}
-	return text(n.ChildByFieldName("property"), src) == field
 }
 
 func interactionFact(file, sourceSymbol, relKind, target string, site *sitter.Node, props map[string]any) facts.Fact {
@@ -1924,16 +1900,6 @@ func containsCallName(n *sitter.Node, name string, src []byte, kinds *tsutil.Kin
 	})
 }
 
-func containsCallToAny(n *sitter.Node, names map[string]bool, src []byte, kinds *tsutil.KindTable) bool {
-	found := false
-	walk(n, func(c *sitter.Node) {
-		if kinds.Of(c) == "call_expression" && names[calleeName(c, src, kinds)] {
-			found = true
-		}
-	})
-	return found
-}
-
 func typedEventParameter(fn *sitter.Node, m *machineModel, file string, src []byte, kinds *tsutil.KindTable, a *Analyzer) string {
 	params := fn.ChildByFieldName("parameters")
 	for _, p := range namedChildren(params) {
@@ -1965,13 +1931,6 @@ func (a *Analyzer) typeNodeMatches(m *machineModel, file string, typ *sitter.Nod
 		}
 	})
 	return matched
-}
-
-func firstArg(args []*sitter.Node, src []byte, kinds *tsutil.KindTable) *sitter.Node {
-	if len(args) > 0 {
-		return args[0]
-	}
-	return nil
 }
 
 func eventObjectTag(n *sitter.Node, src []byte, kinds *tsutil.KindTable) (string, bool) {

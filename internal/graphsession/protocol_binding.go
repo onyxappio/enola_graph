@@ -38,11 +38,11 @@ func bindProtocol(dir string, frozen bool) error {
 		return err
 	}
 	if _, err := f.WriteString(want); err != nil {
-		f.Close()
+		_ = f.Close() // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if err := f.Sync(); err != nil {
-		f.Close()
+		_ = f.Close() // Preserve the primary operation error; cleanup is best effort.
 		return err
 	}
 	if err := f.Close(); err != nil {

@@ -33,7 +33,7 @@ func (e *SwiftExtractor) observedContext(repoPath string) (string, []string) {
 			paths = append(paths, rel)
 		}
 		b, err := inputScope.ReadFile(filepath.Join(repoPath, rel))
-		fmt.Fprintf(h, "%q:%d:%v\n", rel, len(b), err)
+		_, _ = fmt.Fprintf(h, "%q:%d:%v\n", rel, len(b), err) // SHA-256 writers cannot fail.
 		h.Write(b)
 		return b, err
 	}
@@ -50,11 +50,11 @@ func (e *SwiftExtractor) observedContext(repoPath string) (string, []string) {
 			// The parser retries case-insensitive lookup on read OR parse failure.
 			if readErr != nil || yaml.Unmarshal(b, &f) != nil {
 				if resolved, ok := resolveCaseInsensitive(repoPath, rel, inputScope); ok {
-					read(resolved)
+					_, _ = read(resolved) // The callback records this observation, including read errors.
 				}
 			}
 		}
 	}
-	fmt.Fprintf(h, "ios:%t", detectiOSProject(repoPath, inputScope))
+	_, _ = fmt.Fprintf(h, "ios:%t", detectiOSProject(repoPath, inputScope)) // SHA-256 writers cannot fail.
 	return fmt.Sprintf("swift-v1:%x", h.Sum(nil)), paths
 }

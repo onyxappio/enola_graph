@@ -29,7 +29,11 @@ func TestNeutralProofAndCandidateScopeShareOneCapture(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, err := r.ApplyChanges(context.Background(), ChangeBatch{Reconcile: "initial"}); err != nil {
 		t.Fatal(err)
 	}
@@ -41,7 +45,7 @@ func TestNeutralProofAndCandidateScopeShareOneCapture(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if changed.Result.OwnersPublished == 0 {
+	if changed.OwnersPublished == 0 {
 		t.Fatal("a dependency edit published nothing")
 	}
 	if changed.Work.NonTSCaptures != 1 {
@@ -55,8 +59,8 @@ func TestNeutralProofAndCandidateScopeShareOneCapture(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if neutral.Result.OwnersPublished != 0 || neutral.Result.ParsedFiles != 0 {
-		t.Fatalf("a version-only edit published %d owner(s) and parsed %d file(s)", neutral.Result.OwnersPublished, neutral.Result.ParsedFiles)
+	if neutral.OwnersPublished != 0 || neutral.ParsedFiles != 0 {
+		t.Fatalf("a version-only edit published %d owner(s) and parsed %d file(s)", neutral.OwnersPublished, neutral.ParsedFiles)
 	}
 	if neutral.Work.NonTSCaptures != 1 {
 		t.Fatalf("a graph-neutral edit made %d fenced capture(s), want exactly 1", neutral.Work.NonTSCaptures)
@@ -131,7 +135,7 @@ func (c countingNotes) Extract(ctx context.Context, repo string, files []string)
 	if c.live != nil {
 		*c.live++
 	}
-	return c.capturingStub.stubExtractor.Extract(ctx, repo, files)
+	return c.stubExtractor.Extract(ctx, repo, files)
 }
 
 // The need for a non-TypeScript extractor is raised from input hashes, and the

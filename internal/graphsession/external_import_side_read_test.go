@@ -77,7 +77,11 @@ func TestExternalImportResidentProofRollsBackWithFailedEnd(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	if _, err := r.ApplyChanges(context.Background(), ChangeBatch{Reconcile: "initial"}); err != nil {
 		t.Fatal(err)
 	}
@@ -160,7 +164,11 @@ func TestExternalImportProofReconcilesResolverChanges(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer r.Close()
+			defer func() {
+				if err := r.Close(); err != nil {
+					t.Errorf("cleanup: %v", err)
+				}
+			}()
 			apply := func() {
 				t.Helper()
 				if _, err := r.ApplyChanges(context.Background(), ChangeBatch{Reconcile: "resolver mutation"}); err != nil {

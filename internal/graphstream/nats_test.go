@@ -52,7 +52,11 @@ func TestNATSSinkPublishAckAndReplay(t *testing.T) {
 	if err != nil {
 		t.Fatalf("connect: %v", err)
 	}
-	defer sink.Close()
+	defer func() {
+		if err := sink.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 
 	begin := BeginReplace{
 		Type:             TypeBeginReplace,
@@ -108,7 +112,7 @@ func TestConcretePublishSubjectStaysInWildcard(t *testing.T) {
 	if got == SubjectForRun("r", "c", "run-1") {
 		t.Fatal("custom pattern collapsed onto default enola.graph subject")
 	}
-	if !(len(got) > len("acceptance.custom.") && got[:len("acceptance.custom.")] == "acceptance.custom.") {
+	if len(got) <= len("acceptance.custom.") || got[:len("acceptance.custom.")] != "acceptance.custom." {
 		t.Fatalf("subject %q not under acceptance.custom.", got)
 	}
 }
@@ -128,7 +132,11 @@ func freePort(t *testing.T) int {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer l.Close()
+	defer func() {
+		if err := l.Close(); err != nil {
+			t.Errorf("cleanup: %v", err)
+		}
+	}()
 	return l.Addr().(*net.TCPAddr).Port
 }
 

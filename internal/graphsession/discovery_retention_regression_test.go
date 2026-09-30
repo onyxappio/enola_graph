@@ -20,9 +20,15 @@ func retentionFixture(t *testing.T, files map[string]string, opts Options) (stri
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { r.Close() })
+	t.Cleanup(func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("operation failed: %v", err)
+		}
+	})
 	q := NewChangeQueue("test", 8)
-	q.Start(context.Background())
+	if err := q.Start(context.Background()); err != nil {
+		t.Errorf("operation failed: %v", err)
+	}
 	return dir, r, q, sink
 }
 

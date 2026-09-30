@@ -414,25 +414,33 @@ type Result struct {
 }
 
 // Run performs initial analysis when no complete state exists, otherwise a delta.
-func Run(ctx context.Context, eng *engine.Engine, repoPath string, sink graphstream.Sink, opts Options) (*Result, error) {
+func Run(ctx context.Context, eng *engine.Engine, repoPath string, sink graphstream.Sink, opts Options) (result *Result, retErr error) {
 	r, err := OpenSession(ctx, eng, repoPath, sink, opts)
 	if err != nil {
 		return nil, err
 	}
-	defer r.Close()
+	defer func() {
+		if closeErr := r.Close(); retErr == nil {
+			retErr = closeErr
+		}
+	}()
 	return r.reconcile(ctx, true)
 }
 
 // RunSummary executes the same analysis and delivery contract as Run, but omits
 // Facts from the returned result. It may avoid cloning cached contributions on
 // a proven no-publication run. It still fully decodes and validates durable state.
-func RunSummary(ctx context.Context, eng *engine.Engine, repoPath string, sink graphstream.Sink, opts Options) (*Result, error) {
+func RunSummary(ctx context.Context, eng *engine.Engine, repoPath string, sink graphstream.Sink, opts Options) (result *Result, retErr error) {
 	opts.summaryOnly = true
 	r, err := OpenSession(ctx, eng, repoPath, sink, opts)
 	if err != nil {
 		return nil, err
 	}
-	defer r.Close()
+	defer func() {
+		if closeErr := r.Close(); retErr == nil {
+			retErr = closeErr
+		}
+	}()
 	return r.reconcile(ctx, false)
 }
 
@@ -671,14 +679,6 @@ type session struct {
 type preparedParse struct {
 	path   string
 	reason string
-}
-
-func (s *session) analyze(ctx context.Context) (*Result, error) {
-	return s.run(ctx, true)
-}
-
-func (s *session) delta(ctx context.Context) (*Result, error) {
-	return s.run(ctx, false)
 }
 
 func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
@@ -961,9 +961,6 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			need = ownedExtractorContextNeed(owned, s.state, ext, inv.Files, inv.AllNames, hashes, fileSetHash, prevScan, scanHash)
 		}
 		needByExt[ext.Name()] = need
-		if need {
-			nonTSNeed = true
-		}
 	}
 	for _, name := range priorExtractorNames(s.state, prevFiles) {
 		// Plugin-owned file contributions are reconciled from the separate
@@ -976,7 +973,6 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			continue
 		}
 		needByExt[name] = true
-		nonTSNeed = true
 		nonTSFileOwners = append(nonTSFileOwners, retireExtractorOwners(s.state, prevFiles, name)...)
 		dropExtractorContribution(prevFiles, name)
 		delete(extractorDigest, name)
@@ -1745,8 +1741,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 				}
 				// The last round's verdicts outlive the loop: they are the proof
 				// behind every side read it decided not to follow.
-				changed := map[string]bool{}
-				proven := map[string]bool{}
+				var changed, proven map[string]bool
 				for {
 					changed = map[string]bool{}
 					for path, rec := range res.Records {
@@ -2528,30 +2523,6 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 type ownerChunk struct {
 	nodes []graphstream.Node
 	edges []graphstream.Edge
-}
-
-func chunkOwner(nodes []graphstream.Node, edges []graphstream.Edge, limit int) []ownerChunk {
-	if limit <= 0 {
-		return []ownerChunk{{nodes, edges}}
-	}
-	var out []ownerChunk
-	for len(nodes) > 0 || len(edges) > 0 {
-		c := ownerChunk{}
-		n := limit
-		if len(nodes) < n {
-			n = len(nodes)
-		}
-		c.nodes = nodes[:n]
-		nodes = nodes[n:]
-		e := limit
-		if len(edges) < e {
-			e = len(edges)
-		}
-		c.edges = edges[:e]
-		edges = edges[e:]
-		out = append(out, c)
-	}
-	return out
 }
 
 func (s *session) begin(ctx context.Context, runID, repoID string, base, target int64, phase, scopeMode string, owners []graphstream.OwnerRef) error {
@@ -3761,21 +3732,6 @@ func analysisFingerprintInputs(abs string, eng *engine.Engine) (string, map[stri
 
 func asFatal(err error, dest **plugin.FatalError) bool {
 	return errors.As(err, dest)
-}
-
-func writePending(dir, runID string, base, target int64) error {
-	if err := os.MkdirAll(dir, 0o755); err != nil {
-		return err
-	}
-	b, err := json.Marshal(map[string]any{"run_id": runID, "base": base, "target": target})
-	if err != nil {
-		return err
-	}
-	tmp := filepath.Join(dir, "pending.json.tmp")
-	if err := os.WriteFile(tmp, b, 0o644); err != nil {
-		return err
-	}
-	return os.Rename(tmp, filepath.Join(dir, "pending.json"))
 }
 
 func cloneTagged(ff []facts.Fact, repo string) []facts.Fact {
