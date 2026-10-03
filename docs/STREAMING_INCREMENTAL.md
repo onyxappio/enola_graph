@@ -84,6 +84,28 @@ The names below describe semantics; implementation names may differ.
 3. `EndReplace` declares the exact batch manifest/count/digest, the final owner
    scope length/digest, and successful completion.
 
+EndReplace may include additive `statistics.transaction_duration_ns` (integer
+nanoseconds). The producer samples its monotonic clock once after acquiring the
+transaction lock and once after preparing End's digests, before serializing End.
+This includes recovery and policy/input preparation within the transaction,
+planning, extraction, prior batch publication/backpressure, and pending-state
+preparation. It excludes CLI/OpenSession startup, Watch buffer/event
+classification and pre-transaction changed-input hashing/probes, waiting for the
+transaction lock, End serialization/publication and the final outstanding ACK
+drain, final checkpoint promotion, and consumer application. It is elapsed
+transaction time, **not** extraction-only CPU time or complete acknowledged
+CLI latency. Existing `completeness` and envelope counters report parses, cached
+files, scans, fallback reasons, batch count and owner-scope count without another
+walk. Missing statistics in old envelopes means unknown, not zero.
+
+Statistics are sampled only for the original End payload. Durable journal replay
+reuses those exact bytes and never recomputes timing. Silent no-change runs still
+emit neither Begin nor End; failed runs do not gain a successful End merely to
+report timing. The optional diagnostic field does not change graph semantics,
+frozen scope, completeness, batch digests, schema version or consumer commit rules.
+Consumers must accept unknown optional envelope fields; an external consumer
+that rejects additional JSON fields must update its decoder before rollout.
+
 Consumers finalize only after every declared batch is applied. Seeing an end marker
 alone does not prove completeness or processing order. Duplicate delivery is expected;
 run and batch identity must support idempotent handling. Replayed payloads for the same

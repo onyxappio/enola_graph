@@ -14,6 +14,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/enola-labs/enola/internal/analyzerplugin"
 	"github.com/enola-labs/enola/internal/engine"
@@ -424,6 +425,7 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 	if r.closed {
 		return nil, WorkCounters{}, fmt.Errorf("graphsession: session closed")
 	}
+	transactionStarted := time.Now()
 	// recoveryWork is what the barrier below cost. It is folded into the run's
 	// counters once the session exists, so a recovery that skipped a decode
 	// reports it on the same receipt as the run that followed it.
@@ -545,7 +547,7 @@ func (r *Resident) transaction(ctx context.Context, input *runtimeInputs, fast b
 		rtr.Mark("reload_engine", "")
 	}
 	rtr.Mark("reconcile_complete", fmt.Sprintf("reloaded=%v", reloaded))
-	s := &session{eng: r.eng, abs: r.abs, opts: r.opts, sink: r.sink, state: r.state, stateFP: r.ck.fp, journal: r.journal, prof: graphprofile.StartNamed("session"), inputs: input, fast: fast, runtimeFingerprints: r.runtimeFingerprints}
+	s := &session{transactionStarted: transactionStarted, eng: r.eng, abs: r.abs, opts: r.opts, sink: r.sink, state: r.state, stateFP: r.ck.fp, journal: r.journal, prof: graphprofile.StartNamed("session"), inputs: input, fast: fast, runtimeFingerprints: r.runtimeFingerprints}
 	s.retained, s.retainedFor = r.tsDiscovery, r.tsDiscoveryFor
 	s.retryRecords, s.retryFor = r.retryRecords, r.retryFor
 	s.retryFileContext, s.retryFileBase = r.retryFileContext, r.retryFileBase

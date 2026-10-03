@@ -558,7 +558,8 @@ func identityOK(st *State, opts Options, abs string) error {
 }
 
 type session struct {
-	deferBegin bool
+	transactionStarted time.Time
+	deferBegin         bool
 	// retained is the snapshot the resident's last committed run proved, and
 	// retainedFor the policy identity it was proven under. Both are an offer,
 	// never an answer: nothing is used until this run proves it again.
@@ -682,6 +683,9 @@ type preparedParse struct {
 }
 
 func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
+	if s.transactionStarted.IsZero() {
+		s.transactionStarted = time.Now()
+	}
 	if s.opts.ChangedOwnersOnly && !s.opts.AuthoritativeFiles {
 		return nil, fmt.Errorf("changed-owner scope requires authoritative file scope")
 	}
@@ -3235,6 +3239,9 @@ func (s *session) end(ctx context.Context, runID string, batchCount int, owners 
 		OwnerScopeLen:    len(owners),
 		OwnerScopeDigest: graphstream.DigestOwners(owners),
 		Completeness:     c,
+	}
+	if !s.transactionStarted.IsZero() {
+		msg.Statistics = &graphstream.RunStatistics{TransactionDurationNS: time.Since(s.transactionStarted).Nanoseconds()}
 	}
 	payload, err := graphstream.Marshal(msg)
 	if err != nil {

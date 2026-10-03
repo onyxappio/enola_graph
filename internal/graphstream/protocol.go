@@ -156,18 +156,31 @@ type Fallback struct {
 	Reason    string `json:"reason"`
 }
 
+// RunStatistics describes producer work before the End envelope is serialized.
+// It is diagnostic metadata, not part of graph identity or completeness.
+type RunStatistics struct {
+	// TransactionDurationNS uses the producer's monotonic clock. It includes
+	// transaction recovery, policy/input preparation within the transaction,
+	// planning, extraction,
+	// prior publication/backpressure, checkpoint preparation and End digests.
+	// It excludes CLI/OpenSession startup, Watch buffering/classification and pre-transaction input hashing/probes,
+	// waiting for the transaction lock, End publish, final outstanding ACK drain, and consumer apply.
+	TransactionDurationNS int64 `json:"transaction_duration_ns"`
+}
+
 // EndReplace closes a replacement. BatchDigest is the hex SHA-256 of the
 // concatenation of every batch payload in seq order. OwnerScopeDigest is the
 // hex SHA-256 of the sorted final owner manifest; required for incremental
 // scope so consumers can verify the collected set before commit.
 type EndReplace struct {
-	Type             string       `json:"type"`
-	RunID            string       `json:"run_id"`
-	BatchCount       int          `json:"batch_count"`
-	BatchDigest      string       `json:"batch_digest"`
-	Completeness     Completeness `json:"completeness"`
-	OwnerScopeLen    int          `json:"owner_scope_len"`
-	OwnerScopeDigest string       `json:"owner_scope_digest,omitempty"`
+	Statistics       *RunStatistics `json:"statistics,omitempty"`
+	Type             string         `json:"type"`
+	RunID            string         `json:"run_id"`
+	BatchCount       int            `json:"batch_count"`
+	BatchDigest      string         `json:"batch_digest"`
+	Completeness     Completeness   `json:"completeness"`
+	OwnerScopeLen    int            `json:"owner_scope_len"`
+	OwnerScopeDigest string         `json:"owner_scope_digest,omitempty"`
 }
 
 // MessageID is the deterministic JetStream Msg-Id for an envelope.

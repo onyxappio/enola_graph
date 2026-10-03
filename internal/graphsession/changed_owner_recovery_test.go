@@ -49,6 +49,13 @@ func TestChangedOwnerScopeEndFailureKeepsConfirmedDigests(t *testing.T) {
 	if err == nil || failing.failed.MsgID == "" {
 		t.Fatalf("End failure not exercised: %v", err)
 	}
+	var failedEnd graphstream.EndReplace
+	if err := json.Unmarshal(failing.failed.Payload, &failedEnd); err != nil {
+		t.Fatal(err)
+	}
+	if failedEnd.Statistics == nil || failedEnd.Statistics.TransactionDurationNS <= 0 {
+		t.Fatal("failed delivery lost original End statistics")
+	}
 	after, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)
