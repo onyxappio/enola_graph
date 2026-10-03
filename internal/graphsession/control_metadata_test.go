@@ -54,7 +54,7 @@ func TestGitControlMetadataRequiresIdenticalCapturedBytes(t *testing.T) {
 	if err := os.WriteFile(control, original, 0644); err != nil {
 		t.Errorf("operation failed: %v", err)
 	}
-	for _, op := range []fsnotify.Op{fsnotify.Write, fsnotify.Rename, fsnotify.Remove, fsnotify.Create, fsnotify.Write | fsnotify.Chmod} {
+	for _, op := range []fsnotify.Op{fsnotify.Write, fsnotify.Rename, fsnotify.Remove, fsnotify.Create, fsnotify.Write | fsnotify.Chmod, fsnotify.Rename | fsnotify.Chmod, fsnotify.Create | fsnotify.Chmod, fsnotify.Remove | fsnotify.Chmod} {
 		s.handleEvent(fsnotify.Event{Name: control, Op: op})
 		if b := s.Drain(); b.Reconcile == "" {
 			t.Fatalf("control operation %v ignored", op)

@@ -276,12 +276,34 @@ func TestScopedNativeGitMetadataSettles(t *testing.T) {
 		if source.ObservedPath(index) <= observed {
 			t.Fatal("native metadata delivery not observed")
 		}
-		res, err := r.ApplyChanges(context.Background(), source.Drain())
+		batch := source.Drain()
+		events := len(sink.CloneRecords())
+		res, err := r.ApplyChanges(context.Background(), batch)
 		if err != nil {
 			t.Fatal(err)
 		}
-		if res.Reconciled || res.Work.PolicyBuilds != 0 || res.TargetGeneration != res.BaseGeneration {
-			t.Fatalf("Git metadata self-reconciliation %+v", res)
+		// Native backends may report RENAME|CHMOD even for this chmod call.
+		// Membership-bearing notifications must reconcile conservatively; the
+		// exact pure-CHMOD fast path has deterministic classifier coverage in
+		// TestGitControlMetadataRequiresIdenticalCapturedBytes. The native
+		// guarantee here is graph silence, not a particular OS event flag.
+		if res.ParsedFiles != 0 || res.TargetGeneration != res.BaseGeneration || res.Work.PublishedEvents != 0 || len(sink.CloneRecords()) != events {
+			t.Fatalf("unchanged Git metadata performed graph work %+v", res)
+		}
+		if batch.Reconcile == "" {
+			if res.Reconciled || res.Work.PolicyBuilds != 0 {
+				t.Fatalf("pure Git metadata self-reconciliation %+v", res)
+			}
+		} else {
+			if batch.Reconcile != "filesystem name change requires reconciliation" && batch.Reconcile != "graph input policy or membership changed" {
+				t.Fatalf("unexpected native reconciliation: %+v", batch)
+			}
+			if !res.Reconciled || res.Work.PolicyBuilds == 0 || res.FallbackReason != batch.Reconcile {
+				t.Fatalf("native membership notification failed to reconcile %+v", res)
+			}
+			if err = source.CoverSessionInputs(r); err != nil {
+				t.Fatal(err)
+			}
 		}
 	}
 	// No writers remain: the byte check must not create a self-sustaining
