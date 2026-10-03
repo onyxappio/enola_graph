@@ -1,0 +1,307 @@
+{
+  "schema": "enola.independent-final-integration-review.v1",
+  "report_id": "astra-stage55-final-main-acceptance-20261003T213213Z",
+  "reviewer": "native:/root/astra_integrated_review",
+  "created_at": "2026-10-03T21:32:13.617925+00:00",
+  "verdict": "PASS",
+  "required_changes": [],
+  "scope": "Final Stage55 main telemetry integration source, supplied validation, Product correctness transfer and reviewed documentation. Ready for coordinator-controlled required-hook publication workflow; no publication performed by reviewer.",
+  "runtime_revision": "11edf1ee149ea4b6c3610e3cd727986ad2f690ba",
+  "final_test_revision": "fbda7b3eb8cd096425da9cab8c1e6835bd1b234c",
+  "references": [
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-final-full-suite-receipt.json",
+      "sha256": "c4655a5888e3b0213f26372eec9b9e3ad1f47416199bff4cd6603ab130db14a8"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-final-full-suite.jsonl",
+      "sha256": "7d4a0efcd45ac8a120750a744c0f2ede128f48ffa10f7111d86ccff9a20a4388"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-final-full-suite.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-final-graphsession-receipt.json",
+      "sha256": "d439c51b54236ea8059a66cd986c1fc5d9af125a077cf8b04ce3725e602c4de8"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-final-graphsession-20m.jsonl",
+      "sha256": "8a46fa0ada27989091b8cf04d2d4bee1ce34ce7f5b8e9ed1723e4ae3e66dff4b"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-final-graphsession-20m.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-combined-validation.json",
+      "sha256": "faedea9d5fc6d2266b54c567ddf134c00d3c086b203dc6823c63c51e29688d69"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-final-source-manifest.json",
+      "sha256": "e713691d1230691d66a1119accbdbb5e5f66efb27d1abdea05af655d1a3ace72"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-source-transfer.json",
+      "sha256": "8575bc51222755e638b2ea1499648900572ff5ab066407f9866b072397f2e17c"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/report-preservation.json",
+      "sha256": "0912e339f3b28561aaa26ddf0e42063dfccf6ccb7128bc5e7dde311030bcfb99"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/report-final-docslint.log",
+      "sha256": "be08fe3ebb49dca0875e78d7b6355e1398a19829e3413ac6819bbb9755671d58"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-final-docslint.log",
+      "sha256": "ed4c1416d8d54d02769bd417704dc00795ecfe88ca967d1c31e781ead7d69afd"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-doc-guards.log",
+      "sha256": "d3eae8f58d8c99eba38607e581243848bf721e92198739fb3c1ec12bb38815fa"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-native-contract-race.log",
+      "sha256": "bfa5c16cdddcebf277ac5ff6d2d1fbaafd12c21459308d7463b5328932bf242b"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/receipt.json",
+      "sha256": "9dabfb20e3fed13a38d765b269bd8283d6300aeb9a68be8156bf9e9ff73c9045"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-product/pins.json",
+      "sha256": "5e84d5dd3a80d27456effef30b3729aaa21cbf3f42c32c7ef8df0edbfc171d71"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-product/source-manifest.json",
+      "sha256": "93ea003ac859f8f486b80728091644cc0ee0c6dfe36a60b4486d762b514c07ae"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-product/product-statistics-receipt.json",
+      "sha256": "60b3a567cdec26e726ecb1ed9c716a642c045a4bc44ab55aec31455f260de7c7"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-product/binary-build-info.txt",
+      "sha256": "79eec85b43fa2ef26c90d487b60a3f31476d57c658a13f7da39b384fa8849aae"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/astra-main-source-review-20261003T164635Z.json",
+      "sha256": "bcf266a34b727625514e7fa5368537b024b24c9f8d479e46e7957128c30e17c8"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/astra-main-product-review-20261003T165540Z.json",
+      "sha256": "dfa27b9c680de97e1dbba3816243aead0b5bb3fbc08ab3c950a603efd379e7c4"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/astra-native-contract-source-review-20261003T210614Z.json",
+      "sha256": "a2da23fba71176105d57fbde2ea85c1b8270a7ea6868843c799198321c97010b"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/astra-transfer-negative-docs-review-20261003T210920Z.json",
+      "sha256": "4f7280bd98983ca59281d9e5cf6a2f00310d9938c484e4a5e732e16ea3c1e723"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/STREAMING_INCREMENTAL.md",
+      "sha256": "acb31136d1e090c83d362b62e52a98b5e38e143b226f6a9c7680e20c97d3c4c7"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/progress/enola-stages.html",
+      "sha256": "c35c2e49fdc58303a4dbd43cf46239cd00b048b8ec514959e32b6cff99aef238"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/watch-fanout-2026-09-26/enola-stages.html",
+      "sha256": "c35c2e49fdc58303a4dbd43cf46239cd00b048b8ec514959e32b6cff99aef238"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphsession/control_metadata_test.go",
+      "sha256": "aa07ebf834cda055ac01faf4173d52f2f86300aa550824551b9f2107b3d273d2"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/pkg/bootstrap/scoped_delta_test.go",
+      "sha256": "a3e6451f8c9c08997f0b2e4389c6e8f037e71c8a8707e5274abd110dff90e791"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphsession/resident.go",
+      "sha256": "27b72f2c760be3ce4b339470f144c25ed033f42ab6e24c682cc35232f21054dc"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphsession/session.go",
+      "sha256": "73f1753eac82389bae45eaf5b772a918de973a038e7cebec5b28366efe50074e"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphstream/protocol.go",
+      "sha256": "d6587ab29325c60a9698f5e01e1f0459fb505515b1e0607f97b36a8864fd2c69"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/go.mod",
+      "sha256": "74604f41b33a42e9b3dcb99874be162c48eec347075bf266e708360d8cbbfcf9"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/go.sum",
+      "sha256": "550aa9860dd76f34ea9b39fdfa7f5654fa22b03c77664c6945ba2807b21442be"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/README.md",
+      "sha256": "90451bfcc2c80f36b9849aca5385eea6d0ebeb51392b9523ae7eed5ad5c9ca9d"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/astra-end-statistics-source-review-20261003T162029Z.json",
+      "sha256": "f35e55c0bb1c65cc3cd63debe694cf1349e4defa4fc9db946f0732a1236f658c"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/astra-final-validation-review-20261003T163907Z.json",
+      "sha256": "d3a63fea52aadf9100f9c6928c7e1f868180d32a9cb54f46734ead8ac2e91a1a"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/astra-gitmetadata-investigation-20261003T205627Z.json",
+      "sha256": "7487c61ba553d7b5b29f3645468e0ee4a361ff13df6961f0fdf42bec73868c4f"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/astra-main-product-review-20261003T165540Z.json",
+      "sha256": "dfa27b9c680de97e1dbba3816243aead0b5bb3fbc08ab3c950a603efd379e7c4"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/astra-main-source-review-20261003T164635Z.json",
+      "sha256": "bcf266a34b727625514e7fa5368537b024b24c9f8d479e46e7957128c30e17c8"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/astra-native-contract-source-review-20261003T210614Z.json",
+      "sha256": "a2da23fba71176105d57fbde2ea85c1b8270a7ea6868843c799198321c97010b"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/astra-native-metadata-contract-design-20261003T210227Z.json",
+      "sha256": "19b2d65a0405424362d0570e629926d16c899c56c8603879c048f5555d68503d"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/astra-transfer-negative-docs-review-20261003T210920Z.json",
+      "sha256": "4f7280bd98983ca59281d9e5cf6a2f00310d9938c484e4a5e732e16ea3c1e723"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/main-combined-validation.json",
+      "sha256": "faedea9d5fc6d2266b54c567ddf134c00d3c086b203dc6823c63c51e29688d69"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/main-dependency-binding.json",
+      "sha256": "169661c7caf986e856c6bb1934ee8c9b28b8cff7517ae63e94b767896906d201"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/main-final-full-suite-receipt.json",
+      "sha256": "c4655a5888e3b0213f26372eec9b9e3ad1f47416199bff4cd6603ab130db14a8"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/main-final-graphsession-receipt.json",
+      "sha256": "d439c51b54236ea8059a66cd986c1fc5d9af125a077cf8b04ce3725e602c4de8"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/main-focused-race.log",
+      "sha256": "94bdc0f6218469e5f098cce7100c8c2d8f71871077affa1bc2d05529242938f1"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/main-full-suite-receipt.json",
+      "sha256": "3ef31ca50b074bd045bb9eef6e19afcb2edfefbc1f853365b85949123e09047c"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/main-native-contract-race.log",
+      "sha256": "bfa5c16cdddcebf277ac5ff6d2d1fbaafd12c21459308d7463b5328932bf242b"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/main-product-statistics-receipt.json",
+      "sha256": "60b3a567cdec26e726ecb1ed9c716a642c045a4bc44ab55aec31455f260de7c7"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/main-source-transfer.json",
+      "sha256": "8575bc51222755e638b2ea1499648900572ff5ab066407f9866b072397f2e17c"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/native-negative-receipt.json",
+      "sha256": "9dabfb20e3fed13a38d765b269bd8283d6300aeb9a68be8156bf9e9ff73c9045"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/report-final-preservation.json",
+      "sha256": "fdfd76cfe6ee7e434bbb24fbee04e108f7a0eeeb2afd533b1358ac32fd911e4c"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/report-preservation.json",
+      "sha256": "0912e339f3b28561aaa26ddf0e42063dfccf6ccb7128bc5e7dde311030bcfb99"
+    }
+  ],
+  "validation_reconciliation": {
+    "repository_wide_exit": 1,
+    "repository_wide_package_pass": 112,
+    "repository_wide_package_skip": 13,
+    "repository_wide_package_timeout": 1,
+    "repository_wide_test_pass_events": 7376,
+    "repository_wide_test_skip_events": 33,
+    "timeout_package": "internal/graphsession",
+    "timeout_seconds": 600,
+    "assertion_fail_events": 0,
+    "fresh_graphsession_exit": 0,
+    "fresh_graphsession_timeout_budget_seconds": 1200,
+    "fresh_graphsession_elapsed_seconds": 544.26,
+    "fresh_graphsession_root_test_passes": 659,
+    "fresh_graphsession_test_pass_events": 877,
+    "fresh_graphsession_skips_or_fails": 0,
+    "combined_packages": 126,
+    "combined_pass": 113,
+    "combined_skip": 13,
+    "exact_receipt_counts_and_hashes_match_raw": true,
+    "stderr_files_empty": true,
+    "qualification": "125 completed packages from repository-wide run plus fresh unfiltered graphsession retry. Not one all-package exit0 command. Test counts overlap between runs and must not be summed as unique coverage."
+  },
+  "source_and_product_binding": {
+    "all_final_source_entries_match": 1323,
+    "unchanged_production_go_and_root_module_entries": 542,
+    "only_source_changes_since_product": [
+      "internal/graphsession/control_metadata_test.go",
+      "pkg/bootstrap/scoped_delta_test.go"
+    ],
+    "clean_product_binary_vcs": true,
+    "all_Product_artifact_pins_rechecked": true,
+    "dependency_clarification": "Current main has no third_party tree/local replace; clean producer build metadata pins upstream Segmentio v0.5.4. Root manifest is not a transitive dependency-source manifest.",
+    "carried_forward_product_review": "10frames20paired lifecycle, sixcold equivalent parsed1scope1 edits, positive coherent bounded transaction stats, generation1->7, two bounded wire/state silence controls,102host samples and expected owned cancellation verified in referenced independent main Product review. Runtime bytes unchanged."
+  },
+  "source_contract_acceptance": [
+    "Optional monotonic duration sampled within locked transaction before End serialization; excludes pre-transaction probes, startup/Watch collection, final outstanding ACK drain, checkpoint promotion and consumer apply.",
+    "Journal replay preserves original End bytes/timing. Silent no-op and failure delivery rules unchanged; no graph walk/index/extraction changes.",
+    "Main architecture preserved through integration, no Stage54 encoder or other experimental runtime imported.",
+    "Native test contract correction retains zero graph work/publication/generation change in both branches and requires conservative work on recognized reconciliation. Exact pure/composite behavior resides in deterministic classifier tests, with both targeted negative faults demonstrated."
+  ],
+  "documentation_acceptance": {
+    "final_docslint": "PASS1.044s supplied completed log",
+    "other_doc_and_cachecov_checks": "PASS supplied logs",
+    "README": "Accurately preserves first native failure, failed settling hypotheses, package timeout, separate successful retry, scope limits, strict decoder caveat and publication still pending.",
+    "cumulative_reports_identical": true,
+    "article_count": 55,
+    "older_53_articles_byte_identical_to": "b3f443efda41890e9470b1ca5df9b3390ed9f9b3",
+    "newest_first": [
+      "55",
+      "54",
+      "53"
+    ],
+    "no_telemetry_speed_claim": true
+  },
+  "limits": [
+    "PASS is source/correctness/integration validation, not performance acceptance or an absolute latency claim.",
+    "13 package skips and33 skipped test events remain outside executed coverage; passing covered tests is not universal equivalence.",
+    "Product is one shared-host correctness repetition; duplicate silence is bounded0.7s and not an independent zero-hidden-parse proof.",
+    "Documentation commit verified clean and byte-identical. Required hooks, remote integration check and non-force push remain coordinator actions; reviewer does not assert publication succeeded.",
+    "Any subsequent runtime/test change requires renewed applicable review. Exact reviewed documentation hashes are included.",
+    "No reviewer tests, heavy jobs, live host collectors, implementation edits or publication."
+  ],
+  "authority": {
+    "source_and_supplied_evidence_acceptance": true,
+    "performance_acceptance": false,
+    "timing_hold": false,
+    "publication_performed": false
+  },
+  "final_committed_revision": "e0c565373566382ca876f4b7b121265f2712f62c",
+  "final_checkout_clean": true,
+  "docs_commit_changes_only_docs": true,
+  "all_precommit_review_reference_hashes_still_match": true,
+  "supersedes": {
+    "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/astra-final-main-acceptance-20261003T213139Z.json",
+    "sha256": "d62dfa4dbe8913511a612030254c419821b6b86bdda7c674bc001c96a3d72742",
+    "reason": "Binds identical reviewed documentation to completed clean docs commit; publication still pending."
+  }
+}

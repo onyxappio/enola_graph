@@ -62,7 +62,9 @@ A fresh unfiltered graphsession run with a twenty-minute budget passed in
 544.260 seconds, with 659 root tests and no assertion failures.
 Combined coverage is 126 packages: 113 PASS and 13 skipped, across the
 repository-wide run and the separate graphsession retry. This is not a claim
-that one repository-wide command exited zero. Publication is pending final review.
+that one repository-wide command exited zero. Final independent Astra medium acceptance passed at clean `e0c56537`.
+The acceptance JSON is retained here; required hooks and non-force publication
+follow this source/correctness gate. No performance acceptance is claimed.
 
 Product evidence remains tied to clean11edf1ee. The transfer receipt proves
 only those two tests differ in root-module Go/module pins; all production Go
