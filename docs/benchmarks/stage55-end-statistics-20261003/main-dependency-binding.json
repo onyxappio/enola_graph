@@ -1,0 +1,14 @@
+{
+  "checkout": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics",
+  "third_party_directory_present": false,
+  "root_go_mod_sha256": "74604f41b33a42e9b3dcb99874be162c48eec347075bf266e708360d8cbbfcf9",
+  "root_go_sum_sha256": "550aa9860dd76f34ea9b39fdfa7f5654fa22b03c77664c6945ba2807b21442be",
+  "binary_dependency_stamp": [
+    "\tdep\tgithub.com/segmentio/asm\tv1.1.3\th1:WM03sfUOENvvKexOLp+pCqgb/WDjsi7EK8gIsICtzhc=",
+    "\tdep\tgithub.com/segmentio/encoding\tv0.5.4\th1:OW1VRern8Nw6ITAtwSZ7Idrl3MXCFwXHPgqESYfvNt0=",
+    "\tbuild\tvcs.revision=11edf1ee149ea4b6c3610e3cd727986ad2f690ba",
+    "\tbuild\tvcs.time=2026-10-03T16:40:37Z",
+    "\tbuild\tvcs.modified=false"
+  ],
+  "note": "Main integration has no local third_party replacement; it uses stamped upstream Segmentio dependencies. The earlier root-module manifest exclusion wording does not imply a third_party tree exists here."
+}

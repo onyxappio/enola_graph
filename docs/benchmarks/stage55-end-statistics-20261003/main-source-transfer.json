@@ -1,0 +1,15 @@
+{
+  "purpose": "Product telemetry evidence transfer to final tests-only correction; no production code change",
+  "runtime_revision": "11edf1ee149ea4b6c3610e3cd727986ad2f690ba",
+  "production_files_compared": 542,
+  "changed_files": [
+    "internal/graphsession/control_metadata_test.go",
+    "pkg/bootstrap/scoped_delta_test.go"
+  ],
+  "all_changed_files_are_tests": true,
+  "all_non_test_go_and_root_module_hashes_identical": true,
+  "root_source_files": 1323,
+  "scope": "tracked Go/module files in root module; excludes nested third_party module",
+  "before_manifest_sha256": "93ea003ac859f8f486b80728091644cc0ee0c6dfe36a60b4486d762b514c07ae",
+  "final_test_revision": "fbda7b3eb8cd096425da9cab8c1e6835bd1b234c"
+}

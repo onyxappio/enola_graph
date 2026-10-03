@@ -1,0 +1,92 @@
+{
+  "schema": "enola.independent-failure-investigation.v1",
+  "report_id": "astra-stage55-gitmetadata-settling-20261003T205627Z",
+  "reviewer": "native:/root/astra_integrated_review",
+  "created_at": "2026-10-03T20:56:27.609103+00:00",
+  "verdict": "INVESTIGATION_ONLY_NOT_ACCEPTED",
+  "scope": "Read-only failing native test/source and supplied control evidence; no proposed remedy executed or accepted.",
+  "references": [
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/pkg/bootstrap/scoped_delta_test.go",
+      "sha256": "3e4efdff56f0c9344d8210f94b6b2f31ce2a5d0a89a15271ca913683e91996c3"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphsession/changes.go",
+      "sha256": "0436e160bf1798e5e76de4141a0660779fbe768951eb5b1a5ec714ffe429d76f"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphsession/watch_backend_darwin.go",
+      "sha256": "dbf707d2332fa596b8b289dbe8cf864ceb08303f6c0951f4178a561624be9938"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-full-suite.jsonl",
+      "sha256": "c029df659ae911bdec1122eeb84bfe9a010851a305e42a67cfa4cc83f2b9782c"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-full-suite.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-gitmetadata-retry.log",
+      "sha256": "9aabb4020c1e08831a767ee599bad963a4b909075df1e5050fb2b6ec428f77b1"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/baseline-gitmetadata.log",
+      "sha256": "fa5fdbb2a149eb85707c14fb3b69c2a1d1eb7b01fc8efaaa230d0322aaf4261c"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/gitmetadata-diagnostic/changes.go",
+      "sha256": "04c89cc3409b69b4aea493e6beba7ae31c8c3ba5fcf91388b10217369010531c"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/gitmetadata-diagnostic/overlay.json",
+      "sha256": "037df1c05b736456d9cee2f9077ebdbb1331fa913e17763cff3665ff02b99812"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/gitmetadata-diagnostic/run.log",
+      "sha256": "f238e7967e4293a93da3fb6e053c898526b0f103c7c02a1756440719fcd5c9ef"
+    }
+  ],
+  "verified_evidence": {
+    "main_full_suite_package_outcomes": {
+      "pass": 112,
+      "skip": 13,
+      "fail": 1
+    },
+    "sole_failed_test": "pkg/bootstrap TestScopedNativeGitMetadataSettles",
+    "main_repeat_log_observed_failure_lines": 9,
+    "baseline_repeat_log_observed_failure_lines": 3,
+    "baseline_clean_head": "d9ae5c6eed3a33c9e203ca2f90344b0b7d241809",
+    "baseline_test_changes_and_darwin_backend_match_main": true,
+    "diagnostic_overlay_change": "Only printf of native event before handleEvent",
+    "diagnostic_index_event": "RENAME|CHMOD"
+  },
+  "interpretation": [
+    "Failure reproduced on clean pre-telemetry baseline with identical test/watcher source, supporting pre-existing test/environment interaction rather than telemetry regression.",
+    "FSEvents maps ItemRenamed and metadata flags cumulatively to RENAME|CHMOD; the observed event is not pure metadata.",
+    "Production unchangedControlBytes applies only to exact Chmod, deliberately preserving conservative membership handling. Rename-bearing event correctly triggers reconciliation.",
+    "Four immediate drain/apply/cover iterations do not await asynchronous native delivery. FSEvents configured latency100ms; ObservedPath explicitly does not establish coverage.",
+    "Fixture git add creates/renames index shortly before watcher bootstrap. Pending/coalesced fixture rename is plausible, but a single observed mixed event does not alone prove its historical origin."
+  ],
+  "recommended_narrow_remedy": [
+    "Keep production behavior unchanged. Add explicit unmeasured metadata warm-up pulse on index, wait boundedly for native delivery, drain/apply bootstrap batches and CoverSessionInputs.",
+    "Require bounded sustained native quiescence after warm-up with an overall deadline; reset quiet window when native count/queued work changes. Never silently discard queued events or label ObservedPath a coverage barrier.",
+    "Then retain all three measured same-mode chmod checks requiring no reconciliation, zero PolicyBuilds and unchanged generation; retain idle-feedback check, real index-change reconciliation and cold graph equality.",
+    "Gather bounded diagnostic repeat proving warm-up consumes mixed event and measured events have only metadata flags. If mixed flags recur after settling, investigate further rather than relaxing assertions."
+  ],
+  "not_recommended": [
+    "Treating RENAME|CHMOD as ignorable solely because bytes happen to match.",
+    "Reducing measured iteration count, skipping the failing case, accepting reconciliation in measured section, or draining away real changes.",
+    "Claiming production native coverage correctness from a sleep or quiet observed counter alone."
+  ],
+  "limits": [
+    "No tests or live collectors run by reviewer; all runtime observations are supplied logs.",
+    "Main retry log has9 explicit failure lines; do not claim10/10 failures without supporting evidence.",
+    "Final full-suite acceptance and publication remain blocked pending sound repair and validation."
+  ],
+  "authority": {
+    "main_push": false,
+    "performance_acceptance": false,
+    "implementation_modified": false
+  }
+}

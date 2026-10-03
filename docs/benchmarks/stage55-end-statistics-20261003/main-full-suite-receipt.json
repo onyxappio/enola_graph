@@ -1,0 +1,40 @@
+{
+  "result": "FAIL",
+  "exit_code": 1,
+  "session_id": 42315,
+  "command": "go test -p 1 -json -count=1 ./...",
+  "source_revision": "11edf1ee149ea4b6c3610e3cd727986ad2f690ba",
+  "packages": {
+    "pass": 112,
+    "skip": 13,
+    "fail": 1
+  },
+  "test_events": {
+    "pass": 7388,
+    "skip": 33,
+    "fail": 1
+  },
+  "failures": [
+    {
+      "Time": "2026-10-03T19:58:10.266653+03:00",
+      "Action": "fail",
+      "Package": "github.com/enola-labs/enola/pkg/bootstrap",
+      "Test": "TestScopedNativeGitMetadataSettles",
+      "Elapsed": 0.82
+    },
+    {
+      "Time": "2026-10-03T19:58:51.700329+03:00",
+      "Action": "fail",
+      "Package": "github.com/enola-labs/enola/pkg/bootstrap",
+      "Elapsed": 79.477
+    }
+  ],
+  "stderr_bytes": 0,
+  "hashes": {
+    "main-full-suite.jsonl": "c029df659ae911bdec1122eeb84bfe9a010851a305e42a67cfa4cc83f2b9782c",
+    "main-full-suite.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "main-gitmetadata-retry.log": "9aabb4020c1e08831a767ee599bad963a4b909075df1e5050fb2b6ec428f77b1",
+    "baseline-gitmetadata.log": "fa5fdbb2a149eb85707c14fb3b69c2a1d1eb7b01fc8efaaa230d0322aaf4261c"
+  },
+  "scope": "one pre-existing native Watch failure reproduced in unchanged clean origin/main; publication pending; no telemetry failure"
+}

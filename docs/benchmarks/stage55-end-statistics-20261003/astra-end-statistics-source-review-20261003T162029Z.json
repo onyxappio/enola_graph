@@ -1,0 +1,96 @@
+{
+  "schema": "enola.independent-source-review.v1",
+  "report_id": "astra-stage55-end-statistics-source-20261003T162029Z",
+  "reviewer": "native:/root/astra_integrated_review",
+  "created_at": "2026-10-03T16:20:29.036713+00:00",
+  "verdict": "PASS",
+  "required_changes": [],
+  "repository": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-end-statistics",
+  "base_revision": "b3f443efda41890e9470b1ca5df9b3390ed9f9b3",
+  "scope": "Optional End transaction duration source and focused race evidence. Full-suite, Product telemetry and publication acceptance excluded.",
+  "references": [
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-end-statistics/docs/STREAMING_INCREMENTAL.md",
+      "sha256": "acb31136d1e090c83d362b62e52a98b5e38e143b226f6a9c7680e20c97d3c4c7"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-end-statistics/internal/graphstream/protocol.go",
+      "sha256": "d6587ab29325c60a9698f5e01e1f0459fb505515b1e0607f97b36a8864fd2c69"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-end-statistics/internal/graphstream/end_statistics_test.go",
+      "sha256": "91f3ae4e09f565aeab3d918cba5e80d61d517d6f4d9480c074f5339a64a7d87d"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-end-statistics/internal/graphstream/journal.go",
+      "sha256": "65e2223be82bc3db5f4a087f5b451a8b020431025747c66543680d75fecfa453"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-end-statistics/internal/graphstream/async.go",
+      "sha256": "e17767772410ad0b3ba942817646edd7305836c70eb1b30fea86604cca57a395"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-end-statistics/internal/graphsession/resident.go",
+      "sha256": "94811bec62cd046cbc1b7701fa104a19dfa204776dcacc3b6e37bbe3e064a053"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-end-statistics/internal/graphsession/session.go",
+      "sha256": "be113b3e7fe64ed93366b4e69b5ebd9e99dd743d8d6f415454d9bdea7fb98552"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-end-statistics/internal/graphsession/end_statistics_test.go",
+      "sha256": "d7b83f0d7130dd59b08869721fbb9ab947c6a76438030ad1d558536a201e9316"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-end-statistics/internal/graphsession/changed_owner_recovery_test.go",
+      "sha256": "4392a5e1510ac196788a5c65e777dc653ced7e3d0e4fbefe2e3670a994b25985"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/PLAN.md",
+      "sha256": "46abec392288e50e7f849e24e8547b161c2821f9290530988e7f0b7dc1ec9348"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/focused.log",
+      "sha256": "b921f8d523a0b79fdbc36d5ac7af79430a96b421b59f3b911979978977440433"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/focused-race.log",
+      "sha256": "e709eff4066f799df0b9b04239e3dd54c93d9c6b7e5993e05f255a6cbcefdf7d"
+    }
+  ],
+  "runtime_findings": [
+    "Production Resident callers hold mutex before transaction entry. Start sampled after closed check, before transaction recovery. ApplyChanges classification/contentInputs hashing runs earlier and is excluded.",
+    "Each transaction constructs a fresh session carrying monotonic time.Time start; direct session.run has a fallback only for zero start. End reads time.Since after batch/owner digests and before Marshal.",
+    "Only two new production clock reads for an End-producing transaction. No added repository scan, semantic dependency index or graph extraction change.",
+    "Statistics pointer uses omitempty: old envelopes lack it and decode as nil/unknown. New messages preserve schema, graph facts, completeness counters, batch digest and owner digest rules.",
+    "Existing publisher journals fully serialized payload. ReplayUnacked sends recorded payload bytes unchanged and cannot recompute duration; End-delivery failure leaves prior committed checkpoint intact.",
+    "Asynchronous outstanding delivery/ACK work drained after s.end is excluded. The field is neither total acknowledged CLI duration nor extraction CPU time.",
+    "No-op and verify/skip End paths stay silent; telemetry adds no successful End for failed extraction. Failed End delivery can retain an original success payload for later replay, as existing durability semantics require."
+  ],
+  "documentation_corrections_verified": [
+    "Input preparation explicitly qualified as within transaction.",
+    "Pre-transaction dirty-input hashing/probes and final outstanding ACK drain explicitly excluded.",
+    "External strict unknown-field decoders must adapt before rollout; permissive legacy unit test is not universal consumer compatibility proof."
+  ],
+  "focused_evidence": {
+    "race_log": "PASS graphsession and graphstream; initial/delta legacy+frozen, same-config cold equality, identical-write silence/generation, pre-delivery sampling, failed-End identical replay, frozen scope and covered-idle controls.",
+    "initial_failed_run": "Retained focused.log shows frozen-versus-legacy cold mismatch in new test. Final test constructs cold with same AuthoritativeFiles/ChangedOwnersOnly settings and preserves graph equality assertion.",
+    "replay_assertion": "Existing complete-payload byte equality now necessarily covers sampled statistics, plus new positive original statistics check.",
+    "test_limits": "No direct injected clock/lock-delay or recovery-delay timing test; boundaries verified by source. No claim of proof for arbitrary external consumers."
+  },
+  "pending": [
+    "Full application suite final receipt",
+    "Product current-speed telemetry validation",
+    "Any required controlled-negative guard evidence and documentation checks"
+  ],
+  "limits": [
+    "Reviewer performed bounded source and supplied-log review only; no tests, measurements, live collectors, implementation edits or publication.",
+    "Timing metadata adds bytes and a small allocation; no zero-overhead or performance-improvement claim.",
+    "References bind reviewed files, not a complete repository source manifest or final experimental binary."
+  ],
+  "authority": {
+    "performance_acceptance": false,
+    "timing_hold": false,
+    "main_push": false
+  }
+}

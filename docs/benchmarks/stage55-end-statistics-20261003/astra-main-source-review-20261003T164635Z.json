@@ -1,0 +1,106 @@
+{
+  "schema": "enola.independent-source-review.v1",
+  "report_id": "astra-stage55-main-integration-source-20261003T164635Z",
+  "reviewer": "native:/root/astra_integrated_review",
+  "created_at": "2026-10-03T16:46:35.552017+00:00",
+  "verdict": "PASS",
+  "required_changes": [],
+  "repository": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics",
+  "base_revision": "d9ae5c6eed3a33c9e203ca2f90344b0b7d241809",
+  "reviewed_revision": "11edf1ee149ea4b6c3610e3cd727986ad2f690ba",
+  "worktree_clean": true,
+  "changed_files": [
+    "docs/STREAMING_INCREMENTAL.md",
+    "internal/graphsession/changed_owner_recovery_test.go",
+    "internal/graphsession/end_statistics_test.go",
+    "internal/graphsession/resident.go",
+    "internal/graphsession/session.go",
+    "internal/graphstream/end_statistics_test.go",
+    "internal/graphstream/protocol.go"
+  ],
+  "diff_sha256": "0a3fdd940bd683359e272f20e8befa0a262f49eb75e7c875c59aa2bcd8490297",
+  "diff_summary": "7 files,194 insertions,9 deletions",
+  "references": [
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/STREAMING_INCREMENTAL.md",
+      "sha256": "acb31136d1e090c83d362b62e52a98b5e38e143b226f6a9c7680e20c97d3c4c7"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphsession/changed_owner_recovery_test.go",
+      "sha256": "4392a5e1510ac196788a5c65e777dc653ced7e3d0e4fbefe2e3670a994b25985"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphsession/end_statistics_test.go",
+      "sha256": "d7b83f0d7130dd59b08869721fbb9ab947c6a76438030ad1d558536a201e9316"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphsession/resident.go",
+      "sha256": "27b72f2c760be3ce4b339470f144c25ed033f42ab6e24c682cc35232f21054dc"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphsession/session.go",
+      "sha256": "73f1753eac82389bae45eaf5b772a918de973a038e7cebec5b28366efe50074e"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphstream/end_statistics_test.go",
+      "sha256": "91f3ae4e09f565aeab3d918cba5e80d61d517d6f4d9480c074f5339a64a7d87d"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphstream/protocol.go",
+      "sha256": "d6587ab29325c60a9698f5e01e1f0459fb505515b1e0607f97b36a8864fd2c69"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphstream/journal.go",
+      "sha256": "65e2223be82bc3db5f4a087f5b451a8b020431025747c66543680d75fecfa453"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphstream/async.go",
+      "sha256": "e17767772410ad0b3ba942817646edd7305836c70eb1b30fea86604cca57a395"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-focused-race.log",
+      "sha256": "94bdc0f6218469e5f098cce7100c8c2d8f71871077affa1bc2d05529242938f1"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/astra-end-statistics-source-review-20261003T162029Z.json",
+      "sha256": "f35e55c0bb1c65cc3cd63debe694cf1349e4defa4fc9db946f0732a1236f658c"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/astra-final-validation-review-20261003T163907Z.json",
+      "sha256": "d3a63fea52aadf9100f9c6928c7e1f868180d32a9cb54f46734ead8ac2e91a1a"
+    }
+  ],
+  "scope": "Read-only telemetry integration source and supplied focused race review against current main baseline. Not final combined-runtime acceptance or publication authority.",
+  "integration_findings": [
+    "Entire base-to-head diff contains only telemetry field/timing, tests and contract documentation. No state encoder, detector instrumentation, provenInventory or other experimental implementation imported.",
+    "resident/session conflict resolution retains baseline main architecture: only time import/start capture/session field propagation, zero-start fallback and End statistics sampling added. No graph resolution, frozen scope or invalidation changes.",
+    "Other five changed files exactly equal previously reviewed Stage55 child files, including same-profile cold equality tests, failed-End statistics/replay assertions and optional field protocol test."
+  ],
+  "timing_and_delivery": [
+    "Monotonic start is captured within locked Resident transaction after closed check and before recovery. Pre-transaction classification/contentInputs hashing and lock wait remain excluded.",
+    "End sample occurs after owner/batch digest computation and before Marshal, journal publication and final outstanding ACK drain. No-op skip and verification exits precede End creation.",
+    "The sampled field is pointer+omitempty; absent old envelopes remain unknown/nil. Strict external unknown-field consumers require explicit adaptation, documented.",
+    "Unchanged journal replay sends stored payload bytes. Existing strengthened regression compares full failed/replayed End bytes, preserving sampled timing and prior committed checkpoint on failure.",
+    "No successful End is added to failing extraction to report telemetry; no new publication or generation advancement for no-op."
+  ],
+  "evidence": {
+    "main_focused_race": "PASS supplied log: graphsession5.056s,graphstream1.522s. This log gives package-level completion, not enumerated test output.",
+    "prior_child_product_and_suite": "Historical separate-child evidence only; not substituted for main-integrated runtime validation.",
+    "reviewer_tests": "None; only source/diff/hash reads."
+  },
+  "pending": [
+    "Main-integrated full-suite final receipt and raw reconciliation.",
+    "Main-integrated Product telemetry/cold/no-op results and final source/binary pin binding.",
+    "Final documentation checks and any post-review source change assessment."
+  ],
+  "limits": [
+    "No performance acceptance, latency baseline or clock-overhead measurement.",
+    "PASS applies exactly to reviewed commit and referenced files. Additional main commits/integration must be reviewed."
+  ],
+  "authority": {
+    "main_push": false,
+    "performance_acceptance": false,
+    "timing_hold": false,
+    "implementation_modified": false
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "schema": "enola.independent-source-review.v1",
+  "report_id": "astra-stage55-native-test-contract-20261003T210614Z",
+  "reviewer": "native:/root/astra_integrated_review",
+  "created_at": "2026-10-03T21:06:14.069567+00:00",
+  "verdict": "PASS",
+  "scope": "Two-test contract correction source and focused evidence only; final suite/report acceptance excluded.",
+  "references": [
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/pkg/bootstrap/scoped_delta_test.go",
+      "sha256": "a3e6451f8c9c08997f0b2e4389c6e8f037e71c8a8707e5274abd110dff90e791"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphsession/control_metadata_test.go",
+      "sha256": "aa07ebf834cda055ac01faf4173d52f2f86300aa550824551b9f2107b3d273d2"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphsession/changes.go",
+      "sha256": "0436e160bf1798e5e76de4141a0660779fbe768951eb5b1a5ec714ffe429d76f"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphsession/watch_backend_darwin.go",
+      "sha256": "dbf707d2332fa596b8b289dbe8cf864ceb08303f6c0951f4178a561624be9938"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-native-contract-race.log",
+      "sha256": "bfa5c16cdddcebf277ac5ff6d2d1fbaafd12c21459308d7463b5328932bf242b"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/ignore-rename-metadata/changes.go",
+      "sha256": "dc39677a6557cbe9d297afdef7f98324814fbe88fc096819d4faf59b371677ef"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/ignore-rename-metadata/overlay.json",
+      "sha256": "518274f9fd6eb86dd74ee5e9cd63a6e706d8b6275efd111828b0651d59f28520"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/ignore-rename-metadata/guard.log",
+      "sha256": "b965a2fc3c0374b52452deb55f9d3aff3075dffd1b19293de5f6e9b26f44b3fb"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/ignore-membership/changes.go",
+      "sha256": "677733f39965e9b0aed7b9b0446e4fccb8d8a340f1cd7246badca41f9bbc38ba"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/ignore-membership/overlay.json",
+      "sha256": "42388d977ca722730acd5fdaee909c691beef4127b4793dd2307e85311f4c1a0"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/ignore-membership/guard.log",
+      "sha256": "5c2772693c542f68eef63890be780a5f8ed4d4b97300d7fbbc9a9a162ae03451"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/disable-pure/changes.go",
+      "sha256": "1c0b21fe1193d4c518bdd2268ec3fe1258c72665616175abac776c0e9ae2614d"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/disable-pure/overlay.json",
+      "sha256": "bf1bf0d31b7042efcbc6fe5c76fd67b48d3309705377d3fdcd9c4998643eb6b0"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/disable-pure/guard.log",
+      "sha256": "0327ac8c12c7316d7665abd85738cf2233fa68001eabe7c241294ef733cdc40f"
+    }
+  ],
+  "findings": [
+    "Production watcher/classifier/diagnostic maps unchanged. Two tests only alter native expectation and add composite classifier cases.",
+    "Native test branches on drained queue contract, not inferred raw OS flags; it deliberately no longer claims a chmod syscall guarantees pure CHMOD delivery.",
+    "Both branches require ParsedFiles0, PublishedEvents0, unchanged sink record count and unchanged generation. No-reconcile batch retains !Reconciled and zero PolicyBuilds.",
+    "Reconcile batch accepts only two existing policy/membership reasons; requires actual reconciliation, positive PolicyBuilds and exact fallback reason, then restores coverage. Unknown reasons/errors fail.",
+    "Three stimuli and observed index delivery waits retained. Final idle feedback check, actual Git/index change reconciliation and cold graph equality retained.",
+    "Deterministic test retains four unchanged-byte exact CHMOD no-work probes and changed/missing controls, and adds Rename/Create/Remove combined with Chmod to conservative reconciliation checks."
+  ],
+  "causal_limit": "Native no-reconcile branch is a queue-state assertion, not proof native delivery was pure CHMOD. Operation-level guarantee is explicitly covered by deterministic injected events. This is the disclosed contract correction, not permission to ignore real membership.",
+  "evidence": {
+    "focused_race_log": "PASS bootstrap28.797s and graphsession2.963s supplied log. Repetition command/count is not encoded in this terse package log.",
+    "pure_disabled_negative": "Fails unchanged-byte exact CHMOD case as intended.",
+    "composite_suppression_negative": "Current broad faulty overlay fails first at existing WRITE|CHMOD; does not yet prove new RENAME|CHMOD case is exercised negatively."
+  },
+  "recommendation": "Target negative fault specifically at Rename|Chmod, or use independent per-operation subtests, before claiming controlled-negative proof for added membership coverage.",
+  "remaining": [
+    "Final full suite outcome/raw reconciliation after test change",
+    "Targeted new membership negative evidence",
+    "Final documentation accurately describing transferred coverage and preserved initial failures"
+  ],
+  "limits": [
+    "Prior settling hypothesis remains historical/unproven; no claim this repair fixes delayed bootstrap events.",
+    "No production behavior changed, no tests or edits performed by reviewer.",
+    "Prior source/Product passes do not erase failed first main suite."
+  ],
+  "authority": {
+    "main_push": false,
+    "performance_acceptance": false,
+    "final_acceptance": false
+  }
+}

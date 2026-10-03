@@ -1,0 +1,48 @@
+{
+  "schema": "enola.independent-design-review.v1",
+  "reviewer": "native:/root/astra_integrated_review",
+  "created_at": "2026-10-03T21:02:27.359736+00:00",
+  "verdict": "DESIGN_SUPPORTED_WITH_CONDITIONS",
+  "scope": "Native metadata test contract correction recommendation only; no implementation accepted.",
+  "references": [
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/gitmetadata-diagnostic/warmup.log",
+      "sha256": "b0c6ed284a31467b29bd43c3c81239eb97285335e2d17760f2a3fca35a587233"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/gitmetadata-diagnostic/quiet.log",
+      "sha256": "eef0ec543b20f02523296e3a824fcb0f162d3404b16ef104beaaa3124b352afc"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/gitmetadata-diagnostic/aged.log",
+      "sha256": "d9f61d3b8ebae02863b4f5187ca8555bc76fb97746b9fb231953096cd25c5caf"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/gitmetadata-diagnostic/utime.log",
+      "sha256": "86d1547cb7bc6c32a2baa868a58a8ff96c30a797895b9f2e165f1776e715e15d"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/gitmetadata-diagnostic/head.log",
+      "sha256": "f4ef4cb6f759593841c0a41c9ae8c871f19ba553eed359b8d6ca4ab66fc38c3c"
+    }
+  ],
+  "evidence": "Mixed RENAME|CHMOD persists with quiet/aged/utime/HEAD probes. Warmup log contains9failure lines and some pure CHMOD deliveries; prior stale-bootstrap origin hypothesis not established.",
+  "contract": [
+    "Identical control bytes must preserve graph facts, zero parses/publication and unchanged generation for both branches.",
+    "Exact pure CHMOD must avoid reconciliation/policy rebuild. Membership-bearing native flags must conservatively reconcile even if bytes match.",
+    "Retain real index-change delivery/reconciliation/cold equality and idle feedback assertions."
+  ],
+  "conditions": [
+    "Add deterministic unchanged-byte pure-CHMOD and composite-RENAME|CHMOD tests preserving both sides of the contract.",
+    "Native operation observations must identify the measured delivery window. Last sequence+op alone can overwrite earlier membership flags; require unambiguous single event or retain latest membership sequence in existing bounded per-path entry.",
+    "Unknown/evicted/ambiguous evidence must not select an easier assertion or silently skip.",
+    "Do not change production event classification/filtering or discard pending batches.",
+    "Document explicit OS-operation contract adjustment rather than describing it as bootstrap settling. Preserve failed suite and control evidence."
+  ],
+  "alternative": "A simpler separation is deterministic strict pure/composite classification tests plus native delivery/graph-noop/true-change coverage, but explicitly acknowledge that this moves pure-flag zero-work coverage out of the OS-dependent test; do not claim native pure behavior was exercised if no such event arrived.",
+  "authority": {
+    "implementation_acceptance": false,
+    "main_push": false,
+    "performance_acceptance": false
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "result": "TIMEOUT",
+  "exit_code": 1,
+  "session_id": 6411,
+  "source_test_revision": "fbda7b3eb8cd096425da9cab8c1e6835bd1b234c",
+  "command": "go test -p 1 -json -count=1 ./...",
+  "packages": {
+    "pass": 112,
+    "skip": 13,
+    "fail": 1
+  },
+  "test_events": {
+    "pass": 7376,
+    "skip": 33
+  },
+  "failure_events": [
+    {
+      "Time": "2026-10-04T00:16:56.317755+03:00",
+      "Action": "fail",
+      "Package": "github.com/enola-labs/enola/internal/graphsession",
+      "Elapsed": 600.528
+    }
+  ],
+  "bootstrap_outcome": "pass",
+  "note": "graphsession exceeded10min package-wide timeout; fresh20min package run pending; no failing assertion",
+  "files": {
+    "main-final-full-suite.jsonl": "7d4a0efcd45ac8a120750a744c0f2ede128f48ffa10f7111d86ccff9a20a4388",
+    "main-final-full-suite.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "main-final-source-manifest.json": "e713691d1230691d66a1119accbdbb5e5f66efb27d1abdea05af655d1a3ace72"
+  }
+}

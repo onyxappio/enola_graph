@@ -1,0 +1,197 @@
+{
+  "schema": "enola.independent-validation-review.v1",
+  "report_id": "astra-stage55-final-validation-20261003T163907Z",
+  "reviewer": "native:/root/astra_integrated_review",
+  "created_at": "2026-10-03T16:39:07.494611+00:00",
+  "verdict": "PASS",
+  "required_changes": [],
+  "scope": "Stage55 dirty experimental child source binding, final supplied suite and Product End-statistics correctness. Combined-source/publication acceptance excluded.",
+  "references": [
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/source-manifest.json",
+      "sha256": "7cf6d0cfed2374e36161032c700ccda7cd58ffc6594dd7a921239ee453130e65"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/pins.json",
+      "sha256": "5198fd00d016d9444af2a68359a47293ec515793c2d3d3c56046c76398d6bfbb"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/full-suite-receipt.json",
+      "sha256": "b106366f442ae84989650c0d64c1f5af7443f269c89493b0da8996132cb42bd1"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/full-suite.jsonl",
+      "sha256": "0f6f3b6e220251f26852125daf8294c132b6c7e5702c5ff50800de795d9cf211"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/full-suite.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/focused-race.log",
+      "sha256": "e709eff4066f799df0b9b04239e3dd54c93d9c6b7e5993e05f255a6cbcefdf7d"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/focused.log",
+      "sha256": "b921f8d523a0b79fdbc36d5ac7af79430a96b421b59f3b911979978977440433"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/negative/receipt.json",
+      "sha256": "a7e175f3d72718b5cb423cac07050760009751a5361df7d108cfc22d2d2d8800"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/negative/guard.log",
+      "sha256": "6d37bdbb2e7a9c9b6bfa4e62e9f47d8ad886492f48324dc340af2c9674dc13a4"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/negative/overlay.json",
+      "sha256": "2a92824463894190608b178100b58b8184932ad5a53059704010cfc54efde636"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/negative/session-no-statistics.go",
+      "sha256": "dcffec85271f033b0360fdc53296fbb99ff89f39563c69823b78dbdb9feeb2b4"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/product-statistics-receipt.json",
+      "sha256": "4c1208fc113dc676e864edca3e473feb345a7b7bf49f026d9e0072f425381dfb"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/results.json",
+      "sha256": "054481f322f807f9eb9c8c1dc584fc8eaf8315eeec9ab389a28cf6ffa07ba8fa"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/run-product-statistics.py",
+      "sha256": "13dd4e0da848d4db778946b9e8a6815c17fc3dbacde0939966def29e9d754b98"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/product-run.log",
+      "sha256": "b96a404bb7e1fe01c0a31825560415a4a54843358598efdd18f636478e225f0b"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/observer-source/main.go",
+      "sha256": "9937a2bf20970add60dcef78a838be60ce7e4a50ac4b71250efb492fd5d63d85"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/observer-source/go.mod",
+      "sha256": "633f6b82f878ac9eb0e994af088f0af235e6598ffae7b276166e9b1867e38bb1"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/observer-source/go.sum",
+      "sha256": "e27c6e4c00a2c3f9512946caa36d1015eefa4b66fc2ac3acd691e5328e424f11"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/enola-end-statistics-experimental",
+      "sha256": "275d50b31186d9009eb2e7d911478d7552042e79bf14b3e44bc0f329e05c5698"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/benchobserver-with-statistics",
+      "sha256": "45ba48e8830ce202a24f0ab7cbabb389260398bb847ea8fec3388cf78ea69516"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/repeat-1/consumer.jsonl",
+      "sha256": "595e330e4d43c38d3aa765ac3b318a6f4ee05e0596eaebac9415ff6fc3dabcba"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/repeat-1/lifecycle.jsonl",
+      "sha256": "be3fc3de624195b167f12353b56d8fa868daad8a972cae2956ab1d2679bff5ed"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/repeat-1/watch.stderr",
+      "sha256": "7a69580963095a0c60f3ee54f7838212b890e7fad74fb77f455aaa0b94f2e87e"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/repeat-1/observer.stderr",
+      "sha256": "3dfa3fb239f56c778a1e9b33eb31328349edd155a95806dac4378904e88527e5"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/host-load.jsonl",
+      "sha256": "db68712bcb38215706d9d4b335ffe0fe9b699a20145047eb801b53277b606a35"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/astra-end-statistics-source-review-20261003T162029Z.json",
+      "sha256": "f35e55c0bb1c65cc3cd63debe694cf1349e4defa4fc9db946f0732a1236f658c"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-end-statistics/docs/STREAMING_INCREMENTAL.md",
+      "sha256": "acb31136d1e090c83d362b62e52a98b5e38e143b226f6a9c7680e20c97d3c4c7"
+    }
+  ],
+  "source_binding": {
+    "all_1323_manifest_entries_match_current": true,
+    "all_artifact_pins_match": true,
+    "prior_review_referenced_source_and_docs_unchanged": true,
+    "binary_vcs_revision": "b3f443efda41890e9470b1ca5df9b3390ed9f9b3",
+    "binary_vcs_modified": true,
+    "qualification": "Manifest covers internal/pkg/cmd/module inputs; not claimed to be every transitive dependency source. Binary is an experimental dirty-child build, not a published commit.",
+    "observer": "Pinned module/binary use nats.go v1.47.0 and explicit local Enola replacement. Observer binary uses upstream Segmentio module, whereas producer uses local replacement; observer reads End JSON via std encoding/json and no state checkpoint decoder is involved in sampled-field observation."
+  },
+  "full_suite": {
+    "receipt_exit_code": 0,
+    "raw_package_start": 126,
+    "raw_package_pass": 114,
+    "raw_package_skip": 12,
+    "raw_test_pass_events": 7441,
+    "raw_test_skip_events": 33,
+    "raw_fail_events": 0,
+    "stderr_empty": true,
+    "all_receipt_action_counts_and_log_hash_match": true,
+    "limits": "12 package skips and 33 skipped test events are retained; not every optional/environment/platform test executed."
+  },
+  "focused_and_negative": {
+    "focused_race": "PASS supplied log; prior review established failed-End byte-identical replay, same-config cold graph equality, silent no-op and sample-before-delivery assertions.",
+    "negative": "Overlay changes only msg.Statistics assignment to nil. Supplied exit1 log fails initial timing presence in both legacy and frozen subtests; log digest matches receipt.",
+    "first_focused_failure": "Preserved focused.log from mismatched frozen/legacy cold test; same-config repair reviewed earlier."
+  },
+  "product_reconciliation": {
+    "frames": 10,
+    "lifecycle_records": 20,
+    "all_begin_end_pairs_complete": true,
+    "all_frame_statistics_equal_end_lifecycle_statistics": true,
+    "all_frame_statistics_positive": true,
+    "all_statistics_bounded_by_enclosing_launch_or_save_to_broker_and_consumer_interval": true,
+    "cold_equal_edits": 6,
+    "per_edit_parsed_files": 1,
+    "per_edit_owner_scope": 1,
+    "generation_chain": "watch initial0->1; six edits1->2 through6->7",
+    "initial_watch_and_restored_hashes_equal": true,
+    "original_and_copied_product_clean_pinned_revision": true,
+    "bounded_duplicate_controls": 2,
+    "host_samples": 85,
+    "host_sample_errors": 0,
+    "watch_exit": 2,
+    "watch_exit_reason": "Owned SIGTERM/cancellation after duplicate checks; final stderr context canceled.",
+    "observer_exit": -15,
+    "broker_exit": 0
+  },
+  "observer_source_review": [
+    "Optional *RunStatistics is decoded directly from received End payload with standard JSON. Same pointer value is serialized into consumer frame and End lifecycle; duration is not recomputed from wall timestamps.",
+    "Existing consumer Apply runs before frame emission and validates generation/manifest/batch completion; new field does not alter graph hash computation.",
+    "Harness requires positive producer statistics in every matching frame, retains same cold/delta/duplicate assertions as reviewed Stage53 harness, and explicitly sets ENOLA_GRAPH_PROFILE=0."
+  ],
+  "transaction_diagnostics_s": {
+    "initial": 14.572355125,
+    "watch_initial": 11.436669458,
+    "edits": {
+      "median": 1.4556280625,
+      "min": 1.416592375,
+      "max": 1.536233583
+    }
+  },
+  "measurement_limits": [
+    "One noisy/shared-host repetition, not a new speed baseline or absolute ceiling. Telemetry correctness only; no performance acceptance.",
+    "Field excludes startup, Watch collection/classification, pre-transaction hashing/probes, lock wait, End serialization/publication, final outstanding ACK drain, promotion and consumer application.",
+    "Duration bounds compare independent producer monotonic duration to enclosing host/broker timestamps; they check plausibility, not shared-clock identity or precise decomposition.",
+    "Two0.7-second duplicate controls assert wire/frame/state silence in harness; raw before/after broker-info receipts absent, and no zero-hidden-parse proof inferred.",
+    "Graph equivalence reconciles observer canonical hashes, not an independently rebuilt full graph from raw payloads."
+  ],
+  "remaining": [
+    "README/cumulative report updates and required documentation checks when finalized.",
+    "Combined-source review and validation after integration; this report grants no main-push authority."
+  ],
+  "reviewer_actions": "Bounded source/log/hash/build-metadata reads only; no tests, measurements, host collection, implementation edits or publication.",
+  "authority": {
+    "performance_acceptance": false,
+    "timing_hold": false,
+    "main_push": false
+  }
+}

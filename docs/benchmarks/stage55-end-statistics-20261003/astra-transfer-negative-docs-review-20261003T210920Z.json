@@ -1,0 +1,109 @@
+{
+  "schema": "enola.independent-validation-review.v1",
+  "report_id": "astra-stage55-transfer-negative-docs-20261003T210920Z",
+  "reviewer": "native:/root/astra_integrated_review",
+  "created_at": "2026-10-03T21:09:20.500512+00:00",
+  "verdict": "PASS",
+  "scope": "Targeted negative controls, test-only Product evidence transfer, and current documentation content. Final full suite and publication still pending.",
+  "references": [
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/receipt.json",
+      "sha256": "9dabfb20e3fed13a38d765b269bd8283d6300aeb9a68be8156bf9e9ff73c9045"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/disable-pure/guard.log",
+      "sha256": "0327ac8c12c7316d7665abd85738cf2233fa68001eabe7c241294ef733cdc40f"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/disable-pure/overlay.json",
+      "sha256": "bf1bf0d31b7042efcbc6fe5c76fd67b48d3309705377d3fdcd9c4998643eb6b0"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/disable-pure/changes.go",
+      "sha256": "1c0b21fe1193d4c518bdd2268ec3fe1258c72665616175abac776c0e9ae2614d"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/ignore-rename-metadata/guard.log",
+      "sha256": "b965a2fc3c0374b52452deb55f9d3aff3075dffd1b19293de5f6e9b26f44b3fb"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/ignore-rename-metadata/overlay.json",
+      "sha256": "518274f9fd6eb86dd74ee5e9cd63a6e706d8b6275efd111828b0651d59f28520"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/native-negative/ignore-rename-metadata/changes.go",
+      "sha256": "dc39677a6557cbe9d297afdef7f98324814fbe88fc096819d4faf59b371677ef"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-source-transfer.json",
+      "sha256": "8575bc51222755e638b2ea1499648900572ff5ab066407f9866b072397f2e17c"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-final-source-manifest.json",
+      "sha256": "e713691d1230691d66a1119accbdbb5e5f66efb27d1abdea05af655d1a3ace72"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-product/source-manifest.json",
+      "sha256": "93ea003ac859f8f486b80728091644cc0ee0c6dfe36a60b4486d762b514c07ae"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/.local/share/enola-performance/stage55-end-statistics-20261003/main-native-contract-race.log",
+      "sha256": "bfa5c16cdddcebf277ac5ff6d2d1fbaafd12c21459308d7463b5328932bf242b"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/stage55-end-statistics-20261003/README.md",
+      "sha256": "17043c947230b91e37f1bf4a04e82e5ec8a9f371acef52158699a2c7bf34d8ba"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/progress/enola-stages.html",
+      "sha256": "a89fa4d2a1516f301bc916152dfcb4b74c45f9fefe16108772f9207226775f7f"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/docs/benchmarks/watch-fanout-2026-09-26/enola-stages.html",
+      "sha256": "a89fa4d2a1516f301bc916152dfcb4b74c45f9fefe16108772f9207226775f7f"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/internal/graphsession/control_metadata_test.go",
+      "sha256": "aa07ebf834cda055ac01faf4173d52f2f86300aa550824551b9f2107b3d273d2"
+    },
+    {
+      "path": "/Users/oleksandr.mykulych/orca/workspaces/enola_graph/enola-stage55-main-statistics/pkg/bootstrap/scoped_delta_test.go",
+      "sha256": "a3e6451f8c9c08997f0b2e4389c6e8f037e71c8a8707e5274abd110dff90e791"
+    }
+  ],
+  "negative_controls": {
+    "all_receipt_hashes_match": true,
+    "pure_disabled": "Overlay only removes exact Chmod byte shortcut; supplied exit1 fails identical metadata triggered work.",
+    "rename_metadata_suppressed": "Overlay extends exact shortcut solely to Rename|Chmod; supplied exit1 fails control operation RENAME|CHMOD ignored. This directly closes previous negative-evidence gap.",
+    "prior_broad_negative": "Earlier WRITE|CHMOD failure remains historical, not substituted for targeted proof."
+  },
+  "source_transfer": {
+    "manifest_entries": 1323,
+    "all_current_files_match_final_manifest": true,
+    "only_changed_files": [
+      "internal/graphsession/control_metadata_test.go",
+      "pkg/bootstrap/scoped_delta_test.go"
+    ],
+    "unchanged_non_test_go_and_root_module_files": 542,
+    "runtime_revision": "11edf1ee149ea4b6c3610e3cd727986ad2f690ba",
+    "limit": "Root-module tracked Go/module scope only, excludes nested third_party. Supports correctness transfer for unchanged runtime; not performance acceptance."
+  },
+  "documentation": [
+    "README correctly preserves failed first main suite112pass13skip1fail and unchanged-baseline reproduction. Failed waiting hypotheses remain recorded, not claimed resolved by settling.",
+    "Native graph-silence guarantee and deterministic pure/composite classifier guarantee are explicitly separated; three pulses, idle and actual-index cold controls preserved.",
+    "Timing interval exclusions, optional decoder compatibility, dirty-child versus clean-main evidence, bounded duplicate limit and manifest scope clearly stated.",
+    "Both cumulative HTML copies match; cards55,54,53 appear newest first with benefit marking and pending/experimental/diagnostic limitations. Stage54 remains outside integration.",
+    "Stage53 displayed numbers match earlier diagnostic review; unchanged-vs-prior-draft claim was not independently established from main HEAD baseline."
+  ],
+  "validation_limits": [
+    "Focused native race package log passes; repetition10count is coordinator-reported, not enumerated by terse package log.",
+    "Final complete suite still pending at review; no acceptance inferred from partial log.",
+    "Final docslint/required report checks not yet reviewed.",
+    "No reviewer tests, heavy jobs, edits or publication."
+  ],
+  "authority": {
+    "main_push": false,
+    "performance_acceptance": false,
+    "final_acceptance": false
+  }
+}

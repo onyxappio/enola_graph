@@ -1,0 +1,26 @@
+{
+  "result": "PASS",
+  "purpose": "negative controls fail on removal of pure-metadata shortcut or suppression of exact RENAME|CHMOD",
+  "guards": [
+    {
+      "name": "disable-pure",
+      "exit_code": 1,
+      "expected_failure": "identical metadata triggered work",
+      "files": {
+        "native-negative/disable-pure/guard.log": "0327ac8c12c7316d7665abd85738cf2233fa68001eabe7c241294ef733cdc40f",
+        "native-negative/disable-pure/overlay.json": "bf1bf0d31b7042efcbc6fe5c76fd67b48d3309705377d3fdcd9c4998643eb6b0",
+        "native-negative/disable-pure/changes.go": "1c0b21fe1193d4c518bdd2268ec3fe1258c72665616175abac776c0e9ae2614d"
+      }
+    },
+    {
+      "name": "ignore-rename-metadata",
+      "exit_code": 1,
+      "expected_failure": "control operation RENAME|CHMOD ignored",
+      "files": {
+        "native-negative/ignore-rename-metadata/guard.log": "b965a2fc3c0374b52452deb55f9d3aff3075dffd1b19293de5f6e9b26f44b3fb",
+        "native-negative/ignore-rename-metadata/overlay.json": "518274f9fd6eb86dd74ee5e9cd63a6e706d8b6275efd111828b0651d59f28520",
+        "native-negative/ignore-rename-metadata/changes.go": "dc39677a6557cbe9d297afdef7f98324814fbe88fc096819d4faf59b371677ef"
+      }
+    }
+  ]
+}

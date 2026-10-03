@@ -1,0 +1,32 @@
+{
+  "result": "PASS",
+  "purpose": "combined-main End telemetry correctness; no performance acceptance",
+  "source_revision": "11edf1ee149ea4b6c3610e3cd727986ad2f690ba",
+  "source_files": 1323,
+  "source_scope": "tracked Go/module files in root module; excludes nested third_party module",
+  "frames": 10,
+  "lifecycle_records": 20,
+  "cold_equivalent_edits": 6,
+  "parsed_files_per_edit": 1,
+  "owners_per_edit": 1,
+  "bounded_duplicate_checks": 2,
+  "duplicate_limit": "0.7s wire/state silence; not independent zero-parse proof",
+  "host_sample_count": 102,
+  "host_sample_errors": [],
+  "quiet_hold": false,
+  "watch_exit": 2,
+  "cleanup_exits": {
+    "observer": -15,
+    "broker": 0
+  },
+  "input_hashes": {
+    "results.json": "727e2ef8d9506712f48304e4a36e27578f1fbcdae2bf77ee35f1e772139fbe0d",
+    "pins.json": "5e84d5dd3a80d27456effef30b3729aaa21cbf3f42c32c7ef8df0edbfc171d71",
+    "run-product-statistics.py": "4bac82914f7b93a26dddee6f1870a53b7734588516a2e50560cfaee9e4c33a57",
+    "source-manifest.json": "93ea003ac859f8f486b80728091644cc0ee0c6dfe36a60b4486d762b514c07ae",
+    "binary-build-info.txt": "79eec85b43fa2ef26c90d487b60a3f31476d57c658a13f7da39b384fa8849aae",
+    "host-load.jsonl": "46f4bbf88d2fcd91086b41ea705e8a1c40839422edefcc2fd49a3dc5f7bd0a5d",
+    "repeat-1/consumer.jsonl": "5b95c21b89960a239fe6330ccb49d0a1020d5daad5ce356d909778ed1291383a",
+    "repeat-1/lifecycle.jsonl": "23a88331204739c53a4c249b2ec5b4c2b037d4bd63ad335424706256d18dd116"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "result": "PASS",
+  "exit_code": 0,
+  "session_id": 83939,
+  "command": "go test -timeout 20m -json -count=1 ./internal/graphsession",
+  "source_test_revision": "fbda7b3eb8cd096425da9cab8c1e6835bd1b234c",
+  "package_elapsed_s": 544.26,
+  "test_events": {
+    "pass": 877
+  },
+  "root_test_passes": 659,
+  "stderr_bytes": 0,
+  "files": {
+    "main-final-graphsession-20m.jsonl": "8a46fa0ada27989091b8cf04d2d4bee1ce34ce7f5b8e9ed1723e4ae3e66dff4b",
+    "main-final-graphsession-20m.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "main-final-source-manifest.json": "e713691d1230691d66a1119accbdbb5e5f66efb27d1abdea05af655d1a3ace72"
+  }
+}
