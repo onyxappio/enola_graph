@@ -1,0 +1,22 @@
+# T-026: copy to .github/workflows/code-graph.yml of an onyxappio repository.
+# Indexes main/master on every push and every pull request (from this repository, not forks) as its own
+# graph `<repo>-pr<N>`, removed when the pull request is closed or merged. Everything else is in the
+# reusable workflow, which the GCP trust (WIF) accepts only at codata's main.
+name: code-graph
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+  id-token: write
+
+jobs:
+  code-graph:
+    uses: onyxappio/codata/.github/workflows/code-graph.yml@main
