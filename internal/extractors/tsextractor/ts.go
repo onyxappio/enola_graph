@@ -6253,8 +6253,13 @@ func tsLoopLexicalNames(kinds *tsutil.KindTable, n *sitter.Node, src []byte) []s
 	case "for_in_statement":
 		// The grammar exposes `left` as the binding pattern and stores let/const
 		// separately in the `kind` field. An assignment-form `for (x of xs)`
-		// introduces no binding and must not shadow an outer import.
-		declKind := nodeText(n.ChildByFieldName("kind"), src)
+		// introduces no binding and must not shadow an outer import; it has no
+		// `kind` field at all (codata/T-046).
+		kindNode := n.ChildByFieldName("kind")
+		if kindNode == nil {
+			return nil
+		}
+		declKind := nodeText(kindNode, src)
 		if declKind != "let" && declKind != "const" {
 			return nil
 		}
