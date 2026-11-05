@@ -1592,14 +1592,14 @@ func mergeAnalyzerPluginEnrichments(base []facts.Fact, enrichments []pluginEnric
 }
 
 func pluginFactKind(pluginName, api string, fsmVocabulary bool, kind string) string {
-	if api == analyzerplugin.GoAPIVersion && !(fsmVocabulary && analyzerplugin.IsFSMVocabularyNodeKind(kind)) {
+	if api == analyzerplugin.GoAPIVersion && (!fsmVocabulary || !analyzerplugin.IsFSMVocabularyNodeKind(kind)) {
 		return analyzerplugin.GenericFactKind(pluginName, kind)
 	}
 	return kind
 }
 
 func pluginEnrichmentTargetKind(pluginName, api string, fsmVocabulary bool, kind string) string {
-	if api == analyzerplugin.GoAPIVersion && !(fsmVocabulary && analyzerplugin.IsFSMVocabularyNodeKind(kind)) {
+	if api == analyzerplugin.GoAPIVersion && (!fsmVocabulary || !analyzerplugin.IsFSMVocabularyNodeKind(kind)) {
 		return analyzerplugin.GenericTargetKind(pluginName, kind)
 	}
 	return kind

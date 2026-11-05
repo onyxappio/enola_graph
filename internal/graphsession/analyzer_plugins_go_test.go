@@ -250,15 +250,36 @@ func TestGoFSMVocabularyV2IdentityRejectsSameHostFactAcrossOwners(t *testing.T) 
 	}
 }
 
-func TestAnalyzerPluginClaimCannotCollideWithLegacyStateMachine(t *testing.T) {
+func TestPluginOwnerResultFactsKeepsFSMVocabularyResolutionCandidatesUnnamespaced(t *testing.T) {
+	owners := func(name string) map[string]analyzerplugin.OwnerResult {
+		return map[string]analyzerplugin.OwnerResult{
+			"src/machine.ts": {Nodes: []analyzerplugin.Node{{Kind: facts.KindFSMState, Name: name}}},
+		}
+	}
+	previous := pluginOwnerResultFacts("product-fsm", analyzerplugin.GoAPIVersion, true, owners("product/state:idle"))
+	next := pluginOwnerResultFacts("product-fsm", analyzerplugin.GoAPIVersion, true, owners("product/state:ready"))
+	for _, fact := range append(previous, next...) {
+		if fact.Kind != facts.KindFSMState {
+			t.Fatalf("FSM vocabulary resolution candidate was namespaced: %#v", fact)
+		}
+	}
+	changed := changedResolutionCandidateNames(previous, next)
+	for _, name := range []string{"product/state:idle", "product/state:ready"} {
+		if !changed[name] {
+			t.Fatalf("FSM vocabulary resolution delta omitted unnamespaced candidate %q: %#v", name, changed)
+		}
+	}
+}
+
+func TestOpenSessionRejectsPluginClaimCollisionWithLegacyStateMachine(t *testing.T) {
 	root := setupTSRepo(t, map[string]string{"src/machine.ts": "export function dispatch() {}\n"})
 	registration := goFSMAnalyzerPluginFixture(t, root)
 	eng := testEngine(t, root)
 	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
 	eng.Config().StateMachines = []fsm.Spec{{ID: "product"}}
-	_, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, Options{StateDir: filepath.Join(root, ".enola", "collision-state"), AuthoritativeFiles: true, AllowRepoPlugins: []string{"product-fsm"}})
+	_, err := OpenSession(context.Background(), eng, root, &graphstream.MemorySink{}, Options{StateDir: filepath.Join(root, ".enola", "collision-state"), AuthoritativeFiles: true, AllowRepoPlugins: []string{"product-fsm"}})
 	if err == nil || !strings.Contains(err.Error(), "configuration conflict") || !strings.Contains(err.Error(), "legacy state_machines") {
-		t.Fatalf("legacy/plugin machine collision was accepted or unclear: %v", err)
+		t.Fatalf("OpenSession accepted legacy/plugin machine collision or returned an unclear error: %v", err)
 	}
 }
 
