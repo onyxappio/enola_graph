@@ -13,6 +13,7 @@ import (
 
 	"github.com/enola-labs/enola/internal/analyzerplugin"
 	"github.com/enola-labs/enola/internal/facts"
+	"github.com/enola-labs/enola/internal/fsm"
 	"github.com/enola-labs/enola/internal/graphinput"
 	"github.com/enola-labs/enola/internal/graphstream"
 )
@@ -45,6 +46,261 @@ func goAnalyzerPluginFixture(t *testing.T, root string) analyzerplugin.Config {
 		t.Fatal(err)
 	}
 	return analyzerplugin.Config{Path: "tools/task-graph", Config: map[string]any{"series": "sample"}}
+}
+
+func goFSMAnalyzerPluginFixture(t *testing.T, root string) analyzerplugin.Config {
+	t.Helper()
+	_, source, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Fatal("locate Go FSM analyzer plugin fixture")
+	}
+	repoRoot := filepath.Clean(filepath.Join(filepath.Dir(source), "..", ".."))
+	pluginDir := filepath.Join(root, "tools", "product-fsm")
+	entry := filepath.Join(pluginDir, "dist", "product-fsm")
+	if err := os.MkdirAll(filepath.Dir(entry), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	build := exec.Command("go", "build", "-o", entry, "./internal/analyzerplugin/testdata/go_fsm_plugin")
+	build.Dir = repoRoot
+	if output, err := build.CombinedOutput(); err != nil {
+		t.Fatalf("build Go FSM plugin fixture: %v\n%s", err, output)
+	}
+	manifest := "" +
+		"api: enola.plugin/v2\n" +
+		"name: product-fsm\n" +
+		"runtime:\n  kind: go-executable\n  entry: dist/product-fsm\n" +
+		"identity_files: [dist/product-fsm]\n" +
+		"vocabularies: [enola.fsm@1]\n" +
+		"claims:\n  machines: [product]\n" +
+		"hooks: [analysis.plan@1, analysis.unit@1]\n" +
+		"owner_domain: [src/**]\n"
+	if err := os.WriteFile(filepath.Join(pluginDir, "enola-plugin.yaml"), []byte(manifest), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	return analyzerplugin.Config{Path: "tools/product-fsm"}
+}
+
+func goNonFSMVocabularyAnalyzerPluginFixture(t *testing.T, root string) analyzerplugin.Config {
+	t.Helper()
+	_, source, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Fatal("locate non-FSM Go analyzer plugin fixture")
+	}
+	repoRoot := filepath.Clean(filepath.Join(filepath.Dir(source), "..", ".."))
+	pluginDir := filepath.Join(root, "tools", "generic-fsm-names")
+	entry := filepath.Join(pluginDir, "dist", "generic-fsm-names")
+	if err := os.MkdirAll(filepath.Dir(entry), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	build := exec.Command("go", "build", "-o", entry, "./internal/analyzerplugin/testdata/go_non_fsm_plugin")
+	build.Dir = repoRoot
+	if output, err := build.CombinedOutput(); err != nil {
+		t.Fatalf("build non-FSM Go plugin fixture: %v\n%s", err, output)
+	}
+	manifest := "" +
+		"api: enola.plugin/v2\n" +
+		"name: generic-fsm-names\n" +
+		"runtime:\n  kind: go-executable\n  entry: dist/generic-fsm-names\n" +
+		"identity_files: [dist/generic-fsm-names]\n" +
+		"hooks: [analysis.plan@1, analysis.unit@1]\n" +
+		"owner_domain: [src/**]\n"
+	if err := os.WriteFile(filepath.Join(pluginDir, "enola-plugin.yaml"), []byte(manifest), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	return analyzerplugin.Config{Path: "tools/generic-fsm-names"}
+}
+
+func TestGoFSMVocabularyPublishesHostFactsAndKeepsGenericContributionsNamespaced(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{"src/machine.ts": "export function dispatch() {}\n"})
+	registration := goFSMAnalyzerPluginFixture(t, root)
+	eng := testEngine(t, root)
+	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+	run, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, Options{StateDir: filepath.Join(root, ".enola", "fsm-plugin-state"), AuthoritativeFiles: true, AllowRepoPlugins: []string{"product-fsm"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if run.AnalyzerPlugins.ParsedFiles != 5 {
+		t.Fatalf("plugin parsed-file census = %d, want sum 5", run.AnalyzerPlugins.ParsedFiles)
+	}
+	for name, kind := range map[string]string{
+		"product":                       facts.KindFSMMachine,
+		"product/state:idle":            facts.KindFSMState,
+		"product/event:start":           facts.KindFSMEvent,
+		"product/command:start":         facts.KindFSMCommand,
+		"product/transition:idle-start": facts.KindFSMTransition,
+	} {
+		fact, found := factByName(run.Facts, name)
+		if !found || fact.Kind != kind {
+			t.Fatalf("FSM vocabulary kind %s/%s = %#v, found=%v", kind, name, fact, found)
+		}
+		if fact.Props["plugin_properties"] != nil {
+			t.Fatalf("FSM vocabulary fact %s was nested: %#v", name, fact.Props)
+		}
+	}
+	state, ok := factByName(run.Facts, "product/state:idle")
+	if !ok || state.Kind != facts.KindFSMState {
+		t.Fatalf("FSM state fact = %#v, found=%v", state, ok)
+	}
+	if state.Props["state"] != "idle" || state.Props["plugin_properties"] != nil {
+		t.Fatalf("FSM state properties were not flat: %#v", state.Props)
+	}
+	if len(state.Relations) != 1 || state.Relations[0].Kind != facts.RelFSMParent || state.Relations[0].TargetKind != facts.KindFSMState {
+		t.Fatalf("FSM state relations were not host relations: %#v", state.Relations)
+	}
+	coverage, ok := factByName(run.Facts, "plugin:product-fsm:coverage")
+	if !ok || coverage.Kind != facts.KindExtraction || coverage.Props["edge_coverage"] != "partial" || coverage.Props["plugin_properties"] != nil {
+		t.Fatalf("coverage fact was not V1-compatible: %#v, found=%v", coverage, ok)
+	}
+	generic, ok := factByName(run.Facts, "product/diagnostic")
+	if !ok || generic.Kind != "plugin:product-fsm:diagnostic" {
+		t.Fatalf("generic fact lost its namespace: %#v, found=%v", generic, ok)
+	}
+	if generic.Props["plugin_properties"] == nil || generic.Relations[0].Kind != "plugin:product-fsm:mentions" {
+		t.Fatalf("generic contribution lost V2 isolation: %#v", generic)
+	}
+	contribs := pluginState(t, filepath.Join(root, ".enola", "fsm-plugin-state")).Files["src/machine.ts"].Contrib["plugin:product-fsm"]
+	for _, contrib := range contribs {
+		if contrib.Kind == facts.KindSymbol && contrib.Name == "dispatch" {
+			if contrib.Props["anchor_detail"] != "flat" || contrib.Props["plugin_properties"] != nil {
+				t.Fatalf("persisted anchor properties were not flat: %#v", contrib.Props)
+			}
+			return
+		}
+	}
+	t.Fatalf("persisted anchor symbol missing from plugin contribs: %#v", contribs)
+}
+
+func TestGoFSMVocabularyRejectsInvalidFSMNodeWithV1Validation(t *testing.T) {
+	p := analyzerplugin.Loaded{Manifest: analyzerplugin.Manifest{API: analyzerplugin.GoAPIVersion, Name: "product-fsm", Vocabularies: []string{analyzerplugin.FSMVocabularyV1}, Claims: analyzerplugin.Claims{Machines: []string{"product"}}, OwnerDomain: []string{"src/**"}}}
+	u := analyzerplugin.UnitDecl{ID: "model:product", Kind: "model"}
+	bad := analyzerplugin.UnitResult{Unit: u.ID, Owners: map[string]analyzerplugin.OwnerResult{"src/machine.ts": {Nodes: []analyzerplugin.Node{{Kind: facts.KindFSMState, Name: "other/state:idle"}}}}}
+	if err := analyzerplugin.ValidateResult(p, u, bad); err == nil || !strings.Contains(err.Error(), "claimed machine") {
+		t.Fatalf("V2 FSM vocabulary accepted invalid V1 FSM identity: %v", err)
+	}
+}
+
+func TestAnalyzerPluginParsedFileCensusSurvivesSummaryJSON(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{"src/machine.ts": "export function dispatch() {}\n"})
+	registration := goFSMAnalyzerPluginFixture(t, root)
+	eng := testEngine(t, root)
+	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+	opts := Options{StateDir: filepath.Join(root, ".enola", "summary-state"), AuthoritativeFiles: true, AllowRepoPlugins: []string{"product-fsm"}}
+	result, err := RunSummary(context.Background(), eng, root, &graphstream.MemorySink{}, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.AnalyzerPlugins.ParsedFiles != 5 || result.Facts != nil {
+		t.Fatalf("summary result = %+v", result)
+	}
+	encoded, err := json.Marshal(result)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var summary map[string]any
+	if err := json.Unmarshal(encoded, &summary); err != nil {
+		t.Fatal(err)
+	}
+	stats, ok := summary["AnalyzerPlugins"].(map[string]any)
+	if !ok || stats["ParsedFiles"] != float64(5) {
+		t.Fatalf("summary JSON omitted plugin parsed files: %s", encoded)
+	}
+	noop, err := RunSummary(context.Background(), eng, root, &graphstream.MemorySink{}, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if noop.AnalyzerPlugins.ParsedFiles != 0 || noop.AnalyzerPlugins.UnitsReused == 0 {
+		t.Fatalf("summary no-op did not reuse units without census: %+v", noop.AnalyzerPlugins)
+	}
+}
+
+func TestGoV2WithoutFSMVocabularyNamespacesFSMNamedKinds(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{"src/machine.ts": "export function dispatch() {}\n"})
+	registration := goNonFSMVocabularyAnalyzerPluginFixture(t, root)
+	eng := testEngine(t, root)
+	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+	run, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, Options{StateDir: filepath.Join(root, ".enola", "generic-fsm-names-state"), AuthoritativeFiles: true, AllowRepoPlugins: []string{"generic-fsm-names"}})
+	if err != nil {
+		t.Fatalf("generic V2 fixture was rejected instead of validated generically: %v", err)
+	}
+	for name, wantKind := range map[string]string{
+		"product/state:generic": "plugin:generic-fsm-names:fsm_state",
+		"product/coverage":      "plugin:generic-fsm-names:extraction",
+	} {
+		fact, found := factByName(run.Facts, name)
+		if !found || fact.Kind != wantKind {
+			t.Fatalf("generic V2 fact %q = %#v, found=%v; want kind %q", name, fact, found, wantKind)
+		}
+		props, _ := fact.Props["plugin_properties"].(map[string]any)
+		owned, _ := props["generic-fsm-names"].(map[string]any)
+		if len(owned) == 0 {
+			t.Fatalf("generic V2 fact %q lost nested plugin properties: %#v", name, fact.Props)
+		}
+	}
+}
+
+func TestGoFSMVocabularyV2IdentityRejectsSameHostFactAcrossOwners(t *testing.T) {
+	s := &session{opts: Options{analyzerPlugins: []analyzerplugin.Loaded{{Manifest: analyzerplugin.Manifest{API: analyzerplugin.GoAPIVersion, Name: "product-fsm", Vocabularies: []string{analyzerplugin.FSMVocabularyV1}}}}}}
+	records := map[string]analyzerplugin.PluginRecord{"product-fsm": {Units: map[string]analyzerplugin.UnitRecord{"fixture": {Owners: map[string]analyzerplugin.OwnerResult{
+		"src/a.ts": {Nodes: []analyzerplugin.Node{{Kind: facts.KindFSMState, Name: "product/state:idle"}}},
+		"src/b.ts": {Nodes: []analyzerplugin.Node{{Kind: facts.KindFSMState, Name: "product/state:idle"}}},
+	}}}}}
+	err := s.collectPluginContributions(records, map[string]bool{"src/a.ts": true, "src/b.ts": true})
+	if err == nil || !strings.Contains(err.Error(), "stable fact identity fsm_state/product/state:idle") || !strings.Contains(err.Error(), "multiple owners") {
+		t.Fatalf("same V2 FSM identity across owners was not rejected as documented: %v", err)
+	}
+}
+
+func TestPluginOwnerResultFactsKeepsFSMVocabularyResolutionCandidatesUnnamespaced(t *testing.T) {
+	owners := func(name string) map[string]analyzerplugin.OwnerResult {
+		return map[string]analyzerplugin.OwnerResult{
+			"src/machine.ts": {Nodes: []analyzerplugin.Node{{Kind: facts.KindFSMState, Name: name}}},
+		}
+	}
+	previous := pluginOwnerResultFacts("product-fsm", analyzerplugin.GoAPIVersion, true, owners("product/state:idle"))
+	next := pluginOwnerResultFacts("product-fsm", analyzerplugin.GoAPIVersion, true, owners("product/state:ready"))
+	for _, fact := range append(previous, next...) {
+		if fact.Kind != facts.KindFSMState {
+			t.Fatalf("FSM vocabulary resolution candidate was namespaced: %#v", fact)
+		}
+	}
+	changed := changedResolutionCandidateNames(previous, next)
+	for _, name := range []string{"product/state:idle", "product/state:ready"} {
+		if !changed[name] {
+			t.Fatalf("FSM vocabulary resolution delta omitted unnamespaced candidate %q: %#v", name, changed)
+		}
+	}
+}
+
+func TestOpenSessionRejectsPluginClaimCollisionWithLegacyStateMachine(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{"src/machine.ts": "export function dispatch() {}\n"})
+	registration := goFSMAnalyzerPluginFixture(t, root)
+	eng := testEngine(t, root)
+	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+	eng.Config().StateMachines = []fsm.Spec{{ID: "product"}}
+	_, err := OpenSession(context.Background(), eng, root, &graphstream.MemorySink{}, Options{StateDir: filepath.Join(root, ".enola", "collision-state"), AuthoritativeFiles: true, AllowRepoPlugins: []string{"product-fsm"}})
+	if err == nil || !strings.Contains(err.Error(), "configuration conflict") || !strings.Contains(err.Error(), "legacy state_machines") {
+		t.Fatalf("OpenSession accepted legacy/plugin machine collision or returned an unclear error: %v", err)
+	}
+}
+
+func TestResidentReloadRejectsPluginClaimCollisionAddedAfterOpen(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{"src/machine.ts": "export function dispatch() {}\n"})
+	registration := goFSMAnalyzerPluginFixture(t, root)
+	eng := testEngine(t, root)
+	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+	r, err := OpenSession(context.Background(), eng, root, &graphstream.MemorySink{}, Options{StateDir: filepath.Join(root, ".enola", "resident-collision-state"), AuthoritativeFiles: true, AllowRepoPlugins: []string{"product-fsm"}})
+	if err != nil {
+		t.Fatalf("open without legacy collision: %v", err)
+	}
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
+	eng.Config().StateMachines = []fsm.Spec{{ID: "product"}}
+	if _, err := r.reconcile(context.Background(), false); err == nil || !strings.Contains(err.Error(), "configuration conflict") {
+		t.Fatalf("resident reload accepted newly colliding legacy state machine: %v", err)
+	}
 }
 
 func TestGoNonFSMPluginColdDeltaAndNoopGraphContract(t *testing.T) {

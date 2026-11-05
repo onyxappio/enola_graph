@@ -395,6 +395,7 @@ type AnalyzerPluginStats struct {
 	UnitsExecuted    int
 	UnitsReused      int
 	OwnerFiles       int
+	ParsedFiles      int
 }
 
 type Result struct {
@@ -524,6 +525,9 @@ func OpenSession(ctx context.Context, eng *engine.Engine, repoPath string, sink 
 	pluginConfigs := append([]analyzerplugin.Config(nil), eng.Config().AnalyzerPlugins...)
 	loadedPlugins, err := analyzerplugin.Load(abs, pluginConfigs, runtimeCache)
 	if err != nil {
+		return nil, err
+	}
+	if err := validatePluginMachineClaims(eng, loadedPlugins); err != nil {
 		return nil, err
 	}
 	for _, p := range loadedPlugins {

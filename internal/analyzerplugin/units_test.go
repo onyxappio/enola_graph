@@ -73,6 +73,15 @@ func TestValidateResultChecksVocabularyClaimAndOwnerDomain(t *testing.T) {
 	}
 }
 
+func TestValidateResultIgnoresCensusForV1Plugins(t *testing.T) {
+	p := Loaded{Manifest: Manifest{Name: "legacy", OwnerDomain: []string{"src/**"}}}
+	u := UnitDecl{ID: "file:src/a.ts", Kind: "file"}
+	result := UnitResult{Unit: u.ID, Census: map[string]any{"parsed_files": -1}}
+	if err := ValidateResult(p, u, result); err != nil {
+		t.Fatalf("V1 result was rejected for a V2-only census: %v", err)
+	}
+}
+
 func TestRepositoryGlobMatchesRecursiveZeroDepthAndBraceForms(t *testing.T) {
 	for _, path := range []string{"src/file.ts", "src/nested/file.ts"} {
 		if !MatchRepositoryGlob("src/**/file.ts", path) {

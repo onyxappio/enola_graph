@@ -118,6 +118,13 @@ type Contribution struct {
 	Unit    string                       `json:"unit"`
 	Owners  map[string]OwnerContribution `json:"owners"`
 	Summary any                          `json:"summary,omitempty"`
+	Census  *Census                      `json:"census,omitempty"`
+}
+
+// Census reports optional, plugin-measured unit work. ParsedFiles counts files
+// parsed by the plugin itself; it is separate from host extractor parse counts.
+type Census struct {
+	ParsedFiles int `json:"parsed_files"`
 }
 
 type OwnerContribution struct {

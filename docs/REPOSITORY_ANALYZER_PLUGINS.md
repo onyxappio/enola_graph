@@ -99,6 +99,16 @@ or an out-of-inventory owner aborts the run before `BeginReplace`. The last
 committed graph and generation remain in place. Removing a plugin from config
 is explicit and replaces its previous contributions with empty output.
 
+For a V2 Go plugin, declaring `vocabularies: [enola.fsm@1]` opts only FSM node
+kinds and `extraction` into the V1 compatibility contract: host kinds and
+`fsm_*` relations remain un-namespaced, properties and anchor properties are
+flat, and V1 machine-claim validation applies. Other V2 node kinds from the
+same plugin remain namespaced and use nested plugin properties. V2 plugins
+without that vocabulary remain unchanged. Unit contributions may report an
+optional `census.parsed_files`; executed-unit values are summed as
+`AnalyzerPlugins.ParsedFiles` in `graph --summary-json`. A plugin claim may
+not collide with an ID configured under legacy `state_machines`.
+
 ## Cache and migration boundaries
 
 Plugin observations and unit outputs live in graphsession state, separately
