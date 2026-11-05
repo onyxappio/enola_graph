@@ -165,6 +165,35 @@ contributions. The built-in FSM vocabulary remains supported through an
 optional compatibility adapter; FSM names and machine-claim rules do not
 constrain other plugins.
 
+### V2 FSM vocabulary compatibility
+
+A Go (`enola.plugin/v2`) plugin that declares `vocabularies:
+[enola.fsm@1]` may contribute the host FSM node kinds (`fsm_machine`,
+`fsm_state`, `fsm_event`, `fsm_transition`, and `fsm_command`) and
+`extraction`. Those nodes use the V1 compatibility path: their kinds and
+`fsm_*` relations stay un-namespaced, their properties (including anchor
+properties) stay flat, and the host applies the V1 FSM identity and claimed
+machine validation. Other node kinds from that same plugin remain generic:
+their kinds and relations are plugin-namespaced and their properties stay in
+the plugin property namespace. A V2 plugin that does not declare
+`enola.fsm@1` is wholly generic.
+
+An `analysis.unit@1` contribution may also include an optional census:
+
+```go
+Census: &sdk.Census{ParsedFiles: parsed},
+```
+
+`parsed_files` is a non-negative count of files parsed by the plugin, not by
+the host extractor. Enola sums executed-unit values into
+`AnalyzerPlugins.ParsedFiles`, including in `graph --summary-json`, so
+benchmark harnesses can report the two parse populations separately.
+
+A repository may not configure a plugin claim for the same machine ID as a
+legacy `state_machines` entry. Enola rejects that configuration before graph
+replacement, because accepting both sources would make the FSM vocabulary
+ambiguous.
+
 ## Hook and invalidation contract
 
 - The host invokes versioned `plan` and `analyze_unit` hooks before replacement

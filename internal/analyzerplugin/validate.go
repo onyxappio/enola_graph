@@ -2,6 +2,7 @@ package analyzerplugin
 
 import (
 	"fmt"
+	"math"
 	"path"
 	"sort"
 	"strings"
@@ -15,6 +16,9 @@ import (
 func ValidateResult(p Loaded, unit UnitDecl, result UnitResult) error {
 	if result.Unit != unit.ID {
 		return fmt.Errorf("plugin %q returned unit %q while running %q", p.Manifest.Name, result.Unit, unit.ID)
+	}
+	if _, err := CensusParsedFiles(result.Census); err != nil {
+		return fmt.Errorf("plugin %q unit %q census: %w", p.Manifest.Name, unit.ID, err)
 	}
 	if p.Manifest.API == GoAPIVersion {
 		return validateGenericResult(p, unit, result)
@@ -78,6 +82,11 @@ func ValidateResult(p Loaded, unit UnitDecl, result UnitResult) error {
 
 func validateGenericResult(p Loaded, unit UnitDecl, result UnitResult) error {
 	seen := map[string]map[string]bool{}
+	claims := map[string]bool{}
+	for _, id := range p.Manifest.Claims.Machines {
+		claims[id] = true
+	}
+	fsmVocabulary := UsesFSMVocabulary(p.Manifest)
 	for owner, output := range result.Owners {
 		if !validOwner(owner) || !ownerAllowed(p.Manifest.OwnerDomain, owner) {
 			return fmt.Errorf("plugin %q unit %q wrote outside owner_domain: %q", p.Manifest.Name, unit.ID, owner)
@@ -85,6 +94,12 @@ func validateGenericResult(p Loaded, unit UnitDecl, result UnitResult) error {
 		for _, node := range output.Nodes {
 			if node.Owner != "" && node.Owner != owner {
 				return fmt.Errorf("plugin %q unit %q node %q claims owner %q, enclosing owner is %q", p.Manifest.Name, unit.ID, node.Name, node.Owner, owner)
+			}
+			if fsmVocabulary && IsFSMVocabularyNodeKind(node.Kind) {
+				if err := validateNode(p.Manifest.Name, claims, owner, node, seen); err != nil {
+					return fmt.Errorf("plugin %q unit %q: %w", p.Manifest.Name, unit.ID, err)
+				}
+				continue
 			}
 			if node.Kind == "" || !validLocalKind(node.Kind) || node.Name == "" {
 				return fmt.Errorf("plugin %q unit %q node must have a stable local kind and non-empty name", p.Manifest.Name, unit.ID)
@@ -140,6 +155,49 @@ func validateGenericResult(p Loaded, unit UnitDecl, result UnitResult) error {
 		}
 	}
 	return nil
+}
+
+// UsesFSMVocabulary reports whether a V2 plugin opted into the host's FSM
+// vocabulary compatibility contract.
+func UsesFSMVocabulary(m Manifest) bool {
+	return m.API == GoAPIVersion && containsString(m.Vocabularies, FSMVocabularyV1)
+}
+
+// IsFSMVocabularyNodeKind is a node kind that the FSM vocabulary owns. These
+// remain host kinds when a V2 plugin has explicitly declared enola.fsm@1.
+func IsFSMVocabularyNodeKind(kind string) bool {
+	return kind == facts.KindExtraction || isFSMKind(kind)
+}
+
+// CensusParsedFiles returns the optional parsed-files census supplied by a
+// unit. Protocol JSON numbers arrive as float64; accepting integral Go values
+// as well keeps direct SDK and host tests honest.
+func CensusParsedFiles(census map[string]any) (int, error) {
+	if len(census) == 0 {
+		return 0, nil
+	}
+	raw, ok := census["parsed_files"]
+	if !ok || raw == nil {
+		return 0, nil
+	}
+	var value int64
+	switch n := raw.(type) {
+	case int:
+		value = int64(n)
+	case int64:
+		value = n
+	case float64:
+		if math.Trunc(n) != n || n > float64(math.MaxInt) || n < 0 {
+			return 0, fmt.Errorf("parsed_files must be a non-negative integer")
+		}
+		value = int64(n)
+	default:
+		return 0, fmt.Errorf("parsed_files must be a non-negative integer")
+	}
+	if value < 0 || value > int64(math.MaxInt) {
+		return 0, fmt.Errorf("parsed_files must be a non-negative integer")
+	}
+	return int(value), nil
 }
 
 func validateGenericAnchor(p Loaded, owner string, anchor Anchor) error {

@@ -253,7 +253,13 @@ func (s *session) prepareAnalyzerPluginsWith(ctx context.Context, input *runtime
 				client.Abort()
 				return err
 			}
+			parsedFiles, err := analyzerplugin.CensusParsedFiles(output.Census)
+			if err != nil {
+				client.Abort()
+				return fmt.Errorf("plugin %q unit %q census: %w", name, unit.ID, err)
+			}
 			s.analyzerPluginStats.UnitsExecuted++
+			s.analyzerPluginStats.ParsedFiles += parsedFiles
 			for owner := range output.Owners {
 				if !containsSlashPath(files, owner) {
 					client.Abort()
@@ -302,7 +308,7 @@ func (s *session) prepareAnalyzerPluginsWith(ctx context.Context, input *runtime
 				stagedUnits[unit.ID] = analyzerplugin.UnitRecord{Decl: unit, Observations: unitObs[unit.ID], Owners: owners, Summary: summaryBytes, OutputDigest: canonical}
 				addPluginOwnerKeys(deltaOwners, previousUnit.Owners)
 				addPluginOwnerKeys(deltaOwners, owners)
-				for n := range changedResolutionCandidateNames(pluginOwnerResultFacts(name, p.Manifest.API, previousUnit.Owners), pluginOwnerResultFacts(name, p.Manifest.API, owners)) {
+				for n := range changedResolutionCandidateNames(pluginOwnerResultFacts(name, p.Manifest.API, analyzerplugin.UsesFSMVocabulary(p.Manifest), previousUnit.Owners), pluginOwnerResultFacts(name, p.Manifest.API, analyzerplugin.UsesFSMVocabulary(p.Manifest), owners)) {
 					nameDelta[n] = true
 				}
 			}
@@ -393,6 +399,19 @@ func (s *session) reloadAnalyzerPlugins() error {
 	loaded, err := analyzerplugin.Load(s.abs, entries, cache)
 	if err != nil {
 		return err
+	}
+	legacyMachines := map[string]bool{}
+	if cfg := s.eng.Config(); cfg != nil {
+		for _, machine := range cfg.StateMachines {
+			legacyMachines[machine.ID] = true
+		}
+	}
+	for _, plugin := range loaded {
+		for _, machine := range plugin.Manifest.Claims.Machines {
+			if legacyMachines[machine] {
+				return fmt.Errorf("configuration conflict: analyzer plugin %q claims machine %q, also configured by legacy state_machines", plugin.Manifest.Name, machine)
+			}
+		}
 	}
 	for _, p := range loaded {
 		if !analyzerplugin.Trusted(s.opts.AllowRepoPlugins, p.Manifest.Name) {
@@ -550,13 +569,14 @@ func pluginOwnerResultNames(owners map[string]analyzerplugin.OwnerResult) map[st
 	return names
 }
 
-func pluginOwnerResultFacts(pluginName, api string, owners map[string]analyzerplugin.OwnerResult) []facts.Fact {
+func pluginOwnerResultFacts(pluginName, api string, fsmVocabulary bool, owners map[string]analyzerplugin.OwnerResult) []facts.Fact {
 	var out []facts.Fact
 	for owner, result := range owners {
 		owner = filepath.ToSlash(owner)
 		for _, node := range result.Nodes {
-			rels := pluginFactsRelations(pluginName, api, node.Relations)
-			out = append(out, facts.Fact{Kind: pluginFactKind(pluginName, api, node.Kind), Name: node.Name, File: owner, Line: node.Line, EndLine: node.EndLine, Relations: rels})
+			passthrough := fsmVocabulary && analyzerplugin.IsFSMVocabularyNodeKind(node.Kind)
+			rels := pluginFactsRelations(pluginName, api, passthrough, node.Relations)
+			out = append(out, facts.Fact{Kind: pluginFactKind(pluginName, api, passthrough, node.Kind), Name: node.Name, File: owner, Line: node.Line, EndLine: node.EndLine, Relations: rels})
 		}
 		for _, anchor := range result.Anchors {
 			anchorOwner := filepath.ToSlash(anchor.Owner)
@@ -566,7 +586,7 @@ func pluginOwnerResultFacts(pluginName, api string, owners map[string]analyzerpl
 			for _, rel := range anchor.Relations {
 				out = append(out, facts.Fact{
 					Kind: facts.KindSymbol, Name: anchor.Symbol, File: anchorOwner, Line: anchor.Line, EndLine: anchor.EndLine,
-					Relations: pluginAnchorRelations(pluginName, api, []analyzerplugin.Relation{rel}),
+					Relations: pluginAnchorRelations(pluginName, api, fsmVocabulary, []analyzerplugin.Relation{rel}),
 				})
 			}
 		}
@@ -576,8 +596,8 @@ func pluginOwnerResultFacts(pluginName, api string, owners map[string]analyzerpl
 				enrichmentOwner = owner
 			}
 			out = append(out, facts.Fact{
-				Kind: pluginEnrichmentTargetKind(pluginName, api, enrichment.Kind), Name: enrichment.Name, File: enrichmentOwner,
-				Relations: pluginFactsRelations(pluginName, api, enrichment.Relations),
+				Kind: pluginEnrichmentTargetKind(pluginName, api, false, enrichment.Kind), Name: enrichment.Name, File: enrichmentOwner,
+				Relations: pluginFactsRelations(pluginName, api, false, enrichment.Relations),
 			})
 		}
 	}
@@ -1135,8 +1155,10 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 	seenIdentities := map[string]*seenPluginIdentity{}
 	ownerFiles := map[string]bool{}
 	apiVersions := map[string]string{}
+	fsmVocabularies := map[string]bool{}
 	for _, plugin := range s.analyzerPluginsLocked() {
 		apiVersions[plugin.Manifest.Name] = plugin.Manifest.API
+		fsmVocabularies[plugin.Manifest.Name] = analyzerplugin.UsesFSMVocabulary(plugin.Manifest)
 	}
 	repoID := s.opts.RepoID
 	if repoID == "" {
@@ -1150,6 +1172,7 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 	for _, pluginName := range pluginNames {
 		record := records[pluginName]
 		api := apiVersions[pluginName]
+		fsmVocabulary := fsmVocabularies[pluginName]
 		unitIDs := make([]string, 0, len(record.Units))
 		for id := range record.Units {
 			unitIDs = append(unitIDs, id)
@@ -1173,7 +1196,7 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 				output := unit.Owners[owner]
 				key := "plugin:" + pluginName
 				for _, node := range output.Nodes {
-					factKind := pluginFactKind(pluginName, api, node.Kind)
+					factKind := pluginFactKind(pluginName, api, fsmVocabulary, node.Kind)
 					identity := factKind + "\x00" + node.Name
 					if api != analyzerplugin.GoAPIVersion {
 						// Legacy Node plugins keep their owner-path-qualified fact identity.
@@ -1196,10 +1219,10 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 						return fmt.Errorf("analyzer plugins emitted duplicate fact identity %s/%s for owner %s without distinct occurrences", node.Kind, node.Name, owner)
 					}
 					seen.occurrences[occurrence] = id
-					props := pluginOwnedProperties(api, pluginName, node.Props)
+					props := pluginOwnedProperties(api, pluginName, fsmVocabulary && analyzerplugin.IsFSMVocabularyNodeKind(node.Kind), node.Props)
 					props["plugin"] = pluginName
 					props["plugin_identity"] = record.Identity
-					rels := pluginFactsRelations(pluginName, api, node.Relations)
+					rels := pluginFactsRelations(pluginName, api, fsmVocabulary && analyzerplugin.IsFSMVocabularyNodeKind(node.Kind), node.Relations)
 					fact := facts.Fact{Kind: factKind, Name: node.Name, File: owner, Line: node.Line, EndLine: node.EndLine, Repo: repoID, Props: props, Relations: rels}
 					s.pluginFacts = append(s.pluginFacts, fact)
 					s.pluginContribs[key] = append(s.pluginContribs[key], fact)
@@ -1215,14 +1238,14 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 						anchor.Owner = anchorOwner
 					}
 					ownerFiles[anchorOwner] = true
-					props := pluginOwnedProperties(api, pluginName, anchor.Props)
+					props := pluginOwnedProperties(api, pluginName, fsmVocabulary, anchor.Props)
 					props["plugin"] = pluginName
 					props["plugin_identity"] = record.Identity
 					props["plugin_anchor"] = true
 					if anchor.SourceIdentity != "" {
 						props["fsm_source_identity"] = anchor.SourceIdentity
 					}
-					rels := pluginAnchorRelations(pluginName, api, anchor.Relations)
+					rels := pluginAnchorRelations(pluginName, api, fsmVocabulary, anchor.Relations)
 					// Persist anchors into Contrib so frozen pre-Begin name
 					// planning and resolution indexes see old and new owners.
 					s.pluginContribs[key] = append(s.pluginContribs[key], facts.Fact{
@@ -1466,8 +1489,8 @@ func mergeAnalyzerPluginEnrichments(base []facts.Fact, enrichments []pluginEnric
 	sort.SliceStable(ordered, func(i, j int) bool {
 		left, right := ordered[i], ordered[j]
 		leftOwner, rightOwner := filepath.ToSlash(left.Value.Owner), filepath.ToSlash(right.Value.Owner)
-		leftKey := leftOwner + "\x00" + pluginEnrichmentTargetKind(left.Plugin, left.API, left.Value.Kind) + "\x00" + left.Value.Name
-		rightKey := rightOwner + "\x00" + pluginEnrichmentTargetKind(right.Plugin, right.API, right.Value.Kind) + "\x00" + right.Value.Name
+		leftKey := leftOwner + "\x00" + pluginEnrichmentTargetKind(left.Plugin, left.API, false, left.Value.Kind) + "\x00" + left.Value.Name
+		rightKey := rightOwner + "\x00" + pluginEnrichmentTargetKind(right.Plugin, right.API, false, right.Value.Kind) + "\x00" + right.Value.Name
 		if left.Plugin != right.Plugin {
 			return left.Plugin < right.Plugin
 		}
@@ -1480,7 +1503,7 @@ func mergeAnalyzerPluginEnrichments(base []facts.Fact, enrichments []pluginEnric
 	for _, wrapped := range ordered {
 		enrichment := wrapped.Value
 		owner := filepath.ToSlash(enrichment.Owner)
-		kind := pluginEnrichmentTargetKind(wrapped.Plugin, wrapped.API, enrichment.Kind)
+		kind := pluginEnrichmentTargetKind(wrapped.Plugin, wrapped.API, false, enrichment.Kind)
 		match, matches := -1, 0
 		for i := range out {
 			if out[i].Kind == kind && out[i].Name == enrichment.Name && filepath.ToSlash(out[i].File) == owner {
@@ -1497,7 +1520,7 @@ func mergeAnalyzerPluginEnrichments(base []facts.Fact, enrichments []pluginEnric
 
 		target := out[match]
 		if len(enrichment.Props) > 0 {
-			properties := pluginOwnedProperties(wrapped.API, wrapped.Plugin, enrichment.Props)
+			properties := pluginOwnedProperties(wrapped.API, wrapped.Plugin, false, enrichment.Props)
 			incoming, _ := properties["plugin_properties"].(map[string]any)
 			existing, ok := target.Props["plugin_properties"].(map[string]any)
 			if value, present := target.Props["plugin_properties"]; present && !ok {
@@ -1544,7 +1567,7 @@ func mergeAnalyzerPluginEnrichments(base []facts.Fact, enrichments []pluginEnric
 		}
 
 		relationsCopied := false
-		for _, relation := range pluginFactsRelations(wrapped.Plugin, wrapped.API, enrichment.Relations) {
+		for _, relation := range pluginFactsRelations(wrapped.Plugin, wrapped.API, false, enrichment.Relations) {
 			found := false
 			for _, previous := range target.Relations {
 				if previous == relation {
@@ -1565,25 +1588,25 @@ func mergeAnalyzerPluginEnrichments(base []facts.Fact, enrichments []pluginEnric
 	return out, nil
 }
 
-func pluginFactKind(pluginName, api, kind string) string {
-	if api == analyzerplugin.GoAPIVersion {
+func pluginFactKind(pluginName, api string, fsmVocabulary bool, kind string) string {
+	if api == analyzerplugin.GoAPIVersion && !(fsmVocabulary && analyzerplugin.IsFSMVocabularyNodeKind(kind)) {
 		return analyzerplugin.GenericFactKind(pluginName, kind)
 	}
 	return kind
 }
 
-func pluginEnrichmentTargetKind(pluginName, api, kind string) string {
-	if api == analyzerplugin.GoAPIVersion {
+func pluginEnrichmentTargetKind(pluginName, api string, fsmVocabulary bool, kind string) string {
+	if api == analyzerplugin.GoAPIVersion && !(fsmVocabulary && analyzerplugin.IsFSMVocabularyNodeKind(kind)) {
 		return analyzerplugin.GenericTargetKind(pluginName, kind)
 	}
 	return kind
 }
 
-func pluginFactsRelations(pluginName, api string, relations []analyzerplugin.Relation) []facts.Relation {
+func pluginFactsRelations(pluginName, api string, fsmVocabulary bool, relations []analyzerplugin.Relation) []facts.Relation {
 	out := make([]facts.Relation, 0, len(relations))
 	for _, relation := range relations {
 		kind, targetKind := relation.Kind, relation.TargetKind
-		if api == analyzerplugin.GoAPIVersion {
+		if api == analyzerplugin.GoAPIVersion && !fsmVocabulary {
 			kind = analyzerplugin.GenericRelationKind(pluginName, kind)
 			targetKind = analyzerplugin.GenericTargetKind(pluginName, targetKind)
 		}
@@ -1592,9 +1615,9 @@ func pluginFactsRelations(pluginName, api string, relations []analyzerplugin.Rel
 	return out
 }
 
-func pluginAnchorRelations(pluginName, api string, relations []analyzerplugin.Relation) []facts.Relation {
+func pluginAnchorRelations(pluginName, api string, fsmVocabulary bool, relations []analyzerplugin.Relation) []facts.Relation {
 	if api != analyzerplugin.GoAPIVersion {
-		return pluginFactsRelations(pluginName, api, relations)
+		return pluginFactsRelations(pluginName, api, fsmVocabulary, relations)
 	}
 	out := make([]facts.Relation, 0, len(relations))
 	for _, relation := range relations {
@@ -1607,8 +1630,8 @@ func pluginAnchorRelations(pluginName, api string, relations []analyzerplugin.Re
 	return out
 }
 
-func pluginOwnedProperties(api, pluginName string, properties map[string]any) map[string]any {
-	if api != analyzerplugin.GoAPIVersion {
+func pluginOwnedProperties(api, pluginName string, fsmVocabulary bool, properties map[string]any) map[string]any {
+	if api != analyzerplugin.GoAPIVersion || fsmVocabulary {
 		out := cloneAnyMap(properties)
 		if out == nil {
 			out = map[string]any{}

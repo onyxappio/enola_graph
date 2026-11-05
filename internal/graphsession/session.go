@@ -395,6 +395,7 @@ type AnalyzerPluginStats struct {
 	UnitsExecuted    int
 	UnitsReused      int
 	OwnerFiles       int
+	ParsedFiles      int
 }
 
 type Result struct {
