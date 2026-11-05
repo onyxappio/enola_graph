@@ -178,6 +178,13 @@ their kinds and relations are plugin-namespaced and their properties stay in
 the plugin property namespace. A V2 plugin that does not declare
 `enola.fsm@1` is wholly generic.
 
+V2 fact identities are stable across owners, including nodes on this FSM
+compatibility path. Therefore a V2 plugin that emits the same host FSM
+kind/name pair for two owners is rejected as ambiguous; it must use distinct
+identities (or a distinct occurrence within one owner). This intentionally
+differs from V1's owner-qualified identity rule and preserves the generic V2
+contract.
+
 An `analysis.unit@1` contribution may also include an optional census:
 
 ```go

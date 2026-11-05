@@ -527,6 +527,9 @@ func OpenSession(ctx context.Context, eng *engine.Engine, repoPath string, sink 
 	if err != nil {
 		return nil, err
 	}
+	if err := validatePluginMachineClaims(eng, loadedPlugins); err != nil {
+		return nil, err
+	}
 	for _, p := range loadedPlugins {
 		if !analyzerplugin.Trusted(opts.AllowRepoPlugins, p.Manifest.Name) {
 			return nil, fmt.Errorf("repository analyzer plugin %q is not trusted; rerun with --allow-repo-plugins %s", p.Manifest.Name, p.Manifest.Name)

@@ -249,14 +249,10 @@ func (s *session) prepareAnalyzerPluginsWith(ctx context.Context, input *runtime
 				return fmt.Errorf("plugin %q unit %q result: %w", name, unit.ID, err)
 			}
 			output = analyzerplugin.CanonicalizeResult(output)
-			if err := analyzerplugin.ValidateResult(p, unit, output); err != nil {
-				client.Abort()
-				return err
-			}
-			parsedFiles, err := analyzerplugin.CensusParsedFiles(output.Census)
+			parsedFiles, err := analyzerplugin.ValidatedCensusParsedFiles(p, unit, output)
 			if err != nil {
 				client.Abort()
-				return fmt.Errorf("plugin %q unit %q census: %w", name, unit.ID, err)
+				return err
 			}
 			s.analyzerPluginStats.UnitsExecuted++
 			s.analyzerPluginStats.ParsedFiles += parsedFiles
@@ -400,9 +396,22 @@ func (s *session) reloadAnalyzerPlugins() error {
 	if err != nil {
 		return err
 	}
+	if err := validatePluginMachineClaims(s.eng, loaded); err != nil {
+		return err
+	}
+	for _, p := range loaded {
+		if !analyzerplugin.Trusted(s.opts.AllowRepoPlugins, p.Manifest.Name) {
+			return fmt.Errorf("repository analyzer plugin %q is not trusted; rerun with --allow-repo-plugins %s", p.Manifest.Name, p.Manifest.Name)
+		}
+	}
+	s.setAnalyzerPlugins(append([]analyzerplugin.Config(nil), entries...), loaded)
+	return nil
+}
+
+func validatePluginMachineClaims(eng *engine.Engine, loaded []analyzerplugin.Loaded) error {
 	legacyMachines := map[string]bool{}
-	if cfg := s.eng.Config(); cfg != nil {
-		for _, machine := range cfg.StateMachines {
+	if eng != nil && eng.Config() != nil {
+		for _, machine := range eng.Config().StateMachines {
 			legacyMachines[machine.ID] = true
 		}
 	}
@@ -413,12 +422,6 @@ func (s *session) reloadAnalyzerPlugins() error {
 			}
 		}
 	}
-	for _, p := range loaded {
-		if !analyzerplugin.Trusted(s.opts.AllowRepoPlugins, p.Manifest.Name) {
-			return fmt.Errorf("repository analyzer plugin %q is not trusted; rerun with --allow-repo-plugins %s", p.Manifest.Name, p.Manifest.Name)
-		}
-	}
-	s.setAnalyzerPlugins(append([]analyzerplugin.Config(nil), entries...), loaded)
 	return nil
 }
 
@@ -1213,10 +1216,10 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 						seen = &seenPluginIdentity{owner: owner, occurrences: map[string]string{}}
 						seenIdentities[identity] = seen
 					} else if api == analyzerplugin.GoAPIVersion && seen.owner != owner {
-						return fmt.Errorf("go analyzer plugin %q emitted stable fact identity %s/%s for multiple owners %q and %q", pluginName, node.Kind, node.Name, seen.owner, owner)
+						return fmt.Errorf("go analyzer plugin %q emitted stable fact identity %s/%s for multiple owners %q and %q", pluginName, factKind, node.Name, seen.owner, owner)
 					}
 					if len(seen.occurrences) > 0 && (occurrence == "" || seen.occurrences[""] != "" || seen.occurrences[occurrence] != "") {
-						return fmt.Errorf("analyzer plugins emitted duplicate fact identity %s/%s for owner %s without distinct occurrences", node.Kind, node.Name, owner)
+						return fmt.Errorf("analyzer plugins emitted duplicate fact identity %s/%s for owner %s without distinct occurrences", factKind, node.Name, owner)
 					}
 					seen.occurrences[occurrence] = id
 					props := pluginOwnedProperties(api, pluginName, fsmVocabulary && analyzerplugin.IsFSMVocabularyNodeKind(node.Kind), node.Props)

@@ -14,11 +14,31 @@ import (
 // owner domain, and per-owner identity uniqueness before a result can enter
 // durable state or a frozen replacement plan.
 func ValidateResult(p Loaded, unit UnitDecl, result UnitResult) error {
+	_, err := ValidatedCensusParsedFiles(p, unit, result)
+	return err
+}
+
+// ValidatedCensusParsedFiles validates a result and returns its V2 parsed-files
+// census exactly once for host accounting. Census is not part of the V1
+// protocol, so V1 results retain their historical behavior and return zero.
+func ValidatedCensusParsedFiles(p Loaded, unit UnitDecl, result UnitResult) (int, error) {
+	parsedFiles := 0
+	if p.Manifest.API == GoAPIVersion {
+		var err error
+		parsedFiles, err = CensusParsedFiles(result.Census)
+		if err != nil {
+			return 0, fmt.Errorf("plugin %q unit %q census: %w", p.Manifest.Name, unit.ID, err)
+		}
+	}
+	if err := validateResult(p, unit, result); err != nil {
+		return 0, err
+	}
+	return parsedFiles, nil
+}
+
+func validateResult(p Loaded, unit UnitDecl, result UnitResult) error {
 	if result.Unit != unit.ID {
 		return fmt.Errorf("plugin %q returned unit %q while running %q", p.Manifest.Name, result.Unit, unit.ID)
-	}
-	if _, err := CensusParsedFiles(result.Census); err != nil {
-		return fmt.Errorf("plugin %q unit %q census: %w", p.Manifest.Name, unit.ID, err)
 	}
 	if p.Manifest.API == GoAPIVersion {
 		return validateGenericResult(p, unit, result)
