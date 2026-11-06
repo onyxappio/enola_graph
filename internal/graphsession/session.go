@@ -2317,7 +2317,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			ownerDigests[key] = value
 		}
 	}
-	if s.deferBegin {
+	if s.deferBegin && s.state != nil {
 		if err := s.narrowPublishedOwners(grouped, idx, ownerDigests); err != nil {
 			return nil, err
 		}

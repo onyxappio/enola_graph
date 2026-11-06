@@ -353,6 +353,25 @@ func TestGoFSMVocabularyNestedHelpersAreFileOwnedAndDoNotCollideWithHostSymbols(
 	}
 }
 
+// This is an end-to-end guard for the pre-Begin contract: the V2 fixture
+// publishes a nested helper and the real TypeScript extractor publishes the
+// same symbol.  Validation must reject it before any transaction record.
+func TestGoFSMNestedHelperCollisionPublishesNoBegin(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{"src/machine.ts": "export class Container { dispatch() {} }\n"})
+	registration := goFSMAnalyzerPluginFixture(t, root)
+	eng := testEngine(t, root)
+	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+	sink := &graphstream.MemorySink{}
+	_, err := Run(context.Background(), eng, root, sink, Options{StateDir: filepath.Join(root, ".enola", "nested-collision"), AllowRepoPlugins: []string{"product-fsm"}})
+	if err == nil || !strings.Contains(err.Error(), "collides with a host TypeScript symbol") {
+		t.Fatalf("nested helper collision error = %v", err)
+	}
+	begins, batches, ends, err := DecodeRun(sink.CloneRecords())
+	if err != nil || len(begins) != 0 || len(batches) != 0 || len(ends) != 0 {
+		t.Fatalf("collision published transaction: begins=%d batches=%d ends=%d err=%v", len(begins), len(batches), len(ends), err)
+	}
+}
+
 func TestPluginOwnerResultFactsKeepsFSMVocabularyResolutionCandidatesUnnamespaced(t *testing.T) {
 	owners := func(name string) map[string]analyzerplugin.OwnerResult {
 		return map[string]analyzerplugin.OwnerResult{
