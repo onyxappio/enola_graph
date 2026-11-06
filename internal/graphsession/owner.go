@@ -711,6 +711,9 @@ func ownerOf(f facts.Fact) graphstream.OwnerRef {
 		return graphstream.OwnerRef{Kind: graphstream.OwnerSynthetic, ID: "module:" + f.Name}
 	}
 	if f.Kind == facts.KindExtraction {
+		if f.OwnerFile && f.File != "" {
+			return graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: filepath.ToSlash(f.File)}
+		}
 		if f.Props != nil && f.Props["extractor"] == "typescript:fsm" && f.File != "" {
 			return graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: filepath.ToSlash(f.File)}
 		}

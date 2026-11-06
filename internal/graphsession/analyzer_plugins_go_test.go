@@ -298,6 +298,80 @@ func TestV2FSMAnchorPublishesLegacyTargetKindShape(t *testing.T) {
 	}
 }
 
+func TestV2FSMUnboundAnchorUsesLegacyFileOwner(t *testing.T) {
+	legacy := facts.Fact{Kind: facts.KindExtraction, Name: "typescript:fsm:source-binding:src/app.ts:unboundDispatch", File: "src/app.ts",
+		Props: map[string]any{"extractor": "typescript:fsm"}}
+	anchor := pluginAnchor{Plugin: "product-fsm", Identity: "id", FileOwnUnboundFallback: true, Value: analyzerplugin.Anchor{
+		Owner: "src/app.ts", Symbol: "unboundDispatch", Line: 3,
+		Relations: []analyzerplugin.Relation{{Kind: facts.RelFSMDispatches, Target: "product/event:start"}},
+	}}
+	merged := mergeAnalyzerPluginAnchors(nil, []pluginAnchor{anchor})
+	if len(merged) != 1 || merged[0].Kind != facts.KindExtraction {
+		t.Fatalf("V2 FSM unbound anchor did not produce extraction evidence: %#v", merged)
+	}
+	if got, want := groupOwners(merged)[0].Owner, groupOwners([]facts.Fact{legacy})[0].Owner; got != want {
+		t.Fatalf("V2 FSM unbound owner = %+v, want legacy file owner %+v", got, want)
+	}
+	if !merged[0].OwnerFile {
+		t.Fatal("V2 FSM unbound evidence lost its file-owner routing marker")
+	}
+	// This is the reviewer mutant: deleting the V2-only owner marker sends the
+	// fallback back to aggregate:typescript, so the parity assertion above
+	// fails when the production assignment is removed.
+	mutant := merged[0]
+	mutant.OwnerFile = false
+	if got := groupOwners([]facts.Fact{mutant})[0].Owner; got == groupOwners([]facts.Fact{legacy})[0].Owner {
+		t.Fatalf("owner-marker mutant remained legacy-compatible: %+v", got)
+	}
+	generic := mergeAnalyzerPluginAnchors(nil, []pluginAnchor{{Plugin: "legacy", Identity: "id", Value: anchor.Value}})
+	if got := ownerOf(generic[0]); got.Kind != graphstream.OwnerSynthetic || got.ID != "aggregate:typescript" {
+		t.Fatalf("V1/generic unbound anchor ownership changed: %+v", got)
+	}
+}
+
+func TestV2FSMUnboundAnchorFileDeletionRetiresEvidence(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"src/machine.ts": "export function dispatch() {} // NO_NESTED_HELPER\n",
+		"src/app.ts":     "// UNBOUND_FSM_FIXTURE\nexport const App = () => null\n",
+	})
+	registration := goFSMAnalyzerPluginFixture(t, root)
+	state := filepath.Join(root, ".enola", "unbound-anchor-retirement")
+	run := func(stateDir string) (*Result, *graphstream.MemorySink) {
+		eng := testEngine(t, root)
+		eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+		sink := &graphstream.MemorySink{}
+		got, err := Run(context.Background(), eng, root, sink, Options{
+			StateDir: stateDir, AuthoritativeFiles: true, AllowRepoPlugins: []string{"product-fsm"},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return got, sink
+	}
+	initial, initialSink := run(state)
+	name := "plugin:product-fsm:source-binding:src/app.ts:unboundDispatch"
+	initialEvidence, ok := factByName(initial.Facts, name)
+	if !ok || ownerOf(initialEvidence) != (graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: "src/app.ts"}) {
+		t.Fatalf("initial unbound evidence owner = %#v, found=%v", initialEvidence, ok)
+	}
+	if err := os.Remove(filepath.Join(root, "src", "app.ts")); err != nil {
+		t.Fatal(err)
+	}
+	delta, deltaSink := run(state)
+	_, freshSink := run(filepath.Join(root, ".enola", "unbound-anchor-retirement-fresh"))
+	if _, ok := factByName(delta.Facts, name); ok {
+		t.Fatalf("delta retained unbound source-binding evidence for deleted file: %#v", delta.Facts)
+	}
+	// Compare the graph visible to a consumer: this proves the removed file's
+	// file-owned fallback is actually cleared by delta replacement, not merely
+	// omitted from the in-memory result slice.
+	applied, cold := NewConsumer(), NewConsumer()
+	applyRun(t, applied, initialSink)
+	applyRun(t, applied, deltaSink)
+	applyRun(t, cold, freshSink)
+	assertAppliedEqualsCold(t, applied, cold)
+}
+
 func TestCollectPluginContributionsDoesNotMutateCachedFSMAnchorRelations(t *testing.T) {
 	s := &session{
 		opts: Options{analyzerPlugins: []analyzerplugin.Loaded{{Manifest: analyzerplugin.Manifest{

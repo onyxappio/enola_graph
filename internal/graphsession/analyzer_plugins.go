@@ -40,10 +40,11 @@ func (s *session) hasConfiguredAnalyzerPluginContribution(name string) bool {
 }
 
 type pluginAnchor struct {
-	Plugin        string
-	Identity      string
-	PreserveOrder bool
-	Value         analyzerplugin.Anchor
+	Plugin                 string
+	Identity               string
+	PreserveOrder          bool
+	FileOwnUnboundFallback bool
+	Value                  analyzerplugin.Anchor
 }
 
 type pluginEnrichment struct {
@@ -1277,7 +1278,15 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 						Kind: facts.KindSymbol, Name: anchor.Symbol, File: anchorOwner,
 						Line: anchor.Line, EndLine: anchor.EndLine, Repo: repoID, Props: props, Relations: rels,
 					})
-					s.pluginAnchors = append(s.pluginAnchors, pluginAnchor{Plugin: pluginName, Identity: record.Identity, PreserveOrder: preserveAnchorOrder, Value: anchor})
+					s.pluginAnchors = append(s.pluginAnchors, pluginAnchor{
+						Plugin: pluginName, Identity: record.Identity, PreserveOrder: preserveAnchorOrder,
+						// Legacy fsmUnboundOverlayEvidence is file-owned. Keep the V2
+						// FSM compatibility fallback on that same owner so file edits
+						// retire it with the source contribution; generic/V1 anchors
+						// retain their historical aggregate ownership.
+						FileOwnUnboundFallback: api == analyzerplugin.GoAPIVersion && fsmVocabulary,
+						Value:                  anchor,
+					})
 				}
 				for _, enrichment := range output.Enrichments {
 					if enrichment.Owner == "" {
@@ -1493,7 +1502,7 @@ func mergeAnalyzerPluginAnchors(base []facts.Fact, anchors []pluginAnchor) []fac
 			props["unresolved_source_binding"] = a.Symbol
 			props["unresolved_source_bindings"] = 1
 			props["unbound_fsm_relations"] = relationEvidence(overlay.Relations)
-			out = append(out, facts.Fact{Kind: facts.KindExtraction, Name: "plugin:" + wrapped.Plugin + ":source-binding:" + ownerPath + ":" + a.Symbol, File: ownerPath, Line: a.Line, EndLine: a.EndLine, Repo: overlay.Repo, Props: props})
+			out = append(out, facts.Fact{Kind: facts.KindExtraction, Name: "plugin:" + wrapped.Plugin + ":source-binding:" + ownerPath + ":" + a.Symbol, File: ownerPath, Line: a.Line, EndLine: a.EndLine, Repo: overlay.Repo, Props: props, OwnerFile: wrapped.FileOwnUnboundFallback})
 			continue
 		}
 		for _, rel := range overlay.Relations {

@@ -26,7 +26,7 @@ func main() {
 			return sdk.Contribution{}, err
 		}
 		nestedDoc, nestedOwner := doc, "src/machine.ts"
-		if app, err := host.Read(ctx, "src/app.ts"); err == nil && strings.Contains(app.Text, "NESTED_PARITY_FIXTURE") {
+		if app, err := host.Read(ctx, "src/app.ts"); err == nil && (strings.Contains(app.Text, "NESTED_PARITY_FIXTURE") || strings.Contains(app.Text, "UNBOUND_FSM_FIXTURE")) {
 			nestedDoc, nestedOwner = app, "src/app.ts"
 		} else if app, err := host.Read(ctx, "src/App.tsx"); err == nil && strings.Contains(app.Text, "NESTED_PARITY_FIXTURE") {
 			nestedDoc, nestedOwner = app, "src/App.tsx"
@@ -51,7 +51,9 @@ func main() {
 		}
 		var nestedNodes []sdk.Node
 		var nestedAnchors []sdk.Anchor
-		if !strings.Contains(nestedDoc.Text, "NO_NESTED_HELPER") {
+		if strings.Contains(nestedDoc.Text, "UNBOUND_FSM_FIXTURE") {
+			nestedAnchors = append(nestedAnchors, sdk.Anchor{Symbol: "unboundDispatch", Owner: nestedOwner, Line: 1, Relations: []sdk.Relation{{Kind: "fsm_dispatches", Target: "product/event:start", TargetKind: "fsm_event"}}})
+		} else if !strings.Contains(nestedDoc.Text, "NO_NESTED_HELPER") {
 			helperLine := 1
 			helperSymbol := "dispatch"
 			if at := strings.Index(nestedDoc.Text, "dispatch() {"); at >= 0 {
