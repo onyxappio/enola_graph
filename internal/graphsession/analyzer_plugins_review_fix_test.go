@@ -1967,6 +1967,49 @@ func TestPluginFSMFactsCarryRepoSoTSAnchorsResolve(t *testing.T) {
 	}
 }
 
+func TestPluginNestedDeclarationSymbolBindsSourceIdentityAnchorLikeLegacy(t *testing.T) {
+	props := map[string]any{
+		"language": "typescript", "symbol_kind": facts.SymbolFunc,
+		"fsm_source_binding": "tree_sitter_nested_declaration",
+	}
+	legacy := facts.Fact{Kind: facts.KindSymbol, Name: "src.render.Panel", File: "src/view.ts", Line: 4, EndLine: 9, Props: cloneAnyMap(props)}
+	anchor := pluginAnchor{Plugin: "product-fsm", Identity: "digest", Value: analyzerplugin.Anchor{
+		Symbol: "render", Owner: "src/view.ts", Line: 5, SourceIdentity: "src.render.Panel",
+		Relations: []analyzerplugin.Relation{{Kind: facts.RelFSMDispatches, Target: "app/event:go", TargetKind: facts.KindFSMEvent}},
+	}}
+	legacyGraph := mergeAnalyzerPluginAnchors([]facts.Fact{legacy}, []pluginAnchor{anchor})
+	if len(legacyGraph) != 1 || len(legacyGraph[0].Relations) != 1 || legacyGraph[0].Relations[0].Kind != facts.RelFSMDispatches {
+		t.Fatalf("legacy helper did not bind source identity: %#v", legacyGraph)
+	}
+
+	s := &session{opts: Options{analyzerPlugins: []analyzerplugin.Loaded{{Manifest: analyzerplugin.Manifest{
+		API: analyzerplugin.GoAPIVersion, Name: "product-fsm", Vocabularies: []string{analyzerplugin.FSMVocabularyV1},
+	}}}}}
+	records := map[string]analyzerplugin.PluginRecord{"product-fsm": {Identity: "digest", Units: map[string]analyzerplugin.UnitRecord{
+		"model:app": {Owners: map[string]analyzerplugin.OwnerResult{"src/view.ts": {
+			Nodes:   []analyzerplugin.Node{{Kind: facts.KindSymbol, Name: "src.render.Panel", Line: 4, EndLine: 9, Props: props}},
+			Anchors: []analyzerplugin.Anchor{anchor.Value},
+		}}},
+	}}}
+	if err := s.collectPluginContributions(records, map[string]bool{"src/view.ts": true}); err != nil {
+		t.Fatal(err)
+	}
+	if len(s.pluginFacts) != 1 || s.pluginFacts[0].Kind != facts.KindSymbol || s.pluginFacts[0].Props["language"] != "typescript" {
+		t.Fatalf("helper did not use unnamespaced flat host symbol contract: %#v", s.pluginFacts)
+	}
+	pluginGraph := mergeAnalyzerPluginAnchors(s.pluginFacts, s.pluginAnchors)
+	if len(pluginGraph) != 1 || len(pluginGraph[0].Relations) != 1 || pluginGraph[0].Relations[0] != legacyGraph[0].Relations[0] {
+		t.Fatalf("plugin helper graph differs from legacy: plugin=%#v legacy=%#v", pluginGraph, legacyGraph)
+	}
+
+	mutant := s.pluginFacts[0]
+	mutant.Props = cloneAnyMap(mutant.Props)
+	mutant.Props["fsm_source_binding"] = "other"
+	if got := mergeAnalyzerPluginAnchors([]facts.Fact{mutant}, s.pluginAnchors); len(got) != 2 || got[1].Kind != facts.KindExtraction {
+		t.Fatalf("non-helper plugin symbol bound source identity: %#v", got)
+	}
+}
+
 func TestReplacePluginContributionsKeepsAdmittedUnhashedNonTSOwners(t *testing.T) {
 	files := map[string]*FileState{
 		"src/keep.ts": {Hash: "keep", Contrib: map[string][]facts.Fact{}, ContribHash: map[string]string{}},

@@ -577,7 +577,7 @@ func pluginOwnerResultFacts(pluginName, api string, fsmVocabulary bool, owners m
 	for owner, result := range owners {
 		owner = filepath.ToSlash(owner)
 		for _, node := range result.Nodes {
-			passthrough := fsmVocabulary && analyzerplugin.IsFSMVocabularyNodeKind(node.Kind)
+			passthrough := fsmVocabulary && (analyzerplugin.IsFSMVocabularyNodeKind(node.Kind) || analyzerplugin.IsFSMNestedDeclarationSymbol(owner, node))
 			rels := pluginFactsRelations(pluginName, api, passthrough, node.Relations)
 			out = append(out, facts.Fact{Kind: pluginFactKind(pluginName, api, passthrough, node.Kind), Name: node.Name, File: owner, Line: node.Line, EndLine: node.EndLine, Relations: rels})
 		}
@@ -1199,7 +1199,8 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 				output := unit.Owners[owner]
 				key := "plugin:" + pluginName
 				for _, node := range output.Nodes {
-					factKind := pluginFactKind(pluginName, api, fsmVocabulary, node.Kind)
+					passthrough := fsmVocabulary && (analyzerplugin.IsFSMVocabularyNodeKind(node.Kind) || analyzerplugin.IsFSMNestedDeclarationSymbol(owner, node))
+					factKind := pluginFactKind(pluginName, api, passthrough, node.Kind)
 					identity := factKind + "\x00" + node.Name
 					if api != analyzerplugin.GoAPIVersion {
 						// Legacy Node plugins keep their owner-path-qualified fact identity.
@@ -1222,10 +1223,10 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 						return fmt.Errorf("analyzer plugins emitted duplicate fact identity %s/%s for owner %s without distinct occurrences", factKind, node.Name, owner)
 					}
 					seen.occurrences[occurrence] = id
-					props := pluginOwnedProperties(api, pluginName, fsmVocabulary && analyzerplugin.IsFSMVocabularyNodeKind(node.Kind), node.Props)
+					props := pluginOwnedProperties(api, pluginName, passthrough, node.Props)
 					props["plugin"] = pluginName
 					props["plugin_identity"] = record.Identity
-					rels := pluginFactsRelations(pluginName, api, fsmVocabulary && analyzerplugin.IsFSMVocabularyNodeKind(node.Kind), node.Relations)
+					rels := pluginFactsRelations(pluginName, api, passthrough, node.Relations)
 					fact := facts.Fact{Kind: factKind, Name: node.Name, File: owner, Line: node.Line, EndLine: node.EndLine, Repo: repoID, Props: props, Relations: rels}
 					s.pluginFacts = append(s.pluginFacts, fact)
 					s.pluginContribs[key] = append(s.pluginContribs[key], fact)
@@ -1591,8 +1592,8 @@ func mergeAnalyzerPluginEnrichments(base []facts.Fact, enrichments []pluginEnric
 	return out, nil
 }
 
-func pluginFactKind(pluginName, api string, fsmVocabulary bool, kind string) string {
-	if api == analyzerplugin.GoAPIVersion && (!fsmVocabulary || !analyzerplugin.IsFSMVocabularyNodeKind(kind)) {
+func pluginFactKind(pluginName, api string, passthrough bool, kind string) string {
+	if api == analyzerplugin.GoAPIVersion && !passthrough {
 		return analyzerplugin.GenericFactKind(pluginName, kind)
 	}
 	return kind

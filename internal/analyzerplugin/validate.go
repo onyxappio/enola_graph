@@ -124,6 +124,12 @@ func validateGenericResult(p Loaded, unit UnitDecl, result UnitResult) error {
 				}
 				continue
 			}
+			if fsmVocabulary && node.Kind == facts.KindSymbol {
+				if err := validateFSMNestedDeclarationSymbol(owner, node, seen); err != nil {
+					return fmt.Errorf("plugin %q unit %q: %w", p.Manifest.Name, unit.ID, err)
+				}
+				continue
+			}
 			if node.Kind == "" || !validLocalKind(node.Kind) || node.Name == "" {
 				return fmt.Errorf("plugin %q unit %q node must have a stable local kind and non-empty name", p.Manifest.Name, unit.ID)
 			}
@@ -190,6 +196,43 @@ func UsesFSMVocabulary(m Manifest) bool {
 // remain host kinds when a V2 plugin has explicitly declared enola.fsm@1.
 func IsFSMVocabularyNodeKind(kind string) bool {
 	return kind == facts.KindExtraction || isFSMKind(kind)
+}
+
+// IsFSMNestedDeclarationSymbol identifies the single ordinary host symbol
+// shape admitted by enola.fsm@1. It is the synthetic nested-callable helper
+// emitted by the legacy TypeScript FSM binder; accepting it lets V2 anchors
+// resolve with exactly the same source identity without opening the host
+// symbol vocabulary to arbitrary plugin output.
+func IsFSMNestedDeclarationSymbol(owner string, n Node) bool {
+	if n.Kind != facts.KindSymbol || n.Line < 1 || n.EndLine < n.Line || len(n.Relations) != 0 || len(n.Props) != 3 {
+		return false
+	}
+	module := path.Dir(owner)
+	if !strings.HasPrefix(n.Name, module+".") || strings.TrimPrefix(n.Name, module+".") == "" {
+		return false
+	}
+	return n.Props["language"] == "typescript" &&
+		n.Props["symbol_kind"] == facts.SymbolFunc &&
+		n.Props["fsm_source_binding"] == "tree_sitter_nested_declaration"
+}
+
+func validateFSMNestedDeclarationSymbol(owner string, n Node, seen map[string]map[string]bool) error {
+	// IsFSMNestedDeclarationSymbol includes the exact prop, source-span, owner
+	// module and relation restrictions. Keep an explicit diagnostic here so a
+	// near miss cannot silently become a generic namespaced node.
+	if !IsFSMNestedDeclarationSymbol(owner, n) {
+		return fmt.Errorf("symbol %q is not the permitted nested-declaration FSM helper shape", n.Name)
+	}
+	key := n.Kind + "\x00" + n.Name + "\x00" + owner
+	if seen[key] == nil {
+		seen[key] = map[string]bool{}
+	}
+	occ := occurrence(n)
+	if seen[key][occ] || (occ == "" && len(seen[key]) > 0) || seen[key][""] {
+		return fmt.Errorf("duplicate node identity %s/%s in owner %s without distinct occurrence", n.Kind, n.Name, owner)
+	}
+	seen[key][occ] = true
+	return nil
 }
 
 // CensusParsedFiles returns the optional parsed-files census supplied by a

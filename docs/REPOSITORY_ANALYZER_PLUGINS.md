@@ -99,8 +99,14 @@ or an out-of-inventory owner aborts the run before `BeginReplace`. The last
 committed graph and generation remain in place. Removing a plugin from config
 is explicit and replaces its previous contributions with empty output.
 
-For a V2 Go plugin, declaring `vocabularies: [enola.fsm@1]` opts only FSM node
-kinds and `extraction` into the V1 compatibility contract: host kinds and
+For a V2 Go plugin, declaring `vocabularies: [enola.fsm@1]` opts FSM node
+kinds, `extraction`, and the one legacy nested-declaration helper `symbol`
+shape into the V1 compatibility contract. The helper must have the file
+module-qualified callable name, a non-empty source span, no relations, and
+exactly `language: typescript`, `symbol_kind: function`, and
+`fsm_source_binding: tree_sitter_nested_declaration`; it exists only so FSM
+anchors can bind like the legacy extractor. All other `symbol` nodes remain
+plugin-namespaced. Host kinds and
 `fsm_*` relations remain un-namespaced, properties and anchor properties are
 flat, and V1 machine-claim validation applies. Other V2 node kinds from the
 same plugin remain namespaced and use nested plugin properties. V2 plugins

@@ -128,6 +128,59 @@ func TestV2FSMVocabularyAcceptsOnlyLegacyDeclaresShapes(t *testing.T) {
 	}
 }
 
+func TestV2FSMVocabularyAcceptsOnlyNestedDeclarationHelperSymbol(t *testing.T) {
+	unit := UnitDecl{ID: "model:demo", Kind: "model"}
+	v2 := Loaded{Manifest: Manifest{
+		API: GoAPIVersion, Name: "toy", Vocabularies: []string{FSMVocabularyV1},
+		OwnerDomain: []string{"src/**"},
+	}}
+	helper := Node{
+		Kind: facts.KindSymbol, Name: "src.render.Panel", Line: 7, EndLine: 11,
+		Props: map[string]any{
+			"language":           "typescript",
+			"symbol_kind":        facts.SymbolFunc,
+			"fsm_source_binding": "tree_sitter_nested_declaration",
+		},
+	}
+	valid := func(n Node) UnitResult {
+		return UnitResult{Unit: unit.ID, Owners: map[string]OwnerResult{"src/view.ts": {Nodes: []Node{n}}}}
+	}
+	if err := ValidateResult(v2, unit, valid(helper)); err != nil {
+		t.Fatalf("exact nested-declaration helper rejected: %v", err)
+	}
+	for _, tc := range []struct {
+		name string
+		edit func(*Node)
+	}{
+		{"wrong module", func(n *Node) { n.Name = "other.render.Panel" }},
+		{"no chain", func(n *Node) { n.Name = "src." }},
+		{"zero line", func(n *Node) { n.Line = 0 }},
+		{"bad end line", func(n *Node) { n.EndLine = 6 }},
+		{"extra property", func(n *Node) { n.Props["occurrence"] = "other" }},
+		{"wrong language", func(n *Node) { n.Props["language"] = "tsx" }},
+		{"wrong symbol kind", func(n *Node) { n.Props["symbol_kind"] = "method" }},
+		{"wrong binding", func(n *Node) { n.Props["fsm_source_binding"] = "other" }},
+		{"relation", func(n *Node) { n.Relations = []Relation{{Kind: "calls", Target: "x", TargetKind: "symbol"}} }},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			mutant := helper
+			mutant.Props = cloneJSONMap(helper.Props)
+			tc.edit(&mutant)
+			if err := ValidateResult(v2, unit, valid(mutant)); err == nil {
+				t.Fatal("invalid helper symbol was accepted")
+			}
+		})
+	}
+
+	// The exception is opt-in: the same unnamespaced symbol remains a normal
+	// generic V2 contribution without enola.fsm@1.
+	withoutVocabulary := v2
+	withoutVocabulary.Manifest.Vocabularies = nil
+	if err := ValidateResult(withoutVocabulary, unit, valid(Node{Kind: facts.KindSymbol, Name: "local", Props: map[string]any{"x": "y"}})); err != nil {
+		t.Fatalf("non-vocabulary V2 symbol behavior changed: %v", err)
+	}
+}
+
 func TestValidateResultIgnoresCensusForV1Plugins(t *testing.T) {
 	p := Loaded{Manifest: Manifest{Name: "legacy", OwnerDomain: []string{"src/**"}}}
 	u := UnitDecl{ID: "file:src/a.ts", Kind: "file"}
