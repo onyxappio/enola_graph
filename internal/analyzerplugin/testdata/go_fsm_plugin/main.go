@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"strings"
 
 	sdk "github.com/enola-labs/enola/pkg/analyzerplugin"
 )
@@ -20,7 +21,8 @@ func main() {
 		if request.Unit.ID == "census:extra" {
 			return sdk.Contribution{Unit: request.Unit.ID, Owners: map[string]sdk.OwnerContribution{}, Census: &sdk.Census{ParsedFiles: 2}}, nil
 		}
-		if _, err := host.Read(ctx, "src/machine.ts"); err != nil {
+		doc, err := host.Read(ctx, "src/machine.ts")
+		if err != nil {
 			return sdk.Contribution{}, err
 		}
 		nodes := []sdk.Node{
@@ -33,8 +35,10 @@ func main() {
 			{Kind: "diagnostic", Name: "product/diagnostic", Owner: "src/machine.ts", Props: map[string]any{"detail": "generic"}, Relations: []sdk.Relation{{Kind: "mentions", Target: "product", TargetKind: "fsm_machine"}}},
 		}
 		anchors := []sdk.Anchor{{Symbol: "dispatch", Line: 1, Props: map[string]any{"anchor_detail": "flat"}, Relations: []sdk.Relation{{Kind: "fsm_dispatches", Target: "product/event:start", TargetKind: "fsm_event"}}}}
-		nodes = append(nodes, sdk.Node{Kind: "symbol", Name: "src.Container.dispatch", Owner: "src/machine.ts", Line: 1, EndLine: 1, Props: map[string]any{"language": "typescript", "symbol_kind": "function", "fsm_source_binding": "tree_sitter_nested_declaration"}})
-		anchors = append(anchors, sdk.Anchor{Symbol: "dispatch", Owner: "src/machine.ts", Line: 1, EndLine: 1, SourceIdentity: "src.Container.dispatch", Relations: []sdk.Relation{{Kind: "fsm_dispatches", Target: "product/event:start", TargetKind: "fsm_event"}}})
+		if !strings.Contains(doc.Text, "NO_NESTED_HELPER") {
+			nodes = append(nodes, sdk.Node{Kind: "symbol", Name: "src.Container.dispatch", Owner: "src/machine.ts", Line: 1, EndLine: 1, Props: map[string]any{"language": "typescript", "symbol_kind": "function", "fsm_source_binding": "tree_sitter_nested_declaration"}})
+			anchors = append(anchors, sdk.Anchor{Symbol: "dispatch", Owner: "src/machine.ts", Line: 1, EndLine: 1, SourceIdentity: "src.Container.dispatch", Relations: []sdk.Relation{{Kind: "fsm_dispatches", Target: "product/event:start", TargetKind: "fsm_event"}}})
+		}
 		return sdk.Contribution{
 			Unit: request.Unit.ID,
 			Owners: map[string]sdk.OwnerContribution{"src/machine.ts": {

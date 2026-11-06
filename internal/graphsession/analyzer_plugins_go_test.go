@@ -372,6 +372,40 @@ func TestGoFSMNestedHelperCollisionPublishesNoBegin(t *testing.T) {
 	}
 }
 
+// The fixture exercises the published V2 graph rather than merge helpers in
+// isolation: the helper is anchor-bound on cold analysis and its contribution
+// is retired on a durable delta exactly as on a fresh cold run.
+func TestGoFSMNestedHelperPublishedGraphRetiresColdEqualsDelta(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{"src/machine.ts": "export function dispatch() {}\n"})
+	registration := goFSMAnalyzerPluginFixture(t, root)
+	state := filepath.Join(root, ".enola", "nested-retirement")
+	run := func(stateDir string) *Result {
+		eng := testEngine(t, root)
+		eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+		got, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, Options{StateDir: stateDir, AllowRepoPlugins: []string{"product-fsm"}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return got
+	}
+	cold := run(state)
+	if _, ok := factByName(cold.Facts, "src.Container.dispatch"); !ok {
+		t.Fatalf("V2 nested helper was not published: %#v", cold.Facts)
+	}
+	path := filepath.Join(root, "src", "machine.ts")
+	if err := os.WriteFile(path, []byte("export function dispatch() {} // NO_NESTED_HELPER\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	delta := run(state)
+	fresh := run(filepath.Join(root, ".enola", "nested-retirement-fresh"))
+	if _, ok := factByName(delta.Facts, "src.Container.dispatch"); ok {
+		t.Fatalf("delta retained retired helper")
+	}
+	if !reflect.DeepEqual(delta.Facts, fresh.Facts) {
+		t.Fatalf("retirement delta graph differs from cold: delta=%#v cold=%#v", delta.Facts, fresh.Facts)
+	}
+}
+
 func TestPluginOwnerResultFactsKeepsFSMVocabularyResolutionCandidatesUnnamespaced(t *testing.T) {
 	owners := func(name string) map[string]analyzerplugin.OwnerResult {
 		return map[string]analyzerplugin.OwnerResult{

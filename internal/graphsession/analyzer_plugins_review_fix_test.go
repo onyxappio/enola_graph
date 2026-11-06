@@ -2042,6 +2042,15 @@ func TestPluginNestedDeclarationAnchorOwnerRequiresContainingHelperSpan(t *testi
 	if got := pluginAnchorOwner([]facts.Fact{helper, second}, anchor(0), helper.Name); got != -1 {
 		t.Fatalf("ambiguous nested anchor owner = %d, want -1", got)
 	}
+	// Exact line preference is what makes two otherwise-containing candidates
+	// deterministic. If it is removed this becomes ambiguous (-1), which is a
+	// deliberate mutation test for pluginAnchorOwner.
+	exactA, exactB := helper, helper
+	exactA.Line, exactA.EndLine = 10, 30
+	exactB.Line, exactB.EndLine = 15, 25
+	if got := pluginAnchorOwner([]facts.Fact{exactA, exactB}, anchor(15), helper.Name); got != 1 {
+		t.Fatalf("exact-line nested anchor owner = %d, want exact candidate 1", got)
+	}
 }
 
 func TestReplacePluginContributionsKeepsAdmittedUnhashedNonTSOwners(t *testing.T) {
