@@ -190,6 +190,13 @@ identities (or a distinct occurrence within one owner). This intentionally
 differs from V1's owner-qualified identity rule and preserves the generic V2
 contract.
 
+The sole `symbol` exception is the legacy nested-declaration helper: its name
+is the owner file's module plus a chain of at least two named callable scopes,
+it has the exact legacy helper properties and no relations, and it is
+file-owned. Enola rejects it if a TypeScript symbol in the same file already
+has that identity. Every other V2 `symbol` contribution is rejected; it is not
+silently namespaced.
+
 An `analysis.unit@1` contribution may also include an optional census:
 
 ```go

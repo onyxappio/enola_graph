@@ -208,8 +208,21 @@ func IsFSMNestedDeclarationSymbol(owner string, n Node) bool {
 		return false
 	}
 	module := path.Dir(owner)
-	if !strings.HasPrefix(n.Name, module+".") || strings.TrimPrefix(n.Name, module+".") == "" {
+	if !strings.HasPrefix(n.Name, module+".") {
 		return false
+	}
+	chain := strings.Split(strings.TrimPrefix(n.Name, module+"."), ".")
+	// bindNestedSourceDeclarations only publishes a nested callable. Its AST
+	// chain has at least the enclosing callable and the callable carrying the
+	// evidence; accepting a single segment lets a plugin forge a top-level TS
+	// symbol identity.
+	if len(chain) < 2 {
+		return false
+	}
+	for _, scope := range chain {
+		if scope == "" {
+			return false
+		}
 	}
 	return n.Props["language"] == "typescript" &&
 		n.Props["symbol_kind"] == facts.SymbolFunc &&

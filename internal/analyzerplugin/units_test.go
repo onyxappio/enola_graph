@@ -153,6 +153,7 @@ func TestV2FSMVocabularyAcceptsOnlyNestedDeclarationHelperSymbol(t *testing.T) {
 		edit func(*Node)
 	}{
 		{"wrong module", func(n *Node) { n.Name = "other.render.Panel" }},
+		{"top-level scope", func(n *Node) { n.Name = "src.dispatch" }},
 		{"no chain", func(n *Node) { n.Name = "src." }},
 		{"zero line", func(n *Node) { n.Line = 0 }},
 		{"bad end line", func(n *Node) { n.EndLine = 6 }},

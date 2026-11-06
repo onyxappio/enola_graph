@@ -2256,6 +2256,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		allFacts = kept
 	}
 	if pluginExecution {
+		if err := rejectPluginNestedDeclarationCollisions(allFacts, s.pluginFacts); err != nil {
+			return nil, err
+		}
 		allFacts = mergeAnalyzerPluginAnchors(append(allFacts, s.pluginFacts...), s.pluginAnchors)
 		allFacts, err = mergeAnalyzerPluginEnrichments(allFacts, s.pluginEnrichments)
 		if err != nil {

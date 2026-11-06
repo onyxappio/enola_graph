@@ -2010,6 +2010,25 @@ func TestPluginNestedDeclarationSymbolBindsSourceIdentityAnchorLikeLegacy(t *tes
 	}
 }
 
+func TestPluginNestedDeclarationAnchorOwnerRequiresContainingHelperSpan(t *testing.T) {
+	helper := facts.Fact{Kind: facts.KindSymbol, Name: "src.outer.inner", File: "src/view.ts", Line: 10, EndLine: 20,
+		Props: map[string]any{"language": "typescript", "symbol_kind": facts.SymbolFunc, "fsm_source_binding": "tree_sitter_nested_declaration"}}
+	anchor := func(line int) facts.Fact {
+		return facts.Fact{Kind: facts.KindSymbol, Name: "inner", File: "src/view.ts", Line: line}
+	}
+	if got := pluginAnchorOwner([]facts.Fact{helper}, anchor(15), helper.Name); got != 0 {
+		t.Fatalf("contained nested anchor owner = %d, want 0", got)
+	}
+	if got := pluginAnchorOwner([]facts.Fact{helper}, anchor(25), helper.Name); got != -1 {
+		t.Fatalf("out-of-span nested anchor bound helper %d", got)
+	}
+	second := helper
+	second.Line, second.EndLine = 30, 40
+	if got := pluginAnchorOwner([]facts.Fact{helper, second}, anchor(0), helper.Name); got != -1 {
+		t.Fatalf("ambiguous nested anchor owner = %d, want -1", got)
+	}
+}
+
 func TestReplacePluginContributionsKeepsAdmittedUnhashedNonTSOwners(t *testing.T) {
 	files := map[string]*FileState{
 		"src/keep.ts": {Hash: "keep", Contrib: map[string][]facts.Fact{}, ContribHash: map[string]string{}},

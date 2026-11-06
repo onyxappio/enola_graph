@@ -331,6 +331,28 @@ func TestGoFSMVocabularyV2IdentityRejectsSameHostFactAcrossOwners(t *testing.T) 
 	}
 }
 
+func TestGoFSMVocabularyNestedHelpersAreFileOwnedAndDoNotCollideWithHostSymbols(t *testing.T) {
+	helper := func() analyzerplugin.Node {
+		return analyzerplugin.Node{Kind: facts.KindSymbol, Name: "src.outer.inner", Line: 4, EndLine: 7, Props: map[string]any{
+			"language": "typescript", "symbol_kind": facts.SymbolFunc, "fsm_source_binding": "tree_sitter_nested_declaration",
+		}}
+	}
+	s := &session{opts: Options{analyzerPlugins: []analyzerplugin.Loaded{{Manifest: analyzerplugin.Manifest{API: analyzerplugin.GoAPIVersion, Name: "product-fsm", Vocabularies: []string{analyzerplugin.FSMVocabularyV1}}}}}}
+	records := map[string]analyzerplugin.PluginRecord{"product-fsm": {Units: map[string]analyzerplugin.UnitRecord{"fixture": {Owners: map[string]analyzerplugin.OwnerResult{
+		"src/a.ts": {Nodes: []analyzerplugin.Node{helper()}},
+		"src/b.ts": {Nodes: []analyzerplugin.Node{helper()}},
+	}}}}}
+	if err := s.collectPluginContributions(records, map[string]bool{"src/a.ts": true, "src/b.ts": true}); err != nil {
+		t.Fatalf("same nested helper identity in separate files was rejected: %v", err)
+	}
+	if err := rejectPluginNestedDeclarationCollisions([]facts.Fact{{Kind: facts.KindSymbol, Name: "src.outer.inner", File: "src/a.ts"}}, s.pluginFacts); err == nil {
+		t.Fatal("plugin helper collision with TypeScript symbol was accepted")
+	}
+	if err := rejectPluginNestedDeclarationCollisions([]facts.Fact{{Kind: facts.KindSymbol, Name: "src.dispatch", File: "src/a.ts"}}, s.pluginFacts); err != nil {
+		t.Fatalf("different TypeScript symbol rejected as collision: %v", err)
+	}
+}
+
 func TestPluginOwnerResultFactsKeepsFSMVocabularyResolutionCandidatesUnnamespaced(t *testing.T) {
 	owners := func(name string) map[string]analyzerplugin.OwnerResult {
 		return map[string]analyzerplugin.OwnerResult{

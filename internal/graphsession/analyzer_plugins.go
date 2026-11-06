@@ -1199,11 +1199,14 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 				output := unit.Owners[owner]
 				key := "plugin:" + pluginName
 				for _, node := range output.Nodes {
-					passthrough := fsmVocabulary && (analyzerplugin.IsFSMVocabularyNodeKind(node.Kind) || analyzerplugin.IsFSMNestedDeclarationSymbol(owner, node))
+					helper := fsmVocabulary && analyzerplugin.IsFSMNestedDeclarationSymbol(owner, node)
+					passthrough := fsmVocabulary && (analyzerplugin.IsFSMVocabularyNodeKind(node.Kind) || helper)
 					factKind := pluginFactKind(pluginName, api, passthrough, node.Kind)
 					identity := factKind + "\x00" + node.Name
-					if api != analyzerplugin.GoAPIVersion {
+					if api != analyzerplugin.GoAPIVersion || helper {
 						// Legacy Node plugins keep their owner-path-qualified fact identity.
+						// The admitted helper is deliberately the same: legacy nested
+						// declaration symbols are file-owned, unlike V2 FSM identities.
 						identity += "\x00" + filepath.ToSlash(owner)
 					}
 					occurrence := ""
@@ -1695,6 +1698,28 @@ func pluginAnchorOwner(base []facts.Fact, overlay facts.Fact, sourceIdentity str
 		return candidates[0]
 	}
 	return -1
+}
+
+// rejectPluginNestedDeclarationCollisions prevents the only admitted plugin
+// host-symbol shape from shadowing a real TypeScript extraction. It runs after
+// the current source facts are assembled, so it protects cold and delta runs.
+func rejectPluginNestedDeclarationCollisions(hostFacts, pluginFacts []facts.Fact) error {
+	host := map[string]bool{}
+	for _, fact := range hostFacts {
+		if fact.Kind == facts.KindSymbol {
+			host[filepath.ToSlash(fact.File)+"\x00"+fact.Name] = true
+		}
+	}
+	for _, fact := range pluginFacts {
+		if fact.Kind != facts.KindSymbol || fact.Props["fsm_source_binding"] != "tree_sitter_nested_declaration" {
+			continue
+		}
+		key := filepath.ToSlash(fact.File) + "\x00" + fact.Name
+		if host[key] {
+			return fmt.Errorf("plugin nested-declaration helper %q in %q collides with a host TypeScript symbol", fact.Name, fact.File)
+		}
+	}
+	return nil
 }
 func relationEvidence(relations []facts.Relation) []map[string]string {
 	out := make([]map[string]string, 0, len(relations))
