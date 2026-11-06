@@ -2010,7 +2010,7 @@ func TestPluginNestedDeclarationSymbolBindsSourceIdentityAnchorLikeLegacy(t *tes
 		t.Fatalf("plugin evidence source identity = %#v, want legacy identity", got)
 	}
 	rels, _ := sites[0]["relations"].([]map[string]string)
-	if len(rels) != 1 || len(rels[0]) != 3 || rels[0]["kind"] != facts.RelFSMDispatches || rels[0]["target"] != "app/event:open" || rels[0]["target_kind"] != "" {
+	if len(rels) != 1 || len(rels[0]) != 3 || rels[0]["kind"] != facts.RelFSMDispatches || rels[0]["target"] != "app/event:go" || rels[0]["target_kind"] != "" {
 		t.Fatalf("plugin evidence must retain the legacy relation-map shape, got %#v", sites[0]["relations"])
 	}
 	if got := relationEvidence([]facts.Relation{{Kind: "declares", Target: "x"}}); len(got) != 1 || got[0]["target_kind"] != "" {
