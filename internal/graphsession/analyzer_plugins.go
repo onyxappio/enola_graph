@@ -1742,11 +1742,10 @@ func rejectPluginNestedDeclarationCollisions(hostFacts, pluginFacts []facts.Fact
 func relationEvidence(relations []facts.Relation) []map[string]string {
 	out := make([]map[string]string, 0, len(relations))
 	for _, r := range relations {
-		row := map[string]string{"kind": r.Kind, "target": r.Target, "target_file": r.TargetFile}
-		if r.TargetKind != "" {
-			row["target_kind"] = r.TargetKind
-		}
-		out = append(out, row)
+		// Evidence is the legacy FSM provenance shape.  Relation target kinds
+		// belong to the published edge, not its evidence-site annotation; the
+		// legacy mergeFSMFacts map deliberately contains only these three keys.
+		out = append(out, map[string]string{"kind": r.Kind, "target": r.Target, "target_file": r.TargetFile})
 	}
 	return out
 }

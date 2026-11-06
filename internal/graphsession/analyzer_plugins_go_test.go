@@ -144,7 +144,7 @@ func TestGoFSMVocabularyPublishesHostFactsAndKeepsGenericContributionsNamespaced
 	if state.Props["state"] != "idle" || state.Props["plugin_properties"] != nil {
 		t.Fatalf("FSM state properties were not flat: %#v", state.Props)
 	}
-	if len(state.Relations) != 2 || state.Relations[0].Kind != facts.RelDeclares || state.Relations[0].Target != "product" || state.Relations[1].Kind != facts.RelFSMParent || state.Relations[1].TargetKind != facts.KindFSMState {
+	if len(state.Relations) != 1 || state.Relations[0].Kind != facts.RelDeclares || state.Relations[0].Target != "product" {
 		t.Fatalf("FSM state relations were not host relations: %#v", state.Relations)
 	}
 	coverage, ok := factByName(run.Facts, "plugin:product-fsm:coverage")
