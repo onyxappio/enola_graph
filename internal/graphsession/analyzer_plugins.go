@@ -1239,6 +1239,10 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 					return analyzerplugin.AnchorSortKey(anchors[i]) < analyzerplugin.AnchorSortKey(anchors[j])
 				})
 				for _, anchor := range anchors {
+					// Anchor evidence uses the same inferred FSM target kind as
+					// persisted plugin contributions. The legacy extractor leaves
+					// it absent; that deliberate V2 distinction is surfaced by E6.
+					anchor.Relations = canonicalAnchorRelations(anchor.Relations)
 					anchorOwner := filepath.ToSlash(anchor.Owner)
 					if anchorOwner == "" {
 						anchorOwner = filepath.ToSlash(owner)
@@ -1444,6 +1448,7 @@ func mergeAnalyzerPluginAnchors(base []facts.Fact, anchors []pluginAnchor) []fac
 		}
 		overlay.Props["plugin"] = wrapped.Plugin
 		overlay.Props["plugin_identity"] = wrapped.Identity
+		overlay.Props["plugin_anchor"] = true
 		if a.SourceIdentity != "" {
 			overlay.Props["fsm_source_identity"] = a.SourceIdentity
 		}
@@ -1636,6 +1641,16 @@ func pluginAnchorRelations(pluginName, api string, fsmVocabulary bool, relations
 			targetKind, _ = facts.FSMRelationTargetKind(relation.Kind)
 		}
 		out = append(out, facts.Relation{Kind: relation.Kind, Target: relation.Target, TargetKind: targetKind, TargetFile: relation.TargetFile})
+	}
+	return out
+}
+
+func canonicalAnchorRelations(relations []analyzerplugin.Relation) []analyzerplugin.Relation {
+	out := append([]analyzerplugin.Relation(nil), relations...)
+	for i := range out {
+		if out[i].TargetKind == "" {
+			out[i].TargetKind, _ = facts.FSMRelationTargetKind(out[i].Kind)
+		}
 	}
 	return out
 }
