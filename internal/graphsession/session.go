@@ -3152,6 +3152,12 @@ func (s *session) publishScope(ctx context.Context, runID string, owners []graph
 	if s.opts.PluginVerify || s.pluginVerifyOnly || s.skipPublish {
 		return nil
 	}
+	// Plugin validation can still reject the run. Do not announce a scope (or
+	// mark its owners announced) until the deferred BeginReplace validates and
+	// opens the transaction; consumers reject scope batches for an unknown run.
+	if s.deferBegin {
+		return nil
+	}
 	if s.opts.AuthoritativeFiles {
 		return s.fileLocalErr()
 	}

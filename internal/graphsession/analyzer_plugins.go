@@ -40,9 +40,10 @@ func (s *session) hasConfiguredAnalyzerPluginContribution(name string) bool {
 }
 
 type pluginAnchor struct {
-	Plugin   string
-	Identity string
-	Value    analyzerplugin.Anchor
+	Plugin        string
+	Identity      string
+	PreserveOrder bool
+	Value         analyzerplugin.Anchor
 }
 
 type pluginEnrichment struct {
@@ -248,7 +249,11 @@ func (s *session) prepareAnalyzerPluginsWith(ctx context.Context, input *runtime
 				client.Abort()
 				return fmt.Errorf("plugin %q unit %q result: %w", name, unit.ID, err)
 			}
-			output = analyzerplugin.CanonicalizeResult(output)
+			if p.Manifest.API == analyzerplugin.GoAPIVersion && analyzerplugin.UsesFSMVocabulary(p.Manifest) {
+				output = analyzerplugin.CanonicalizeFSMResult(output)
+			} else {
+				output = analyzerplugin.CanonicalizeResult(output)
+			}
 			parsedFiles, err := analyzerplugin.ValidatedCensusParsedFiles(p, unit, output)
 			if err != nil {
 				client.Abort()
@@ -1234,11 +1239,20 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 					s.pluginFacts = append(s.pluginFacts, fact)
 					s.pluginContribs[key] = append(s.pluginContribs[key], fact)
 				}
-				for _, anchor := range output.Anchors {
+				anchors := output.Anchors
+				preserveAnchorOrder := api == analyzerplugin.GoAPIVersion && fsmVocabulary
+				if !preserveAnchorOrder {
+					anchors = append([]analyzerplugin.Anchor(nil), anchors...)
+					sort.SliceStable(anchors, func(i, j int) bool {
+						return analyzerplugin.AnchorSortKey(anchors[i]) < analyzerplugin.AnchorSortKey(anchors[j])
+					})
+				}
+				for _, anchor := range anchors {
 					if api == analyzerplugin.GoAPIVersion && fsmVocabulary {
 						// The V2 FSM validator derives target kinds from relation.Kind;
 						// anchor publication must retain the legacy edge wire shape,
 						// which leaves target_kind empty.
+						anchor.Relations = append([]analyzerplugin.Relation(nil), anchor.Relations...)
 						for i := range anchor.Relations {
 							anchor.Relations[i].TargetKind = ""
 						}
@@ -1263,7 +1277,7 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 						Kind: facts.KindSymbol, Name: anchor.Symbol, File: anchorOwner,
 						Line: anchor.Line, EndLine: anchor.EndLine, Repo: repoID, Props: props, Relations: rels,
 					})
-					s.pluginAnchors = append(s.pluginAnchors, pluginAnchor{Plugin: pluginName, Identity: record.Identity, Value: anchor})
+					s.pluginAnchors = append(s.pluginAnchors, pluginAnchor{Plugin: pluginName, Identity: record.Identity, PreserveOrder: preserveAnchorOrder, Value: anchor})
 				}
 				for _, enrichment := range output.Enrichments {
 					if enrichment.Owner == "" {
@@ -1425,8 +1439,37 @@ func mergeAnalyzerPluginAnchors(base []facts.Fact, anchors []pluginAnchor) []fac
 	if len(anchors) == 0 {
 		return base
 	}
+	ordered := append([]pluginAnchor(nil), anchors...)
+	// Only the V2 enola.fsm@1 compatibility path has observable anchor order.
+	// Keep generic anchors canonical, including the historical V1 behavior. Do
+	// not sort the whole mixed list: that would reorder V2 FSM overlays. Sort
+	// generic entries into their existing slots instead.
+	var genericSlots []int
+	var generic []pluginAnchor
+	for i, anchor := range ordered {
+		if anchor.PreserveOrder {
+			continue
+		}
+		genericSlots = append(genericSlots, i)
+		generic = append(generic, anchor)
+	}
+	sort.SliceStable(generic, func(i, j int) bool {
+		left, right := generic[i], generic[j]
+		if left.Plugin != right.Plugin {
+			return left.Plugin < right.Plugin
+		}
+		leftKey := analyzerplugin.AnchorSortKey(left.Value)
+		rightKey := analyzerplugin.AnchorSortKey(right.Value)
+		if leftKey != rightKey {
+			return leftKey < rightKey
+		}
+		return left.Identity < right.Identity
+	})
+	for i, slot := range genericSlots {
+		ordered[slot] = generic[i]
+	}
 	out := append([]facts.Fact(nil), base...)
-	for _, wrapped := range anchors {
+	for _, wrapped := range ordered {
 		a := wrapped.Value
 		ownerPath := filepath.ToSlash(a.Owner)
 		overlay := facts.Fact{Kind: facts.KindSymbol, Name: a.Symbol, File: ownerPath, Line: a.Line, EndLine: a.EndLine, Props: cloneAnyMap(a.Props)}

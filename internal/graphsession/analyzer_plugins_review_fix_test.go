@@ -1973,9 +1973,9 @@ func TestPluginNestedDeclarationSymbolBindsSourceIdentityAnchorLikeLegacy(t *tes
 		"fsm_source_binding": "tree_sitter_nested_declaration",
 	}
 	legacy := facts.Fact{Kind: facts.KindSymbol, Name: "src.render.Panel", File: "src/view.ts", Line: 4, EndLine: 9, Props: cloneAnyMap(props)}
-	anchor := pluginAnchor{Plugin: "product-fsm", Identity: "digest", Value: analyzerplugin.Anchor{
+	anchor := pluginAnchor{Plugin: "product-fsm", Identity: "digest", PreserveOrder: true, Value: analyzerplugin.Anchor{
 		Symbol: "render", Owner: "src/view.ts", Line: 5, SourceIdentity: "src.render.Panel",
-		Relations: []analyzerplugin.Relation{{Kind: facts.RelFSMDispatches, Target: "app/event:go", TargetKind: facts.KindFSMEvent}},
+		Relations: []analyzerplugin.Relation{{Kind: facts.RelFSMDispatches, Target: "app/event:go"}},
 	}}
 	legacyGraph := mergeAnalyzerPluginAnchors([]facts.Fact{legacy}, []pluginAnchor{anchor})
 	if len(legacyGraph) != 1 || len(legacyGraph[0].Relations) != 1 || legacyGraph[0].Relations[0].Kind != facts.RelFSMDispatches {

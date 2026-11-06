@@ -298,6 +298,90 @@ func TestV2FSMAnchorPublishesLegacyTargetKindShape(t *testing.T) {
 	}
 }
 
+func TestCollectPluginContributionsDoesNotMutateCachedFSMAnchorRelations(t *testing.T) {
+	s := &session{
+		opts: Options{analyzerPlugins: []analyzerplugin.Loaded{{Manifest: analyzerplugin.Manifest{
+			API: analyzerplugin.GoAPIVersion, Name: "product-fsm", Vocabularies: []string{analyzerplugin.FSMVocabularyV1},
+		}}}},
+		pluginContribs: map[string][]facts.Fact{},
+	}
+	records := map[string]analyzerplugin.PluginRecord{"product-fsm": {Identity: "digest", Units: map[string]analyzerplugin.UnitRecord{
+		"model:app": {OutputDigest: "unit-output-digest", Owners: map[string]analyzerplugin.OwnerResult{"src/app.ts": {
+			Anchors: []analyzerplugin.Anchor{{Symbol: "dispatch", Line: 1, Relations: []analyzerplugin.Relation{{
+				Kind: facts.RelFSMDispatches, Target: "app/event:A", TargetKind: facts.KindFSMEvent,
+			}}}},
+		}}},
+	}}}
+	before, err := json.Marshal(records)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.collectPluginContributions(records, map[string]bool{"src/app.ts": true}); err != nil {
+		t.Fatal(err)
+	}
+	after, err := json.Marshal(records)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(after) != string(before) {
+		t.Fatalf("collection mutated cached unit output: before=%s after=%s", before, after)
+	}
+	if got := records["product-fsm"].Units["model:app"].Owners["src/app.ts"].Anchors[0].Relations[0].TargetKind; got != facts.KindFSMEvent {
+		t.Fatalf("cached validation target kind = %q, want %q", got, facts.KindFSMEvent)
+	}
+}
+
+func TestCollectPluginContributionsPreservesOrderOnlyForV2FSMAnchors(t *testing.T) {
+	records := func() map[string]analyzerplugin.PluginRecord {
+		return map[string]analyzerplugin.PluginRecord{"plugin": {Identity: "id", Units: map[string]analyzerplugin.UnitRecord{
+			"unit": {Owners: map[string]analyzerplugin.OwnerResult{"src/app.ts": {Anchors: []analyzerplugin.Anchor{
+				{Owner: "src/app.ts", Symbol: "dispatch", Line: 1, Relations: []analyzerplugin.Relation{{Kind: facts.RelFSMDispatches, Target: "app/event:Z"}}},
+				{Owner: "src/app.ts", Symbol: "dispatch", Line: 1, Relations: []analyzerplugin.Relation{{Kind: facts.RelFSMDispatches, Target: "app/event:A"}}},
+			}}}},
+		}}}
+	}
+	collect := func(api string, vocabularies []string) []pluginAnchor {
+		t.Helper()
+		s := &session{opts: Options{analyzerPlugins: []analyzerplugin.Loaded{{Manifest: analyzerplugin.Manifest{
+			API: api, Name: "plugin", Vocabularies: vocabularies,
+		}}}}, pluginContribs: map[string][]facts.Fact{}}
+		if err := s.collectPluginContributions(records(), map[string]bool{"src/app.ts": true}); err != nil {
+			t.Fatal(err)
+		}
+		return s.pluginAnchors
+	}
+	v2FSM := collect(analyzerplugin.GoAPIVersion, []string{analyzerplugin.FSMVocabularyV1})
+	if len(v2FSM) != 2 || !v2FSM[0].PreserveOrder || v2FSM[0].Value.Relations[0].Target != "app/event:Z" {
+		t.Fatalf("V2 FSM anchor emission order was not retained: %#v", v2FSM)
+	}
+	v1 := collect(analyzerplugin.APIVersion, []string{analyzerplugin.FSMVocabularyV1})
+	if len(v1) != 2 || v1[0].PreserveOrder || v1[0].Value.Relations[0].Target != "app/event:A" {
+		t.Fatalf("V1 anchors did not retain generic canonical order: %#v", v1)
+	}
+	nonVocabularyV2 := collect(analyzerplugin.GoAPIVersion, nil)
+	if len(nonVocabularyV2) != 2 || nonVocabularyV2[0].PreserveOrder || nonVocabularyV2[0].Value.Relations[0].Target != "app/event:A" {
+		t.Fatalf("non-vocabulary V2 anchors did not retain generic canonical order: %#v", nonVocabularyV2)
+	}
+}
+
+func TestMergeAnalyzerPluginAnchorsCanonicalizesGenericAnchorOrder(t *testing.T) {
+	anchor := func(tag string) pluginAnchor {
+		return pluginAnchor{Plugin: "legacy", Identity: "id", Value: analyzerplugin.Anchor{
+			Owner: "src/app.ts", Symbol: "dispatch", Line: 1, Props: map[string]any{"tag": tag},
+			Relations: []analyzerplugin.Relation{{Kind: facts.RelFSMDispatches, Target: "app/event:" + tag}},
+		}}
+	}
+	base := []facts.Fact{{Kind: facts.KindSymbol, Name: "dispatch", File: "src/app.ts", Line: 1}}
+	first := mergeAnalyzerPluginAnchors(base, []pluginAnchor{anchor("b"), anchor("a")})
+	second := mergeAnalyzerPluginAnchors(base, []pluginAnchor{anchor("a"), anchor("b")})
+	if !reflect.DeepEqual(first, second) {
+		t.Fatalf("generic anchor order changed publication: first=%#v second=%#v", first, second)
+	}
+	if len(first[0].Relations) != 2 || first[0].Relations[0].Target != "app/event:a" {
+		t.Fatalf("generic anchor relations were not canonicalized: %#v", first[0].Relations)
+	}
+}
+
 func TestMergeAnalyzerPluginAnchorsPreservesMultiOverlayRelationOrder(t *testing.T) {
 	base := []facts.Fact{{Kind: facts.KindSymbol, Name: "dispatch", File: "src/app.ts", Line: 10,
 		Relations: []facts.Relation{{Kind: facts.RelFSMDispatches, Target: "app/event:BASE"}}}}
@@ -306,7 +390,7 @@ func TestMergeAnalyzerPluginAnchorsPreservesMultiOverlayRelationOrder(t *testing
 		for i, relation := range relations {
 			out[i] = analyzerplugin.Relation{Kind: relation.Kind, Target: relation.Target, TargetFile: relation.TargetFile}
 		}
-		return pluginAnchor{Plugin: "product-fsm", Identity: "id", Value: analyzerplugin.Anchor{
+		return pluginAnchor{Plugin: "product-fsm", Identity: "id", PreserveOrder: true, Value: analyzerplugin.Anchor{
 			Owner: "src/app.ts", Symbol: "dispatch", Line: 10, Relations: out,
 		}}
 	}

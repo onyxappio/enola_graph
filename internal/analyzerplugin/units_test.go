@@ -208,7 +208,7 @@ func TestRepositoryGlobMatchesRecursiveZeroDepthAndBraceForms(t *testing.T) {
 	}
 }
 
-func TestCanonicalizeResultIgnoresNodeOrderButPreservesRelationOrder(t *testing.T) {
+func TestCanonicalizeResultIgnoresNodeAndRelationOrder(t *testing.T) {
 	a := UnitResult{Unit: "file:a", Owners: map[string]OwnerResult{"src/a.ts": {Nodes: []Node{
 		{Kind: facts.KindFSMState, Name: "demo/state:b", Relations: []Relation{{Kind: "to_state", Target: "demo/state:z"}, {Kind: "to_state", Target: "demo/state:a"}}},
 		{Kind: facts.KindFSMState, Name: "demo/state:a"},
@@ -227,11 +227,11 @@ func TestCanonicalizeResultIgnoresNodeOrderButPreservesRelationOrder(t *testing.
 	if err != nil {
 		t.Fatal(err)
 	}
-	if aDigest == bDigest {
-		t.Fatalf("relation ordering was erased from canonical output: %s", aDigest)
+	if aDigest != bDigest {
+		t.Fatalf("relation ordering changed canonical output: %s != %s", aDigest, bDigest)
 	}
-	if got := a.Owners["src/a.ts"].Nodes[1].Relations[0].Target; got != "demo/state:z" {
-		t.Fatalf("legacy relation emission order changed: first target=%q", got)
+	if got := a.Owners["src/a.ts"].Nodes[1].Relations[0].Target; got != "demo/state:a" {
+		t.Fatalf("relations were not canonicalized: first target=%q", got)
 	}
 	if got := a.Owners["src/a.ts"].Nodes[0].Name; got != "demo/state:a" {
 		t.Fatalf("node ordering was not canonicalized: first=%q", got)
@@ -387,7 +387,7 @@ owner_domain: [src/**]
 	}
 }
 
-func TestCanonicalizeResultPreservesAnchorEmissionOrder(t *testing.T) {
+func TestCanonicalizeResultIgnoresAnchorEmissionOrder(t *testing.T) {
 	a := UnitResult{Unit: "file:a", Owners: map[string]OwnerResult{"src/a.ts": {Anchors: []Anchor{
 		{Symbol: "caller", Line: 1, Props: map[string]any{"tag": "b"}, Relations: []Relation{{Kind: "fsm_dispatches", Target: "demo/event:go"}}},
 		{Symbol: "caller", Line: 1, Props: map[string]any{"tag": "a"}, Relations: []Relation{{Kind: "fsm_dispatches", Target: "demo/event:go"}}},
@@ -406,11 +406,43 @@ func TestCanonicalizeResultPreservesAnchorEmissionOrder(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if left == right {
-		t.Fatalf("anchor emission ordering was erased from canonical output: %s", left)
+	if left != right {
+		t.Fatalf("anchor ordering changed canonical output: %s != %s", left, right)
 	}
-	if a.Owners["src/a.ts"].Anchors[0].Props["tag"] != "b" {
-		t.Fatalf("anchor emission order changed: %#v", a.Owners["src/a.ts"].Anchors)
+	if a.Owners["src/a.ts"].Anchors[0].Props["tag"] != "a" {
+		t.Fatalf("anchors were not canonicalized: %#v", a.Owners["src/a.ts"].Anchors)
+	}
+}
+
+func TestCanonicalizeFSMResultPreservesFSMAnchorAndRelationOrder(t *testing.T) {
+	result := func(tags []string, targets []string) UnitResult {
+		anchors := make([]Anchor, 0, len(tags))
+		for _, tag := range tags {
+			anchors = append(anchors, Anchor{Symbol: "caller", Line: 1, Props: map[string]any{"tag": tag}})
+		}
+		return UnitResult{Unit: "model:demo", Owners: map[string]OwnerResult{"src/a.ts": {
+			Nodes: []Node{{Kind: facts.KindFSMState, Name: "demo/state:idle", Relations: []Relation{
+				{Kind: "fsm_action_calls", Target: targets[0]}, {Kind: "fsm_action_calls", Target: targets[1]},
+			}}},
+			Anchors: anchors,
+		}}}
+	}
+	left := CanonicalizeFSMResult(result([]string{"b", "a"}, []string{"demo/action:z", "demo/action:a"}))
+	right := CanonicalizeFSMResult(result([]string{"a", "b"}, []string{"demo/action:a", "demo/action:z"}))
+	leftDigest, err := CanonicalDigest(left)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rightDigest, err := CanonicalDigest(right)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if leftDigest == rightDigest {
+		t.Fatal("FSM compatibility canonicalization erased producer order")
+	}
+	owner := left.Owners["src/a.ts"]
+	if owner.Anchors[0].Props["tag"] != "b" || owner.Nodes[0].Relations[0].Target != "demo/action:z" {
+		t.Fatalf("FSM producer order changed: %#v", owner)
 	}
 }
 
