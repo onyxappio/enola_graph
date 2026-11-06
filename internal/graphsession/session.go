@@ -716,6 +716,11 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	// without plugins still prepares after an engine rebuild adds analyzer_plugins.
 	pluginExecution := pluginStatePresent || len(s.boundAnalyzerPluginConfigs()) > 0
 	s.pluginExecution = pluginExecution
+	// Plugin helper validation needs the fully assembled TypeScript facts.
+	// Hold BeginReplace (and local batches) until that validation succeeds.
+	if pluginExecution {
+		s.deferBegin = true
+	}
 	var err error
 	input := s.inputs
 	if !s.fast || pluginExecution {
@@ -2256,6 +2261,9 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 		allFacts = kept
 	}
 	if pluginExecution {
+		if err := rejectPluginNestedDeclarationCollisions(allFacts, s.pluginFacts); err != nil {
+			return nil, err
+		}
 		allFacts = mergeAnalyzerPluginAnchors(append(allFacts, s.pluginFacts...), s.pluginAnchors)
 		allFacts, err = mergeAnalyzerPluginEnrichments(allFacts, s.pluginEnrichments)
 		if err != nil {
@@ -2309,7 +2317,7 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 			ownerDigests[key] = value
 		}
 	}
-	if s.deferBegin {
+	if s.deferBegin && s.state != nil {
 		if err := s.narrowPublishedOwners(grouped, idx, ownerDigests); err != nil {
 			return nil, err
 		}
@@ -2971,7 +2979,7 @@ func scopeOwnerRefs(scopeFiles map[string]bool, owned []string, st *State, force
 }
 
 func (s *session) publishLocal(ctx context.Context, runID, repoID string, rec *tsextractor.FileRecord, earlyLocal *int) {
-	if s.opts.AuthoritativeFiles || s.opts.PluginVerify || s.pluginVerifyOnly || s.skipPublish {
+	if s.opts.AuthoritativeFiles || s.opts.PluginVerify || s.pluginVerifyOnly || s.skipPublish || s.deferBegin {
 		return
 	}
 	if rec == nil || rec.Unreadable || rec.Minified {
@@ -3142,6 +3150,12 @@ func (s *session) emitBatch(ctx context.Context, runID, phase string, nodes []gr
 
 func (s *session) publishScope(ctx context.Context, runID string, owners []graphstream.OwnerRef) error {
 	if s.opts.PluginVerify || s.pluginVerifyOnly || s.skipPublish {
+		return nil
+	}
+	// Plugin validation can still reject the run. Do not announce a scope (or
+	// mark its owners announced) until the deferred BeginReplace validates and
+	// opens the transaction; consumers reject scope batches for an unknown run.
+	if s.deferBegin {
 		return nil
 	}
 	if s.opts.AuthoritativeFiles {

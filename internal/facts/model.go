@@ -18,6 +18,9 @@ type Fact struct {
 	Repo      string         `json:"repo,omitempty"`       // Repository label; set on every fact, single-repo snapshots included (see RepoLabel)
 	Props     map[string]any `json:"props,omitempty"`      // Kind-specific properties
 	Relations []Relation     `json:"relations,omitempty"`  // Edges to other facts
+	// OwnerFile is a run-local routing hint for a file-scoped synthetic fact.
+	// It is intentionally not part of the published or persisted fact shape.
+	OwnerFile bool `json:"-"`
 }
 
 // Relation represents a directed edge between two facts.

@@ -73,6 +73,115 @@ func TestValidateResultChecksVocabularyClaimAndOwnerDomain(t *testing.T) {
 	}
 }
 
+func TestV2FSMVocabularyAcceptsOnlyLegacyDeclaresShapes(t *testing.T) {
+	unit := UnitDecl{ID: "model:demo", Kind: "model"}
+	v2 := Loaded{Manifest: Manifest{
+		API:          GoAPIVersion,
+		Name:         "toy",
+		Vocabularies: []string{FSMVocabularyV1},
+		Claims:       Claims{Machines: []string{"demo"}},
+		OwnerDomain:  []string{"src/**"},
+	}}
+	legacy := UnitResult{Unit: unit.ID, Owners: map[string]OwnerResult{"src/machine.ts": {Nodes: []Node{
+		{Kind: facts.KindFSMMachine, Name: "demo", Relations: []Relation{{Kind: facts.RelDeclares, Target: "src"}}},
+		{Kind: facts.KindFSMState, Name: "demo/state:idle", Relations: []Relation{{Kind: facts.RelDeclares, Target: "demo"}}},
+		{Kind: facts.KindFSMEvent, Name: "demo/event:go", Relations: []Relation{{Kind: facts.RelDeclares, Target: "demo"}}},
+		{Kind: facts.KindFSMCommand, Name: "demo/command:run", Relations: []Relation{{Kind: facts.RelDeclares, Target: "demo"}}},
+	}}}}
+	if err := ValidateResult(v2, unit, legacy); err != nil {
+		t.Fatalf("V2 FSM vocabulary rejected legacy declares shapes: %v", err)
+	}
+	withTypedModule := legacy
+	withTypedModule.Owners["src/machine.ts"] = OwnerResult{Nodes: append([]Node(nil), legacy.Owners["src/machine.ts"].Nodes...)}
+	withTypedModule.Owners["src/machine.ts"].Nodes[0].Relations = []Relation{{Kind: facts.RelDeclares, Target: "src", TargetKind: facts.KindModule}}
+	if err := ValidateResult(v2, unit, withTypedModule); err != nil {
+		t.Fatalf("V2 FSM vocabulary rejected explicit module target kind: %v", err)
+	}
+
+	withRelation := func(kind, name string, rel Relation) UnitResult {
+		return UnitResult{Unit: unit.ID, Owners: map[string]OwnerResult{"src/machine.ts": {Nodes: []Node{{Kind: kind, Name: name, Relations: []Relation{rel}}}}}}
+	}
+	for _, tc := range []struct {
+		name   string
+		result UnitResult
+	}{
+		{"member unclaimed machine", withRelation(facts.KindFSMState, "demo/state:idle", Relation{Kind: facts.RelDeclares, Target: "other"})},
+		{"member target kind", withRelation(facts.KindFSMEvent, "demo/event:go", Relation{Kind: facts.RelDeclares, Target: "demo", TargetKind: facts.KindFSMMachine})},
+		{"machine non-module target kind", withRelation(facts.KindFSMMachine, "demo", Relation{Kind: facts.RelDeclares, Target: "src", TargetKind: facts.KindSymbol})},
+		{"machine other module", withRelation(facts.KindFSMMachine, "demo", Relation{Kind: facts.RelDeclares, Target: "other"})},
+		{"machine target file", withRelation(facts.KindFSMMachine, "demo", Relation{Kind: facts.RelDeclares, Target: "src", TargetFile: "src/machine.ts"})},
+		{"transition declares", withRelation(facts.KindFSMTransition, "demo/transition:idle-go", Relation{Kind: facts.RelDeclares, Target: "demo"})},
+		{"other non-FSM relation", withRelation(facts.KindFSMState, "demo/state:idle", Relation{Kind: "declared_by", Target: "demo"})},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			if err := ValidateResult(v2, unit, tc.result); err == nil {
+				t.Fatal("invalid V2 FSM declares shape was accepted")
+			}
+		})
+	}
+
+	// The V1 protocol's relation table is intentionally unchanged.
+	v1 := v2
+	v1.Manifest.API = "enola.plugin/v1"
+	if err := ValidateResult(v1, unit, legacy); err == nil || !strings.Contains(err.Error(), "unsupported relation") {
+		t.Fatalf("V1 plugin accepted V2-only declares compatibility: %v", err)
+	}
+}
+
+func TestV2FSMVocabularyAcceptsOnlyNestedDeclarationHelperSymbol(t *testing.T) {
+	unit := UnitDecl{ID: "model:demo", Kind: "model"}
+	v2 := Loaded{Manifest: Manifest{
+		API: GoAPIVersion, Name: "toy", Vocabularies: []string{FSMVocabularyV1},
+		OwnerDomain: []string{"src/**"},
+	}}
+	helper := Node{
+		Kind: facts.KindSymbol, Name: "src.render.Panel", Line: 7, EndLine: 11,
+		Props: map[string]any{
+			"language":           "typescript",
+			"symbol_kind":        facts.SymbolFunc,
+			"fsm_source_binding": "tree_sitter_nested_declaration",
+		},
+	}
+	valid := func(n Node) UnitResult {
+		return UnitResult{Unit: unit.ID, Owners: map[string]OwnerResult{"src/view.ts": {Nodes: []Node{n}}}}
+	}
+	if err := ValidateResult(v2, unit, valid(helper)); err != nil {
+		t.Fatalf("exact nested-declaration helper rejected: %v", err)
+	}
+	for _, tc := range []struct {
+		name string
+		edit func(*Node)
+	}{
+		{"wrong module", func(n *Node) { n.Name = "other.render.Panel" }},
+		{"top-level scope", func(n *Node) { n.Name = "src.dispatch" }},
+		{"no chain", func(n *Node) { n.Name = "src." }},
+		{"zero line", func(n *Node) { n.Line = 0 }},
+		{"bad end line", func(n *Node) { n.EndLine = 6 }},
+		{"extra property", func(n *Node) { n.Props["occurrence"] = "other" }},
+		{"wrong language", func(n *Node) { n.Props["language"] = "tsx" }},
+		{"wrong symbol kind", func(n *Node) { n.Props["symbol_kind"] = "method" }},
+		{"wrong binding", func(n *Node) { n.Props["fsm_source_binding"] = "other" }},
+		{"relation", func(n *Node) { n.Relations = []Relation{{Kind: "calls", Target: "x", TargetKind: "symbol"}} }},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			mutant := helper
+			mutant.Props = cloneJSONMap(helper.Props)
+			tc.edit(&mutant)
+			if err := ValidateResult(v2, unit, valid(mutant)); err == nil {
+				t.Fatal("invalid helper symbol was accepted")
+			}
+		})
+	}
+
+	// The exception is opt-in: the same unnamespaced symbol remains a normal
+	// generic V2 contribution without enola.fsm@1.
+	withoutVocabulary := v2
+	withoutVocabulary.Manifest.Vocabularies = nil
+	if err := ValidateResult(withoutVocabulary, unit, valid(Node{Kind: facts.KindSymbol, Name: "local", Props: map[string]any{"x": "y"}})); err != nil {
+		t.Fatalf("non-vocabulary V2 symbol behavior changed: %v", err)
+	}
+}
+
 func TestValidateResultIgnoresCensusForV1Plugins(t *testing.T) {
 	p := Loaded{Manifest: Manifest{Name: "legacy", OwnerDomain: []string{"src/**"}}}
 	u := UnitDecl{ID: "file:src/a.ts", Kind: "file"}
@@ -119,7 +228,13 @@ func TestCanonicalizeResultIgnoresNodeAndRelationOrder(t *testing.T) {
 		t.Fatal(err)
 	}
 	if aDigest != bDigest {
-		t.Fatalf("array ordering changed canonical digest: %s != %s", aDigest, bDigest)
+		t.Fatalf("relation ordering changed canonical output: %s != %s", aDigest, bDigest)
+	}
+	if got := a.Owners["src/a.ts"].Nodes[1].Relations[0].Target; got != "demo/state:a" {
+		t.Fatalf("relations were not canonicalized: first target=%q", got)
+	}
+	if got := a.Owners["src/a.ts"].Nodes[0].Name; got != "demo/state:a" {
+		t.Fatalf("node ordering was not canonicalized: first=%q", got)
 	}
 }
 
@@ -272,7 +387,7 @@ owner_domain: [src/**]
 	}
 }
 
-func TestCanonicalizeResultOrdersAnchorsByPropsAndRelations(t *testing.T) {
+func TestCanonicalizeResultIgnoresAnchorEmissionOrder(t *testing.T) {
 	a := UnitResult{Unit: "file:a", Owners: map[string]OwnerResult{"src/a.ts": {Anchors: []Anchor{
 		{Symbol: "caller", Line: 1, Props: map[string]any{"tag": "b"}, Relations: []Relation{{Kind: "fsm_dispatches", Target: "demo/event:go"}}},
 		{Symbol: "caller", Line: 1, Props: map[string]any{"tag": "a"}, Relations: []Relation{{Kind: "fsm_dispatches", Target: "demo/event:go"}}},
@@ -292,10 +407,42 @@ func TestCanonicalizeResultOrdersAnchorsByPropsAndRelations(t *testing.T) {
 		t.Fatal(err)
 	}
 	if left != right {
-		t.Fatalf("anchor prop ordering changed digest: %s != %s", left, right)
+		t.Fatalf("anchor ordering changed canonical output: %s != %s", left, right)
 	}
 	if a.Owners["src/a.ts"].Anchors[0].Props["tag"] != "a" {
-		t.Fatalf("anchors were not totally ordered by props: %#v", a.Owners["src/a.ts"].Anchors)
+		t.Fatalf("anchors were not canonicalized: %#v", a.Owners["src/a.ts"].Anchors)
+	}
+}
+
+func TestCanonicalizeFSMResultPreservesFSMAnchorAndRelationOrder(t *testing.T) {
+	result := func(tags []string, targets []string) UnitResult {
+		anchors := make([]Anchor, 0, len(tags))
+		for _, tag := range tags {
+			anchors = append(anchors, Anchor{Symbol: "caller", Line: 1, Props: map[string]any{"tag": tag}})
+		}
+		return UnitResult{Unit: "model:demo", Owners: map[string]OwnerResult{"src/a.ts": {
+			Nodes: []Node{{Kind: facts.KindFSMState, Name: "demo/state:idle", Relations: []Relation{
+				{Kind: "fsm_action_calls", Target: targets[0]}, {Kind: "fsm_action_calls", Target: targets[1]},
+			}}},
+			Anchors: anchors,
+		}}}
+	}
+	left := CanonicalizeFSMResult(result([]string{"b", "a"}, []string{"demo/action:z", "demo/action:a"}))
+	right := CanonicalizeFSMResult(result([]string{"a", "b"}, []string{"demo/action:a", "demo/action:z"}))
+	leftDigest, err := CanonicalDigest(left)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rightDigest, err := CanonicalDigest(right)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if leftDigest == rightDigest {
+		t.Fatal("FSM compatibility canonicalization erased producer order")
+	}
+	owner := left.Owners["src/a.ts"]
+	if owner.Anchors[0].Props["tag"] != "b" || owner.Nodes[0].Relations[0].Target != "demo/action:z" {
+		t.Fatalf("FSM producer order changed: %#v", owner)
 	}
 }
 

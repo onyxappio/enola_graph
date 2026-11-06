@@ -361,10 +361,22 @@ func CanonicalDigest(v any) (string, error) {
 	return hex.EncodeToString(sum[:]), nil
 }
 
-// CanonicalizeResult removes plugin array ordering from the persisted graph
-// contribution and its digest while preserving distinct occurrences. Empty
-// anchor owners inherit their enclosing output owner before sorting.
+// CanonicalizeResult removes plugin array ordering from generic persisted graph
+// contributions and their digest while preserving distinct occurrences.
 func CanonicalizeResult(result UnitResult) UnitResult {
+	return canonicalizeResult(result, false)
+}
+
+// CanonicalizeFSMResult retains producer anchor order and FSM-node relation
+// order for enola.fsm@1 V2 contributions. Those orders become edge occurrence
+// indexes after host merge and must match the legacy FSM extractor.
+func CanonicalizeFSMResult(result UnitResult) UnitResult {
+	return canonicalizeResult(result, true)
+}
+
+// canonicalizeResult gives only the FSM compatibility path order-sensitive
+// publication semantics; V1 and generic V2 retain canonical order/digests.
+func canonicalizeResult(result UnitResult, preserveFSMOrder bool) UnitResult {
 	for owner, contribution := range result.Owners {
 		for i := range contribution.Anchors {
 			if contribution.Anchors[i].Owner == "" {
@@ -380,6 +392,9 @@ func CanonicalizeResult(result UnitResult) UnitResult {
 			})
 		}
 		for i := range contribution.Nodes {
+			if preserveFSMOrder && IsFSMVocabularyNodeKind(contribution.Nodes[i].Kind) {
+				continue
+			}
 			sort.SliceStable(contribution.Nodes[i].Relations, func(a, b int) bool {
 				return relationKey(contribution.Nodes[i].Relations[a]) < relationKey(contribution.Nodes[i].Relations[b])
 			})
@@ -400,14 +415,16 @@ func CanonicalizeResult(result UnitResult) UnitResult {
 			}
 			return occurrence(left) < occurrence(right)
 		})
-		for i := range contribution.Anchors {
-			sort.SliceStable(contribution.Anchors[i].Relations, func(a, b int) bool {
-				return relationKey(contribution.Anchors[i].Relations[a]) < relationKey(contribution.Anchors[i].Relations[b])
+		if !preserveFSMOrder {
+			for i := range contribution.Anchors {
+				sort.SliceStable(contribution.Anchors[i].Relations, func(a, b int) bool {
+					return relationKey(contribution.Anchors[i].Relations[a]) < relationKey(contribution.Anchors[i].Relations[b])
+				})
+			}
+			sort.SliceStable(contribution.Anchors, func(a, b int) bool {
+				return anchorLess(contribution.Anchors[a], contribution.Anchors[b])
 			})
 		}
-		sort.SliceStable(contribution.Anchors, func(a, b int) bool {
-			return anchorLess(contribution.Anchors[a], contribution.Anchors[b])
-		})
 		sort.SliceStable(contribution.Enrichments, func(a, b int) bool {
 			return enrichmentLess(contribution.Enrichments[a], contribution.Enrichments[b])
 		})
@@ -449,16 +466,15 @@ func anchorLess(left, right Anchor) bool {
 	if left.Owner != right.Owner {
 		return left.Owner < right.Owner
 	}
-	leftProps := canonicalJSONKey(left.Props)
-	rightProps := canonicalJSONKey(right.Props)
+	leftProps, rightProps := canonicalJSONKey(left.Props), canonicalJSONKey(right.Props)
 	if leftProps != rightProps {
 		return leftProps < rightProps
 	}
 	return relationsKey(left.Relations) < relationsKey(right.Relations)
 }
 
-// AnchorSortKey is a total order over canonical anchor content for host-side
-// multi-plugin evidence ordering.
+// AnchorSortKey is a total order over generic anchor content for host-side
+// canonical V1/non-vocabulary contribution processing.
 func AnchorSortKey(a Anchor) string {
 	return strings.Join([]string{
 		a.Symbol,

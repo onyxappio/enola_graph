@@ -144,7 +144,7 @@ func TestGoFSMVocabularyPublishesHostFactsAndKeepsGenericContributionsNamespaced
 	if state.Props["state"] != "idle" || state.Props["plugin_properties"] != nil {
 		t.Fatalf("FSM state properties were not flat: %#v", state.Props)
 	}
-	if len(state.Relations) != 1 || state.Relations[0].Kind != facts.RelFSMParent || state.Relations[0].TargetKind != facts.KindFSMState {
+	if len(state.Relations) != 1 || state.Relations[0].Kind != facts.RelDeclares || state.Relations[0].Target != "product" {
 		t.Fatalf("FSM state relations were not host relations: %#v", state.Relations)
 	}
 	coverage, ok := factByName(run.Facts, "plugin:product-fsm:coverage")
@@ -170,6 +170,87 @@ func TestGoFSMVocabularyPublishesHostFactsAndKeepsGenericContributionsNamespaced
 	t.Fatalf("persisted anchor symbol missing from plugin contribs: %#v", contribs)
 }
 
+func TestGoFSMVocabularyPublishesLegacyDeclaresEdges(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{"src/machine.ts": "export function dispatch() {}\n"})
+	eng := testEngine(t, root)
+	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{goFSMAnalyzerPluginFixture(t, root)}
+	sink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, sink, Options{
+		StateDir: filepath.Join(root, ".enola", "fsm-declares-state"), AuthoritativeFiles: true, AllowRepoPlugins: []string{"product-fsm"},
+	}); err != nil {
+		t.Fatal(err)
+	}
+	consumer := applyGraph(t, sink)
+	machine, ok := pluginGraphNode(consumer, facts.KindFSMMachine, "product")
+	if !ok {
+		t.Fatal("published FSM machine missing")
+	}
+	if !consumerHasRelation(consumer, "product", facts.RelDeclares, "src") {
+		t.Fatal("published machine lost its un-namespaced declares relation")
+	}
+	for _, member := range []struct{ kind, name string }{
+		{facts.KindFSMState, "product/state:idle"},
+		{facts.KindFSMEvent, "product/event:start"},
+		{facts.KindFSMCommand, "product/command:start"},
+	} {
+		node, ok := pluginGraphNode(consumer, member.kind, member.name)
+		if !ok {
+			t.Fatalf("published FSM member missing: %s/%s", member.kind, member.name)
+		}
+		assertPublishedDeclaresEdge(t, consumer, node, machine)
+	}
+}
+
+func TestV2FSMVocabularyDeclaresResolvesLikeLegacy(t *testing.T) {
+	module := facts.Fact{Kind: facts.KindModule, Name: "src", File: "src"}
+	legacy := facts.Fact{Kind: facts.KindFSMMachine, Name: "product", File: "src/machine.ts", Relations: []facts.Relation{{Kind: facts.RelDeclares, Target: "src"}}}
+	pluginFacts := pluginOwnerResultFacts("product-fsm", analyzerplugin.GoAPIVersion, true, map[string]analyzerplugin.OwnerResult{
+		"src/machine.ts": {Nodes: []analyzerplugin.Node{{
+			Kind: facts.KindFSMMachine, Name: "product", Relations: []analyzerplugin.Relation{{Kind: facts.RelDeclares, Target: "src", TargetKind: facts.KindModule}},
+		}}},
+	})
+	if len(pluginFacts) != 1 || len(pluginFacts[0].Relations) != 1 || pluginFacts[0].Relations[0].Kind != facts.RelDeclares {
+		t.Fatalf("V2 FSM declares relation was namespaced or dropped: %#v", pluginFacts)
+	}
+	_, legacyEdges := encodeOwner(ownerOutput{Owner: ownerOf(legacy), Facts: []facts.Fact{legacy}}, buildIndex([]facts.Fact{legacy, module}), false)
+	_, pluginEdges := encodeOwner(ownerOutput{Owner: ownerOf(pluginFacts[0]), Facts: pluginFacts}, buildIndex(append(pluginFacts, module)), false)
+	if len(legacyEdges) != 1 || len(pluginEdges) != 1 {
+		t.Fatalf("legacy/plugin declares edge count = %d/%d", len(legacyEdges), len(pluginEdges))
+	}
+	legacyEdge, pluginEdge := legacyEdges[0], pluginEdges[0]
+	if pluginEdge.Kind != legacyEdge.Kind || pluginEdge.TargetName != legacyEdge.TargetName || pluginEdge.TargetID != legacyEdge.TargetID || pluginEdge.Resolution != legacyEdge.Resolution {
+		t.Fatalf("V2 declares edge = %#v, want legacy %#v", pluginEdge, legacyEdge)
+	}
+}
+
+func pluginGraphNode(c *Consumer, kind, name string) (graphstream.Node, bool) {
+	for _, nodes := range c.Owners {
+		for _, node := range nodes {
+			if node.Kind == kind && node.Name == name {
+				return node, true
+			}
+		}
+	}
+	return graphstream.Node{}, false
+}
+
+func assertPublishedDeclaresEdge(t *testing.T, c *Consumer, from, want graphstream.Node) {
+	t.Helper()
+	for owner, nodes := range c.Owners {
+		for _, node := range nodes {
+			if node.ID != from.ID {
+				continue
+			}
+			for _, edge := range c.Edges[owner] {
+				if edge.FromID == from.ID && edge.Kind == facts.RelDeclares && edge.TargetName == want.Name && edge.TargetID == want.ID && edge.Resolution == graphstream.ResResolved {
+					return
+				}
+			}
+		}
+	}
+	t.Fatalf("missing resolved legacy declares edge %s -> %s", from.Name, want.Name)
+}
+
 func TestGoFSMVocabularyRejectsInvalidFSMNodeWithV1Validation(t *testing.T) {
 	p := analyzerplugin.Loaded{Manifest: analyzerplugin.Manifest{API: analyzerplugin.GoAPIVersion, Name: "product-fsm", Vocabularies: []string{analyzerplugin.FSMVocabularyV1}, Claims: analyzerplugin.Claims{Machines: []string{"product"}}, OwnerDomain: []string{"src/**"}}}
 	u := analyzerplugin.UnitDecl{ID: "model:product", Kind: "model"}
@@ -177,6 +258,262 @@ func TestGoFSMVocabularyRejectsInvalidFSMNodeWithV1Validation(t *testing.T) {
 	if err := analyzerplugin.ValidateResult(p, u, bad); err == nil || !strings.Contains(err.Error(), "claimed machine") {
 		t.Fatalf("V2 FSM vocabulary accepted invalid V1 FSM identity: %v", err)
 	}
+}
+
+// V1 anchors publish their supplied relation shape without inferred target
+// kinds. V2 FSM anchors must retain the same legacy wire shape even if the
+// plugin supplies the validation-only target kind.
+func TestV1FSMAnchorPublishesEdgeWithoutInferredTargetKind(t *testing.T) {
+	s := &session{opts: Options{analyzerPlugins: []analyzerplugin.Loaded{{Manifest: analyzerplugin.Manifest{
+		API: analyzerplugin.APIVersion, Name: "legacy-fsm", Vocabularies: []string{analyzerplugin.FSMVocabularyV1},
+	}}}}}
+	records := map[string]analyzerplugin.PluginRecord{"legacy-fsm": {Identity: "legacy", Units: map[string]analyzerplugin.UnitRecord{
+		"model:app": {Owners: map[string]analyzerplugin.OwnerResult{"src/app.ts": {
+			Anchors: []analyzerplugin.Anchor{{Symbol: "dispatch", Line: 1, Relations: []analyzerplugin.Relation{{Kind: facts.RelFSMDispatches, Target: "app/event:A"}}}},
+		}}},
+	}}}
+	if err := s.collectPluginContributions(records, map[string]bool{"src/app.ts": true}); err != nil {
+		t.Fatal(err)
+	}
+	base := facts.Fact{Kind: facts.KindSymbol, Name: "dispatch", File: "src/app.ts", Line: 1}
+	merged := mergeAnalyzerPluginAnchors([]facts.Fact{base}, s.pluginAnchors)
+	if len(merged) != 1 || len(merged[0].Relations) != 1 {
+		t.Fatalf("V1 anchor did not bind its host symbol: %#v", merged)
+	}
+	target := facts.Fact{Kind: facts.KindFSMEvent, Name: "app/event:A", File: "machine.ts"}
+	_, edges := encodeOwner(ownerOutput{Owner: ownerOf(merged[0]), Facts: merged}, buildIndex(append(merged, target)), false)
+	if len(edges) != 1 || edges[0].Kind != facts.RelFSMDispatches || edges[0].TargetKind != "" {
+		t.Fatalf("V1 published edge inferred target kind: %#v", edges)
+	}
+}
+
+func TestV2FSMAnchorPublishesLegacyTargetKindShape(t *testing.T) {
+	legacy := publishedFSMAnchorEdge(t, analyzerplugin.APIVersion, analyzerplugin.FSMVocabularyV1, "")
+	v2 := publishedFSMAnchorEdge(t, analyzerplugin.GoAPIVersion, analyzerplugin.FSMVocabularyV1, facts.KindFSMEvent)
+	if v2 != legacy {
+		t.Fatalf("V2 FSM anchor published edge = %#v, want legacy shape %#v", v2, legacy)
+	}
+	if v2.TargetKind != "" {
+		t.Fatalf("V2 FSM anchor leaked validation target kind into published edge: %#v", v2)
+	}
+}
+
+func TestV2FSMUnboundAnchorUsesLegacyFileOwner(t *testing.T) {
+	legacy := facts.Fact{Kind: facts.KindExtraction, Name: "typescript:fsm:source-binding:src/app.ts:unboundDispatch", File: "src/app.ts",
+		Props: map[string]any{"extractor": "typescript:fsm"}}
+	anchor := pluginAnchor{Plugin: "product-fsm", Identity: "id", FileOwnUnboundFallback: true, Value: analyzerplugin.Anchor{
+		Owner: "src/app.ts", Symbol: "unboundDispatch", Line: 3,
+		Relations: []analyzerplugin.Relation{{Kind: facts.RelFSMDispatches, Target: "product/event:start"}},
+	}}
+	merged := mergeAnalyzerPluginAnchors(nil, []pluginAnchor{anchor})
+	if len(merged) != 1 || merged[0].Kind != facts.KindExtraction {
+		t.Fatalf("V2 FSM unbound anchor did not produce extraction evidence: %#v", merged)
+	}
+	if got, want := groupOwners(merged)[0].Owner, groupOwners([]facts.Fact{legacy})[0].Owner; got != want {
+		t.Fatalf("V2 FSM unbound owner = %+v, want legacy file owner %+v", got, want)
+	}
+	if !merged[0].OwnerFile {
+		t.Fatal("V2 FSM unbound evidence lost its file-owner routing marker")
+	}
+	// This is the reviewer mutant: deleting the V2-only owner marker sends the
+	// fallback back to aggregate:typescript, so the parity assertion above
+	// fails when the production assignment is removed.
+	mutant := merged[0]
+	mutant.OwnerFile = false
+	if got := groupOwners([]facts.Fact{mutant})[0].Owner; got == groupOwners([]facts.Fact{legacy})[0].Owner {
+		t.Fatalf("owner-marker mutant remained legacy-compatible: %+v", got)
+	}
+	generic := mergeAnalyzerPluginAnchors(nil, []pluginAnchor{{Plugin: "legacy", Identity: "id", Value: anchor.Value}})
+	if got := ownerOf(generic[0]); got.Kind != graphstream.OwnerSynthetic || got.ID != "aggregate:typescript" {
+		t.Fatalf("V1/generic unbound anchor ownership changed: %+v", got)
+	}
+}
+
+func TestV2FSMUnboundAnchorFileDeletionRetiresEvidence(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"src/machine.ts": "export function dispatch() {} // NO_NESTED_HELPER\n",
+		"src/app.ts":     "// UNBOUND_FSM_FIXTURE\nexport const App = () => null\n",
+	})
+	registration := goFSMAnalyzerPluginFixture(t, root)
+	state := filepath.Join(root, ".enola", "unbound-anchor-retirement")
+	run := func(stateDir string) (*Result, *graphstream.MemorySink) {
+		eng := testEngine(t, root)
+		eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+		sink := &graphstream.MemorySink{}
+		got, err := Run(context.Background(), eng, root, sink, Options{
+			StateDir: stateDir, AuthoritativeFiles: true, AllowRepoPlugins: []string{"product-fsm"},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return got, sink
+	}
+	initial, initialSink := run(state)
+	name := "plugin:product-fsm:source-binding:src/app.ts:unboundDispatch"
+	initialEvidence, ok := factByName(initial.Facts, name)
+	if !ok || ownerOf(initialEvidence) != (graphstream.OwnerRef{Kind: graphstream.OwnerFile, ID: "src/app.ts"}) {
+		t.Fatalf("initial unbound evidence owner = %#v, found=%v", initialEvidence, ok)
+	}
+	if err := os.Remove(filepath.Join(root, "src", "app.ts")); err != nil {
+		t.Fatal(err)
+	}
+	delta, deltaSink := run(state)
+	_, freshSink := run(filepath.Join(root, ".enola", "unbound-anchor-retirement-fresh"))
+	if _, ok := factByName(delta.Facts, name); ok {
+		t.Fatalf("delta retained unbound source-binding evidence for deleted file: %#v", delta.Facts)
+	}
+	// Compare the graph visible to a consumer: this proves the removed file's
+	// file-owned fallback is actually cleared by delta replacement, not merely
+	// omitted from the in-memory result slice.
+	applied, cold := NewConsumer(), NewConsumer()
+	applyRun(t, applied, initialSink)
+	applyRun(t, applied, deltaSink)
+	applyRun(t, cold, freshSink)
+	assertAppliedEqualsCold(t, applied, cold)
+}
+
+func TestCollectPluginContributionsDoesNotMutateCachedFSMAnchorRelations(t *testing.T) {
+	s := &session{
+		opts: Options{analyzerPlugins: []analyzerplugin.Loaded{{Manifest: analyzerplugin.Manifest{
+			API: analyzerplugin.GoAPIVersion, Name: "product-fsm", Vocabularies: []string{analyzerplugin.FSMVocabularyV1},
+		}}}},
+		pluginContribs: map[string][]facts.Fact{},
+	}
+	records := map[string]analyzerplugin.PluginRecord{"product-fsm": {Identity: "digest", Units: map[string]analyzerplugin.UnitRecord{
+		"model:app": {OutputDigest: "unit-output-digest", Owners: map[string]analyzerplugin.OwnerResult{"src/app.ts": {
+			Anchors: []analyzerplugin.Anchor{{Symbol: "dispatch", Line: 1, Relations: []analyzerplugin.Relation{{
+				Kind: facts.RelFSMDispatches, Target: "app/event:A", TargetKind: facts.KindFSMEvent,
+			}}}},
+		}}},
+	}}}
+	before, err := json.Marshal(records)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.collectPluginContributions(records, map[string]bool{"src/app.ts": true}); err != nil {
+		t.Fatal(err)
+	}
+	after, err := json.Marshal(records)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(after) != string(before) {
+		t.Fatalf("collection mutated cached unit output: before=%s after=%s", before, after)
+	}
+	if got := records["product-fsm"].Units["model:app"].Owners["src/app.ts"].Anchors[0].Relations[0].TargetKind; got != facts.KindFSMEvent {
+		t.Fatalf("cached validation target kind = %q, want %q", got, facts.KindFSMEvent)
+	}
+}
+
+func TestCollectPluginContributionsPreservesOrderOnlyForV2FSMAnchors(t *testing.T) {
+	records := func() map[string]analyzerplugin.PluginRecord {
+		return map[string]analyzerplugin.PluginRecord{"plugin": {Identity: "id", Units: map[string]analyzerplugin.UnitRecord{
+			"unit": {Owners: map[string]analyzerplugin.OwnerResult{"src/app.ts": {Anchors: []analyzerplugin.Anchor{
+				{Owner: "src/app.ts", Symbol: "dispatch", Line: 1, Relations: []analyzerplugin.Relation{{Kind: facts.RelFSMDispatches, Target: "app/event:Z"}}},
+				{Owner: "src/app.ts", Symbol: "dispatch", Line: 1, Relations: []analyzerplugin.Relation{{Kind: facts.RelFSMDispatches, Target: "app/event:A"}}},
+			}}}},
+		}}}
+	}
+	collect := func(api string, vocabularies []string) []pluginAnchor {
+		t.Helper()
+		s := &session{opts: Options{analyzerPlugins: []analyzerplugin.Loaded{{Manifest: analyzerplugin.Manifest{
+			API: api, Name: "plugin", Vocabularies: vocabularies,
+		}}}}, pluginContribs: map[string][]facts.Fact{}}
+		if err := s.collectPluginContributions(records(), map[string]bool{"src/app.ts": true}); err != nil {
+			t.Fatal(err)
+		}
+		return s.pluginAnchors
+	}
+	v2FSM := collect(analyzerplugin.GoAPIVersion, []string{analyzerplugin.FSMVocabularyV1})
+	if len(v2FSM) != 2 || !v2FSM[0].PreserveOrder || v2FSM[0].Value.Relations[0].Target != "app/event:Z" {
+		t.Fatalf("V2 FSM anchor emission order was not retained: %#v", v2FSM)
+	}
+	v1 := collect(analyzerplugin.APIVersion, []string{analyzerplugin.FSMVocabularyV1})
+	if len(v1) != 2 || v1[0].PreserveOrder || v1[0].Value.Relations[0].Target != "app/event:A" {
+		t.Fatalf("V1 anchors did not retain generic canonical order: %#v", v1)
+	}
+	nonVocabularyV2 := collect(analyzerplugin.GoAPIVersion, nil)
+	if len(nonVocabularyV2) != 2 || nonVocabularyV2[0].PreserveOrder || nonVocabularyV2[0].Value.Relations[0].Target != "app/event:A" {
+		t.Fatalf("non-vocabulary V2 anchors did not retain generic canonical order: %#v", nonVocabularyV2)
+	}
+}
+
+func TestMergeAnalyzerPluginAnchorsCanonicalizesGenericAnchorOrder(t *testing.T) {
+	anchor := func(tag string) pluginAnchor {
+		return pluginAnchor{Plugin: "legacy", Identity: "id", Value: analyzerplugin.Anchor{
+			Owner: "src/app.ts", Symbol: "dispatch", Line: 1, Props: map[string]any{"tag": tag},
+			Relations: []analyzerplugin.Relation{{Kind: facts.RelFSMDispatches, Target: "app/event:" + tag}},
+		}}
+	}
+	base := []facts.Fact{{Kind: facts.KindSymbol, Name: "dispatch", File: "src/app.ts", Line: 1}}
+	first := mergeAnalyzerPluginAnchors(base, []pluginAnchor{anchor("b"), anchor("a")})
+	second := mergeAnalyzerPluginAnchors(base, []pluginAnchor{anchor("a"), anchor("b")})
+	if !reflect.DeepEqual(first, second) {
+		t.Fatalf("generic anchor order changed publication: first=%#v second=%#v", first, second)
+	}
+	if len(first[0].Relations) != 2 || first[0].Relations[0].Target != "app/event:a" {
+		t.Fatalf("generic anchor relations were not canonicalized: %#v", first[0].Relations)
+	}
+}
+
+func TestMergeAnalyzerPluginAnchorsPreservesMultiOverlayRelationOrder(t *testing.T) {
+	base := []facts.Fact{{Kind: facts.KindSymbol, Name: "dispatch", File: "src/app.ts", Line: 10,
+		Relations: []facts.Relation{{Kind: facts.RelFSMDispatches, Target: "app/event:BASE"}}}}
+	anchor := func(relations ...facts.Relation) pluginAnchor {
+		out := make([]analyzerplugin.Relation, len(relations))
+		for i, relation := range relations {
+			out[i] = analyzerplugin.Relation{Kind: relation.Kind, Target: relation.Target, TargetFile: relation.TargetFile}
+		}
+		return pluginAnchor{Plugin: "product-fsm", Identity: "id", PreserveOrder: true, Value: analyzerplugin.Anchor{
+			Owner: "src/app.ts", Symbol: "dispatch", Line: 10, Relations: out,
+		}}
+	}
+	merged := mergeAnalyzerPluginAnchors(base, []pluginAnchor{
+		anchor(
+			facts.Relation{Kind: facts.RelFSMDispatches, Target: "app/event:Z"},
+			facts.Relation{Kind: facts.RelFSMConstructsEvent, Target: "app/event:B"},
+		),
+		anchor(
+			facts.Relation{Kind: facts.RelFSMDispatches, Target: "app/event:A"},
+			facts.Relation{Kind: facts.RelFSMDispatches, Target: "app/event:Z"}, // first sight wins
+		),
+	})
+	got := make([]string, 0, len(merged[0].Relations))
+	for _, relation := range merged[0].Relations {
+		got = append(got, relation.Kind+" "+relation.Target)
+	}
+	want := []string{
+		"fsm_dispatches app/event:BASE",
+		"fsm_dispatches app/event:Z",
+		"fsm_constructs_event app/event:B",
+		"fsm_dispatches app/event:A",
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("merged anchor relation order = %v, want legacy overlay order %v", got, want)
+	}
+}
+
+func publishedFSMAnchorEdge(t *testing.T, api, vocabulary, suppliedTargetKind string) graphstream.Edge {
+	t.Helper()
+	s := &session{opts: Options{analyzerPlugins: []analyzerplugin.Loaded{{Manifest: analyzerplugin.Manifest{
+		API: api, Name: "fsm", Vocabularies: []string{vocabulary}, Claims: analyzerplugin.Claims{Machines: []string{"app"}}, OwnerDomain: []string{"src/**"},
+	}}}}}
+	records := map[string]analyzerplugin.PluginRecord{"fsm": {Identity: "id", Units: map[string]analyzerplugin.UnitRecord{
+		"model:app": {Owners: map[string]analyzerplugin.OwnerResult{"src/app.ts": {
+			Anchors: []analyzerplugin.Anchor{{Symbol: "dispatch", Line: 1, Relations: []analyzerplugin.Relation{{Kind: facts.RelFSMDispatches, Target: "app/event:A", TargetKind: suppliedTargetKind}}}},
+		}}},
+	}}}
+	if err := s.collectPluginContributions(records, map[string]bool{"src/app.ts": true}); err != nil {
+		t.Fatal(err)
+	}
+	base := facts.Fact{Kind: facts.KindSymbol, Name: "dispatch", File: "src/app.ts", Line: 1}
+	merged := mergeAnalyzerPluginAnchors([]facts.Fact{base}, s.pluginAnchors)
+	target := facts.Fact{Kind: facts.KindFSMEvent, Name: "app/event:A", File: "machine.ts"}
+	_, edges := encodeOwner(ownerOutput{Owner: ownerOf(merged[0]), Facts: merged}, buildIndex(append(merged, target)), false)
+	if len(edges) != 1 || edges[0].Kind != facts.RelFSMDispatches || edges[0].Resolution != graphstream.ResResolved {
+		t.Fatalf("published FSM anchor edges = %#v", edges)
+	}
+	return edges[0]
 }
 
 func TestAnalyzerPluginParsedFileCensusSurvivesSummaryJSON(t *testing.T) {
@@ -247,6 +584,81 @@ func TestGoFSMVocabularyV2IdentityRejectsSameHostFactAcrossOwners(t *testing.T) 
 	err := s.collectPluginContributions(records, map[string]bool{"src/a.ts": true, "src/b.ts": true})
 	if err == nil || !strings.Contains(err.Error(), "stable fact identity fsm_state/product/state:idle") || !strings.Contains(err.Error(), "multiple owners") {
 		t.Fatalf("same V2 FSM identity across owners was not rejected as documented: %v", err)
+	}
+}
+
+func TestGoFSMVocabularyNestedHelpersAreFileOwnedAndDoNotCollideWithHostSymbols(t *testing.T) {
+	helper := func() analyzerplugin.Node {
+		return analyzerplugin.Node{Kind: facts.KindSymbol, Name: "src.outer.inner", Line: 4, EndLine: 7, Props: map[string]any{
+			"language": "typescript", "symbol_kind": facts.SymbolFunc, "fsm_source_binding": "tree_sitter_nested_declaration",
+		}}
+	}
+	s := &session{opts: Options{analyzerPlugins: []analyzerplugin.Loaded{{Manifest: analyzerplugin.Manifest{API: analyzerplugin.GoAPIVersion, Name: "product-fsm", Vocabularies: []string{analyzerplugin.FSMVocabularyV1}}}}}}
+	records := map[string]analyzerplugin.PluginRecord{"product-fsm": {Units: map[string]analyzerplugin.UnitRecord{"fixture": {Owners: map[string]analyzerplugin.OwnerResult{
+		"src/a.ts": {Nodes: []analyzerplugin.Node{helper()}},
+		"src/b.ts": {Nodes: []analyzerplugin.Node{helper()}},
+	}}}}}
+	if err := s.collectPluginContributions(records, map[string]bool{"src/a.ts": true, "src/b.ts": true}); err != nil {
+		t.Fatalf("same nested helper identity in separate files was rejected: %v", err)
+	}
+	if err := rejectPluginNestedDeclarationCollisions([]facts.Fact{{Kind: facts.KindSymbol, Name: "src.outer.inner", File: "src/a.ts"}}, s.pluginFacts); err == nil {
+		t.Fatal("plugin helper collision with TypeScript symbol was accepted")
+	}
+	if err := rejectPluginNestedDeclarationCollisions([]facts.Fact{{Kind: facts.KindSymbol, Name: "src.dispatch", File: "src/a.ts"}}, s.pluginFacts); err != nil {
+		t.Fatalf("different TypeScript symbol rejected as collision: %v", err)
+	}
+}
+
+// This is an end-to-end guard for the pre-Begin contract: the V2 fixture
+// publishes a nested helper and the real TypeScript extractor publishes the
+// same symbol.  Validation must reject it before any transaction record.
+func TestGoFSMNestedHelperCollisionPublishesNoBegin(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{"src/machine.ts": "export class Container { dispatch() {} }\n"})
+	registration := goFSMAnalyzerPluginFixture(t, root)
+	eng := testEngine(t, root)
+	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+	sink := &graphstream.MemorySink{}
+	_, err := Run(context.Background(), eng, root, sink, Options{StateDir: filepath.Join(root, ".enola", "nested-collision"), AllowRepoPlugins: []string{"product-fsm"}})
+	if err == nil || !strings.Contains(err.Error(), "collides with a host TypeScript symbol") {
+		t.Fatalf("nested helper collision error = %v", err)
+	}
+	begins, batches, ends, err := DecodeRun(sink.CloneRecords())
+	if err != nil || len(begins) != 0 || len(batches) != 0 || len(ends) != 0 {
+		t.Fatalf("collision published transaction: begins=%d batches=%d ends=%d err=%v", len(begins), len(batches), len(ends), err)
+	}
+}
+
+// The fixture exercises the published V2 graph rather than merge helpers in
+// isolation: the helper is anchor-bound on cold analysis and its contribution
+// is retired on a durable delta exactly as on a fresh cold run.
+func TestGoFSMNestedHelperPublishedGraphRetiresColdEqualsDelta(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{"src/machine.ts": "export function dispatch() {}\n"})
+	registration := goFSMAnalyzerPluginFixture(t, root)
+	state := filepath.Join(root, ".enola", "nested-retirement")
+	run := func(stateDir string) *Result {
+		eng := testEngine(t, root)
+		eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+		got, err := Run(context.Background(), eng, root, &graphstream.MemorySink{}, Options{StateDir: stateDir, AllowRepoPlugins: []string{"product-fsm"}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return got
+	}
+	cold := run(state)
+	if _, ok := factByName(cold.Facts, "src.Container.dispatch"); !ok {
+		t.Fatalf("V2 nested helper was not published: %#v", cold.Facts)
+	}
+	path := filepath.Join(root, "src", "machine.ts")
+	if err := os.WriteFile(path, []byte("export function dispatch() {} // NO_NESTED_HELPER\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	delta := run(state)
+	fresh := run(filepath.Join(root, ".enola", "nested-retirement-fresh"))
+	if _, ok := factByName(delta.Facts, "src.Container.dispatch"); ok {
+		t.Fatalf("delta retained retired helper")
+	}
+	if !reflect.DeepEqual(delta.Facts, fresh.Facts) {
+		t.Fatalf("retirement delta graph differs from cold: delta=%#v cold=%#v", delta.Facts, fresh.Facts)
 	}
 }
 

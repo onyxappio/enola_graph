@@ -40,9 +40,11 @@ func (s *session) hasConfiguredAnalyzerPluginContribution(name string) bool {
 }
 
 type pluginAnchor struct {
-	Plugin   string
-	Identity string
-	Value    analyzerplugin.Anchor
+	Plugin                 string
+	Identity               string
+	PreserveOrder          bool
+	FileOwnUnboundFallback bool
+	Value                  analyzerplugin.Anchor
 }
 
 type pluginEnrichment struct {
@@ -248,7 +250,11 @@ func (s *session) prepareAnalyzerPluginsWith(ctx context.Context, input *runtime
 				client.Abort()
 				return fmt.Errorf("plugin %q unit %q result: %w", name, unit.ID, err)
 			}
-			output = analyzerplugin.CanonicalizeResult(output)
+			if p.Manifest.API == analyzerplugin.GoAPIVersion && analyzerplugin.UsesFSMVocabulary(p.Manifest) {
+				output = analyzerplugin.CanonicalizeFSMResult(output)
+			} else {
+				output = analyzerplugin.CanonicalizeResult(output)
+			}
 			parsedFiles, err := analyzerplugin.ValidatedCensusParsedFiles(p, unit, output)
 			if err != nil {
 				client.Abort()
@@ -577,7 +583,7 @@ func pluginOwnerResultFacts(pluginName, api string, fsmVocabulary bool, owners m
 	for owner, result := range owners {
 		owner = filepath.ToSlash(owner)
 		for _, node := range result.Nodes {
-			passthrough := fsmVocabulary && analyzerplugin.IsFSMVocabularyNodeKind(node.Kind)
+			passthrough := fsmVocabulary && (analyzerplugin.IsFSMVocabularyNodeKind(node.Kind) || analyzerplugin.IsFSMNestedDeclarationSymbol(owner, node))
 			rels := pluginFactsRelations(pluginName, api, passthrough, node.Relations)
 			out = append(out, facts.Fact{Kind: pluginFactKind(pluginName, api, passthrough, node.Kind), Name: node.Name, File: owner, Line: node.Line, EndLine: node.EndLine, Relations: rels})
 		}
@@ -1199,10 +1205,14 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 				output := unit.Owners[owner]
 				key := "plugin:" + pluginName
 				for _, node := range output.Nodes {
-					factKind := pluginFactKind(pluginName, api, fsmVocabulary, node.Kind)
+					helper := fsmVocabulary && analyzerplugin.IsFSMNestedDeclarationSymbol(owner, node)
+					passthrough := fsmVocabulary && (analyzerplugin.IsFSMVocabularyNodeKind(node.Kind) || helper)
+					factKind := pluginFactKind(pluginName, api, passthrough, node.Kind)
 					identity := factKind + "\x00" + node.Name
-					if api != analyzerplugin.GoAPIVersion {
+					if api != analyzerplugin.GoAPIVersion || helper {
 						// Legacy Node plugins keep their owner-path-qualified fact identity.
+						// The admitted helper is deliberately the same: legacy nested
+						// declaration symbols are file-owned, unlike V2 FSM identities.
 						identity += "\x00" + filepath.ToSlash(owner)
 					}
 					occurrence := ""
@@ -1222,19 +1232,32 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 						return fmt.Errorf("analyzer plugins emitted duplicate fact identity %s/%s for owner %s without distinct occurrences", factKind, node.Name, owner)
 					}
 					seen.occurrences[occurrence] = id
-					props := pluginOwnedProperties(api, pluginName, fsmVocabulary && analyzerplugin.IsFSMVocabularyNodeKind(node.Kind), node.Props)
+					props := pluginOwnedProperties(api, pluginName, passthrough, node.Props)
 					props["plugin"] = pluginName
 					props["plugin_identity"] = record.Identity
-					rels := pluginFactsRelations(pluginName, api, fsmVocabulary && analyzerplugin.IsFSMVocabularyNodeKind(node.Kind), node.Relations)
+					rels := pluginFactsRelations(pluginName, api, passthrough, node.Relations)
 					fact := facts.Fact{Kind: factKind, Name: node.Name, File: owner, Line: node.Line, EndLine: node.EndLine, Repo: repoID, Props: props, Relations: rels}
 					s.pluginFacts = append(s.pluginFacts, fact)
 					s.pluginContribs[key] = append(s.pluginContribs[key], fact)
 				}
-				anchors := append([]analyzerplugin.Anchor(nil), output.Anchors...)
-				sort.SliceStable(anchors, func(i, j int) bool {
-					return analyzerplugin.AnchorSortKey(anchors[i]) < analyzerplugin.AnchorSortKey(anchors[j])
-				})
+				anchors := output.Anchors
+				preserveAnchorOrder := api == analyzerplugin.GoAPIVersion && fsmVocabulary
+				if !preserveAnchorOrder {
+					anchors = append([]analyzerplugin.Anchor(nil), anchors...)
+					sort.SliceStable(anchors, func(i, j int) bool {
+						return analyzerplugin.AnchorSortKey(anchors[i]) < analyzerplugin.AnchorSortKey(anchors[j])
+					})
+				}
 				for _, anchor := range anchors {
+					if api == analyzerplugin.GoAPIVersion && fsmVocabulary {
+						// The V2 FSM validator derives target kinds from relation.Kind;
+						// anchor publication must retain the legacy edge wire shape,
+						// which leaves target_kind empty.
+						anchor.Relations = append([]analyzerplugin.Relation(nil), anchor.Relations...)
+						for i := range anchor.Relations {
+							anchor.Relations[i].TargetKind = ""
+						}
+					}
 					anchorOwner := filepath.ToSlash(anchor.Owner)
 					if anchorOwner == "" {
 						anchorOwner = filepath.ToSlash(owner)
@@ -1255,7 +1278,15 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 						Kind: facts.KindSymbol, Name: anchor.Symbol, File: anchorOwner,
 						Line: anchor.Line, EndLine: anchor.EndLine, Repo: repoID, Props: props, Relations: rels,
 					})
-					s.pluginAnchors = append(s.pluginAnchors, pluginAnchor{Plugin: pluginName, Identity: record.Identity, Value: anchor})
+					s.pluginAnchors = append(s.pluginAnchors, pluginAnchor{
+						Plugin: pluginName, Identity: record.Identity, PreserveOrder: preserveAnchorOrder,
+						// Legacy fsmUnboundOverlayEvidence is file-owned. Keep the V2
+						// FSM compatibility fallback on that same owner so file edits
+						// retire it with the source contribution; generic/V1 anchors
+						// retain their historical aggregate ownership.
+						FileOwnUnboundFallback: api == analyzerplugin.GoAPIVersion && fsmVocabulary,
+						Value:                  anchor,
+					})
 				}
 				for _, enrichment := range output.Enrichments {
 					if enrichment.Owner == "" {
@@ -1418,8 +1449,21 @@ func mergeAnalyzerPluginAnchors(base []facts.Fact, anchors []pluginAnchor) []fac
 		return base
 	}
 	ordered := append([]pluginAnchor(nil), anchors...)
-	sort.SliceStable(ordered, func(i, j int) bool {
-		left, right := ordered[i], ordered[j]
+	// Only the V2 enola.fsm@1 compatibility path has observable anchor order.
+	// Keep generic anchors canonical, including the historical V1 behavior. Do
+	// not sort the whole mixed list: that would reorder V2 FSM overlays. Sort
+	// generic entries into their existing slots instead.
+	var genericSlots []int
+	var generic []pluginAnchor
+	for i, anchor := range ordered {
+		if anchor.PreserveOrder {
+			continue
+		}
+		genericSlots = append(genericSlots, i)
+		generic = append(generic, anchor)
+	}
+	sort.SliceStable(generic, func(i, j int) bool {
+		left, right := generic[i], generic[j]
 		if left.Plugin != right.Plugin {
 			return left.Plugin < right.Plugin
 		}
@@ -1430,6 +1474,9 @@ func mergeAnalyzerPluginAnchors(base []facts.Fact, anchors []pluginAnchor) []fac
 		}
 		return left.Identity < right.Identity
 	})
+	for i, slot := range genericSlots {
+		ordered[slot] = generic[i]
+	}
 	out := append([]facts.Fact(nil), base...)
 	for _, wrapped := range ordered {
 		a := wrapped.Value
@@ -1440,6 +1487,10 @@ func mergeAnalyzerPluginAnchors(base []facts.Fact, anchors []pluginAnchor) []fac
 		}
 		overlay.Props["plugin"] = wrapped.Plugin
 		overlay.Props["plugin_identity"] = wrapped.Identity
+		overlay.Props["plugin_anchor"] = true
+		if a.SourceIdentity != "" {
+			overlay.Props["fsm_source_identity"] = a.SourceIdentity
+		}
 		for _, r := range a.Relations {
 			overlay.Relations = append(overlay.Relations, facts.Relation{Kind: r.Kind, Target: r.Target, TargetKind: r.TargetKind, TargetFile: r.TargetFile})
 		}
@@ -1451,7 +1502,7 @@ func mergeAnalyzerPluginAnchors(base []facts.Fact, anchors []pluginAnchor) []fac
 			props["unresolved_source_binding"] = a.Symbol
 			props["unresolved_source_bindings"] = 1
 			props["unbound_fsm_relations"] = relationEvidence(overlay.Relations)
-			out = append(out, facts.Fact{Kind: facts.KindExtraction, Name: "plugin:" + wrapped.Plugin + ":source-binding:" + ownerPath + ":" + a.Symbol, File: ownerPath, Line: a.Line, EndLine: a.EndLine, Repo: overlay.Repo, Props: props})
+			out = append(out, facts.Fact{Kind: facts.KindExtraction, Name: "plugin:" + wrapped.Plugin + ":source-binding:" + ownerPath + ":" + a.Symbol, File: ownerPath, Line: a.Line, EndLine: a.EndLine, Repo: overlay.Repo, Props: props, OwnerFile: wrapped.FileOwnUnboundFallback})
 			continue
 		}
 		for _, rel := range overlay.Relations {
@@ -1591,8 +1642,8 @@ func mergeAnalyzerPluginEnrichments(base []facts.Fact, enrichments []pluginEnric
 	return out, nil
 }
 
-func pluginFactKind(pluginName, api string, fsmVocabulary bool, kind string) string {
-	if api == analyzerplugin.GoAPIVersion && (!fsmVocabulary || !analyzerplugin.IsFSMVocabularyNodeKind(kind)) {
+func pluginFactKind(pluginName, api string, passthrough bool, kind string) string {
+	if api == analyzerplugin.GoAPIVersion && !passthrough {
 		return analyzerplugin.GenericFactKind(pluginName, kind)
 	}
 	return kind
@@ -1619,18 +1670,7 @@ func pluginFactsRelations(pluginName, api string, fsmVocabulary bool, relations 
 }
 
 func pluginAnchorRelations(pluginName, api string, fsmVocabulary bool, relations []analyzerplugin.Relation) []facts.Relation {
-	if api != analyzerplugin.GoAPIVersion {
-		return pluginFactsRelations(pluginName, api, fsmVocabulary, relations)
-	}
-	out := make([]facts.Relation, 0, len(relations))
-	for _, relation := range relations {
-		targetKind := relation.TargetKind
-		if targetKind == "" {
-			targetKind, _ = facts.FSMRelationTargetKind(relation.Kind)
-		}
-		out = append(out, facts.Relation{Kind: relation.Kind, Target: relation.Target, TargetKind: targetKind, TargetFile: relation.TargetFile})
-	}
-	return out
+	return pluginFactsRelations(pluginName, api, fsmVocabulary, relations)
 }
 
 func pluginOwnedProperties(api, pluginName string, fsmVocabulary bool, properties map[string]any) map[string]any {
@@ -1695,10 +1735,35 @@ func pluginAnchorOwner(base []facts.Fact, overlay facts.Fact, sourceIdentity str
 	}
 	return -1
 }
+
+// rejectPluginNestedDeclarationCollisions prevents the only admitted plugin
+// host-symbol shape from shadowing a real TypeScript extraction. It runs after
+// the current source facts are assembled, so it protects cold and delta runs.
+func rejectPluginNestedDeclarationCollisions(hostFacts, pluginFacts []facts.Fact) error {
+	host := map[string]bool{}
+	for _, fact := range hostFacts {
+		if fact.Kind == facts.KindSymbol {
+			host[filepath.ToSlash(fact.File)+"\x00"+fact.Name] = true
+		}
+	}
+	for _, fact := range pluginFacts {
+		if fact.Kind != facts.KindSymbol || fact.Props["fsm_source_binding"] != "tree_sitter_nested_declaration" {
+			continue
+		}
+		key := filepath.ToSlash(fact.File) + "\x00" + fact.Name
+		if host[key] {
+			return fmt.Errorf("plugin nested-declaration helper %q in %q collides with a host TypeScript symbol", fact.Name, fact.File)
+		}
+	}
+	return nil
+}
 func relationEvidence(relations []facts.Relation) []map[string]string {
 	out := make([]map[string]string, 0, len(relations))
 	for _, r := range relations {
-		out = append(out, map[string]string{"kind": r.Kind, "target": r.Target, "target_kind": r.TargetKind, "target_file": r.TargetFile})
+		// Evidence is the legacy FSM provenance shape.  Relation target kinds
+		// belong to the published edge, not its evidence-site annotation; the
+		// legacy mergeFSMFacts map deliberately contains only these three keys.
+		out = append(out, map[string]string{"kind": r.Kind, "target": r.Target, "target_file": r.TargetFile})
 	}
 	return out
 }

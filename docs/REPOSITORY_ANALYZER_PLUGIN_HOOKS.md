@@ -173,7 +173,12 @@ A Go (`enola.plugin/v2`) plugin that declares `vocabularies:
 `extraction`. Those nodes use the V1 compatibility path: their kinds and
 `fsm_*` relations stay un-namespaced, their properties (including anchor
 properties) stay flat, and the host applies the V1 FSM identity and claimed
-machine validation. Other node kinds from that same plugin remain generic:
+machine validation. For parity with the legacy FSM extractor, these V2 nodes
+may also use the un-namespaced `declares` containment relation: an
+`fsm_state`, `fsm_event`, or `fsm_command` declares one claimed machine, and
+an `fsm_machine` declares the module containing its owner file (with its target
+kind omitted or set to `module`). No other non-`fsm_*` relation is part of this
+compatibility contract. Other node kinds from that same plugin remain generic:
 their kinds and relations are plugin-namespaced and their properties stay in
 the plugin property namespace. A V2 plugin that does not declare
 `enola.fsm@1` is wholly generic.
@@ -184,6 +189,13 @@ kind/name pair for two owners is rejected as ambiguous; it must use distinct
 identities (or a distinct occurrence within one owner). This intentionally
 differs from V1's owner-qualified identity rule and preserves the generic V2
 contract.
+
+The sole `symbol` exception is the legacy nested-declaration helper: its name
+is the owner file's module plus a chain of at least two named callable scopes,
+it has the exact legacy helper properties and no relations, and it is
+file-owned. Enola rejects it if a TypeScript symbol in the same file already
+has that identity. Every other V2 `symbol` contribution is rejected; it is not
+silently namespaced.
 
 An `analysis.unit@1` contribution may also include an optional census:
 

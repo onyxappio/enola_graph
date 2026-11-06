@@ -56,7 +56,10 @@ func validateResult(p Loaded, unit UnitDecl, result UnitResult) error {
 			if node.Owner != "" && node.Owner != owner {
 				return fmt.Errorf("plugin %q unit %q node %q claims owner %q, enclosing owner is %q", p.Manifest.Name, unit.ID, node.Name, node.Owner, owner)
 			}
-			if err := validateNode(p.Manifest.Name, claims, owner, node, seen); err != nil {
+			// V1 remains deliberately unchanged: its historical FSM-only relation
+			// table does not include the legacy containment edge. V2 plugins which
+			// explicitly opt into the FSM vocabulary get that one legacy shape.
+			if err := validateNode(p.Manifest.Name, claims, owner, node, seen, false); err != nil {
 				return fmt.Errorf("plugin %q unit %q: %w", p.Manifest.Name, unit.ID, err)
 			}
 		}
@@ -116,7 +119,13 @@ func validateGenericResult(p Loaded, unit UnitDecl, result UnitResult) error {
 				return fmt.Errorf("plugin %q unit %q node %q claims owner %q, enclosing owner is %q", p.Manifest.Name, unit.ID, node.Name, node.Owner, owner)
 			}
 			if fsmVocabulary && IsFSMVocabularyNodeKind(node.Kind) {
-				if err := validateNode(p.Manifest.Name, claims, owner, node, seen); err != nil {
+				if err := validateNode(p.Manifest.Name, claims, owner, node, seen, true); err != nil {
+					return fmt.Errorf("plugin %q unit %q: %w", p.Manifest.Name, unit.ID, err)
+				}
+				continue
+			}
+			if fsmVocabulary && node.Kind == facts.KindSymbol {
+				if err := validateFSMNestedDeclarationSymbol(owner, node, seen); err != nil {
 					return fmt.Errorf("plugin %q unit %q: %w", p.Manifest.Name, unit.ID, err)
 				}
 				continue
@@ -187,6 +196,56 @@ func UsesFSMVocabulary(m Manifest) bool {
 // remain host kinds when a V2 plugin has explicitly declared enola.fsm@1.
 func IsFSMVocabularyNodeKind(kind string) bool {
 	return kind == facts.KindExtraction || isFSMKind(kind)
+}
+
+// IsFSMNestedDeclarationSymbol identifies the single ordinary host symbol
+// shape admitted by enola.fsm@1. It is the synthetic nested-callable helper
+// emitted by the legacy TypeScript FSM binder; accepting it lets V2 anchors
+// resolve with exactly the same source identity without opening the host
+// symbol vocabulary to arbitrary plugin output.
+func IsFSMNestedDeclarationSymbol(owner string, n Node) bool {
+	if n.Kind != facts.KindSymbol || n.Line < 1 || n.EndLine < n.Line || len(n.Relations) != 0 || len(n.Props) != 3 {
+		return false
+	}
+	module := path.Dir(owner)
+	if !strings.HasPrefix(n.Name, module+".") {
+		return false
+	}
+	chain := strings.Split(strings.TrimPrefix(n.Name, module+"."), ".")
+	// bindNestedSourceDeclarations only publishes a nested callable. Its AST
+	// chain has at least the enclosing callable and the callable carrying the
+	// evidence; accepting a single segment lets a plugin forge a top-level TS
+	// symbol identity.
+	if len(chain) < 2 {
+		return false
+	}
+	for _, scope := range chain {
+		if scope == "" {
+			return false
+		}
+	}
+	return n.Props["language"] == "typescript" &&
+		n.Props["symbol_kind"] == facts.SymbolFunc &&
+		n.Props["fsm_source_binding"] == "tree_sitter_nested_declaration"
+}
+
+func validateFSMNestedDeclarationSymbol(owner string, n Node, seen map[string]map[string]bool) error {
+	// IsFSMNestedDeclarationSymbol includes the exact prop, source-span, owner
+	// module and relation restrictions. Keep an explicit diagnostic here so a
+	// near miss cannot silently become a generic namespaced node.
+	if !IsFSMNestedDeclarationSymbol(owner, n) {
+		return fmt.Errorf("symbol %q is not the permitted nested-declaration FSM helper shape", n.Name)
+	}
+	key := n.Kind + "\x00" + n.Name + "\x00" + owner
+	if seen[key] == nil {
+		seen[key] = map[string]bool{}
+	}
+	occ := occurrence(n)
+	if seen[key][occ] || (occ == "" && len(seen[key]) > 0) || seen[key][""] {
+		return fmt.Errorf("duplicate node identity %s/%s in owner %s without distinct occurrence", n.Kind, n.Name, owner)
+	}
+	seen[key][occ] = true
+	return nil
 }
 
 // CensusParsedFiles returns the optional parsed-files census supplied by a
@@ -327,7 +386,7 @@ func containsString(values []string, want string) bool {
 	return false
 }
 
-func validateNode(plugin string, claims map[string]bool, owner string, n Node, seen map[string]map[string]bool) error {
+func validateNode(plugin string, claims map[string]bool, owner string, n Node, seen map[string]map[string]bool, allowLegacyDeclares bool) error {
 	if n.Name == "" || n.Kind == "" {
 		return fmt.Errorf("node in %q has empty kind or name", owner)
 	}
@@ -353,6 +412,12 @@ func validateNode(plugin string, claims map[string]bool, owner string, n Node, s
 	}
 	seen[key][occ] = true
 	for _, rel := range n.Relations {
+		if allowLegacyDeclares && rel.Kind == facts.RelDeclares {
+			if err := validateV2FSMLegacyDeclares(claims, owner, n, rel); err != nil {
+				return err
+			}
+			continue
+		}
 		want, ok := facts.FSMRelationTargetKind(rel.Kind)
 		if !ok {
 			return fmt.Errorf("node %q uses unsupported relation %q", n.Name, rel.Kind)
@@ -377,6 +442,44 @@ func validateNode(plugin string, claims map[string]bool, owner string, n Node, s
 		}
 	}
 	return nil
+}
+
+// validateV2FSMLegacyDeclares accepts the containment relations emitted by the
+// legacy FSM extractor, but only for a V2 plugin which explicitly adopted the
+// FSM vocabulary. They are intentionally not added to FSMRelationTargetKind:
+// that table describes typed fsm_* relations, while declares keeps its
+// repository-wide, un-namespaced graph meaning.
+func validateV2FSMLegacyDeclares(claims map[string]bool, owner string, n Node, rel Relation) error {
+	if rel.Target == "" {
+		return fmt.Errorf("node %q has empty target for %s", n.Name, rel.Kind)
+	}
+	if rel.TargetFile != "" {
+		return fmt.Errorf("node %q relation %s must not set target_file", n.Name, rel.Kind)
+	}
+	switch n.Kind {
+	case facts.KindFSMState, facts.KindFSMEvent, facts.KindFSMCommand:
+		// rule_table.go emitted this untyped relation from each member to the
+		// configured machine. A target kind would change that legacy shape.
+		if rel.TargetKind != "" {
+			return fmt.Errorf("node %q relation %s must not set target_kind", n.Name, rel.Kind)
+		}
+		if !claims[rel.Target] {
+			return fmt.Errorf("relation %s targets unclaimed machine %q", rel.Kind, rel.Target)
+		}
+		return nil
+	case facts.KindFSMMachine:
+		// A machine declares the module containing its definition. Legacy facts
+		// omit target_kind; V2 producers may make the module type explicit.
+		if rel.TargetKind != "" && rel.TargetKind != facts.KindModule {
+			return fmt.Errorf("node %q relation %s targets %q, not %q", n.Name, rel.Kind, rel.TargetKind, facts.KindModule)
+		}
+		if rel.Target != path.Dir(owner) {
+			return fmt.Errorf("node %q relation %s targets module %q, want owner module %q", n.Name, rel.Kind, rel.Target, path.Dir(owner))
+		}
+		return nil
+	default:
+		return fmt.Errorf("node %q kind %q cannot use relation %q", n.Name, n.Kind, rel.Kind)
+	}
 }
 
 func isFSMKind(kind string) bool {

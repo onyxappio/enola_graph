@@ -1967,6 +1967,92 @@ func TestPluginFSMFactsCarryRepoSoTSAnchorsResolve(t *testing.T) {
 	}
 }
 
+func TestPluginNestedDeclarationSymbolBindsSourceIdentityAnchorLikeLegacy(t *testing.T) {
+	props := map[string]any{
+		"language": "typescript", "symbol_kind": facts.SymbolFunc,
+		"fsm_source_binding": "tree_sitter_nested_declaration",
+	}
+	legacy := facts.Fact{Kind: facts.KindSymbol, Name: "src.render.Panel", File: "src/view.ts", Line: 4, EndLine: 9, Props: cloneAnyMap(props)}
+	anchor := pluginAnchor{Plugin: "product-fsm", Identity: "digest", PreserveOrder: true, Value: analyzerplugin.Anchor{
+		Symbol: "render", Owner: "src/view.ts", Line: 5, SourceIdentity: "src.render.Panel",
+		Relations: []analyzerplugin.Relation{{Kind: facts.RelFSMDispatches, Target: "app/event:go"}},
+	}}
+	legacyGraph := mergeAnalyzerPluginAnchors([]facts.Fact{legacy}, []pluginAnchor{anchor})
+	if len(legacyGraph) != 1 || len(legacyGraph[0].Relations) != 1 || legacyGraph[0].Relations[0].Kind != facts.RelFSMDispatches {
+		t.Fatalf("legacy helper did not bind source identity: %#v", legacyGraph)
+	}
+
+	s := &session{opts: Options{analyzerPlugins: []analyzerplugin.Loaded{{Manifest: analyzerplugin.Manifest{
+		API: analyzerplugin.GoAPIVersion, Name: "product-fsm", Vocabularies: []string{analyzerplugin.FSMVocabularyV1},
+	}}}}}
+	records := map[string]analyzerplugin.PluginRecord{"product-fsm": {Identity: "digest", Units: map[string]analyzerplugin.UnitRecord{
+		"model:app": {Owners: map[string]analyzerplugin.OwnerResult{"src/view.ts": {
+			Nodes:   []analyzerplugin.Node{{Kind: facts.KindSymbol, Name: "src.render.Panel", Line: 4, EndLine: 9, Props: props}},
+			Anchors: []analyzerplugin.Anchor{anchor.Value},
+		}}},
+	}}}
+	if err := s.collectPluginContributions(records, map[string]bool{"src/view.ts": true}); err != nil {
+		t.Fatal(err)
+	}
+	if len(s.pluginFacts) != 1 || s.pluginFacts[0].Kind != facts.KindSymbol || s.pluginFacts[0].Props["language"] != "typescript" {
+		t.Fatalf("helper did not use unnamespaced flat host symbol contract: %#v", s.pluginFacts)
+	}
+	pluginGraph := mergeAnalyzerPluginAnchors(s.pluginFacts, s.pluginAnchors)
+	if len(pluginGraph) != 1 || len(pluginGraph[0].Relations) != 1 || pluginGraph[0].Relations[0] != legacyGraph[0].Relations[0] {
+		t.Fatalf("plugin helper graph differs from legacy: plugin=%#v legacy=%#v", pluginGraph, legacyGraph)
+	}
+	sites, _ := pluginGraph[0].Props["fsm_evidence_sites"].([]map[string]any)
+	if len(sites) != 1 {
+		t.Fatalf("plugin helper evidence = %#v", pluginGraph[0].Props["fsm_evidence_sites"])
+	}
+	evidenceProps, _ := sites[0]["props"].(map[string]any)
+	if got := evidenceProps["fsm_source_identity"]; got != "src.render.Panel" {
+		t.Fatalf("plugin evidence source identity = %#v, want legacy identity", got)
+	}
+	rels, _ := sites[0]["relations"].([]map[string]string)
+	if len(rels) != 1 || len(rels[0]) != 3 || rels[0]["kind"] != facts.RelFSMDispatches || rels[0]["target"] != "app/event:go" || rels[0]["target_kind"] != "" {
+		t.Fatalf("plugin evidence must retain the legacy relation-map shape, got %#v", sites[0]["relations"])
+	}
+	if got := relationEvidence([]facts.Relation{{Kind: "declares", Target: "x"}}); len(got) != 1 || got[0]["target_kind"] != "" {
+		t.Fatalf("empty target kind must be omitted, got %#v", got)
+	}
+
+	mutant := s.pluginFacts[0]
+	mutant.Props = cloneAnyMap(mutant.Props)
+	mutant.Props["fsm_source_binding"] = "other"
+	if got := mergeAnalyzerPluginAnchors([]facts.Fact{mutant}, s.pluginAnchors); len(got) != 2 || got[1].Kind != facts.KindExtraction {
+		t.Fatalf("non-helper plugin symbol bound source identity: %#v", got)
+	}
+}
+
+func TestPluginNestedDeclarationAnchorOwnerRequiresContainingHelperSpan(t *testing.T) {
+	helper := facts.Fact{Kind: facts.KindSymbol, Name: "src.outer.inner", File: "src/view.ts", Line: 10, EndLine: 20,
+		Props: map[string]any{"language": "typescript", "symbol_kind": facts.SymbolFunc, "fsm_source_binding": "tree_sitter_nested_declaration"}}
+	anchor := func(line int) facts.Fact {
+		return facts.Fact{Kind: facts.KindSymbol, Name: "inner", File: "src/view.ts", Line: line}
+	}
+	if got := pluginAnchorOwner([]facts.Fact{helper}, anchor(15), helper.Name); got != 0 {
+		t.Fatalf("contained nested anchor owner = %d, want 0", got)
+	}
+	if got := pluginAnchorOwner([]facts.Fact{helper}, anchor(25), helper.Name); got != -1 {
+		t.Fatalf("out-of-span nested anchor bound helper %d", got)
+	}
+	second := helper
+	second.Line, second.EndLine = 30, 40
+	if got := pluginAnchorOwner([]facts.Fact{helper, second}, anchor(0), helper.Name); got != -1 {
+		t.Fatalf("ambiguous nested anchor owner = %d, want -1", got)
+	}
+	// Exact line preference is what makes two otherwise-containing candidates
+	// deterministic. If it is removed this becomes ambiguous (-1), which is a
+	// deliberate mutation test for pluginAnchorOwner.
+	exactA, exactB := helper, helper
+	exactA.Line, exactA.EndLine = 10, 30
+	exactB.Line, exactB.EndLine = 15, 25
+	if got := pluginAnchorOwner([]facts.Fact{exactA, exactB}, anchor(15), helper.Name); got != 1 {
+		t.Fatalf("exact-line nested anchor owner = %d, want exact candidate 1", got)
+	}
+}
+
 func TestReplacePluginContributionsKeepsAdmittedUnhashedNonTSOwners(t *testing.T) {
 	files := map[string]*FileState{
 		"src/keep.ts": {Hash: "keep", Contrib: map[string][]facts.Fact{}, ContribHash: map[string]string{}},
