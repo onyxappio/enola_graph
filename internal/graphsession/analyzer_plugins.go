@@ -1239,10 +1239,13 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 					return analyzerplugin.AnchorSortKey(anchors[i]) < analyzerplugin.AnchorSortKey(anchors[j])
 				})
 				for _, anchor := range anchors {
-					// Inferred anchor target kinds are a V2-only contract. V1
-					// relations were historically published exactly as supplied.
-					if api == analyzerplugin.GoAPIVersion {
-						anchor.Relations = canonicalAnchorRelations(anchor.Relations)
+					if api == analyzerplugin.GoAPIVersion && fsmVocabulary {
+						// The V2 FSM validator derives target kinds from relation.Kind;
+						// anchor publication must retain the legacy edge wire shape,
+						// which leaves target_kind empty.
+						for i := range anchor.Relations {
+							anchor.Relations[i].TargetKind = ""
+						}
 					}
 					anchorOwner := filepath.ToSlash(anchor.Owner)
 					if anchorOwner == "" {
@@ -1632,28 +1635,7 @@ func pluginFactsRelations(pluginName, api string, fsmVocabulary bool, relations 
 }
 
 func pluginAnchorRelations(pluginName, api string, fsmVocabulary bool, relations []analyzerplugin.Relation) []facts.Relation {
-	if api != analyzerplugin.GoAPIVersion {
-		return pluginFactsRelations(pluginName, api, fsmVocabulary, relations)
-	}
-	out := make([]facts.Relation, 0, len(relations))
-	for _, relation := range relations {
-		targetKind := relation.TargetKind
-		if targetKind == "" {
-			targetKind, _ = facts.FSMRelationTargetKind(relation.Kind)
-		}
-		out = append(out, facts.Relation{Kind: relation.Kind, Target: relation.Target, TargetKind: targetKind, TargetFile: relation.TargetFile})
-	}
-	return out
-}
-
-func canonicalAnchorRelations(relations []analyzerplugin.Relation) []analyzerplugin.Relation {
-	out := append([]analyzerplugin.Relation(nil), relations...)
-	for i := range out {
-		if out[i].TargetKind == "" {
-			out[i].TargetKind, _ = facts.FSMRelationTargetKind(out[i].Kind)
-		}
-	}
-	return out
+	return pluginFactsRelations(pluginName, api, fsmVocabulary, relations)
 }
 
 func pluginOwnedProperties(api, pluginName string, fsmVocabulary bool, properties map[string]any) map[string]any {
