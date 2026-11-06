@@ -387,7 +387,7 @@ owner_domain: [src/**]
 	}
 }
 
-func TestCanonicalizeResultOrdersAnchorsByPropsAndRelations(t *testing.T) {
+func TestCanonicalizeResultPreservesAnchorEmissionOrder(t *testing.T) {
 	a := UnitResult{Unit: "file:a", Owners: map[string]OwnerResult{"src/a.ts": {Anchors: []Anchor{
 		{Symbol: "caller", Line: 1, Props: map[string]any{"tag": "b"}, Relations: []Relation{{Kind: "fsm_dispatches", Target: "demo/event:go"}}},
 		{Symbol: "caller", Line: 1, Props: map[string]any{"tag": "a"}, Relations: []Relation{{Kind: "fsm_dispatches", Target: "demo/event:go"}}},
@@ -406,11 +406,11 @@ func TestCanonicalizeResultOrdersAnchorsByPropsAndRelations(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if left != right {
-		t.Fatalf("anchor prop ordering changed digest: %s != %s", left, right)
+	if left == right {
+		t.Fatalf("anchor emission ordering was erased from canonical output: %s", left)
 	}
-	if a.Owners["src/a.ts"].Anchors[0].Props["tag"] != "a" {
-		t.Fatalf("anchors were not totally ordered by props: %#v", a.Owners["src/a.ts"].Anchors)
+	if a.Owners["src/a.ts"].Anchors[0].Props["tag"] != "b" {
+		t.Fatalf("anchor emission order changed: %#v", a.Owners["src/a.ts"].Anchors)
 	}
 }
 

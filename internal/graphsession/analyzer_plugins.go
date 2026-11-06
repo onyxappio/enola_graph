@@ -1234,11 +1234,7 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 					s.pluginFacts = append(s.pluginFacts, fact)
 					s.pluginContribs[key] = append(s.pluginContribs[key], fact)
 				}
-				anchors := append([]analyzerplugin.Anchor(nil), output.Anchors...)
-				sort.SliceStable(anchors, func(i, j int) bool {
-					return analyzerplugin.AnchorSortKey(anchors[i]) < analyzerplugin.AnchorSortKey(anchors[j])
-				})
-				for _, anchor := range anchors {
+				for _, anchor := range output.Anchors {
 					if api == analyzerplugin.GoAPIVersion && fsmVocabulary {
 						// The V2 FSM validator derives target kinds from relation.Kind;
 						// anchor publication must retain the legacy edge wire shape,
@@ -1429,21 +1425,8 @@ func mergeAnalyzerPluginAnchors(base []facts.Fact, anchors []pluginAnchor) []fac
 	if len(anchors) == 0 {
 		return base
 	}
-	ordered := append([]pluginAnchor(nil), anchors...)
-	sort.SliceStable(ordered, func(i, j int) bool {
-		left, right := ordered[i], ordered[j]
-		if left.Plugin != right.Plugin {
-			return left.Plugin < right.Plugin
-		}
-		leftKey := analyzerplugin.AnchorSortKey(left.Value)
-		rightKey := analyzerplugin.AnchorSortKey(right.Value)
-		if leftKey != rightKey {
-			return leftKey < rightKey
-		}
-		return left.Identity < right.Identity
-	})
 	out := append([]facts.Fact(nil), base...)
-	for _, wrapped := range ordered {
+	for _, wrapped := range anchors {
 		a := wrapped.Value
 		ownerPath := filepath.ToSlash(a.Owner)
 		overlay := facts.Fact{Kind: facts.KindSymbol, Name: a.Symbol, File: ownerPath, Line: a.Line, EndLine: a.EndLine, Props: cloneAnyMap(a.Props)}

@@ -298,6 +298,43 @@ func TestV2FSMAnchorPublishesLegacyTargetKindShape(t *testing.T) {
 	}
 }
 
+func TestMergeAnalyzerPluginAnchorsPreservesMultiOverlayRelationOrder(t *testing.T) {
+	base := []facts.Fact{{Kind: facts.KindSymbol, Name: "dispatch", File: "src/app.ts", Line: 10,
+		Relations: []facts.Relation{{Kind: facts.RelFSMDispatches, Target: "app/event:BASE"}}}}
+	anchor := func(relations ...facts.Relation) pluginAnchor {
+		out := make([]analyzerplugin.Relation, len(relations))
+		for i, relation := range relations {
+			out[i] = analyzerplugin.Relation{Kind: relation.Kind, Target: relation.Target, TargetFile: relation.TargetFile}
+		}
+		return pluginAnchor{Plugin: "product-fsm", Identity: "id", Value: analyzerplugin.Anchor{
+			Owner: "src/app.ts", Symbol: "dispatch", Line: 10, Relations: out,
+		}}
+	}
+	merged := mergeAnalyzerPluginAnchors(base, []pluginAnchor{
+		anchor(
+			facts.Relation{Kind: facts.RelFSMDispatches, Target: "app/event:Z"},
+			facts.Relation{Kind: facts.RelFSMConstructsEvent, Target: "app/event:B"},
+		),
+		anchor(
+			facts.Relation{Kind: facts.RelFSMDispatches, Target: "app/event:A"},
+			facts.Relation{Kind: facts.RelFSMDispatches, Target: "app/event:Z"}, // first sight wins
+		),
+	})
+	got := make([]string, 0, len(merged[0].Relations))
+	for _, relation := range merged[0].Relations {
+		got = append(got, relation.Kind+" "+relation.Target)
+	}
+	want := []string{
+		"fsm_dispatches app/event:BASE",
+		"fsm_dispatches app/event:Z",
+		"fsm_constructs_event app/event:B",
+		"fsm_dispatches app/event:A",
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("merged anchor relation order = %v, want legacy overlay order %v", got, want)
+	}
+}
+
 func publishedFSMAnchorEdge(t *testing.T, api, vocabulary, suppliedTargetKind string) graphstream.Edge {
 	t.Helper()
 	s := &session{opts: Options{analyzerPlugins: []analyzerplugin.Loaded{{Manifest: analyzerplugin.Manifest{

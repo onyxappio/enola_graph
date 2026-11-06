@@ -361,12 +361,12 @@ func CanonicalDigest(v any) (string, error) {
 	return hex.EncodeToString(sum[:]), nil
 }
 
-// CanonicalizeResult removes node/anchor/enrichment array ordering from the
-// persisted graph contribution and its digest while preserving distinct
-// occurrences. Relation order is deliberately retained: it is the producer's
-// published graph order, and FSM V2 compatibility requires legacy emission
-// order to survive through the host. Empty anchor owners inherit their
-// enclosing output owner before sorting.
+// CanonicalizeResult removes node/enrichment array ordering from the persisted
+// graph contribution and its digest while preserving distinct occurrences.
+// Anchor and relation order are deliberately retained: anchors merge their
+// relations into source symbols in producer emission order, and FSM V2
+// compatibility requires that legacy graph order to survive through the host.
+// Empty anchor owners inherit their enclosing output owner before persistence.
 func CanonicalizeResult(result UnitResult) UnitResult {
 	for owner, contribution := range result.Owners {
 		for i := range contribution.Anchors {
@@ -395,9 +395,6 @@ func CanonicalizeResult(result UnitResult) UnitResult {
 			}
 			return occurrence(left) < occurrence(right)
 		})
-		sort.SliceStable(contribution.Anchors, func(a, b int) bool {
-			return anchorLess(contribution.Anchors[a], contribution.Anchors[b])
-		})
 		sort.SliceStable(contribution.Enrichments, func(a, b int) bool {
 			return enrichmentLess(contribution.Enrichments[a], contribution.Enrichments[b])
 		})
@@ -421,44 +418,6 @@ func enrichmentLess(left, right Enrichment) bool {
 		return leftProps < rightProps
 	}
 	return relationsKey(left.Relations) < relationsKey(right.Relations)
-}
-
-func anchorLess(left, right Anchor) bool {
-	if left.Symbol != right.Symbol {
-		return left.Symbol < right.Symbol
-	}
-	if left.Line != right.Line {
-		return left.Line < right.Line
-	}
-	if left.EndLine != right.EndLine {
-		return left.EndLine < right.EndLine
-	}
-	if left.SourceIdentity != right.SourceIdentity {
-		return left.SourceIdentity < right.SourceIdentity
-	}
-	if left.Owner != right.Owner {
-		return left.Owner < right.Owner
-	}
-	leftProps := canonicalJSONKey(left.Props)
-	rightProps := canonicalJSONKey(right.Props)
-	if leftProps != rightProps {
-		return leftProps < rightProps
-	}
-	return relationsKey(left.Relations) < relationsKey(right.Relations)
-}
-
-// AnchorSortKey is a total order over canonical anchor content for host-side
-// multi-plugin evidence ordering.
-func AnchorSortKey(a Anchor) string {
-	return strings.Join([]string{
-		a.Symbol,
-		fmt.Sprintf("%d", a.Line),
-		fmt.Sprintf("%d", a.EndLine),
-		a.SourceIdentity,
-		a.Owner,
-		canonicalJSONKey(a.Props),
-		relationsKey(a.Relations),
-	}, "\x00")
 }
 
 func relationKey(relation Relation) string {
