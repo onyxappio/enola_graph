@@ -716,6 +716,11 @@ func (s *session) run(ctx context.Context, initial bool) (*Result, error) {
 	// without plugins still prepares after an engine rebuild adds analyzer_plugins.
 	pluginExecution := pluginStatePresent || len(s.boundAnalyzerPluginConfigs()) > 0
 	s.pluginExecution = pluginExecution
+	// Plugin helper validation needs the fully assembled TypeScript facts.
+	// Hold BeginReplace (and local batches) until that validation succeeds.
+	if pluginExecution {
+		s.deferBegin = true
+	}
 	var err error
 	input := s.inputs
 	if !s.fast || pluginExecution {
@@ -2974,7 +2979,7 @@ func scopeOwnerRefs(scopeFiles map[string]bool, owned []string, st *State, force
 }
 
 func (s *session) publishLocal(ctx context.Context, runID, repoID string, rec *tsextractor.FileRecord, earlyLocal *int) {
-	if s.opts.AuthoritativeFiles || s.opts.PluginVerify || s.pluginVerifyOnly || s.skipPublish {
+	if s.opts.AuthoritativeFiles || s.opts.PluginVerify || s.pluginVerifyOnly || s.skipPublish || s.deferBegin {
 		return
 	}
 	if rec == nil || rec.Unreadable || rec.Minified {

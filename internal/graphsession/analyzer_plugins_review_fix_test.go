@@ -2001,6 +2001,21 @@ func TestPluginNestedDeclarationSymbolBindsSourceIdentityAnchorLikeLegacy(t *tes
 	if len(pluginGraph) != 1 || len(pluginGraph[0].Relations) != 1 || pluginGraph[0].Relations[0] != legacyGraph[0].Relations[0] {
 		t.Fatalf("plugin helper graph differs from legacy: plugin=%#v legacy=%#v", pluginGraph, legacyGraph)
 	}
+	sites, _ := pluginGraph[0].Props["fsm_evidence_sites"].([]map[string]any)
+	if len(sites) != 1 {
+		t.Fatalf("plugin helper evidence = %#v", pluginGraph[0].Props["fsm_evidence_sites"])
+	}
+	evidenceProps, _ := sites[0]["props"].(map[string]any)
+	if got := evidenceProps["fsm_source_identity"]; got != "src.render.Panel" {
+		t.Fatalf("plugin evidence source identity = %#v, want legacy identity", got)
+	}
+	rels, _ := sites[0]["relations"].([]map[string]string)
+	if len(rels) != 1 || rels[0]["target_kind"] != facts.KindFSMEvent {
+		t.Fatalf("plugin evidence target kind = %#v", sites[0]["relations"])
+	}
+	if got := relationEvidence([]facts.Relation{{Kind: "declares", Target: "x"}}); len(got) != 1 || got[0]["target_kind"] != "" {
+		t.Fatalf("empty target kind must be omitted, got %#v", got)
+	}
 
 	mutant := s.pluginFacts[0]
 	mutant.Props = cloneAnyMap(mutant.Props)

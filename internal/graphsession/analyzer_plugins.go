@@ -1444,6 +1444,9 @@ func mergeAnalyzerPluginAnchors(base []facts.Fact, anchors []pluginAnchor) []fac
 		}
 		overlay.Props["plugin"] = wrapped.Plugin
 		overlay.Props["plugin_identity"] = wrapped.Identity
+		if a.SourceIdentity != "" {
+			overlay.Props["fsm_source_identity"] = a.SourceIdentity
+		}
 		for _, r := range a.Relations {
 			overlay.Relations = append(overlay.Relations, facts.Relation{Kind: r.Kind, Target: r.Target, TargetKind: r.TargetKind, TargetFile: r.TargetFile})
 		}
@@ -1724,7 +1727,11 @@ func rejectPluginNestedDeclarationCollisions(hostFacts, pluginFacts []facts.Fact
 func relationEvidence(relations []facts.Relation) []map[string]string {
 	out := make([]map[string]string, 0, len(relations))
 	for _, r := range relations {
-		out = append(out, map[string]string{"kind": r.Kind, "target": r.Target, "target_kind": r.TargetKind, "target_file": r.TargetFile})
+		row := map[string]string{"kind": r.Kind, "target": r.Target, "target_file": r.TargetFile}
+		if r.TargetKind != "" {
+			row["target_kind"] = r.TargetKind
+		}
+		out = append(out, row)
 	}
 	return out
 }
