@@ -144,7 +144,7 @@ func TestGoFSMVocabularyPublishesHostFactsAndKeepsGenericContributionsNamespaced
 	if state.Props["state"] != "idle" || state.Props["plugin_properties"] != nil {
 		t.Fatalf("FSM state properties were not flat: %#v", state.Props)
 	}
-	if len(state.Relations) != 1 || state.Relations[0].Kind != facts.RelFSMParent || state.Relations[0].TargetKind != facts.KindFSMState {
+	if len(state.Relations) != 2 || state.Relations[0].Kind != facts.RelDeclares || state.Relations[0].Target != "product" || state.Relations[1].Kind != facts.RelFSMParent || state.Relations[1].TargetKind != facts.KindFSMState {
 		t.Fatalf("FSM state relations were not host relations: %#v", state.Relations)
 	}
 	coverage, ok := factByName(run.Facts, "plugin:product-fsm:coverage")
@@ -168,6 +168,87 @@ func TestGoFSMVocabularyPublishesHostFactsAndKeepsGenericContributionsNamespaced
 		}
 	}
 	t.Fatalf("persisted anchor symbol missing from plugin contribs: %#v", contribs)
+}
+
+func TestGoFSMVocabularyPublishesLegacyDeclaresEdges(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{"src/machine.ts": "export function dispatch() {}\n"})
+	eng := testEngine(t, root)
+	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{goFSMAnalyzerPluginFixture(t, root)}
+	sink := &graphstream.MemorySink{}
+	if _, err := Run(context.Background(), eng, root, sink, Options{
+		StateDir: filepath.Join(root, ".enola", "fsm-declares-state"), AuthoritativeFiles: true, AllowRepoPlugins: []string{"product-fsm"},
+	}); err != nil {
+		t.Fatal(err)
+	}
+	consumer := applyGraph(t, sink)
+	machine, ok := pluginGraphNode(consumer, facts.KindFSMMachine, "product")
+	if !ok {
+		t.Fatal("published FSM machine missing")
+	}
+	if !consumerHasRelation(consumer, "product", facts.RelDeclares, "src") {
+		t.Fatal("published machine lost its un-namespaced declares relation")
+	}
+	for _, member := range []struct{ kind, name string }{
+		{facts.KindFSMState, "product/state:idle"},
+		{facts.KindFSMEvent, "product/event:start"},
+		{facts.KindFSMCommand, "product/command:start"},
+	} {
+		node, ok := pluginGraphNode(consumer, member.kind, member.name)
+		if !ok {
+			t.Fatalf("published FSM member missing: %s/%s", member.kind, member.name)
+		}
+		assertPublishedDeclaresEdge(t, consumer, node, machine)
+	}
+}
+
+func TestV2FSMVocabularyDeclaresResolvesLikeLegacy(t *testing.T) {
+	module := facts.Fact{Kind: facts.KindModule, Name: "src", File: "src"}
+	legacy := facts.Fact{Kind: facts.KindFSMMachine, Name: "product", File: "src/machine.ts", Relations: []facts.Relation{{Kind: facts.RelDeclares, Target: "src"}}}
+	pluginFacts := pluginOwnerResultFacts("product-fsm", analyzerplugin.GoAPIVersion, true, map[string]analyzerplugin.OwnerResult{
+		"src/machine.ts": {Nodes: []analyzerplugin.Node{{
+			Kind: facts.KindFSMMachine, Name: "product", Relations: []analyzerplugin.Relation{{Kind: facts.RelDeclares, Target: "src", TargetKind: facts.KindModule}},
+		}}},
+	})
+	if len(pluginFacts) != 1 || len(pluginFacts[0].Relations) != 1 || pluginFacts[0].Relations[0].Kind != facts.RelDeclares {
+		t.Fatalf("V2 FSM declares relation was namespaced or dropped: %#v", pluginFacts)
+	}
+	_, legacyEdges := encodeOwner(ownerOutput{Owner: ownerOf(legacy), Facts: []facts.Fact{legacy}}, buildIndex([]facts.Fact{legacy, module}), false)
+	_, pluginEdges := encodeOwner(ownerOutput{Owner: ownerOf(pluginFacts[0]), Facts: pluginFacts}, buildIndex(append(pluginFacts, module)), false)
+	if len(legacyEdges) != 1 || len(pluginEdges) != 1 {
+		t.Fatalf("legacy/plugin declares edge count = %d/%d", len(legacyEdges), len(pluginEdges))
+	}
+	legacyEdge, pluginEdge := legacyEdges[0], pluginEdges[0]
+	if pluginEdge.Kind != legacyEdge.Kind || pluginEdge.TargetName != legacyEdge.TargetName || pluginEdge.TargetID != legacyEdge.TargetID || pluginEdge.Resolution != legacyEdge.Resolution {
+		t.Fatalf("V2 declares edge = %#v, want legacy %#v", pluginEdge, legacyEdge)
+	}
+}
+
+func pluginGraphNode(c *Consumer, kind, name string) (graphstream.Node, bool) {
+	for _, nodes := range c.Owners {
+		for _, node := range nodes {
+			if node.Kind == kind && node.Name == name {
+				return node, true
+			}
+		}
+	}
+	return graphstream.Node{}, false
+}
+
+func assertPublishedDeclaresEdge(t *testing.T, c *Consumer, from, want graphstream.Node) {
+	t.Helper()
+	for owner, nodes := range c.Owners {
+		for _, node := range nodes {
+			if node.ID != from.ID {
+				continue
+			}
+			for _, edge := range c.Edges[owner] {
+				if edge.FromID == from.ID && edge.Kind == facts.RelDeclares && edge.TargetName == want.Name && edge.TargetID == want.ID && edge.Resolution == graphstream.ResResolved {
+					return
+				}
+			}
+		}
+	}
+	t.Fatalf("missing resolved legacy declares edge %s -> %s", from.Name, want.Name)
 }
 
 func TestGoFSMVocabularyRejectsInvalidFSMNodeWithV1Validation(t *testing.T) {

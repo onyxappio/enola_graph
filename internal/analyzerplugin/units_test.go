@@ -73,6 +73,61 @@ func TestValidateResultChecksVocabularyClaimAndOwnerDomain(t *testing.T) {
 	}
 }
 
+func TestV2FSMVocabularyAcceptsOnlyLegacyDeclaresShapes(t *testing.T) {
+	unit := UnitDecl{ID: "model:demo", Kind: "model"}
+	v2 := Loaded{Manifest: Manifest{
+		API:          GoAPIVersion,
+		Name:         "toy",
+		Vocabularies: []string{FSMVocabularyV1},
+		Claims:       Claims{Machines: []string{"demo"}},
+		OwnerDomain:  []string{"src/**"},
+	}}
+	legacy := UnitResult{Unit: unit.ID, Owners: map[string]OwnerResult{"src/machine.ts": {Nodes: []Node{
+		{Kind: facts.KindFSMMachine, Name: "demo", Relations: []Relation{{Kind: facts.RelDeclares, Target: "src"}}},
+		{Kind: facts.KindFSMState, Name: "demo/state:idle", Relations: []Relation{{Kind: facts.RelDeclares, Target: "demo"}}},
+		{Kind: facts.KindFSMEvent, Name: "demo/event:go", Relations: []Relation{{Kind: facts.RelDeclares, Target: "demo"}}},
+		{Kind: facts.KindFSMCommand, Name: "demo/command:run", Relations: []Relation{{Kind: facts.RelDeclares, Target: "demo"}}},
+	}}}}
+	if err := ValidateResult(v2, unit, legacy); err != nil {
+		t.Fatalf("V2 FSM vocabulary rejected legacy declares shapes: %v", err)
+	}
+	withTypedModule := legacy
+	withTypedModule.Owners["src/machine.ts"] = OwnerResult{Nodes: append([]Node(nil), legacy.Owners["src/machine.ts"].Nodes...)}
+	withTypedModule.Owners["src/machine.ts"].Nodes[0].Relations = []Relation{{Kind: facts.RelDeclares, Target: "src", TargetKind: facts.KindModule}}
+	if err := ValidateResult(v2, unit, withTypedModule); err != nil {
+		t.Fatalf("V2 FSM vocabulary rejected explicit module target kind: %v", err)
+	}
+
+	withRelation := func(kind, name string, rel Relation) UnitResult {
+		return UnitResult{Unit: unit.ID, Owners: map[string]OwnerResult{"src/machine.ts": {Nodes: []Node{{Kind: kind, Name: name, Relations: []Relation{rel}}}}}}
+	}
+	for _, tc := range []struct {
+		name   string
+		result UnitResult
+	}{
+		{"member unclaimed machine", withRelation(facts.KindFSMState, "demo/state:idle", Relation{Kind: facts.RelDeclares, Target: "other"})},
+		{"member target kind", withRelation(facts.KindFSMEvent, "demo/event:go", Relation{Kind: facts.RelDeclares, Target: "demo", TargetKind: facts.KindFSMMachine})},
+		{"machine non-module target kind", withRelation(facts.KindFSMMachine, "demo", Relation{Kind: facts.RelDeclares, Target: "src", TargetKind: facts.KindSymbol})},
+		{"machine other module", withRelation(facts.KindFSMMachine, "demo", Relation{Kind: facts.RelDeclares, Target: "other"})},
+		{"machine target file", withRelation(facts.KindFSMMachine, "demo", Relation{Kind: facts.RelDeclares, Target: "src", TargetFile: "src/machine.ts"})},
+		{"transition declares", withRelation(facts.KindFSMTransition, "demo/transition:idle-go", Relation{Kind: facts.RelDeclares, Target: "demo"})},
+		{"other non-FSM relation", withRelation(facts.KindFSMState, "demo/state:idle", Relation{Kind: "declared_by", Target: "demo"})},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			if err := ValidateResult(v2, unit, tc.result); err == nil {
+				t.Fatal("invalid V2 FSM declares shape was accepted")
+			}
+		})
+	}
+
+	// The V1 protocol's relation table is intentionally unchanged.
+	v1 := v2
+	v1.Manifest.API = "enola.plugin/v1"
+	if err := ValidateResult(v1, unit, legacy); err == nil || !strings.Contains(err.Error(), "unsupported relation") {
+		t.Fatalf("V1 plugin accepted V2-only declares compatibility: %v", err)
+	}
+}
+
 func TestValidateResultIgnoresCensusForV1Plugins(t *testing.T) {
 	p := Loaded{Manifest: Manifest{Name: "legacy", OwnerDomain: []string{"src/**"}}}
 	u := UnitDecl{ID: "file:src/a.ts", Kind: "file"}
