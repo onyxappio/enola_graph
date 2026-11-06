@@ -260,6 +260,32 @@ func TestGoFSMVocabularyRejectsInvalidFSMNodeWithV1Validation(t *testing.T) {
 	}
 }
 
+// V1 anchors predate inferred FSM target kinds. Keep their published edge
+// wire shape byte-compatible even while V2 infers a kind for its vocabulary.
+func TestV1FSMAnchorPublishesEdgeWithoutInferredTargetKind(t *testing.T) {
+	s := &session{opts: Options{analyzerPlugins: []analyzerplugin.Loaded{{Manifest: analyzerplugin.Manifest{
+		API: analyzerplugin.APIVersion, Name: "legacy-fsm", Vocabularies: []string{analyzerplugin.FSMVocabularyV1},
+	}}}}}
+	records := map[string]analyzerplugin.PluginRecord{"legacy-fsm": {Identity: "legacy", Units: map[string]analyzerplugin.UnitRecord{
+		"model:app": {Owners: map[string]analyzerplugin.OwnerResult{"src/app.ts": {
+			Anchors: []analyzerplugin.Anchor{{Symbol: "dispatch", Line: 1, Relations: []analyzerplugin.Relation{{Kind: facts.RelFSMDispatches, Target: "app/event:A"}}}},
+		}}},
+	}}}
+	if err := s.collectPluginContributions(records, map[string]bool{"src/app.ts": true}); err != nil {
+		t.Fatal(err)
+	}
+	base := facts.Fact{Kind: facts.KindSymbol, Name: "dispatch", File: "src/app.ts", Line: 1}
+	merged := mergeAnalyzerPluginAnchors([]facts.Fact{base}, s.pluginAnchors)
+	if len(merged) != 1 || len(merged[0].Relations) != 1 {
+		t.Fatalf("V1 anchor did not bind its host symbol: %#v", merged)
+	}
+	target := facts.Fact{Kind: facts.KindFSMEvent, Name: "app/event:A", File: "machine.ts"}
+	_, edges := encodeOwner(ownerOutput{Owner: ownerOf(merged[0]), Facts: merged}, buildIndex(append(merged, target)), false)
+	if len(edges) != 1 || edges[0].Kind != facts.RelFSMDispatches || edges[0].TargetKind != "" {
+		t.Fatalf("V1 published edge inferred target kind: %#v", edges)
+	}
+}
+
 func TestAnalyzerPluginParsedFileCensusSurvivesSummaryJSON(t *testing.T) {
 	root := setupTSRepo(t, map[string]string{"src/machine.ts": "export function dispatch() {}\n"})
 	registration := goFSMAnalyzerPluginFixture(t, root)

@@ -208,7 +208,7 @@ func TestRepositoryGlobMatchesRecursiveZeroDepthAndBraceForms(t *testing.T) {
 	}
 }
 
-func TestCanonicalizeResultIgnoresNodeAndRelationOrder(t *testing.T) {
+func TestCanonicalizeResultIgnoresNodeOrderButPreservesRelationOrder(t *testing.T) {
 	a := UnitResult{Unit: "file:a", Owners: map[string]OwnerResult{"src/a.ts": {Nodes: []Node{
 		{Kind: facts.KindFSMState, Name: "demo/state:b", Relations: []Relation{{Kind: "to_state", Target: "demo/state:z"}, {Kind: "to_state", Target: "demo/state:a"}}},
 		{Kind: facts.KindFSMState, Name: "demo/state:a"},
@@ -227,8 +227,14 @@ func TestCanonicalizeResultIgnoresNodeAndRelationOrder(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if aDigest != bDigest {
-		t.Fatalf("array ordering changed canonical digest: %s != %s", aDigest, bDigest)
+	if aDigest == bDigest {
+		t.Fatalf("relation ordering was erased from canonical output: %s", aDigest)
+	}
+	if got := a.Owners["src/a.ts"].Nodes[1].Relations[0].Target; got != "demo/state:z" {
+		t.Fatalf("legacy relation emission order changed: first target=%q", got)
+	}
+	if got := a.Owners["src/a.ts"].Nodes[0].Name; got != "demo/state:a" {
+		t.Fatalf("node ordering was not canonicalized: first=%q", got)
 	}
 }
 

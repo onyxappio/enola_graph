@@ -1239,10 +1239,11 @@ func (s *session) collectPluginContributions(records map[string]analyzerplugin.P
 					return analyzerplugin.AnchorSortKey(anchors[i]) < analyzerplugin.AnchorSortKey(anchors[j])
 				})
 				for _, anchor := range anchors {
-					// Anchor evidence uses the same inferred FSM target kind as
-					// persisted plugin contributions. The legacy extractor leaves
-					// it absent; that deliberate V2 distinction is surfaced by E6.
-					anchor.Relations = canonicalAnchorRelations(anchor.Relations)
+					// Inferred anchor target kinds are a V2-only contract. V1
+					// relations were historically published exactly as supplied.
+					if api == analyzerplugin.GoAPIVersion {
+						anchor.Relations = canonicalAnchorRelations(anchor.Relations)
+					}
 					anchorOwner := filepath.ToSlash(anchor.Owner)
 					if anchorOwner == "" {
 						anchorOwner = filepath.ToSlash(owner)

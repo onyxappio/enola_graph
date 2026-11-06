@@ -2,6 +2,7 @@ package graphsession
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -37,6 +38,7 @@ export function createRegistration() {
     rules: [{ id: 'idle-start', from: 'idle', on: 'start', to: 'idle', reduce: (s, e) => ({ next: s, commands: [ProductCommand.start()] }) }],
   }), commandTags: ['start'] };
 }
+// NO_NESTED_HELPER
 `,
 	})
 
@@ -75,6 +77,46 @@ export function createRegistration() {
 			t.Fatalf("ambiguous owner=%d, want -1", got)
 		}
 	})
+	t.Run("identity-bound nested helper published graph", func(t *testing.T) {
+		nestedRoot := setupTSRepo(t, map[string]string{
+			"impl.ts": "export function createRuntime() { return { send(_event: unknown) {} }; }\n",
+			"src/machine.ts": `
+export type ProductState = 'idle';
+export type ProductEvent = { type: 'start' };
+function enterState(state: ProductState) { return state; }
+function rejected(state: ProductState, _event: string) { return state; }
+export function dispatch(state: ProductState, event: ProductEvent) {
+  if (event.type === 'start') return enterState('idle');
+  return rejected(state, event.type);
+}
+`,
+			"src/App.tsx": `import { createRuntime } from '../impl';
+import type { ProductEvent } from './machine';
+const runtime = createRuntime();
+const send = runtime.send;
+function sendUi(event: ProductEvent) { send(event); }
+// NESTED_PARITY_FIXTURE
+export function App() {
+  const dispatchIntent = () => sendUi({ type: 'start' });
+  dispatchIntent();
+}
+`,
+		})
+		legacy := fsmFixtureEngine(t, nestedRoot, []fsm.Spec{{
+			ID: "product", Adapter: fsm.AdapterReducerInterpreter, File: "src/machine.ts", Dispatcher: "dispatch",
+			Enter: "enterState", Reject: "rejected", StateType: "ProductState", EventType: "ProductEvent",
+			DispatchFiles: []string{"src/App.tsx"}, DispatchSinks: []fsm.DispatchSink{{Factory: fsm.SymbolRef{Module: "impl.ts", Export: "createRuntime"}, Method: "send"}},
+		}}, nil)
+		v2 := fsmFixtureEngine(t, nestedRoot, nil, []analyzerplugin.Config{goFSMAnalyzerPluginFixture(t, nestedRoot)})
+		left := publishedNestedHelperGraph(t, legacy, nestedRoot, filepath.Join(nestedRoot, ".enola", "nested-legacy"), Options{AuthoritativeFiles: true})
+		right := publishedNestedHelperGraph(t, v2, nestedRoot, filepath.Join(nestedRoot, ".enola", "nested-v2"), Options{AuthoritativeFiles: true, AllowRepoPlugins: []string{"product-fsm"}})
+		if got, want := strings.Join(right, "\n"), strings.Join(left, "\n"); got != want {
+			t.Fatalf("legacy and V2 nested helper graph differ\nV2-only / legacy-only:\n%s", publishedGraphDiff(right, left))
+		}
+		if !containsFixtureRow(left, "fsm_dispatches product/event:start resolved") {
+			t.Fatalf("legacy fixture omitted the nested helper's resolved FSM dispatch: %v", left)
+		}
+	})
 	// These use real TypeScript extraction and the session/sink protocol (not
 	// synthetic facts): a collision is rejected before Begin, and a helper's
 	// retirement on delta publishes the same graph as a fresh cold analysis.
@@ -99,7 +141,8 @@ func publishedFSMFixtureGraph(t *testing.T, eng *engine.Engine, root, state stri
 	t.Helper()
 	opts.StateDir = state
 	sink := &graphstream.MemorySink{}
-	if _, err := Run(context.Background(), eng, root, sink, opts); err != nil {
+	_, err := Run(context.Background(), eng, root, sink, opts)
+	if err != nil {
 		t.Fatal(err)
 	}
 	consumer := applyGraph(t, sink)
@@ -110,14 +153,18 @@ func publishedFSMFixtureGraph(t *testing.T, eng *engine.Engine, root, state stri
 			byID[node.ID] = node.Name
 		}
 		for _, node := range nodes {
-			if !isFixtureFSMKind(node.Kind) {
+			if !isFixtureFSMKind(node.Kind) && !isFixtureNestedHelper(node) {
 				continue
 			}
-			rows = append(rows, "node "+owner+" "+node.Kind+" "+node.Name)
+			if isFixtureNestedHelper(node) {
+				rows = append(rows, fmt.Sprintf("node %s %s %s %s %d %d", owner, node.Kind, node.Name, node.File, node.Line, node.EndLine))
+			} else {
+				rows = append(rows, "node "+owner+" "+node.Kind+" "+node.Name)
+			}
 		}
 		for _, edge := range consumer.Edges[owner] {
 			from := byID[edge.FromID]
-			if isFixtureFSMName(from) && isFixtureFSMName(edge.TargetName) && isFixtureFSMRelation(edge.Kind) {
+			if ((isFixtureFSMName(from) && isFixtureFSMName(edge.TargetName)) || isFixtureNestedHelperID(nodes, edge.FromID)) && isFixtureFSMRelation(edge.Kind) {
 				rows = append(rows, "edge "+owner+" "+from+" "+edge.Kind+" "+edge.TargetName)
 			}
 		}
@@ -126,8 +173,57 @@ func publishedFSMFixtureGraph(t *testing.T, eng *engine.Engine, root, state stri
 	return rows
 }
 
+func publishedNestedHelperGraph(t *testing.T, eng *engine.Engine, root, state string, opts Options) []string {
+	t.Helper()
+	opts.StateDir = state
+	sink := &graphstream.MemorySink{}
+	_, err := Run(context.Background(), eng, root, sink, opts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	consumer := applyGraph(t, sink)
+	var rows []string
+	for owner, nodes := range consumer.Owners {
+		for _, node := range nodes {
+			if !isFixtureNestedHelper(node) {
+				continue
+			}
+			rows = append(rows, fmt.Sprintf("node %s %s %s %d %d", owner, node.Name, node.File, node.Line, node.EndLine))
+			for _, edge := range consumer.Edges[owner] {
+				if edge.FromID == node.ID && edge.Kind == facts.RelFSMDispatches {
+					rows = append(rows, fmt.Sprintf("edge %s %s %s %s", owner, edge.Kind, edge.TargetName, edge.Resolution))
+				}
+			}
+		}
+	}
+	sort.Strings(rows)
+	return rows
+}
+
+func containsFixtureRow(rows []string, suffix string) bool {
+	for _, row := range rows {
+		if strings.HasSuffix(row, suffix) {
+			return true
+		}
+	}
+	return false
+}
+
 func isFixtureFSMKind(kind string) bool {
 	return kind == facts.KindFSMMachine || kind == facts.KindFSMState || kind == facts.KindFSMEvent || kind == facts.KindFSMCommand || kind == facts.KindFSMTransition
+}
+
+func isFixtureNestedHelper(node graphstream.Node) bool {
+	return node.Kind == facts.KindSymbol && (node.Name == "src.Container.dispatch" || node.Name == "src.App.dispatch" || node.Name == "src.App.dispatchIntent")
+}
+
+func isFixtureNestedHelperID(nodes []graphstream.Node, id string) bool {
+	for _, node := range nodes {
+		if node.ID == id {
+			return isFixtureNestedHelper(node)
+		}
+	}
+	return false
 }
 
 func isFixtureFSMName(name string) bool {

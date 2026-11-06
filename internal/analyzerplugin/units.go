@@ -361,9 +361,12 @@ func CanonicalDigest(v any) (string, error) {
 	return hex.EncodeToString(sum[:]), nil
 }
 
-// CanonicalizeResult removes plugin array ordering from the persisted graph
-// contribution and its digest while preserving distinct occurrences. Empty
-// anchor owners inherit their enclosing output owner before sorting.
+// CanonicalizeResult removes node/anchor/enrichment array ordering from the
+// persisted graph contribution and its digest while preserving distinct
+// occurrences. Relation order is deliberately retained: it is the producer's
+// published graph order, and FSM V2 compatibility requires legacy emission
+// order to survive through the host. Empty anchor owners inherit their
+// enclosing output owner before sorting.
 func CanonicalizeResult(result UnitResult) UnitResult {
 	for owner, contribution := range result.Owners {
 		for i := range contribution.Anchors {
@@ -375,14 +378,6 @@ func CanonicalizeResult(result UnitResult) UnitResult {
 			if contribution.Enrichments[i].Owner == "" {
 				contribution.Enrichments[i].Owner = owner
 			}
-			sort.SliceStable(contribution.Enrichments[i].Relations, func(a, b int) bool {
-				return relationKey(contribution.Enrichments[i].Relations[a]) < relationKey(contribution.Enrichments[i].Relations[b])
-			})
-		}
-		for i := range contribution.Nodes {
-			sort.SliceStable(contribution.Nodes[i].Relations, func(a, b int) bool {
-				return relationKey(contribution.Nodes[i].Relations[a]) < relationKey(contribution.Nodes[i].Relations[b])
-			})
 		}
 		sort.SliceStable(contribution.Nodes, func(a, b int) bool {
 			left, right := contribution.Nodes[a], contribution.Nodes[b]
@@ -400,11 +395,6 @@ func CanonicalizeResult(result UnitResult) UnitResult {
 			}
 			return occurrence(left) < occurrence(right)
 		})
-		for i := range contribution.Anchors {
-			sort.SliceStable(contribution.Anchors[i].Relations, func(a, b int) bool {
-				return relationKey(contribution.Anchors[i].Relations[a]) < relationKey(contribution.Anchors[i].Relations[b])
-			})
-		}
 		sort.SliceStable(contribution.Anchors, func(a, b int) bool {
 			return anchorLess(contribution.Anchors[a], contribution.Anchors[b])
 		})
