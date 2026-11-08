@@ -44,7 +44,7 @@ func (d *Discovery) NewPluginResolver(files []string) *PluginResolver {
 // shares its known-file/alias setup and caches by the only source attribute
 // that resolution observes: the requesting directory.
 func (r *PluginResolver) ResolveModule(from, spec string) PluginModuleResolution {
-	from = filepath.ToSlash(filepath.Clean(from))
+	from = factpath.Clean(from)
 	key := pluginResolverKey{fromDir: factpath.Dir(from), spec: spec}
 	r.mu.Lock()
 	defer r.mu.Unlock()
