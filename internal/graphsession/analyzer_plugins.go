@@ -12,6 +12,7 @@ import (
 	"reflect"
 	"sort"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/enola-labs/enola/internal/analyzerplugin"
@@ -820,6 +821,14 @@ func pathNowExcluded(policy *graphinput.Policy, rel string) bool {
 	return policy.ClassifyDependency(rel).Kind == graphinput.Excluded
 }
 
+// pluginPathNotFound is the filesystem result a plugin receives for a
+// candidate that cannot be read because one of its path components is a file.
+// Resolver candidate probes intentionally ask after both files and directory
+// indexes, so ENOTDIR has the same absent-input semantics as ENOENT.
+func pluginPathNotFound(err error) bool {
+	return os.IsNotExist(err) || errors.Is(err, syscall.ENOTDIR)
+}
+
 func observationsValid(obs analyzerplugin.Observation, root string, eng *engine.Engine, files []string, hashes, tsContext map[string]string, records map[string]analyzerplugin.UnitRecord) bool {
 	policy := graphPolicy(eng)
 	if obs.Policy != "" && (policy == nil || obs.Policy != policy.Identity()) {
@@ -833,7 +842,7 @@ func observationsValid(obs analyzerplugin.Observation, root string, eng *engine.
 			continue
 		}
 		if want == "MISSING" {
-			if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(rel))); !os.IsNotExist(err) {
+			if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(rel))); !pluginPathNotFound(err) {
 				return false
 			}
 			continue
@@ -869,7 +878,7 @@ func observationsValid(obs analyzerplugin.Observation, root string, eng *engine.
 		}
 		_, err := os.Stat(filepath.Join(root, filepath.FromSlash(rel)))
 		got := "exists"
-		if os.IsNotExist(err) {
+		if pluginPathNotFound(err) {
 			got = "absent"
 		} else if err != nil {
 			return false
@@ -1010,12 +1019,12 @@ func (s *session) pluginCallback(ctx context.Context, p analyzerplugin.Loaded, m
 		} else {
 			var err error
 			data, err = os.ReadFile(full)
-			if os.IsNotExist(err) {
+			if pluginPathNotFound(err) {
 				current.Reads[pathArg] = "MISSING"
 				obs[unit] = current
 				s.pluginPreviewFences = append(s.pluginPreviewFences, func() error {
 					_, later := os.Stat(full)
-					if !os.IsNotExist(later) {
+					if !pluginPathNotFound(later) {
 						return fmt.Errorf("%w: plugin input %s appeared during analysis", ErrInputsChanged, pathArg)
 					}
 					return nil
@@ -1046,7 +1055,7 @@ func (s *session) pluginCallback(ctx context.Context, p analyzerplugin.Loaded, m
 	case "probe":
 		_, err := os.Stat(full)
 		exists := err == nil
-		if err != nil && !os.IsNotExist(err) {
+		if err != nil && !pluginPathNotFound(err) {
 			return nil, err
 		}
 		answer := "absent"
@@ -1059,7 +1068,7 @@ func (s *session) pluginCallback(ctx context.Context, p analyzerplugin.Loaded, m
 		s.pluginPreviewFences = append(s.pluginPreviewFences, func() error {
 			_, later := os.Stat(full)
 			same := later == nil
-			if os.IsNotExist(later) {
+			if pluginPathNotFound(later) {
 				same = false
 			} else if later != nil {
 				return later
@@ -1836,7 +1845,7 @@ func confinedRepositoryInputPath(root, rel string) (string, error) {
 			}
 			return filepath.Join(resolved, suffix), nil
 		}
-		if !os.IsNotExist(resolveErr) {
+		if !pluginPathNotFound(resolveErr) {
 			return "", resolveErr
 		}
 		parent := filepath.Dir(ancestor)
