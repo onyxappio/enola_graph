@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"strings"
 	"testing"
@@ -14,6 +15,7 @@ import (
 
 	"github.com/enola-labs/enola/internal/analyzerplugin"
 	"github.com/enola-labs/enola/internal/engine"
+	"github.com/enola-labs/enola/internal/extractors/tsextractor"
 	"github.com/enola-labs/enola/internal/graphinput"
 	"github.com/enola-labs/enola/internal/graphstream"
 )
@@ -446,6 +448,104 @@ func TestRepositoryAnalyzerPluginHostResolverCacheAndColdEquality(t *testing.T) 
 	cold := NewConsumer()
 	applyRun(t, cold, coldSink)
 	assertAppliedEqualsCold(t, cons, cold)
+}
+
+func TestPluginModuleResolverCachePreservesEveryUnitObservation(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"tsconfig.json": `{"compilerOptions":{"baseUrl":".","paths":{"@/*":["src/*"]}}}`,
+		"src/a.ts":      `export {};`,
+		"src/b.ts":      `export {};`,
+		"src/dep.ts":    `export const dep = 1;`,
+	})
+	files := []string{"src/a.ts", "src/b.ts", "src/dep.ts", "tsconfig.json"}
+	discovery := tsextractor.New().NewDiscovery(context.Background(), root, nil)
+	input := &runtimeInputs{tsDiscovery: discovery, tsContext: map[string]string{"tsconfig": "fixture"}}
+	requests := []map[string]any{
+		{"op": "resolve_module", "unit": "model:app", "from": "src/a.ts", "spec": "./dep"},
+		{"op": "resolve_module", "unit": "model:app", "from": "src/b.ts", "spec": "./dep"}, // same directory key
+		{"op": "resolve_module", "unit": "model:app", "from": "src/a.ts", "spec": "@/dep"},
+		{"op": "resolve_module", "unit": "model:app", "from": "src/a.ts", "spec": "./missing"},
+	}
+	run := func(cached bool) (map[string]any, analyzerplugin.Observation) {
+		s := &session{abs: root, eng: testEngine(t, root)}
+		if cached {
+			s.pluginResolver = newPluginResolverCache(s.eng, discovery, files, input.tsContext)
+		}
+		obs := map[string]analyzerplugin.Observation{}
+		var last map[string]any
+		for repeat := 0; repeat < 3; repeat++ {
+			for _, request := range requests {
+				answer, err := s.pluginCallback(context.Background(), analyzerplugin.Loaded{}, request, "model:app", obs, input, files, files, nil, nil, nil)
+				if err != nil {
+					t.Fatal(err)
+				}
+				last = answer
+			}
+		}
+		return last, obs["model:app"]
+	}
+	uncachedAnswer, uncachedObs := run(false)
+	cachedAnswer, cachedObs := run(true)
+	if !reflect.DeepEqual(cachedAnswer, uncachedAnswer) {
+		t.Fatalf("cached resolver answer changed: cached=%#v uncached=%#v", cachedAnswer, uncachedAnswer)
+	}
+	if !reflect.DeepEqual(cachedObs, uncachedObs) {
+		t.Fatalf("cached resolver observations changed: cached=%#v uncached=%#v", cachedObs, uncachedObs)
+	}
+}
+
+func TestPluginResolverCacheTSConfigChangeDeltaEqualsCold(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"tsconfig.json":  `{"compilerOptions":{"baseUrl":".","paths":{"@app/*":["src/old/*"]}}}`,
+		"src/a.ts":       `export const a = 1;`,
+		"src/old/dep.ts": `export const value = "old";`,
+		"src/new/dep.ts": `export const value = "new";`,
+	})
+	registration := genericAnalyzerPlugin(t, root, filepath.Join(t.TempDir(), "starts.jsonl"))
+	// Exercise the real plugin callback with an alias lookup rather than the
+	// fixture's default relative import.
+	script := filepath.Join(root, "tools", "analyzers", "fixture", "plugin.mjs")
+	contents, err := os.ReadFile(script)
+	if err != nil {
+		t.Fatal(err)
+	}
+	contents = []byte(strings.Replace(string(contents), `spec: "./dep"`, `spec: "@app/dep"`, 1))
+	if err := os.WriteFile(script, contents, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	state := filepath.Join(root, ".enola", "resolver-tsconfig")
+	options := Options{StateDir: state, AuthoritativeFiles: true, AllowRepoPlugins: []string{"fixture"}}
+	run := func(eng *engine.Engine, opts Options) (*Result, *graphstream.MemorySink) {
+		sink := &graphstream.MemorySink{}
+		result, err := Run(context.Background(), eng, root, sink, opts)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return result, sink
+	}
+	eng := admissionEngine(t, root, graphinput.Options{})
+	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+	_, initialSink := run(eng, options)
+	if err := os.WriteFile(filepath.Join(root, "tsconfig.json"), []byte(`{"compilerOptions":{"baseUrl":".","paths":{"@app/*":["src/new/*"]}}}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	_, deltaSink := run(eng, options)
+	record := pluginState(t, state).AnalyzerPlugins["fixture"].Units["file:src/a.ts"]
+	var summary map[string]any
+	if err := json.Unmarshal(record.Summary, &summary); err != nil {
+		t.Fatal(err)
+	}
+	if got := summary["module_file"]; got != "src/new/dep.ts" {
+		t.Fatalf("tsconfig delta used stale resolver answer %q", got)
+	}
+	coldEngine := admissionEngine(t, root, graphinput.Options{})
+	coldEngine.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+	_, coldSink := run(coldEngine, Options{StateDir: filepath.Join(root, ".enola", "resolver-tsconfig-cold"), ForceInitial: true, AuthoritativeFiles: true, AllowRepoPlugins: []string{"fixture"}})
+	applied, cold := NewConsumer(), NewConsumer()
+	applyRun(t, applied, initialSink)
+	applyRun(t, applied, deltaSink)
+	applyRun(t, cold, coldSink)
+	assertAppliedEqualsCold(t, applied, cold)
 }
 
 func TestRepositoryAnalyzerPluginResidentRunMetrics(t *testing.T) {

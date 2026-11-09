@@ -620,6 +620,7 @@ type session struct {
 	// during concurrent cold prepare; reload must not mutate it mid-run.
 	pluginHoldSnapshot  []analyzerplugin.Loaded
 	pluginPrepareDone   <-chan error
+	pluginResolver      *pluginResolverCache
 	runtimeFingerprints analyzerplugin.RuntimeCache
 	capturedSources     map[string][]byte
 	// pluginCapturedSources holds plugin-callback reads until they are merged

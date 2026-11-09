@@ -16,6 +16,7 @@ import (
 
 	"github.com/enola-labs/enola/internal/analyzerplugin"
 	"github.com/enola-labs/enola/internal/engine"
+	"github.com/enola-labs/enola/internal/extractors/tsextractor"
 	"github.com/enola-labs/enola/internal/facts"
 	"github.com/enola-labs/enola/internal/graphinput"
 	"github.com/enola-labs/enola/internal/graphstream"
@@ -25,6 +26,27 @@ const pluginPlanUnit = "@plan"
 const pluginResolverInventory = "@host-resolver-all-files"
 const pluginResolverContext = "@host-resolver-ts-context"
 const pluginContributionPrefix = "plugin:"
+
+// pluginResolverCache binds a resolver snapshot to the inventory and alias
+// context this run observed. A new session generation receives a new instance,
+// so an inventory or tsconfig change cannot reuse an old answer. The cached
+// digests are still written into every requesting unit's observation.
+type pluginResolverCache struct {
+	resolver        *tsextractor.PluginResolver
+	inventoryDigest string
+	contextDigest   string
+}
+
+func newPluginResolverCache(eng *engine.Engine, discovery *tsextractor.Discovery, files []string, tsContext map[string]string) *pluginResolverCache {
+	if discovery == nil {
+		return nil
+	}
+	return &pluginResolverCache{
+		resolver:        discovery.NewPluginResolver(files),
+		inventoryDigest: nameSetDigest(pluginVisibleNames(eng, files)),
+		contextDigest:   stringMapDigest(tsContext),
+	}
+}
 
 func (s *session) hasConfiguredAnalyzerPluginContribution(name string) bool {
 	if !strings.HasPrefix(name, pluginContributionPrefix) {
@@ -74,6 +96,9 @@ func (s *session) prepareAnalyzerPluginsWith(ctx context.Context, input *runtime
 	s.pluginResOwners = nil
 	s.pluginEnrichments = nil
 	s.pluginScopeIncomplete = false
+	// Resolver answers are valid only for this captured inventory/configuration
+	// generation. Rebuild the run-local cache before any plugin RPC can use it.
+	s.pluginResolver = newPluginResolverCache(s.eng, input.tsDiscovery, files, input.tsContext)
 	loadedPlugins := s.analyzerPluginsLocked()
 	configured := map[string]analyzerplugin.Loaded{}
 	configuredNames := make([]string, 0, len(loadedPlugins))
@@ -1073,8 +1098,14 @@ func (s *session) pluginCallback(ctx context.Context, p analyzerplugin.Loaded, m
 		if input == nil || input.tsDiscovery == nil {
 			return nil, errors.New("TypeScript host resolver is unavailable")
 		}
-		current.Lists[pluginResolverInventory] = nameSetDigest(pluginVisibleNames(s.eng, files))
-		current.Resolves[pluginResolverContext] = stringMapDigest(input.tsContext)
+		resolverCache := s.pluginResolver
+		if resolverCache != nil {
+			current.Lists[pluginResolverInventory] = resolverCache.inventoryDigest
+			current.Resolves[pluginResolverContext] = resolverCache.contextDigest
+		} else {
+			current.Lists[pluginResolverInventory] = nameSetDigest(pluginVisibleNames(s.eng, files))
+			current.Resolves[pluginResolverContext] = stringMapDigest(input.tsContext)
+		}
 		switch msg["op"] {
 		case "resolve_module":
 			from, ok := msg["from"].(string)
@@ -1089,7 +1120,12 @@ func (s *session) pluginCallback(ctx context.Context, p analyzerplugin.Loaded, m
 			if from == "." || from == ".." || strings.HasPrefix(from, "../") || filepath.IsAbs(from) || strings.Contains(from, "\\") {
 				return nil, fmt.Errorf("resolve_module source %q escapes repository", from)
 			}
-			resolved := input.tsDiscovery.ResolvePluginModule(from, spec, files)
+			var resolved tsextractor.PluginModuleResolution
+			if resolverCache != nil {
+				resolved = resolverCache.resolver.ResolveModule(from, spec)
+			} else {
+				resolved = input.tsDiscovery.ResolvePluginModule(from, spec, files)
+			}
 			obs[unit] = current
 			for _, candidate := range resolved.Candidates {
 				if _, err := s.pluginCallback(ctx, p, map[string]any{"op": "probe", "unit": unit, "path": candidate}, defaultUnit, obs, input, files, allNames, hashes, summaries, allowedSummaries); err != nil {
@@ -1137,8 +1173,13 @@ func (s *session) pluginCallback(ctx context.Context, p analyzerplugin.Loaded, m
 			answer := map[string]any{"target": target, "file": targetFile, "found": targetFile != ""}
 			key, _ := analyzerplugin.CanonicalDigest(map[string]any{"op": "resolve_export", "file": file, "name": name})
 			current = obs[unit]
-			current.Lists[pluginResolverInventory] = nameSetDigest(pluginVisibleNames(s.eng, files))
-			current.Resolves[pluginResolverContext] = stringMapDigest(input.tsContext)
+			if resolverCache != nil {
+				current.Lists[pluginResolverInventory] = resolverCache.inventoryDigest
+				current.Resolves[pluginResolverContext] = resolverCache.contextDigest
+			} else {
+				current.Lists[pluginResolverInventory] = nameSetDigest(pluginVisibleNames(s.eng, files))
+				current.Resolves[pluginResolverContext] = stringMapDigest(input.tsContext)
+			}
 			current.Resolves[key], _ = analyzerplugin.CanonicalDigest(answer)
 			obs[unit] = current
 			return answer, nil
