@@ -494,6 +494,101 @@ func TestPluginModuleResolverCachePreservesEveryUnitObservation(t *testing.T) {
 	}
 }
 
+func TestPluginResolverTreatsENOTDIRCandidateAsMissingAndInvalidates(t *testing.T) {
+	root := setupTSRepo(t, map[string]string{
+		"src/a.ts":           `export const a = 1;`,
+		"src/asset.png":      "png",
+		"src/machine.svg.ts": `export const machine = 1;`,
+		"src/events.svg.ts":  `export const event = 1;`,
+		"tsconfig.json":      `{"compilerOptions":{"baseUrl":".","paths":{"@events.svg":["src/events.svg.ts"]}}}`,
+	})
+	registration := genericAnalyzerPlugin(t, root, filepath.Join(t.TempDir(), "starts.jsonl"))
+	script := filepath.Join(root, "tools", "analyzers", "fixture", "plugin.mjs")
+	contents, err := os.ReadFile(script)
+	if err != nil {
+		t.Fatal(err)
+	}
+	contents = []byte(strings.Replace(string(contents), `spec: "./dep"`, `spec: "./asset.png"`, 1))
+	if err := os.WriteFile(script, contents, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	stateDir := filepath.Join(root, ".enola", "enotdir-plugin-state")
+	opts := Options{StateDir: stateDir, AuthoritativeFiles: true, AllowRepoPlugins: []string{"fixture"}}
+	run := func(eng *engine.Engine, options Options) *graphstream.MemorySink {
+		t.Helper()
+		sink := &graphstream.MemorySink{}
+		if _, err := Run(context.Background(), eng, root, sink, options); err != nil {
+			t.Fatal(err)
+		}
+		return sink
+	}
+	eng := admissionEngine(t, root, graphinput.Options{})
+	eng.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+	initialSink := run(eng, opts)
+	record := pluginState(t, stateDir).AnalyzerPlugins["fixture"].Units["file:src/a.ts"]
+	if got := record.Observations.Probes["src/asset.png/index.ts"]; got != "absent" {
+		t.Fatalf("ENOTDIR candidate observation = %q, want absent; observations=%+v", got, record.Observations)
+	}
+	var summary map[string]any
+	if err := json.Unmarshal(record.Summary, &summary); err != nil {
+		t.Fatal(err)
+	}
+	if got := summary["module_file"]; got != "src/asset.png" {
+		t.Fatalf("unresolved asset replay path = %q, want src/asset.png", got)
+	}
+
+	// The same host callback still resolves real extension and alias targets and
+	// records every candidate probe. This keeps the absent ENOTDIR branch from
+	// accidentally short-circuiting the resolver's normal precedence rules.
+	files := []string{"src/a.ts", "src/machine.svg.ts", "src/events.svg.ts", "tsconfig.json"}
+	input := &runtimeInputs{tsDiscovery: tsextractor.New().NewDiscovery(context.Background(), root, nil)}
+	resolve := func(spec string) (map[string]any, analyzerplugin.Observation) {
+		t.Helper()
+		s := &session{abs: root, eng: testEngine(t, root)}
+		obs := map[string]analyzerplugin.Observation{}
+		answer, err := s.pluginCallback(context.Background(), analyzerplugin.Loaded{}, map[string]any{
+			"op": "resolve_module", "unit": "model:app", "from": "src/a.ts", "spec": spec,
+		}, "model:app", obs, input, files, files, nil, nil, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return answer, obs["model:app"]
+	}
+	if answer, observation := resolve("./machine.svg"); answer["file"] != "src/machine.svg.ts" || observation.Probes["src/machine.svg.ts"] != "exists" {
+		t.Fatalf("svg resolution = %#v observations=%+v", answer, observation)
+	}
+	if answer, observation := resolve("@events.svg"); answer["file"] != "src/events.svg.ts" || observation.Probes["src/events.svg.ts"] != "exists" {
+		t.Fatalf("alias resolution = %#v observations=%+v", answer, observation)
+	}
+
+	if err := os.Remove(filepath.Join(root, "src", "asset.png")); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(filepath.Join(root, "src", "asset.png"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "src", "asset.png", "index.ts"), []byte(`export const value = 1;`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	deltaSink := run(eng, opts)
+	record = pluginState(t, stateDir).AnalyzerPlugins["fixture"].Units["file:src/a.ts"]
+	if err := json.Unmarshal(record.Summary, &summary); err != nil {
+		t.Fatal(err)
+	}
+	if got := summary["module_file"]; got != "src/asset.png/index.ts" {
+		t.Fatalf("directory candidate did not invalidate resolver answer: %q", got)
+	}
+
+	coldEngine := admissionEngine(t, root, graphinput.Options{})
+	coldEngine.Config().AnalyzerPlugins = []analyzerplugin.Config{registration}
+	coldSink := run(coldEngine, Options{StateDir: filepath.Join(root, ".enola", "enotdir-plugin-cold"), ForceInitial: true, AuthoritativeFiles: true, AllowRepoPlugins: []string{"fixture"}})
+	applied, cold := NewConsumer(), NewConsumer()
+	applyRun(t, applied, initialSink)
+	applyRun(t, applied, deltaSink)
+	applyRun(t, cold, coldSink)
+	assertAppliedEqualsCold(t, applied, cold)
+}
+
 func TestPluginResolverCacheTSConfigChangeDeltaEqualsCold(t *testing.T) {
 	root := setupTSRepo(t, map[string]string{
 		"tsconfig.json":  `{"compilerOptions":{"baseUrl":".","paths":{"@app/*":["src/old/*"]}}}`,
